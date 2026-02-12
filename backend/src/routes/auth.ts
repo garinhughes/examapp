@@ -8,6 +8,7 @@
 
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { jwtVerify, createRemoteJWKSet } from 'jose'
+import { upsertUserFromCognito } from '../services/dynamo.js'
 
 const AUTH_MODE = process.env.AUTH_MODE || 'dev'
 
@@ -110,6 +111,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             const JWKS = createRemoteJWKSet(new URL(jwksUrl))
             const issuer = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`
             const verified = await jwtVerify(tokens.id_token, JWKS, { issuer, audience: clientId })
+            // upsert user in DynamoDB
+            try { await upsertUserFromCognito(verified.payload) } catch (e) { /* ignore */ }
             // attach user info
             return { ...tokens, user: verified.payload }
           }
@@ -168,6 +171,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             const JWKS = createRemoteJWKSet(new URL(jwksUrl))
             const issuer = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`
             const verified = await jwtVerify(tokens.id_token, JWKS, { issuer, audience: clientId })
+            // upsert user in DynamoDB
+            try { await upsertUserFromCognito(verified.payload) } catch (e) { /* ignore */ }
             // redirect back to frontend with id_token (dev-friendly; consider HttpOnly cookie for prod)
             const frontend = process.env.FRONTEND_ORIGIN || 'http://localhost:5173'
             const sep = frontend.includes('#') ? '&' : '#'

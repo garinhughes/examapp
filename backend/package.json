@@ -10,6 +10,8 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.988.0",
+    "@aws-sdk/lib-dynamodb": "^3.988.0",
     "@fastify/cors": "^8.0.0",
     "@fastify/jwt": "^10.0.0",
     "dotenv": "^17.2.4",

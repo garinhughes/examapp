@@ -3,6 +3,8 @@ import CodeBlock from './components/CodeBlock'
 import { Confetti, RewardModal } from './components/Confetti'
 import AccountPage from './components/AccountPage'
 import Leaderboard from './components/Leaderboard'
+import AdminPanel from './components/AdminPanel'
+import { useIsAdmin } from './auth/useIsAdmin'
 import { useAuth } from './auth/AuthContext'
 import { useAuthFetch } from './auth/useAuthFetch'
 import { useGamification } from './gamification/GamificationContext'
@@ -42,13 +44,14 @@ export default function App() {
   const authFetch = useAuthFetch()
   const { state: gamState, recordAttemptFinish, recordPracticeDay } = useGamification()
   const gamLevel = levelFromXP(gamState.xp)
+  const isAdmin = useIsAdmin()
 
   // Confetti / reward modal state
   const [showConfetti, setShowConfetti] = useState(false)
   const [rewardModal, setRewardModal] = useState<{ title: string; subtitle?: string; xpGained: number; badges: { icon: string; name: string }[] } | null>(null)
 
   // simple client-side route: 'home' | 'practice' | 'analytics' | 'account'
-  const [route, setRoute] = useState<'home' | 'practice' | 'analytics' | 'account'>('home')
+  const [route, setRoute] = useState<'home' | 'practice' | 'analytics' | 'account' | 'admin'>('home')
   const [exams, setExams] = useState<Exam[]>([])
   const [selected, setSelected] = useState<string | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
@@ -1245,6 +1248,19 @@ ${questionsHTML}
                 </svg>
                 <span className="sr-only">Account</span>
               </button>
+                {isAdmin() && (
+                <button
+                  onClick={() => setRoute('admin')}
+                  title="Admin"
+                  className={`px-3 py-1 rounded text-sm ${route === 'admin' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                >
+                  <svg aria-hidden className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="10" rx="2" />
+                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                  </svg>
+                  <span className="sr-only">Admin</span>
+                </button>
+              )}
             </nav>
           </div>
             <div className="flex items-center gap-3">
@@ -1329,6 +1345,14 @@ ${questionsHTML}
                 <button onClick={() => { setRoute('account'); setMobileOpen(false) }} title="Account" className={`text-left px-3 py-2 rounded ${route === 'account' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`} aria-label="Account">
                   <svg className="w-5 h-5 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3" /><path d="M5.5 20a6.5 6.5 0 0113 0" /></svg>
                 </button>
+                {isAdmin() && (
+                  <button onClick={() => { setRoute('admin'); setMobileOpen(false) }} title="Admin" className={`text-left px-3 py-2 rounded ${route === 'admin' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`} aria-label="Admin">
+                    <svg className="w-5 h-5 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="10" rx="2" />
+                      <path d="M7 11V7a5 5 0 0110 0v4" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
               {/* Gamification stats in mobile menu */}
@@ -1743,6 +1767,12 @@ ${questionsHTML}
                 <div className="mt-6">
                   <Leaderboard />
                 </div>
+              </div>
+            )}
+
+            {route === 'admin' && (
+              <div className="mb-6">
+                <AdminPanel />
               </div>
             )}
 

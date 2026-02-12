@@ -7,6 +7,7 @@ import examsRoutes from './routes/exams.js'
 import attemptsRoutes from './routes/attempts.js'
 import analyticsRoutes from './routes/analytics.js'
 import gamificationRoutes from './routes/gamification.js'
+import adminRoutes from './routes/admin.js'
 
 const server = Fastify({ logger: true })
 
@@ -23,6 +24,8 @@ await server.register(examsRoutes, { prefix: '/exams' })
 await server.register(attemptsRoutes, { prefix: '/attempts' })
 await server.register(analyticsRoutes, { prefix: '/analytics' })
 await server.register(gamificationRoutes, { prefix: '/gamification' })
+// Admin routes
+await server.register(adminRoutes, { prefix: '/admin' })
 
 const port = Number(process.env.PORT) || 3000
 

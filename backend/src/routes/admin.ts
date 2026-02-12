@@ -1,0 +1,53 @@
+import { FastifyInstance, FastifyPluginOptions } from 'fastify'
+import { getUserBySub, listUsers, recordAdminAudit, updateUserFields } from '../services/dynamo.js'
+
+export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
+  // Require auth and admin flag
+  server.addHook('preHandler', async (request, reply) => {
+    // only apply to admin routes
+    if (!request.routerPath?.startsWith('/admin')) return
+    await server.authenticate(request, reply)
+    if (!request.user) return reply.code(401).send({ message: 'Unauthorized' })
+    const local = await getUserBySub(request.user.sub)
+    if (!local || !local.isAdmin) return reply.code(403).send({ message: 'Forbidden' })
+  })
+
+  // List users (simple scan with pagination)
+  server.get('/users', async (request, reply) => {
+    const q = request.query as any
+    const limit = Math.min(Number(q.limit || 50), 200)
+    const res = await listUsers(limit, q.lastKey)
+    return { users: res.Items ?? [], lastKey: (res as any).LastEvaluatedKey ?? null }
+  })
+
+  // Get single user by sub
+  server.get('/users/:sub', async (request, reply) => {
+    const { sub } = request.params as any
+    const user = await getUserBySub(sub)
+    if (!user) return reply.code(404).send({ message: 'user not found' })
+    return user
+  })
+
+  // Toggle isAdmin or isActive
+  server.patch('/users/:sub', async (request, reply) => {
+    const { sub } = request.params as any
+    const body = request.body as any
+    // minimal validation: only allow isAdmin, isActive
+    const updates: any = {}
+    if (typeof body.isAdmin === 'boolean') updates.isAdmin = body.isAdmin
+    if (typeof body.isActive === 'boolean') updates.isActive = body.isActive
+    if (Object.keys(updates).length === 0) return reply.code(400).send({ message: 'no updatable fields' })
+
+    // perform update via DynamoDB UpdateCommand directly (reuse service would be nicer)
+    try {
+      if (!request.user) return reply.code(401).send({ message: 'Unauthorized' })
+      await server.log?.debug?.(`admin update ${sub} ${JSON.stringify(updates)}`)
+      await updateUserFields(sub, updates)
+      await recordAdminAudit((request.user as any).sub, sub, 'update_user', { updates })
+      return { ok: true }
+    } catch (err: any) {
+      request.log?.error?.('admin update failed', err)
+      return reply.code(500).send({ message: 'update failed' })
+    }
+  })
+}

@@ -11,6 +11,7 @@ export default defineConfig({
       '/attempts': 'http://localhost:3000',
       '/analytics': 'http://localhost:3000',
       '/auth': 'http://localhost:3000',
+      '/admin': 'http://localhost:3000',
       '/gamification': 'http://localhost:3000',
     }
   }
