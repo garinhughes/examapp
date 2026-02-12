@@ -1,0 +1,654 @@
+{
+  "attempts": [
+    {
+      "attemptId": "15d7bb8d-feaa-4c67-8c7c-85b10ff2f57b",
+      "userId": null,
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-12T11:16:35.745Z",
+      "finishedAt": "2026-02-12T11:16:40.371Z",
+      "score": 100,
+      "answers": [
+        {
+          "questionId": 101,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:16:37.794Z"
+        },
+        {
+          "questionId": 102,
+          "selectedIndex": 1,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:16:40.369Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": []
+      },
+      "questions": [
+        {
+          "id": 101,
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "format": "text",
+          "domain": "Detection",
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
+          "choiceExplanations": [
+            "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior.",
+            "AWS Config tracks resource configuration and compliance, not threat detection.",
+            "AWS WAF is a web application firewall focused on HTTP(s) protections.",
+            "Amazon SNS is a notification service, not a security findings aggregator."
+          ]
+        },
+        {
+          "id": 102,
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "format": "text",
+          "domain": "Incident Response",
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            "AWS Systems Manager",
+            "Amazon Detective",
+            "AWS Shield",
+            "AWS CloudTrail"
+          ],
+          "answerIndex": 1,
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective helps analyze and investigate security issues by collecting and organizing log data to make investigations faster.",
+          "choiceExplanations": [
+            "Systems Manager helps manage instances but isn't focused on security investigation notebooks.",
+            "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues.",
+            "AWS Shield provides DDoS protections, not forensic investigation tools.",
+            "CloudTrail records API activity and is useful for forensics but Detective provides investigative workflows."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Incident Response": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        }
+      }
+    },
+    {
+      "attemptId": "879443a1-0ac8-4fd4-b7d4-99fc0906ae9e",
+      "userId": null,
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-12T11:17:33.762Z",
+      "finishedAt": "2026-02-12T11:17:35.026Z",
+      "score": 0,
+      "answers": [
+        {
+          "questionId": 101,
+          "selectedIndex": 3,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:17:34.690Z"
+        },
+        {
+          "questionId": 102,
+          "selectedIndex": 3,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:17:34.860Z"
+        },
+        {
+          "questionId": 103,
+          "selectedIndex": 3,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:17:35.023Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": []
+      },
+      "questions": [
+        {
+          "id": 101,
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "format": "text",
+          "domain": "Detection",
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
+          "choiceExplanations": [
+            "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior.",
+            "AWS Config tracks resource configuration and compliance, not threat detection.",
+            "AWS WAF is a web application firewall focused on HTTP(s) protections.",
+            "Amazon SNS is a notification service, not a security findings aggregator."
+          ]
+        },
+        {
+          "id": 102,
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "format": "text",
+          "domain": "Incident Response",
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            "AWS Systems Manager",
+            "Amazon Detective",
+            "AWS Shield",
+            "AWS CloudTrail"
+          ],
+          "answerIndex": 1,
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective helps analyze and investigate security issues by collecting and organizing log data to make investigations faster.",
+          "choiceExplanations": [
+            "Systems Manager helps manage instances but isn't focused on security investigation notebooks.",
+            "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues.",
+            "AWS Shield provides DDoS protections, not forensic investigation tools.",
+            "CloudTrail records API activity and is useful for forensics but Detective provides investigative workflows."
+          ]
+        },
+        {
+          "id": 103,
+          "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "question": "To restrict traffic at the network edge for HTTP endpoints, which service should you combine with CloudFront?",
+          "choices": [
+            "AWS WAF",
+            "Security Groups",
+            "VPC Endpoint",
+            "AWS KMS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think web application protection rules that block common attack patterns at the edge.",
+          "explanation": "AWS WAF integrates with CloudFront to allow deployment of custom rules to block or rate-limit malicious HTTP(s) requests at the edge.",
+          "choiceExplanations": [
+            "AWS WAF is the web application firewall used with CloudFront to filter HTTP(S) traffic.",
+            "Security Groups control traffic to EC2 at the instance level, not the CloudFront edge.",
+            "VPC Endpoints provide private connectivity to services within a VPC, not edge HTTP filtering.",
+            "AWS KMS is for key management and encryption, not traffic filtering."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Incident Response": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Infrastructure Security": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
+    },
+    {
+      "attemptId": "94cdb0d8-f97f-4ace-b67e-9ed63b15b762",
+      "userId": null,
+      "examCode": "SAA-C03",
+      "startedAt": "2026-02-12T11:17:50.838Z",
+      "finishedAt": "2026-02-12T11:18:14.025Z",
+      "score": 60,
+      "answers": [
+        {
+          "questionId": 1,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:17:52.298Z"
+        },
+        {
+          "questionId": 2,
+          "selectedIndex": 1,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:17:54.960Z"
+        },
+        {
+          "questionId": 3,
+          "selectedIndex": 3,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:17:59.114Z"
+        },
+        {
+          "questionId": 4,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:18:10.424Z"
+        },
+        {
+          "questionId": 5,
+          "selectedIndex": null,
+          "selectedIndices": [
+            1,
+            4
+          ],
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:18:14.017Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": []
+      },
+      "questions": [
+        {
+          "id": 1,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+          "format": "text",
+          "domain": "Storage",
+          "question": "Which service is best for object storage?",
+          "choices": [
+            "S3",
+            "EBS",
+            "EFS",
+            "RDS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think about storing files and assets cheaply and durably.",
+          "explanation": "Amazon S3 is object storage for files and static assets. EBS is block storage for EC2, EFS is network file system, and RDS is managed relational database.",
+          "choiceExplanations": [
+            "S3 is object storage optimized for storing and retrieving any amount of data.",
+            "EBS is block storage attached to EC2 instances and is not considered object storage.",
+            "EFS is a file system service (NFS), suitable for shared file storage, not object storage.",
+            "RDS provides managed relational databases, not object storage."
+          ]
+        },
+        {
+          "id": 2,
+          "docs": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+          "format": "text",
+          "domain": "Compute",
+          "question": "Which service is serverless for running functions?",
+          "choices": [
+            "EC2",
+            "Lambda",
+            "ECS",
+            "EKS"
+          ],
+          "answerIndex": 1,
+          "tip": "Serverless functions run code without managing servers.",
+          "explanation": "AWS Lambda is the serverless compute service for running short-lived functions. EC2 is VMs, ECS/EKS are container services.",
+          "choiceExplanations": [
+            "EC2 is virtual machines where you manage the OS and runtime.",
+            "Lambda runs code in response to events and is serverless — no servers to manage.",
+            "ECS runs containers; you manage or use Fargate but it's not the same as functions.",
+            "EKS is Kubernetes-managed containers, not serverless functions."
+          ]
+        },
+        {
+          "id": 3,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#public-access-block",
+          "format": "json",
+          "domain": "Security",
+          "question": "Which of the following bucket policies allows public read access to objects in the bucket?",
+          "choices": [
+            "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::example-bucket/*\"\n    }\n  ]\n}",
+            "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"s3:DeleteObject\",\n      \"Resource\": \"arn:aws:s3:::example-bucket/*\"\n    }\n  ]\n}",
+            "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": { \"AWS\": \"arn:aws:iam::123456789012:role/ReadRole\" },\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::example-bucket/*\"\n    }\n  ]\n}",
+            "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Action\": [\"s3:PutObject\", \"s3:GetObject\"],\n      \"Resource\": \"arn:aws:s3:::example-bucket/*\"\n    }\n  ]\n}"
+          ],
+          "answerIndex": 0,
+          "explanation": "A policy that allows Principal '*' and Action 's3:GetObject' on the bucket objects grants public read access.",
+          "choiceExplanations": [
+            "This policy explicitly allows public GetObject on all objects — public read.",
+            "This policy denies DeleteObject and does not grant read access.",
+            "This policy allows only a specific IAM role, not public access.",
+            "This policy allows PutObject as well as GetObject; while it includes GetObject, allowing PutObject to everyone is not typical for public read and may be unsafe."
+          ]
+        },
+        {
+          "id": 4,
+          "docs": "https://docs.aws.amazon.com/cli/latest/reference/s3/cp.html",
+          "format": "cli",
+          "domain": "Storage",
+          "question": "Which AWS CLI command uploads local file 'report.pdf' to S3 bucket 'my-bucket'?",
+          "choices": [
+            "aws s3 cp report.pdf s3://my-bucket/",
+            "aws s3 sync report.pdf s3://my-bucket/",
+            "aws s3 mv report.pdf s3://my-bucket/",
+            "aws s3api put-object --bucket my-bucket --key report.pdf --body report.pdf"
+          ],
+          "answerIndex": 0,
+          "explanation": "The 'aws s3 cp' command copies a file to S3; 'put-object' is a lower-level API call that also works but requires more options; 'sync' and 'mv' are different semantics."
+        },
+        {
+          "id": 5,
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
+          "format": "text",
+          "domain": "Compute",
+          "question": "A company needs to improve the availability of a web application. Which TWO actions should a solutions architect recommend? (Select TWO)",
+          "selectCount": 2,
+          "choices": [
+            "Deploy the application across multiple Availability Zones",
+            "Store session data on the local instance storage",
+            "Use an Application Load Balancer to distribute traffic",
+            "Use a single large EC2 instance for all traffic",
+            "Disable health checks to reduce overhead"
+          ],
+          "answerIndices": [
+            0,
+            2
+          ],
+          "tip": "Think about redundancy and distributing traffic.",
+          "explanation": "Deploying across multiple AZs provides fault tolerance, and an ALB distributes traffic across healthy targets. Instance store is ephemeral, a single instance is a single point of failure, and disabling health checks reduces reliability.",
+          "choiceExplanations": [
+            "Multi-AZ deployment provides fault tolerance if one AZ becomes unavailable.",
+            "Instance store is ephemeral and lost when the instance stops — not suitable for sessions.",
+            "An ALB distributes traffic across targets and performs health checks to route around failures.",
+            "A single instance is a single point of failure and does not improve availability.",
+            "Disabling health checks means unhealthy targets still receive traffic, reducing availability."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Storage": {
+          "total": 2,
+          "correct": 2,
+          "score": 100
+        },
+        "Compute": {
+          "total": 2,
+          "correct": 1,
+          "score": 50
+        },
+        "Security": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
+    },
+    {
+      "attemptId": "a47d621f-0a84-40b1-83c5-879947420d05",
+      "userId": null,
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-12T11:29:08.127Z",
+      "finishedAt": "2026-02-12T11:29:33.202Z",
+      "score": 100,
+      "answers": [
+        {
+          "questionId": 101,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:29:28.779Z"
+        },
+        {
+          "questionId": 106,
+          "selectedIndex": null,
+          "selectedIndices": [
+            0,
+            1
+          ],
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:29:33.199Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": [
+          "CloudFormation",
+          "Config"
+        ]
+      },
+      "questions": [
+        {
+          "id": 101,
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
+          "choiceExplanations": [
+            "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior.",
+            "AWS Config tracks resource configuration and compliance, not threat detection.",
+            "AWS WAF is a web application firewall focused on HTTP(s) protections.",
+            "Amazon SNS is a notification service, not a security findings aggregator."
+          ]
+        },
+        {
+          "id": 106,
+          "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "Security Hub",
+            "KMS",
+            "SQS",
+            "CloudFormation",
+            "EC2"
+          ],
+          "question": "A security team needs to centrally manage findings from multiple AWS security services and ensure encryption of sensitive data at rest. Which TWO services should they use together? (Select TWO)",
+          "selectCount": 2,
+          "choices": [
+            "AWS Security Hub",
+            "AWS KMS",
+            "Amazon SQS",
+            "AWS CloudFormation",
+            "Amazon EC2"
+          ],
+          "answerIndices": [
+            0,
+            1
+          ],
+          "tip": "Think about centralized findings aggregation and key management.",
+          "explanation": "Security Hub aggregates and prioritizes findings from GuardDuty, Inspector, Macie, and partner tools. KMS provides managed encryption keys for data at rest. SQS is a messaging service, CloudFormation is IaC, and EC2 is compute — none address the stated requirements.",
+          "choiceExplanations": [
+            "Security Hub provides a comprehensive view of security alerts and compliance status across accounts.",
+            "KMS provides centralized encryption key management for encrypting data at rest.",
+            "SQS is a message queuing service, not related to security findings or encryption.",
+            "CloudFormation is an infrastructure-as-code service, not a security findings tool.",
+            "EC2 provides virtual machines, not security findings management."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 2,
+          "correct": 2,
+          "score": 100
+        }
+      }
+    },
+    {
+      "attemptId": "03be248a-cb64-4928-b6dd-6c28bf77791a",
+      "userId": null,
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-12T11:30:28.176Z",
+      "finishedAt": "2026-02-12T11:30:32.326Z",
+      "score": 0,
+      "answers": [
+        {
+          "questionId": 106,
+          "selectedIndex": null,
+          "selectedIndices": [
+            3,
+            4
+          ],
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T11:30:32.323Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": [
+          "CloudFormation"
+        ]
+      },
+      "questions": [
+        {
+          "id": 106,
+          "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "Security Hub",
+            "KMS",
+            "SQS",
+            "CloudFormation",
+            "EC2"
+          ],
+          "question": "A security team needs to centrally manage findings from multiple AWS security services and ensure encryption of sensitive data at rest. Which TWO services should they use together? (Select TWO)",
+          "selectCount": 2,
+          "choices": [
+            "AWS Security Hub",
+            "AWS KMS",
+            "Amazon SQS",
+            "AWS CloudFormation",
+            "Amazon EC2"
+          ],
+          "answerIndices": [
+            0,
+            1
+          ],
+          "tip": "Think about centralized findings aggregation and key management.",
+          "explanation": "Security Hub aggregates and prioritizes findings from GuardDuty, Inspector, Macie, and partner tools. KMS provides managed encryption keys for data at rest. SQS is a messaging service, CloudFormation is IaC, and EC2 is compute — none address the stated requirements.",
+          "choiceExplanations": [
+            "Security Hub provides a comprehensive view of security alerts and compliance status across accounts.",
+            "KMS provides centralized encryption key management for encrypting data at rest.",
+            "SQS is a message queuing service, not related to security findings or encryption.",
+            "CloudFormation is an infrastructure-as-code service, not a security findings tool.",
+            "EC2 provides virtual machines, not security findings management."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
+    },
+    {
+      "attemptId": "cf643527-b502-4412-802b-400fcea11600",
+      "userId": "dev-user-001",
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-12T13:03:18.188Z",
+      "finishedAt": "2026-02-12T13:03:20.982Z",
+      "score": 100,
+      "answers": [
+        {
+          "questionId": 101,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-12T13:03:20.977Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": 101,
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
+          "choiceExplanations": [
+            "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior.",
+            "AWS Config tracks resource configuration and compliance, not threat detection.",
+            "AWS WAF is a web application firewall focused on HTTP(s) protections.",
+            "Amazon SNS is a notification service, not a security findings aggregator."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        }
+      }
+    }
+  ]
+}

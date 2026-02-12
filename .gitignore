@@ -1,0 +1,61 @@
+### Node
+node_modules/
+**/node_modules/
+
+# build / output
+dist/
+build/
+**/dist/
+
+# local env files / secrets
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.secrets/
+*.pem
+*.key
+*.crt
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# coverage / cache
+coverage/
+.nyc_output/
+.cache/
+.parcel-cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# Python virtualenvs
+.venv/
+
+# Misc
+.history/
+
+# examapp specific: ignore runtime data and generated backend files
+/backend/dist/
+/backend/node_modules/
+/frontend/dist/
+/frontend/node_modules/
+/backend/.env
+/frontend/.env
+
+# Persisted JSON used by runtime (may contain user data)
+/backend/data/gamification.json
+/backend/data/*.db
+/backend/data/*.sqlite

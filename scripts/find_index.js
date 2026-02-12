@@ -1,0 +1,1 @@
+const fs=require('fs'); const s=fs.readFileSync('/home/garin/github/examapp/frontend/src/App.tsx','utf8'); const idx=8036; const lines=s.slice(0,idx).split('\n'); const lineNo=lines.length; const line= s.split('\n')[lineNo-1]; console.log('line',lineNo); console.log(line); console.log('---context---'); console.log(s.slice(Math.max(0,idx-120), idx+120));
