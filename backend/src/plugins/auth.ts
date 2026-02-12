@@ -13,8 +13,6 @@
 
 import fp from 'fastify-plugin'
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import jwksRsa from 'jwks-rsa'
-
 // ——— Types ———
 
 export interface AuthUser {
@@ -38,21 +36,7 @@ declare module 'fastify' {
 const AUTH_MODE = process.env.AUTH_MODE || 'dev'
 
 // Cognito JWKS client (lazily created)
-let jwksClient: jwksRsa.JwksClient | null = null
-
-function getJwksClient(): jwksRsa.JwksClient {
-  if (jwksClient) return jwksClient
-  const region = process.env.COGNITO_REGION
-  const poolId = process.env.COGNITO_USER_POOL_ID
-  if (!region || !poolId) throw new Error('COGNITO_REGION and COGNITO_USER_POOL_ID are required when AUTH_MODE=cognito')
-  jwksClient = jwksRsa({
-    cache: true,
-    rateLimit: true,
-    jwksRequestsPerMinute: 10,
-    jwksUri: `https://cognito-idp.${region}.amazonaws.com/${poolId}/.well-known/jwks.json`
-  })
-  return jwksClient
-}
+// We'll use jose's createRemoteJWKSet for verification and add debug logging
 
 /** Decode a JWT without verification (just parse header + payload) */
 function decodeJwt(token: string) {
@@ -65,43 +49,53 @@ function decodeJwt(token: string) {
 
 /** Verify a Cognito JWT using JWKS */
 async function verifyCognitoToken(token: string): Promise<AuthUser> {
-  // dynamic import jose (ESM)
-  const { importJWK, jwtVerify } = await import('jose')
+  // Use jose's createRemoteJWKSet which handles JWKS retrieval/rotation
+  const { jwtVerify, createRemoteJWKSet } = await import('jose')
 
-  const { header } = decodeJwt(token)
-  const kid = header.kid as string
-  if (!kid) throw new Error('JWT missing kid')
+  // Decode for lightweight logging (do not trust until verified)
+  let header: any = {}
+  let payloadPreview: any = {}
+  try {
+    const decoded = decodeJwt(token)
+    header = decoded.header || {}
+    payloadPreview = decoded.payload || {}
+  } catch (e) {
+    // ignore
+  }
 
-  const client = getJwksClient()
-  const key = await client.getSigningKey(kid)
-  const pubKey = key.getPublicKey()
+  const region = process.env.COGNITO_REGION
+  const poolId = process.env.COGNITO_USER_POOL_ID
+  const clientId = process.env.COGNITO_APP_CLIENT_ID
 
-  const region = process.env.COGNITO_REGION!
-  const poolId = process.env.COGNITO_USER_POOL_ID!
-  const clientId = process.env.COGNITO_APP_CLIENT_ID!
+  if (!region || !poolId || !clientId) {
+    console.warn('[auth] Missing Cognito config', { region, poolId, clientId })
+    throw new Error('COGNITO_REGION, COGNITO_USER_POOL_ID and COGNITO_APP_CLIENT_ID must be set')
+  }
+
+  const jwksUrl = `https://cognito-idp.${region}.amazonaws.com/${poolId}/.well-known/jwks.json`
+  const JWKS = createRemoteJWKSet(new URL(jwksUrl))
   const issuer = `https://cognito-idp.${region}.amazonaws.com/${poolId}`
 
-  // jose needs a CryptoKey — import the PEM
-  const cryptoKey = await importJWK(
-    JSON.parse(JSON.stringify(key)),
-    header.alg || 'RS256'
-  ).catch(() => {
-    // fallback: use createPublicKey
-    const { createPublicKey } = require('crypto')
-    return createPublicKey(pubKey)
-  })
-
-  const { payload } = await jwtVerify(token, cryptoKey as any, {
-    issuer,
-    audience: clientId,
-    algorithms: ['RS256']
-  })
-
-  return {
-    sub: payload.sub as string,
-    email: (payload.email as string) || (payload['cognito:username'] as string) || '',
-    name: (payload.name as string) || undefined
+  try {
+    const result = await jwtVerify(token, JWKS, { issuer, audience: clientId, algorithms: ['RS256'] })
+    const payload = result.payload as any
+    return {
+      sub: payload.sub as string,
+      email: (payload.email as string) || (payload['cognito:username'] as string) || '',
+      name: (payload.name as string) || undefined
+    }
+  } catch (err: any) {
+    const kid = header?.kid || '<no-kid>'
+    const aud = payloadPreview?.aud || '<no-aud>'
+    const sub = payloadPreview?.sub || '<no-sub>'
+    const msg = `JWT verification failed (kid=${kid} aud=${aud} sub=${sub}): ${err?.message || String(err)}`
+    console.warn('[auth] ' + msg)
+    throw new Error(msg)
   }
+}
+
+function requestLogWarn(msg: string) {
+  console.warn('[auth-plugin]', msg)
 }
 
 // ——— Plugin ———

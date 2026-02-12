@@ -134,7 +134,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /* ---- handle /callback (Cognito redirect with ?code=...) ---- */
   useEffect(() => {
     if (MODE === 'dev') return
+    // First: check for server flow that returned id_token in hash (backend redirect)
+    try {
+      if (window.location.hash && window.location.hash.includes('id_token=')) {
+        const h = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+        const idToken = h.get('id_token')
+        if (idToken) {
+          setToken(idToken)
+          const u = userFromToken(idToken)
+          setUser(u)
+          // clean URL
+          window.history.replaceState({}, '', '/')
+          setLoading(false)
+          return
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
 
+    // PKCE flow: handle `?code=...` on frontend callback
     const params = new URLSearchParams(window.location.search)
     const code = params.get('code')
     if (!code) return
@@ -171,20 +190,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /* ---- login: redirect to Cognito Hosted UI ---- */
   const login = useCallback(async () => {
     if (MODE === 'dev') return // already logged in
-
     const domain = import.meta.env.VITE_COGNITO_DOMAIN
     const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID
-    const redirectUri = encodeURIComponent(window.location.origin + '/callback')
 
-    const verifier = generateCodeVerifier()
-    const challenge = await generateCodeChallenge(verifier)
-    sessionStorage.setItem('pkce_code_verifier', verifier)
+    // Choose flow: 'server' -> confidential client redirects to backend callback
+    // 'pkce' -> SPA does PKCE exchange. Default to 'server' for this app.
+    const flow = import.meta.env.VITE_AUTH_FLOW || 'server'
 
-    const url =
-      `${domain}/oauth2/authorize?response_type=code&client_id=${clientId}` +
-      `&redirect_uri=${redirectUri}&scope=openid+email+profile` +
-      `&code_challenge=${challenge}&code_challenge_method=S256`
+    if (flow === 'pkce') {
+      const redirectUri = encodeURIComponent(window.location.origin + '/callback')
+      const verifier = generateCodeVerifier()
+      const challenge = await generateCodeChallenge(verifier)
+      sessionStorage.setItem('pkce_code_verifier', verifier)
 
+      const url =
+        `${domain}/oauth2/authorize?response_type=code&client_id=${clientId}` +
+        `&redirect_uri=${redirectUri}&scope=openid+email+profile` +
+        `&code_challenge=${challenge}&code_challenge_method=S256&identity_provider=Google`
+      window.location.href = url
+      return
+    }
+
+    // server flow: redirect to Cognito and let Cognito redirect to backend /auth/token
+    const backendCallback = import.meta.env.VITE_BACKEND_TOKEN_CALLBACK || 'http://localhost:3000/auth/token'
+    const url = `${domain}/oauth2/authorize?response_type=code&client_id=${clientId}` +
+      `&redirect_uri=${encodeURIComponent(backendCallback)}` +
+      `&scope=openid+email+profile&identity_provider=Google`
     window.location.href = url
   }, [])
 
