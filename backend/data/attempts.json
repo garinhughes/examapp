@@ -5623,6 +5623,557 @@
           "score": 0
         }
       }
+    },
+    {
+      "attemptId": "eca96633-105f-4f09-b3b2-396b55de5586",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SAA-C03",
+      "startedAt": "2026-02-15T18:43:24.562Z",
+      "finishedAt": "2026-02-15T18:44:15.101Z",
+      "score": 30,
+      "answers": [
+        {
+          "questionId": 1,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T18:43:36.519Z"
+        },
+        {
+          "questionId": 2,
+          "selectedIndex": 1,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T18:43:46.896Z"
+        },
+        {
+          "questionId": 3,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T18:44:08.661Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": 1,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+          "format": "text",
+          "domain": "Storage",
+          "services": [
+            "S3",
+            "EBS",
+            "EFS",
+            "RDS"
+          ],
+          "question": "Which service is best for object storage?",
+          "choices": [
+            "S3",
+            "EBS",
+            "EFS",
+            "RDS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think about storing files and assets cheaply and durably.",
+          "explanation": "Amazon S3 is object storage for files and static assets. EBS is block storage for EC2, EFS is network file system, and RDS is managed relational database.",
+          "choiceExplanations": [
+            "S3 is object storage optimized for storing and retrieving any amount of data.",
+            "EBS is block storage attached to EC2 instances and is not considered object storage.",
+            "EFS is a file system service (NFS), suitable for shared file storage, not object storage.",
+            "RDS provides managed relational databases, not object storage."
+          ]
+        },
+        {
+          "id": 2,
+          "docs": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+          "format": "text",
+          "domain": "Compute",
+          "services": [
+            "Lambda",
+            "EC2",
+            "ECS",
+            "EKS"
+          ],
+          "question": "Which service is serverless for running functions?",
+          "choices": [
+            "EC2",
+            "Lambda",
+            "ECS",
+            "EKS"
+          ],
+          "answerIndex": 1,
+          "tip": "Serverless functions run code without managing servers.",
+          "explanation": "AWS Lambda is the serverless compute service for running short-lived functions. EC2 is VMs, ECS/EKS are container services.",
+          "choiceExplanations": [
+            "EC2 is virtual machines where you manage the OS and runtime.",
+            "Lambda runs code in response to events and is serverless — no servers to manage.",
+            "ECS runs containers; you manage or use Fargate but it's not the same as functions.",
+            "EKS is Kubernetes-managed containers, not serverless functions."
+          ]
+        },
+        {
+          "id": 3,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#public-access-block",
+          "format": "json",
+          "domain": "Security",
+          "services": [
+            "S3",
+            "IAM"
+          ],
+          "question": "Which of the following bucket policies allows public read access to objects in the bucket?",
+          "choices": [
+            "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::example-bucket/*\"\n    }\n  ]\n}",
+            "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"s3:DeleteObject\",\n      \"Resource\": \"arn:aws:s3:::example-bucket/*\"\n    }\n  ]\n}",
+            "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": { \"AWS\": \"arn:aws:iam::123456789012:role/ReadRole\" },\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::example-bucket/*\"\n    }\n  ]\n}",
+            "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Action\": [\"s3:PutObject\", \"s3:GetObject\"],\n      \"Resource\": \"arn:aws:s3:::example-bucket/*\"\n    }\n  ]\n}"
+          ],
+          "answerIndex": 0,
+          "explanation": "A policy that allows Principal '*' and Action 's3:GetObject' on the bucket objects grants public read access.",
+          "choiceExplanations": [
+            "This policy explicitly allows public GetObject on all objects — public read.",
+            "This policy denies DeleteObject and does not grant read access.",
+            "This policy allows only a specific IAM role, not public access.",
+            "This policy allows PutObject as well as GetObject; while it includes GetObject, allowing PutObject to everyone is not typical for public read and may be unsafe."
+          ]
+        },
+        {
+          "id": 4,
+          "docs": "https://docs.aws.amazon.com/cli/latest/reference/s3/cp.html",
+          "format": "cli",
+          "domain": "Storage",
+          "services": [
+            "S3",
+            "AWS CLI"
+          ],
+          "question": "Which AWS CLI command uploads local file 'report.pdf' to S3 bucket 'my-bucket'?",
+          "choices": [
+            "aws s3 cp report.pdf s3://my-bucket/",
+            "aws s3 sync report.pdf s3://my-bucket/",
+            "aws s3 mv report.pdf s3://my-bucket/",
+            "aws s3api put-object --bucket my-bucket --key report.pdf --body report.pdf"
+          ],
+          "answerIndex": 0,
+          "explanation": "The 'aws s3 cp' command copies a file to S3; 'put-object' is a lower-level API call that also works but requires more options; 'sync' and 'mv' are different semantics."
+        },
+        {
+          "id": 5,
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
+          "format": "text",
+          "domain": "Compute",
+          "services": [
+            "EC2",
+            "ALB",
+            "ELB"
+          ],
+          "question": "A company needs to improve the availability of a web application. Which TWO actions should a solutions architect recommend? (Select TWO)",
+          "selectCount": 2,
+          "choices": [
+            "Deploy the application across multiple Availability Zones",
+            "Store session data on the local instance storage",
+            "Use an Application Load Balancer to distribute traffic",
+            "Use a single large EC2 instance for all traffic",
+            "Disable health checks to reduce overhead"
+          ],
+          "answerIndices": [
+            0,
+            2
+          ],
+          "tip": "Think about redundancy and distributing traffic.",
+          "explanation": "Deploying across multiple AZs provides fault tolerance, and an ALB distributes traffic across healthy targets. Instance store is ephemeral, a single instance is a single point of failure, and disabling health checks reduces reliability.",
+          "choiceExplanations": [
+            "Multi-AZ deployment provides fault tolerance if one AZ becomes unavailable.",
+            "Instance store is ephemeral and lost when the instance stops — not suitable for sessions.",
+            "An ALB distributes traffic across targets and performs health checks to route around failures.",
+            "A single instance is a single point of failure and does not improve availability.",
+            "Disabling health checks means unhealthy targets still receive traffic, reducing availability."
+          ]
+        },
+        {
+          "id": 6,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-bucket-policies.html",
+          "format": "json",
+          "domain": "Storage",
+          "services": [
+            "S3",
+            "IAM"
+          ],
+          "question": "A developer needs to grant public read access to all objects in an S3 bucket. Which bucket policy statement achieves this?",
+          "choices": [
+            "{\"Effect\": \"Allow\", \"Principal\": \"*\", \"Action\": \"s3:GetObject\", \"Resource\": \"arn:aws:s3:::my-bucket/*\"}",
+            "{\"Effect\": \"Allow\", \"Principal\": \"*\", \"Action\": \"s3:PutObject\", \"Resource\": \"arn:aws:s3:::my-bucket/*\"}",
+            "Grant the s3:GetObject permission to the IAM group 'Everyone' on the bucket",
+            "Enable static website hosting — this automatically makes all objects public"
+          ],
+          "answerIndex": 0,
+          "tip": "Bucket policies use JSON to specify permissions. The Principal '*' means everyone.",
+          "explanation": "The JSON policy statement grants s3:GetObject to Principal '*' (everyone) on all objects in the bucket. Option 2 grants write access, not read. Option 3 is not how S3 bucket policies work — there is no 'Everyone' IAM group. Option 4 enables website hosting but does not automatically make objects public.",
+          "choiceExplanations": [
+            "Correct — this JSON policy allows any principal to read objects from the bucket.",
+            "This grants PutObject (write) permission, not read access.",
+            "S3 bucket policies are JSON documents — there is no IAM group called 'Everyone' for this purpose.",
+            "Static website hosting requires a separate bucket policy to make objects publicly readable."
+          ]
+        },
+        {
+          "id": 7,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/lifecycle-transition-general-considerations.html",
+          "format": "yaml",
+          "domain": "Storage",
+          "services": [
+            "S3",
+            "CloudFormation"
+          ],
+          "question": "A team wants to automatically move S3 objects to Glacier after 90 days using CloudFormation. Which template snippet correctly defines this lifecycle rule?",
+          "choices": [
+            "LifecycleConfiguration:\n  Rules:\n    - Id: ArchiveRule\n      Status: Enabled\n      Transitions:\n        - StorageClass: GLACIER\n          TransitionInDays: 90",
+            "LifecycleConfiguration:\n  Rules:\n    - Id: ArchiveRule\n      Status: Active\n      Transitions:\n        - StorageClass: GLACIER\n          TransitionInDays: 90",
+            "Move objects to Glacier by setting the storage class to GLACIER on each PutObject request after 90 days",
+            "Enable S3 Intelligent-Tiering — it automatically archives all objects to Glacier after 90 days"
+          ],
+          "answerIndex": 0,
+          "tip": "CloudFormation lifecycle rules use Status: Enabled (not Active), and TransitionInDays for the number of days.",
+          "explanation": "The correct YAML uses Status: Enabled and TransitionInDays: 90 to automatically transition objects to Glacier. Option 2 uses 'Active' which is not a valid lifecycle rule status. Option 3 describes a manual approach, not an automated lifecycle rule. Option 4 is incorrect — Intelligent-Tiering moves between access tiers, not directly to Glacier after a fixed period.",
+          "choiceExplanations": [
+            "Correct — valid CloudFormation lifecycle rule with Enabled status and 90-day Glacier transition.",
+            "Invalid — the Status must be 'Enabled' or 'Disabled', not 'Active'.",
+            "This is a manual process, not an automated lifecycle rule defined in CloudFormation.",
+            "Intelligent-Tiering optimises between frequent and infrequent access tiers — it doesn't guarantee Glacier archival after 90 days."
+          ]
+        },
+        {
+          "id": 8,
+          "docs": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html",
+          "format": "text",
+          "domain": "Database",
+          "services": [
+            "RDS",
+            "Aurora"
+          ],
+          "question": "A web application experiences heavy read traffic on its RDS MySQL database, causing performance degradation. Which solution improves read performance with minimal application changes?",
+          "choices": [
+            "Create an RDS Read Replica and direct read queries to the replica endpoint",
+            "Enable Multi-AZ deployment on the existing RDS instance",
+            "Migrate the database to Amazon Redshift for better read performance",
+            "Increase the RDS instance size to the largest available instance class"
+          ],
+          "answerIndex": 0,
+          "tip": "Read Replicas offload read traffic from the primary database instance.",
+          "explanation": "Read Replicas allow you to create read-only copies of your database and direct read queries to them, reducing load on the primary instance. Multi-AZ is for high availability, not read scaling. Redshift is for analytics, not OLTP workloads. Scaling up has limits and is not the most cost-effective approach.",
+          "choiceExplanations": [
+            "Correct — Read Replicas handle read traffic, reducing primary database load with minimal code changes.",
+            "Multi-AZ provides failover for high availability but does not improve read performance — the standby is not accessible for reads.",
+            "Amazon Redshift is a data warehouse optimised for analytics (OLAP), not transactional (OLTP) workloads.",
+            "Vertical scaling is expensive, has limits, and requires downtime — Read Replicas are more efficient for read scaling."
+          ]
+        },
+        {
+          "id": 9,
+          "docs": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html",
+          "format": "text",
+          "domain": "Networking",
+          "services": [
+            "ALB",
+            "EC2",
+            "Auto Scaling"
+          ],
+          "question": "A company wants to distribute incoming HTTPS traffic across multiple EC2 instances and route requests based on the URL path. Which load balancer type should they use?",
+          "choices": [
+            "Application Load Balancer (ALB)",
+            "Network Load Balancer (NLB)",
+            "Classic Load Balancer (CLB)",
+            "Gateway Load Balancer (GWLB)"
+          ],
+          "answerIndex": 0,
+          "tip": "Different load balancer types operate at different OSI layers and support different routing features.",
+          "explanation": "ALB operates at Layer 7 (HTTP/HTTPS) and supports path-based routing, host-based routing, and other advanced request-level routing. NLB operates at Layer 4 (TCP/UDP) and does not inspect HTTP paths. CLB is legacy and has limited routing capabilities. GWLB is for deploying third-party network appliances.",
+          "choiceExplanations": [
+            "Correct — ALB supports path-based routing, host-based routing, and operates at the HTTP/HTTPS layer.",
+            "NLB operates at Layer 4 (TCP/UDP) and cannot inspect HTTP paths or headers for routing decisions.",
+            "Classic Load Balancer is legacy, lacks path-based routing, and AWS recommends migrating to ALB or NLB.",
+            "Gateway Load Balancer is used to deploy and manage third-party virtual network appliances, not for general web traffic routing."
+          ]
+        },
+        {
+          "id": 10,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html",
+          "format": "text",
+          "domain": "Storage",
+          "services": [
+            "S3",
+            "S3 Glacier"
+          ],
+          "question": "A company stores log files in S3 Standard. Logs older than 30 days are rarely accessed but must be retained for 1 year. Which approach minimises storage costs?",
+          "choices": [
+            "Create an S3 Lifecycle policy to transition objects to S3 Glacier after 30 days and delete after 365 days",
+            "Manually move files to a separate S3 bucket with S3 One Zone-IA storage class",
+            "Enable S3 Intelligent-Tiering on the bucket and let AWS manage transitions automatically",
+            "Use S3 Cross-Region Replication to copy logs to a cheaper region"
+          ],
+          "answerIndex": 0,
+          "tip": "S3 Lifecycle policies automate transitions between storage classes based on object age.",
+          "explanation": "A Lifecycle policy automates the transition to Glacier (very low cost) after 30 days and deletes objects after 365 days, meeting all requirements with minimal cost. Manual moves are error-prone. Intelligent-Tiering has monitoring fees and Glacier is cheaper for known access patterns. Cross-Region Replication doubles storage costs.",
+          "choiceExplanations": [
+            "Correct — automates the transition to the cheapest appropriate tier and handles expiration, minimising cost.",
+            "Manual operations are error-prone and One Zone-IA is more expensive than Glacier for rarely-accessed data.",
+            "Intelligent-Tiering is useful when access patterns are unknown, but Glacier is cheaper when you know data is rarely accessed.",
+            "Cross-Region Replication creates copies in another region, doubling storage costs rather than reducing them."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Storage": {
+          "total": 5,
+          "correct": 1,
+          "score": 20
+        },
+        "Compute": {
+          "total": 2,
+          "correct": 1,
+          "score": 50
+        },
+        "Security": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Database": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Networking": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
+    },
+    {
+      "attemptId": "48f51e82-6349-4c0d-ae7f-c833ae73ccf2",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "DVA-C02",
+      "startedAt": "2026-02-15T18:45:43.722Z",
+      "finishedAt": "2026-02-15T18:47:19.210Z",
+      "score": 100,
+      "answers": [
+        {
+          "questionId": 301,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T18:45:56.870Z"
+        },
+        {
+          "questionId": 302,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T18:46:10.006Z"
+        },
+        {
+          "questionId": 303,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T18:46:14.407Z"
+        },
+        {
+          "questionId": 304,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T18:46:47.903Z"
+        },
+        {
+          "questionId": 305,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T18:46:53.865Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": 301,
+          "docs": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+          "format": "text",
+          "domain": "Development",
+          "services": [
+            "Lambda",
+            "API Gateway"
+          ],
+          "question": "A developer is building a serverless REST API. When a Lambda function runs longer than expected, API Gateway returns a 504 error. What is the MOST likely cause?",
+          "choices": [
+            "The Lambda function execution exceeds the API Gateway integration timeout of 29 seconds",
+            "The Lambda function has insufficient memory allocated",
+            "The API Gateway throttling limit has been reached",
+            "The Lambda function's IAM role lacks permission to write to CloudWatch Logs"
+          ],
+          "answerIndex": 0,
+          "tip": "API Gateway has a hard limit on how long it will wait for a backend response.",
+          "explanation": "API Gateway has a maximum integration timeout of 29 seconds. If a Lambda function takes longer, API Gateway returns a 504 Gateway Timeout. Insufficient memory would cause slower execution but typically results in a different error. Throttling returns 429, not 504. Missing CloudWatch permissions wouldn't cause a 504.",
+          "choiceExplanations": [
+            "Correct — API Gateway's 29-second hard limit causes a 504 if Lambda exceeds it.",
+            "Low memory slows execution but typically causes timeouts within Lambda (producing a different error), not a 504 from API Gateway specifically.",
+            "Throttling produces a 429 Too Many Requests error, not a 504 Gateway Timeout.",
+            "Missing CloudWatch Logs permissions would prevent logging but would not cause a 504 response."
+          ]
+        },
+        {
+          "id": 302,
+          "docs": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+          "format": "text",
+          "domain": "Development",
+          "services": [
+            "DynamoDB"
+          ],
+          "question": "A developer needs to retrieve a single item from a DynamoDB table using its primary key. Which API call should they use for maximum efficiency?",
+          "choices": [
+            "GetItem",
+            "Query",
+            "Scan",
+            "BatchGetItem"
+          ],
+          "answerIndex": 0,
+          "tip": "DynamoDB provides different API operations optimised for different access patterns.",
+          "explanation": "GetItem retrieves a single item by its primary key in a single, efficient read operation. Query returns multiple items matching a partition key. Scan reads the entire table, which is inefficient. BatchGetItem retrieves multiple items but is overkill for a single item.",
+          "choiceExplanations": [
+            "Correct — GetItem is the most efficient way to retrieve a single item by primary key.",
+            "Query is used to retrieve multiple items that share the same partition key value, which is unnecessary for a single item.",
+            "Scan reads every item in the table and filters afterwards — extremely inefficient for retrieving a single item.",
+            "BatchGetItem retrieves up to 100 items across tables — unnecessary overhead for a single item."
+          ]
+        },
+        {
+          "id": 303,
+          "docs": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html",
+          "format": "text",
+          "domain": "Monitoring and Troubleshooting",
+          "services": [
+            "X-Ray",
+            "Lambda",
+            "API Gateway"
+          ],
+          "question": "A developer needs to trace requests across multiple AWS services to identify performance bottlenecks in a distributed application. Which service should they use?",
+          "choices": [
+            "AWS X-Ray",
+            "Amazon CloudWatch Metrics",
+            "AWS CloudTrail",
+            "Amazon EventBridge"
+          ],
+          "answerIndex": 0,
+          "tip": "Distributed tracing helps visualise the flow of requests across microservices.",
+          "explanation": "AWS X-Ray provides distributed tracing, creating service maps and trace analysis to identify bottlenecks across services. CloudWatch Metrics monitors individual resource metrics. CloudTrail logs API calls for auditing. EventBridge routes events between services.",
+          "choiceExplanations": [
+            "Correct — X-Ray provides end-to-end distributed tracing, service maps, and latency analysis.",
+            "CloudWatch Metrics monitors individual resources but doesn't trace requests across services.",
+            "CloudTrail logs API calls for governance and compliance — it's not a performance tracing tool.",
+            "EventBridge is an event bus for routing events between services, not for tracing or debugging."
+          ]
+        },
+        {
+          "id": 304,
+          "docs": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html",
+          "format": "text",
+          "domain": "Deployment",
+          "services": [
+            "Elastic Beanstalk",
+            "CloudFormation",
+            "CodeDeploy"
+          ],
+          "question": "A developer wants to deploy a web application to AWS with minimal infrastructure management. The application uses a standard Node.js runtime. Which service provides the simplest deployment experience?",
+          "choices": [
+            "AWS Elastic Beanstalk",
+            "AWS CloudFormation",
+            "Amazon EC2 with a custom AMI",
+            "Amazon ECS with Fargate"
+          ],
+          "answerIndex": 0,
+          "tip": "Some AWS services abstract away infrastructure management so developers can focus on code.",
+          "explanation": "Elastic Beanstalk is a PaaS that handles provisioning, load balancing, scaling, and monitoring automatically for standard runtimes. CloudFormation requires writing infrastructure templates. EC2 with custom AMI requires full server management. ECS with Fargate is more complex to set up than Beanstalk for simple web apps.",
+          "choiceExplanations": [
+            "Correct — Elastic Beanstalk automatically manages infrastructure for supported platforms including Node.js.",
+            "CloudFormation is powerful but requires writing and maintaining infrastructure-as-code templates.",
+            "EC2 with a custom AMI requires manual server provisioning, patching, and scaling configuration.",
+            "ECS with Fargate is suitable for containers but requires Docker configuration and task definitions — more setup than Beanstalk."
+          ]
+        },
+        {
+          "id": 305,
+          "docs": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html",
+          "format": "text",
+          "domain": "Security",
+          "services": [
+            "Cognito",
+            "IAM",
+            "STS"
+          ],
+          "question": "A developer is building a mobile application that needs user sign-up, sign-in, and access control. Which AWS service is purpose-built for this?",
+          "choices": [
+            "Amazon Cognito",
+            "AWS IAM",
+            "AWS STS",
+            "AWS Directory Service"
+          ],
+          "answerIndex": 0,
+          "tip": "AWS provides a managed service specifically for application user identity management.",
+          "explanation": "Amazon Cognito provides user pools for sign-up/sign-in and identity pools for granting temporary AWS credentials to app users. IAM manages AWS account access, not application users. STS provides temporary credentials but doesn't handle user registration. Directory Service manages Microsoft Active Directory.",
+          "choiceExplanations": [
+            "Correct — Cognito User Pools handle sign-up, sign-in, MFA, and social identity federation for application users.",
+            "IAM manages access for AWS account users and services — it's not designed for application end-user authentication.",
+            "STS provides temporary security credentials but doesn't offer user registration or sign-in flows.",
+            "AWS Directory Service manages Microsoft AD for enterprise identity — it's not for consumer/mobile app authentication."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Development": {
+          "total": 2,
+          "correct": 2,
+          "score": 100
+        },
+        "Monitoring and Troubleshooting": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Deployment": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Security": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        }
+      }
     }
   ]
 }
