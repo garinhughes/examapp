@@ -4562,6 +4562,1067 @@
           ]
         }
       ]
+    },
+    {
+      "attemptId": "57612bca-a6d0-4d50-a13d-7082c1ffd123",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-15T16:08:56.909Z",
+      "finishedAt": "2026-02-15T16:09:15.105Z",
+      "score": 0,
+      "answers": [
+        {
+          "questionId": 103,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:09:02.542Z"
+        },
+        {
+          "questionId": 105,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:09:06.317Z"
+        }
+      ],
+      "metadata": {
+        "mode": "weakest-link",
+        "domainWeights": {
+          "Detection": 0.11455847255369928,
+          "Incident Response": 0.1336515513126492,
+          "Infrastructure Security": 0.20047732696897375,
+          "Identity and Access Management": 0.21718377088305488,
+          "Data Protection": 0.11694510739856803,
+          "Identity & Access": 0.21718377088305488
+        },
+        "wrongQuestionCount": 8
+      },
+      "questions": [
+        {
+          "id": 101,
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
+          "choiceExplanations": [
+            "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior.",
+            "AWS Config tracks resource configuration and compliance, not threat detection.",
+            "AWS WAF is a web application firewall focused on HTTP(s) protections.",
+            "Amazon SNS is a notification service, not a security findings aggregator."
+          ]
+        },
+        {
+          "id": 102,
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Detective",
+            "Systems Manager",
+            "Shield",
+            "CloudTrail"
+          ],
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            "AWS Systems Manager",
+            "Amazon Detective",
+            "AWS Shield",
+            "AWS CloudTrail"
+          ],
+          "answerIndex": 1,
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective helps analyze and investigate security issues by collecting and organizing log data to make investigations faster.",
+          "choiceExplanations": [
+            "Systems Manager helps manage instances but isn't focused on security investigation notebooks.",
+            "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues.",
+            "AWS Shield provides DDoS protections, not forensic investigation tools.",
+            "CloudTrail records API activity and is useful for forensics but Detective provides investigative workflows."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Incident Response": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
+    },
+    {
+      "attemptId": "3664b2bb-90f7-44d0-b739-ae36a43c230e",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-15T16:10:10.373Z",
+      "finishedAt": "2026-02-15T16:10:30.150Z",
+      "score": 100,
+      "answers": [
+        {
+          "questionId": 101,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:10:14.222Z"
+        },
+        {
+          "questionId": 102,
+          "selectedIndex": 1,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:10:21.610Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": 101,
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
+          "choiceExplanations": [
+            "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior.",
+            "AWS Config tracks resource configuration and compliance, not threat detection.",
+            "AWS WAF is a web application firewall focused on HTTP(s) protections.",
+            "Amazon SNS is a notification service, not a security findings aggregator."
+          ]
+        },
+        {
+          "id": 102,
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Detective",
+            "Systems Manager",
+            "Shield",
+            "CloudTrail"
+          ],
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            "AWS Systems Manager",
+            "Amazon Detective",
+            "AWS Shield",
+            "AWS CloudTrail"
+          ],
+          "answerIndex": 1,
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective helps analyze and investigate security issues by collecting and organizing log data to make investigations faster.",
+          "choiceExplanations": [
+            "Systems Manager helps manage instances but isn't focused on security investigation notebooks.",
+            "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues.",
+            "AWS Shield provides DDoS protections, not forensic investigation tools.",
+            "CloudTrail records API activity and is useful for forensics but Detective provides investigative workflows."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Incident Response": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        }
+      }
+    },
+    {
+      "attemptId": "a03fdfae-4019-4397-aca0-d6fc6717dde9",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-15T16:10:45.912Z",
+      "finishedAt": "2026-02-15T16:10:57.995Z",
+      "score": 0,
+      "answers": [
+        {
+          "questionId": 104,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:10:49.255Z"
+        },
+        {
+          "questionId": 107,
+          "selectedIndex": 3,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:10:54.823Z"
+        }
+      ],
+      "metadata": {
+        "mode": "weakest-link",
+        "domainWeights": {
+          "Detection": 0.10672358591248667,
+          "Incident Response": 0.11526147278548558,
+          "Infrastructure Security": 0.2113127001067236,
+          "Identity and Access Management": 0.22091782283884737,
+          "Data Protection": 0.1248665955176094,
+          "Identity & Access": 0.22091782283884737
+        },
+        "wrongQuestionCount": 8
+      },
+      "questions": [
+        {
+          "id": 101,
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
+          "choiceExplanations": [
+            "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior.",
+            "AWS Config tracks resource configuration and compliance, not threat detection.",
+            "AWS WAF is a web application firewall focused on HTTP(s) protections.",
+            "Amazon SNS is a notification service, not a security findings aggregator."
+          ]
+        },
+        {
+          "id": 102,
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Detective",
+            "Systems Manager",
+            "Shield",
+            "CloudTrail"
+          ],
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            "AWS Systems Manager",
+            "Amazon Detective",
+            "AWS Shield",
+            "AWS CloudTrail"
+          ],
+          "answerIndex": 1,
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective helps analyze and investigate security issues by collecting and organizing log data to make investigations faster.",
+          "choiceExplanations": [
+            "Systems Manager helps manage instances but isn't focused on security investigation notebooks.",
+            "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues.",
+            "AWS Shield provides DDoS protections, not forensic investigation tools.",
+            "CloudTrail records API activity and is useful for forensics but Detective provides investigative workflows."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Incident Response": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
+    },
+    {
+      "attemptId": "de09f947-afd3-401f-b6e4-87f4736ec0c1",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-15T16:15:07.449Z",
+      "finishedAt": "2026-02-15T16:15:19.433Z",
+      "score": 13,
+      "answers": [
+        {
+          "questionId": 102,
+          "selectedIndex": 1,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:15:14.629Z"
+        },
+        {
+          "questionId": 105,
+          "selectedIndex": 1,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:15:16.370Z"
+        }
+      ],
+      "metadata": {
+        "mode": "weakest-link",
+        "domainWeights": {
+          "Detection": 0.11128284389489952,
+          "Incident Response": 0.12364760432766615,
+          "Infrastructure Security": 0.2086553323029366,
+          "Identity and Access Management": 0.21638330757341576,
+          "Data Protection": 0.12364760432766615,
+          "Identity & Access": 0.21638330757341576
+        },
+        "wrongQuestionCount": 8
+      },
+      "questions": [
+        {
+          "id": 101,
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
+          "choiceExplanations": [
+            "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior.",
+            "AWS Config tracks resource configuration and compliance, not threat detection.",
+            "AWS WAF is a web application firewall focused on HTTP(s) protections.",
+            "Amazon SNS is a notification service, not a security findings aggregator."
+          ]
+        },
+        {
+          "id": 102,
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Detective",
+            "Systems Manager",
+            "Shield",
+            "CloudTrail"
+          ],
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            "AWS Systems Manager",
+            "Amazon Detective",
+            "AWS Shield",
+            "AWS CloudTrail"
+          ],
+          "answerIndex": 1,
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective helps analyze and investigate security issues by collecting and organizing log data to make investigations faster.",
+          "choiceExplanations": [
+            "Systems Manager helps manage instances but isn't focused on security investigation notebooks.",
+            "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues.",
+            "AWS Shield provides DDoS protections, not forensic investigation tools.",
+            "CloudTrail records API activity and is useful for forensics but Detective provides investigative workflows."
+          ]
+        },
+        {
+          "id": 103,
+          "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "WAF",
+            "CloudFront",
+            "Security Groups"
+          ],
+          "question": "To restrict traffic at the network edge for HTTP endpoints, which service should you combine with CloudFront?",
+          "choices": [
+            "AWS WAF",
+            "Security Groups",
+            "VPC Endpoint",
+            "AWS KMS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think web application protection rules that block common attack patterns at the edge.",
+          "explanation": "AWS WAF integrates with CloudFront to allow deployment of custom rules to block or rate-limit malicious HTTP(s) requests at the edge.",
+          "choiceExplanations": [
+            "AWS WAF is the web application firewall used with CloudFront to filter HTTP(S) traffic.",
+            "Security Groups control traffic to EC2 at the instance level, not the CloudFront edge.",
+            "VPC Endpoints provide private connectivity to services within a VPC, not edge HTTP filtering.",
+            "AWS KMS is for key management and encryption, not traffic filtering."
+          ]
+        },
+        {
+          "id": 104,
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "STS",
+            "Cognito"
+          ],
+          "question": "Which feature helps enforce least privilege by providing temporary credentials?",
+          "choices": [
+            "IAM Roles with STS",
+            "IAM Users with long-term keys",
+            "Security Groups",
+            "Amazon Cognito Sync"
+          ],
+          "answerIndex": 0,
+          "tip": "Temporary credentials reduce the risk from long-lived keys.",
+          "explanation": "IAM Roles combined with AWS STS (Security Token Service) issue temporary credentials that help enforce least privilege and reduce exposure of long-term credentials.",
+          "choiceExplanations": [
+            "IAM Roles with STS allow issuance of temporary credentials for short-term access.",
+            "IAM Users with long-term keys are not recommended for least-privilege patterns.",
+            "Security Groups are network controls, not credential mechanisms.",
+            "Amazon Cognito provides user identity for apps but the key mechanism for temporary AWS credentials is STS/roles."
+          ]
+        },
+        {
+          "id": 105,
+          "docs": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "KMS",
+            "IAM",
+            "Shield",
+            "WAF"
+          ],
+          "question": "Which service provides managed encryption keys that you can use to encrypt data at rest?",
+          "choices": [
+            "AWS KMS",
+            "AWS IAM",
+            "AWS Shield",
+            "AWS WAF"
+          ],
+          "answerIndex": 0,
+          "tip": "Key management service with envelope encryption support.",
+          "explanation": "AWS Key Management Service (KMS) provides centralized management of encryption keys used to protect data at rest across many AWS services.",
+          "choiceExplanations": [
+            "AWS KMS is the managed service for creating and controlling encryption keys.",
+            "AWS IAM handles identity and permissions, not key storage/encryption primitives.",
+            "AWS Shield protects against DDoS attacks, not key management.",
+            "AWS WAF is a web firewall, not key management."
+          ]
+        },
+        {
+          "id": 106,
+          "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "Security Hub",
+            "KMS",
+            "SQS",
+            "CloudFormation",
+            "EC2"
+          ],
+          "question": "A security team needs to centrally manage findings from multiple AWS security services and ensure encryption of sensitive data at rest. Which TWO services should they use together? (Select TWO)",
+          "selectCount": 2,
+          "choices": [
+            "AWS Security Hub",
+            "AWS KMS",
+            "Amazon SQS",
+            "AWS CloudFormation",
+            "Amazon EC2"
+          ],
+          "answerIndices": [
+            0,
+            1
+          ],
+          "tip": "Think about centralized findings aggregation and key management.",
+          "explanation": "Security Hub aggregates and prioritizes findings from GuardDuty, Inspector, Macie, and partner tools. KMS provides managed encryption keys for data at rest. SQS is a messaging service, CloudFormation is IaC, and EC2 is compute — none address the stated requirements.",
+          "choiceExplanations": [
+            "Security Hub provides a comprehensive view of security alerts and compliance status across accounts.",
+            "KMS provides centralized encryption key management for encrypting data at rest.",
+            "SQS is a message queuing service, not related to security findings or encryption.",
+            "CloudFormation is an infrastructure-as-code service, not a security findings tool.",
+            "EC2 provides virtual machines, not security findings management."
+          ]
+        },
+        {
+          "id": 107,
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "format": "json",
+          "domain": "Identity & Access",
+          "services": [
+            "IAM",
+            "S3"
+          ],
+          "question": "A security engineer needs to restrict an IAM role so it can only access a specific S3 bucket from a particular VPC endpoint. Which policy condition block should be added?",
+          "choices": [
+            "{\"Condition\": {\"StringEquals\": {\"aws:sourceVpce\": \"vpce-1a2b3c4d\"}}}",
+            "{\"Condition\": {\"IpAddress\": {\"aws:SourceIp\": \"10.0.0.0/16\"}}}",
+            "Add the VPC endpoint ID to the IAM role's trust policy as a Principal",
+            "Attach a security group to the IAM role that only allows traffic from the VPC"
+          ],
+          "answerIndex": 0,
+          "tip": "VPC endpoint restrictions in IAM use the aws:sourceVpce condition key with StringEquals.",
+          "explanation": "The JSON condition block uses aws:sourceVpce with StringEquals to restrict access to requests originating from a specific VPC endpoint. Option 2 restricts by IP, which doesn't specifically target a VPC endpoint. Option 3 is invalid — VPC endpoints cannot be IAM principals. Option 4 is invalid — security groups cannot be attached to IAM roles.",
+          "choiceExplanations": [
+            "Correct — aws:sourceVpce condition restricts the policy to requests through the specified VPC endpoint.",
+            "IpAddress/SourceIp restricts by IP range, not by VPC endpoint identity.",
+            "VPC endpoints are not IAM principals and cannot appear in a trust policy's Principal element.",
+            "Security groups are network-level controls for ENIs — they cannot be attached to IAM roles."
+          ]
+        },
+        {
+          "id": 108,
+          "docs": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html",
+          "format": "yaml",
+          "domain": "Detection",
+          "services": [
+            "Config",
+            "CloudFormation",
+            "S3"
+          ],
+          "question": "A security team wants to use AWS Config to detect S3 buckets that have public read access. Which CloudFormation resource snippet correctly defines this managed Config rule?",
+          "choices": [
+            "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: AWS\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+            "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: CUSTOM\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+            "Use AWS CloudTrail to monitor S3:GetBucketPolicy API calls and alert when public access is detected",
+            "Enable S3 Block Public Access at the account level — this replaces the need for Config rules"
+          ],
+          "answerIndex": 0,
+          "tip": "AWS Config managed rules use Owner: AWS with a predefined SourceIdentifier.",
+          "explanation": "The correct YAML uses AWS::Config::ConfigRule with Owner: AWS and the managed rule identifier S3_BUCKET_PUBLIC_READ_PROHIBITED. Option 2 uses Owner: CUSTOM which is for Lambda-backed custom rules. Option 3 describes a monitoring approach but not an AWS Config rule. Option 4 is a preventive control, not a detective Config rule.",
+          "choiceExplanations": [
+            "Correct — AWS managed Config rule using Owner: AWS and the standard S3 public read detection identifier.",
+            "Owner: CUSTOM is for custom rules backed by Lambda functions, not AWS managed rules.",
+            "CloudTrail monitors API calls but doesn't provide continuous compliance evaluation like AWS Config.",
+            "Block Public Access is preventive — it doesn't detect existing violations like a Config rule does."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 3,
+          "correct": 0,
+          "score": 0
+        },
+        "Incident Response": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Infrastructure Security": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Identity and Access Management": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Data Protection": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Identity & Access": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
+    },
+    {
+      "attemptId": "7eda246f-6acb-4df7-a43d-bfacf3939881",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-15T16:20:19.822Z",
+      "finishedAt": "2026-02-15T16:21:23.293Z",
+      "score": 67,
+      "answers": [
+        {
+          "questionId": 108,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:21:08.907Z"
+        },
+        {
+          "questionId": 102,
+          "selectedIndex": 1,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:21:13.778Z"
+        },
+        {
+          "questionId": 103,
+          "selectedIndex": 2,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:21:19.391Z"
+        }
+      ],
+      "metadata": {
+        "mode": "weakest-link",
+        "domainWeights": {
+          "Detection": 0.12665438096833642,
+          "Incident Response": 0.10454012397386497,
+          "Infrastructure Security": 0.2025464901993634,
+          "Identity and Access Management": 0.20908024794772995,
+          "Data Protection": 0.14809850896297538,
+          "Identity & Access": 0.20908024794772995
+        },
+        "wrongQuestionCount": 8
+      },
+      "questions": [
+        {
+          "id": 108,
+          "docs": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html",
+          "format": "yaml",
+          "domain": "Detection",
+          "services": [
+            "Config",
+            "CloudFormation",
+            "S3"
+          ],
+          "question": "A security team wants to use AWS Config to detect S3 buckets that have public read access. Which CloudFormation resource snippet correctly defines this managed Config rule?",
+          "choices": [
+            "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: AWS\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+            "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: CUSTOM\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+            "Use AWS CloudTrail to monitor S3:GetBucketPolicy API calls and alert when public access is detected",
+            "Enable S3 Block Public Access at the account level — this replaces the need for Config rules"
+          ],
+          "answerIndex": 0,
+          "tip": "AWS Config managed rules use Owner: AWS with a predefined SourceIdentifier.",
+          "explanation": "The correct YAML uses AWS::Config::ConfigRule with Owner: AWS and the managed rule identifier S3_BUCKET_PUBLIC_READ_PROHIBITED. Option 2 uses Owner: CUSTOM which is for Lambda-backed custom rules. Option 3 describes a monitoring approach but not an AWS Config rule. Option 4 is a preventive control, not a detective Config rule.",
+          "choiceExplanations": [
+            "Correct — AWS managed Config rule using Owner: AWS and the standard S3 public read detection identifier.",
+            "Owner: CUSTOM is for custom rules backed by Lambda functions, not AWS managed rules.",
+            "CloudTrail monitors API calls but doesn't provide continuous compliance evaluation like AWS Config.",
+            "Block Public Access is preventive — it doesn't detect existing violations like a Config rule does."
+          ],
+          "weight": 0.12665438096833642,
+          "previouslyWrong": false
+        },
+        {
+          "id": 102,
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Detective",
+            "Systems Manager",
+            "Shield",
+            "CloudTrail"
+          ],
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            "AWS Systems Manager",
+            "Amazon Detective",
+            "AWS Shield",
+            "AWS CloudTrail"
+          ],
+          "answerIndex": 1,
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective helps analyze and investigate security issues by collecting and organizing log data to make investigations faster.",
+          "choiceExplanations": [
+            "Systems Manager helps manage instances but isn't focused on security investigation notebooks.",
+            "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues.",
+            "AWS Shield provides DDoS protections, not forensic investigation tools.",
+            "CloudTrail records API activity and is useful for forensics but Detective provides investigative workflows."
+          ],
+          "weight": 0.10454012397386497,
+          "previouslyWrong": true
+        },
+        {
+          "id": 103,
+          "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "WAF",
+            "CloudFront",
+            "Security Groups"
+          ],
+          "question": "To restrict traffic at the network edge for HTTP endpoints, which service should you combine with CloudFront?",
+          "choices": [
+            "AWS WAF",
+            "Security Groups",
+            "VPC Endpoint",
+            "AWS KMS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think web application protection rules that block common attack patterns at the edge.",
+          "explanation": "AWS WAF integrates with CloudFront to allow deployment of custom rules to block or rate-limit malicious HTTP(s) requests at the edge.",
+          "choiceExplanations": [
+            "AWS WAF is the web application firewall used with CloudFront to filter HTTP(S) traffic.",
+            "Security Groups control traffic to EC2 at the instance level, not the CloudFront edge.",
+            "VPC Endpoints provide private connectivity to services within a VPC, not edge HTTP filtering.",
+            "AWS KMS is for key management and encryption, not traffic filtering."
+          ],
+          "weight": 0.2025464901993634,
+          "previouslyWrong": true
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Incident Response": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Infrastructure Security": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
+    },
+    {
+      "attemptId": "1ea8b07e-2471-445e-a063-7ae9bff372c5",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SAMPLE-10Q",
+      "startedAt": "2026-02-15T16:35:03.480Z",
+      "finishedAt": "2026-02-15T16:35:54.790Z",
+      "score": 50,
+      "answers": [
+        {
+          "questionId": 2,
+          "selectedIndex": 0,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:35:12.149Z"
+        },
+        {
+          "questionId": 3,
+          "selectedIndex": 2,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:35:23.383Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": 2,
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+          "format": "json",
+          "domain": "Security",
+          "services": [
+            "IAM"
+          ],
+          "question": "The following IAM policy document is attached to a user. What actions can the user perform?",
+          "choices": [
+            "{\"Effect\": \"Allow\", \"Action\": \"s3:GetObject\", \"Resource\": \"arn:aws:s3:::my-bucket/*\"}",
+            "{\"Effect\": \"Allow\", \"Action\": \"s3:*\", \"Resource\": \"*\"}",
+            "{\"Effect\": \"Deny\", \"Action\": \"s3:GetObject\", \"Resource\": \"arn:aws:s3:::my-bucket/*\"}",
+            "{\"Effect\": \"Allow\", \"Action\": \"ec2:*\", \"Resource\": \"*\"}"
+          ],
+          "answerIndex": 0,
+          "tip": "Read the JSON policy statement carefully — focus on Effect, Action, and Resource fields.",
+          "explanation": "The correct policy grants read-only access (s3:GetObject) to objects in a specific S3 bucket. The second option grants full S3 access to all resources (too broad). The third explicitly denies. The fourth grants EC2 access, not S3.",
+          "choiceExplanations": [
+            "This allows only GetObject on the specific bucket — the least-privilege, correct answer.",
+            "This grants full S3 access to all resources — far too permissive for read-only access.",
+            "This explicitly denies GetObject — the user would NOT be able to read objects.",
+            "This grants full EC2 access, which is unrelated to S3 operations."
+          ]
+        },
+        {
+          "id": 3,
+          "docs": "https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html",
+          "format": "yaml",
+          "domain": "Deployment",
+          "services": [
+            "CloudFormation"
+          ],
+          "question": "Which CloudFormation template snippet correctly defines an S3 bucket with versioning enabled?",
+          "choices": [
+            "Resources:\n  MyBucket:\n    Type: AWS::S3::Bucket\n    Properties:\n      VersioningConfiguration:\n        Status: Enabled",
+            "Resources:\n  MyBucket:\n    Type: AWS::S3::Bucket\n    Properties:\n      Versioning: true",
+            "Resources:\n  MyBucket:\n    Type: AWS::S3\n    Properties:\n      VersioningConfiguration:\n        Status: Enabled",
+            "Resources:\n  MyBucket:\n    Kind: AWS::S3::Bucket\n    Properties:\n      VersioningConfiguration:\n        Status: On"
+          ],
+          "answerIndex": 0,
+          "tip": "CloudFormation uses Type (not Kind) and the S3 versioning property uses VersioningConfiguration with Status: Enabled.",
+          "explanation": "The correct CloudFormation syntax uses Type: AWS::S3::Bucket with a VersioningConfiguration block containing Status: Enabled. Option 2 uses an incorrect shorthand. Option 3 has an invalid Type. Option 4 uses Kind (Kubernetes syntax) instead of Type.",
+          "choiceExplanations": [
+            "Correct — uses the proper Type, and VersioningConfiguration with Status: Enabled.",
+            "Incorrect — \"Versioning: true\" is not valid CloudFormation syntax; you need VersioningConfiguration.",
+            "Incorrect — the Type should be AWS::S3::Bucket, not AWS::S3.",
+            "Incorrect — CloudFormation uses \"Type\" not \"Kind\", and the Status should be \"Enabled\" not \"On\"."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Security": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Deployment": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
+    },
+    {
+      "attemptId": "506516f5-2bd5-4ce0-b0de-64b3853bff72",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SCS-C03",
+      "startedAt": "2026-02-15T16:36:10.970Z",
+      "finishedAt": "2026-02-15T16:36:30.368Z",
+      "score": 25,
+      "answers": [
+        {
+          "questionId": 101,
+          "selectedIndex": 2,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:36:12.979Z"
+        },
+        {
+          "questionId": 102,
+          "selectedIndex": 1,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:36:13.860Z"
+        },
+        {
+          "questionId": 103,
+          "selectedIndex": 2,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:36:21.802Z"
+        },
+        {
+          "questionId": 104,
+          "selectedIndex": 2,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-15T16:36:25.375Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": 101,
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
+          "choiceExplanations": [
+            "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior.",
+            "AWS Config tracks resource configuration and compliance, not threat detection.",
+            "AWS WAF is a web application firewall focused on HTTP(s) protections.",
+            "Amazon SNS is a notification service, not a security findings aggregator."
+          ]
+        },
+        {
+          "id": 102,
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Detective",
+            "Systems Manager",
+            "Shield",
+            "CloudTrail"
+          ],
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            "AWS Systems Manager",
+            "Amazon Detective",
+            "AWS Shield",
+            "AWS CloudTrail"
+          ],
+          "answerIndex": 1,
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective helps analyze and investigate security issues by collecting and organizing log data to make investigations faster.",
+          "choiceExplanations": [
+            "Systems Manager helps manage instances but isn't focused on security investigation notebooks.",
+            "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues.",
+            "AWS Shield provides DDoS protections, not forensic investigation tools.",
+            "CloudTrail records API activity and is useful for forensics but Detective provides investigative workflows."
+          ]
+        },
+        {
+          "id": 103,
+          "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "WAF",
+            "CloudFront",
+            "Security Groups"
+          ],
+          "question": "To restrict traffic at the network edge for HTTP endpoints, which service should you combine with CloudFront?",
+          "choices": [
+            "AWS WAF",
+            "Security Groups",
+            "VPC Endpoint",
+            "AWS KMS"
+          ],
+          "answerIndex": 0,
+          "tip": "Think web application protection rules that block common attack patterns at the edge.",
+          "explanation": "AWS WAF integrates with CloudFront to allow deployment of custom rules to block or rate-limit malicious HTTP(s) requests at the edge.",
+          "choiceExplanations": [
+            "AWS WAF is the web application firewall used with CloudFront to filter HTTP(S) traffic.",
+            "Security Groups control traffic to EC2 at the instance level, not the CloudFront edge.",
+            "VPC Endpoints provide private connectivity to services within a VPC, not edge HTTP filtering.",
+            "AWS KMS is for key management and encryption, not traffic filtering."
+          ]
+        },
+        {
+          "id": 104,
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "STS",
+            "Cognito"
+          ],
+          "question": "Which feature helps enforce least privilege by providing temporary credentials?",
+          "choices": [
+            "IAM Roles with STS",
+            "IAM Users with long-term keys",
+            "Security Groups",
+            "Amazon Cognito Sync"
+          ],
+          "answerIndex": 0,
+          "tip": "Temporary credentials reduce the risk from long-lived keys.",
+          "explanation": "IAM Roles combined with AWS STS (Security Token Service) issue temporary credentials that help enforce least privilege and reduce exposure of long-term credentials.",
+          "choiceExplanations": [
+            "IAM Roles with STS allow issuance of temporary credentials for short-term access.",
+            "IAM Users with long-term keys are not recommended for least-privilege patterns.",
+            "Security Groups are network controls, not credential mechanisms.",
+            "Amazon Cognito provides user identity for apps but the key mechanism for temporary AWS credentials is STS/roles."
+          ]
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Incident Response": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        },
+        "Infrastructure Security": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Identity and Access Management": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      }
     }
   ]
 }

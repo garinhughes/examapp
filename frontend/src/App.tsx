@@ -239,6 +239,21 @@ export default function App() {
   const [examStarted, setExamStarted] = useState<boolean>(false)
   const [timed, setTimed] = useState<boolean>(false)
   const [durationMinutes, setDurationMinutes] = useState<number>(15)
+  // Exam mode: 'casual' | 'timed' | 'weakest-link'
+  const [examMode, setExamMode] = useState<'casual' | 'timed' | 'weakest-link'>('casual')
+  // When to reveal correct answers: immediately after each question or on exam completion
+  const [revealAnswers, setRevealAnswers] = useState<'immediately' | 'on-completion'>('immediately')
+  // Set of question IDs whose answers have been revealed (for immediate mode)
+  const [revealedQuestions, setRevealedQuestions] = useState<Set<number>>(new Set())
+  // Staged single-select answer (not yet submitted, used in immediate mode)
+  const [stagedAnswer, setStagedAnswer] = useState<Record<number, number>>({})
+  // Weakest-link metadata returned from the backend (domain weights, etc.)
+  const [weakestLinkInfo, setWeakestLinkInfo] = useState<{
+    domainWeights: Record<string, number>
+    domainStats: Record<string, { total: number; correct: number; avgScore: number; attemptCount: number }>
+    wrongQuestionCount: number
+  } | null>(null)
+  const [loadingWeakestLink, setLoadingWeakestLink] = useState<boolean>(false)
   // (no persisted per-exam prefs) duration is a single value used for pre-start form
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [numQuestions, setNumQuestions] = useState<number>(0)
@@ -279,6 +294,11 @@ export default function App() {
     setSelected(ex.code)
     setSelectedAnswers({})
     setAttemptData(null)
+    setWeakestLinkInfo(null)
+    setExamMode('casual')
+    setRevealAnswers('immediately')
+    setRevealedQuestions(new Set())
+    setStagedAnswer({})
     try {
       const def = ex.defaultQuestions ?? ex.defaultQuestionCount ?? (ex.provider === 'AWS' ? 65 : (ex.questions?.length || 10))
       setNumQuestions(def)
@@ -804,21 +824,85 @@ ${questionsHTML}
     setCurrentQuestionIndex(0)
     setShowSubmitConfirm(false)
     setShowCompleteEarlyConfirm(false)
+    setRevealedQuestions(new Set())
+    setStagedAnswer({})
     try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
     const key = `attempt:${selected}`
 
       // ── Visitor (unauthenticated) — run exam entirely client-side ──
       if (!user) {
+        if (examMode === 'weakest-link') {
+          setLastError('Sign in to use Weakest Link mode — it needs your attempt history.')
+          return
+        }
         const localId = `visitor-${Date.now()}`
         setAttemptId(localId)
         setExamStarted(true)
-        if (timed) setTimeLeft(durationMinutes * 60)
+        if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
         return
       }
 
       try {
         // do not persist pre-start prefs; start with current form values
 
+      // ── Weakest Link mode: fetch weighted questions from backend ──
+      if (examMode === 'weakest-link') {
+        setLoadingWeakestLink(true)
+        try {
+          const wlRes = await authFetch(`/exams/${encodeURIComponent(selected)}/weakest-link?count=${numQuestions}`)
+          if (!wlRes.ok) {
+            const errText = await wlRes.text().catch(() => 'weakest-link fetch failed')
+            setLastError(errText)
+            return
+          }
+          const wlData = await wlRes.json()
+          const wlQuestions = wlData.questions || []
+          if (wlQuestions.length === 0) {
+            setLastError('No questions available for Weakest Link mode. Complete some attempts first!')
+            return
+          }
+          setWeakestLinkInfo({
+            domainWeights: wlData.domainWeights,
+            domainStats: wlData.domainStats,
+            wrongQuestionCount: wlData.wrongQuestionCount,
+          })
+
+          // Create a server-side attempt with the exact weakest-link questions
+          // so the server scores against the same set the user sees
+          const res = await authFetch('/attempts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              examCode: selected,
+              questionIds: wlQuestions.map((q: any) => q.id),
+              questions: wlQuestions,
+              metadata: { mode: 'weakest-link', domainWeights: wlData.domainWeights, wrongQuestionCount: wlData.wrongQuestionCount }
+            })
+          })
+          if (!res.ok) {
+            const text = await res.text().catch(() => 'create attempt failed')
+            setLastError(text)
+            return
+          }
+          const data = await res.json()
+          if (data?.attemptId) {
+            recordPracticeDay()
+            setAttemptId(data.attemptId)
+            try { localStorage.setItem(key, data.attemptId) } catch {}
+            // Use the weakest-link questions directly and set attemptData
+            // so the questions-fetch effect doesn't overwrite them
+            setQuestions(wlQuestions)
+            setAttemptData({ questions: wlQuestions, attemptId: data.attemptId, examCode: selected })
+            setNumQuestions(wlQuestions.length)
+            setExamStarted(true)
+          }
+        } finally {
+          setLoadingWeakestLink(false)
+        }
+        return
+      }
+
+      // ── Normal (casual / timed) mode ──
       // prepare metadata (service keywords) from Beta input
       const keywords = serviceFilterText.split(',').map((s) => s.trim()).filter(Boolean)
 
@@ -883,20 +967,20 @@ ${questionsHTML}
             // if attempt contains questions (filtered set), use them
             if (Array.isArray(attemptFull.questions)) setQuestions(attemptFull.questions)
             setExamStarted(true)
-            if (timed) setTimeLeft(durationMinutes * 60)
+            if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
           } else {
             // fallback: set attempt id and start
             setAttemptId(data.attemptId)
             try { localStorage.setItem(key, data.attemptId) } catch {}
             setExamStarted(true)
-            if (timed) setTimeLeft(durationMinutes * 60)
+            if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
           }
         } catch (err) {
           // if follow-up fetch fails, still start with attempt id
           setAttemptId(data.attemptId)
           try { localStorage.setItem(key, data.attemptId) } catch {}
           setExamStarted(true)
-          if (timed) setTimeLeft(durationMinutes * 60)
+          if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
         }
       }
     } catch (err) {
@@ -924,8 +1008,8 @@ ${questionsHTML}
     // clear any pending multi-select state
     setMultiSelectPending((p) => { const next = { ...p }; delete next[q.id]; return next })
 
-    // Auto-advance to next unanswered question (skip when re-answering)
-    if (!isReAnswer) {
+    // Auto-advance to next unanswered question (skip when re-answering or in immediate-reveal mode)
+    if (!isReAnswer && revealAnswers !== 'immediately') {
       const nextIdx = displayQuestions.findIndex((qq, idx) => idx > currentQuestionIndex && newSelected[qq.id] === undefined)
       if (nextIdx >= 0) setCurrentQuestionIndex(nextIdx)
       else {
@@ -1159,7 +1243,7 @@ ${questionsHTML}
 
   // timer effect for timed exams (respects paused state)
   useEffect(() => {
-    if (!examStarted || !timed) return
+    if (!examStarted || examMode !== 'timed') return
     if (timeLeft === null) return
     if (paused) return // don't tick while paused
     const id = setInterval(() => {
@@ -1173,7 +1257,7 @@ ${questionsHTML}
       })
     }, 1000)
     return () => clearInterval(id)
-  }, [examStarted, timed, timeLeft, attemptId, paused])
+  }, [examStarted, examMode, timeLeft, attemptId, paused])
 
   // Auto-save exam progress to localStorage for Save & Resume
   useEffect(() => {
@@ -2762,13 +2846,13 @@ ${questionsHTML}
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
                   <div className="md:col-span-2">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
                       <button
                         type="button"
-                        onClick={() => setTimed(false)}
+                        onClick={() => { setExamMode('casual'); setTimed(false); setRevealAnswers('immediately') }}
                         disabled={!!attemptId && !isFinished}
-                        className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${!timed ? 'border-sky-400 bg-sky-50 dark:bg-sky-900/30' : 'border-transparent bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700/20'} text-sm`}
-                        aria-pressed={!timed}
+                        className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${examMode === 'casual' ? 'border-sky-400 bg-sky-50 dark:bg-sky-900/30' : 'border-transparent bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700/20'} text-sm`}
+                        aria-pressed={examMode === 'casual'}
                         title="Casual mode"
                       >
                         <svg className="w-5 h-5 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -2781,24 +2865,140 @@ ${questionsHTML}
                       <button
                         type="button"
                         onClick={() => {
-                          if (!selected) { setTimed(true); return }
+                          setExamMode('timed')
+                          setTimed(true)
+                          setRevealAnswers('on-completion')
+                          if (!selected) return
                           try {
                             const meta = exams.find((e: any) => e.code === selected)
                             if (typeof meta?.defaultDuration === 'number') setDurationMinutes(meta.defaultDuration)
                           } catch {}
-                          setTimed(true)
                         }}
                         disabled={!!attemptId && !isFinished}
-                        className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${timed ? 'border-sky-400 bg-sky-50 dark:bg-sky-900/30' : 'border-transparent bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700/20'} text-sm`}
-                        aria-pressed={timed}
+                        className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${examMode === 'timed' ? 'border-sky-400 bg-sky-50 dark:bg-sky-900/30' : 'border-transparent bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700/20'} text-sm`}
+                        aria-pressed={examMode === 'timed'}
                         title="Timed mode"
                       >
                         <svg className="w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
                         <span>Timed</span>
                       </button>
+
+                      <button
+                        type="button"
+                        onClick={() => { setExamMode('weakest-link'); setTimed(false); setRevealAnswers('immediately') }}
+                        disabled={(!!attemptId && !isFinished) || !user}
+                        className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${examMode === 'weakest-link' ? 'border-purple-400 bg-purple-50 dark:bg-purple-900/30' : 'border-transparent bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700/20'} text-sm ${!user ? 'opacity-40 cursor-not-allowed' : ''}`}
+                        aria-pressed={examMode === 'weakest-link'}
+                        title={user ? 'Weakest Link — prioritises your weakest domains and previously wrong questions' : 'Sign in to use Weakest Link mode'}
+                      >
+                        <span className="text-lg">🧠</span>
+                        <span>Weakest Link</span>
+                      </button>
                     </div>
 
-                    {timed && (
+                    {/* Mode descriptions */}
+                    {examMode === 'casual' && (
+                      <div className="mt-3 p-3 rounded-lg border border-sky-200 dark:border-sky-700/50 bg-sky-50/50 dark:bg-sky-900/10 text-sm text-sky-800 dark:text-sky-200">
+                        <div className="flex items-start gap-2">
+                          <svg className="w-5 h-5 text-sky-500 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h6L3 12h6" /><path d="M8 10h6L8 16h6" /></svg>
+                          <div>
+                            <p className="font-medium">Casual Mode</p>
+                            <p className="text-xs mt-1 text-sky-600 dark:text-sky-300/80">
+                              No time pressure — work through questions at your own pace. Perfect for learning, reviewing explanations, and building confidence.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {examMode === 'timed' && (
+                      <div className="mt-3 p-3 rounded-lg border border-indigo-200 dark:border-indigo-700/50 bg-indigo-50/50 dark:bg-indigo-900/10 text-sm text-indigo-800 dark:text-indigo-200">
+                        <div className="flex items-start gap-2">
+                          <svg className="w-5 h-5 text-indigo-500 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+                          <div>
+                            <p className="font-medium">Timed Mode</p>
+                            <p className="text-xs mt-1 text-indigo-600 dark:text-indigo-300/80">
+                              Simulate real exam conditions with a countdown timer. The exam auto-submits when time runs out. Great for building time management skills.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {examMode === 'weakest-link' && (
+                      <div className="mt-3 p-3 rounded-lg border border-purple-200 dark:border-purple-700/50 bg-purple-50/50 dark:bg-purple-900/10 text-sm text-purple-800 dark:text-purple-200">
+                        <div className="flex items-start gap-2">
+                          <span className="text-lg mt-0.5">🧠</span>
+                          <div>
+                            <p className="font-medium">Weakest Link Mode</p>
+                            <p className="text-xs mt-1 text-purple-600 dark:text-purple-300/80">
+                              Questions are weighted toward your historically weakest domains. Previously wrong questions appear more frequently.
+                              {analyticsDomains ? '' : ' Complete at least one attempt first for best results.'}
+                            </p>
+                            {analyticsDomains && Object.keys(analyticsDomains).length > 0 && (
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                {Object.entries(analyticsDomains)
+                                  .sort(([, a], [, b]) => a.avgScore - b.avgScore)
+                                  .map(([domain, stats]) => (
+                                    <span
+                                      key={domain}
+                                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                                        stats.avgScore < 50
+                                          ? 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700/40'
+                                          : stats.avgScore < 70
+                                          ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-700/40'
+                                          : 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700/40'
+                                      }`}
+                                    >
+                                      {domain}: {stats.avgScore}%
+                                    </span>
+                                  ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Show Answers toggle */}
+                    <div className="mt-3">
+                      <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Show answers</label>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setRevealAnswers('immediately')}
+                          disabled={!!attemptId && !isFinished}
+                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition ${
+                            revealAnswers === 'immediately'
+                              ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+                              : 'border-transparent bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700/20 text-slate-600 dark:text-slate-400'
+                          }`}
+                        >
+                          <span className="text-sm">👁️</span>
+                          <span>Immediately</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRevealAnswers('on-completion')}
+                          disabled={!!attemptId && !isFinished}
+                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition ${
+                            revealAnswers === 'on-completion'
+                              ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                              : 'border-transparent bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700/20 text-slate-600 dark:text-slate-400'
+                          }`}
+                        >
+                          <span className="text-sm">🔒</span>
+                          <span>On completion</span>
+                        </button>
+                      </div>
+                      <p className="mt-1 text-[11px] text-slate-400">
+                        {revealAnswers === 'immediately'
+                          ? 'You\'ll see the correct answer and explanation after submitting each question.'
+                          : 'Answers and explanations are only revealed after you finish the exam.'}
+                      </p>
+                    </div>
+
+                    {examMode === 'timed' && (
                       <div className="mt-3">
                         <label className="block text-sm font-medium mb-1">Duration (mins)</label>
                         <div className="flex items-center gap-3">
@@ -2974,6 +3174,11 @@ ${questionsHTML}
                   
                   <button className="px-3 py-2 rounded-md bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-500 transition" onClick={() => { 
                     setTakeDomains(['All']); setTimed(false);
+                    setExamMode('casual')
+                    setWeakestLinkInfo(null)
+                    setRevealAnswers('immediately')
+                    setRevealedQuestions(new Set())
+                    setStagedAnswer({})
                     setServiceFilterText('')
                     setSelectedServices([])
                     setLastError(null)
@@ -2990,7 +3195,17 @@ ${questionsHTML}
                       Resume ({savedProgress.answeredCount}/{savedProgress.total} answered)
                     </button>
                   )}
-                  <button className="px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold" onClick={() => createAttempt()}>{savedProgress ? 'Start new' : 'Start exam'}</button>
+                  <button
+                    className={`px-4 py-2 rounded-md text-white font-semibold transition-all ${
+                      examMode === 'weakest-link'
+                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600'
+                        : 'bg-gradient-to-r from-sky-500 to-indigo-500'
+                    } ${loadingWeakestLink ? 'opacity-70 cursor-wait' : ''}`}
+                    onClick={() => createAttempt()}
+                    disabled={loadingWeakestLink}
+                  >
+                    {loadingWeakestLink ? '🧠 Preparing…' : examMode === 'weakest-link' ? '🧠 Start Weakest Link' : savedProgress ? 'Start new' : 'Start exam'}
+                  </button>
                 </div>
               </div>
             )}
@@ -3074,6 +3289,14 @@ ${questionsHTML}
                       ? (Array.isArray(q.answerIndices) && Array.isArray(chosen) && q.answerIndices.length === (chosen as number[]).length && q.answerIndices.every((v) => (chosen as number[]).includes(v)))
                       : (typeof q.answerIndex === 'number' && chosen === q.answerIndex)
                   )
+                  // Should we show correct/incorrect feedback for this question?
+                  const showFeedback = isFinished || revealedQuestions.has(q.id)
+                  // Staged single-select answer (not yet submitted, for immediate reveal mode)
+                  const staged = stagedAnswer[q.id]
+                  const hasStaged = staged !== undefined
+                  // In immediate mode, is the question still open for interaction?
+                  const immediateMode = revealAnswers === 'immediately'
+                  const questionLocked = showFeedback && answered
                   return (
                     <article
                       key={q.id}
@@ -3126,13 +3349,16 @@ ${questionsHTML}
                           const isSelectedSingle = !isMultiSelect && chosen === i
                           const isSelectedMulti = isMultiSelect && (answered ? (Array.isArray(chosen) && (chosen as number[]).includes(i)) : pending.includes(i))
                           const isSelected = isSelectedSingle || isSelectedMulti
+                          const isStagedChoice = !isMultiSelect && staged === i
                           const isCorrectChoice = isMultiSelect
                             ? (Array.isArray(q.answerIndices) && q.answerIndices.includes(i))
                             : (typeof q.answerIndex === 'number' && q.answerIndex === i)
                           let bg = 'bg-transparent'
-                          if (isFinished && answered) {
+                          if (showFeedback && answered) {
                             if (isCorrectChoice) bg = 'bg-gradient-to-r from-neon-cyan/10 to-neon-pink/10'
                             else if (isSelected && !isCorrectChoice) bg = 'bg-red-600/10'
+                          } else if (isStagedChoice) {
+                            bg = 'bg-sky-500/10'
                           } else if (answered && isSelected) {
                             bg = 'bg-sky-500/10'
                           } else if (isMultiSelect && isSelected) {
@@ -3142,7 +3368,7 @@ ${questionsHTML}
                             <li key={i}>
                               <button
                                 onClick={() => {
-                                  if (isFinished) return
+                                  if (isFinished || questionLocked) return
                                   if (isMultiSelect) {
                                     // If already answered, move old answer into pending so user can adjust
                                     if (answered && !multiSelectPending[q.id]) {
@@ -3159,11 +3385,16 @@ ${questionsHTML}
                                     })
                                     return
                                   }
+                                  // Single-select: in immediate mode, stage instead of submitting
+                                  if (immediateMode && !answered) {
+                                    setStagedAnswer((prev) => ({ ...prev, [q.id]: i }))
+                                    return
+                                  }
                                   submitAnswer(q, i)
                                 }}
-                                className={`w-full text-left px-3 py-2.5 rounded-lg border ${isFinished && answered ? (isCorrectChoice ? 'border-green-400/40 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-400/40 dark:border-red-500/30' : 'border-slate-200/60 dark:border-slate-700/60') : isSelected ? 'border-sky-400/50 dark:border-sky-500/40' : 'border-slate-200/60 dark:border-slate-700/60'} ${bg} hover:bg-slate-100 dark:hover:bg-slate-700 flex items-start gap-3 transition-colors`}
+                                className={`w-full text-left px-3 py-2.5 rounded-lg border ${showFeedback && answered ? (isCorrectChoice ? 'border-green-400/40 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-400/40 dark:border-red-500/30' : 'border-slate-200/60 dark:border-slate-700/60') : isStagedChoice ? 'border-sky-400/50 dark:border-sky-500/40' : isSelected ? 'border-sky-400/50 dark:border-sky-500/40' : 'border-slate-200/60 dark:border-slate-700/60'} ${bg} hover:bg-slate-100 dark:hover:bg-slate-700 flex items-start gap-3 transition-colors`}
                               >
-                                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold flex-shrink-0 mt-0.5 ${isFinished && answered ? (isCorrectChoice ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : isSelected && !isCorrectChoice ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400') : isSelected ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
+                                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold flex-shrink-0 mt-0.5 ${showFeedback && answered ? (isCorrectChoice ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : isSelected && !isCorrectChoice ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400') : isStagedChoice ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300' : isSelected ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
                                   {String.fromCharCode(65 + i)}
                                 </span>
                                 <span className="flex-1 min-w-0">
@@ -3177,12 +3408,12 @@ ${questionsHTML}
                                   </span>
                                 </span>
                                 <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
-                                                  {isFinished && answered && isCorrectChoice && <span className="text-xs text-green-400">Correct</span>}
-                                                  {isFinished && answered && isSelected && !isCorrectChoice && <span className="text-xs text-red-300">Incorrect</span>}
+                                                  {showFeedback && answered && isCorrectChoice && <span className="text-xs text-green-400">Correct</span>}
+                                                  {showFeedback && answered && isSelected && !isCorrectChoice && <span className="text-xs text-red-300">Incorrect</span>}
                                 </div>
                               </button>
 
-                              {isFinished && answered && q.choiceExplanations && (
+                              {showFeedback && answered && q.choiceExplanations && (
                                 <div className="mt-1 text-sm text-slate-600 dark:text-slate-300 p-2 rounded">
                                   {q.choiceExplanations[i]}
                                 </div>
@@ -3192,13 +3423,34 @@ ${questionsHTML}
                         })}
                       </ol>
 
+                      {/* Single-select Submit Answer button (immediate reveal mode) */}
+                      {immediateMode && !isMultiSelect && hasStaged && !answered && !isFinished && (
+                        <div className="mt-3">
+                          <button
+                            className="px-4 py-2 rounded-md font-semibold text-sm bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:from-sky-400 hover:to-indigo-400 transition-colors"
+                            onClick={async () => {
+                              await submitAnswer(q, staged!)
+                              setRevealedQuestions((prev) => new Set(prev).add(q.id))
+                              setStagedAnswer((prev) => { const next = { ...prev }; delete next[q.id]; return next })
+                            }}
+                          >
+                            ✅ Submit Answer
+                          </button>
+                        </div>
+                      )}
+
                       {/* Multi-select confirm button */}
                       {isMultiSelect && !answered && pending.length > 0 && (
                         <div className="mt-3 flex items-center gap-3">
                           <button
                             className={`px-4 py-2 rounded-md font-semibold text-sm ${pending.length === (q.selectCount ?? 2) ? 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white' : 'bg-slate-600 text-slate-300 cursor-not-allowed'}`}
                             disabled={pending.length !== (q.selectCount ?? 2)}
-                            onClick={() => submitAnswer(q, pending)}
+                            onClick={async () => {
+                              await submitAnswer(q, pending)
+                              if (immediateMode) {
+                                setRevealedQuestions((prev) => new Set(prev).add(q.id))
+                              }
+                            }}
                           >
                             Confirm ({pending.length}/{q.selectCount ?? 2} selected)
                           </button>
@@ -3217,15 +3469,23 @@ ${questionsHTML}
                             disabled={currentQuestionIndex <= 0}
                             className="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-700 text-sm disabled:opacity-40"
                           >← Prev</button>
-                          <button
-                            onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
-                            disabled={currentQuestionIndex >= displayQuestions.length - 1}
-                            className="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-700 text-sm disabled:opacity-40"
-                          >Next →</button>
+                          {immediateMode && showFeedback && answered ? (
+                            <button
+                              onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
+                              disabled={currentQuestionIndex >= displayQuestions.length - 1}
+                              className="px-4 py-1.5 rounded-md bg-gradient-to-r from-sky-500 to-indigo-500 text-white text-sm font-semibold disabled:opacity-40 hover:from-sky-400 hover:to-indigo-400 transition-colors"
+                            >Next Question →</button>
+                          ) : (
+                            <button
+                              onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
+                              disabled={currentQuestionIndex >= displayQuestions.length - 1}
+                              className="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-700 text-sm disabled:opacity-40"
+                            >Next →</button>
+                          )}
                         </div>
                       )}
 
-                      {isFinished && answered && (
+                      {showFeedback && answered && (
                         <div className="mt-3 text-sm space-y-2">
                           {q.explanation && (
                             <div className="p-2 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200">

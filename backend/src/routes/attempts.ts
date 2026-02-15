@@ -36,6 +36,28 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (!exam) return reply.status(400).send({ message: 'exam not found' })
 
     let filteredQuestions = exam.questions.slice()
+
+    // ── Pre-selected questions (used by weakest-link mode) ──
+    // When body.questions is provided (full question objects from the weakest-link
+    // endpoint), use them directly. This guarantees the server-side attempt stores
+    // exactly the questions the user sees.
+    // Fallback: body.questionIds (array of IDs) for backwards compatibility.
+    const inlineQuestions: any[] | null = Array.isArray(body?.questions) && body.questions.length > 0
+      ? body.questions
+      : null
+    const questionIds: number[] | null = !inlineQuestions && Array.isArray(body?.questionIds) && body.questionIds.length > 0
+      ? body.questionIds.map((id: any) => Number(id)).filter((id: number) => Number.isFinite(id))
+      : null
+
+    if (inlineQuestions) {
+      // Validate that every supplied question exists in the exam bank
+      const validIds = new Set(exam.questions.map((q: any) => q.id))
+      filteredQuestions = inlineQuestions.filter((q: any) => validIds.has(q.id))
+    } else if (questionIds && questionIds.length > 0) {
+      const byId = new Map(exam.questions.map((q: any) => [q.id, q]))
+      // preserve the requested order
+      filteredQuestions = questionIds.map((id: number) => byId.get(id)).filter(Boolean)
+    } else {
     const keywords: string[] = Array.isArray(body?.metadata?.serviceKeywords)
       ? body.metadata.serviceKeywords.map((k: string) => String(k).trim().toLowerCase()).filter(Boolean)
       : []
@@ -78,6 +100,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     // respect requested numQuestions if provided
     const numQuestionsRequested = typeof body?.numQuestions === 'number' && body.numQuestions > 0 ? body.numQuestions : null
     if (numQuestionsRequested) filteredQuestions = filteredQuestions.slice(0, numQuestionsRequested)
+    } // end else (non-questionIds path)
 
     // If filtering produced no questions, return a clear error (don't create empty attempts)
     if (!filteredQuestions || filteredQuestions.length === 0) {
