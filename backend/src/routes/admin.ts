@@ -1,5 +1,7 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { getUserBySub, listUsers, recordAdminAudit, updateUserFields } from '../services/dynamo.js'
+import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement } from '../services/entitlements.js'
+import { PRODUCTS } from '../catalog.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Require auth and admin flag
@@ -48,6 +50,70 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err: any) {
       request.log?.error?.('admin update failed', err)
       return reply.code(500).send({ message: 'update failed' })
+    }
+  })
+
+  // ── Entitlements ──
+
+  /** List all products from catalog */
+  server.get('/products', async (_request, reply) => {
+    return { products: PRODUCTS }
+  })
+
+  /** Get all entitlements for a specific user (including expired/cancelled) */
+  server.get('/users/:sub/entitlements', async (request, reply) => {
+    const { sub } = request.params as any
+    const entitlements = await getUserEntitlements(sub, true)
+    return { entitlements }
+  })
+
+  /** Grant an entitlement to a user */
+  server.post('/users/:sub/entitlements', async (request, reply) => {
+    const { sub } = request.params as any
+    const body = request.body as any
+
+    if (!body?.productId || typeof body.productId !== 'string') {
+      return reply.code(400).send({ message: 'productId is required' })
+    }
+
+    // Validate the product exists in catalog
+    const product = PRODUCTS.find((p) => p.productId === body.productId)
+    if (!product) {
+      return reply.code(400).send({ message: `Unknown product: ${body.productId}` })
+    }
+
+    // Validate the target user exists
+    const targetUser = await getUserBySub(sub)
+    if (!targetUser) {
+      return reply.code(404).send({ message: 'User not found' })
+    }
+
+    try {
+      const ent = await adminGrantEntitlement(sub, body.productId, product.kind)
+      await recordAdminAudit((request.user as any).sub, sub, 'grant_entitlement', {
+        productId: body.productId,
+        kind: product.kind,
+      })
+      return { ok: true, entitlement: ent }
+    } catch (err: any) {
+      request.log?.error?.('admin grant entitlement failed', err)
+      return reply.code(500).send({ message: 'grant failed' })
+    }
+  })
+
+  /** Revoke an entitlement from a user */
+  server.delete('/users/:sub/entitlements/:productId', async (request, reply) => {
+    const { sub, productId } = request.params as any
+
+    try {
+      await revokeEntitlement(sub, decodeURIComponent(productId))
+      await recordAdminAudit((request.user as any).sub, sub, 'revoke_entitlement', {
+        productId: decodeURIComponent(productId),
+      })
+      return { ok: true }
+    } catch (err: any) {
+      request.log?.error?.('admin revoke entitlement failed', err)
+      return reply.code(500).send({ message: 'revoke failed' })
     }
   })
 }

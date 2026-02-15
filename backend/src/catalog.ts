@@ -114,7 +114,7 @@ export const PRODUCTS: Product[] = [
     productId: 'exam:SOA-C02',
     kind: 'exam',
     label: 'AWS SOA-C02',
-    description: 'Full access to AWS SysOps Administrator practice exam',
+    description: 'Full access to AWS CloudOps Engineer Associate practice exam',
     priceGBP: 300,
   },
   {
@@ -124,6 +124,13 @@ export const PRODUCTS: Product[] = [
     description: 'Full access to Azure Fundamentals practice exam',
     priceGBP: 300,
   },
+  {
+    productId: 'exam:SCS-C03',
+    kind: 'exam',
+    label: 'AWS SCS-C03',
+    description: 'Full access to AWS Security Specialty practice exam',
+    priceGBP: 300,
+  },
 
   // ── Bundles ──
   {
@@ -131,8 +138,8 @@ export const PRODUCTS: Product[] = [
     kind: 'bundle',
     label: 'AWS Bundle',
     description: 'All AWS certification practice exams',
-    priceGBP: 900,
-    examCodes: ['SAA-C03', 'CLF-C02', 'DVA-C02', 'SOA-C02'],
+    priceGBP: 1200,
+    examCodes: ['SAA-C03', 'CLF-C02', 'DVA-C02', 'SOA-C02', 'SCS-C03'],
   },
 
   // ── Subscription ──

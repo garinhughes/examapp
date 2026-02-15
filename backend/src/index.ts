@@ -11,6 +11,7 @@ import gamificationRoutes from './routes/gamification.js'
 import adminRoutes from './routes/admin.js'
 import pricingRoutes from './routes/pricing.js'
 import stripeRoutes from './routes/stripe.js'
+import usernameRoutes from './routes/username.js'
 
 const server = Fastify({ logger: true })
 
@@ -34,6 +35,8 @@ await server.register(examsRoutes, { prefix: '/exams' })
 await server.register(attemptsRoutes, { prefix: '/attempts' })
 await server.register(analyticsRoutes, { prefix: '/analytics' })
 await server.register(gamificationRoutes, { prefix: '/gamification' })
+// Username routes
+await server.register(usernameRoutes, { prefix: '/username' })
 // Admin routes
 await server.register(adminRoutes, { prefix: '/admin' })
 

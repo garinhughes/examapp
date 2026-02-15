@@ -110,6 +110,28 @@ export async function recordAdminAudit(adminId: string, targetUserId: string | n
   }
 }
 
-export default { upsertUserFromCognito, getUserBySub, addEntitlement, listUsers, recordAdminAudit, updateUserFields }
+/**
+ * Find a user by their username (case-insensitive scan).
+ * Returns the user item or null.
+ *
+ * NOTE: For production scale, add a GSI on `usernameLower` to avoid table scans.
+ */
+export async function findUserByUsername(username: string): Promise<any | null> {
+  const lower = username.toLowerCase()
+  try {
+    const res = await ddb.send(new ScanCommand({
+      TableName: USERS_TABLE,
+      FilterExpression: 'usernameLower = :u',
+      ExpressionAttributeValues: { ':u': lower },
+      Limit: 1,
+    }))
+    return res.Items && res.Items.length > 0 ? res.Items[0] : null
+  } catch (err) {
+    console.warn('[dynamo] findUserByUsername failed', err)
+    return null
+  }
+}
+
+export default { upsertUserFromCognito, getUserBySub, addEntitlement, listUsers, recordAdminAudit, updateUserFields, findUserByUsername }
 
 export { ddb, USERS_TABLE, ENTITLEMENTS_TABLE, AUDIT_TABLE }

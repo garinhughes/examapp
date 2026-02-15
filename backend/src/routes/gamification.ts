@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { getUserBySub } from '../services/dynamo.js'
 
 const dataDir = fileURLToPath(new URL('../../data', import.meta.url))
 const gamificationFile = path.join(dataDir, 'gamification.json')
@@ -71,14 +72,25 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     // sort by XP desc
     optedIn.sort((a, b) => b.xp - a.xp)
 
-    const entries = optedIn.map((u, i) => ({
-      rank: i + 1,
-      name: u.displayName,
-      xp: u.xp,
-      level: u.level,
-      streak: u.streak,
-      isYou: u.userId === userId,
-    }))
+    // Look up usernames from DynamoDB for each opted-in user
+    const entries = await Promise.all(
+      optedIn.map(async (u, i) => {
+        let username: string | null = null
+        try {
+          const dbUser = await getUserBySub(u.userId)
+          username = dbUser?.username ?? null
+        } catch {}
+        return {
+          rank: i + 1,
+          name: username || u.displayName,
+          username: username ?? undefined,
+          xp: u.xp,
+          level: u.level,
+          streak: u.streak,
+          isYou: u.userId === userId,
+        }
+      })
+    )
 
     return { entries }
   })

@@ -5,6 +5,7 @@ import { useGamification } from '../gamification/GamificationContext'
 interface LeaderboardEntry {
   rank: number
   name: string
+  username?: string
   xp: number
   level: number
   streak: number
@@ -77,7 +78,10 @@ export default function Leaderboard() {
               <span className="w-6 text-center font-bold text-slate-400">
                 {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
               </span>
-              <span className="flex-1 font-medium truncate">{e.name}{e.isYou ? ' (you)' : ''}</span>
+              <span className="flex-1 min-w-0">
+                <span className="font-medium truncate block">{e.name}{e.isYou ? ' (you)' : ''}</span>
+                {e.username && <span className="text-xs text-slate-400 truncate block">@{e.username}</span>}
+              </span>
               {tab === 'xp' ? (
                 <span className="text-amber-500 font-semibold">{e.xp.toLocaleString()} XP</span>
               ) : (

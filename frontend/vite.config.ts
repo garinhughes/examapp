@@ -15,6 +15,7 @@ export default defineConfig({
       '/pricing': 'http://localhost:3000',
       '/stripe': 'http://localhost:3000',
       '/gamification': 'http://localhost:3000',
+      '/username': 'http://localhost:3000',
     }
   }
 })

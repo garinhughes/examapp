@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import { apiUrl } from '../apiBase'
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -99,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (MODE === 'dev') {
       // Fetch dev user info from backend config endpoint
-      fetch('/auth/config')
+      fetch(apiUrl('/auth/config'))
         .then((r) => r.json())
         .then((data) => {
           if (data.devUser) {
@@ -163,7 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Exchange auth code for tokens via our backend
     setLoading(true)
-    fetch('/auth/token', {
+    fetch(apiUrl('/auth/token'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../auth/AuthContext'
+import { useAuthFetch } from '../auth/useAuthFetch'
 import { useGamification } from '../gamification/GamificationContext'
 import { levelFromXP } from '../gamification/types'
 import { BADGES } from '../gamification/badges'
@@ -22,10 +23,104 @@ const TIER_COLORS: Record<string, string> = {
 
 export default function AccountPage() {
   const { user } = useAuth()
+  const authFetch = useAuthFetch()
   const { state, toggleLeaderboard } = useGamification()
   const [tab, setTab] = useState<'overview' | 'badges' | 'mastery' | 'purchases'>('overview')
   const { level, currentXP, nextLevelXP, progress: levelProgress } = levelFromXP(state.xp)
   const { tier, tierConfig, entitlements, products, loading: entLoading } = useEntitlements()
+
+  // ── Username state ──
+  const [currentUsername, setCurrentUsername] = useState<string | null>(null)
+  const [usernameInput, setUsernameInput] = useState('')
+  const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'saving' | 'saved' | 'error'>('idle')
+  const [usernameMessage, setUsernameMessage] = useState('')
+  const [editingUsername, setEditingUsername] = useState(false)
+
+  // Fetch current username on mount
+  useEffect(() => {
+    authFetch('/username')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.username) {
+          setCurrentUsername(data.username)
+          setUsernameInput(data.username)
+        } else {
+          // If the user has no username yet, enter edit mode so they can claim one
+          setEditingUsername(true)
+        }
+      })
+      .catch(() => {})
+  }, [authFetch])
+
+  // Debounced availability check
+  useEffect(() => {
+    // If the user already has a username and is not actively editing, skip checks
+    if (!editingUsername && currentUsername) {
+      setUsernameStatus('idle')
+      setUsernameMessage('')
+      return
+    }
+
+    const trimmed = usernameInput.trim()
+    if (!trimmed || trimmed === currentUsername) {
+      setUsernameStatus('idle')
+      setUsernameMessage('')
+      return
+    }
+    if (trimmed.length < 3) {
+      setUsernameStatus('invalid')
+      setUsernameMessage('Username must be at least 3 characters.')
+      return
+    }
+
+    setUsernameStatus('checking')
+    const timer = setTimeout(() => {
+      authFetch(`/username/check/${encodeURIComponent(trimmed)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.available) {
+            setUsernameStatus('available')
+            setUsernameMessage('Username is available!')
+          } else {
+            setUsernameStatus(data.reason?.includes('taken') ? 'taken' : 'invalid')
+            setUsernameMessage(data.reason || 'Not available.')
+          }
+        })
+        .catch(() => {
+          setUsernameStatus('error')
+          setUsernameMessage('Could not check availability.')
+        })
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [usernameInput, editingUsername, currentUsername, authFetch])
+
+  const saveUsername = useCallback(async () => {
+    const trimmed = usernameInput.trim()
+    if (!trimmed || trimmed === currentUsername) return
+    setUsernameStatus('saving')
+    try {
+      const res = await authFetch('/username', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: trimmed }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setCurrentUsername(data.username)
+        setUsernameStatus('saved')
+        setUsernameMessage('Username saved!')
+        setEditingUsername(false)
+      } else {
+        const err = await res.json().catch(() => ({ message: 'Failed to save.' }))
+        setUsernameStatus('error')
+        setUsernameMessage(err.message || 'Failed to save.')
+      }
+    } catch {
+      setUsernameStatus('error')
+      setUsernameMessage('Network error.')
+    }
+  }, [usernameInput, currentUsername, authFetch])
 
   const earnedIds = new Set(state.badges.map((b) => b.id))
 
@@ -51,8 +146,11 @@ export default function AccountPage() {
             {user?.name?.[0]?.toUpperCase() ?? '?'}
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-bold">{user?.name ?? 'Guest'}</h2>
+            <h2 className="text-lg font-bold">{currentUsername ?? user?.name ?? 'Guest'}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400">{user?.email ?? ''}</p>
+            {currentUsername && (
+              <p className="text-xs text-slate-400 mt-0.5">@{currentUsername}</p>
+            )}
           </div>
           <div className="text-right">
             <div className="text-2xl font-extrabold text-sky-500">Level {level}</div>
@@ -114,6 +212,90 @@ export default function AccountPage() {
       {/* Tab content */}
       {tab === 'overview' && (
         <div className="space-y-4">
+          {/* Username */}
+          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+            <div className="flex items-center justify-between mb-1">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300">Username</h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Your public display name on the leaderboard. 3–20 characters, letters/numbers/underscores/hyphens.
+                </p>
+              </div>
+              {currentUsername && !editingUsername && (
+                <button
+                  onClick={() => setEditingUsername(true)}
+                  className="text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                >
+                  Edit
+                </button>
+              )}
+            </div>
+
+            {(!currentUsername || editingUsername) ? (
+              <div className="mt-3 space-y-2">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={usernameInput}
+                      onChange={(e) => setUsernameInput(e.target.value)}
+                      placeholder="Choose a username…"
+                      maxLength={20}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500"
+                    />
+                    {usernameStatus === 'checking' && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">checking…</span>
+                    )}
+                    {usernameStatus === 'available' && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">✓</span>
+                    )}
+                    {(usernameStatus === 'taken' || usernameStatus === 'invalid') && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">✗</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={saveUsername}
+                    disabled={usernameStatus !== 'available' || usernameInput.trim() === currentUsername}
+                    className="px-4 py-2 rounded-lg bg-sky-500 text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sky-400 transition-colors"
+                  >
+                    {usernameStatus === 'saving' ? 'Saving…' : currentUsername ? 'Update' : 'Claim'}
+                  </button>
+                  {editingUsername && (
+                    <button
+                      onClick={() => {
+                        setEditingUsername(false)
+                        setUsernameInput(currentUsername ?? '')
+                        setUsernameStatus('idle')
+                        setUsernameMessage('')
+                      }}
+                      className="px-3 py-2 rounded-lg bg-slate-200 dark:bg-slate-700 text-sm text-slate-600 dark:text-slate-300"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+                {usernameMessage && (
+                  <p className={`text-xs ${
+                    usernameStatus === 'available' || usernameStatus === 'saved'
+                      ? 'text-green-500'
+                      : usernameStatus === 'checking' || usernameStatus === 'idle'
+                        ? 'text-slate-400'
+                        : 'text-red-500'
+                  }`}>
+                    {usernameMessage}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-sm font-mono font-semibold text-sky-500">@{currentUsername}</span>
+                {usernameStatus === 'saved' && (
+                  <span className="text-xs text-green-500">✓ Saved</span>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Recent badges */}
           <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
             <h3 className="text-sm font-semibold mb-3 text-slate-600 dark:text-slate-300">Recent Badges</h3>

@@ -8,6 +8,7 @@ import PricingPage from './components/PricingPage'
 import { useIsAdmin } from './auth/useIsAdmin'
 import { useAuth } from './auth/AuthContext'
 import { useAuthFetch } from './auth/useAuthFetch'
+import { apiUrl } from './apiBase'
 import { useGamification } from './gamification/GamificationContext'
 import { levelFromXP } from './gamification/types'
 import { BADGES } from './gamification/badges'
@@ -1142,7 +1143,7 @@ ${questionsHTML}
   }, [dark])
 
   useEffect(() => {
-    fetch('/exams')
+    fetch(apiUrl('/exams'))
       .then((r) => r.json())
       .then(setExams)
       .catch((e) => {

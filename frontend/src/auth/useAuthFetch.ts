@@ -1,5 +1,6 @@
 import { useAuth } from './AuthContext'
 import { useCallback } from 'react'
+import { apiUrl } from '../apiBase'
 
 /**
  * Returns a fetch wrapper that automatically injects the Authorization header.
@@ -18,7 +19,11 @@ export function useAuthFetch() {
       if (token) {
         headers.set('Authorization', `Bearer ${token}`)
       }
-      return fetch(input, { ...init, headers })
+
+      // Prefix relative paths with the API base when set (production)
+      const url = typeof input === 'string' ? apiUrl(input) : input
+
+      return fetch(url, { ...init, headers })
     },
     [getToken],
   )
