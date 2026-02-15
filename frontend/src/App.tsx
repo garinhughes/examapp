@@ -4,6 +4,7 @@ import { Confetti, RewardModal } from './components/Confetti'
 import AccountPage from './components/AccountPage'
 import Leaderboard from './components/Leaderboard'
 import AdminPanel from './components/AdminPanel'
+import PricingPage from './components/PricingPage'
 import { useIsAdmin } from './auth/useIsAdmin'
 import { useAuth } from './auth/AuthContext'
 import { useAuthFetch } from './auth/useAuthFetch'
@@ -51,10 +52,14 @@ export default function App() {
   const [rewardModal, setRewardModal] = useState<{ title: string; subtitle?: string; xpGained: number; badges: { icon: string; name: string }[] } | null>(null)
 
   // simple client-side route: 'home' | 'practice' | 'analytics' | 'account'
-  const [route, setRoute] = useState<'home' | 'practice' | 'analytics' | 'account' | 'admin'>('home')
+  const [route, setRoute] = useState<'home' | 'practice' | 'analytics' | 'account' | 'admin' | 'pricing'>('home')
   const [exams, setExams] = useState<Exam[]>([])
   const [selected, setSelected] = useState<string | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
+  // Tier gating info from backend
+  const [examTier, setExamTier] = useState<string | null>(null)
+  const [examTotalAvailable, setExamTotalAvailable] = useState<number>(0)
+  const [examLimited, setExamLimited] = useState<boolean>(false)
   const selectedMeta = useMemo(() => {
     if (!selected) return null
     const sel = String(selected).toLowerCase()
@@ -165,6 +170,13 @@ export default function App() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number | number[]>>({})
   // pending multi-select choices (not yet confirmed)
   const [multiSelectPending, setMultiSelectPending] = useState<Record<number, number[]>>({})
+  // Flag questions for review (like real AWS exams)
+  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number>>(new Set())
+  // Navigate to specific question by index
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
+  // Opt-in submission / complete-early confirmation
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState<boolean>(false)
+  const [showCompleteEarlyConfirm, setShowCompleteEarlyConfirm] = useState<boolean>(false)
   // map of questionId -> whether tip is visible (tips shown before answering when user requests)
   const [showTipMap, setShowTipMap] = useState<Record<number, boolean>>({})
   // attempt id for current exam (persist per exam in localStorage)
@@ -241,6 +253,8 @@ export default function App() {
   const [serviceSearchText, setServiceSearchText] = useState<string>('')
   const serviceDropRef = React.useRef<HTMLDivElement | null>(null)
   const serviceDropToggleRef = React.useRef<HTMLButtonElement | null>(null)
+  // Guard: when resuming from saved progress, prevent the [selected] effect from resetting state
+  const resumingRef = React.useRef<boolean>(false)
   React.useEffect(() => {
     if (!serviceDropOpen) return
     function onDocMouse(e: MouseEvent) {
@@ -738,6 +752,42 @@ ${questionsHTML}
     ? questions
     : questions.filter((q) => takeDomains.includes((q as any).domain))
 
+  // Compute the total available questions after ALL filters (domain + service + keyword)
+  const availableFilteredCount = useMemo(() => {
+    let pool = filteredByDomain
+    // service filter
+    if (selectedServices.length > 0) {
+      const lowerServices = selectedServices.map((s) => s.toLowerCase())
+      pool = pool.filter((q: any) => {
+        const qServices: string[] = Array.isArray(q.services) ? q.services.map((s: string) => s.toLowerCase()) : []
+        return lowerServices.some((s) => qServices.includes(s))
+      })
+    }
+    // keyword filter
+    const keywords = serviceFilterText.split(',').map((s) => s.trim()).filter(Boolean)
+    if (keywords.length > 0) {
+      pool = pool.filter((q: any) => {
+        const text = String(q.question || '').toLowerCase()
+        if (keywords.some((kw) => text.includes(kw.toLowerCase()))) return true
+        if (Array.isArray(q.choices)) {
+          for (const c of q.choices) {
+            if (keywords.some((kw) => String(c || '').toLowerCase().includes(kw.toLowerCase()))) return true
+          }
+        }
+        return false
+      })
+    }
+    return pool.length
+  }, [filteredByDomain, selectedServices, serviceFilterText])
+
+  // Auto-cap numQuestions when filtered availability drops below current value
+  useEffect(() => {
+    if (examStarted || isFinished) return
+    if (availableFilteredCount > 0 && numQuestions > availableFilteredCount) {
+      setNumQuestions(availableFilteredCount)
+    }
+  }, [availableFilteredCount, examStarted, isFinished])
+
   // Respect user's selected `numQuestions` by slicing the filtered list.
   const displayQuestions = (typeof numQuestions === 'number' && numQuestions > 0)
     ? filteredByDomain.slice(0, numQuestions)
@@ -750,7 +800,22 @@ ${questionsHTML}
     setSelectedAnswers({})
     setAttemptData(null)
     setLastError(null)
+    setFlaggedQuestions(new Set())
+    setCurrentQuestionIndex(0)
+    setShowSubmitConfirm(false)
+    setShowCompleteEarlyConfirm(false)
+    try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
     const key = `attempt:${selected}`
+
+      // ── Visitor (unauthenticated) — run exam entirely client-side ──
+      if (!user) {
+        const localId = `visitor-${Date.now()}`
+        setAttemptId(localId)
+        setExamStarted(true)
+        if (timed) setTimeLeft(durationMinutes * 60)
+        return
+      }
+
       try {
         // do not persist pre-start prefs; start with current form values
 
@@ -842,7 +907,7 @@ ${questionsHTML}
 
   // helper to submit an answer programmatically (used by buttons and keyboard shortcuts)
   async function submitAnswer(q: Question, i: number | number[]) {
-    if (selectedAnswers[q.id] !== undefined) return
+    if (isFinished) return
     if (!examStarted) {
       setLastError('Start the exam before answering')
       return
@@ -853,11 +918,26 @@ ${questionsHTML}
       return
     }
 
+    const isReAnswer = selectedAnswers[q.id] !== undefined
     const newSelected = { ...selectedAnswers, [q.id]: i }
     setSelectedAnswers(newSelected)
     // clear any pending multi-select state
     setMultiSelectPending((p) => { const next = { ...p }; delete next[q.id]; return next })
 
+    // Auto-advance to next unanswered question (skip when re-answering)
+    if (!isReAnswer) {
+      const nextIdx = displayQuestions.findIndex((qq, idx) => idx > currentQuestionIndex && newSelected[qq.id] === undefined)
+      if (nextIdx >= 0) setCurrentQuestionIndex(nextIdx)
+      else {
+        const wrap = displayQuestions.findIndex((qq) => newSelected[qq.id] === undefined)
+        if (wrap >= 0) setCurrentQuestionIndex(wrap)
+      }
+    }
+
+    // ── Visitor (unauthenticated) — no server round-trips ──
+    if (!user) return
+
+    // ── Authenticated — save answer to server (no auto-finish; user must opt-in) ──
     const isMulti = Array.isArray(i)
     try {
       const res = await authFetch(`/attempts/${aid}/answer`, {
@@ -874,31 +954,6 @@ ${questionsHTML}
         const text = await res.text()
         console.error('save answer failed', text)
         setLastError(text)
-        return
-      }
-
-      // auto-finish if complete
-      if (Object.keys(newSelected).length >= displayQuestions.length) {
-        try {
-          const fin = await authFetch(`/attempts/${aid}/finish`, { method: 'PATCH' })
-          const finData = await fin.json()
-          if ('attemptId' in finData) {
-            setAttemptData(finData)
-            handleGamificationReward(finData)
-            if (showAttempts) {
-              try {
-                const r2 = await authFetch('/attempts')
-                const dd = await r2.json()
-                setAttemptsList(dd.attempts ?? [])
-              } catch {}
-            }
-          } else {
-            setLastError(JSON.stringify(finData))
-          }
-        } catch (err) {
-          console.error('auto-finish error', err)
-          setLastError(String(err))
-        }
       }
     } catch (err) {
       console.error('submit answer error', err)
@@ -908,6 +963,12 @@ ${questionsHTML}
 
   // finish attempt helper
   async function finishAttempt(aid: string) {
+    // ── Visitor — finish locally ──
+    if (!user) {
+      setExamStarted(false)
+      setTimeLeft(null)
+      return
+    }
     try {
       const fin = await authFetch(`/attempts/${aid}/finish`, { method: 'PATCH' })
       const finData = await fin.json()
@@ -1061,7 +1122,20 @@ ${questionsHTML}
         if (!r.ok) throw new Error(`Failed to load questions (${r.status})`)
         return r.json()
       })
-      .then((qs) => { if (Array.isArray(qs)) setQuestions(qs) })
+      .then((data) => {
+        // Handle both old (array) and new (wrapped) response shapes
+        if (Array.isArray(data)) {
+          setQuestions(data)
+          setExamTier(null)
+          setExamTotalAvailable(data.length)
+          setExamLimited(false)
+        } else if (data && Array.isArray(data.questions)) {
+          setQuestions(data.questions)
+          setExamTier(data.tier ?? null)
+          setExamTotalAvailable(data.totalAvailable ?? data.questions.length)
+          setExamLimited(!!data.limited)
+        }
+      })
       .catch((e) => {
         console.error(e)
         setLastError(String(e))
@@ -1092,7 +1166,7 @@ ${questionsHTML}
       setTimeLeft((t) => {
         if (!t || t <= 1) {
           clearInterval(id)
-          if (attemptId) finishAttempt(attemptId)
+          handleSubmitExam(false)
           return 0
         }
         return t - 1
@@ -1101,8 +1175,157 @@ ${questionsHTML}
     return () => clearInterval(id)
   }, [examStarted, timed, timeLeft, attemptId, paused])
 
+  // Auto-save exam progress to localStorage for Save & Resume
+  useEffect(() => {
+    if (!examStarted || !selected || isFinished) return
+    const key = `examProgress:${selected}`
+    try {
+      localStorage.setItem(key, JSON.stringify({
+        answers: selectedAnswers,
+        flagged: Array.from(flaggedQuestions),
+        currentIndex: currentQuestionIndex,
+        numQuestions,
+        timed,
+        timeLeft,
+        durationMinutes,
+        timestamp: Date.now(),
+      }))
+    } catch {}
+  }, [selectedAnswers, flaggedQuestions, currentQuestionIndex, examStarted, selected, isFinished, timeLeft])
+
+  // Check if saved exam progress exists for the selected exam
+  const savedProgress = useMemo(() => {
+    if (!selected || examStarted) return null
+    try {
+      const raw = localStorage.getItem(`examProgress:${selected}`)
+      if (!raw) return null
+      const saved = JSON.parse(raw)
+      const answeredCount = Object.keys(saved.answers || {}).length
+      if (answeredCount === 0) return null
+      const age = Date.now() - (saved.timestamp || 0)
+      if (age > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem(`examProgress:${selected}`)
+        return null
+      }
+      return { answeredCount, timestamp: saved.timestamp, total: saved.numQuestions || 0 }
+    } catch { return null }
+  }, [selected, examStarted])
+
+  // Scan for any saved exam progress across all exams (for resume banners)
+  const anySavedExam = useMemo(() => {
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (!key || !key.startsWith('examProgress:')) continue
+        const code = key.replace('examProgress:', '')
+        const raw = localStorage.getItem(key)
+        if (!raw) continue
+        const saved = JSON.parse(raw)
+        const answeredCount = Object.keys(saved.answers || {}).length
+        if (answeredCount === 0) continue
+        const age = Date.now() - (saved.timestamp || 0)
+        if (age > 24 * 60 * 60 * 1000) { localStorage.removeItem(key); continue }
+        const meta = exams.find((e: any) => e.code === code)
+        return { code, title: meta?.title ?? code, answeredCount, total: saved.numQuestions || 0 }
+      }
+    } catch {}
+    return null
+  }, [selected, examStarted, savedProgress, exams])
+
+  // Resume a saved exam from localStorage
+  function resumeExam(examCode?: string) {
+    const code = examCode ?? selected
+    if (!code) return
+    const key = `examProgress:${code}`
+    try {
+      const raw = localStorage.getItem(key)
+      if (!raw) return
+      const saved = JSON.parse(raw)
+      // Set guard so the [selected] useEffect doesn't reset our state
+      resumingRef.current = true
+      // Set selected first (may trigger effect, but guard protects us)
+      if (code !== selected) setSelected(code)
+      setRoute('home')
+      setSelectedAnswers(saved.answers || {})
+      setFlaggedQuestions(new Set(saved.flagged || []))
+      setCurrentQuestionIndex(saved.currentIndex || 0)
+      if (typeof saved.numQuestions === 'number') setNumQuestions(saved.numQuestions)
+      if (typeof saved.timed === 'boolean') setTimed(saved.timed)
+      if (typeof saved.durationMinutes === 'number') setDurationMinutes(saved.durationMinutes)
+      if (saved.timed && typeof saved.timeLeft === 'number') setTimeLeft(saved.timeLeft)
+      setExamStarted(true)
+      if (!user) setAttemptId(`visitor-${Date.now()}`)
+      // Clear guard after a tick so effect has run
+      setTimeout(() => { resumingRef.current = false }, 100)
+    } catch (err) {
+      console.error('resumeExam error', err)
+      resumingRef.current = false
+    }
+  }
+
+  // Submit the exam (opt-in) or complete early with partial scoring
+  async function handleSubmitExam(earlyComplete = false) {
+    if (!selected || !attemptId) return
+    const answeredCount = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === Number(id))).length
+    const totalQuestions = displayQuestions.length
+    // Clear saved progress
+    try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
+
+    // Visitor (unauthenticated) — compute locally
+    if (!user) {
+      const qs = displayQuestions as Question[]
+      let correct = 0
+      const perDomain: Record<string, { correct: number; total: number; score?: number }> = {}
+      for (const qn of qs) {
+        const sel = selectedAnswers[qn.id]
+        const dom = (qn as any).domain || 'General'
+        if (!perDomain[dom]) perDomain[dom] = { correct: 0, total: 0 }
+        if (sel === undefined) { if (!earlyComplete) perDomain[dom].total++; continue }
+        perDomain[dom].total++
+        const isRight = Array.isArray(qn.answerIndices)
+          ? Array.isArray(sel) && sel.length === qn.answerIndices.length && sel.every((v: number) => qn.answerIndices!.includes(v))
+          : sel === qn.answerIndex
+        if (isRight) { correct++; perDomain[dom].correct++ }
+      }
+      for (const k of Object.keys(perDomain)) { const e = perDomain[k]; e.score = e.total > 0 ? Math.round((e.correct / e.total) * 100) : 0 }
+      const denom = earlyComplete ? answeredCount : totalQuestions
+      const score = denom > 0 ? Math.round((correct / denom) * 100) : 0
+      setAttemptData({
+        attemptId, examCode: selected, score, correctCount: correct,
+        total: denom, answeredCount, totalQuestions, earlyComplete,
+        perDomain, finishedAt: new Date().toISOString(),
+        questions: qs.map((qn) => ({ ...qn, selectedIndex: Array.isArray(selectedAnswers[qn.id]) ? undefined : selectedAnswers[qn.id] as number, selectedIndices: Array.isArray(selectedAnswers[qn.id]) ? selectedAnswers[qn.id] : undefined })),
+      })
+      setExamStarted(false); setTimeLeft(null)
+      setShowSubmitConfirm(false); setShowCompleteEarlyConfirm(false)
+      return
+    }
+
+    // Authenticated — call server finish
+    try {
+      const fin = await authFetch(`/attempts/${attemptId}/finish`, { method: 'PATCH' })
+      const finData = await fin.json()
+      if ('attemptId' in finData) {
+        if (earlyComplete && answeredCount < totalQuestions && typeof finData.correctCount === 'number') {
+          finData.total = answeredCount
+          finData.score = answeredCount > 0 ? Math.round((finData.correctCount / answeredCount) * 100) : 0
+          finData.answeredCount = answeredCount
+          finData.totalQuestions = totalQuestions
+          finData.earlyComplete = true
+        }
+        setAttemptData(finData)
+        handleGamificationReward(finData)
+        setExamStarted(false); setTimeLeft(null)
+        if (showAttempts) { try { const r2 = await authFetch('/attempts'); const dd = await r2.json(); setAttemptsList(dd.attempts ?? []) } catch {} }
+      } else { setLastError(JSON.stringify(finData)) }
+    } catch (err) { console.error('handleSubmitExam error', err); setLastError(String(err)) }
+    setShowSubmitConfirm(false); setShowCompleteEarlyConfirm(false)
+  }
+
   // when exam selected, check for an existing attempt but DO NOT auto-create one — user must Start
   useEffect(() => {
+    // If we're in the middle of a resume, don't interfere
+    if (resumingRef.current) return
     if (!selected) {
       setAttemptId(null)
       setExamStarted(false)
@@ -1166,10 +1389,11 @@ ${questionsHTML}
     } catch {}
   }, [selected])
 
-  // helper to render choice content (plain text, JSON, or CLI snippets)
+  // helper to render choice content (plain text, JSON, YAML, or CLI snippets)
   const renderChoiceContent = (val: any, q?: Question, inline = false) => {
     const s = typeof val === 'string' ? val : (val == null ? '' : String(val))
     const isLikelyJson = (q?.format === 'json') || s.trim().startsWith('{') || s.trim().startsWith('[')
+    const isLikelyYaml = (q?.format === 'yaml')
     // CLI detection: require either explicit format, multiple tokens with typical CLI patterns,
     // or a leading shell prompt. Avoid matching plain titles like 'AWS Config'.
     const isLikelyCli = (q?.format === 'cli') || s.includes('\n') || /^\s*(?:\$|sudo\b)/.test(s) || /^\s*aws\s+[a-z0-9-]/.test(s)
@@ -1185,6 +1409,10 @@ ${questionsHTML}
       }
     }
 
+    if (isLikelyYaml) {
+      return <CodeBlock code={s} language="yaml" inline={false} />
+    }
+
     if (isLikelyCli) {
       return <CodeBlock code={s} language="bash" inline={false} />
     }
@@ -1198,7 +1426,7 @@ ${questionsHTML}
       <div className="container px-4">
         <header className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl sm:text-2xl font-extrabold">Exam App</h1>
+            <h1 className="text-xl sm:text-2xl font-extrabold">certshack</h1>
             <nav className="hidden sm:flex items-center gap-2">
               <button
                 onClick={() => { setRoute('home'); setSelected(null); setExamStarted(false); setAttemptData(null); setShowAttempts(false); setAttemptsList(null); }}
@@ -1248,6 +1476,14 @@ ${questionsHTML}
                 </svg>
                 <span className="sr-only">Account</span>
               </button>
+              <button
+                onClick={() => setRoute('pricing')}
+                title="Pricing"
+                className={`px-3 py-1 rounded text-sm ${route === 'pricing' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+              >
+                <span aria-hidden className="text-lg font-bold leading-none">£</span>
+                <span className="sr-only">Pricing</span>
+              </button>
                 {isAdmin() && (
                 <button
                   onClick={() => setRoute('admin')}
@@ -1281,14 +1517,16 @@ ${questionsHTML}
             {user ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-slate-600 dark:text-slate-300 hidden md:inline">{user.name}</span>
-                <button onClick={logout} className="px-2 py-1 rounded text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" title="Sign out">
-                  Sign out
+                <button onClick={logout} className="p-1.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" title="Sign out">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
                 </button>
               </div>
             ) : !authLoading ? (
               <button onClick={login} className="px-3 py-1 rounded text-sm bg-sky-500 text-white hover:bg-sky-600">Sign in</button>
             ) : null}
-            <label className="text-sm">Theme</label>
+            <div className="flex items-center gap-1" title="Theme">
+              <svg className="w-4 h-4 text-slate-500 dark:text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="8" r="1.5" fill="currentColor" /><circle cx="8" cy="12" r="1.5" fill="currentColor" /><circle cx="15.5" cy="10" r="1.5" fill="currentColor" /><circle cx="9" cy="15.5" r="1.5" fill="currentColor" /></svg>
+            </div>
             <select value={themePreset} onChange={(e) => setThemePreset(e.target.value)} className="px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm">
               <option value="dark">Dark</option>
               <option value="light">Light</option>
@@ -1336,7 +1574,7 @@ ${questionsHTML}
                 <button onClick={() => { setRoute('home'); setSelected(null); setExamStarted(false); setAttemptData(null); setShowAttempts(false); setAttemptsList(null); setMobileOpen(false); }} title="Home" className={`text-left px-3 py-2 rounded ${route === 'home' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`} aria-label="Home">
                   <svg className="w-5 h-5 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11.5L12 4l9 7.5" /><path d="M5 21V11h14v10" /></svg>
                 </button>
-                <button onClick={() => { setRoute('practice'); setSelected(null); setExamStarted(false); setAttemptData(null); setShowAttempts(false); setAttemptsList(null); setMobileOpen(false); }} title="Practice Exams" className={`text-left px-3 py-2 rounded ${route === 'practice' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`} aria-label="Practice Exams">
+                <button onClick={() => { setRoute('practice'); setShowAttempts(false); setAttemptsList(null); setMobileOpen(false); }} title="Practice Exams" className={`text-left px-3 py-2 rounded ${route === 'practice' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`} aria-label="Practice Exams">
                   <svg className="w-5 h-5 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="2" width="8" height="4" rx="1" /><path d="M6 7h12v13H6z" /><path d="M9 11h6M9 15h6" /></svg>
                 </button>
                 <button onClick={() => { if (selected) { setRoute('analytics'); setMobileOpen(false) } }} title={selected ? `Analytics for ${selected}` : 'Select an exam first'} disabled={!selected} className={`text-left px-3 py-2 rounded ${route === 'analytics' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800'} ${!selected ? 'opacity-50 cursor-not-allowed' : ''}`} aria-label="Analytics">
@@ -1344,6 +1582,9 @@ ${questionsHTML}
                 </button>
                 <button onClick={() => { setRoute('account'); setMobileOpen(false) }} title="Account" className={`text-left px-3 py-2 rounded ${route === 'account' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`} aria-label="Account">
                   <svg className="w-5 h-5 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3" /><path d="M5.5 20a6.5 6.5 0 0113 0" /></svg>
+                </button>
+                <button onClick={() => { setRoute('pricing'); setMobileOpen(false) }} title="Pricing" className={`text-left px-3 py-2 rounded ${route === 'pricing' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`} aria-label="Pricing">
+                  <span className="text-lg font-bold leading-none inline-block">£</span>
                 </button>
                 {isAdmin() && (
                   <button onClick={() => { setRoute('admin'); setMobileOpen(false) }} title="Admin" className={`text-left px-3 py-2 rounded ${route === 'admin' ? 'bg-sky-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`} aria-label="Admin">
@@ -1415,6 +1656,21 @@ ${questionsHTML}
           <main className="md:col-span-4">
             {route === 'practice' && (
               <div className="mb-6">
+                {/* Resume banner when an exam is in progress or has saved progress */}
+                {anySavedExam && !examStarted && (
+                  <div className="mb-4 p-4 rounded-lg border border-sky-300 dark:border-sky-700 bg-sky-50 dark:bg-sky-900/20 flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-sky-800 dark:text-sky-200">Exam in progress</div>
+                      <div className="text-sm text-sky-600 dark:text-sky-400">{anySavedExam.title} — {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
+                    </div>
+                    <button
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold hover:opacity-90 transition-opacity"
+                      onClick={() => resumeExam(anySavedExam.code)}
+                    >
+                      Resume Exam
+                    </button>
+                  </div>
+                )}
                 <h2 className="text-xl font-semibold mb-4">Practice Exams</h2>
                 <div className="space-y-6">
                   {providers.map((p) => (
@@ -1429,8 +1685,11 @@ ${questionsHTML}
                             </div>
                             <div className="mt-3 flex items-center gap-2">
                               <button
-                                className="px-3 py-1 rounded bg-gradient-to-r from-sky-500 to-indigo-500 text-white"
+                                className={`px-3 py-1 rounded text-white ${examStarted || anySavedExam || (selected && savedProgress) ? 'bg-slate-400 cursor-not-allowed' : 'bg-gradient-to-r from-sky-500 to-indigo-500'}`}
+                                disabled={!!(examStarted || anySavedExam || (selected && savedProgress))}
+                                title={examStarted || anySavedExam || (selected && savedProgress) ? 'Complete or cancel your current exam first' : 'Setup this exam'}
                                 onClick={() => {
+                                  if (examStarted || anySavedExam || (selected && savedProgress)) return
                                   setupExamFromMeta(ex)
                                 }}
                               >
@@ -1450,10 +1709,6 @@ ${questionsHTML}
                                 </svg>
                                 <span className="sr-only">Analytics</span>
                               </button>
-                              {/* Gamification: badge count for this exam area */}
-                              {gamState.streak > 0 && (
-                                <span className="px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300 text-[10px] font-semibold" title={`${gamState.streak}-day streak`}>🔥{gamState.streak}</span>
-                              )}
                             </div>
 
                             {ex.logo && (
@@ -1763,6 +2018,21 @@ ${questionsHTML}
             {/* Account / Achievements page */}
             {route === 'account' && (
               <div className="mb-6">
+                {/* Resume banner when an exam is in progress or has saved progress */}
+                {anySavedExam && !examStarted && (
+                  <div className="mb-4 p-4 rounded-lg border border-sky-300 dark:border-sky-700 bg-sky-50 dark:bg-sky-900/20 flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-sky-800 dark:text-sky-200">Exam in progress</div>
+                      <div className="text-sm text-sky-600 dark:text-sky-400">{anySavedExam.title} — {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
+                    </div>
+                    <button
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold hover:opacity-90 transition-opacity"
+                      onClick={() => resumeExam(anySavedExam.code)}
+                    >
+                      Resume Exam
+                    </button>
+                  </div>
+                )}
                 <AccountPage />
                 <div className="mt-6">
                   <Leaderboard />
@@ -1776,6 +2046,43 @@ ${questionsHTML}
               </div>
             )}
 
+            {route === 'pricing' && (
+              <div className="mb-6">
+                {/* Resume banner when an exam is in progress or has saved progress */}
+                {anySavedExam && !examStarted && (
+                  <div className="mb-4 p-4 rounded-lg border border-sky-300 dark:border-sky-700 bg-sky-50 dark:bg-sky-900/20 flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-sky-800 dark:text-sky-200">Exam in progress</div>
+                      <div className="text-sm text-sky-600 dark:text-sky-400">{anySavedExam.title} — {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
+                    </div>
+                    <button
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold hover:opacity-90 transition-opacity"
+                      onClick={() => resumeExam(anySavedExam.code)}
+                    >
+                      Resume Exam
+                    </button>
+                  </div>
+                )}
+                <PricingPage />
+              </div>
+            )}
+
+            {/* Resume banner on homepage when no exam is currently selected */}
+            {route === 'home' && !selected && anySavedExam && (
+              <div className="mb-4 p-4 rounded-lg border border-sky-300 dark:border-sky-700 bg-sky-50 dark:bg-sky-900/20 flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-sky-800 dark:text-sky-200">Exam in progress</div>
+                  <div className="text-sm text-sky-600 dark:text-sky-400">{anySavedExam.title} — {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
+                </div>
+                <button
+                  className="px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold hover:opacity-90 transition-opacity"
+                  onClick={() => resumeExam(anySavedExam.code)}
+                >
+                  Resume Exam
+                </button>
+              </div>
+            )}
+
             {/* Homepage hero when no exam selected */}
             {route === 'home' && !selected && (
               <div className="mb-8 p-8 rounded-lg bg-gradient-to-r from-white to-slate-100 dark:from-slate-800/60 dark:to-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
@@ -1783,22 +2090,42 @@ ${questionsHTML}
                   <h2 className="text-3xl sm:text-4xl font-extrabold mb-3">Practice smarter. Pass faster.</h2>
                   <p className="text-slate-500 dark:text-slate-400 mb-6">Timed or casual practice exams, focused by domain, with per-question explanations and review sessions to help you improve.</p>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div className="p-4 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-transparent">
                       <div className="text-2xl">⏱️</div>
                       <div className="font-semibold mt-2">Timed & Casual</div>
                       <div className="text-sm text-slate-500 dark:text-slate-400">Practice under exam-like timing or take a relaxed walkthrough.</div>
                     </div>
                     <div className="p-4 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-transparent">
-                      <div className="text-2xl">🧭</div>
-                      <div className="font-semibold mt-2">Domain Focus</div>
-                      <div className="text-sm text-slate-500 dark:text-slate-400">Choose specific domains to drill into weaker areas.</div>
+                      <div className="text-2xl">
+                        <svg role="img" aria-label="Exam checklist" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className="w-7 h-7 inline-block">
+                          <defs>
+                            <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+                              <stop offset="0" stopColor="#06b6d4"/>
+                              <stop offset="1" stopColor="#8b5cf6"/>
+                            </linearGradient>
+                          </defs>
+                          <rect x="6" y="8" width="40" height="48" rx="3" className="fill-slate-200 dark:fill-slate-800" stroke="url(#g1)" strokeWidth="2.5" />
+                          <path d="M16 18h20M16 26h20M16 34h20" className="stroke-slate-400 dark:stroke-slate-500" strokeWidth="3" strokeLinecap="round" />
+                          <rect x="44" y="4" width="16" height="16" rx="3" fill="url(#g1)" />
+                          <path d="M48 10l3 3L58 6" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                        </svg>
+                      </div>
+                      <div className="font-semibold mt-2">Exam Checklists</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400">Organise your study with focused checklists and topic goals.</div>
                     </div>
                     <div className="p-4 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-transparent">
                       <div className="text-2xl">📈</div>
                       <div className="font-semibold mt-2">Review & Insights</div>
                       <div className="text-sm text-slate-500 dark:text-slate-400">View per-domain scores and detailed explanations after each attempt.</div>
                     </div>
+                    <button onClick={() => setRoute('account')} className="p-4 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-transparent hover:border-sky-400 dark:hover:border-sky-500 transition-colors text-left">
+                      <div className="text-2xl">
+                        <svg className="w-7 h-7 inline-block text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7" /><path d="M4 22h16" /><path d="M10 22V8h4v14" /><path d="M5 22V12h4" /><path d="M15 22V12h4" /></svg>
+                      </div>
+                      <div className="font-semibold mt-2">Leaderboard</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400">Compete with fellow learners and climb the ranks.</div>
+                    </button>
                   </div>
 
                   <div className="flex items-center justify-center gap-4">
@@ -1808,41 +2135,19 @@ ${questionsHTML}
                 </div>
                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-transparent">
-                    <div className="h-40 flex items-center justify-center text-slate-400">
-                      <svg role="img" aria-label="Exam checklist" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className="w-40 h-40" preserveAspectRatio="xMidYMid meet">
-                        <defs>
-                          <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
-                            <stop offset="0" stopColor="#06b6d4"/>
-                            <stop offset="1" stopColor="#8b5cf6"/>
-                          </linearGradient>
-                        </defs>
-                        <rect x="6" y="8" width="40" height="48" rx="3" className="fill-slate-200 dark:fill-slate-800" stroke="url(#g1)" strokeWidth="1.5" />
-                        <path d="M16 18h20M16 26h20M16 34h20" className="stroke-slate-400 dark:stroke-slate-500" strokeWidth="2" strokeLinecap="round" />
-                        <rect x="46" y="6" width="12" height="12" rx="2" fill="url(#g1)" />
-                        <path d="M50 10l2.5 2.5L58 7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                        <circle cx="18" cy="18" r="2.5" fill="#06b6d4" />
-                        <circle cx="18" cy="26" r="2.5" fill="#06b6d4" />
-                        <circle cx="18" cy="34" r="2.5" fill="#06b6d4" />
-                      </svg>
-                    </div>
-                    <div className="mt-3">
-                      <div className="font-semibold">Exam Checklists</div>
-                      <div className="text-sm text-slate-500 dark:text-slate-400">Organise your study with focused checklists and topic goals.</div>
-                    </div>
+                    <div className="text-2xl">🧭</div>
+                    <div className="font-semibold mt-2">Domain Focus</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400">Choose specific domains to drill into weaker areas.</div>
                   </div>
 
                     <div className="p-4 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-transparent">
-                      <div className="h-40 flex items-center justify-center text-slate-400">
-                        <svg role="img" aria-label="Filter exams" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-32 h-32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M22 3H2l7 9v7l6-4v-6z" />
-                          <path d="M10 13V6" strokeOpacity="0.6" />
-                          <path d="M14 13v-4" strokeOpacity="0.6" />
+                      <div className="text-2xl">
+                        <svg role="img" aria-label="Filter exams" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-7 h-7 inline-block text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 3H2l8 9.46V19l4-2v-4.54L22 3z" />
                         </svg>
                       </div>
-                      <div className="mt-3">
-                        <div className="font-semibold">Advanced Question Filtering</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">Filter question sets by services or keywords.</div>
-                      </div>
+                      <div className="font-semibold mt-2">Advanced Question Filtering</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400">Filter question sets by services or keywords.</div>
                     </div>
                 </div>
               </div>
@@ -1871,12 +2176,26 @@ ${questionsHTML}
                     Attempts
                   </button>
                   {attemptId && !isFinished && examStarted && (
-                    <button
-                      className="px-2 py-1 rounded bg-red-600 text-white text-sm"
-                      onClick={() => setShowCancelConfirm(true)}
-                    >
-                      Cancel
-                    </button>
+                    <>
+                      <button
+                        className="px-2 py-1 rounded bg-sky-600 text-white text-sm hover:bg-sky-700 transition-colors"
+                        onClick={() => {
+                          // Save progress is already handled by the auto-save effect.
+                          // Just exit the exam view so user can navigate freely and resume later.
+                          setExamStarted(false)
+                          showToast('Progress saved — resume any time', 'info')
+                        }}
+                        title="Save progress and exit — resume later"
+                      >
+                        Save for Later
+                      </button>
+                      <button
+                        className="px-2 py-1 rounded bg-red-600 text-white text-sm"
+                        onClick={() => setShowCancelConfirm(true)}
+                      >
+                        Cancel
+                      </button>
+                    </>
                   )}
                   {examStarted && timed && timeLeft !== null && (
                     <div className="flex items-center gap-2">
@@ -1991,7 +2310,10 @@ ${questionsHTML}
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-sm text-slate-500">{attemptData.correctCount ?? 0} / {attemptData.total ?? 0} correct</div>
+                        <div className="text-sm text-slate-500">
+                          {attemptData.correctCount ?? 0} / {attemptData.total ?? 0} correct
+                          {attemptData.earlyComplete && <span className="ml-2 text-amber-500">(completed early — {attemptData.answeredCount} of {attemptData.totalQuestions} questions)</span>}
+                        </div>
                         <div className="mt-1 text-xs text-slate-500">Completed: {attemptData.finishedAt ? new Date(attemptData.finishedAt).toLocaleString() : '—'}</div>
                       </div>
                     </div>
@@ -2330,6 +2652,25 @@ ${questionsHTML}
                   {/* removed available count */}
                 </div>
 
+                {/* Tier-limit banner */}
+                {examLimited && (
+                  <div className="mb-4 p-3 rounded-lg border border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/20 text-sm">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="text-amber-700 dark:text-amber-300">
+                        🔒 You have access to <strong>{questions.length}</strong> of <strong>{examTotalAvailable}</strong> questions
+                        {examTier === 'visitor' && ' (sign in to unlock more)'}
+                        {examTier === 'registered' && ' (upgrade to unlock all)'}
+                      </span>
+                      <button
+                        onClick={() => examTier === 'visitor' ? login() : setRoute('pricing')}
+                        className="px-3 py-1 rounded text-xs font-semibold bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:from-sky-600 hover:to-indigo-600"
+                      >
+                        {examTier === 'visitor' ? 'Sign in' : 'View plans'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="mb-4">
                   {(() => {
                     const domains: string[] = attemptData?.perDomain ? Object.keys(attemptData.perDomain) : Array.from(new Set(questions.map((q) => (q as any).domain)))
@@ -2485,24 +2826,25 @@ ${questionsHTML}
                     )}
 
                     <div className="mt-3">
-                      <label className="block text-sm font-medium mb-1">Questions</label>
+                      <label className="block text-sm font-medium mb-1">Questions <span className="text-xs text-slate-500 font-normal">({availableFilteredCount} available)</span></label>
                       <div className="flex items-center gap-3">
                         <input
                           type="range"
                           min={1}
-                          max={Math.max(questions.length || 1, 200)}
+                          max={Math.max(availableFilteredCount, 1)}
                           step={1}
-                          value={numQuestions}
-                          onChange={(e) => setNumQuestions(Number(e.target.value) || 1)}
+                          value={Math.min(numQuestions, availableFilteredCount || 1)}
+                          onChange={(e) => setNumQuestions(Math.min(Number(e.target.value) || 1, availableFilteredCount || 1))}
                           className="flex-1"
                           disabled={!!attemptId && !isFinished}
                         />
                         <input
                           type="number"
                           min={1}
+                          max={availableFilteredCount || 1}
                           step={1}
-                          value={numQuestions}
-                          onChange={(e) => setNumQuestions(Number(e.target.value) || 1)}
+                          value={Math.min(numQuestions, availableFilteredCount || 1)}
+                          onChange={(e) => setNumQuestions(Math.min(Math.max(1, Number(e.target.value) || 1), availableFilteredCount || 1))}
                           className="w-28 px-2 py-1 rounded bg-slate-100 dark:bg-slate-700/40 text-slate-900 dark:text-white border border-slate-300 dark:border-transparent"
                           disabled={!!attemptId && !isFinished}
                         />
@@ -2622,6 +2964,7 @@ ${questionsHTML}
                   </div>
 
                   <div className="text-xs text-slate-500">Filters narrow down which questions appear. Leave blank for all questions.</div>
+
                   {lastError && (
                     <div className="mt-1 text-sm text-red-400">{lastError}</div>
                   )}
@@ -2642,36 +2985,85 @@ ${questionsHTML}
                       setDurationMinutes(defDur)
                     } catch { setNumQuestions(10) }
                   }}>Reset</button>
-                  <button className="px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold" onClick={() => createAttempt()}>Start exam</button>
+                  {savedProgress && (
+                    <button className="px-4 py-2 rounded-md bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors" onClick={() => resumeExam()}>
+                      Resume ({savedProgress.answeredCount}/{savedProgress.total} answered)
+                    </button>
+                  )}
+                  <button className="px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold" onClick={() => createAttempt()}>{savedProgress ? 'Start new' : 'Start exam'}</button>
                 </div>
               </div>
             )}
-            <div className="mb-3">
-              {!isFinished && examStarted && displayQuestions.length > 0 && (
-                (() => {
-                  const answeredCount = Object.keys(selectedAnswers).length
-                  const current = Math.min(answeredCount + 1, displayQuestions.length)
+            {!isFinished && examStarted && displayQuestions.length > 0 && route === 'home' && (
+              <div className="mb-3 space-y-2">
+                {/* Question navigation bar */}
+                <div className="flex flex-wrap gap-1">
+                  {displayQuestions.map((qq, idx) => {
+                    const isAnswered = selectedAnswers[qq.id] !== undefined
+                    const isFlagged = flaggedQuestions.has(qq.id)
+                    const isCurrent = idx === Math.min(currentQuestionIndex, displayQuestions.length - 1)
+                    return (
+                      <button
+                        key={qq.id}
+                        onClick={() => setCurrentQuestionIndex(idx)}
+                        title={`Q${idx + 1}${isFlagged ? ' (flagged)' : ''}${isAnswered ? ' (answered)' : ''}`}
+                        className={`relative w-8 h-8 rounded text-xs font-bold transition-all
+                          ${isCurrent ? 'ring-2 ring-sky-400 ring-offset-1 ring-offset-transparent' : ''}
+                          ${isAnswered ? 'bg-sky-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}
+                          hover:opacity-80`}
+                      >
+                        {idx + 1}
+                        {isFlagged && <span className="absolute -top-1 -right-1 text-[10px]">🚩</span>}
+                      </button>
+                    )
+                  })}
+                </div>
+                {/* Progress + action bar */}
+                {(() => {
+                  const answeredCount = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === Number(id))).length
                   const pct = Math.round((answeredCount / Math.max(1, displayQuestions.length)) * 100)
+                  const allAnswered = answeredCount >= displayQuestions.length
+                  const flaggedCount = displayQuestions.filter(q => flaggedQuestions.has(q.id)).length
                   return (
                     <div>
                       <div className="flex items-center justify-between text-sm mb-1">
-                        <div>Question {current}/{displayQuestions.length}</div>
-                        <div className="text-xs text-slate-500">{pct}%</div>
+                        <div className="flex items-center gap-3">
+                          <span>Question {Math.min(currentQuestionIndex + 1, displayQuestions.length)}/{displayQuestions.length}</span>
+                          <span className="text-xs text-slate-500">{answeredCount} answered · {pct}%</span>
+                          {flaggedCount > 0 && <span className="text-xs text-orange-400">🚩 {flaggedCount} flagged</span>}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {!allAnswered && answeredCount > 0 && (
+                            <button className="px-2 py-1 rounded bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors" onClick={() => setShowCompleteEarlyConfirm(true)}>
+                              Complete Early
+                            </button>
+                          )}
+                          {flaggedCount > 0 && (
+                            <button className="px-2 py-1 rounded bg-slate-200 dark:bg-slate-700 text-orange-500 dark:text-orange-400 text-xs font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors" onClick={() => setFlaggedQuestions(new Set())}>
+                              🚩 Unflag All
+                            </button>
+                          )}
+                          {allAnswered && (
+                            <button className="px-3 py-1 rounded bg-gradient-to-r from-sky-500 to-indigo-500 text-white text-xs font-semibold animate-pulse" onClick={() => setShowSubmitConfirm(true)}>
+                              Submit Exam
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <div className="w-full h-2 bg-slate-200/60 rounded overflow-hidden">
-                        <div className="h-2 bg-sky-400 dark:bg-sky-600" style={{ width: `${pct}%` }} />
+                      <div className="w-full h-2 bg-slate-200/60 dark:bg-slate-700/40 rounded overflow-hidden">
+                        <div className="h-2 bg-sky-400 dark:bg-sky-600 transition-all" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
                   )
-                })()
-              )}
-            </div>
+                })()}
+              </div>
+            )}
 
-            {!isFinished && examStarted && (
+            {!isFinished && examStarted && route === 'home' && (
             <div className="space-y-4">
               {(() => {
-                const firstUnansweredIndex = displayQuestions.findIndex((qq) => selectedAnswers[qq.id] === undefined)
-                const visible = firstUnansweredIndex >= 0 ? [displayQuestions[firstUnansweredIndex]] : displayQuestions
+                const clampedIdx = Math.min(currentQuestionIndex, displayQuestions.length - 1)
+                const visible = displayQuestions.length > 0 ? [displayQuestions[Math.max(0, clampedIdx)]] : []
                 return visible.map((q) => {
                   const chosen = selectedAnswers[q.id]
                   const answered = chosen !== undefined
@@ -2687,23 +3079,46 @@ ${questionsHTML}
                       key={q.id}
                       className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-r from-white/40 to-slate-50/40 dark:from-slate-800/40 dark:to-slate-900/40"
                     >
-                      <div className="flex items-start justify-between mb-2">
+                      <div className="mb-2">
                         <div className="font-semibold text-slate-900 dark:text-slate-100">
                           {q.question}
                           {isMultiSelect && <span className="ml-2 text-xs font-medium text-sky-400">(Select {q.selectCount})</span>}
                         </div>
-                        <div className="ml-4">
-                          {!answered && (
+                        {/* Tip toggle + Flag for Review — right-aligned row under the question */}
+                        {!isFinished && (
+                          <div className="mt-2 flex items-center justify-end gap-2">
+                            {q.tip && (
+                              <button
+                                onClick={() => setShowTipMap((s) => ({ ...s, [q.id]: !s[q.id] }))}
+                                className="text-sm px-2 py-1 rounded bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700/40 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors"
+                                aria-label={showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
+                              >
+                                💡 {showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
+                              </button>
+                            )}
                             <button
-                              onClick={() => setShowTipMap((s) => ({ ...s, [q.id]: !s[q.id] }))}
-                              className="text-sm px-2 py-1 rounded bg-yellow-50 dark:bg-slate-700"
-                              aria-label="Show Tip"
-                              title="Show Tip"
+                              onClick={() => {
+                                setFlaggedQuestions((prev) => {
+                                  const next = new Set(prev)
+                                  if (next.has(q.id)) next.delete(q.id)
+                                  else next.add(q.id)
+                                  return next
+                                })
+                                if (!flaggedQuestions.has(q.id)) {
+                                  setCurrentQuestionIndex((idx) => Math.min(displayQuestions.length - 1, idx + 1))
+                                }
+                              }}
+                              className={`text-sm px-2 py-1 rounded font-medium transition-colors ${flaggedQuestions.has(q.id) ? 'bg-orange-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-orange-500 dark:text-orange-400 border border-slate-300 dark:border-slate-600'}`}
                             >
-                              💡 Show Tip
+                              🚩 {flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}
                             </button>
-                          )}
-                        </div>
+                          </div>
+                        )}
+                        {q.tip && !isFinished && showTipMap[q.id] && (
+                          <div className="mt-2 p-2.5 rounded-lg bg-yellow-50 dark:bg-yellow-900/15 border border-yellow-200/60 dark:border-yellow-700/30 text-sm text-yellow-800 dark:text-yellow-200">
+                            <strong>💡 Tip:</strong> {q.tip}
+                          </div>
+                        )}
                       </div>
 
                       <ol className="list-none pl-0 space-y-2">
@@ -2715,29 +3130,28 @@ ${questionsHTML}
                             ? (Array.isArray(q.answerIndices) && q.answerIndices.includes(i))
                             : (typeof q.answerIndex === 'number' && q.answerIndex === i)
                           let bg = 'bg-transparent'
-                          if (answered) {
+                          if (isFinished && answered) {
                             if (isCorrectChoice) bg = 'bg-gradient-to-r from-neon-cyan/10 to-neon-pink/10'
                             else if (isSelected && !isCorrectChoice) bg = 'bg-red-600/10'
+                          } else if (answered && isSelected) {
+                            bg = 'bg-sky-500/10'
                           } else if (isMultiSelect && isSelected) {
                             bg = 'bg-sky-500/10'
                           }
                           return (
                             <li key={i}>
                               <button
-                                onClick={async () => {
-                                  if (answered) return
-                                  if (!examStarted) {
-                                    setLastError('Start the exam before answering')
-                                    return
-                                  }
-                                  let aid = attemptId
-                                  if (!aid) {
-                                    setLastError('No active attempt. Click Start to begin the exam.')
-                                    return
-                                  }
-
+                                onClick={() => {
+                                  if (isFinished) return
                                   if (isMultiSelect) {
-                                    // toggle this choice in the pending set
+                                    // If already answered, move old answer into pending so user can adjust
+                                    if (answered && !multiSelectPending[q.id]) {
+                                      const prev = Array.isArray(chosen) ? (chosen as number[]) : []
+                                      setMultiSelectPending((p) => ({ ...p, [q.id]: prev }))
+                                      // clear the committed answer so the UI shows pending state
+                                      setSelectedAnswers((sa) => { const next = { ...sa }; delete next[q.id]; return next })
+                                      return
+                                    }
                                     setMultiSelectPending((prev) => {
                                       const cur = prev[q.id] ?? []
                                       const next = cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]
@@ -2745,56 +3159,24 @@ ${questionsHTML}
                                     })
                                     return
                                   }
-
-                                  // single-select: submit immediately
-                                  const newSelected = { ...selectedAnswers, [q.id]: i }
-                                  setSelectedAnswers(newSelected)
-
-                                  try {
-                                    if (aid) {
-                                      const res = await authFetch(`/attempts/${aid}/answer`, {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ questionId: q.id, selectedIndex: i, timeMs: 0, showTip: !!showTipMap[q.id] })
-                                      })
-                                      if (res.ok) {
-                                        if (Object.keys(newSelected).length >= displayQuestions.length) {
-                                          try {
-                                            const fin = await authFetch(`/attempts/${aid}/finish`, { method: 'PATCH' })
-                                            const finData = await fin.json()
-                                            if ('attemptId' in finData) {
-                                              setAttemptData(finData)
-                                              handleGamificationReward(finData)
-                                              if (showAttempts) {
-                                                try { const r2 = await authFetch('/attempts'); const dd = await r2.json(); setAttemptsList(dd.attempts ?? []) } catch {}
-                                              }
-                                            } else {
-                                              setLastError(JSON.stringify(finData))
-                                            }
-                                          } catch (err) { console.error('auto-finish error', err); setLastError(String(err)) }
-                                        }
-                                      } else {
-                                        const text = await res.text()
-                                        console.error('save answer failed', text)
-                                        setLastError(text)
-                                      }
-                                    }
-                                  } catch (err) {
-                                    console.error('submit answer error', err)
-                                    setLastError(String(err))
-                                  }
+                                  submitAnswer(q, i)
                                 }}
-                                className={`w-full text-left px-3 py-2 rounded ${bg} hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between`}
+                                className={`w-full text-left px-3 py-2.5 rounded-lg border ${isFinished && answered ? (isCorrectChoice ? 'border-green-400/40 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-400/40 dark:border-red-500/30' : 'border-slate-200/60 dark:border-slate-700/60') : isSelected ? 'border-sky-400/50 dark:border-sky-500/40' : 'border-slate-200/60 dark:border-slate-700/60'} ${bg} hover:bg-slate-100 dark:hover:bg-slate-700 flex items-start gap-3 transition-colors`}
                               >
-                                <span className="flex items-center gap-2">
-                                  {isMultiSelect && !answered && (
-                                    <span className={`inline-flex items-center justify-center w-5 h-5 rounded border-2 ${isSelected ? 'border-sky-500 bg-sky-500 text-white' : 'border-slate-400'}`}>
-                                      {isSelected && <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
-                                    </span>
-                                  )}
-                                  <span className={`${isSelected ? 'font-semibold' : ''}`}>{renderChoiceContent(c, q, true)}</span>
+                                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold flex-shrink-0 mt-0.5 ${isFinished && answered ? (isCorrectChoice ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : isSelected && !isCorrectChoice ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400') : isSelected ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
+                                  {String.fromCharCode(65 + i)}
                                 </span>
-                                <div className="flex items-center gap-2">
+                                <span className="flex-1 min-w-0">
+                                  <span className="flex items-center gap-2">
+                                    {isMultiSelect && !answered && (
+                                      <span className={`inline-flex items-center justify-center w-5 h-5 rounded border-2 flex-shrink-0 ${isSelected ? 'border-sky-500 bg-sky-500 text-white' : 'border-slate-400'}`}>
+                                        {isSelected && <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
+                                      </span>
+                                    )}
+                                    <span className={`${isSelected ? 'font-semibold' : ''}`}>{renderChoiceContent(c, q, true)}</span>
+                                  </span>
+                                </span>
+                                <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
                                                   {isFinished && answered && isCorrectChoice && <span className="text-xs text-green-400">Correct</span>}
                                                   {isFinished && answered && isSelected && !isCorrectChoice && <span className="text-xs text-red-300">Incorrect</span>}
                                 </div>
@@ -2827,12 +3209,19 @@ ${questionsHTML}
                         </div>
                       )}
 
-                      {/* Show tip before answering only when user requested it */}
-                      {!answered && showTipMap[q.id] && q.tip && (
-                        <div className="mt-3 text-sm">
-                          <div className="p-2 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-                            <strong>Tip:</strong> {q.tip}
-                          </div>
+                      {/* Navigation buttons */}
+                      {!isFinished && (
+                        <div className="mt-3 flex items-center gap-2 border-t border-slate-200/40 dark:border-slate-700/40 pt-3">
+                          <button
+                            onClick={() => setCurrentQuestionIndex((i) => Math.max(0, i - 1))}
+                            disabled={currentQuestionIndex <= 0}
+                            className="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-700 text-sm disabled:opacity-40"
+                          >← Prev</button>
+                          <button
+                            onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
+                            disabled={currentQuestionIndex >= displayQuestions.length - 1}
+                            className="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-700 text-sm disabled:opacity-40"
+                          >Next →</button>
                         </div>
                       )}
 
@@ -2902,14 +3291,19 @@ ${questionsHTML}
                   // ignore delete errors (e.g., attempt has answers)
                 }
                 try { if (selected) localStorage.removeItem(`attempt:${selected}`) } catch {}
+                try { if (selected) localStorage.removeItem(`examProgress:${selected}`) } catch {}
                 setAttemptId(null)
                 setAttemptData(null)
                 setExamStarted(false)
                 setSelectedAnswers({})
                 setMultiSelectPending({})
+                setFlaggedQuestions(new Set())
+                setCurrentQuestionIndex(0)
                 setTimeLeft(null)
                 setPaused(false)
                 setShowCancelConfirm(false)
+                setShowSubmitConfirm(false)
+                setShowCompleteEarlyConfirm(false)
                 // refresh attempts list if panel open
                 if (showAttempts) {
                   try {
@@ -2920,6 +3314,59 @@ ${questionsHTML}
                 }
                 showToast('Attempt cancelled')
               }}>Yes, cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Submit Exam confirmation modal */}
+      {showSubmitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowSubmitConfirm(false)} />
+          <div className="relative bg-white dark:bg-slate-800 p-6 rounded max-w-lg w-full mx-4">
+            <h3 className="text-lg font-semibold mb-2">Submit exam?</h3>
+            <div className="text-sm text-slate-600 dark:text-slate-300 mb-2">
+              You have answered all {displayQuestions.length} questions.
+            </div>
+            {displayQuestions.filter(q => flaggedQuestions.has(q.id)).length > 0 && (
+              <div className="text-sm text-orange-400 mb-2">
+                🚩 You have {displayQuestions.filter(q => flaggedQuestions.has(q.id)).length} flagged question(s). Review them before submitting?
+              </div>
+            )}
+            <div className="text-sm text-slate-500 mb-4">Once submitted, you cannot change your answers.</div>
+            <div className="flex items-center justify-end gap-3">
+              <button className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600" onClick={() => setShowSubmitConfirm(false)}>Review answers</button>
+              <button className="px-4 py-1.5 rounded bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold hover:from-sky-600 hover:to-indigo-600" onClick={() => handleSubmitExam(false)}>Submit</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Complete Early confirmation modal */}
+      {showCompleteEarlyConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowCompleteEarlyConfirm(false)} />
+          <div className="relative bg-white dark:bg-slate-800 p-6 rounded max-w-lg w-full mx-4">
+            <h3 className="text-lg font-semibold mb-2">Complete exam early?</h3>
+            {(() => {
+              const answered = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === Number(id))).length
+              const total = displayQuestions.length
+              const unanswered = total - answered
+              return (
+                <>
+                  <div className="text-sm text-slate-600 dark:text-slate-300 mb-2">
+                    You have answered <strong>{answered}</strong> of <strong>{total}</strong> questions.
+                    {unanswered > 0 && <span className="text-amber-500"> {unanswered} question{unanswered > 1 ? 's' : ''} will not be scored.</span>}
+                  </div>
+                  <div className="text-sm text-slate-500 mb-4">
+                    Your score will be calculated from the <strong>{answered}</strong> answered questions only — unanswered questions won't count against you.
+                  </div>
+                </>
+              )
+            })()}
+            <div className="flex items-center justify-end gap-3">
+              <button className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600" onClick={() => setShowCompleteEarlyConfirm(false)}>Keep going</button>
+              <button className="px-4 py-1.5 rounded bg-amber-600 text-white font-semibold hover:bg-amber-700" onClick={() => handleSubmitExam(true)}>Complete &amp; Score</button>
             </div>
           </div>
         </div>

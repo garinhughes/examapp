@@ -1,6 +1,293 @@
 {
   "exams": [
     {
+      "code": "SAMPLE-10Q",
+      "provider": "Sample",
+      "passMark": 70,
+      "logo": null,
+      "logoHref": null,
+      "defaultQuestions": 10,
+      "defaultDuration": 15,
+      "title": "Sample Exam",
+      "questions": [
+        {
+          "id": 2,
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+          "format": "json",
+          "domain": "Security",
+          "services": [
+            "IAM"
+          ],
+          "question": "The following IAM policy document is attached to a user. What actions can the user perform?",
+          "choices": [
+            "{\"Effect\": \"Allow\", \"Action\": \"s3:GetObject\", \"Resource\": \"arn:aws:s3:::my-bucket/*\"}",
+            "{\"Effect\": \"Allow\", \"Action\": \"s3:*\", \"Resource\": \"*\"}",
+            "{\"Effect\": \"Deny\", \"Action\": \"s3:GetObject\", \"Resource\": \"arn:aws:s3:::my-bucket/*\"}",
+            "{\"Effect\": \"Allow\", \"Action\": \"ec2:*\", \"Resource\": \"*\"}"
+          ],
+          "answerIndex": 0,
+          "tip": "Read the JSON policy statement carefully — focus on Effect, Action, and Resource fields.",
+          "explanation": "The correct policy grants read-only access (s3:GetObject) to objects in a specific S3 bucket. The second option grants full S3 access to all resources (too broad). The third explicitly denies. The fourth grants EC2 access, not S3.",
+          "choiceExplanations": [
+            "This allows only GetObject on the specific bucket — the least-privilege, correct answer.",
+            "This grants full S3 access to all resources — far too permissive for read-only access.",
+            "This explicitly denies GetObject — the user would NOT be able to read objects.",
+            "This grants full EC2 access, which is unrelated to S3 operations."
+          ]
+        },
+        {
+          "id": 3,
+          "docs": "https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html",
+          "format": "yaml",
+          "domain": "Deployment",
+          "services": [
+            "CloudFormation"
+          ],
+          "question": "Which CloudFormation template snippet correctly defines an S3 bucket with versioning enabled?",
+          "choices": [
+            "Resources:\n  MyBucket:\n    Type: AWS::S3::Bucket\n    Properties:\n      VersioningConfiguration:\n        Status: Enabled",
+            "Resources:\n  MyBucket:\n    Type: AWS::S3::Bucket\n    Properties:\n      Versioning: true",
+            "Resources:\n  MyBucket:\n    Type: AWS::S3\n    Properties:\n      VersioningConfiguration:\n        Status: Enabled",
+            "Resources:\n  MyBucket:\n    Kind: AWS::S3::Bucket\n    Properties:\n      VersioningConfiguration:\n        Status: On"
+          ],
+          "answerIndex": 0,
+          "tip": "CloudFormation uses Type (not Kind) and the S3 versioning property uses VersioningConfiguration with Status: Enabled.",
+          "explanation": "The correct CloudFormation syntax uses Type: AWS::S3::Bucket with a VersioningConfiguration block containing Status: Enabled. Option 2 uses an incorrect shorthand. Option 3 has an invalid Type. Option 4 uses Kind (Kubernetes syntax) instead of Type.",
+          "choiceExplanations": [
+            "Correct — uses the proper Type, and VersioningConfiguration with Status: Enabled.",
+            "Incorrect — \"Versioning: true\" is not valid CloudFormation syntax; you need VersioningConfiguration.",
+            "Incorrect — the Type should be AWS::S3::Bucket, not AWS::S3.",
+            "Incorrect — CloudFormation uses \"Type\" not \"Kind\", and the Status should be \"Enabled\" not \"On\"."
+          ]
+        },
+        {
+          "id": 4,
+          "docs": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "format": "text",
+          "domain": "Networking",
+          "services": [
+            "VPC",
+            "Subnet",
+            "Internet Gateway",
+            "NAT Gateway"
+          ],
+          "selectCount": 2,
+          "question": "A company needs to allow EC2 instances in a private subnet to access the internet for software updates while preventing inbound internet traffic. Which TWO resources should a solutions architect configure? (Select TWO)",
+          "choices": [
+            "NAT Gateway in a public subnet",
+            "Internet Gateway attached to the VPC",
+            "Elastic IP on each private instance",
+            "VPC Peering connection",
+            "AWS Direct Connect link"
+          ],
+          "answerIndices": [
+            0,
+            1
+          ],
+          "tip": "Private subnets need a way to reach the internet without being directly exposed.",
+          "explanation": "A NAT Gateway in a public subnet allows instances in private subnets to initiate outbound internet traffic. An Internet Gateway must be attached to the VPC for any internet connectivity. Together they enable outbound-only access from private subnets.",
+          "choiceExplanations": [
+            "A NAT Gateway translates private IPs to a public IP for outbound traffic, while blocking inbound connections.",
+            "An Internet Gateway is required at the VPC level for any internet traffic — NAT Gateway routes through it.",
+            "Elastic IPs on private instances would require them to be in a public subnet to work — defeating the purpose.",
+            "VPC Peering connects two VPCs together, it does not provide internet access.",
+            "Direct Connect provides a dedicated connection to on-premises networks, not general internet access."
+          ]
+        },
+        {
+          "id": 5,
+          "docs": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "format": "json",
+          "domain": "Monitoring",
+          "services": [
+            "CloudWatch",
+            "SNS"
+          ],
+          "question": "What does the following CloudWatch alarm configuration do?",
+          "choices": [
+            "{\"AlarmName\": \"HighCPU\", \"MetricName\": \"CPUUtilization\", \"Threshold\": 80, \"ComparisonOperator\": \"GreaterThanThreshold\", \"Period\": 300, \"EvaluationPeriods\": 2}",
+            "{\"AlarmName\": \"HighCPU\", \"MetricName\": \"CPUUtilization\", \"Threshold\": 80, \"ComparisonOperator\": \"LessThanThreshold\", \"Period\": 300, \"EvaluationPeriods\": 2}",
+            "{\"AlarmName\": \"HighCPU\", \"MetricName\": \"MemoryUtilization\", \"Threshold\": 80, \"ComparisonOperator\": \"GreaterThanThreshold\", \"Period\": 300, \"EvaluationPeriods\": 2}",
+            "{\"AlarmName\": \"HighCPU\", \"MetricName\": \"CPUUtilization\", \"Threshold\": 80, \"ComparisonOperator\": \"GreaterThanThreshold\", \"Period\": 60, \"EvaluationPeriods\": 10}"
+          ],
+          "answerIndex": 0,
+          "tip": "Match the alarm name to the metric, and check the threshold direction and evaluation window.",
+          "explanation": "The correct configuration triggers when CPU exceeds 80% for two consecutive 5-minute periods (10 minutes total). Option 2 checks for CPU less than 80%. Option 3 checks memory, not CPU. Option 4 uses 10 × 60s = 10 minutes of 1-minute granularity, which is a different evaluation window.",
+          "choiceExplanations": [
+            "Triggers when CPUUtilization > 80% for 2 consecutive 5-minute periods — matches the HighCPU alarm intent.",
+            "This triggers when CPU is LESS than 80% — opposite of what a high-CPU alarm should do.",
+            "This monitors MemoryUtilization, not CPUUtilization — mismatch with the alarm name.",
+            "While this monitors CPU > 80%, it uses 10 evaluation periods of 60s each — a very different sensitivity window."
+          ]
+        },
+        {
+          "id": 6,
+          "docs": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+          "format": "yaml",
+          "domain": "Compute",
+          "services": [
+            "Lambda",
+            "API Gateway"
+          ],
+          "question": "Which SAM template snippet correctly defines a Lambda function triggered by an API Gateway GET request?",
+          "choices": [
+            "MyFunction:\n  Type: AWS::Serverless::Function\n  Properties:\n    Handler: index.handler\n    Runtime: nodejs18.x\n    Events:\n      GetItems:\n        Type: Api\n        Properties:\n          Path: /items\n          Method: get",
+            "MyFunction:\n  Type: AWS::Lambda::Function\n  Properties:\n    Handler: index.handler\n    Runtime: nodejs18.x\n    Events:\n      GetItems:\n        Type: Api\n        Properties:\n          Path: /items\n          Method: get",
+            "MyFunction:\n  Type: AWS::Serverless::Function\n  Properties:\n    Handler: index.handler\n    Runtime: nodejs18.x\n    Triggers:\n      GetItems:\n        Type: HttpApi\n        Path: /items\n        Method: GET",
+            "MyFunction:\n  Type: AWS::Serverless::Function\n  Properties:\n    Code: index.handler\n    Runtime: nodejs18.x\n    Events:\n      GetItems:\n        Type: Api\n        Properties:\n          Path: /items\n          Method: get"
+          ],
+          "answerIndex": 0,
+          "tip": "SAM uses AWS::Serverless::Function (not AWS::Lambda::Function) and events are defined under Events, not Triggers.",
+          "explanation": "AWS SAM uses AWS::Serverless::Function type with an Events block. The Api event type defines an API Gateway integration. Option 2 uses the raw CloudFormation type (Lambda::Function) which doesn't support the Events shorthand. Option 3 uses \"Triggers\" (not valid). Option 4 uses \"Code\" instead of \"Handler\".",
+          "choiceExplanations": [
+            "Correct — uses SAM's Serverless::Function type with Events > Api event for a GET /items route.",
+            "Incorrect — AWS::Lambda::Function is the CloudFormation type and doesn't support the SAM Events shorthand.",
+            "Incorrect — SAM uses \"Events\" not \"Triggers\", and the structure is wrong.",
+            "Incorrect — the property should be \"Handler\" not \"Code\" for specifying the function entry point."
+          ]
+        },
+        {
+          "id": 7,
+          "docs": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html",
+          "format": "text",
+          "domain": "Database",
+          "services": [
+            "RDS",
+            "DynamoDB",
+            "ElastiCache",
+            "Aurora"
+          ],
+          "question": "Which AWS database service is a fully managed key-value and document NoSQL database that delivers single-digit millisecond performance at any scale?",
+          "choices": [
+            "Amazon RDS",
+            "Amazon DynamoDB",
+            "Amazon ElastiCache",
+            "Amazon Aurora"
+          ],
+          "answerIndex": 1,
+          "tip": "Key-value and document are NoSQL data models. Which service is specifically designed for this?",
+          "explanation": "Amazon DynamoDB is a fully managed NoSQL database supporting key-value and document data models with guaranteed single-digit millisecond latency. RDS and Aurora are relational (SQL) databases. ElastiCache is an in-memory caching service.",
+          "choiceExplanations": [
+            "RDS is a managed relational database service (SQL) — not a NoSQL key-value store.",
+            "DynamoDB is purpose-built for key-value and document workloads with single-digit millisecond performance.",
+            "ElastiCache is an in-memory caching layer (Redis/Memcached), not a primary NoSQL database.",
+            "Aurora is a MySQL/PostgreSQL-compatible relational database — not a NoSQL service."
+          ]
+        },
+        {
+          "id": 8,
+          "docs": "https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html",
+          "format": "cli",
+          "domain": "Compute",
+          "services": [
+            "EC2",
+            "CLI"
+          ],
+          "question": "Which AWS CLI command correctly lists all running EC2 instances in the eu-west-1 region, showing only instance IDs and their state?",
+          "choices": [
+            "aws ec2 describe-instances \\\n  --region eu-west-1 \\\n  --filters Name=instance-state-name,Values=running \\\n  --query \"Reservations[].Instances[].[InstanceId,State.Name]\" \\\n  --output table",
+            "aws ec2 list-instances \\\n  --region eu-west-1 \\\n  --state running \\\n  --output table",
+            "aws ec2 describe-instances \\\n  --region eu-west-1 \\\n  --instance-state running \\\n  --query \"Instances[].[InstanceId,State]\"",
+            "aws ec2 get-instances \\\n  --region eu-west-1 \\\n  --filters Name=state,Values=running \\\n  --output json"
+          ],
+          "answerIndex": 0,
+          "tip": "The EC2 CLI uses describe-instances (not list or get) and JMESPath queries to filter output fields.",
+          "explanation": "The correct command uses describe-instances with --filters for running state and a --query JMESPath expression to extract InstanceId and State.Name. Option 2 uses a non-existent list-instances subcommand. Option 3 uses an invalid --instance-state flag. Option 4 uses non-existent get-instances.",
+          "choiceExplanations": [
+            "Correct — uses describe-instances with proper filter and JMESPath query to show only IDs and state.",
+            "Incorrect — there is no \"list-instances\" subcommand in the AWS CLI for EC2.",
+            "Incorrect — \"--instance-state\" is not a valid parameter; use --filters with Name=instance-state-name.",
+            "Incorrect — there is no \"get-instances\" subcommand and the filter Name should be \"instance-state-name\"."
+          ]
+        },
+        {
+          "id": 9,
+          "docs": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html",
+          "format": "json",
+          "domain": "Containers",
+          "services": [
+            "ECS",
+            "Fargate"
+          ],
+          "question": "Which ECS task definition JSON snippet correctly configures a Fargate container with port mapping?",
+          "choices": [
+            "{\"family\": \"my-app\", \"networkMode\": \"awsvpc\", \"requiresCompatibilities\": [\"FARGATE\"], \"cpu\": \"256\", \"memory\": \"512\", \"containerDefinitions\": [{\"name\": \"web\", \"image\": \"nginx:latest\", \"portMappings\": [{\"containerPort\": 80, \"protocol\": \"tcp\"}]}]}",
+            "{\"family\": \"my-app\", \"networkMode\": \"bridge\", \"requiresCompatibilities\": [\"FARGATE\"], \"cpu\": \"256\", \"memory\": \"512\", \"containerDefinitions\": [{\"name\": \"web\", \"image\": \"nginx:latest\", \"portMappings\": [{\"containerPort\": 80}]}]}",
+            "{\"family\": \"my-app\", \"networkMode\": \"awsvpc\", \"requiresCompatibilities\": [\"EC2\"], \"cpu\": \"256\", \"memory\": \"512\", \"containerDefinitions\": [{\"name\": \"web\", \"image\": \"nginx:latest\", \"portMappings\": [{\"containerPort\": 80}]}]}",
+            "{\"family\": \"my-app\", \"networkMode\": \"awsvpc\", \"requiresCompatibilities\": [\"FARGATE\"], \"containerDefinitions\": [{\"name\": \"web\", \"image\": \"nginx:latest\", \"portMappings\": [{\"hostPort\": 80}]}]}"
+          ],
+          "answerIndex": 0,
+          "tip": "Fargate requires awsvpc networking, explicit cpu/memory at the task level, and containerPort in port mappings.",
+          "explanation": "Fargate tasks must use awsvpc network mode, specify FARGATE compatibility, and define cpu/memory at the task level. Option 2 uses bridge networking (not supported on Fargate). Option 3 targets EC2 not Fargate. Option 4 is missing required cpu/memory fields and uses hostPort instead of containerPort.",
+          "choiceExplanations": [
+            "Correct — awsvpc network mode, FARGATE compatibility, task-level cpu/memory, and containerPort mapping.",
+            "Incorrect — Fargate requires awsvpc networking; bridge mode is only available for EC2 launch type.",
+            "Incorrect — this targets EC2 compatibility, not FARGATE.",
+            "Incorrect — missing required cpu and memory at task level, and using hostPort without containerPort."
+          ]
+        },
+        {
+          "id": 10,
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html",
+          "format": "text",
+          "domain": "Architecture",
+          "services": [
+            "Well-Architected",
+            "CloudFormation",
+            "IAM"
+          ],
+          "selectCount": 2,
+          "question": "Which TWO of the following are pillars of the AWS Well-Architected Framework? (Select TWO)",
+          "choices": [
+            "Operational Excellence",
+            "Cost Optimization",
+            "Horizontal Scaling",
+            "Database Normalization",
+            "Code Refactoring"
+          ],
+          "answerIndices": [
+            0,
+            1
+          ],
+          "tip": "The Well-Architected Framework has six pillars — think about the broad categories that apply to all workloads.",
+          "explanation": "The six pillars are: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability. Horizontal Scaling, Database Normalization, and Code Refactoring are valid techniques but are not named pillars of the framework.",
+          "choiceExplanations": [
+            "Operational Excellence is a pillar focused on running and monitoring systems to deliver business value.",
+            "Cost Optimization is a pillar focused on avoiding unnecessary costs and managing spending.",
+            "Horizontal Scaling is a design pattern, not one of the six Well-Architected pillars.",
+            "Database Normalization is a data modelling technique, not a Well-Architected pillar.",
+            "Code Refactoring is a development practice, not a Well-Architected pillar."
+          ]
+        },
+        {
+          "id": 11,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-bucket-policies.html",
+          "format": "json",
+          "domain": "Security",
+          "services": [
+            "S3",
+            "IAM"
+          ],
+          "question": "A security engineer must ensure that only a specific IAM role can upload objects to an S3 bucket. Which bucket policy statement enforces this?",
+          "choices": [
+            "{\"Effect\": \"Deny\", \"NotPrincipal\": {\"AWS\": \"arn:aws:iam::123456789012:role/UploadRole\"}, \"Action\": \"s3:PutObject\", \"Resource\": \"arn:aws:s3:::secure-bucket/*\"}",
+            "{\"Effect\": \"Allow\", \"Principal\": \"*\", \"Action\": \"s3:PutObject\", \"Resource\": \"arn:aws:s3:::secure-bucket/*\"}",
+            "Create a NACL on the VPC to block PutObject calls from all sources except the role's EC2 instance",
+            "Enable S3 Object Lock in governance mode — only the designated role can upload new versions"
+          ],
+          "answerIndex": 0,
+          "tip": "Use a Deny with NotPrincipal to block everyone except the specified role. This is a common least-privilege pattern.",
+          "explanation": "The Deny + NotPrincipal pattern explicitly blocks all principals except the specified IAM role from performing PutObject. Option 2 allows everyone to upload, which is the opposite of the requirement. Option 3 is invalid — NACLs operate at the network layer and cannot filter S3 API actions. Option 4 is incorrect — Object Lock prevents deletion/overwrite, not upload restriction.",
+          "choiceExplanations": [
+            "Correct — Deny with NotPrincipal blocks all principals except the specified role from uploading.",
+            "This allows any principal to upload objects — the opposite of restricting to one role.",
+            "NACLs filter network traffic by IP/port — they cannot restrict specific S3 API actions like PutObject.",
+            "Object Lock prevents object deletion or overwrite, it does not control which principal can upload."
+          ]
+        }
+      ]
+    },
+    {
       "code": "SAA-C03",
       "provider": "AWS",
       "passMark": 70,
@@ -15,9 +302,19 @@
           "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
           "format": "text",
           "domain": "Storage",
-          "services": ["S3", "EBS", "EFS", "RDS"],
+          "services": [
+            "S3",
+            "EBS",
+            "EFS",
+            "RDS"
+          ],
           "question": "Which service is best for object storage?",
-          "choices": ["S3", "EBS", "EFS", "RDS"],
+          "choices": [
+            "S3",
+            "EBS",
+            "EFS",
+            "RDS"
+          ],
           "answerIndex": 0,
           "tip": "Think about storing files and assets cheaply and durably.",
           "explanation": "Amazon S3 is object storage for files and static assets. EBS is block storage for EC2, EFS is network file system, and RDS is managed relational database.",
@@ -33,9 +330,19 @@
           "docs": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
           "format": "text",
           "domain": "Compute",
-          "services": ["Lambda", "EC2", "ECS", "EKS"],
+          "services": [
+            "Lambda",
+            "EC2",
+            "ECS",
+            "EKS"
+          ],
           "question": "Which service is serverless for running functions?",
-          "choices": ["EC2", "Lambda", "ECS", "EKS"],
+          "choices": [
+            "EC2",
+            "Lambda",
+            "ECS",
+            "EKS"
+          ],
           "answerIndex": 1,
           "tip": "Serverless functions run code without managing servers.",
           "explanation": "AWS Lambda is the serverless compute service for running short-lived functions. EC2 is VMs, ECS/EKS are container services.",
@@ -51,7 +358,10 @@
           "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#public-access-block",
           "format": "json",
           "domain": "Security",
-          "services": ["S3", "IAM"],
+          "services": [
+            "S3",
+            "IAM"
+          ],
           "question": "Which of the following bucket policies allows public read access to objects in the bucket?",
           "choices": [
             "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::example-bucket/*\"\n    }\n  ]\n}",
@@ -73,7 +383,10 @@
           "docs": "https://docs.aws.amazon.com/cli/latest/reference/s3/cp.html",
           "format": "cli",
           "domain": "Storage",
-          "services": ["S3", "AWS CLI"],
+          "services": [
+            "S3",
+            "AWS CLI"
+          ],
           "question": "Which AWS CLI command uploads local file 'report.pdf' to S3 bucket 'my-bucket'?",
           "choices": [
             "aws s3 cp report.pdf s3://my-bucket/",
@@ -89,7 +402,11 @@
           "docs": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
           "format": "text",
           "domain": "Compute",
-          "services": ["EC2", "ALB", "ELB"],
+          "services": [
+            "EC2",
+            "ALB",
+            "ELB"
+          ],
           "question": "A company needs to improve the availability of a web application. Which TWO actions should a solutions architect recommend? (Select TWO)",
           "selectCount": 2,
           "choices": [
@@ -99,7 +416,10 @@
             "Use a single large EC2 instance for all traffic",
             "Disable health checks to reduce overhead"
           ],
-          "answerIndices": [0, 2],
+          "answerIndices": [
+            0,
+            2
+          ],
           "tip": "Think about redundancy and distributing traffic.",
           "explanation": "Deploying across multiple AZs provides fault tolerance, and an ALB distributes traffic across healthy targets. Instance store is ephemeral, a single instance is a single point of failure, and disabling health checks reduces reliability.",
           "choiceExplanations": [
@@ -108,6 +428,58 @@
             "An ALB distributes traffic across targets and performs health checks to route around failures.",
             "A single instance is a single point of failure and does not improve availability.",
             "Disabling health checks means unhealthy targets still receive traffic, reducing availability."
+          ]
+        },
+        {
+          "id": 6,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-bucket-policies.html",
+          "format": "json",
+          "domain": "Storage",
+          "services": [
+            "S3",
+            "IAM"
+          ],
+          "question": "A developer needs to grant public read access to all objects in an S3 bucket. Which bucket policy statement achieves this?",
+          "choices": [
+            "{\"Effect\": \"Allow\", \"Principal\": \"*\", \"Action\": \"s3:GetObject\", \"Resource\": \"arn:aws:s3:::my-bucket/*\"}",
+            "{\"Effect\": \"Allow\", \"Principal\": \"*\", \"Action\": \"s3:PutObject\", \"Resource\": \"arn:aws:s3:::my-bucket/*\"}",
+            "Grant the s3:GetObject permission to the IAM group 'Everyone' on the bucket",
+            "Enable static website hosting — this automatically makes all objects public"
+          ],
+          "answerIndex": 0,
+          "tip": "Bucket policies use JSON to specify permissions. The Principal '*' means everyone.",
+          "explanation": "The JSON policy statement grants s3:GetObject to Principal '*' (everyone) on all objects in the bucket. Option 2 grants write access, not read. Option 3 is not how S3 bucket policies work — there is no 'Everyone' IAM group. Option 4 enables website hosting but does not automatically make objects public.",
+          "choiceExplanations": [
+            "Correct — this JSON policy allows any principal to read objects from the bucket.",
+            "This grants PutObject (write) permission, not read access.",
+            "S3 bucket policies are JSON documents — there is no IAM group called 'Everyone' for this purpose.",
+            "Static website hosting requires a separate bucket policy to make objects publicly readable."
+          ]
+        },
+        {
+          "id": 7,
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/lifecycle-transition-general-considerations.html",
+          "format": "yaml",
+          "domain": "Storage",
+          "services": [
+            "S3",
+            "CloudFormation"
+          ],
+          "question": "A team wants to automatically move S3 objects to Glacier after 90 days using CloudFormation. Which template snippet correctly defines this lifecycle rule?",
+          "choices": [
+            "LifecycleConfiguration:\n  Rules:\n    - Id: ArchiveRule\n      Status: Enabled\n      Transitions:\n        - StorageClass: GLACIER\n          TransitionInDays: 90",
+            "LifecycleConfiguration:\n  Rules:\n    - Id: ArchiveRule\n      Status: Active\n      Transitions:\n        - StorageClass: GLACIER\n          TransitionInDays: 90",
+            "Move objects to Glacier by setting the storage class to GLACIER on each PutObject request after 90 days",
+            "Enable S3 Intelligent-Tiering — it automatically archives all objects to Glacier after 90 days"
+          ],
+          "answerIndex": 0,
+          "tip": "CloudFormation lifecycle rules use Status: Enabled (not Active), and TransitionInDays for the number of days.",
+          "explanation": "The correct YAML uses Status: Enabled and TransitionInDays: 90 to automatically transition objects to Glacier. Option 2 uses 'Active' which is not a valid lifecycle rule status. Option 3 describes a manual approach, not an automated lifecycle rule. Option 4 is incorrect — Intelligent-Tiering moves between access tiers, not directly to Glacier after a fixed period.",
+          "choiceExplanations": [
+            "Correct — valid CloudFormation lifecycle rule with Enabled status and 90-day Glacier transition.",
+            "Invalid — the Status must be 'Enabled' or 'Disabled', not 'Active'.",
+            "This is a manual process, not an automated lifecycle rule defined in CloudFormation.",
+            "Intelligent-Tiering optimises between frequent and infrequent access tiers — it doesn't guarantee Glacier archival after 90 days."
           ]
         }
       ]
@@ -127,9 +499,19 @@
           "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
           "format": "text",
           "domain": "Detection",
-          "services": ["GuardDuty", "Config", "WAF", "SNS"],
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
           "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
-          "choices": ["Amazon GuardDuty", "AWS Config", "AWS WAF", "Amazon SNS"],
+          "choices": [
+            "Amazon GuardDuty",
+            "AWS Config",
+            "AWS WAF",
+            "Amazon SNS"
+          ],
           "answerIndex": 0,
           "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
           "explanation": "Amazon GuardDuty analyzes events and findings for malicious or unauthorized behaviour; it aggregates threat detections across AWS accounts and workloads.",
@@ -145,9 +527,19 @@
           "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
           "format": "text",
           "domain": "Incident Response",
-          "services": ["Detective", "Systems Manager", "Shield", "CloudTrail"],
+          "services": [
+            "Detective",
+            "Systems Manager",
+            "Shield",
+            "CloudTrail"
+          ],
           "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
-          "choices": ["AWS Systems Manager", "Amazon Detective", "AWS Shield", "AWS CloudTrail"],
+          "choices": [
+            "AWS Systems Manager",
+            "Amazon Detective",
+            "AWS Shield",
+            "AWS CloudTrail"
+          ],
           "answerIndex": 1,
           "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
           "explanation": "Amazon Detective helps analyze and investigate security issues by collecting and organizing log data to make investigations faster.",
@@ -163,9 +555,18 @@
           "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
           "format": "text",
           "domain": "Infrastructure Security",
-          "services": ["WAF", "CloudFront", "Security Groups"],
+          "services": [
+            "WAF",
+            "CloudFront",
+            "Security Groups"
+          ],
           "question": "To restrict traffic at the network edge for HTTP endpoints, which service should you combine with CloudFront?",
-          "choices": ["AWS WAF", "Security Groups", "VPC Endpoint", "AWS KMS"],
+          "choices": [
+            "AWS WAF",
+            "Security Groups",
+            "VPC Endpoint",
+            "AWS KMS"
+          ],
           "answerIndex": 0,
           "tip": "Think web application protection rules that block common attack patterns at the edge.",
           "explanation": "AWS WAF integrates with CloudFront to allow deployment of custom rules to block or rate-limit malicious HTTP(s) requests at the edge.",
@@ -181,9 +582,18 @@
           "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
           "format": "text",
           "domain": "Identity and Access Management",
-          "services": ["IAM", "STS", "Cognito"],
+          "services": [
+            "IAM",
+            "STS",
+            "Cognito"
+          ],
           "question": "Which feature helps enforce least privilege by providing temporary credentials?",
-          "choices": ["IAM Roles with STS", "IAM Users with long-term keys", "Security Groups", "Amazon Cognito Sync"],
+          "choices": [
+            "IAM Roles with STS",
+            "IAM Users with long-term keys",
+            "Security Groups",
+            "Amazon Cognito Sync"
+          ],
           "answerIndex": 0,
           "tip": "Temporary credentials reduce the risk from long-lived keys.",
           "explanation": "IAM Roles combined with AWS STS (Security Token Service) issue temporary credentials that help enforce least privilege and reduce exposure of long-term credentials.",
@@ -199,9 +609,19 @@
           "docs": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
           "format": "text",
           "domain": "Data Protection",
-          "services": ["KMS", "IAM", "Shield", "WAF"],
+          "services": [
+            "KMS",
+            "IAM",
+            "Shield",
+            "WAF"
+          ],
           "question": "Which service provides managed encryption keys that you can use to encrypt data at rest?",
-          "choices": ["AWS KMS", "AWS IAM", "AWS Shield", "AWS WAF"],
+          "choices": [
+            "AWS KMS",
+            "AWS IAM",
+            "AWS Shield",
+            "AWS WAF"
+          ],
           "answerIndex": 0,
           "tip": "Key management service with envelope encryption support.",
           "explanation": "AWS Key Management Service (KMS) provides centralized management of encryption keys used to protect data at rest across many AWS services.",
@@ -217,7 +637,13 @@
           "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
           "format": "text",
           "domain": "Detection",
-          "services": ["Security Hub", "KMS", "SQS", "CloudFormation", "EC2"],
+          "services": [
+            "Security Hub",
+            "KMS",
+            "SQS",
+            "CloudFormation",
+            "EC2"
+          ],
           "question": "A security team needs to centrally manage findings from multiple AWS security services and ensure encryption of sensitive data at rest. Which TWO services should they use together? (Select TWO)",
           "selectCount": 2,
           "choices": [
@@ -227,7 +653,10 @@
             "AWS CloudFormation",
             "Amazon EC2"
           ],
-          "answerIndices": [0, 1],
+          "answerIndices": [
+            0,
+            1
+          ],
           "tip": "Think about centralized findings aggregation and key management.",
           "explanation": "Security Hub aggregates and prioritizes findings from GuardDuty, Inspector, Macie, and partner tools. KMS provides managed encryption keys for data at rest. SQS is a messaging service, CloudFormation is IaC, and EC2 is compute — none address the stated requirements.",
           "choiceExplanations": [
@@ -237,10 +666,61 @@
             "CloudFormation is an infrastructure-as-code service, not a security findings tool.",
             "EC2 provides virtual machines, not security findings management."
           ]
+        },
+        {
+          "id": 107,
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "format": "json",
+          "domain": "Identity & Access",
+          "services": [
+            "IAM",
+            "S3"
+          ],
+          "question": "A security engineer needs to restrict an IAM role so it can only access a specific S3 bucket from a particular VPC endpoint. Which policy condition block should be added?",
+          "choices": [
+            "{\"Condition\": {\"StringEquals\": {\"aws:sourceVpce\": \"vpce-1a2b3c4d\"}}}",
+            "{\"Condition\": {\"IpAddress\": {\"aws:SourceIp\": \"10.0.0.0/16\"}}}",
+            "Add the VPC endpoint ID to the IAM role's trust policy as a Principal",
+            "Attach a security group to the IAM role that only allows traffic from the VPC"
+          ],
+          "answerIndex": 0,
+          "tip": "VPC endpoint restrictions in IAM use the aws:sourceVpce condition key with StringEquals.",
+          "explanation": "The JSON condition block uses aws:sourceVpce with StringEquals to restrict access to requests originating from a specific VPC endpoint. Option 2 restricts by IP, which doesn't specifically target a VPC endpoint. Option 3 is invalid — VPC endpoints cannot be IAM principals. Option 4 is invalid — security groups cannot be attached to IAM roles.",
+          "choiceExplanations": [
+            "Correct — aws:sourceVpce condition restricts the policy to requests through the specified VPC endpoint.",
+            "IpAddress/SourceIp restricts by IP range, not by VPC endpoint identity.",
+            "VPC endpoints are not IAM principals and cannot appear in a trust policy's Principal element.",
+            "Security groups are network-level controls for ENIs — they cannot be attached to IAM roles."
+          ]
+        },
+        {
+          "id": 108,
+          "docs": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html",
+          "format": "yaml",
+          "domain": "Detection",
+          "services": [
+            "Config",
+            "CloudFormation",
+            "S3"
+          ],
+          "question": "A security team wants to use AWS Config to detect S3 buckets that have public read access. Which CloudFormation resource snippet correctly defines this managed Config rule?",
+          "choices": [
+            "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: AWS\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+            "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: CUSTOM\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+            "Use AWS CloudTrail to monitor S3:GetBucketPolicy API calls and alert when public access is detected",
+            "Enable S3 Block Public Access at the account level — this replaces the need for Config rules"
+          ],
+          "answerIndex": 0,
+          "tip": "AWS Config managed rules use Owner: AWS with a predefined SourceIdentifier.",
+          "explanation": "The correct YAML uses AWS::Config::ConfigRule with Owner: AWS and the managed rule identifier S3_BUCKET_PUBLIC_READ_PROHIBITED. Option 2 uses Owner: CUSTOM which is for Lambda-backed custom rules. Option 3 describes a monitoring approach but not an AWS Config rule. Option 4 is a preventive control, not a detective Config rule.",
+          "choiceExplanations": [
+            "Correct — AWS managed Config rule using Owner: AWS and the standard S3 public read detection identifier.",
+            "Owner: CUSTOM is for custom rules backed by Lambda functions, not AWS managed rules.",
+            "CloudTrail monitors API calls but doesn't provide continuous compliance evaluation like AWS Config.",
+            "Block Public Access is preventive — it doesn't detect existing violations like a Config rule does."
+          ]
         }
       ]
     }
   ]
 }
-
-

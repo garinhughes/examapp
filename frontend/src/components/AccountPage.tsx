@@ -3,6 +3,7 @@ import { useAuth } from '../auth/AuthContext'
 import { useGamification } from '../gamification/GamificationContext'
 import { levelFromXP } from '../gamification/types'
 import { BADGES } from '../gamification/badges'
+import { useEntitlements } from '../hooks/useEntitlements'
 
 const CATEGORY_LABELS: Record<string, string> = {
   milestone: '📚 Milestones',
@@ -22,8 +23,9 @@ const TIER_COLORS: Record<string, string> = {
 export default function AccountPage() {
   const { user } = useAuth()
   const { state, toggleLeaderboard } = useGamification()
-  const [tab, setTab] = useState<'overview' | 'badges' | 'mastery'>('overview')
+  const [tab, setTab] = useState<'overview' | 'badges' | 'mastery' | 'purchases'>('overview')
   const { level, currentXP, nextLevelXP, progress: levelProgress } = levelFromXP(state.xp)
+  const { tier, tierConfig, entitlements, products, loading: entLoading } = useEntitlements()
 
   const earnedIds = new Set(state.badges.map((b) => b.id))
 
@@ -94,7 +96,7 @@ export default function AccountPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-        {(['overview', 'badges', 'mastery'] as const).map((t) => (
+        {(['overview', 'badges', 'mastery', 'purchases'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -104,7 +106,7 @@ export default function AccountPage() {
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
             }`}
           >
-            {t === 'overview' ? '📊 Overview' : t === 'badges' ? '🏅 Badges' : '🎓 Mastery'}
+            {t === 'overview' ? '📊 Overview' : t === 'badges' ? '🏅 Badges' : t === 'mastery' ? '🎓 Mastery' : '💳 Purchases'}
           </button>
         ))}
       </div>
@@ -234,6 +236,97 @@ export default function AccountPage() {
               </div>
             ))
           )}
+        </div>
+      )}
+
+      {tab === 'purchases' && (
+        <div className="space-y-4">
+          {/* Current tier */}
+          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+            <h3 className="text-sm font-semibold mb-2 text-slate-600 dark:text-slate-300">Your Plan</h3>
+            <div className="flex items-center gap-3">
+              <span className={`px-3 py-1 rounded-full text-sm font-bold capitalize ${
+                tier === 'paying'
+                  ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+                  : tier === 'registered'
+                    ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+              }`}>
+                {tier}
+              </span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                {tierConfig.questionLimit === null
+                  ? 'Unlimited questions'
+                  : `Up to ${tierConfig.questionLimit} questions per exam`}
+              </span>
+            </div>
+            {tier !== 'paying' && (
+              <p className="text-xs text-slate-400 mt-2">
+                Upgrade to unlock all questions, exports, leaderboard, and more.
+              </p>
+            )}
+          </div>
+
+          {/* Feature access summary */}
+          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+            <h3 className="text-sm font-semibold mb-3 text-slate-600 dark:text-slate-300">Feature Access</h3>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {[
+                { label: 'Review & explanations', on: tierConfig.reviewEnabled },
+                { label: 'CSV / PDF export', on: tierConfig.exportEnabled },
+                { label: 'Leaderboard', on: tierConfig.leaderboardEnabled },
+                { label: 'Domain mastery history', on: tierConfig.domainMasteryEnabled },
+              ].map((f) => (
+                <div key={f.label} className="flex items-center gap-2">
+                  <span className={f.on ? 'text-emerald-500' : 'text-slate-400'}>
+                    {f.on ? '✓' : '—'}
+                  </span>
+                  <span className={f.on ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'}>
+                    {f.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Active entitlements */}
+          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+            <h3 className="text-sm font-semibold mb-3 text-slate-600 dark:text-slate-300">Purchases</h3>
+            {entLoading ? (
+              <p className="text-sm text-slate-400">Loading…</p>
+            ) : entitlements.length === 0 ? (
+              <p className="text-sm text-slate-400">No purchases yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {entitlements.map((pid) => {
+                  const prod = products.find((p) => p.productId === pid)
+                  return (
+                    <div key={pid} className="flex items-center justify-between p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-900/10">
+                      <div>
+                        <div className="text-sm font-medium">{prod?.label ?? pid}</div>
+                        {prod?.description && (
+                          <div className="text-xs text-slate-400">{prod.description}</div>
+                        )}
+                      </div>
+                      <span className="text-emerald-500 text-sm font-semibold">Active</span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Manage / Stripe portal stub */}
+          <div className="flex flex-wrap gap-3">
+            {entitlements.some((id) => id.startsWith('sub:')) && (
+              <button
+                onClick={() => alert('Stripe Customer Portal will be available soon.')}
+                className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                Manage Subscription
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

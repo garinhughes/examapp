@@ -17,15 +17,18 @@ Rationale
 Keeps entry price low to avoid friction (£3–£9 fits your £5–10 cap for main offers).
 Subscription provides stable ARR and appeals to heavy users; single buys suit casual buyers.
 Bundles should be at noticeable discount vs many single purchases.
+
 Feature gating per tier
 Free: view limited questions, basic analytics, local gamification
 Registered: more questions, saved attempts, mobile sync
 Paying: full question bank, CSV/PDF downloads, unlimited attempts, leaderboard opt-in, domain mastery history, offline export
+
 Payments & Auth
 Use Cognito for auth (Google/Apple/email) already planned.
 Use Stripe for payments (Checkout + Subscriptions; webhooks for entitlement updates).
 Backend: store entitlements per user (userId, productId, expiresAt). Protect API endpoints by checking entitlements.
 Offer trial (7 days) for subscription.
+
 Implementation details (dev-friendly)
 Products in Stripe:
 SKU: exam:exam-code (one-off)
@@ -48,9 +51,8 @@ A/B test:
 Variant A: single £3, bundle £9, sub £6/mo
 Variant B: single £4, bundle £10, sub £5/mo
 Track conversion funnel: landing → register → start exam → purchase
-Next steps I can implement
 
+Next steps I can implement
 Scaffold Stripe Checkout + webhook handlers and product SKUs
 Add entitlement model + middleware to protect resources
 Add UI for single purchase & subscription checkout flow and Account → Purchases
-Tell me which price points/package to scaffold and I’ll generate the code changes.
