@@ -1,9 +1,9 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import fs from 'fs/promises'
 import { randomUUID } from 'crypto'
+import { loadExam, shuffleQuestions, normaliseQuestion } from '../examLoader.js'
 
 const attemptsFile = new URL('../../data/attempts.json', import.meta.url)
-const questionsFile = new URL('../../data/questions.json', import.meta.url)
 
 async function loadAttempts() {
   const raw = await fs.readFile(attemptsFile)
@@ -12,11 +12,6 @@ async function loadAttempts() {
 
 async function saveAttempts(obj: any) {
   await fs.writeFile(attemptsFile, JSON.stringify(obj, null, 2))
-}
-
-async function loadQuestionsDb() {
-  const raw = await fs.readFile(questionsFile)
-  return JSON.parse(raw.toString())
 }
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
@@ -30,9 +25,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const id = randomUUID()
     const now = new Date().toISOString()
     // build per-attempt question set if metadata.filterKeywords provided
-    const qdb = await loadQuestionsDb()
     const lc = String(examCode || '').toLowerCase()
-    const exam = qdb.exams.find((e: any) => String(e.code || '').toLowerCase() === lc)
+    const exam = await loadExam(lc)
     if (!exam) return reply.status(400).send({ message: 'exam not found' })
 
     let filteredQuestions = exam.questions.slice()
@@ -84,7 +78,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         // check choices for any keyword
         if (Array.isArray(q.choices)) {
           for (const c of q.choices) {
-            if (keywords.some((kw) => String(c || '').toLowerCase().includes(kw))) return true
+            const choiceText = typeof c === 'string' ? c : (c?.text ?? '')
+            if (keywords.some((kw) => String(choiceText).toLowerCase().includes(kw))) return true
           }
         }
         return false
@@ -107,17 +102,24 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       return reply.status(400).send({ message: 'No questions match the requested filters (service keywords + domains)' })
     }
 
+    // Shuffle choices for this attempt so answer positions vary
+    const shuffled = shuffleQuestions(filteredQuestions)
+
     const attempt = {
       attemptId: id,
       userId: request.user?.sub ?? null,
       examCode,
+      // Snapshot the exam version at time of attempt creation so edits to the
+      // canonical exam file do not affect scoring/resume for this attempt.
+      examVersion: (exam as any)?.version ?? null,
+      attemptSchemaVersion: 1,
       startedAt: now,
       finishedAt: null,
       score: null,
       answers: [] as any[],
       metadata: body?.metadata ?? null,
       // store the concrete question objects for this attempt so scoring and resume work on the filtered set
-      questions: filteredQuestions
+      questions: shuffled
     }
 
     attemptsDb.attempts.push(attempt)
@@ -177,37 +179,67 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (attempt.finishedAt) return reply.status(400).send({ message: 'attempt already finished' })
 
     // validate question exists in the attempt's question set if present, else fallback to exam questions
-    let question = undefined
+    let question: any = undefined
     if (Array.isArray(attempt.questions) && attempt.questions.length > 0) {
-      question = attempt.questions.find((q: any) => q.id === body.questionId)
+      question = attempt.questions.find((q: any) => String(q.id) === String(body.questionId))
     }
     if (!question) {
-      const qdb = await loadQuestionsDb()
-      const exam = qdb.exams.find((e: any) => e.code === attempt.examCode)
+      const exam = await loadExam(attempt.examCode)
       if (!exam) return reply.status(400).send({ message: 'exam not found' })
-      question = exam.questions.find((q: any) => q.id === body.questionId)
+      question = exam.questions.find((q: any) => String(q.id) === String(body.questionId))
     }
     if (!question) return reply.status(400).send({ message: 'question not found' })
 
-    const selectedIndex = body.selectedIndex
-    const selectedIndices: number[] | null = Array.isArray(body.selectedIndices) ? body.selectedIndices : null
     const timeMs = body.timeMs ?? null
     const showTip = !!body.showTip
 
-    // Multi-select scoring: if question has answerIndices (array), compare sets
+    // --- New format: choices are objects with { id, text, isCorrect } ---
+    // Accept selectedChoiceId (string) or selectedChoiceIds (string[]) for multi-select
+    const selectedChoiceId: string | null = body.selectedChoiceId ?? null
+    const selectedChoiceIds: string[] | null = Array.isArray(body.selectedChoiceIds) ? body.selectedChoiceIds : null
+
+    // Also support legacy selectedIndex / selectedIndices for backwards compat
+    const selectedIndex = body.selectedIndex
+    const selectedIndices: number[] | null = Array.isArray(body.selectedIndices) ? body.selectedIndices : null
+
     let isCorrect: boolean
-    if (Array.isArray(question.answerIndices) && question.answerIndices.length > 0) {
-      // multi-select question
-      const expected = new Set(question.answerIndices as number[])
-      const actual = new Set(selectedIndices ?? (typeof selectedIndex === 'number' ? [selectedIndex] : []))
-      isCorrect = expected.size === actual.size && [...expected].every((v) => actual.has(v))
+    const choices = question.choices ?? []
+    const hasObjectChoices = choices.length > 0 && typeof choices[0] === 'object' && 'isCorrect' in choices[0]
+
+    if (hasObjectChoices) {
+      // New format: check isCorrect on the selected choice(s)
+      const correctIds = new Set<string>(choices.filter((c: any) => c.isCorrect).map((c: any) => c.id))
+      if (selectedChoiceIds && selectedChoiceIds.length > 0) {
+        const actual = new Set(selectedChoiceIds)
+        isCorrect = correctIds.size === actual.size && [...correctIds].every((v) => actual.has(v))
+      } else if (selectedChoiceId) {
+        isCorrect = correctIds.size === 1 && correctIds.has(selectedChoiceId)
+      } else if (typeof selectedIndex === 'number') {
+        // legacy fallback: translate index to choice id
+        const choice = choices[selectedIndex]
+        isCorrect = !!choice?.isCorrect
+      } else if (selectedIndices && selectedIndices.length > 0) {
+        const actual = new Set(selectedIndices.map((i: number) => choices[i]?.id).filter(Boolean))
+        isCorrect = correctIds.size === actual.size && [...correctIds].every((v) => actual.has(v))
+      } else {
+        isCorrect = false
+      }
     } else {
-      // single-select question
-      isCorrect = typeof question.answerIndex === 'number' && question.answerIndex === selectedIndex
+      // Legacy format: answerIndex / answerIndices
+      if (Array.isArray(question.answerIndices) && question.answerIndices.length > 0) {
+        const expected = new Set(question.answerIndices as number[])
+        const actual = new Set(selectedIndices ?? (typeof selectedIndex === 'number' ? [selectedIndex] : []))
+        isCorrect = expected.size === actual.size && [...expected].every((v) => actual.has(v))
+      } else {
+        isCorrect = typeof question.answerIndex === 'number' && question.answerIndex === selectedIndex
+      }
     }
 
     const answerRecord = {
       questionId: question.id,
+      selectedChoiceId: selectedChoiceId ?? null,
+      selectedChoiceIds: selectedChoiceIds ?? null,
+      // keep legacy fields for backwards compat
       selectedIndex: selectedIndex ?? null,
       selectedIndices: selectedIndices ?? null,
       correct: !!isCorrect,
@@ -217,7 +249,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     // replace existing answer for same questionId if present
-    const existingIndex = attempt.answers.findIndex((a: any) => a.questionId === question.id)
+    const existingIndex = attempt.answers.findIndex((a: any) => String(a.questionId) === String(question.id))
     if (existingIndex >= 0) {
       attempt.answers[existingIndex] = answerRecord
     } else {
@@ -240,16 +272,16 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     // prefer per-attempt question set when computing totals
     const qSet = Array.isArray(attempt.questions) && attempt.questions.length > 0
       ? attempt.questions
-      : (await loadQuestionsDb()).exams.find((e: any) => e.code === attempt.examCode)?.questions ?? []
+      : (await loadExam(attempt.examCode))?.questions ?? []
 
     const total = qSet.length
 
     // Build latest answer per question (use createdAt to pick the latest)
-    const latestByQ = new Map<number, any>()
+    const latestByQ = new Map<string, any>()
     if (Array.isArray(attempt.answers)) {
       for (const ans of attempt.answers) {
-        const qid = Number(ans?.questionId)
-        if (!Number.isFinite(qid)) continue
+        const qid = String(ans?.questionId)
+        if (!qid) continue
         const prev = latestByQ.get(qid)
         const prevT = prev?.createdAt ? String(prev.createdAt) : ''
         const currT = ans?.createdAt ? String(ans.createdAt) : ''
@@ -260,7 +292,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     // Count correct answers from the latest answer per question
     let correctCount = 0
     for (const q of qSet) {
-      const ans = latestByQ.get(q.id)
+      const ans = latestByQ.get(String(q.id))
       if (ans && ans.correct) correctCount += 1
     }
 
@@ -269,10 +301,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     // compute per-domain breakdown using latest answers
     const perDomain: Record<string, { total: number; correct: number; score: number }> = {}
     for (const q of qSet) {
-      const domain = q.domain ?? 'General'
+      const domain = q.domain ?? q.meta?.domain ?? 'General'
       if (!perDomain[domain]) perDomain[domain] = { total: 0, correct: 0, score: 0 }
       perDomain[domain].total += 1
-      const latestAns = latestByQ.get(q.id)
+      const latestAns = latestByQ.get(String(q.id))
       if (latestAns && latestAns.correct) perDomain[domain].correct += 1
     }
     for (const k of Object.keys(perDomain)) {
@@ -296,6 +328,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const attempt = attemptsDb.attempts.find((a: any) => a.attemptId === id)
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
     if (attempt.userId !== request.user?.sub) return reply.status(403).send({ message: 'forbidden' })
+    // Ensure returned attempt.questions are normalised to the current schema
+    try {
+      if (Array.isArray(attempt.questions) && attempt.questions.length > 0) {
+        attempt.questions = attempt.questions.map((q: any) => normaliseQuestion(q))
+      }
+    } catch (err) {
+      // If normalization fails, return original attempt but log the error
+      console.error('Failed to normalise attempt.questions', err)
+    }
     return attempt
   })
 

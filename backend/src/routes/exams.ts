@@ -3,14 +3,9 @@ import fs from 'fs/promises'
 import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS, hasExamAccess } from '../catalog.js'
 import { computeDomainWeights, selectWeakestLinkQuestions, type DomainStats } from '../services/weakestLink.js'
+import { loadAllExams, loadExam, shuffleQuestions } from '../examLoader.js'
 
-const dataFile = new URL('../../data/questions.json', import.meta.url)
 const attemptsFile = new URL('../../data/attempts.json', import.meta.url)
-
-async function loadDb() {
-  const raw = await fs.readFile(dataFile)
-  return JSON.parse(raw.toString())
-}
 
 async function loadAttempts() {
   const raw = await fs.readFile(attemptsFile)
@@ -19,13 +14,13 @@ async function loadAttempts() {
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   server.get('/', async (request, reply) => {
-    const db = await loadDb()
+    const allExams = await loadAllExams()
 
     // Resolve auth state to filter visitor-only exams
     await server.optionalAuth(request, reply)
     const isAuthenticated = !!request.user
 
-    const filteredExams = db.exams.filter((e: any) => {
+    const filteredExams = allExams.filter((e: any) => {
       // The 'SAMPLE-10Q' exam is only visible to visitors (unauthenticated users)
       if (String(e.code).toLowerCase() === 'sample-10q' && isAuthenticated) return false
       return true
@@ -39,8 +34,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       logo: e.logo,
       logoHref: e.logoHref,
       passMark: typeof e.passMark === 'number' ? e.passMark : 70,
-      defaultQuestions: e.defaultQuestions ?? e.defaultQuestionCount,
-      defaultDuration: e.defaultDuration
+      defaultQuestions: e.defaultQuestions,
+      defaultDuration: e.defaultDuration,
+      // include level where present so frontend can render badges
+      level: e.level
     }))
   })
 
@@ -53,9 +50,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    */
   server.get('/:examCode/questions', async (request, reply) => {
     const { examCode } = request.params as any
-    const db = await loadDb()
     const lc = String(examCode || '').toLowerCase()
-    const exam = db.exams.find((e: any) => String(e.code || '').toLowerCase() === lc)
+    const exam = await loadExam(lc)
     if (!exam) {
       return reply.status(404).send({ message: 'exam not found' })
     }
@@ -78,7 +74,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     const allQuestions = exam.questions as any[]
     const limit = tierConfig.questionLimit
-    const questions = limit != null ? allQuestions.slice(0, limit) : allQuestions
+    const pool = limit != null ? allQuestions.slice(0, limit) : allQuestions
+    const questions = shuffleQuestions(pool)
 
     return {
       questions,
@@ -91,9 +88,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // Return all unique services referenced in an exam's questions
   server.get('/:examCode/services', async (request, reply) => {
     const { examCode } = request.params as any
-    const db = await loadDb()
     const lc = String(examCode || '').toLowerCase()
-    const exam = db.exams.find((e: any) => String(e.code || '').toLowerCase() === lc)
+    const exam = await loadExam(lc)
     if (!exam) {
       return reply.status(404).send({ message: 'exam not found' })
     }
@@ -118,9 +114,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   server.get('/:examCode/weakest-link', { preHandler: [server.authenticate] }, async (request, reply) => {
     const { examCode } = request.params as any
     const query = request.query as any
-    const db = await loadDb()
     const lc = String(examCode || '').toLowerCase()
-    const exam = db.exams.find((e: any) => String(e.code || '').toLowerCase() === lc)
+    const exam = await loadExam(lc)
     if (!exam) {
       return reply.status(404).send({ message: 'exam not found' })
     }
@@ -198,7 +193,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const questions = selectWeakestLinkQuestions(accessibleQuestions, domainWeights, wrongIds, count)
 
     return {
-      questions,
+      questions: shuffleQuestions(questions as any),
       domainWeights,
       domainStats,
       wrongQuestionCount: wrongIds.size,

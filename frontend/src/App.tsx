@@ -26,19 +26,22 @@ type Exam = {
   defaultDuration?: number
   questions?: unknown[]
 }
+type Choice = {
+  id: string
+  text: string
+  isCorrect: boolean
+  explanation?: string
+}
 type Question = {
-  id: number
+  id: string
   question: string
-  choices: string[]
-  answerIndex?: number
-  answerIndices?: number[]
+  choices: Choice[]
   selectCount?: number
   format?: string
   domain?: string
   tip?: string
   explanation?: string
   docs?: string
-  choiceExplanations?: string[]
 }
 
 export default function App() {
@@ -167,19 +170,19 @@ export default function App() {
     try { localStorage.setItem('themePrefs', JSON.stringify({ preset: themePreset, customCorrect, customCorrect2, customIncorrect, customIncorrect2 })) } catch {}
   }, [themePreset, customCorrect, customCorrect2, customIncorrect, customIncorrect2, dark])
 
-  // map of questionId -> selectedChoiceIndex
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number | number[]>>({})
+  // map of questionId -> selectedChoiceId(s)
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string | string[]>>({})
   // pending multi-select choices (not yet confirmed)
-  const [multiSelectPending, setMultiSelectPending] = useState<Record<number, number[]>>({})
+  const [multiSelectPending, setMultiSelectPending] = useState<Record<string, string[]>>({})
   // Flag questions for review (like real AWS exams)
-  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number>>(new Set())
+  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(new Set())
   // Navigate to specific question by index
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
   // Opt-in submission / complete-early confirmation
   const [showSubmitConfirm, setShowSubmitConfirm] = useState<boolean>(false)
   const [showCompleteEarlyConfirm, setShowCompleteEarlyConfirm] = useState<boolean>(false)
   // map of questionId -> whether tip is visible (tips shown before answering when user requests)
-  const [showTipMap, setShowTipMap] = useState<Record<number, boolean>>({})
+  const [showTipMap, setShowTipMap] = useState<Record<string, boolean>>({})
   // attempt id for current exam (persist per exam in localStorage)
   const [attemptId, setAttemptId] = useState<string | null>(null)
   // paused state for timed exams
@@ -245,9 +248,9 @@ export default function App() {
   // When to reveal correct answers: immediately after each question or on exam completion
   const [revealAnswers, setRevealAnswers] = useState<'immediately' | 'on-completion'>('immediately')
   // Set of question IDs whose answers have been revealed (for immediate mode)
-  const [revealedQuestions, setRevealedQuestions] = useState<Set<number>>(new Set())
+  const [revealedQuestions, setRevealedQuestions] = useState<Set<string>>(new Set())
   // Staged single-select answer (not yet submitted, used in immediate mode)
-  const [stagedAnswer, setStagedAnswer] = useState<Record<number, number>>({})
+  const [stagedAnswer, setStagedAnswer] = useState<Record<string, string>>({})
   // Weakest-link metadata returned from the backend (domain weights, etc.)
   const [weakestLinkInfo, setWeakestLinkInfo] = useState<{
     domainWeights: Record<string, number>
@@ -298,7 +301,7 @@ export default function App() {
     setWeakestLinkInfo(null)
     setExamMode('casual')
     setRevealAnswers('immediately')
-    setRevealedQuestions(new Set())
+    setRevealedQuestions(new Set<string>())
     setStagedAnswer({})
     try {
       const def = ex.defaultQuestions ?? ex.defaultQuestionCount ?? (ex.provider === 'AWS' ? 65 : (ex.questions?.length || 10))
@@ -574,10 +577,9 @@ export default function App() {
     const qs = Array.isArray(attemptData.questions) && attemptData.questions.length > 0 ? attemptData.questions : questions
     for (const q of qs as Question[]) {
       const ansRec = Array.isArray(attemptData.answers) ? attemptData.answers.find((a: any) => a.questionId === q.id) : undefined
-      const chosenIdxs = ansRec?.selectedIndices ?? (typeof ansRec?.selectedIndex === 'number' ? [ansRec.selectedIndex] : [])
-      const yourAnswer = chosenIdxs.map((i: number) => q.choices?.[i] ?? '').join('; ')
-      const correctIdxs = Array.isArray(q.answerIndices) ? q.answerIndices : (typeof q.answerIndex === 'number' ? [q.answerIndex] : [])
-      const correctAnswer = correctIdxs.map((i: number) => q.choices?.[i] ?? '').join('; ')
+      const chosenIds: string[] = ansRec?.selectedChoiceIds ?? (ansRec?.selectedChoiceId ? [ansRec.selectedChoiceId] : ansRec?.selectedIndices ?? (typeof ansRec?.selectedIndex === 'number' ? [ansRec.selectedIndex] : []))
+      const yourAnswer = chosenIds.map((cid: any) => { const ch = q.choices?.find((c: any) => c.id === cid); return ch?.text ?? (typeof cid === 'number' ? q.choices?.[cid] ?? '' : cid) }).join('; ')
+      const correctAnswer = q.choices?.filter((c: any) => c.isCorrect).map((c: any) => c.text).join('; ') ?? ''
       const result = ansRec ? (ansRec.correct ? 'Correct' : 'Incorrect') : 'Unanswered'
       rows.push(`${esc(q.question)},${esc(q.domain ?? '')},${esc(yourAnswer)},${esc(correctAnswer)},${result}`)
     }
@@ -617,8 +619,7 @@ export default function App() {
     let questionsHTML = '<h2>Questions</h2>'
     for (const q of qs as Question[]) {
       const ansRec = Array.isArray(attemptData.answers) ? attemptData.answers.find((a: any) => a.questionId === q.id) : undefined
-      const chosenIdxs: number[] = ansRec?.selectedIndices ?? (typeof ansRec?.selectedIndex === 'number' ? [ansRec.selectedIndex] : [])
-      const correctIdxs = Array.isArray(q.answerIndices) ? q.answerIndices : (typeof q.answerIndex === 'number' ? [q.answerIndex] : [])
+      const chosenIds: string[] = ansRec?.selectedChoiceIds ?? (ansRec?.selectedChoiceId ? [ansRec.selectedChoiceId] : ansRec?.selectedIndices ?? (typeof ansRec?.selectedIndex === 'number' ? [ansRec.selectedIndex] : []))
       const isCorrect = ansRec ? !!ansRec.correct : false
       const statusIcon = ansRec ? (isCorrect ? '✅' : '❌') : '⬜'
 
@@ -627,10 +628,13 @@ export default function App() {
 
       questionsHTML += `<ol>`
       for (let ci = 0; ci < (q.choices?.length ?? 0); ci++) {
-        const isChosen = chosenIdxs.includes(ci)
-        const isCorrectChoice = correctIdxs.includes(ci)
+        const ch = q.choices[ci]
+        const choiceText = typeof ch === 'string' ? ch : (ch?.text ?? '')
+        const choiceId = typeof ch === 'string' ? String(ci) : (ch?.id ?? String(ci))
+        const isChosen = chosenIds.includes(choiceId) || chosenIds.includes(ci as any)
+        const isCorrectChoice = typeof ch === 'object' && !!ch?.isCorrect
         const cls = isChosen && isCorrectChoice ? 'correct' : isChosen ? 'wrong' : isCorrectChoice ? 'correct-not-chosen' : ''
-        questionsHTML += `<li class="${cls}">${(q.choices[ci] ?? '').replace(/</g, '&lt;')}${isChosen ? ' ◀ your answer' : ''}${isCorrectChoice && !isChosen ? ' ◀ correct' : ''}</li>`
+        questionsHTML += `<li class="${cls}">${choiceText.replace(/</g, '&lt;')}${isChosen ? ' ◀ your answer' : ''}${isCorrectChoice && !isChosen ? ' ◀ correct' : ''}</li>`
       }
       questionsHTML += `</ol>`
       if (q.explanation) questionsHTML += `<div class="explanation">💡 ${q.explanation.replace(/</g, '&lt;')}</div>`
@@ -678,11 +682,11 @@ ${questionsHTML}
       ? attemptObj.questions
       : (Array.isArray(suppliedQuestions) && suppliedQuestions.length > 0 ? suppliedQuestions : questions)
 
-    const latestByQ = new Map<number, any>()
+    const latestByQ = new Map<string, any>()
     if (Array.isArray(attemptObj.answers)) {
       for (const ans of attemptObj.answers) {
-        const qid = Number(ans?.questionId)
-        if (!Number.isFinite(qid)) continue
+        const qid = String(ans?.questionId)
+        if (!qid) continue
         const prev = latestByQ.get(qid)
         const prevT = prev?.createdAt ? String(prev.createdAt) : ''
         const currT = ans?.createdAt ? String(ans.createdAt) : ''
@@ -792,7 +796,8 @@ ${questionsHTML}
         if (keywords.some((kw) => text.includes(kw.toLowerCase()))) return true
         if (Array.isArray(q.choices)) {
           for (const c of q.choices) {
-            if (keywords.some((kw) => String(c || '').toLowerCase().includes(kw.toLowerCase()))) return true
+            const ct = typeof c === 'string' ? c : (c?.text ?? '')
+            if (keywords.some((kw) => String(ct).toLowerCase().includes(kw.toLowerCase()))) return true
           }
         }
         return false
@@ -821,11 +826,11 @@ ${questionsHTML}
     setSelectedAnswers({})
     setAttemptData(null)
     setLastError(null)
-    setFlaggedQuestions(new Set())
+    setFlaggedQuestions(new Set<string>())
     setCurrentQuestionIndex(0)
     setShowSubmitConfirm(false)
     setShowCompleteEarlyConfirm(false)
-    setRevealedQuestions(new Set())
+    setRevealedQuestions(new Set<string>())
     setStagedAnswer({})
     try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
     const key = `attempt:${selected}`
@@ -888,10 +893,25 @@ ${questionsHTML}
           const data = await res.json()
           if (data?.attemptId) {
             recordPracticeDay()
+            // fetch the full attempt to obtain examVersion and canonical questions
+            try {
+              const r2 = await authFetch(`/attempts/${data.attemptId}`)
+              if (r2.ok) {
+                const attemptFull = await r2.json()
+                setAttemptId(data.attemptId)
+                try { localStorage.setItem(key, JSON.stringify({ attemptId: data.attemptId, examVersion: attemptFull?.examVersion ?? attemptFull?.version ?? null, attemptSchemaVersion: 1 })) } catch {}
+                setQuestions(attemptFull.questions ?? wlQuestions)
+                setAttemptData(attemptFull)
+                setNumQuestions((attemptFull.questions || wlQuestions).length)
+                setExamStarted(true)
+                return
+              }
+            } catch (err) {
+              // fallback to previous behaviour
+            }
+            // fallback: if fetching attemptFull failed, continue with provided weakest-link questions
             setAttemptId(data.attemptId)
-            try { localStorage.setItem(key, data.attemptId) } catch {}
-            // Use the weakest-link questions directly and set attemptData
-            // so the questions-fetch effect doesn't overwrite them
+            try { localStorage.setItem(key, JSON.stringify({ attemptId: data.attemptId, examVersion: null, attemptSchemaVersion: 1 })) } catch {}
             setQuestions(wlQuestions)
             setAttemptData({ questions: wlQuestions, attemptId: data.attemptId, examCode: selected })
             setNumQuestions(wlQuestions.length)
@@ -926,7 +946,8 @@ ${questionsHTML}
             if (keywords.some((kw) => text.includes(kw))) return true
             if (Array.isArray(q.choices)) {
               for (const c of q.choices) {
-                if (keywords.some((kw) => String(c || '').toLowerCase().includes(kw))) return true
+                const ct = typeof c === 'string' ? c : (c?.text ?? '')
+                if (keywords.some((kw) => String(ct).toLowerCase().includes(kw))) return true
               }
             }
             return false
@@ -963,7 +984,7 @@ ${questionsHTML}
           if (r2.ok) {
             const attemptFull = await r2.json()
             setAttemptId(data.attemptId)
-            try { localStorage.setItem(key, data.attemptId) } catch {}
+            try { localStorage.setItem(key, JSON.stringify({ attemptId: data.attemptId, examVersion: attemptFull?.examVersion ?? attemptFull?.version ?? null, attemptSchemaVersion: 1 })) } catch {}
             setAttemptData(attemptFull)
             // if attempt contains questions (filtered set), use them
             if (Array.isArray(attemptFull.questions)) setQuestions(attemptFull.questions)
@@ -972,14 +993,14 @@ ${questionsHTML}
           } else {
             // fallback: set attempt id and start
             setAttemptId(data.attemptId)
-            try { localStorage.setItem(key, data.attemptId) } catch {}
+            try { localStorage.setItem(key, JSON.stringify({ attemptId: data.attemptId, examVersion: null, attemptSchemaVersion: 1 })) } catch {}
             setExamStarted(true)
             if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
           }
         } catch (err) {
           // if follow-up fetch fails, still start with attempt id
           setAttemptId(data.attemptId)
-          try { localStorage.setItem(key, data.attemptId) } catch {}
+          try { localStorage.setItem(key, JSON.stringify({ attemptId: data.attemptId, examVersion: null, attemptSchemaVersion: 1 })) } catch {}
           setExamStarted(true)
           if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
         }
@@ -991,7 +1012,8 @@ ${questionsHTML}
   }
 
   // helper to submit an answer programmatically (used by buttons and keyboard shortcuts)
-  async function submitAnswer(q: Question, i: number | number[]) {
+  // i is a choice ID (string) or array of choice IDs (string[]) for multi-select
+  async function submitAnswer(q: Question, i: string | string[]) {
     if (isFinished) return
     if (!examStarted) {
       setLastError('Start the exam before answering')
@@ -1030,7 +1052,7 @@ ${questionsHTML}
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           questionId: q.id,
-          ...(isMulti ? { selectedIndices: i } : { selectedIndex: i }),
+          ...(isMulti ? { selectedChoiceIds: i } : { selectedChoiceId: i }),
           timeMs: 0,
           showTip: !!showTipMap[q.id]
         })
@@ -1195,6 +1217,16 @@ ${questionsHTML}
       })
       result.push({ provider: prov, exams: cards })
     }
+    // sort exams within each provider by level
+    const levelOrder: Record<string, number> = {
+      Foundational: 0, Fundamentals: 0,
+      Associate: 1,
+      Professional: 2, Expert: 2,
+      Specialty: 3,
+    }
+    for (const p of result) {
+      p.exams.sort((a: any, b: any) => (levelOrder[a.level] ?? 99) - (levelOrder[b.level] ?? 99))
+    }
     return result
   }, [exams])
 
@@ -1229,8 +1261,11 @@ ${questionsHTML}
 
   // Ensure when navigating to the Home pre-start view for a selected exam
   // we apply per-exam duration defaults (or saved prefs) deterministically.
+  // Skip when exam is already started or we're resuming — otherwise this
+  // overwrites the saved numQuestions with the exam's defaultQuestions.
   useEffect(() => {
     if (route !== 'home' || !selected) return
+    if (examStarted || resumingRef.current) return
     try {
       const meta = exams.find((e: any) => e.code === selected)
       const defDur = typeof meta?.defaultDuration === 'number' ? meta.defaultDuration : 15
@@ -1273,6 +1308,9 @@ ${questionsHTML}
         timed,
         timeLeft,
         durationMinutes,
+        attemptId: attemptId ?? null,
+        examMode: examMode ?? 'casual',
+        revealAnswers: revealAnswers ?? 'immediately',
         timestamp: Date.now(),
       }))
     } catch {}
@@ -1338,8 +1376,15 @@ ${questionsHTML}
       if (typeof saved.timed === 'boolean') setTimed(saved.timed)
       if (typeof saved.durationMinutes === 'number') setDurationMinutes(saved.durationMinutes)
       if (saved.timed && typeof saved.timeLeft === 'number') setTimeLeft(saved.timeLeft)
+      if (saved.examMode) setExamMode(saved.examMode)
+      if (saved.revealAnswers) setRevealAnswers(saved.revealAnswers)
+      // Restore attemptId so Cancel / Complete & Score buttons work
+      if (saved.attemptId) {
+        setAttemptId(saved.attemptId)
+      } else if (!user) {
+        setAttemptId(`visitor-${Date.now()}`)
+      }
       setExamStarted(true)
-      if (!user) setAttemptId(`visitor-${Date.now()}`)
       // Clear guard after a tick so effect has run
       setTimeout(() => { resumingRef.current = false }, 100)
     } catch (err) {
@@ -1351,7 +1396,7 @@ ${questionsHTML}
   // Submit the exam (opt-in) or complete early with partial scoring
   async function handleSubmitExam(earlyComplete = false) {
     if (!selected || !attemptId) return
-    const answeredCount = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === Number(id))).length
+    const answeredCount = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === id)).length
     const totalQuestions = displayQuestions.length
     // Clear saved progress
     try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
@@ -1367,9 +1412,14 @@ ${questionsHTML}
         if (!perDomain[dom]) perDomain[dom] = { correct: 0, total: 0 }
         if (sel === undefined) { if (!earlyComplete) perDomain[dom].total++; continue }
         perDomain[dom].total++
-        const isRight = Array.isArray(qn.answerIndices)
-          ? Array.isArray(sel) && sel.length === qn.answerIndices.length && sel.every((v: number) => qn.answerIndices!.includes(v))
-          : sel === qn.answerIndex
+        // Check correctness using isCorrect field on choice objects
+        let isRight = false
+        const correctIds = qn.choices.filter((c) => c.isCorrect).map((c) => c.id)
+        if (Array.isArray(sel)) {
+          isRight = sel.length === correctIds.length && sel.every((v) => correctIds.includes(v))
+        } else {
+          isRight = correctIds.length === 1 && correctIds[0] === sel
+        }
         if (isRight) { correct++; perDomain[dom].correct++ }
       }
       for (const k of Object.keys(perDomain)) { const e = perDomain[k]; e.score = e.total > 0 ? Math.round((e.correct / e.total) * 100) : 0 }
@@ -1379,7 +1429,7 @@ ${questionsHTML}
         attemptId, examCode: selected, score, correctCount: correct,
         total: denom, answeredCount, totalQuestions, earlyComplete,
         perDomain, finishedAt: new Date().toISOString(),
-        questions: qs.map((qn) => ({ ...qn, selectedIndex: Array.isArray(selectedAnswers[qn.id]) ? undefined : selectedAnswers[qn.id] as number, selectedIndices: Array.isArray(selectedAnswers[qn.id]) ? selectedAnswers[qn.id] : undefined })),
+        questions: qs.map((qn) => ({ ...qn, selectedChoiceId: Array.isArray(selectedAnswers[qn.id]) ? undefined : selectedAnswers[qn.id] as string, selectedChoiceIds: Array.isArray(selectedAnswers[qn.id]) ? selectedAnswers[qn.id] : undefined })),
       })
       setExamStarted(false); setTimeLeft(null)
       setShowSubmitConfirm(false); setShowCompleteEarlyConfirm(false)
@@ -1417,12 +1467,17 @@ ${questionsHTML}
       return
     }
     const key = `attempt:${selected}`
+    const existingRaw = (() => {
+      try { return localStorage.getItem(key) } catch { return null }
+    })()
+    // support legacy value (plain attemptId string) and new JSON value
     const existing = (() => {
+      if (!existingRaw) return null
       try {
-        return localStorage.getItem(key)
-      } catch {
-        return null
-      }
+        const parsed = JSON.parse(existingRaw)
+        if (parsed && parsed.attemptId) return parsed.attemptId
+      } catch {}
+      return existingRaw
     })()
 
     if (!existing) {
@@ -1476,7 +1531,8 @@ ${questionsHTML}
 
   // helper to render choice content (plain text, JSON, YAML, or CLI snippets)
   const renderChoiceContent = (val: any, q?: Question, inline = false) => {
-    const s = typeof val === 'string' ? val : (val == null ? '' : String(val))
+    // handle Choice objects — extract text
+    const s = typeof val === 'string' ? val : (val?.text != null ? String(val.text) : (val == null ? '' : String(val)))
     const isLikelyJson = (q?.format === 'json') || s.trim().startsWith('{') || s.trim().startsWith('[')
     const isLikelyYaml = (q?.format === 'yaml')
     // CLI detection: require either explicit format, multiple tokens with typical CLI patterns,
@@ -1757,6 +1813,7 @@ ${questionsHTML}
                   </div>
                 )}
                 <h2 className="text-xl font-semibold mb-4">Practice Exams</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 italic">This product is not affiliated with or endorsed by any certification provider. All questions are original and created for practice purposes only.</p>
                 <div className="space-y-6">
                   {providers.map((p) => (
                     <div key={p.provider}>
@@ -1766,7 +1823,18 @@ ${questionsHTML}
                           <div key={ex.code} className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 shadow-sm dark:shadow-none relative">
                             <div>
                               <div className="font-medium">{ex.title ?? ex.code}</div>
-                              <div className="text-sm text-slate-500">{ex.version}</div>
+                              <div className="flex items-center gap-2 mt-1">
+                                {ex.level && (
+                                  <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                                    ex.level === 'Foundational' || ex.level === 'Fundamentals' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+                                    : ex.level === 'Associate' ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300'
+                                    : ex.level === 'Professional' || ex.level === 'Expert' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                                    : ex.level === 'Specialty' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                                  }`}>{ex.level}</span>
+                                )}
+                                <span className="text-xs text-slate-400">{ex.code}</span>
+                              </div>
                             </div>
                             <div className="mt-3 flex items-center gap-2">
                               <button
@@ -1833,10 +1901,19 @@ ${questionsHTML}
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2 className="text-xl font-semibold">Analytics</h2>
-                    <div className="text-sm text-slate-500">
+                    <div className="text-sm text-slate-500 flex items-center gap-2">
                       {selected ? (
                         <>
                           {selectedMeta?.title ?? selected}
+                          {(selectedMeta as any)?.level && (
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                              (selectedMeta as any).level === 'Foundational' || (selectedMeta as any).level === 'Fundamentals' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+                              : (selectedMeta as any).level === 'Associate' ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300'
+                              : (selectedMeta as any).level === 'Professional' || (selectedMeta as any).level === 'Expert' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                              : (selectedMeta as any).level === 'Specialty' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}>{(selectedMeta as any).level}</span>
+                          )}
                           {selectedMeta?.code ? ` (${selectedMeta.code})` : ''}
                         </>
                       ) : (
@@ -2593,11 +2670,11 @@ ${questionsHTML}
                           answerRecord = matches[matches.length - 1]
                         }
                       }
-                      const chosen = answerRecord?.selectedIndices ?? answerRecord?.selectedIndex ?? selectedAnswers[q.id]
+                      const chosen = answerRecord?.selectedChoiceIds ?? answerRecord?.selectedChoiceId ?? answerRecord?.selectedIndices ?? answerRecord?.selectedIndex ?? selectedAnswers[q.id]
                       const isCorrect = typeof answerRecord?.correct === 'boolean' ? answerRecord.correct : (
-                        Array.isArray(q.answerIndices)
-                          ? (Array.isArray(chosen) && q.answerIndices.length === chosen.length && q.answerIndices.every((v: number) => chosen.includes(v)))
-                          : (typeof chosen === 'number' && typeof q.answerIndex === 'number' ? chosen === q.answerIndex : false)
+                        Array.isArray(chosen)
+                          ? (Array.isArray(q.choices) && q.choices.filter((c: any) => c.isCorrect).length === chosen.length && q.choices.filter((c: any) => c.isCorrect).every((c: any) => chosen.includes(c.id)))
+                          : (typeof chosen === 'string' && q.choices?.some((c: any) => c.id === chosen && c.isCorrect))
                       )
                       return { answerRecord, chosen, isCorrect }
                     }
@@ -2658,8 +2735,8 @@ ${questionsHTML}
                                         </span>
                                         <span className="break-words max-w-full">
                                           {Array.isArray(item.chosen)
-                                            ? (item.chosen as number[]).map((ci) => item.q.choices[ci]).join(', ')
-                                            : renderChoiceContent(typeof item.chosen === 'number' ? item.q.choices[item.chosen] : '—', item.q, true)}
+                                            ? (item.chosen as string[]).map((cid) => { const ch = item.q.choices?.find((c: any) => c.id === cid); return ch?.text ?? cid }).join(', ')
+                                            : renderChoiceContent(typeof item.chosen === 'string' ? (item.q.choices?.find((c: any) => c.id === item.chosen) ?? '—') : '—', item.q, true)}
                                         </span>
                                       </div>
                                     </div>
@@ -2675,26 +2752,26 @@ ${questionsHTML}
                                     <div className="flex-1">
                                       <div className="px-3 py-2 rounded-md bg-slate-700/10 dark:bg-slate-800/40 text-sm break-words max-w-full whitespace-normal">
                                         {Array.isArray(item.chosen)
-                                          ? (item.chosen as number[]).map((ci) => item.q.choices[ci]).join(', ')
-                                          : renderChoiceContent(typeof item.chosen === 'number' ? item.q.choices[item.chosen] : '—', item.q, true)}
+                                          ? (item.chosen as string[]).map((cid) => { const ch = item.q.choices?.find((c: any) => c.id === cid); return ch?.text ?? cid }).join(', ')
+                                          : renderChoiceContent(typeof item.chosen === 'string' ? (item.q.choices?.find((c: any) => c.id === item.chosen) ?? '—') : '—', item.q, true)}
                                       </div>
                                     </div>
                                   </div>
                                 )
                             })()}
 
-                            {(typeof item.q.answerIndex === 'number' || Array.isArray(item.q.answerIndices)) && (
+                            {Array.isArray(item.q.choices) && item.q.choices.some((c: any) => c.isCorrect) && (
                               <div className="mt-3 font-semibold flex items-center gap-3">
                                 <div className="inline-flex items-center gap-2" style={{ color: 'var(--color-correct-2)' }}>
                                   <span className="inline-flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-correct-muted)', color: 'var(--color-correct-text)' }}>
                                     <svg className="w-3 h-3" style={{ color: 'var(--color-correct-2)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
                                   </span>
-                                  <span>Correct answer{Array.isArray(item.q.answerIndices) ? 's' : ''}:</span>
+                                  <span>Correct answer{item.q.choices.filter((c: any) => c.isCorrect).length > 1 ? 's' : ''}:</span>
                                 </div>
                                 <div className="mt-0">
-                                  {Array.isArray(item.q.answerIndices)
-                                    ? item.q.answerIndices.map((ai) => item.q.choices[ai]).join(', ')
-                                    : renderChoiceContent(item.q.choices[item.q.answerIndex!], item.q, false)}
+                                  {item.q.choices.filter((c: any) => c.isCorrect).length > 1
+                                    ? item.q.choices.filter((c: any) => c.isCorrect).map((c: any) => c.text).join(', ')
+                                    : renderChoiceContent(item.q.choices.find((c: any) => c.isCorrect) ?? '—', item.q, false)}
                                 </div>
                               </div>
                             )}
@@ -3178,7 +3255,7 @@ ${questionsHTML}
                     setExamMode('casual')
                     setWeakestLinkInfo(null)
                     setRevealAnswers('immediately')
-                    setRevealedQuestions(new Set())
+                    setRevealedQuestions(new Set<string>())
                     setStagedAnswer({})
                     setServiceFilterText('')
                     setSelectedServices([])
@@ -3236,7 +3313,7 @@ ${questionsHTML}
                 </div>
                 {/* Progress + action bar */}
                 {(() => {
-                  const answeredCount = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === Number(id))).length
+                  const answeredCount = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === id)).length
                   const pct = Math.round((answeredCount / Math.max(1, displayQuestions.length)) * 100)
                   const allAnswered = answeredCount >= displayQuestions.length
                   const flaggedCount = displayQuestions.filter(q => flaggedQuestions.has(q.id)).length
@@ -3287,8 +3364,8 @@ ${questionsHTML}
                   const pending = multiSelectPending[q.id] ?? []
                   const correct = answered && (
                     isMultiSelect
-                      ? (Array.isArray(q.answerIndices) && Array.isArray(chosen) && q.answerIndices.length === (chosen as number[]).length && q.answerIndices.every((v) => (chosen as number[]).includes(v)))
-                      : (typeof q.answerIndex === 'number' && chosen === q.answerIndex)
+                      ? (Array.isArray(chosen) && Array.isArray(q.choices) && q.choices.filter((c) => c.isCorrect).length === (chosen as string[]).length && q.choices.filter((c) => c.isCorrect).every((c) => (chosen as string[]).includes(c.id)))
+                      : (typeof chosen === 'string' && q.choices?.some((c) => c.id === chosen && c.isCorrect))
                   )
                   // Should we show correct/incorrect feedback for this question?
                   const showFeedback = isFinished || revealedQuestions.has(q.id)
@@ -3347,13 +3424,11 @@ ${questionsHTML}
 
                       <ol className="list-none pl-0 space-y-2">
                         {q.choices.map((c, i) => {
-                          const isSelectedSingle = !isMultiSelect && chosen === i
-                          const isSelectedMulti = isMultiSelect && (answered ? (Array.isArray(chosen) && (chosen as number[]).includes(i)) : pending.includes(i))
+                          const isSelectedSingle = !isMultiSelect && chosen === c.id
+                          const isSelectedMulti = isMultiSelect && (answered ? (Array.isArray(chosen) && (chosen as string[]).includes(c.id)) : pending.includes(c.id))
                           const isSelected = isSelectedSingle || isSelectedMulti
-                          const isStagedChoice = !isMultiSelect && staged === i
-                          const isCorrectChoice = isMultiSelect
-                            ? (Array.isArray(q.answerIndices) && q.answerIndices.includes(i))
-                            : (typeof q.answerIndex === 'number' && q.answerIndex === i)
+                          const isStagedChoice = !isMultiSelect && staged === c.id
+                          const isCorrectChoice = !!c.isCorrect
                           let bg = 'bg-transparent'
                           if (showFeedback && answered) {
                             if (isCorrectChoice) bg = 'bg-gradient-to-r from-neon-cyan/10 to-neon-pink/10'
@@ -3366,14 +3441,14 @@ ${questionsHTML}
                             bg = 'bg-sky-500/10'
                           }
                           return (
-                            <li key={i}>
+                            <li key={c.id}>
                               <button
                                 onClick={() => {
                                   if (isFinished || questionLocked) return
                                   if (isMultiSelect) {
                                     // If already answered, move old answer into pending so user can adjust
                                     if (answered && !multiSelectPending[q.id]) {
-                                      const prev = Array.isArray(chosen) ? (chosen as number[]) : []
+                                      const prev = Array.isArray(chosen) ? (chosen as string[]) : []
                                       setMultiSelectPending((p) => ({ ...p, [q.id]: prev }))
                                       // clear the committed answer so the UI shows pending state
                                       setSelectedAnswers((sa) => { const next = { ...sa }; delete next[q.id]; return next })
@@ -3381,17 +3456,17 @@ ${questionsHTML}
                                     }
                                     setMultiSelectPending((prev) => {
                                       const cur = prev[q.id] ?? []
-                                      const next = cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]
+                                      const next = cur.includes(c.id) ? cur.filter((x) => x !== c.id) : [...cur, c.id]
                                       return { ...prev, [q.id]: next }
                                     })
                                     return
                                   }
                                   // Single-select: in immediate mode, stage instead of submitting
                                   if (immediateMode && !answered) {
-                                    setStagedAnswer((prev) => ({ ...prev, [q.id]: i }))
+                                    setStagedAnswer((prev) => ({ ...prev, [q.id]: c.id }))
                                     return
                                   }
-                                  submitAnswer(q, i)
+                                  submitAnswer(q, c.id)
                                 }}
                                 className={`w-full text-left px-3 py-2.5 rounded-lg border ${showFeedback && answered ? (isCorrectChoice ? 'border-green-400/40 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-400/40 dark:border-red-500/30' : 'border-slate-200/60 dark:border-slate-700/60') : isStagedChoice ? 'border-sky-400/50 dark:border-sky-500/40' : isSelected ? 'border-sky-400/50 dark:border-sky-500/40' : 'border-slate-200/60 dark:border-slate-700/60'} ${bg} hover:bg-slate-100 dark:hover:bg-slate-700 flex items-start gap-3 transition-colors`}
                               >
@@ -3414,9 +3489,9 @@ ${questionsHTML}
                                 </div>
                               </button>
 
-                              {showFeedback && answered && q.choiceExplanations && (
+                              {showFeedback && answered && c.explanation && (
                                 <div className="mt-1 text-sm text-slate-600 dark:text-slate-300 p-2 rounded">
-                                  {q.choiceExplanations[i]}
+                                  {c.explanation}
                                 </div>
                               )}
                             </li>
@@ -3610,7 +3685,7 @@ ${questionsHTML}
           <div className="relative bg-white dark:bg-slate-800 p-6 rounded max-w-lg w-full mx-4">
             <h3 className="text-lg font-semibold mb-2">Complete exam early?</h3>
             {(() => {
-              const answered = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === Number(id))).length
+              const answered = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === id)).length
               const total = displayQuestions.length
               const unanswered = total - answered
               return (

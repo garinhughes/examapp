@@ -37,3 +37,6 @@ git push -u origin main
 
 - This repo keeps runtime JSON for some demo data under `backend/data/`. Production deployments should use a real database and secret management.
 - If you want me to create a GitHub Actions workflow or add a LICENSE file, tell me which license you prefer and I will add it.
+
+- Exams consolidation: several smaller exam files were consolidated into a single canonical exam file `backend/data/exams/SCS-C03.json`. Deprecated exam files were removed; the application now loads per-exam JSON from `backend/data/exams/`.
+- Compliance and provenance: question schema now includes `sourceType`, `lastReviewed`, and `originalityScore` to support the project's safe AI generation workflow. See `backend/data/schemas/safe_ai_gen_workflow.md` for the content-generation policy and requirements.

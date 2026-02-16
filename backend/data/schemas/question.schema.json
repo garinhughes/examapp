@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Exam Name",
+  "type": "object",
+  "required": ["code", "title", "questions"],
+  "properties": {
+    "code": { "type": "string" },
+    "provider": { "type": "string" },
+    "passMark": { "type": "number" },
+    "defaultQuestions": { "type": "integer" },
+    "defaultDuration": { "type": "integer" },
+    "title": { "type": "string" },
+    "logo": { "type": ["string", "null"] },
+    "logoHref": { "type": ["string", "null"] },
+    "level": {
+      "type": "string",
+      "enum": ["Foundational", "Fundamentals", "Associate", "Professional", "Expert", "Specialty"]
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "choices"],
+        "properties": {
+          "id": { "oneOf": [{"type":"integer"},{"type":"string"}] },
+          "docs": { "type": "string" },
+          "format": { "type": "string" },
+          "domain": { "type": "string" },
+          "services": { "type": "array", "items": { "type": "string" } },
+          "question": { "type": "string" },
+          "tip": { "type": "string" },
+          "explanation": { "type": "string" },
+          "selectCount": { "type": "integer" },
+          "sourceType": {
+            "type": "string",
+            "enum": ["official-doc", "whitepaper", "best-practice", "public-guide"]
+          },
+          "lastReviewed": { "type": "string", "format": "date" },
+          "choices": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["id", "text", "isCorrect", "explanation"],
+                  "properties": {
+                    "id": { "type": "string" },
+                    "text": { "type": "string" },
+                    "isCorrect": { "type": "boolean" },
+                    "explanation": { "type": "string" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}
