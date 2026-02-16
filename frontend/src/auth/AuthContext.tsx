@@ -191,12 +191,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /* ---- login: redirect to Cognito Hosted UI ---- */
   const login = useCallback(async () => {
     if (MODE === 'dev') return // already logged in
-    const domain = import.meta.env.VITE_COGNITO_DOMAIN
+    let domain = import.meta.env.VITE_COGNITO_DOMAIN || ''
     const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID
 
     // Choose flow: 'server' -> confidential client redirects to backend callback
     // 'pkce' -> SPA does PKCE exchange. Default to 'server' for this app.
     const flow = import.meta.env.VITE_AUTH_FLOW || 'server'
+
+    if (!domain) {
+      console.error('VITE_COGNITO_DOMAIN is not set')
+      return
+    }
+
+    // Ensure domain includes protocol so it's treated as absolute URL by the browser
+    if (!/^https?:\/\//i.test(domain)) domain = `https://${domain}`
 
     if (flow === 'pkce') {
       const redirectUri = encodeURIComponent(window.location.origin + '/callback')
@@ -226,9 +234,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
 
     if (MODE !== 'dev') {
-      const domain = import.meta.env.VITE_COGNITO_DOMAIN
+      let domain = import.meta.env.VITE_COGNITO_DOMAIN || ''
       const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID
       const logoutUri = encodeURIComponent(window.location.origin)
+      if (!domain) {
+        console.error('VITE_COGNITO_DOMAIN is not set')
+        return
+      }
+      if (!/^https?:\/\//i.test(domain)) domain = `https://${domain}`
       window.location.href = `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}`
     }
   }, [clearToken])
