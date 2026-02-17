@@ -13,8 +13,10 @@
     "logo": { "type": ["string", "null"] },
     "logoHref": { "type": ["string", "null"] },
     "level": {
-      "type": "string",
-      "enum": ["Foundational", "Fundamentals", "Associate", "Professional", "Expert", "Specialty"]
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "description": "Numeric difficulty/level indicator: 0 (lowest) -> 3 (highest)"
     },
     "questions": {
       "type": "array",
@@ -27,6 +29,11 @@
           "format": { "type": "string" },
           "domain": { "type": "string" },
           "services": { "type": "array", "items": { "type": "string" } },
+          "skills": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Optional array of skills this question maps to. Use a short identifier or free-form text (e.g. '1.1.1' or 'Manage Microsoft Entra users and groups')."
+          },
           "question": { "type": "string" },
           "tip": { "type": "string" },
           "explanation": { "type": "string" },

@@ -1831,15 +1831,7 @@ ${questionsHTML}
                             <div>
                               <div className="font-medium">{ex.title ?? ex.code}</div>
                               <div className="flex items-center gap-2 mt-1">
-                                {ex.level && (
-                                  <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${
-                                    ex.level === 'Foundational' || ex.level === 'Fundamentals' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
-                                    : ex.level === 'Associate' ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300'
-                                    : ex.level === 'Professional' || ex.level === 'Expert' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
-                                    : ex.level === 'Specialty' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                                  }`}>{ex.level}</span>
-                                )}
+                                {/* level badge removed — levels are numeric 0..3 in the schema */}
                                 <span className="text-xs text-slate-400">{ex.code}</span>
                               </div>
                             </div>
@@ -1912,15 +1904,7 @@ ${questionsHTML}
                       {selected ? (
                         <>
                           {selectedMeta?.title ?? selected}
-                          {(selectedMeta as any)?.level && (
-                            <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${
-                              (selectedMeta as any).level === 'Foundational' || (selectedMeta as any).level === 'Fundamentals' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
-                              : (selectedMeta as any).level === 'Associate' ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300'
-                              : (selectedMeta as any).level === 'Professional' || (selectedMeta as any).level === 'Expert' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
-                              : (selectedMeta as any).level === 'Specialty' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                            }`}>{(selectedMeta as any).level}</span>
-                          )}
+                          {/* level badge removed from analytics header — levels are numeric 0..3 */}
                           {selectedMeta?.code ? ` (${selectedMeta.code})` : ''}
                         </>
                       ) : (
