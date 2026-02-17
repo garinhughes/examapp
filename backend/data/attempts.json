@@ -713,6 +713,2196 @@
           "score": 33
         }
       }
+    },
+    {
+      "attemptId": "59d1b665-15d1-494c-9a7a-cb5bf5dadb84",
+      "userId": "dev-user-001",
+      "examCode": "SCS-C03",
+      "examVersion": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-02-17T08:18:07.250Z",
+      "finishedAt": null,
+      "score": null,
+      "answers": [
+        {
+          "questionId": "SCS-C03-0019",
+          "selectedChoiceId": "c1",
+          "selectedChoiceIds": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-17T08:22:00.587Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "SCS-C03-0025",
+          "question": "A Lambda function in a private subnet needs to call the Secrets Manager API to retrieve database credentials. The security team prohibits all internet-bound traffic from the VPC. How should the architect configure network access so the Lambda function can reach Secrets Manager without traversing the internet?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Create an interface VPC endpoint (PrivateLink) for Secrets Manager in the same VPC and ensure the Lambda function's security group allows outbound HTTPS to the endpoint",
+              "isCorrect": true,
+              "explanation": "An interface VPC endpoint creates private ENIs within the VPC that route traffic to the Secrets Manager API entirely over the AWS private network, with no internet path required."
+            },
+            {
+              "id": "c3",
+              "text": "Attach an Elastic IP to the Lambda function's ENI for direct outbound access",
+              "isCorrect": false,
+              "explanation": "Lambda functions in a VPC do not support Elastic IPs, and this approach would use the internet gateway, which is prohibited."
+            },
+            {
+              "id": "c2",
+              "text": "Add a NAT Gateway to the VPC and route the Lambda subnet's traffic through it",
+              "isCorrect": false,
+              "explanation": "A NAT Gateway provides internet access for outbound traffic, which violates the security team's prohibition on internet-bound traffic from the VPC."
+            },
+            {
+              "id": "c4",
+              "text": "Configure the Lambda function outside the VPC so it can access Secrets Manager over the internet by default",
+              "isCorrect": false,
+              "explanation": "Placing the function outside the VPC gives it internet access to AWS APIs, but the question states the function is in a private subnet, and moving it out may break access to other VPC resources like the database."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "Lambda",
+            "VPC",
+            "NAT Gateway",
+            "PrivateLink",
+            "Secrets Manager"
+          ],
+          "docs": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html",
+          "tip": "When internet access is prohibited, PrivateLink endpoints bring AWS service APIs into the VPC over private connections.",
+          "explanation": "Interface VPC endpoints (powered by AWS PrivateLink) create private IP addresses inside the VPC that serve as entry points for AWS service APIs. Traffic never leaves the AWS network, satisfying zero-internet-egress security requirements while allowing Lambda to call Secrets Manager."
+        },
+        {
+          "id": "SCS-C03-0006",
+          "question": "A security team needs to centrally manage findings from multiple AWS security services and ensure encryption of sensitive data at rest. Which TWO services should they use together? (Select TWO)",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "AWS CloudFormation",
+              "isCorrect": false,
+              "explanation": "CloudFormation is an infrastructure-as-code service, not a security findings tool."
+            },
+            {
+              "id": "c5",
+              "text": "Amazon EC2",
+              "isCorrect": false,
+              "explanation": "EC2 provides virtual machines, not security findings management."
+            },
+            {
+              "id": "c3",
+              "text": "Amazon SQS",
+              "isCorrect": false,
+              "explanation": "SQS is a message queuing service, not related to security findings or encryption."
+            },
+            {
+              "id": "c2",
+              "text": "AWS KMS",
+              "isCorrect": true,
+              "explanation": "KMS provides centralized encryption key management for encrypting data at rest."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Security Hub",
+              "isCorrect": true,
+              "explanation": "Security Hub provides a comprehensive view of security alerts and compliance status across accounts."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "Security Hub",
+            "KMS",
+            "SQS",
+            "CloudFormation",
+            "EC2"
+          ],
+          "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+          "tip": "Think about centralized findings aggregation and key management.",
+          "explanation": "Security Hub aggregates and normalizes findings and KMS provides the keys to encrypt sensitive data."
+        },
+        {
+          "id": "SCS-C03-0014",
+          "question": "A data lake team manages a single S3 bucket accessed by multiple applications across different VPCs. They need to enforce that each application can only reach the bucket from its own VPC and can only access objects under its designated prefix. Which approach provides the strongest isolation with the least policy complexity?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Create one VPC endpoint per VPC and use endpoint policies",
+              "isCorrect": false,
+              "explanation": "Endpoint policies are coarse for prefix-level scoping."
+            },
+            {
+              "id": "c4",
+              "text": "Replicate data into separate per-application buckets",
+              "isCorrect": false,
+              "explanation": "Replication increases cost and complexity."
+            },
+            {
+              "id": "c2",
+              "text": "Write a single S3 bucket policy with separate statements per application",
+              "isCorrect": false,
+              "explanation": "A single bucket policy becomes difficult to manage and has size limits."
+            },
+            {
+              "id": "c1",
+              "text": "Create a separate S3 Access Point for each application",
+              "isCorrect": true,
+              "explanation": "S3 Access Points allow per-application network and permission scoping against a shared bucket."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "S3",
+            "IAM",
+            "VPC",
+            "PrivateLink"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-points.html",
+          "tip": "Consider a feature that lets you create named network-scoped entry points to a single bucket.",
+          "explanation": "S3 Access Points provide named, per-application entry points to a bucket, each with its own policy and optional VPC restriction."
+        },
+        {
+          "id": "SCS-C03-0020",
+          "question": "After enabling GuardDuty S3 Protection, a security analyst notices a finding of type Policy:S3/BucketAnonymousAccessGranted for a production data bucket. The analyst needs to determine which principal changed the bucket policy and when. Which data source provides this information?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "CloudTrail management events showing the PutBucketPolicy API call",
+              "isCorrect": true,
+              "explanation": "CloudTrail records the identity (principal), timestamp, source IP, and request parameters for S3 control-plane API calls like PutBucketPolicy. This is the authoritative source for who changed the policy and when."
+            },
+            {
+              "id": "c3",
+              "text": "S3 server access logs for the data bucket",
+              "isCorrect": false,
+              "explanation": "S3 server access logs capture object-level read/write requests, not bucket policy changes. Control-plane actions like PutBucketPolicy are not recorded in access logs."
+            },
+            {
+              "id": "c4",
+              "text": "VPC Flow Logs for the VPC where the analyst is working",
+              "isCorrect": false,
+              "explanation": "VPC Flow Logs capture network-layer metadata (IP, port, protocol) but not API-level details like which principal called PutBucketPolicy."
+            },
+            {
+              "id": "c2",
+              "text": "The GuardDuty finding detail itself, which includes the actor and timestamp",
+              "isCorrect": false,
+              "explanation": "GuardDuty findings identify the affected resource and the anomaly but do not always include the full details of who made the original policy change. CloudTrail provides the definitive audit trail."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "CloudTrail",
+            "S3",
+            "Security Hub"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_s3-protection.html",
+          "tip": "Distinguish between data-plane logs (S3 access logs, VPC Flow Logs) and control-plane logs (CloudTrail) when investigating policy changes.",
+          "explanation": "CloudTrail management events are the single source of truth for AWS API activity. When investigating who changed a resource configuration, always start with CloudTrail, which records the IAM principal, the API action, the request parameters, and the exact timestamp."
+        },
+        {
+          "id": "SCS-C03-0002",
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "AWS Shield",
+              "isCorrect": false,
+              "explanation": "AWS Shield provides DDoS protections, not forensic investigation tools."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Systems Manager",
+              "isCorrect": false,
+              "explanation": "Systems Manager helps manage instances but is not focused on security investigation notebooks."
+            },
+            {
+              "id": "c4",
+              "text": "AWS CloudTrail",
+              "isCorrect": false,
+              "explanation": "CloudTrail records API activity and is useful for forensics, but Detective provides investigative workflows."
+            },
+            {
+              "id": "c2",
+              "text": "Amazon Detective",
+              "isCorrect": true,
+              "explanation": "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Detective",
+            "Systems Manager",
+            "Shield",
+            "CloudTrail"
+          ],
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective automatically collects log data from VPC Flow Logs, CloudTrail, and GuardDuty, then builds a graph model that links related events so analysts can visually trace activity."
+        },
+        {
+          "id": "SCS-C03-0005",
+          "question": "Which service provides managed encryption keys that you can use to encrypt data at rest?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "AWS WAF",
+              "isCorrect": false,
+              "explanation": "AWS WAF is a web application firewall, not key management."
+            },
+            {
+              "id": "c2",
+              "text": "AWS IAM",
+              "isCorrect": false,
+              "explanation": "AWS IAM handles identity and permissions, not key storage or encryption primitives."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Shield",
+              "isCorrect": false,
+              "explanation": "AWS Shield protects against DDoS attacks, not key management."
+            },
+            {
+              "id": "c1",
+              "text": "AWS KMS",
+              "isCorrect": true,
+              "explanation": "AWS KMS is the managed service for creating and controlling encryption keys."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "KMS",
+            "IAM",
+            "Shield",
+            "WAF"
+          ],
+          "docs": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+          "tip": "Key management service with envelope encryption support.",
+          "explanation": "AWS KMS provides centralized creation, rotation, and access control of encryption keys used to protect data at rest across services like S3, EBS, and RDS."
+        },
+        {
+          "id": "SCS-C03-0010",
+          "question": "A security architect needs to prevent any account in the organisation from launching EC2 instances outside of eu-west-1 and eu-west-2, regardless of the IAM permissions granted within those accounts. Which approach should they use?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Use a CloudFormation StackSet with a hook that blocks ec2:RunInstances in disallowed regions",
+              "isCorrect": false,
+              "explanation": "CloudFormation hooks validate CloudFormation-managed resources only, not direct API calls or console launches."
+            },
+            {
+              "id": "c2",
+              "text": "Create an IAM policy in each account that denies ec2:RunInstances outside eu-west-1 and eu-west-2, and attach it to every IAM user and role",
+              "isCorrect": false,
+              "explanation": "Per-account IAM policies can be removed by local administrators, and new users or roles might not receive the policy."
+            },
+            {
+              "id": "c1",
+              "text": "Attach a Service Control Policy (SCP) to the organisation root or target OUs that denies ec2:RunInstances unless the aws:RequestedRegion condition matches eu-west-1 or eu-west-2",
+              "isCorrect": true,
+              "explanation": "SCPs set maximum permission boundaries across all accounts in an OU or organisation, overriding any IAM policy within those accounts."
+            },
+            {
+              "id": "c3",
+              "text": "Deploy an AWS Config rule that evaluates EC2 instances and flags any launched outside the allowed regions as non-compliant",
+              "isCorrect": false,
+              "explanation": "Config rules are detective, not preventive - the instance would already be running before Config flags it."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "Organizations",
+            "IAM",
+            "Config",
+            "CloudFormation"
+          ],
+          "docs": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
+          "tip": "You need a preventive control that applies across all accounts regardless of each account's local IAM policies.",
+          "explanation": "Service Control Policies (SCPs) in AWS Organizations act as guardrails that define the maximum permissions available to all principals in member accounts."
+        },
+        {
+          "id": "SCS-C03-0008",
+          "question": "A security team wants to use AWS Config to detect S3 buckets that have public read access. Which CloudFormation resource snippet correctly defines this managed Config rule?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Enable S3 Block Public Access at the account level - this replaces the need for Config rules",
+              "isCorrect": false,
+              "explanation": "Block Public Access is preventive - it does not detect existing violations like a Config rule does."
+            },
+            {
+              "id": "c1",
+              "text": "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: AWS\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+              "isCorrect": true,
+              "explanation": "AWS managed Config rule using Owner: AWS and the standard S3 public read detection identifier."
+            },
+            {
+              "id": "c2",
+              "text": "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: CUSTOM\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+              "isCorrect": false,
+              "explanation": "Owner: CUSTOM is for custom rules backed by Lambda functions, not AWS managed rules."
+            },
+            {
+              "id": "c3",
+              "text": "Use AWS CloudTrail to monitor S3:GetBucketPolicy API calls and alert when public access is detected",
+              "isCorrect": false,
+              "explanation": "CloudTrail monitors API calls but does not provide continuous compliance evaluation like AWS Config."
+            }
+          ],
+          "selectCount": 1,
+          "format": "yaml",
+          "domain": "Detection",
+          "services": [
+            "Config",
+            "CloudFormation",
+            "S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html",
+          "tip": "AWS Config managed rules use Owner: AWS with a predefined SourceIdentifier.",
+          "explanation": "AWS Config managed rules are pre-built by AWS and referenced with Owner: AWS plus a SourceIdentifier like S3_BUCKET_PUBLIC_READ_PROHIBITED."
+        },
+        {
+          "id": "SCS-C03-0018",
+          "question": "A company runs workloads on Amazon EKS and needs each Kubernetes pod to assume a unique IAM role with fine-grained permissions. The trust policy must ensure only the intended service account in a specific namespace can assume the role. Which trust policy snippet correctly restricts role assumption to the pod's OIDC identity?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"eks.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}",
+              "isCorrect": false,
+              "explanation": "This trusts the EKS service itself (the control plane), not individual pod identities. Any EKS-managed component could assume this role, not just the intended pod."
+            },
+            {
+              "id": "c3",
+              "text": "{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:role/eks-node-role\"},\"Action\":\"sts:AssumeRole\"}",
+              "isCorrect": false,
+              "explanation": "Trusting the node role lets every pod on that node assume this role, eliminating per-pod isolation."
+            },
+            {
+              "id": "c4",
+              "text": "{\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"cognito-identity.amazonaws.com\"},\"Action\":\"sts:AssumeRoleWithWebIdentity\"}",
+              "isCorrect": false,
+              "explanation": "Cognito Identity is for end-user identity federation, not Kubernetes workload identity. EKS uses its own OIDC provider endpoint."
+            },
+            {
+              "id": "c1",
+              "text": "{\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE\"},\"Action\":\"sts:AssumeRoleWithWebIdentity\",\"Condition\":{\"StringEquals\":{\"oidc.eks.us-east-1.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE:sub\":\"system:serviceaccount:app-ns:app-sa\"}}}",
+              "isCorrect": true,
+              "explanation": "This uses the EKS OIDC provider as a Federated principal with AssumeRoleWithWebIdentity, and the Condition restricts the sub claim to the exact namespace:serviceaccount pair."
+            }
+          ],
+          "selectCount": 1,
+          "format": "json",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "STS",
+            "Cognito",
+            "EKS"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc.html",
+          "tip": "EKS IRSA (IAM Roles for Service Accounts) uses the cluster's OIDC provider URL as a federated principal and filters by the sub claim.",
+          "explanation": "IRSA projects a signed OIDC token into each pod, and the trust policy uses the cluster OIDC provider as a Federated principal with a Condition on the sub claim (namespace:serviceaccount). This ensures only the precise service account in the correct namespace can assume the role."
+        },
+        {
+          "id": "SCS-C03-0019",
+          "question": "A financial services firm must store audit logs for seven years in a manner that no user, including root, can delete or modify them before the retention period expires. Regulators require proof of immutability. Which S3 feature satisfies these requirements?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "S3 Versioning with an S3 Lifecycle rule to transition objects to Glacier after 30 days",
+              "isCorrect": false,
+              "explanation": "Versioning preserves prior versions but does not prevent deletion of version markers. Glacier transition reduces cost but does not enforce immutability."
+            },
+            {
+              "id": "c2",
+              "text": "S3 Object Lock in Governance mode with a seven-year retention period",
+              "isCorrect": false,
+              "explanation": "Governance mode allows users with the s3:BypassGovernanceRetention permission to delete objects before the retention period ends, which does not meet the absolute immutability requirement."
+            },
+            {
+              "id": "c1",
+              "text": "S3 Object Lock in Compliance mode with a seven-year retention period",
+              "isCorrect": true,
+              "explanation": "Compliance mode prevents anyone, including the root user, from deleting or overwriting an object version until the retention date passes. This satisfies regulatory immutability requirements."
+            },
+            {
+              "id": "c4",
+              "text": "Enable MFA Delete on the S3 bucket to require MFA for all delete operations",
+              "isCorrect": false,
+              "explanation": "MFA Delete requires an additional authentication step but does not make objects truly immutable. A user with MFA can still delete them at any time."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "S3",
+            "S3 Object Lock",
+            "Glacier",
+            "Backup"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+          "tip": "Compliance mode is the only S3 mechanism where even the root account cannot shorten or remove the retention lock.",
+          "explanation": "S3 Object Lock Compliance mode creates a WORM (Write Once Read Many) storage model. Once set, neither the object nor its retention settings can be altered or deleted by any principal until the retention period expires, meeting SEC 17a-4(f) and similar regulatory requirements."
+        },
+        {
+          "id": "SCS-C03-0024",
+          "question": "A security architect wants to continuously detect any S3 buckets, IAM roles, KMS keys, or Lambda functions that are shared with external AWS accounts or public access. The solution must generate findings automatically without requiring custom code. Which service should they enable?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Amazon GuardDuty",
+              "isCorrect": false,
+              "explanation": "GuardDuty detects threats based on anomalous behaviour and threat intelligence. It does not analyze resource policies to find intentional cross-account sharing or public access grants."
+            },
+            {
+              "id": "c2",
+              "text": "AWS Config with the s3-bucket-public-read-prohibited managed rule",
+              "isCorrect": false,
+              "explanation": "This Config rule only checks S3 public read access. It does not cover cross-account sharing of IAM roles, KMS keys, or Lambda functions."
+            },
+            {
+              "id": "c1",
+              "text": "IAM Access Analyzer",
+              "isCorrect": true,
+              "explanation": "Access Analyzer uses automated reasoning to analyze resource-based policies and identifies resources that are accessible from outside the zone of trust (account or organisation), generating findings for each."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Trusted Advisor security checks",
+              "isCorrect": false,
+              "explanation": "Trusted Advisor checks a limited set of security best practices (e.g., open security groups, root MFA) but does not perform policy-level analysis of cross-account resource sharing."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM Access Analyzer",
+            "IAM",
+            "S3",
+            "Lambda",
+            "KMS"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-getting-started.html",
+          "tip": "This service uses automated reasoning (formal logic) over policies, not anomaly detection or predefined compliance rules.",
+          "explanation": "IAM Access Analyzer applies Zelkova-based automated reasoning to evaluate resource-based policies on S3 buckets, SQS queues, IAM roles, KMS keys, Lambda functions, and Secrets Manager secrets. It produces actionable findings whenever a policy grants access outside the defined zone of trust, with no custom code required."
+        },
+        {
+          "id": "SCS-C03-0011",
+          "question": "A compliance requirement mandates that all CloudWatch Logs log groups must be encrypted at rest with a customer-managed KMS key and that the key policy must allow the CloudWatch Logs service principal to use it. Which combination of steps achieves this?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Enable SSE-S3 default encryption on the S3 bucket where CloudWatch Logs exports data and reference that bucket in each log group's settings",
+              "isCorrect": false,
+              "explanation": "S3 encryption applies only to exported log data in S3, not to log data stored within the CloudWatch Logs service itself."
+            },
+            {
+              "id": "c4",
+              "text": "Create an AWS-managed KMS key (alias aws/logs) and it will automatically encrypt all new log groups without any key policy changes",
+              "isCorrect": false,
+              "explanation": "CloudWatch Logs does not have an AWS-managed key. You must create and configure a customer-managed key explicitly."
+            },
+            {
+              "id": "c3",
+              "text": "Enable CloudTrail log file encryption with a KMS key and configure CloudWatch Logs as a CloudTrail destination",
+              "isCorrect": false,
+              "explanation": "CloudTrail encryption covers CloudTrail's own log files delivered to S3, not arbitrary CloudWatch Logs log groups."
+            },
+            {
+              "id": "c1",
+              "text": "Create a customer-managed KMS key with a key policy granting logs.<region>.amazonaws.com the kms:Encrypt, kms:Decrypt, kms:GenerateDataKey, and kms:DescribeKey actions, then associate the key with each log group",
+              "isCorrect": true,
+              "explanation": "CloudWatch Logs requires these four KMS actions in the key policy for the regional service principal to encrypt and decrypt log data."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "CloudWatch Logs",
+            "KMS",
+            "S3",
+            "CloudTrail"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html",
+          "tip": "CloudWatch Logs encryption requires a customer-managed CMK - there is no AWS-managed key option for this service.",
+          "explanation": "CloudWatch Logs supports encryption at rest only with customer-managed KMS keys. You must explicitly grant the regional service principal permission to use the key."
+        },
+        {
+          "id": "SCS-C03-0004",
+          "question": "Which feature helps enforce least privilege by providing temporary credentials?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Amazon Cognito",
+              "isCorrect": false,
+              "explanation": "Amazon Cognito provides user identity for apps, but the core mechanism for temporary AWS credentials is STS with roles."
+            },
+            {
+              "id": "c2",
+              "text": "IAM Users with long-term access keys",
+              "isCorrect": false,
+              "explanation": "IAM Users with long-term keys are not recommended for least-privilege patterns."
+            },
+            {
+              "id": "c3",
+              "text": "Security Groups",
+              "isCorrect": false,
+              "explanation": "Security Groups are network controls, not credential mechanisms."
+            },
+            {
+              "id": "c1",
+              "text": "IAM Roles with STS",
+              "isCorrect": true,
+              "explanation": "IAM Roles with STS allow issuance of temporary credentials for short-term access."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "STS",
+            "Cognito"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "tip": "Temporary credentials reduce the risk from long-lived keys.",
+          "explanation": "IAM Roles combined with AWS STS issue temporary credentials that automatically expire, reducing blast radius if leaked."
+        },
+        {
+          "id": "SCS-C03-0003",
+          "question": "To restrict traffic at the network edge for HTTP endpoints, which service should you combine with CloudFront?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "VPC Endpoint",
+              "isCorrect": false,
+              "explanation": "VPC Endpoints provide private connectivity to services within a VPC, not edge HTTP filtering."
+            },
+            {
+              "id": "c1",
+              "text": "AWS WAF",
+              "isCorrect": true,
+              "explanation": "AWS WAF is the web application firewall used with CloudFront to filter HTTP(S) traffic."
+            },
+            {
+              "id": "c4",
+              "text": "AWS KMS",
+              "isCorrect": false,
+              "explanation": "AWS KMS is for key management and encryption, not traffic filtering."
+            },
+            {
+              "id": "c2",
+              "text": "Security Groups",
+              "isCorrect": false,
+              "explanation": "Security Groups control traffic to EC2 at the instance level, not the CloudFront edge."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "WAF",
+            "CloudFront",
+            "Security Groups"
+          ],
+          "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+          "tip": "Think web application protection rules that block common attack patterns at the edge.",
+          "explanation": "AWS WAF integrates natively with CloudFront, ALB, and API Gateway to inspect and filter HTTP(S) requests using rules such as rate limiting and SQL injection detection."
+        },
+        {
+          "id": "SCS-C03-0023",
+          "question": "A web application team needs to ensure that TLS certificates on their internet-facing ALBs are renewed automatically without any manual intervention or downtime. Certificates must support multiple subdomain names (e.g., api.example.com, app.example.com). Which approach meets these requirements?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Generate a self-signed certificate for each subdomain and configure the ALB to present them using SNI",
+              "isCorrect": false,
+              "explanation": "Self-signed certificates are not trusted by browsers and will produce security warnings. They also require manual rotation, defeating the automation requirement."
+            },
+            {
+              "id": "c2",
+              "text": "Purchase a wildcard certificate from a third-party CA, import it into ACM, and set a calendar reminder to renew it annually",
+              "isCorrect": false,
+              "explanation": "Imported certificates in ACM are not automatically renewed. Manual renewal and re-import is required, which introduces risk of expiration and human error."
+            },
+            {
+              "id": "c3",
+              "text": "Use Let's Encrypt with certbot running on the ALB instances to obtain and renew certificates",
+              "isCorrect": false,
+              "explanation": "ALBs are managed services; you cannot run certbot or any agent on them. Let's Encrypt certificates must be imported into ACM, losing automatic renewal."
+            },
+            {
+              "id": "c1",
+              "text": "Request a public ACM certificate with Subject Alternative Names (SANs) for each subdomain using DNS validation, and associate it with the ALB",
+              "isCorrect": true,
+              "explanation": "ACM public certificates with DNS validation renew automatically as long as the CNAME validation records remain in place. SANs allow multiple subdomains on a single certificate, and ALB natively integrates with ACM for zero-downtime deployment."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "ACM",
+            "CloudFront",
+            "ALB",
+            "Route 53"
+          ],
+          "docs": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+          "tip": "ACM's automatic renewal only works for certificates it issues (not imported ones), and DNS validation is the set-and-forget option.",
+          "explanation": "AWS Certificate Manager issues free public certificates that renew automatically when DNS validation is used. By adding SANs for each subdomain, a single certificate covers multiple endpoints. ACM's native integration with ALB means certificate deployment and rotation happen transparently."
+        },
+        {
+          "id": "SCS-C03-0016",
+          "question": "A development team stores database credentials in environment variables baked into their container images. The security team requires that credentials be rotated every 30 days without redeploying containers and that all credential access be auditable. Which approach best meets these requirements?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Store credentials in SSM Parameter Store SecureString parameters and write a cron job to update them monthly",
+              "isCorrect": false,
+              "explanation": "Parameter Store SecureStrings can hold secrets but lack built-in automatic rotation. A cron job is fragile and requires custom coordination with both the parameter and the database."
+            },
+            {
+              "id": "c4",
+              "text": "Use IAM database authentication to eliminate passwords entirely",
+              "isCorrect": false,
+              "explanation": "IAM database authentication works only with supported engines (Aurora MySQL/PostgreSQL, RDS MySQL/PostgreSQL) and may not cover all the team's databases. It also does not address other types of credentials."
+            },
+            {
+              "id": "c3",
+              "text": "Encrypt the environment variables at build time with a KMS key and decrypt them at container start",
+              "isCorrect": false,
+              "explanation": "This protects secrets at rest in the image, but rotating requires rebuilding and redeploying the container, which violates the no-redeploy requirement."
+            },
+            {
+              "id": "c1",
+              "text": "Store credentials in AWS Secrets Manager with automatic rotation enabled and retrieve them at runtime using the Secrets Manager SDK",
+              "isCorrect": true,
+              "explanation": "Secrets Manager supports automatic rotation via Lambda, provides versioned secrets so applications always fetch the current value at runtime, and logs all access through CloudTrail."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "Secrets Manager",
+            "Parameter Store",
+            "KMS",
+            "Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+          "tip": "Automatic rotation without redeployment means the application must fetch secrets dynamically, not rely on values injected at build or deploy time.",
+          "explanation": "Secrets Manager is purpose-built for credential lifecycle management. Its rotation feature invokes a Lambda function on a schedule to update both the secret value and the target resource (e.g., RDS password), while applications retrieve the current secret at runtime, eliminating the need for redeployment."
+        },
+        {
+          "id": "SCS-C03-0007",
+          "question": "A security engineer needs to restrict an IAM role so it can only access a specific S3 bucket from a particular VPC endpoint. Which policy condition block should be added?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Add the VPC endpoint ID to the IAM role's trust policy as a Principal",
+              "isCorrect": false,
+              "explanation": "VPC endpoints are not IAM principals and cannot appear in a trust policy's Principal element."
+            },
+            {
+              "id": "c1",
+              "text": "{\"Condition\": {\"StringEquals\": {\"aws:sourceVpce\": \"vpce-1a2b3c4d\"}}}",
+              "isCorrect": true,
+              "explanation": "aws:sourceVpce condition restricts the policy to requests through the specified VPC endpoint."
+            },
+            {
+              "id": "c2",
+              "text": "{\"Condition\": {\"IpAddress\": {\"aws:SourceIp\": \"10.0.0.0/16\"}}}",
+              "isCorrect": false,
+              "explanation": "IpAddress/SourceIp restricts by IP range, not by VPC endpoint identity."
+            },
+            {
+              "id": "c4",
+              "text": "Attach a security group to the IAM role that only allows traffic from the VPC",
+              "isCorrect": false,
+              "explanation": "Security groups are network-level controls for ENIs - they cannot be attached to IAM roles."
+            }
+          ],
+          "selectCount": 1,
+          "format": "json",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "tip": "VPC endpoint restrictions in IAM use the aws:sourceVpce condition key with StringEquals.",
+          "explanation": "The aws:sourceVpce condition key with StringEquals restricts access to requests that traverse a specific VPC endpoint."
+        },
+        {
+          "id": "SCS-C03-0015",
+          "question": "A security team needs to provide shell access to EC2 instances in private subnets without opening SSH ports or managing bastion hosts, while maintaining a full audit trail of every command executed. Which solution meets these requirements?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Systems Manager Session Manager",
+              "isCorrect": true,
+              "explanation": "Session Manager establishes encrypted sessions through the SSM agent without opening inbound ports and can log sessions to S3 or CloudWatch Logs."
+            },
+            {
+              "id": "c3",
+              "text": "EC2 Instance Connect",
+              "isCorrect": false,
+              "explanation": "Instance Connect still requires port 22 and does not natively log full session content."
+            },
+            {
+              "id": "c4",
+              "text": "VPN to the private subnet and SSH",
+              "isCorrect": false,
+              "explanation": "VPN plus SSH captures metadata but not command-level audit content."
+            },
+            {
+              "id": "c2",
+              "text": "Deploy a bastion host with SSH key-based authentication",
+              "isCorrect": false,
+              "explanation": "Bastion hosts require open SSH ports and add operational burden."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "Systems Manager",
+            "EC2",
+            "IAM",
+            "CloudTrail"
+          ],
+          "docs": "https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html",
+          "tip": "Look for a service that provides shell access through an agent, not through network-level connectivity.",
+          "explanation": "Session Manager uses the SSM agent to create encrypted, IAM-authenticated sessions without inbound security group rules and logs session output for auditing."
+        },
+        {
+          "id": "SCS-C03-0001",
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Amazon SNS",
+              "isCorrect": false,
+              "explanation": "Amazon SNS is a notification service, not a security findings aggregator."
+            },
+            {
+              "id": "c1",
+              "text": "Amazon GuardDuty",
+              "isCorrect": true,
+              "explanation": "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior."
+            },
+            {
+              "id": "c3",
+              "text": "AWS WAF",
+              "isCorrect": false,
+              "explanation": "AWS WAF is a web application firewall focused on HTTP(S) protections."
+            },
+            {
+              "id": "c2",
+              "text": "AWS Config",
+              "isCorrect": false,
+              "explanation": "AWS Config tracks resource configuration and compliance, not threat detection."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty uses ML models and threat intelligence feeds to continuously detect threats across accounts. The closest wrong answer is AWS Config, which evaluates resource configuration compliance, whereas GuardDuty detects active threats."
+        },
+        {
+          "id": "SCS-C03-0013",
+          "question": "An organisation wants to automatically isolate an EC2 instance when GuardDuty detects cryptocurrency mining activity. Which architecture achieves automated remediation with the least operational overhead?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Use Systems Manager Automation runbooks triggered by a CPU alarm to stop instances",
+              "isCorrect": false,
+              "explanation": "CPU alarms are generic and can cause false positives."
+            },
+            {
+              "id": "c1",
+              "text": "Configure GuardDuty findings to flow into EventBridge and trigger a Lambda that isolates the instance",
+              "isCorrect": true,
+              "explanation": "EventBridge rules can filter GuardDuty finding types and invoke Lambda for automated remediation."
+            },
+            {
+              "id": "c2",
+              "text": "Enable Security Hub automated response playbooks to quarantine instances",
+              "isCorrect": false,
+              "explanation": "Security Hub aggregates findings but does not have built-in quarantine playbooks."
+            },
+            {
+              "id": "c3",
+              "text": "Schedule a Lambda to poll GuardDuty every five minutes and isolate flagged instances",
+              "isCorrect": false,
+              "explanation": "Polling introduces delay and extra maintenance."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "GuardDuty",
+            "Security Hub",
+            "EventBridge",
+            "Lambda",
+            "Systems Manager"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_finding-types-ec2.html",
+          "tip": "The key is event-driven, near-real-time response with minimal ongoing maintenance.",
+          "explanation": "GuardDuty publishes findings to EventBridge in near-real-time, enabling immediate Lambda-driven remediation."
+        },
+        {
+          "id": "SCS-C03-0017",
+          "question": "A network security team must capture all accepted and rejected traffic metadata for forensic analysis across 200 VPCs in a multi-account organisation. They need to query weeks of historical data on demand without maintaining always-on infrastructure. Which architecture meets these requirements most cost-effectively?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Send VPC Flow Logs to CloudWatch Logs in each account and use CloudWatch Logs Insights for queries",
+              "isCorrect": false,
+              "explanation": "CloudWatch Logs Insights works well for recent data but becomes expensive at high volume over weeks, and cross-account querying adds operational complexity compared to a centralised S3 approach."
+            },
+            {
+              "id": "c4",
+              "text": "Enable Traffic Mirroring on all ENIs and capture full packets for analysis",
+              "isCorrect": false,
+              "explanation": "Traffic Mirroring captures full packet payloads, which is vastly more data than flow log metadata, increasing costs dramatically and exceeding what the team requested."
+            },
+            {
+              "id": "c3",
+              "text": "Stream Flow Logs to an Amazon OpenSearch cluster for real-time dashboards and historical search",
+              "isCorrect": false,
+              "explanation": "OpenSearch provides powerful search but requires always-on cluster infrastructure, violating the no-maintained-infrastructure requirement and increasing cost."
+            },
+            {
+              "id": "c1",
+              "text": "Publish VPC Flow Logs to a centralised S3 bucket in the security account and query with Amazon Athena",
+              "isCorrect": true,
+              "explanation": "S3 storage is inexpensive at scale, and Athena provides serverless on-demand querying with no infrastructure to manage. Flow Logs support direct S3 delivery across accounts via resource policies."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "VPC Flow Logs",
+            "CloudWatch Logs",
+            "S3",
+            "Athena"
+          ],
+          "docs": "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html",
+          "tip": "For high-volume, infrequently-queried log data, think serverless query engines over managed log databases.",
+          "explanation": "VPC Flow Logs can deliver directly to S3 in Parquet format with Hive-compatible partitioning, and Athena charges only per query scanned. This combination handles cross-account aggregation at scale without provisioning or maintaining any infrastructure."
+        },
+        {
+          "id": "SCS-C03-0021",
+          "question": "A company needs to inspect all egress traffic from its VPC for data exfiltration patterns using Suricata-compatible IDS/IPS rules at the network layer. Security Groups and NACLs are already in place for basic access control. Which service should they deploy?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Configure more restrictive NACLs on the VPC subnets",
+              "isCorrect": false,
+              "explanation": "NACLs are stateless IP/port filters. They cannot inspect packet payloads or apply IDS/IPS signature-based rules."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Network Firewall",
+              "isCorrect": true,
+              "explanation": "Network Firewall is a managed, stateful network firewall that supports Suricata-compatible rules for deep packet inspection, IDS/IPS, and domain-based filtering on both ingress and egress traffic."
+            },
+            {
+              "id": "c3",
+              "text": "Tighten Security Group outbound rules to restrict destination IPs",
+              "isCorrect": false,
+              "explanation": "Security Groups provide stateful allow/deny by IP and port but cannot perform deep packet inspection or pattern-based detection of data exfiltration."
+            },
+            {
+              "id": "c2",
+              "text": "AWS WAF",
+              "isCorrect": false,
+              "explanation": "WAF operates at Layer 7 (HTTP/HTTPS) and integrates with CloudFront, ALB, and API Gateway. It cannot inspect arbitrary TCP/UDP egress traffic or run Suricata rules."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "Network Firewall",
+            "WAF",
+            "Security Groups",
+            "NACLs"
+          ],
+          "docs": "https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html",
+          "tip": "When the requirement mentions Suricata, IDS/IPS, or deep packet inspection at the network layer, think beyond Security Groups and WAF.",
+          "explanation": "AWS Network Firewall sits in-line in VPC traffic paths (via Gateway Load Balancer endpoints or firewall subnets) and evaluates packets against stateful Suricata-compatible rule groups. It fills the gap between simple Security Group/NACL controls and full deep-packet inspection requirements."
+        },
+        {
+          "id": "SCS-C03-0022",
+          "question": "An operations team wants to automate incident response when a critical CloudWatch alarm triggers: page the on-call engineer, create a timeline, and start a runbook to collect diagnostic data. They want a single AWS-native service to orchestrate all three actions. Which service should they configure?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Amazon SNS with multiple topic subscriptions",
+              "isCorrect": false,
+              "explanation": "SNS delivers notifications but does not manage incident timelines, runbook execution, or structured escalation workflows."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Systems Manager Incident Manager",
+              "isCorrect": true,
+              "explanation": "Incident Manager automates incident creation with response plans that define escalation contacts, engagement protocols, and runbook automation, all triggered by CloudWatch alarms or EventBridge rules."
+            },
+            {
+              "id": "c2",
+              "text": "Amazon EventBridge with Lambda targets",
+              "isCorrect": false,
+              "explanation": "EventBridge plus Lambda can achieve similar automation but requires custom code for paging, timeline tracking, and runbook execution. It is not a single orchestration service purpose-built for incident response."
+            },
+            {
+              "id": "c4",
+              "text": "AWS CloudWatch composite alarms with auto-scaling actions",
+              "isCorrect": false,
+              "explanation": "Composite alarms aggregate alarm states but their actions are limited to SNS, Lambda, or Auto Scaling. They do not provide incident lifecycle management."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Systems Manager Incident Manager",
+            "EventBridge",
+            "SNS",
+            "PagerDuty"
+          ],
+          "docs": "https://docs.aws.amazon.com/incident-manager/latest/userguide/what-is-incident-manager.html",
+          "tip": "Look for a service that combines paging, incident timeline, and runbook automation in a single response plan.",
+          "explanation": "Incident Manager provides structured response plans that automatically engage contacts (via SMS, voice, or email), create incident timelines, and execute SSM Automation runbooks when triggered. This consolidates incident orchestration into one service rather than gluing multiple services together with custom logic."
+        },
+        {
+          "id": "SCS-C03-0012",
+          "question": "A platform team wants to allow developers to create their own IAM roles for Lambda functions, but ensure those roles can never have permissions beyond what the platform team defines. Which mechanism should they use?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Use an SCP to deny iam:CreateRole for all developers and have the platform team create roles on request",
+              "isCorrect": false,
+              "explanation": "This removes developer self-service entirely, creating operational bottlenecks without enabling delegation."
+            },
+            {
+              "id": "c2",
+              "text": "Grant developers iam:CreateRole but restrict the role's trust policy to lambda.amazonaws.com only",
+              "isCorrect": false,
+              "explanation": "Restricting the trust policy limits who can assume the role, but does not limit what permissions the role itself can have."
+            },
+            {
+              "id": "c1",
+              "text": "Require developers to attach a permissions boundary to every role they create",
+              "isCorrect": true,
+              "explanation": "Permissions boundaries cap the maximum permissions a role can have, even if the role's identity policy grants broader access."
+            },
+            {
+              "id": "c3",
+              "text": "Create a single shared Lambda execution role managed by the platform team",
+              "isCorrect": false,
+              "explanation": "A shared role works but violates least privilege because all functions share the same permissions regardless of their needs."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "Organizations",
+            "STS"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html",
+          "tip": "You need a mechanism that caps maximum permissions while still allowing developers to create and manage their own roles.",
+          "explanation": "IAM permissions boundaries act as a ceiling on the effective permissions of a role or user."
+        },
+        {
+          "id": "SCS-C03-0009",
+          "question": "A company stores customer PII in S3 and needs to automatically discover and classify sensitive data across hundreds of buckets. Which service should they enable?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Amazon GuardDuty",
+              "isCorrect": false,
+              "explanation": "GuardDuty detects threats like unusual API calls to S3 but does not inspect object contents for sensitive data."
+            },
+            {
+              "id": "c1",
+              "text": "Amazon Macie",
+              "isCorrect": true,
+              "explanation": "Macie scans S3 objects for PII, financial data, and credentials using ML-powered classifiers and managed data identifiers."
+            },
+            {
+              "id": "c4",
+              "text": "AWS Trusted Advisor",
+              "isCorrect": false,
+              "explanation": "Trusted Advisor provides account-level checks like open security groups, but does not scan S3 object contents."
+            },
+            {
+              "id": "c3",
+              "text": "Amazon Inspector",
+              "isCorrect": false,
+              "explanation": "Inspector focuses on vulnerability scanning for compute workloads, not data classification in S3."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "Macie",
+            "GuardDuty",
+            "Inspector",
+            "Trusted Advisor"
+          ],
+          "docs": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+          "tip": "This service is purpose-built for finding sensitive data like credit card numbers and passport IDs inside S3 objects.",
+          "explanation": "Amazon Macie is designed to scan S3 objects and classify sensitive content such as PII and PHI using managed data identifiers."
+        }
+      ]
+    },
+    {
+      "attemptId": "ad5d80d0-3019-4a08-8984-f11a11e59d49",
+      "userId": "dev-user-001",
+      "examCode": "SCS-C03",
+      "examVersion": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-02-17T08:27:34.058Z",
+      "finishedAt": null,
+      "score": null,
+      "answers": [
+        {
+          "questionId": "SCS-C03-0007",
+          "selectedChoiceId": "c1",
+          "selectedChoiceIds": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-17T08:29:59.781Z"
+        },
+        {
+          "questionId": "SCS-C03-0024",
+          "selectedChoiceId": "c4",
+          "selectedChoiceIds": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-17T08:32:12.702Z"
+        },
+        {
+          "questionId": "SCS-C03-0020",
+          "selectedChoiceId": "c1",
+          "selectedChoiceIds": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-02-17T08:34:15.868Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "SCS-C03-0025",
+          "question": "A Lambda function in a private subnet needs to call the Secrets Manager API to retrieve database credentials. The security team prohibits all internet-bound traffic from the VPC. How should the architect configure network access so the Lambda function can reach Secrets Manager without traversing the internet?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Attach an Elastic IP to the Lambda function's ENI for direct outbound access",
+              "isCorrect": false,
+              "explanation": "Lambda functions in a VPC do not support Elastic IPs, and this approach would use the internet gateway, which is prohibited."
+            },
+            {
+              "id": "c4",
+              "text": "Configure the Lambda function outside the VPC so it can access Secrets Manager over the internet by default",
+              "isCorrect": false,
+              "explanation": "Placing the function outside the VPC gives it internet access to AWS APIs, but the question states the function is in a private subnet, and moving it out may break access to other VPC resources like the database."
+            },
+            {
+              "id": "c2",
+              "text": "Add a NAT Gateway to the VPC and route the Lambda subnet's traffic through it",
+              "isCorrect": false,
+              "explanation": "A NAT Gateway provides internet access for outbound traffic, which violates the security team's prohibition on internet-bound traffic from the VPC."
+            },
+            {
+              "id": "c1",
+              "text": "Create an interface VPC endpoint (PrivateLink) for Secrets Manager in the same VPC and ensure the Lambda function's security group allows outbound HTTPS to the endpoint",
+              "isCorrect": true,
+              "explanation": "An interface VPC endpoint creates private ENIs within the VPC that route traffic to the Secrets Manager API entirely over the AWS private network, with no internet path required."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "Lambda",
+            "VPC",
+            "NAT Gateway",
+            "PrivateLink",
+            "Secrets Manager"
+          ],
+          "docs": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html",
+          "tip": "When internet access is prohibited, PrivateLink endpoints bring AWS service APIs into the VPC over private connections.",
+          "explanation": "Interface VPC endpoints (powered by AWS PrivateLink) create private IP addresses inside the VPC that serve as entry points for AWS service APIs. Traffic never leaves the AWS network, satisfying zero-internet-egress security requirements while allowing Lambda to call Secrets Manager."
+        },
+        {
+          "id": "SCS-C03-0015",
+          "question": "A security team needs to provide shell access to EC2 instances in private subnets without opening SSH ports or managing bastion hosts, while maintaining a full audit trail of every command executed. Which solution meets these requirements?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "VPN to the private subnet and SSH",
+              "isCorrect": false,
+              "explanation": "VPN plus SSH captures metadata but not command-level audit content."
+            },
+            {
+              "id": "c3",
+              "text": "EC2 Instance Connect",
+              "isCorrect": false,
+              "explanation": "Instance Connect still requires port 22 and does not natively log full session content."
+            },
+            {
+              "id": "c1",
+              "text": "Systems Manager Session Manager",
+              "isCorrect": true,
+              "explanation": "Session Manager establishes encrypted sessions through the SSM agent without opening inbound ports and can log sessions to S3 or CloudWatch Logs."
+            },
+            {
+              "id": "c2",
+              "text": "Deploy a bastion host with SSH key-based authentication",
+              "isCorrect": false,
+              "explanation": "Bastion hosts require open SSH ports and add operational burden."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "Systems Manager",
+            "EC2",
+            "IAM",
+            "CloudTrail"
+          ],
+          "docs": "https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html",
+          "tip": "Look for a service that provides shell access through an agent, not through network-level connectivity.",
+          "explanation": "Session Manager uses the SSM agent to create encrypted, IAM-authenticated sessions without inbound security group rules and logs session output for auditing."
+        },
+        {
+          "id": "SCS-C03-0017",
+          "question": "A network security team must capture all accepted and rejected traffic metadata for forensic analysis across 200 VPCs in a multi-account organisation. They need to query weeks of historical data on demand without maintaining always-on infrastructure. Which architecture meets these requirements most cost-effectively?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Send VPC Flow Logs to CloudWatch Logs in each account and use CloudWatch Logs Insights for queries",
+              "isCorrect": false,
+              "explanation": "CloudWatch Logs Insights works well for recent data but becomes expensive at high volume over weeks, and cross-account querying adds operational complexity compared to a centralised S3 approach."
+            },
+            {
+              "id": "c4",
+              "text": "Enable Traffic Mirroring on all ENIs and capture full packets for analysis",
+              "isCorrect": false,
+              "explanation": "Traffic Mirroring captures full packet payloads, which is vastly more data than flow log metadata, increasing costs dramatically and exceeding what the team requested."
+            },
+            {
+              "id": "c3",
+              "text": "Stream Flow Logs to an Amazon OpenSearch cluster for real-time dashboards and historical search",
+              "isCorrect": false,
+              "explanation": "OpenSearch provides powerful search but requires always-on cluster infrastructure, violating the no-maintained-infrastructure requirement and increasing cost."
+            },
+            {
+              "id": "c1",
+              "text": "Publish VPC Flow Logs to a centralised S3 bucket in the security account and query with Amazon Athena",
+              "isCorrect": true,
+              "explanation": "S3 storage is inexpensive at scale, and Athena provides serverless on-demand querying with no infrastructure to manage. Flow Logs support direct S3 delivery across accounts via resource policies."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "VPC Flow Logs",
+            "CloudWatch Logs",
+            "S3",
+            "Athena"
+          ],
+          "docs": "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html",
+          "tip": "For high-volume, infrequently-queried log data, think serverless query engines over managed log databases.",
+          "explanation": "VPC Flow Logs can deliver directly to S3 in Parquet format with Hive-compatible partitioning, and Athena charges only per query scanned. This combination handles cross-account aggregation at scale without provisioning or maintaining any infrastructure."
+        },
+        {
+          "id": "SCS-C03-0024",
+          "question": "A security architect wants to continuously detect any S3 buckets, IAM roles, KMS keys, or Lambda functions that are shared with external AWS accounts or public access. The solution must generate findings automatically without requiring custom code. Which service should they enable?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Amazon GuardDuty",
+              "isCorrect": false,
+              "explanation": "GuardDuty detects threats based on anomalous behaviour and threat intelligence. It does not analyze resource policies to find intentional cross-account sharing or public access grants."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Trusted Advisor security checks",
+              "isCorrect": false,
+              "explanation": "Trusted Advisor checks a limited set of security best practices (e.g., open security groups, root MFA) but does not perform policy-level analysis of cross-account resource sharing."
+            },
+            {
+              "id": "c2",
+              "text": "AWS Config with the s3-bucket-public-read-prohibited managed rule",
+              "isCorrect": false,
+              "explanation": "This Config rule only checks S3 public read access. It does not cover cross-account sharing of IAM roles, KMS keys, or Lambda functions."
+            },
+            {
+              "id": "c1",
+              "text": "IAM Access Analyzer",
+              "isCorrect": true,
+              "explanation": "Access Analyzer uses automated reasoning to analyze resource-based policies and identifies resources that are accessible from outside the zone of trust (account or organisation), generating findings for each."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM Access Analyzer",
+            "IAM",
+            "S3",
+            "Lambda",
+            "KMS"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-getting-started.html",
+          "tip": "This service uses automated reasoning (formal logic) over policies, not anomaly detection or predefined compliance rules.",
+          "explanation": "IAM Access Analyzer applies Zelkova-based automated reasoning to evaluate resource-based policies on S3 buckets, SQS queues, IAM roles, KMS keys, Lambda functions, and Secrets Manager secrets. It produces actionable findings whenever a policy grants access outside the defined zone of trust, with no custom code required."
+        },
+        {
+          "id": "SCS-C03-0019",
+          "question": "A financial services firm must store audit logs for seven years in a manner that no user, including root, can delete or modify them before the retention period expires. Regulators require proof of immutability. Which S3 feature satisfies these requirements?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "S3 Object Lock in Governance mode with a seven-year retention period",
+              "isCorrect": false,
+              "explanation": "Governance mode allows users with the s3:BypassGovernanceRetention permission to delete objects before the retention period ends, which does not meet the absolute immutability requirement."
+            },
+            {
+              "id": "c1",
+              "text": "S3 Object Lock in Compliance mode with a seven-year retention period",
+              "isCorrect": true,
+              "explanation": "Compliance mode prevents anyone, including the root user, from deleting or overwriting an object version until the retention date passes. This satisfies regulatory immutability requirements."
+            },
+            {
+              "id": "c3",
+              "text": "S3 Versioning with an S3 Lifecycle rule to transition objects to Glacier after 30 days",
+              "isCorrect": false,
+              "explanation": "Versioning preserves prior versions but does not prevent deletion of version markers. Glacier transition reduces cost but does not enforce immutability."
+            },
+            {
+              "id": "c4",
+              "text": "Enable MFA Delete on the S3 bucket to require MFA for all delete operations",
+              "isCorrect": false,
+              "explanation": "MFA Delete requires an additional authentication step but does not make objects truly immutable. A user with MFA can still delete them at any time."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "S3",
+            "S3 Object Lock",
+            "Glacier",
+            "Backup"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+          "tip": "Compliance mode is the only S3 mechanism where even the root account cannot shorten or remove the retention lock.",
+          "explanation": "S3 Object Lock Compliance mode creates a WORM (Write Once Read Many) storage model. Once set, neither the object nor its retention settings can be altered or deleted by any principal until the retention period expires, meeting SEC 17a-4(f) and similar regulatory requirements."
+        },
+        {
+          "id": "SCS-C03-0004",
+          "question": "Which feature helps enforce least privilege by providing temporary credentials?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Amazon Cognito",
+              "isCorrect": false,
+              "explanation": "Amazon Cognito provides user identity for apps, but the core mechanism for temporary AWS credentials is STS with roles."
+            },
+            {
+              "id": "c1",
+              "text": "IAM Roles with STS",
+              "isCorrect": true,
+              "explanation": "IAM Roles with STS allow issuance of temporary credentials for short-term access."
+            },
+            {
+              "id": "c3",
+              "text": "Security Groups",
+              "isCorrect": false,
+              "explanation": "Security Groups are network controls, not credential mechanisms."
+            },
+            {
+              "id": "c2",
+              "text": "IAM Users with long-term access keys",
+              "isCorrect": false,
+              "explanation": "IAM Users with long-term keys are not recommended for least-privilege patterns."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "STS",
+            "Cognito"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "tip": "Temporary credentials reduce the risk from long-lived keys.",
+          "explanation": "IAM Roles combined with AWS STS issue temporary credentials that automatically expire, reducing blast radius if leaked."
+        },
+        {
+          "id": "SCS-C03-0020",
+          "question": "After enabling GuardDuty S3 Protection, a security analyst notices a finding of type Policy:S3/BucketAnonymousAccessGranted for a production data bucket. The analyst needs to determine which principal changed the bucket policy and when. Which data source provides this information?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "VPC Flow Logs for the VPC where the analyst is working",
+              "isCorrect": false,
+              "explanation": "VPC Flow Logs capture network-layer metadata (IP, port, protocol) but not API-level details like which principal called PutBucketPolicy."
+            },
+            {
+              "id": "c3",
+              "text": "S3 server access logs for the data bucket",
+              "isCorrect": false,
+              "explanation": "S3 server access logs capture object-level read/write requests, not bucket policy changes. Control-plane actions like PutBucketPolicy are not recorded in access logs."
+            },
+            {
+              "id": "c2",
+              "text": "The GuardDuty finding detail itself, which includes the actor and timestamp",
+              "isCorrect": false,
+              "explanation": "GuardDuty findings identify the affected resource and the anomaly but do not always include the full details of who made the original policy change. CloudTrail provides the definitive audit trail."
+            },
+            {
+              "id": "c1",
+              "text": "CloudTrail management events showing the PutBucketPolicy API call",
+              "isCorrect": true,
+              "explanation": "CloudTrail records the identity (principal), timestamp, source IP, and request parameters for S3 control-plane API calls like PutBucketPolicy. This is the authoritative source for who changed the policy and when."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "CloudTrail",
+            "S3",
+            "Security Hub"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_s3-protection.html",
+          "tip": "Distinguish between data-plane logs (S3 access logs, VPC Flow Logs) and control-plane logs (CloudTrail) when investigating policy changes.",
+          "explanation": "CloudTrail management events are the single source of truth for AWS API activity. When investigating who changed a resource configuration, always start with CloudTrail, which records the IAM principal, the API action, the request parameters, and the exact timestamp."
+        },
+        {
+          "id": "SCS-C03-0012",
+          "question": "A platform team wants to allow developers to create their own IAM roles for Lambda functions, but ensure those roles can never have permissions beyond what the platform team defines. Which mechanism should they use?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Require developers to attach a permissions boundary to every role they create",
+              "isCorrect": true,
+              "explanation": "Permissions boundaries cap the maximum permissions a role can have, even if the role's identity policy grants broader access."
+            },
+            {
+              "id": "c3",
+              "text": "Create a single shared Lambda execution role managed by the platform team",
+              "isCorrect": false,
+              "explanation": "A shared role works but violates least privilege because all functions share the same permissions regardless of their needs."
+            },
+            {
+              "id": "c2",
+              "text": "Grant developers iam:CreateRole but restrict the role's trust policy to lambda.amazonaws.com only",
+              "isCorrect": false,
+              "explanation": "Restricting the trust policy limits who can assume the role, but does not limit what permissions the role itself can have."
+            },
+            {
+              "id": "c4",
+              "text": "Use an SCP to deny iam:CreateRole for all developers and have the platform team create roles on request",
+              "isCorrect": false,
+              "explanation": "This removes developer self-service entirely, creating operational bottlenecks without enabling delegation."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "Organizations",
+            "STS"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html",
+          "tip": "You need a mechanism that caps maximum permissions while still allowing developers to create and manage their own roles.",
+          "explanation": "IAM permissions boundaries act as a ceiling on the effective permissions of a role or user."
+        },
+        {
+          "id": "SCS-C03-0021",
+          "question": "A company needs to inspect all egress traffic from its VPC for data exfiltration patterns using Suricata-compatible IDS/IPS rules at the network layer. Security Groups and NACLs are already in place for basic access control. Which service should they deploy?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Configure more restrictive NACLs on the VPC subnets",
+              "isCorrect": false,
+              "explanation": "NACLs are stateless IP/port filters. They cannot inspect packet payloads or apply IDS/IPS signature-based rules."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Network Firewall",
+              "isCorrect": true,
+              "explanation": "Network Firewall is a managed, stateful network firewall that supports Suricata-compatible rules for deep packet inspection, IDS/IPS, and domain-based filtering on both ingress and egress traffic."
+            },
+            {
+              "id": "c3",
+              "text": "Tighten Security Group outbound rules to restrict destination IPs",
+              "isCorrect": false,
+              "explanation": "Security Groups provide stateful allow/deny by IP and port but cannot perform deep packet inspection or pattern-based detection of data exfiltration."
+            },
+            {
+              "id": "c2",
+              "text": "AWS WAF",
+              "isCorrect": false,
+              "explanation": "WAF operates at Layer 7 (HTTP/HTTPS) and integrates with CloudFront, ALB, and API Gateway. It cannot inspect arbitrary TCP/UDP egress traffic or run Suricata rules."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "Network Firewall",
+            "WAF",
+            "Security Groups",
+            "NACLs"
+          ],
+          "docs": "https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html",
+          "tip": "When the requirement mentions Suricata, IDS/IPS, or deep packet inspection at the network layer, think beyond Security Groups and WAF.",
+          "explanation": "AWS Network Firewall sits in-line in VPC traffic paths (via Gateway Load Balancer endpoints or firewall subnets) and evaluates packets against stateful Suricata-compatible rule groups. It fills the gap between simple Security Group/NACL controls and full deep-packet inspection requirements."
+        },
+        {
+          "id": "SCS-C03-0018",
+          "question": "A company runs workloads on Amazon EKS and needs each Kubernetes pod to assume a unique IAM role with fine-grained permissions. The trust policy must ensure only the intended service account in a specific namespace can assume the role. Which trust policy snippet correctly restricts role assumption to the pod's OIDC identity?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:role/eks-node-role\"},\"Action\":\"sts:AssumeRole\"}",
+              "isCorrect": false,
+              "explanation": "Trusting the node role lets every pod on that node assume this role, eliminating per-pod isolation."
+            },
+            {
+              "id": "c1",
+              "text": "{\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE\"},\"Action\":\"sts:AssumeRoleWithWebIdentity\",\"Condition\":{\"StringEquals\":{\"oidc.eks.us-east-1.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE:sub\":\"system:serviceaccount:app-ns:app-sa\"}}}",
+              "isCorrect": true,
+              "explanation": "This uses the EKS OIDC provider as a Federated principal with AssumeRoleWithWebIdentity, and the Condition restricts the sub claim to the exact namespace:serviceaccount pair."
+            },
+            {
+              "id": "c4",
+              "text": "{\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"cognito-identity.amazonaws.com\"},\"Action\":\"sts:AssumeRoleWithWebIdentity\"}",
+              "isCorrect": false,
+              "explanation": "Cognito Identity is for end-user identity federation, not Kubernetes workload identity. EKS uses its own OIDC provider endpoint."
+            },
+            {
+              "id": "c2",
+              "text": "{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"eks.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}",
+              "isCorrect": false,
+              "explanation": "This trusts the EKS service itself (the control plane), not individual pod identities. Any EKS-managed component could assume this role, not just the intended pod."
+            }
+          ],
+          "selectCount": 1,
+          "format": "json",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "STS",
+            "Cognito",
+            "EKS"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc.html",
+          "tip": "EKS IRSA (IAM Roles for Service Accounts) uses the cluster's OIDC provider URL as a federated principal and filters by the sub claim.",
+          "explanation": "IRSA projects a signed OIDC token into each pod, and the trust policy uses the cluster OIDC provider as a Federated principal with a Condition on the sub claim (namespace:serviceaccount). This ensures only the precise service account in the correct namespace can assume the role."
+        },
+        {
+          "id": "SCS-C03-0016",
+          "question": "A development team stores database credentials in environment variables baked into their container images. The security team requires that credentials be rotated every 30 days without redeploying containers and that all credential access be auditable. Which approach best meets these requirements?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Encrypt the environment variables at build time with a KMS key and decrypt them at container start",
+              "isCorrect": false,
+              "explanation": "This protects secrets at rest in the image, but rotating requires rebuilding and redeploying the container, which violates the no-redeploy requirement."
+            },
+            {
+              "id": "c2",
+              "text": "Store credentials in SSM Parameter Store SecureString parameters and write a cron job to update them monthly",
+              "isCorrect": false,
+              "explanation": "Parameter Store SecureStrings can hold secrets but lack built-in automatic rotation. A cron job is fragile and requires custom coordination with both the parameter and the database."
+            },
+            {
+              "id": "c1",
+              "text": "Store credentials in AWS Secrets Manager with automatic rotation enabled and retrieve them at runtime using the Secrets Manager SDK",
+              "isCorrect": true,
+              "explanation": "Secrets Manager supports automatic rotation via Lambda, provides versioned secrets so applications always fetch the current value at runtime, and logs all access through CloudTrail."
+            },
+            {
+              "id": "c4",
+              "text": "Use IAM database authentication to eliminate passwords entirely",
+              "isCorrect": false,
+              "explanation": "IAM database authentication works only with supported engines (Aurora MySQL/PostgreSQL, RDS MySQL/PostgreSQL) and may not cover all the team's databases. It also does not address other types of credentials."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "Secrets Manager",
+            "Parameter Store",
+            "KMS",
+            "Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+          "tip": "Automatic rotation without redeployment means the application must fetch secrets dynamically, not rely on values injected at build or deploy time.",
+          "explanation": "Secrets Manager is purpose-built for credential lifecycle management. Its rotation feature invokes a Lambda function on a schedule to update both the secret value and the target resource (e.g., RDS password), while applications retrieve the current secret at runtime, eliminating the need for redeployment."
+        },
+        {
+          "id": "SCS-C03-0001",
+          "question": "Which AWS service helps aggregate and analyze security findings across accounts?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "AWS WAF",
+              "isCorrect": false,
+              "explanation": "AWS WAF is a web application firewall focused on HTTP(S) protections."
+            },
+            {
+              "id": "c4",
+              "text": "Amazon SNS",
+              "isCorrect": false,
+              "explanation": "Amazon SNS is a notification service, not a security findings aggregator."
+            },
+            {
+              "id": "c1",
+              "text": "Amazon GuardDuty",
+              "isCorrect": true,
+              "explanation": "GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior."
+            },
+            {
+              "id": "c2",
+              "text": "AWS Config",
+              "isCorrect": false,
+              "explanation": "AWS Config tracks resource configuration and compliance, not threat detection."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "GuardDuty",
+            "Config",
+            "WAF",
+            "SNS"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "tip": "Think of a service that detects threats across your account using machine learning and threat intelligence.",
+          "explanation": "Amazon GuardDuty uses ML models and threat intelligence feeds to continuously detect threats across accounts. The closest wrong answer is AWS Config, which evaluates resource configuration compliance, whereas GuardDuty detects active threats."
+        },
+        {
+          "id": "SCS-C03-0006",
+          "question": "A security team needs to centrally manage findings from multiple AWS security services and ensure encryption of sensitive data at rest. Which TWO services should they use together? (Select TWO)",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "AWS Security Hub",
+              "isCorrect": true,
+              "explanation": "Security Hub provides a comprehensive view of security alerts and compliance status across accounts."
+            },
+            {
+              "id": "c5",
+              "text": "Amazon EC2",
+              "isCorrect": false,
+              "explanation": "EC2 provides virtual machines, not security findings management."
+            },
+            {
+              "id": "c2",
+              "text": "AWS KMS",
+              "isCorrect": true,
+              "explanation": "KMS provides centralized encryption key management for encrypting data at rest."
+            },
+            {
+              "id": "c3",
+              "text": "Amazon SQS",
+              "isCorrect": false,
+              "explanation": "SQS is a message queuing service, not related to security findings or encryption."
+            },
+            {
+              "id": "c4",
+              "text": "AWS CloudFormation",
+              "isCorrect": false,
+              "explanation": "CloudFormation is an infrastructure-as-code service, not a security findings tool."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Detection",
+          "services": [
+            "Security Hub",
+            "KMS",
+            "SQS",
+            "CloudFormation",
+            "EC2"
+          ],
+          "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+          "tip": "Think about centralized findings aggregation and key management.",
+          "explanation": "Security Hub aggregates and normalizes findings and KMS provides the keys to encrypt sensitive data."
+        },
+        {
+          "id": "SCS-C03-0002",
+          "question": "During an incident, which service lets you run investigative notebooks and analyze data?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Amazon Detective",
+              "isCorrect": true,
+              "explanation": "Amazon Detective is designed to analyze, visualize, and conduct investigations into potential security issues."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Systems Manager",
+              "isCorrect": false,
+              "explanation": "Systems Manager helps manage instances but is not focused on security investigation notebooks."
+            },
+            {
+              "id": "c4",
+              "text": "AWS CloudTrail",
+              "isCorrect": false,
+              "explanation": "CloudTrail records API activity and is useful for forensics, but Detective provides investigative workflows."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Shield",
+              "isCorrect": false,
+              "explanation": "AWS Shield provides DDoS protections, not forensic investigation tools."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Detective",
+            "Systems Manager",
+            "Shield",
+            "CloudTrail"
+          ],
+          "docs": "https://docs.aws.amazon.com/detective/latest/adminguide/what-is.html",
+          "tip": "This service helps visualize and investigate security issues by linking related findings and activity.",
+          "explanation": "Amazon Detective automatically collects log data from VPC Flow Logs, CloudTrail, and GuardDuty, then builds a graph model that links related events so analysts can visually trace activity."
+        },
+        {
+          "id": "SCS-C03-0005",
+          "question": "Which service provides managed encryption keys that you can use to encrypt data at rest?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "AWS IAM",
+              "isCorrect": false,
+              "explanation": "AWS IAM handles identity and permissions, not key storage or encryption primitives."
+            },
+            {
+              "id": "c1",
+              "text": "AWS KMS",
+              "isCorrect": true,
+              "explanation": "AWS KMS is the managed service for creating and controlling encryption keys."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Shield",
+              "isCorrect": false,
+              "explanation": "AWS Shield protects against DDoS attacks, not key management."
+            },
+            {
+              "id": "c4",
+              "text": "AWS WAF",
+              "isCorrect": false,
+              "explanation": "AWS WAF is a web application firewall, not key management."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "KMS",
+            "IAM",
+            "Shield",
+            "WAF"
+          ],
+          "docs": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+          "tip": "Key management service with envelope encryption support.",
+          "explanation": "AWS KMS provides centralized creation, rotation, and access control of encryption keys used to protect data at rest across services like S3, EBS, and RDS."
+        },
+        {
+          "id": "SCS-C03-0022",
+          "question": "An operations team wants to automate incident response when a critical CloudWatch alarm triggers: page the on-call engineer, create a timeline, and start a runbook to collect diagnostic data. They want a single AWS-native service to orchestrate all three actions. Which service should they configure?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Amazon EventBridge with Lambda targets",
+              "isCorrect": false,
+              "explanation": "EventBridge plus Lambda can achieve similar automation but requires custom code for paging, timeline tracking, and runbook execution. It is not a single orchestration service purpose-built for incident response."
+            },
+            {
+              "id": "c3",
+              "text": "Amazon SNS with multiple topic subscriptions",
+              "isCorrect": false,
+              "explanation": "SNS delivers notifications but does not manage incident timelines, runbook execution, or structured escalation workflows."
+            },
+            {
+              "id": "c4",
+              "text": "AWS CloudWatch composite alarms with auto-scaling actions",
+              "isCorrect": false,
+              "explanation": "Composite alarms aggregate alarm states but their actions are limited to SNS, Lambda, or Auto Scaling. They do not provide incident lifecycle management."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Systems Manager Incident Manager",
+              "isCorrect": true,
+              "explanation": "Incident Manager automates incident creation with response plans that define escalation contacts, engagement protocols, and runbook automation, all triggered by CloudWatch alarms or EventBridge rules."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "Systems Manager Incident Manager",
+            "EventBridge",
+            "SNS",
+            "PagerDuty"
+          ],
+          "docs": "https://docs.aws.amazon.com/incident-manager/latest/userguide/what-is-incident-manager.html",
+          "tip": "Look for a service that combines paging, incident timeline, and runbook automation in a single response plan.",
+          "explanation": "Incident Manager provides structured response plans that automatically engage contacts (via SMS, voice, or email), create incident timelines, and execute SSM Automation runbooks when triggered. This consolidates incident orchestration into one service rather than gluing multiple services together with custom logic."
+        },
+        {
+          "id": "SCS-C03-0003",
+          "question": "To restrict traffic at the network edge for HTTP endpoints, which service should you combine with CloudFront?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "VPC Endpoint",
+              "isCorrect": false,
+              "explanation": "VPC Endpoints provide private connectivity to services within a VPC, not edge HTTP filtering."
+            },
+            {
+              "id": "c1",
+              "text": "AWS WAF",
+              "isCorrect": true,
+              "explanation": "AWS WAF is the web application firewall used with CloudFront to filter HTTP(S) traffic."
+            },
+            {
+              "id": "c2",
+              "text": "Security Groups",
+              "isCorrect": false,
+              "explanation": "Security Groups control traffic to EC2 at the instance level, not the CloudFront edge."
+            },
+            {
+              "id": "c4",
+              "text": "AWS KMS",
+              "isCorrect": false,
+              "explanation": "AWS KMS is for key management and encryption, not traffic filtering."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Infrastructure Security",
+          "services": [
+            "WAF",
+            "CloudFront",
+            "Security Groups"
+          ],
+          "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+          "tip": "Think web application protection rules that block common attack patterns at the edge.",
+          "explanation": "AWS WAF integrates natively with CloudFront, ALB, and API Gateway to inspect and filter HTTP(S) requests using rules such as rate limiting and SQL injection detection."
+        },
+        {
+          "id": "SCS-C03-0014",
+          "question": "A data lake team manages a single S3 bucket accessed by multiple applications across different VPCs. They need to enforce that each application can only reach the bucket from its own VPC and can only access objects under its designated prefix. Which approach provides the strongest isolation with the least policy complexity?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Create a separate S3 Access Point for each application",
+              "isCorrect": true,
+              "explanation": "S3 Access Points allow per-application network and permission scoping against a shared bucket."
+            },
+            {
+              "id": "c2",
+              "text": "Write a single S3 bucket policy with separate statements per application",
+              "isCorrect": false,
+              "explanation": "A single bucket policy becomes difficult to manage and has size limits."
+            },
+            {
+              "id": "c4",
+              "text": "Replicate data into separate per-application buckets",
+              "isCorrect": false,
+              "explanation": "Replication increases cost and complexity."
+            },
+            {
+              "id": "c3",
+              "text": "Create one VPC endpoint per VPC and use endpoint policies",
+              "isCorrect": false,
+              "explanation": "Endpoint policies are coarse for prefix-level scoping."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "S3",
+            "IAM",
+            "VPC",
+            "PrivateLink"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-points.html",
+          "tip": "Consider a feature that lets you create named network-scoped entry points to a single bucket.",
+          "explanation": "S3 Access Points provide named, per-application entry points to a bucket, each with its own policy and optional VPC restriction."
+        },
+        {
+          "id": "SCS-C03-0010",
+          "question": "A security architect needs to prevent any account in the organisation from launching EC2 instances outside of eu-west-1 and eu-west-2, regardless of the IAM permissions granted within those accounts. Which approach should they use?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Use a CloudFormation StackSet with a hook that blocks ec2:RunInstances in disallowed regions",
+              "isCorrect": false,
+              "explanation": "CloudFormation hooks validate CloudFormation-managed resources only, not direct API calls or console launches."
+            },
+            {
+              "id": "c2",
+              "text": "Create an IAM policy in each account that denies ec2:RunInstances outside eu-west-1 and eu-west-2, and attach it to every IAM user and role",
+              "isCorrect": false,
+              "explanation": "Per-account IAM policies can be removed by local administrators, and new users or roles might not receive the policy."
+            },
+            {
+              "id": "c1",
+              "text": "Attach a Service Control Policy (SCP) to the organisation root or target OUs that denies ec2:RunInstances unless the aws:RequestedRegion condition matches eu-west-1 or eu-west-2",
+              "isCorrect": true,
+              "explanation": "SCPs set maximum permission boundaries across all accounts in an OU or organisation, overriding any IAM policy within those accounts."
+            },
+            {
+              "id": "c3",
+              "text": "Deploy an AWS Config rule that evaluates EC2 instances and flags any launched outside the allowed regions as non-compliant",
+              "isCorrect": false,
+              "explanation": "Config rules are detective, not preventive - the instance would already be running before Config flags it."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identity and Access Management",
+          "services": [
+            "Organizations",
+            "IAM",
+            "Config",
+            "CloudFormation"
+          ],
+          "docs": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
+          "tip": "You need a preventive control that applies across all accounts regardless of each account's local IAM policies.",
+          "explanation": "Service Control Policies (SCPs) in AWS Organizations act as guardrails that define the maximum permissions available to all principals in member accounts."
+        },
+        {
+          "id": "SCS-C03-0011",
+          "question": "A compliance requirement mandates that all CloudWatch Logs log groups must be encrypted at rest with a customer-managed KMS key and that the key policy must allow the CloudWatch Logs service principal to use it. Which combination of steps achieves this?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Enable CloudTrail log file encryption with a KMS key and configure CloudWatch Logs as a CloudTrail destination",
+              "isCorrect": false,
+              "explanation": "CloudTrail encryption covers CloudTrail's own log files delivered to S3, not arbitrary CloudWatch Logs log groups."
+            },
+            {
+              "id": "c1",
+              "text": "Create a customer-managed KMS key with a key policy granting logs.<region>.amazonaws.com the kms:Encrypt, kms:Decrypt, kms:GenerateDataKey, and kms:DescribeKey actions, then associate the key with each log group",
+              "isCorrect": true,
+              "explanation": "CloudWatch Logs requires these four KMS actions in the key policy for the regional service principal to encrypt and decrypt log data."
+            },
+            {
+              "id": "c4",
+              "text": "Create an AWS-managed KMS key (alias aws/logs) and it will automatically encrypt all new log groups without any key policy changes",
+              "isCorrect": false,
+              "explanation": "CloudWatch Logs does not have an AWS-managed key. You must create and configure a customer-managed key explicitly."
+            },
+            {
+              "id": "c2",
+              "text": "Enable SSE-S3 default encryption on the S3 bucket where CloudWatch Logs exports data and reference that bucket in each log group's settings",
+              "isCorrect": false,
+              "explanation": "S3 encryption applies only to exported log data in S3, not to log data stored within the CloudWatch Logs service itself."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "CloudWatch Logs",
+            "KMS",
+            "S3",
+            "CloudTrail"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html",
+          "tip": "CloudWatch Logs encryption requires a customer-managed CMK - there is no AWS-managed key option for this service.",
+          "explanation": "CloudWatch Logs supports encryption at rest only with customer-managed KMS keys. You must explicitly grant the regional service principal permission to use the key."
+        },
+        {
+          "id": "SCS-C03-0023",
+          "question": "A web application team needs to ensure that TLS certificates on their internet-facing ALBs are renewed automatically without any manual intervention or downtime. Certificates must support multiple subdomain names (e.g., api.example.com, app.example.com). Which approach meets these requirements?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Generate a self-signed certificate for each subdomain and configure the ALB to present them using SNI",
+              "isCorrect": false,
+              "explanation": "Self-signed certificates are not trusted by browsers and will produce security warnings. They also require manual rotation, defeating the automation requirement."
+            },
+            {
+              "id": "c1",
+              "text": "Request a public ACM certificate with Subject Alternative Names (SANs) for each subdomain using DNS validation, and associate it with the ALB",
+              "isCorrect": true,
+              "explanation": "ACM public certificates with DNS validation renew automatically as long as the CNAME validation records remain in place. SANs allow multiple subdomains on a single certificate, and ALB natively integrates with ACM for zero-downtime deployment."
+            },
+            {
+              "id": "c2",
+              "text": "Purchase a wildcard certificate from a third-party CA, import it into ACM, and set a calendar reminder to renew it annually",
+              "isCorrect": false,
+              "explanation": "Imported certificates in ACM are not automatically renewed. Manual renewal and re-import is required, which introduces risk of expiration and human error."
+            },
+            {
+              "id": "c3",
+              "text": "Use Let's Encrypt with certbot running on the ALB instances to obtain and renew certificates",
+              "isCorrect": false,
+              "explanation": "ALBs are managed services; you cannot run certbot or any agent on them. Let's Encrypt certificates must be imported into ACM, losing automatic renewal."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "ACM",
+            "CloudFront",
+            "ALB",
+            "Route 53"
+          ],
+          "docs": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+          "tip": "ACM's automatic renewal only works for certificates it issues (not imported ones), and DNS validation is the set-and-forget option.",
+          "explanation": "AWS Certificate Manager issues free public certificates that renew automatically when DNS validation is used. By adding SANs for each subdomain, a single certificate covers multiple endpoints. ACM's native integration with ALB means certificate deployment and rotation happen transparently."
+        },
+        {
+          "id": "SCS-C03-0008",
+          "question": "A security team wants to use AWS Config to detect S3 buckets that have public read access. Which CloudFormation resource snippet correctly defines this managed Config rule?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: AWS\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+              "isCorrect": true,
+              "explanation": "AWS managed Config rule using Owner: AWS and the standard S3 public read detection identifier."
+            },
+            {
+              "id": "c3",
+              "text": "Use AWS CloudTrail to monitor S3:GetBucketPolicy API calls and alert when public access is detected",
+              "isCorrect": false,
+              "explanation": "CloudTrail monitors API calls but does not provide continuous compliance evaluation like AWS Config."
+            },
+            {
+              "id": "c2",
+              "text": "Type: AWS::Config::ConfigRule\nProperties:\n  ConfigRuleName: s3-bucket-public-read-prohibited\n  Source:\n    Owner: CUSTOM\n    SourceIdentifier: S3_BUCKET_PUBLIC_READ_PROHIBITED",
+              "isCorrect": false,
+              "explanation": "Owner: CUSTOM is for custom rules backed by Lambda functions, not AWS managed rules."
+            },
+            {
+              "id": "c4",
+              "text": "Enable S3 Block Public Access at the account level - this replaces the need for Config rules",
+              "isCorrect": false,
+              "explanation": "Block Public Access is preventive - it does not detect existing violations like a Config rule does."
+            }
+          ],
+          "selectCount": 1,
+          "format": "yaml",
+          "domain": "Detection",
+          "services": [
+            "Config",
+            "CloudFormation",
+            "S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html",
+          "tip": "AWS Config managed rules use Owner: AWS with a predefined SourceIdentifier.",
+          "explanation": "AWS Config managed rules are pre-built by AWS and referenced with Owner: AWS plus a SourceIdentifier like S3_BUCKET_PUBLIC_READ_PROHIBITED."
+        },
+        {
+          "id": "SCS-C03-0009",
+          "question": "A company stores customer PII in S3 and needs to automatically discover and classify sensitive data across hundreds of buckets. Which service should they enable?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Amazon Macie",
+              "isCorrect": true,
+              "explanation": "Macie scans S3 objects for PII, financial data, and credentials using ML-powered classifiers and managed data identifiers."
+            },
+            {
+              "id": "c3",
+              "text": "Amazon Inspector",
+              "isCorrect": false,
+              "explanation": "Inspector focuses on vulnerability scanning for compute workloads, not data classification in S3."
+            },
+            {
+              "id": "c4",
+              "text": "AWS Trusted Advisor",
+              "isCorrect": false,
+              "explanation": "Trusted Advisor provides account-level checks like open security groups, but does not scan S3 object contents."
+            },
+            {
+              "id": "c2",
+              "text": "Amazon GuardDuty",
+              "isCorrect": false,
+              "explanation": "GuardDuty detects threats like unusual API calls to S3 but does not inspect object contents for sensitive data."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "services": [
+            "Macie",
+            "GuardDuty",
+            "Inspector",
+            "Trusted Advisor"
+          ],
+          "docs": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+          "tip": "This service is purpose-built for finding sensitive data like credit card numbers and passport IDs inside S3 objects.",
+          "explanation": "Amazon Macie is designed to scan S3 objects and classify sensitive content such as PII and PHI using managed data identifiers."
+        },
+        {
+          "id": "SCS-C03-0007",
+          "question": "A security engineer needs to restrict an IAM role so it can only access a specific S3 bucket from a particular VPC endpoint. Which resource should be added?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Add the VPC endpoint ID to the IAM role's trust policy as a Principal",
+              "isCorrect": false,
+              "explanation": "VPC endpoints are not IAM principals and cannot appear in a trust policy's Principal element."
+            },
+            {
+              "id": "c1",
+              "text": "{\"Condition\": {\"StringEquals\": {\"aws:sourceVpce\": \"vpce-1a2b3c4d\"}}}",
+              "isCorrect": true,
+              "explanation": "aws:sourceVpce condition restricts the policy to requests through the specified VPC endpoint."
+            },
+            {
+              "id": "c2",
+              "text": "{\"Condition\": {\"IpAddress\": {\"aws:SourceIp\": \"10.0.0.0/16\"}}}",
+              "isCorrect": false,
+              "explanation": "IpAddress/SourceIp restricts by IP range, not by VPC endpoint identity."
+            },
+            {
+              "id": "c4",
+              "text": "Attach a security group to the IAM role that only allows traffic from the VPC",
+              "isCorrect": false,
+              "explanation": "Security groups are network-level controls for ENIs - they cannot be attached to IAM roles."
+            }
+          ],
+          "selectCount": 1,
+          "format": "json",
+          "domain": "Identity and Access Management",
+          "services": [
+            "IAM",
+            "S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "tip": "VPC endpoint restrictions in IAM use the aws:sourceVpce condition key with StringEquals.",
+          "explanation": "The aws:sourceVpce condition key with StringEquals restricts access to requests that traverse a specific VPC endpoint."
+        },
+        {
+          "id": "SCS-C03-0013",
+          "question": "An organisation wants to automatically isolate an EC2 instance when GuardDuty detects cryptocurrency mining activity. Which architecture achieves automated remediation with the least operational overhead?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Enable Security Hub automated response playbooks to quarantine instances",
+              "isCorrect": false,
+              "explanation": "Security Hub aggregates findings but does not have built-in quarantine playbooks."
+            },
+            {
+              "id": "c4",
+              "text": "Use Systems Manager Automation runbooks triggered by a CPU alarm to stop instances",
+              "isCorrect": false,
+              "explanation": "CPU alarms are generic and can cause false positives."
+            },
+            {
+              "id": "c3",
+              "text": "Schedule a Lambda to poll GuardDuty every five minutes and isolate flagged instances",
+              "isCorrect": false,
+              "explanation": "Polling introduces delay and extra maintenance."
+            },
+            {
+              "id": "c1",
+              "text": "Configure GuardDuty findings to flow into EventBridge and trigger a Lambda that isolates the instance",
+              "isCorrect": true,
+              "explanation": "EventBridge rules can filter GuardDuty finding types and invoke Lambda for automated remediation."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Incident Response",
+          "services": [
+            "GuardDuty",
+            "Security Hub",
+            "EventBridge",
+            "Lambda",
+            "Systems Manager"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_finding-types-ec2.html",
+          "tip": "The key is event-driven, near-real-time response with minimal ongoing maintenance.",
+          "explanation": "GuardDuty publishes findings to EventBridge in near-real-time, enabling immediate Lambda-driven remediation."
+        }
+      ]
     }
   ]
 }
