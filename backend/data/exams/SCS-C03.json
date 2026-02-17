@@ -748,6 +748,28 @@
       "lastReviewed": "2026-02-16",
       "domain": "Detection",
       "selectCount": 2
+    },
+    {
+      "id": "SCS-C03-0036",
+      "docs": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/what-is-cfn.html",
+      "format": "text",
+      "services": ["CloudFormation","StackSets","CI/CD","Organizations"],
+      "skills": ["6.2.1: Use infrastructure as code (IaC) to deploy cloud resources consistently and securely"],
+      "question": "A security platform team must deploy a hardened VPC, a set of IAM permission boundaries, and logging configuration to 15 existing AWS accounts. Changes must be automated via CI/CD, deployments must be auditable, and any account drift should be detectable centrally. The team also wants least-privilege for the agents that perform deployments. Which approach best satisfies these requirements?",
+      "choices": [
+        {"id":"c1","text":"Create a parameterized CloudFormation module for the baseline, publish it to a central artifact repository, and deploy via CloudFormation StackSets (service-managed) from a CI/CD pipeline using delegated administrator roles; enable drift detection and record pipeline runs for auditability","isCorrect":true,"explanation":"StackSets (service-managed) supports automated, organization-aware deployments driven by CI/CD, delegated admin roles provide least-privilege, and enabling drift detection plus CI/CD run logs provides centralized detection and an audit trail."},
+        {"id":"c2","text":"Let each account run CloudFormation stacks triggered manually by account owners, and collect logs centrally afterwards","isCorrect":false,"explanation":"Manual, per-account deployments are not automated or easily auditable and do not provide centralized drift detection or consistent configuration."},
+        {"id":"c3","text":"Use Terraform workspaces stored locally per account and have individual engineers apply changes when notified","isCorrect":false,"explanation":"Local, manual Terraform applies lack centralized automation, auditability, and organization-level drift detection; they also increase risk of inconsistent state."},
+        {"id":"c4","text":"Utilise AWS Control Tower guardrails to keep accounts compliant and make manual adjustments via the console for exceptions","isCorrect":false,"explanation":"Control Tower provides guardrails and a landing zone but is not a full CI/CD-driven IaC deployment and does not replace an auditable, parameterized IaC pipeline for existing accounts at scale."}
+      ],
+      "selectCount": 1,
+      "tip": "Prefer org-aware IaC patterns that integrate with CI/CD, use delegated roles, and enable drift detection for centralized management.",
+      "explanation": "For consistent, auditable, and automated deployments across multiple accounts, an org-aware IaC pattern like CloudFormation StackSets driven by a CI/CD pipeline provides parameterized modules, centralized rollout, delegated administration for least-privilege, and drift detection to identify configuration divergence. This pattern satisfies automation, auditability, and centralized management requirements.",
+      "meta": {"domain":"Security Foundations and Governance"},
+      "sourceType": "official-doc",
+      "lastReviewed": "2026-02-17",
+      "domain": "Security Foundations and Governance",
+      "selectCount": 1
     }
   ]
 }
