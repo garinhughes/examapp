@@ -531,11 +531,11 @@ export default function App() {
   }
 
   // consider attempt finished when server provides finishedAt OR when we have a computed score
-  // and a matching `total` (fallback for cases where finishedAt or answers array are missing)
+  // (earlyComplete attempts will have total < questions.length, so we just check for score)
   const isFinished = !!attemptData?.finishedAt || (
     typeof attemptData?.score === 'number' &&
     typeof attemptData?.total === 'number' &&
-    attemptData.total >= questions.length
+    attemptData.total > 0
   )
 
   // ——— Download helpers ———
@@ -572,8 +572,8 @@ export default function App() {
       rows.push('')
     }
 
-    // per-question detail
-    rows.push('Question,Domain,Your Answer,Correct Answer,Result')
+    // per-question detail (include per-question explanation)
+    rows.push('Question,Domain,Your Answer,Correct Answer,Result,Explanation')
     const qs = Array.isArray(attemptData.questions) && attemptData.questions.length > 0 ? attemptData.questions : questions
     for (const q of qs as Question[]) {
       const ansRec = Array.isArray(attemptData.answers) ? attemptData.answers.find((a: any) => a.questionId === q.id) : undefined
@@ -581,7 +581,7 @@ export default function App() {
       const yourAnswer = chosenIds.map((cid: any) => { const ch = q.choices?.find((c: any) => c.id === cid); return ch?.text ?? (typeof cid === 'number' ? q.choices?.[cid] ?? '' : cid) }).join('; ')
       const correctAnswer = q.choices?.filter((c: any) => c.isCorrect).map((c: any) => c.text).join('; ') ?? ''
       const result = ansRec ? (ansRec.correct ? 'Correct' : 'Incorrect') : 'Unanswered'
-      rows.push(`${esc(q.question)},${esc(q.domain ?? '')},${esc(yourAnswer)},${esc(correctAnswer)},${result}`)
+      rows.push(`${esc(q.question)},${esc(q.domain ?? '')},${esc(yourAnswer)},${esc(correctAnswer)},${result},${esc(q.explanation ?? '')}`)
     }
 
     const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' })
@@ -635,6 +635,10 @@ export default function App() {
         const isCorrectChoice = typeof ch === 'object' && !!ch?.isCorrect
         const cls = isChosen && isCorrectChoice ? 'correct' : isChosen ? 'wrong' : isCorrectChoice ? 'correct-not-chosen' : ''
         questionsHTML += `<li class="${cls}">${choiceText.replace(/</g, '&lt;')}${isChosen ? ' ◀ your answer' : ''}${isCorrectChoice && !isChosen ? ' ◀ correct' : ''}</li>`
+        // include per-choice explanation when available
+        if (typeof ch === 'object' && ch?.explanation) {
+          questionsHTML += `<div class="choice-expl">${String(ch.explanation).replace(/</g, '&lt;')}</div>`
+        }
       }
       questionsHTML += `</ol>`
       if (q.explanation) questionsHTML += `<div class="explanation">💡 ${q.explanation.replace(/</g, '&lt;')}</div>`
@@ -655,6 +659,7 @@ export default function App() {
   ol{padding-left:20px;margin:6px 0;} li{margin:3px 0;padding:2px 4px;border-radius:3px;}
   li.correct{background:#d1fae5;} li.wrong{background:#fee2e2;} li.correct-not-chosen{background:#dbeafe;}
   .explanation{margin-top:8px;padding:8px;background:#fefce8;border-radius:4px;font-size:12px;}
+  .choice-expl{margin-left:18px;margin-top:4px;font-size:12px;color:#334155;background:#f8fafc;padding:6px;border-radius:4px;}
   @media print{body{padding:0;} .no-print{display:none;}}
 </style></head><body>
 <h1>${examTitle} <span style="color:#94a3b8;font-weight:400;font-size:14px">${examCode}</span></h1>
@@ -1091,10 +1096,18 @@ ${questionsHTML}
       const fin = await authFetch(`/attempts/${aid}/finish`, { method: 'PATCH' })
       const finData = await fin.json()
       if ('attemptId' in finData) {
-        setAttemptData(finData)
+        // Re-fetch full attempt to get the answers array (PATCH response may omit it)
+        let fullAttempt = finData
+        try {
+          const r2 = await authFetch(`/attempts/${finData.attemptId}`)
+          if (r2.ok) fullAttempt = await r2.json()
+        } catch {}
+        const computed = computeDerivedAttempt(fullAttempt, Array.isArray(fullAttempt.questions) ? fullAttempt.questions : undefined)
+        setAttemptData(computed)
+        if (Array.isArray(fullAttempt.questions)) setQuestions(fullAttempt.questions)
         setExamStarted(false)
         setTimeLeft(null)
-        handleGamificationReward(finData)
+        handleGamificationReward(computed)
       } else {
         setLastError(JSON.stringify(finData))
       }
@@ -1457,10 +1470,18 @@ ${questionsHTML}
       const fin = await authFetch(`/attempts/${attemptId}/finish`, finOpts)
       const finData = await fin.json()
       if ('attemptId' in finData) {
-        setAttemptData(finData)
-        handleGamificationReward(finData)
+        // Re-fetch full attempt to get the answers array (PATCH response may omit it)
+        let fullAttempt = finData
+        try {
+          const r2 = await authFetch(`/attempts/${finData.attemptId}`)
+          if (r2.ok) fullAttempt = await r2.json()
+        } catch {}
+        const computed = computeDerivedAttempt(fullAttempt, Array.isArray(fullAttempt.questions) ? fullAttempt.questions : undefined)
+        setAttemptData(computed)
+        if (Array.isArray(fullAttempt.questions)) setQuestions(fullAttempt.questions)
+        handleGamificationReward(computed)
         setExamStarted(false); setTimeLeft(null)
-        if (showAttempts) { try { const r2 = await authFetch('/attempts'); const dd = await r2.json(); setAttemptsList(dd.attempts ?? []) } catch {} }
+        if (showAttempts) { try { const r3 = await authFetch('/attempts'); const dd = await r3.json(); setAttemptsList(dd.attempts ?? []) } catch {} }
       } else { setLastError(JSON.stringify(finData)) }
     } catch (err) { console.error('handleSubmitExam error', err); setLastError(String(err)) }
     setShowSubmitConfirm(false); setShowCompleteEarlyConfirm(false)
@@ -2543,7 +2564,21 @@ ${questionsHTML}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">Review</h3>
-                  <div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="px-3 py-1 rounded bg-sky-500 text-white text-sm"
+                      onClick={async () => { try { await createAttempt(); } catch {} }}
+                      title="Start another attempt with the same settings"
+                    >
+                      Start another attempt
+                    </button>
+                    <button
+                      className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-800 text-sm"
+                      onClick={() => { try { setAttemptData(null); setAttemptId(null); setExamStarted(false); } catch {} }}
+                      title="Return to the exam start form"
+                    >
+                      Return to start
+                    </button>
                     <button
                       className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-800 text-sm"
                       onClick={() => { setRoute('practice'); setSelected(null); setShowAttempts(false); setAttemptsList(null); }}
@@ -2642,18 +2677,15 @@ ${questionsHTML}
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 mb-2">
-                    <label className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" checked={incorrectOnly} onChange={(e) => setIncorrectOnly(e.target.checked)} />
-                      <span className="text-sm text-slate-500 dark:text-slate-400">Show incorrect only</span>
-                    </label>
-                    <div className="ml-auto text-sm text-slate-500">{questions.length} total</div>
-                  </div>
-
                   {(() => {
+                    // If the attempt was completed early, restrict review to answered questions only
+                    const baseQuestions = (attemptData?.earlyComplete && Array.isArray(attemptData?.answers))
+                      ? questions.filter((q) => attemptData.answers.some((a: any) => String(a.questionId) === String(q.id)))
+                      : questions
+
                     const domainFiltered = (reviewDomains.includes('All') || reviewDomains.length === 0)
-                      ? questions
-                      : questions.filter((q) => reviewDomains.includes((q as any).domain))
+                      ? baseQuestions
+                      : baseQuestions.filter((q) => reviewDomains.includes((q as any).domain))
                     const deriveRecord = (q: Question) => {
                       // pick the latest answer for this question (answers may contain history)
                       let answerRecord: any = undefined
@@ -2683,117 +2715,98 @@ ${questionsHTML}
                     const visibleAll = domainFiltered.map((q) => ({ q, ...deriveRecord(q) }))
                     const visible = incorrectOnly ? visibleAll.filter((v) => !v.isCorrect) : visibleAll
 
-                    if (visible.length === 0) return <div className="text-sm text-slate-500 p-3">No questions to review.</div>
-
-                    // clamp index
-                    const idx = Math.max(0, Math.min(reviewIndex, visible.length - 1))
-                    const item = visible[idx]
-
                     return (
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="text-sm text-slate-400">Question {idx + 1} / {visible.length}</div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              className="px-2 py-1 rounded bg-slate-200 dark:bg-slate-800 text-sm"
-                              onClick={() => setReviewIndex((i) => Math.max(0, i - 1))}
-                              disabled={idx === 0}
-                            >Prev</button>
-                            <button
-                              className="px-2 py-1 rounded bg-slate-200 dark:bg-slate-800 text-sm"
-                              onClick={() => setReviewIndex((i) => Math.min(visible.length - 1, i + 1))}
-                              disabled={idx >= visible.length - 1}
-                            >Next</button>
-                          </div>
+                      <>
+                        <div className="flex items-center gap-3 mb-2">
+                          <label className="flex items-center gap-2 text-sm">
+                            <input type="checkbox" checked={incorrectOnly} onChange={(e) => setIncorrectOnly(e.target.checked)} />
+                            <span className="text-sm text-slate-500 dark:text-slate-400">Show incorrect only</span>
+                          </label>
+                          <div className="ml-auto text-sm text-slate-500">{baseQuestions.length} total{attemptData?.earlyComplete ? ` (${questions.length} in bank)` : ''}</div>
                         </div>
 
-                        <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-r from-white/5 to-slate-50/5">
-                          <div className="flex items-start justify-between">
-                            <div className="font-medium text-lg">{item.q.question}</div>
-                            <div className="text-sm">
-                              {item.isCorrect ? <span className="text-green-400">Correct</span> : <span className="text-red-300">Incorrect</span>}
-                            </div>
-                          </div>
+                        {visible.length === 0 ? <div className="text-sm text-slate-500 p-3">No questions to review.</div> : (() => {
+                          const idx = Math.max(0, Math.min(reviewIndex, visible.length - 1))
+                          const item = visible[idx]
+                          const chosenIds: string[] = Array.isArray(item.chosen) ? item.chosen : (typeof item.chosen === 'string' ? [item.chosen] : [])
 
-                          {item.q.domain && (
-                            <div className="mt-2 text-xs text-slate-400">Domain: {item.q.domain}</div>
-                          )}
-
-                          <div className="mt-3 text-sm">
-                            <div className="font-semibold">Your answer:</div>
-                            {(() => {
-                              const isCorrect = item.isCorrect
-                                if (isCorrect) {
-                                  const badgeBg = 'var(--color-correct)'
-                                  const badgeBg2 = 'var(--color-correct-2)'
-                                  const badgeShadow = 'var(--color-correct-shadow)'
-                                  return (
-                                    <div className="mt-2">
-                                      <div style={{ background: `linear-gradient(90deg, ${badgeBg}, ${badgeBg2})`, boxShadow: `0 0 14px ${badgeShadow}`, color: 'var(--color-correct-text)' }} className={`inline-flex items-center gap-3 px-3 py-2 rounded-md font-medium`}>
-                                        <span style={{ backgroundColor: 'var(--color-correct-muted)', color: 'var(--color-correct-text)' }} className="inline-flex items-center justify-center w-6 h-6 rounded-full">
-                                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-                                        </span>
-                                        <span className="break-words max-w-full">
-                                          {Array.isArray(item.chosen)
-                                            ? (item.chosen as string[]).map((cid) => { const ch = item.q.choices?.find((c: any) => c.id === cid); return ch?.text ?? cid }).join(', ')
-                                            : renderChoiceContent(typeof item.chosen === 'string' ? (item.q.choices?.find((c: any) => c.id === item.chosen) ?? '—') : '—', item.q, true)}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  )
-                                }
-
-                                // Incorrect: show red X icon with neutral answer box (no red pill)
-                                return (
-                                  <div className="mt-2 flex items-start gap-3">
-                                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-500">
-                                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                                    </span>
-                                    <div className="flex-1">
-                                      <div className="px-3 py-2 rounded-md bg-slate-700/10 dark:bg-slate-800/40 text-sm break-words max-w-full whitespace-normal">
-                                        {Array.isArray(item.chosen)
-                                          ? (item.chosen as string[]).map((cid) => { const ch = item.q.choices?.find((c: any) => c.id === cid); return ch?.text ?? cid }).join(', ')
-                                          : renderChoiceContent(typeof item.chosen === 'string' ? (item.q.choices?.find((c: any) => c.id === item.chosen) ?? '—') : '—', item.q, true)}
-                                      </div>
-                                    </div>
-                                  </div>
-                                )
-                            })()}
-
-                            {Array.isArray(item.q.choices) && item.q.choices.some((c: any) => c.isCorrect) && (
-                              <div className="mt-3 font-semibold flex items-center gap-3">
-                                <div className="inline-flex items-center gap-2" style={{ color: 'var(--color-correct-2)' }}>
-                                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-correct-muted)', color: 'var(--color-correct-text)' }}>
-                                    <svg className="w-3 h-3" style={{ color: 'var(--color-correct-2)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-                                  </span>
-                                  <span>Correct answer{item.q.choices.filter((c: any) => c.isCorrect).length > 1 ? 's' : ''}:</span>
-                                </div>
-                                <div className="mt-0">
-                                  {item.q.choices.filter((c: any) => c.isCorrect).length > 1
-                                    ? item.q.choices.filter((c: any) => c.isCorrect).map((c: any) => c.text).join(', ')
-                                    : renderChoiceContent(item.q.choices.find((c: any) => c.isCorrect) ?? '—', item.q, false)}
+                          return (
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="text-sm text-slate-400">Question {idx + 1} / {visible.length}</div>
+                                <div className="flex items-center gap-2">
+                                  <button className="px-2 py-1 rounded bg-slate-200 dark:bg-slate-800 text-sm" onClick={() => setReviewIndex((i) => Math.max(0, i - 1))} disabled={idx === 0}>Prev</button>
+                                  <button className="px-2 py-1 rounded bg-slate-200 dark:bg-slate-800 text-sm" onClick={() => setReviewIndex((i) => Math.min(visible.length - 1, i + 1))} disabled={idx >= visible.length - 1}>Next</button>
                                 </div>
                               </div>
-                            )}
-                          </div>
 
-                          {item.q.explanation && (
-                            <div className="mt-3 text-sm p-3 rounded bg-yellow-50 dark:bg-slate-800">
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="pr-2"><strong>Explanation:</strong> {item.q.explanation}</div>
-                                {item.q.docs && (
-                                  <div className="flex-shrink-0">
-                                    <a href={item.q.docs} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white text-sm hover:bg-slate-300 dark:hover:bg-slate-600 transition">
-                                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
-                                      <span>Docs</span>
-                                    </a>
+                              {/* Redesigned review card */}
+                              <div className={`p-4 rounded-lg border-l-4 ${item.isCorrect ? 'border-l-emerald-500' : 'border-l-red-500'} border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60`}>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="font-medium text-base flex-1">{item.q.question}</div>
+                                  <span className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${item.isCorrect ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>
+                                    {item.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                                  </span>
+                                </div>
+
+                                {item.q.domain && <div className="mt-1.5 text-xs text-slate-400">Domain: {item.q.domain}</div>}
+
+                                {/* All choices list */}
+                                <div className="mt-3 space-y-1.5">
+                                  {(item.q.choices ?? []).map((c: any, ci: number) => {
+                                    const cid = typeof c === 'string' ? String(ci) : (c?.id ?? String(ci))
+                                    const cText = typeof c === 'string' ? c : (c?.text ?? '')
+                                    const isChosen = chosenIds.includes(cid)
+                                    const isCorrectChoice = typeof c === 'object' && !!c?.isCorrect
+                                    const letter = String.fromCharCode(65 + ci)
+                                    // determine visual style
+                                    let bg = 'bg-slate-50 dark:bg-slate-700/20 border-slate-200 dark:border-slate-600/40'
+                                    let icon: React.ReactNode = <span className="text-slate-400 text-xs font-mono">{letter}</span>
+                                    if (isChosen && isCorrectChoice) {
+                                      bg = 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-600/50'
+                                      icon = <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                                    } else if (isChosen && !isCorrectChoice) {
+                                      bg = 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-600/50'
+                                      icon = <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                                    } else if (isCorrectChoice) {
+                                      bg = 'bg-blue-50 dark:bg-blue-900/15 border-blue-300 dark:border-blue-600/40'
+                                      icon = <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                                    }
+                                    return (
+                                      <div key={cid} className={`flex items-start gap-2.5 px-3 py-2 rounded-lg border text-sm ${bg}`}>
+                                        <span className="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">{icon}</span>
+                                        <div className="flex-1">
+                                          <span className={`${isChosen ? 'font-semibold' : ''}`}>{renderChoiceContent(c, item.q, true)}</span>
+                                          {isChosen && !isCorrectChoice && <span className="ml-2 text-[10px] text-red-500 font-medium">your answer</span>}
+                                          {!isChosen && isCorrectChoice && <span className="ml-2 text-[10px] text-blue-500 font-medium">correct answer</span>}
+                                          {typeof c === 'object' && c?.explanation && (
+                                            <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{c.explanation}</div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+
+                                {/* Explanation */}
+                                {item.q.explanation && (
+                                  <div className="mt-3 text-sm p-3 rounded-lg bg-amber-50/80 dark:bg-slate-700/40 border border-amber-200/60 dark:border-slate-600/30">
+                                    <div className="flex items-start justify-between gap-4">
+                                      <div><span className="font-semibold">Explanation:</span> {item.q.explanation}</div>
+                                      {item.q.docs && (
+                                        <a href={item.q.docs} target="_blank" rel="noopener noreferrer" className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white text-xs hover:bg-slate-300 dark:hover:bg-slate-600 transition">
+                                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+                                          Docs
+                                        </a>
+                                      )}
+                                    </div>
                                   </div>
                                 )}
                               </div>
                             </div>
-                          )}
-                        </div>
-                      </div>
+                          )
+                        })()}
+                      </>
                     )
                   })()}
                 </div>
@@ -2982,7 +2995,7 @@ ${questionsHTML}
                           <div>
                             <p className="font-medium">Casual Mode</p>
                             <p className="text-xs mt-1 text-sky-600 dark:text-sky-300/80">
-                              No time pressure — work through questions at your own pace. Perfect for learning, reviewing explanations, and building confidence.
+                              No time pressure - work through questions at your own pace. Perfect for learning, reviewing explanations, and building confidence.
                             </p>
                           </div>
                         </div>
@@ -3251,6 +3264,22 @@ ${questionsHTML}
                 <div className="mt-4 md:mt-0 flex items-center justify-end gap-3 md:self-end">
                   
                   <button className="px-3 py-2 rounded-md bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-500 transition" onClick={() => { 
+                    // Clear transient attempt state and reset form values to defaults
+                    try { if (selected) localStorage.removeItem(`attempt:${selected}`) } catch {}
+                    try { if (selected) localStorage.removeItem(`examProgress:${selected}`) } catch {}
+                    setAttemptId(null)
+                    setAttemptData(null)
+                    setSelectedAnswers({})
+                    setMultiSelectPending({})
+                    setFlaggedQuestions(new Set())
+                    setCurrentQuestionIndex(0)
+                    setTimeLeft(null)
+                    setPaused(false)
+                    setExamStarted(false)
+                    setShowSubmitConfirm(false)
+                    setShowCompleteEarlyConfirm(false)
+                    setShowCancelConfirm(false)
+                    // Reset filters and form fields
                     setTakeDomains(['All']); setTimed(false);
                     setExamMode('casual')
                     setWeakestLinkInfo(null)
@@ -3640,6 +3669,9 @@ ${questionsHTML}
                 setShowCancelConfirm(false)
                 setShowSubmitConfirm(false)
                 setShowCompleteEarlyConfirm(false)
+                // clear transient filters so the start form shows defaults
+                setServiceFilterText('')
+                setSelectedServices([])
                 // refresh attempts list if panel open
                 if (showAttempts) {
                   try {
