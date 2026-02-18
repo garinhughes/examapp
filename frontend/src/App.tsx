@@ -694,14 +694,18 @@ ${questionsHTML}
       }
     }
 
-    const total = qSet.length
+    const isEarlyComplete = !!attemptObj.earlyComplete
+    let total = 0
     let correctCount = 0
     const perDomain: Record<string, { total: number; correct: number; score: number }> = {}
     for (const q of qSet) {
+      const latestAns = latestByQ.get(q.id)
+      // For early-completed exams, skip unanswered questions
+      if (isEarlyComplete && !latestAns) continue
       const domain = q.domain ?? 'General'
       if (!perDomain[domain]) perDomain[domain] = { total: 0, correct: 0, score: 0 }
       perDomain[domain].total += 1
-      const latestAns = latestByQ.get(q.id)
+      total += 1
       if (latestAns && latestAns.correct) {
         perDomain[domain].correct += 1
         correctCount += 1
@@ -713,7 +717,14 @@ ${questionsHTML}
     }
 
     const score = total > 0 ? Math.round((correctCount / total) * 100) : 0
-    return { ...attemptObj, total, correctCount, score, perDomain }
+    return {
+      ...attemptObj,
+      total,
+      correctCount,
+      score,
+      perDomain,
+      ...(isEarlyComplete ? { totalQuestions: qSet.length, answeredCount: latestByQ.size } : {})
+    }
   }
 
   /** Download analytics summary as CSV */
