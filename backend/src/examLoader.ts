@@ -1,13 +1,37 @@
 /**
- * Shared exam loader — reads per-exam JSON files from data/exams/
- * and provides utilities for normalising and shuffling questions.
+ * Shared exam loader — reads per-exam JSON files from local disk or S3.
+ *
+ * Controlled by EXAM_SOURCE env var:
+ *   'local' (default) — reads from data/exams/ on disk (fast iteration).
+ *   's3'              — reads from S3 via the DynamoDB exam-index
+ *                       (version-pinned, immutable snapshots).
+ *
+ * Workflow:
+ *   1. Edit JSON in data/exams/, run backend with EXAM_SOURCE=local.
+ *   2. Verify questions render correctly in the frontend.
+ *   3. Run `pnpm publish:exams` to upload to S3 + update DynamoDB index.
+ *   4. Switch to EXAM_SOURCE=s3 (or deploy with it) for production use.
  */
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import {
+  getExamIndex,
+  getExamFromS3,
+  listExamIndex,
+  type ExamIndexEntry,
+} from './services/examStore.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const examsDir = path.resolve(__dirname, '../data/exams')
+
+/**
+ * Exam source switch — mirrors AUTH_MODE pattern.
+ *   'local' = filesystem (default for dev)
+ *   's3'    = S3 + DynamoDB index (production)
+ */
+const EXAM_SOURCE: 'local' | 's3' = (process.env.EXAM_SOURCE ?? 'local') as any
+const USE_S3 = EXAM_SOURCE === 's3'
 
 export interface Choice {
   id: string
@@ -42,6 +66,8 @@ export interface Exam {
   level?: string
   version?: number | string
   publishedAt?: string
+  /** S3 VersionId of the object this exam was loaded from (null when loaded from filesystem). */
+  s3VersionId?: string | null
   questions: Question[]
 }
 
@@ -72,16 +98,9 @@ export function normaliseQuestion(raw: any): Question {
 }
 
 /**
- * Load a single exam by code (case-insensitive filename match).
- * Returns null if no matching file is found.
+ * Parse raw exam JSON into an Exam object.
  */
-export async function loadExam(code: string): Promise<Exam | null> {
-  const files = await fs.readdir(examsDir)
-  const lc = code.toLowerCase()
-  const file = files.find((f) => f.toLowerCase().replace(/\.json$/, '') === lc)
-  if (!file) return null
-
-  const raw = JSON.parse(await fs.readFile(path.join(examsDir, file), 'utf-8'))
+function parseExamJson(raw: any, code: string, s3VersionId?: string | null): Exam {
   return {
     code: raw.code ?? code,
     title: raw.title ?? code,
@@ -94,34 +113,99 @@ export async function loadExam(code: string): Promise<Exam | null> {
     level: raw.level,
     version: raw.version ?? raw.v ?? undefined,
     publishedAt: raw.publishedAt ?? undefined,
+    s3VersionId: s3VersionId ?? null,
     questions: (raw.questions ?? []).map(normaliseQuestion),
   }
 }
 
 /**
- * Load all exams from the data/exams/ directory.
+ * Load a single exam by code.
+ *
+ * When USE_S3 is true:
+ *   - If `s3VersionId` is provided, fetches that exact immutable version from S3.
+ *   - Otherwise, looks up the latest published version via DynamoDB exam-index
+ *     and fetches that version.
+ *
+ * Fallback: reads from local data/exams/ directory.
+ */
+export async function loadExam(
+  code: string,
+  s3VersionId?: string,
+): Promise<Exam | null> {
+  const lc = code.toLowerCase()
+
+  if (USE_S3) {
+    try {
+      // If a specific version is requested, go straight to S3
+      if (s3VersionId) {
+        const { body, s3VersionId: vid } = await getExamFromS3(lc.toUpperCase(), s3VersionId)
+        const raw = JSON.parse(body)
+        return parseExamJson(raw, code, vid)
+      }
+      // Otherwise look up the latest published version
+      const idx = await getExamIndex(lc.toUpperCase())
+        ?? await getExamIndex(code) // try exact case too
+      if (idx) {
+        const { body, s3VersionId: vid } = await getExamFromS3(
+          idx.examCode,
+          idx.s3VersionId,
+        )
+        const raw = JSON.parse(body)
+        return parseExamJson(raw, idx.examCode, vid)
+      }
+    } catch (err) {
+      console.warn(`[examLoader] S3 load failed for ${code}, falling back to filesystem`, err)
+    }
+  }
+
+  // Filesystem fallback (local dev or S3 not configured)
+  const files = await fs.readdir(examsDir)
+  const file = files.find((f) => f.toLowerCase().replace(/\.json$/, '') === lc)
+  if (!file) return null
+
+  const raw = JSON.parse(await fs.readFile(path.join(examsDir, file), 'utf-8'))
+  return parseExamJson(raw, code, null)
+}
+
+/**
+ * Load all exams.
+ *
+ * When USE_S3 is true, reads the exam-index from DynamoDB and fetches
+ * each published exam from S3 (version-pinned).
+ * Falls back to the local data/exams/ directory.
  */
 export async function loadAllExams(): Promise<Exam[]> {
+  if (USE_S3) {
+    try {
+      const entries = await listExamIndex()
+      const exams: Exam[] = []
+      for (const entry of entries) {
+        try {
+          const { body, s3VersionId: vid } = await getExamFromS3(
+            entry.examCode,
+            entry.s3VersionId,
+          )
+          const raw = JSON.parse(body)
+          exams.push(parseExamJson(raw, entry.examCode, vid))
+        } catch (err) {
+          console.error(`[examLoader] Failed to load ${entry.examCode} from S3:`, err)
+        }
+      }
+      if (exams.length > 0) return exams
+      console.warn('[examLoader] No exams in S3 index, falling back to filesystem')
+    } catch (err) {
+      console.warn('[examLoader] S3 index scan failed, falling back to filesystem', err)
+    }
+  }
+
+  // Filesystem fallback
   const files = await fs.readdir(examsDir)
   const exams: Exam[] = []
   for (const file of files) {
     if (!file.endsWith('.json')) continue
     try {
       const raw = JSON.parse(await fs.readFile(path.join(examsDir, file), 'utf-8'))
-      exams.push({
-        code: raw.code ?? file.replace(/\.json$/, ''),
-        title: raw.title ?? file.replace(/\.json$/, ''),
-        provider: raw.provider,
-        passMark: raw.passMark,
-        defaultQuestions: raw.defaultQuestions ?? raw.defaultQuestionCount,
-        defaultDuration: raw.defaultDuration,
-        logo: raw.logo,
-        logoHref: raw.logoHref,
-        level: raw.level,
-        version: raw.version ?? raw.v ?? undefined,
-        publishedAt: raw.publishedAt ?? undefined,
-        questions: (raw.questions ?? []).map(normaliseQuestion),
-      })
+      exams.push(parseExamJson(raw, file.replace(/\.json$/, ''), null))
     } catch (err) {
       console.error(`Failed to load exam file ${file}:`, err)
     }

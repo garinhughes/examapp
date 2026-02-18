@@ -112,6 +112,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       // Snapshot the exam version at time of attempt creation so edits to the
       // canonical exam file do not affect scoring/resume for this attempt.
       examVersion: (exam as any)?.version ?? null,
+      // Pin the exact S3 object version used for this attempt.  If the exam is
+      // republished later, this attempt still references the original snapshot.
+      s3VersionId: (exam as any)?.s3VersionId ?? null,
       attemptSchemaVersion: 1,
       startedAt: now,
       finishedAt: null,

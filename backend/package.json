@@ -7,10 +7,14 @@
     "dev": "node --loader ts-node/esm src/index.ts",
     "dev:reload": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p .",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "publish:exams": "node --loader ts-node/esm scripts/publishExam.ts --all",
+    "publish:exams:dry": "node --loader ts-node/esm scripts/publishExam.ts --all --dry-run",
+    "test:workflow": "node --loader ts-node/esm scripts/testWorkflow.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.988.0",
+    "@aws-sdk/client-s3": "^3.991.0",
     "@aws-sdk/lib-dynamodb": "^3.988.0",
     "@fastify/cors": "^8.0.0",
     "@fastify/jwt": "^10.0.0",
