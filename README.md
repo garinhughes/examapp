@@ -40,3 +40,50 @@ git push -u origin main
 
 - Exams consolidation: several smaller exam files were consolidated into a single canonical exam file `backend/data/exams/SCS-C03.json`. Deprecated exam files were removed; the application now loads per-exam JSON from `backend/data/exams/`.
 - Compliance and provenance: question schema now includes `sourceType`, `lastReviewed`, and `originalityScore` to support the project's safe AI generation workflow. See `backend/data/schemas/safe_ai_gen_workflow.md` for the content-generation policy and requirements.
+
+## Stack & Notes
+
+A concise reference for developers: frameworks, runtime, data layers, infra, and recent fixes.
+
+Frontend
+- Tech: React + TypeScript, built with Vite. Styling by Tailwind CSS.
+- Key patterns: component-based UI in `frontend/src/components`, custom hooks for auth (`AuthContext`, `useAuthFetch`), and a small client-side router/state in `frontend/src/App.tsx`.
+- Dev: `pnpm` + `npx vite` for local development.
+
+Backend
+- Tech: Node.js + TypeScript using Fastify for HTTP routes.
+- Layout: `backend/src/routes` (exams, attempts, admin, analytics), `backend/src/services` (S3/Dynamo adapters, examStore), and small CLI scripts under `backend/scripts`.
+- AWS: uses AWS SDK v3 for S3, DynamoDB, KMS; Cognito used for auth flows in `AUTH_MODE=cognito` (dev mode supported).
+
+Data layer & storage
+- Canonical exam authoring: JSON files under `backend/data/exams/` (local) and published to a versioned S3 bucket when `EXAM_SOURCE=s3`.
+- Runtime index: DynamoDB `examapp-exams-index` maps exam codes to S3 keys + version IDs.
+- Attempts & gamification: persisted in DynamoDB (and demo JSON in `backend/data/attempts.json` for local/dev runs).
+
+Infrastructure & deployment notes
+- Short-term: static frontend (Vite build) served from S3/CloudFront; backend runs on ECS Fargate (task role `examapp-backend-role`) or locally for dev.
+- Security: KMS for encryption, least-privilege IAM policies for S3/Dynamo access.
+
+Dev flows & environment toggles
+- `AUTH_MODE`: `dev` or `cognito` — toggles authentication mode for local development vs production.
+- `EXAM_SOURCE`: `local` or `s3` — toggle whether the backend loads exams from disk or from S3 (versioned publishing workflow supported).
+
+Recent important fixes (2026-02-18)
+- Analytics bug: `backend/src/routes/analytics.ts` — `computeTotals()` incorrectly cast answer `questionId` to Number which produced `NaN` for string IDs; fixed to use string keys so `correctCount` and percentages reflect real answers.
+- Complete-early scoring: server `/attempts/:id/finish` now accepts `{ earlyComplete: true }` and persists `earlyComplete`, `answeredCount`, and `totalQuestions`; finishing early correctly scores only answered questions (frontend now sends the flag).
+- Admin products: `/admin/products` and `frontend` UI updated so grant dropdown filters unavailable exam products (only exams that exist are shown).
+
+Quick local run (dev)
+```bash
+# Backend
+cd backend
+pnpm install
+AUTH_MODE=dev pnpm run dev
+
+# Frontend
+cd frontend
+pnpm install
+pnpm run dev
+```
+
+If you want I can also add a short ops section (deploy steps, Terraform snippets, CI pipeline) or a minimal runbook for publishing exams to S3.
