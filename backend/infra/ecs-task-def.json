@@ -1,0 +1,37 @@
+{
+  "family": "examapp-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::030461496359:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::030461496359:role/examapp-backend-role",
+  "containerDefinitions": [
+    {
+      "name": "examapp-backend",
+      "image": "030461496359.dkr.ecr.eu-west-1.amazonaws.com/examapp-backend:latest",
+      "essential": true,
+      "portMappings": [ { "containerPort": 3000, "protocol": "tcp" } ],
+      "environment": [
+        { "name": "EXAM_SOURCE", "value": "s3" },
+        { "name": "AWS_REGION", "value": "eu-west-1" },
+        { "name": "S3_BUCKET", "value": "certshack-examapp-questions" },
+        { "name": "EXAMS_INDEX_TABLE", "value": "examapp-exams-index" },
+        { "name": "ATTEMPTS_TABLE", "value": "examapp-attempts" },
+        { "name": "GAM_TABLE", "value": "examapp-gamification" },
+        { "name": "USERS_TABLE", "value": "examapp-users" },
+        { "name": "ENTITLEMENTS_TABLE", "value": "examapp-entitlements" },
+        { "name": "AUDIT_TABLE", "value": "examapp-audit" },
+        { "name": "AUTH_MODE", "value": "cognito" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/examapp",
+          "awslogs-region": "eu-west-1",
+          "awslogs-stream-prefix": "examapp"
+        }
+      }
+    }
+  ]
+}

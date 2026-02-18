@@ -159,12 +159,17 @@ export async function loadExam(
   }
 
   // Filesystem fallback (local dev or S3 not configured)
-  const files = await fs.readdir(examsDir)
-  const file = files.find((f) => f.toLowerCase().replace(/\.json$/, '') === lc)
-  if (!file) return null
+  try {
+    const files = await fs.readdir(examsDir)
+    const file = files.find((f) => f.toLowerCase().replace(/\.json$/, '') === lc)
+    if (!file) return null
 
-  const raw = JSON.parse(await fs.readFile(path.join(examsDir, file), 'utf-8'))
-  return parseExamJson(raw, code, null)
+    const raw = JSON.parse(await fs.readFile(path.join(examsDir, file), 'utf-8'))
+    return parseExamJson(raw, code, null)
+  } catch (err) {
+    console.warn(`[examLoader] Filesystem fallback failed for ${code}:`, err)
+    return null
+  }
 }
 
 /**
@@ -199,18 +204,23 @@ export async function loadAllExams(): Promise<Exam[]> {
   }
 
   // Filesystem fallback
-  const files = await fs.readdir(examsDir)
-  const exams: Exam[] = []
-  for (const file of files) {
-    if (!file.endsWith('.json')) continue
-    try {
-      const raw = JSON.parse(await fs.readFile(path.join(examsDir, file), 'utf-8'))
-      exams.push(parseExamJson(raw, file.replace(/\.json$/, ''), null))
-    } catch (err) {
-      console.error(`Failed to load exam file ${file}:`, err)
+  try {
+    const files = await fs.readdir(examsDir)
+    const exams: Exam[] = []
+    for (const file of files) {
+      if (!file.endsWith('.json')) continue
+      try {
+        const raw = JSON.parse(await fs.readFile(path.join(examsDir, file), 'utf-8'))
+        exams.push(parseExamJson(raw, file.replace(/\.json$/, ''), null))
+      } catch (err) {
+        console.error(`Failed to load exam file ${file}:`, err)
+      }
     }
+    return exams
+  } catch (err) {
+    console.warn('[examLoader] Filesystem fallback failed (data/exams dir missing?):', err)
+    return []
   }
-  return exams
 }
 
 /**

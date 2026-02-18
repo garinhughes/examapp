@@ -40,6 +40,9 @@ await server.register(usernameRoutes, { prefix: '/username' })
 // Admin routes
 await server.register(adminRoutes, { prefix: '/admin' })
 
+// Health check for ALB
+server.get('/health', async () => ({ status: 'ok' }))
+
 const port = Number(process.env.PORT) || 3000
 
 try {

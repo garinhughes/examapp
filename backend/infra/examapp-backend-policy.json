@@ -5,7 +5,9 @@
       "Effect": "Allow",
       "Action": [
         "s3:GetObject",
+        "s3:GetObjectVersion",
         "s3:ListBucket",
+        "s3:ListBucketVersions",
         "s3:PutObject",
         "s3:PutObjectAcl"
       ],
@@ -27,7 +29,10 @@
       "Resource": [
         "arn:aws:dynamodb:eu-west-1:030461496359:table/examapp-attempts",
         "arn:aws:dynamodb:eu-west-1:030461496359:table/examapp-gamification",
-        "arn:aws:dynamodb:eu-west-1:030461496359:table/examapp-exams-index"
+        "arn:aws:dynamodb:eu-west-1:030461496359:table/examapp-exams-index",
+        "arn:aws:dynamodb:eu-west-1:030461496359:table/examapp-users",
+        "arn:aws:dynamodb:eu-west-1:030461496359:table/examapp-entitlements",
+        "arn:aws:dynamodb:eu-west-1:030461496359:table/examapp-audit"
       ]
     },
     {

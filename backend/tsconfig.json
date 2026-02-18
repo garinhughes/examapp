@@ -4,11 +4,12 @@
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
-  }
+  },
+  "include": ["src", "scripts"]
 }
