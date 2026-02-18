@@ -1,4 +1,11 @@
 import 'dotenv/config'
+// Ensure Node's WebCrypto is available as `globalThis.crypto` for libraries
+// like `jose` that expect the Web Crypto API.
+import { webcrypto as nodeWebcrypto } from 'crypto'
+if (!(globalThis as any).crypto) {
+  ;(globalThis as any).crypto = nodeWebcrypto
+}
+
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import authPlugin from './plugins/auth.js'

@@ -3,6 +3,41 @@ set -euo pipefail
 
 # Simple idempotent deploy helper for local/manual runs.
 # Usage: cd backend && ./infra/deploy-backend.sh
+#
+# ── Secrets Manager (manual / one-time) ──────────────────────────────
+# Secrets are stored in AWS Secrets Manager under the examapp/ prefix
+# and injected into containers via the "secrets" block in ecs-task-def.json.
+# The ecsTaskExecutionRole has an inline policy (examapp-secrets-access)
+# granting secretsmanager:GetSecretValue on arn:...secret:examapp/*.
+#
+# Create a new secret:
+#   aws secretsmanager create-secret \
+#     --name examapp/<SECRET_NAME> \
+#     --description "<description>" \
+#     --secret-string "<value>" \
+#     --region eu-west-1
+#
+# Update an existing secret:
+#   aws secretsmanager put-secret-value \
+#     --secret-id examapp/<SECRET_NAME> \
+#     --secret-string "<new-value>" \
+#     --region eu-west-1
+#
+# View a secret value:
+#   aws secretsmanager get-secret-value \
+#     --secret-id examapp/<SECRET_NAME> \
+#     --region eu-west-1 \
+#     --query SecretString --output text
+#
+# List all examapp secrets:
+#   aws secretsmanager list-secrets \
+#     --filters Key=name,Values=examapp/ \
+#     --region eu-west-1 \
+#     --query 'SecretList[].{Name:Name,ARN:ARN}' --output table
+#
+# Current secrets:
+#   examapp/cognito-client-secret  → COGNITO_APP_CLIENT_SECRET
+# ─────────────────────────────────────────────────────────────────────
 
 REGION=${AWS_REGION:-eu-west-1}
 ACCOUNT=${ACCOUNT_ID:-030461496359}
@@ -99,6 +134,34 @@ fi
 
 echo "Attach inline policy from $INLINE_POLICY_FILE"
 aws iam put-role-policy --role-name examapp-backend-role --policy-name examapp-backend-policy --policy-document file://"$INLINE_POLICY_FILE"
+
+# Create and attach Secrets Manager access policy for ECS execution role
+SECRETS_POLICY_FILE="$SCRIPT_DIR/examapp-secrets-policy.json"
+if [ ! -f "$SECRETS_POLICY_FILE" ]; then
+  cat > "$SECRETS_POLICY_FILE" <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowGetSecretValueForExamApp",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": "arn:aws:secretsmanager:${REGION}:${ACCOUNT}:secret:examapp/*"
+    }
+  ]
+}
+EOF
+  echo "Created $SECRETS_POLICY_FILE"
+fi
+
+echo "Attaching examapp-secrets-access to ecsTaskExecutionRole"
+aws iam put-role-policy \
+  --role-name ecsTaskExecutionRole \
+  --policy-name examapp-secrets-access \
+  --policy-document file://"$SECRETS_POLICY_FILE" || true
 
 echo "8) Register task definition"
 aws ecs register-task-definition --cli-input-json file://"$TASK_DEF_FILE" --region $REGION

@@ -7,7 +7,7 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
-import { jwtVerify, createRemoteJWKSet } from 'jose'
+import { jwtVerify, createRemoteJWKSet, decodeProtectedHeader } from 'jose'
 import { upsertUserFromCognito } from '../services/dynamo.js'
 
 const AUTH_MODE = process.env.AUTH_MODE || 'dev'
@@ -117,7 +117,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             return { ...tokens, user: verified.payload }
           }
         } catch (verErr: any) {
-          request.log?.error?.('id_token verification failed', verErr)
+          try {
+            const hdr = await decodeProtectedHeader(tokens.id_token)
+            request.log?.error?.({ err: verErr?.message ?? String(verErr), kid: hdr.kid, alg: hdr.alg }, 'id_token verification failed')
+          } catch (hdrErr) {
+            request.log?.error?.({ err: verErr?.message ?? String(verErr), hdrErr: String(hdrErr) }, 'id_token verification failed (header decode failed)')
+          }
           return reply.status(401).send({ message: 'id_token verification failed' })
         }
       }
@@ -179,7 +184,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             return reply.redirect(`${frontend}${sep}id_token=${encodeURIComponent(tokens.id_token)}`)
           }
         } catch (verErr: any) {
-          request.log?.error?.('id_token verification failed', verErr)
+          try {
+            const hdr = await decodeProtectedHeader(tokens.id_token)
+            request.log?.error?.({ err: verErr?.message ?? String(verErr), kid: hdr.kid, alg: hdr.alg }, 'id_token verification failed')
+          } catch (hdrErr) {
+            request.log?.error?.({ err: verErr?.message ?? String(verErr), hdrErr: String(hdrErr) }, 'id_token verification failed (header decode failed)')
+          }
           return reply.status(401).send({ message: 'id_token verification failed' })
         }
       }

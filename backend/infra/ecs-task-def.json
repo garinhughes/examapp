@@ -22,7 +22,19 @@
         { "name": "USERS_TABLE", "value": "examapp-users" },
         { "name": "ENTITLEMENTS_TABLE", "value": "examapp-entitlements" },
         { "name": "AUDIT_TABLE", "value": "examapp-audit" },
-        { "name": "AUTH_MODE", "value": "cognito" }
+        { "name": "AUTH_MODE", "value": "cognito" },
+        { "name": "COGNITO_DOMAIN", "value": "eu-west-1c6wqup1rx.auth.eu-west-1.amazoncognito.com" },
+        { "name": "COGNITO_APP_CLIENT_ID", "value": "2b10tfhn1k9pq9rr5f6k14usc3" },
+        { "name": "COGNITO_REGION", "value": "eu-west-1" },
+        { "name": "COGNITO_USER_POOL_ID", "value": "eu-west-1_c6WQUP1RX" },
+        { "name": "COGNITO_REDIRECT_URI", "value": "https://api.certshack.com/auth/token" },
+        { "name": "FRONTEND_ORIGIN", "value": "https://certshack.com" }
+      ],
+      "secrets": [
+        {
+          "name": "COGNITO_APP_CLIENT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:030461496359:secret:examapp/cognito-client-secret-jSS1a8"
+        }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
