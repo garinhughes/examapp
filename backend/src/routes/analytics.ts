@@ -9,7 +9,7 @@ async function loadAttempts() {
 }
 
 function computeTotals(attempt: any): { correctCount: number | null; total: number | null; percent: number | null } {
-  const total = Array.isArray(attempt?.questions) && attempt.questions.length > 0
+  const totalQuestions = Array.isArray(attempt?.questions) && attempt.questions.length > 0
     ? attempt.questions.length
     : (attempt?.perDomain && typeof attempt.perDomain === 'object'
       ? Object.values(attempt.perDomain).reduce((s: number, v: any) => s + (Number(v?.total) || 0), 0)
@@ -17,11 +17,12 @@ function computeTotals(attempt: any): { correctCount: number | null; total: numb
 
   // Robustly compute correct answers (latest answer per questionId wins)
   let correctCount: number | null = null
+  let answeredCount = 0
   if (Array.isArray(attempt?.answers)) {
-    const latestByQ = new Map<number, any>()
+    const latestByQ = new Map<string, any>()
     for (const ans of attempt.answers) {
-      const qid = Number(ans?.questionId)
-      if (!Number.isFinite(qid)) continue
+      const qid = String(ans?.questionId ?? '')
+      if (!qid) continue
       const prev = latestByQ.get(qid)
       const prevT = prev?.createdAt ? String(prev.createdAt) : ''
       const currT = ans?.createdAt ? String(ans.createdAt) : ''
@@ -30,7 +31,14 @@ function computeTotals(attempt: any): { correctCount: number | null; total: numb
     let c = 0
     for (const v of latestByQ.values()) if (v?.correct) c += 1
     correctCount = c
+    answeredCount = latestByQ.size
   }
+
+  // If the attempt was completed early, use the answered count as denominator
+  const isEarly = !!attempt?.earlyComplete
+  const total = isEarly && typeof attempt?.answeredCount === 'number'
+    ? attempt.answeredCount
+    : totalQuestions
 
   let percent: number | null = null
   if (typeof total === 'number' && total > 0 && typeof correctCount === 'number') {

@@ -35,6 +35,7 @@ interface Product {
   priceGBP: number
   billingPeriod?: string
   examCodes?: string[]
+  available?: boolean
 }
 
 /* ------------------------------------------------------------------ */
@@ -174,7 +175,7 @@ function UserRow({
   const activeEnts = entitlements.filter((e) => e.status === 'active')
   const inactiveEnts = entitlements.filter((e) => e.status !== 'active')
   const alreadyGrantedIds = new Set(activeEnts.map((e) => e.productId))
-  const grantableProducts = products.filter((p) => !alreadyGrantedIds.has(p.productId))
+  const grantableProducts = products.filter((p) => !alreadyGrantedIds.has(p.productId) && p.available !== false)
 
   return (
     <>

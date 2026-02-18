@@ -1234,7 +1234,7 @@ ${questionsHTML}
     if (!selected) return
     // If the current attempt already carries its own questions, skip the fetch
     if (Array.isArray(attemptData?.questions) && attemptData.questions.length > 0) return
-    fetch(`/exams/${selected}/questions`)
+    authFetch(`/exams/${selected}/questions`)
       .then((r) => {
         if (!r.ok) throw new Error(`Failed to load questions (${r.status})`)
         return r.json()
@@ -1257,7 +1257,7 @@ ${questionsHTML}
         console.error(e)
         setLastError(String(e))
       })
-  }, [selected])
+  }, [selected, user])
 
   // Ensure when navigating to the Home pre-start view for a selected exam
   // we apply per-exam duration defaults (or saved prefs) deterministically.
@@ -1438,16 +1438,14 @@ ${questionsHTML}
 
     // Authenticated — call server finish
     try {
-      const fin = await authFetch(`/attempts/${attemptId}/finish`, { method: 'PATCH' })
+      const finOpts: RequestInit = { method: 'PATCH' }
+      if (earlyComplete) {
+        finOpts.headers = { 'Content-Type': 'application/json' }
+        finOpts.body = JSON.stringify({ earlyComplete: true })
+      }
+      const fin = await authFetch(`/attempts/${attemptId}/finish`, finOpts)
       const finData = await fin.json()
       if ('attemptId' in finData) {
-        if (earlyComplete && answeredCount < totalQuestions && typeof finData.correctCount === 'number') {
-          finData.total = answeredCount
-          finData.score = answeredCount > 0 ? Math.round((finData.correctCount / answeredCount) * 100) : 0
-          finData.answeredCount = answeredCount
-          finData.totalQuestions = totalQuestions
-          finData.earlyComplete = true
-        }
         setAttemptData(finData)
         handleGamificationReward(finData)
         setExamStarted(false); setTimeLeft(null)

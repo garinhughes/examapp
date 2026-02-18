@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { getUserBySub, listUsers, recordAdminAudit, updateUserFields } from '../services/dynamo.js'
 import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement } from '../services/entitlements.js'
 import { PRODUCTS } from '../catalog.js'
+import { loadAllExams } from '../examLoader.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Require auth and admin flag
@@ -55,9 +56,21 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
   // ── Entitlements ──
 
-  /** List all products from catalog */
+  /** List all products from catalog — annotate exam products with availability */
   server.get('/products', async (_request, reply) => {
-    return { products: PRODUCTS }
+    // Load available exam codes so we can flag which exam products exist
+    const availableExams = await loadAllExams()
+    const availableCodes = new Set(availableExams.map((e) => e.code))
+
+    const products = PRODUCTS.map((p) => {
+      if (p.kind === 'exam') {
+        const code = p.productId.replace('exam:', '')
+        return { ...p, available: availableCodes.has(code) }
+      }
+      return { ...p, available: true }
+    })
+
+    return { products }
   })
 
   /** Get all entitlements for a specific user (including expired/cancelled) */

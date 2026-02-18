@@ -272,12 +272,16 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (attempt.userId !== request.user?.sub) return reply.status(403).send({ message: 'forbidden' })
     if (attempt.finishedAt) return reply.send({ message: 'already finished', attempt })
 
+    // Check for early-complete flag from request body
+    const body = (request.body as any) ?? {}
+    const earlyComplete = !!body.earlyComplete
+
     // prefer per-attempt question set when computing totals
     const qSet = Array.isArray(attempt.questions) && attempt.questions.length > 0
       ? attempt.questions
       : (await loadExam(attempt.examCode))?.questions ?? []
 
-    const total = qSet.length
+    const totalQuestions = qSet.length
 
     // Build latest answer per question (use createdAt to pick the latest)
     const latestByQ = new Map<string, any>()
@@ -292,6 +296,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }
     }
 
+    const answeredCount = latestByQ.size
+
     // Count correct answers from the latest answer per question
     let correctCount = 0
     for (const q of qSet) {
@@ -299,15 +305,19 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       if (ans && ans.correct) correctCount += 1
     }
 
+    // When completing early, score only the answered questions
+    const total = earlyComplete ? answeredCount : totalQuestions
     const score = total > 0 ? Math.round((correctCount / total) * 100) : 0
 
     // compute per-domain breakdown using latest answers
     const perDomain: Record<string, { total: number; correct: number; score: number }> = {}
     for (const q of qSet) {
+      const latestAns = latestByQ.get(String(q.id))
+      // When completing early, skip unanswered questions in domain totals
+      if (earlyComplete && !latestAns) continue
       const domain = q.domain ?? q.meta?.domain ?? 'General'
       if (!perDomain[domain]) perDomain[domain] = { total: 0, correct: 0, score: 0 }
       perDomain[domain].total += 1
-      const latestAns = latestByQ.get(String(q.id))
       if (latestAns && latestAns.correct) perDomain[domain].correct += 1
     }
     for (const k of Object.keys(perDomain)) {
@@ -318,10 +328,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     attempt.finishedAt = new Date().toISOString()
     attempt.score = score
     attempt.perDomain = perDomain
+    if (earlyComplete) {
+      attempt.earlyComplete = true
+      attempt.answeredCount = answeredCount
+      attempt.totalQuestions = totalQuestions
+    }
 
     await saveAttempts(attemptsDb)
 
-    return { attemptId: attempt.attemptId, score, correctCount, total, perDomain }
+    return { attemptId: attempt.attemptId, score, correctCount, total, totalQuestions, answeredCount, earlyComplete, perDomain }
   })
 
   // Get attempt (user must own it)
