@@ -6,17 +6,18 @@
 
 import { useAuth } from '../auth/AuthContext'
 import { useEntitlements, type CatalogProduct, type TierConfig } from '../hooks/useEntitlements'
+import { Check } from 'lucide-react'
 
 const CHECK = '✓'
 const CROSS = '—'
 
 function FeatureRow({ label, visitor, registered, paying }: { label: string; visitor: string; registered: string; paying: string }) {
   return (
-    <tr className="border-t border-slate-200 dark:border-slate-700">
-      <td className="py-2.5 px-3 text-sm font-medium text-slate-700 dark:text-slate-300">{label}</td>
-      <td className="py-2.5 px-3 text-sm text-center text-slate-500 dark:text-slate-400">{visitor}</td>
-      <td className="py-2.5 px-3 text-sm text-center text-slate-500 dark:text-slate-400">{registered}</td>
-      <td className="py-2.5 px-3 text-sm text-center font-semibold text-sky-600 dark:text-sky-400">{paying}</td>
+    <tr className="border-t border-border">
+      <td className="py-2.5 px-3 text-sm font-medium text-foreground">{label}</td>
+      <td className="py-2.5 px-3 text-sm text-center text-muted-foreground">{visitor}</td>
+      <td className="py-2.5 px-3 text-sm text-center text-muted-foreground">{registered}</td>
+      <td className="py-2.5 px-3 text-sm text-center font-semibold text-primary">{paying}</td>
     </tr>
   )
 }
@@ -37,26 +38,26 @@ function ProductCard({ product, onBuy }: { product: CatalogProduct; onBuy: (p: C
     <div className={`p-4 rounded-xl border transition-all ${
       product.owned
         ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-900/10'
-        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 hover:border-sky-400 dark:hover:border-sky-500'
+        : 'border-border bg-card hover:border-primary'
     }`}>
       <div className="flex items-start justify-between">
         <div>
-          <span className="inline-block text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 mb-1.5">
+          <span className="inline-block text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground mb-1.5">
             {kindLabels[product.kind] ?? product.kind}
           </span>
-          <h3 className="font-semibold text-slate-900 dark:text-white">{product.label}</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{product.description}</p>
+          <h3 className="font-semibold text-foreground">{product.label}</h3>
+          <p className="text-sm text-muted-foreground mt-0.5">{product.description}</p>
           {product.billingPeriod && (
-            <p className="text-xs text-slate-400 mt-1">Billed {product.billingPeriod === 'annual' ? 'annually' : 'monthly'}</p>
+            <p className="text-xs text-muted-foreground mt-1">Billed {product.billingPeriod === 'annual' ? 'annually' : 'monthly'}</p>
           )}
         </div>
         <div className="text-right ml-4 flex-shrink-0">
-          <div className="text-xl font-bold text-slate-900 dark:text-white">{formatPrice(product.priceGBP)}</div>
+          <div className="text-xl font-bold text-foreground">{formatPrice(product.priceGBP)}</div>
           {product.billingPeriod === 'monthly' && (
-            <div className="text-xs text-slate-400">/month</div>
+            <div className="text-xs text-muted-foreground">/month</div>
           )}
           {product.billingPeriod === 'annual' && (
-            <div className="text-xs text-slate-400">/year</div>
+            <div className="text-xs text-muted-foreground">/year</div>
           )}
         </div>
       </div>
@@ -64,7 +65,7 @@ function ProductCard({ product, onBuy }: { product: CatalogProduct; onBuy: (p: C
       {product.examCodes && product.examCodes.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
           {product.examCodes.map((c) => (
-            <span key={c} className="text-[10px] px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300">
+            <span key={c} className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">
               {c}
             </span>
           ))}
@@ -74,13 +75,13 @@ function ProductCard({ product, onBuy }: { product: CatalogProduct; onBuy: (p: C
       <div className="mt-3">
         {product.owned ? (
           <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-            <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+            <Check className="w-4 h-4" />
             Owned
           </span>
         ) : (
           <button
             onClick={() => onBuy(product)}
-            className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 text-white text-sm font-semibold hover:from-sky-600 hover:to-indigo-600 transition-all"
+            className="w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition-all"
           >
             Buy {formatPrice(product.priceGBP)}
           </button>
@@ -113,11 +114,11 @@ export default function PricingPage() {
       {/* Header */}
       <div className="text-center">
         <h2 className="text-3xl font-extrabold">Simple, fair pricing</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-lg mx-auto">
+        <p className="text-muted-foreground mt-2 max-w-lg mx-auto">
           Start free, upgrade when you're ready. Pay once per exam or go unlimited.
         </p>
         {tier && (
-          <div className="mt-3 inline-block px-3 py-1 rounded-full text-sm font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300">
+          <div className="mt-3 inline-block px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
             Your tier: <span className="font-bold capitalize">{tier}</span>
           </div>
         )}
@@ -127,15 +128,15 @@ export default function PricingPage() {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b-2 border-slate-200 dark:border-slate-600">
-              <th className="py-3 px-3 text-sm font-semibold text-slate-600 dark:text-slate-300 w-1/3">Feature</th>
-              <th className="py-3 px-3 text-sm font-semibold text-center text-slate-500 dark:text-slate-400">
+            <tr className="border-b-2 border-border">
+              <th className="py-3 px-3 text-sm font-semibold text-muted-foreground w-1/3">Feature</th>
+              <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">
                 Free / Visitor
               </th>
-              <th className="py-3 px-3 text-sm font-semibold text-center text-slate-500 dark:text-slate-400">
+              <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">
                 Registered
               </th>
-              <th className="py-3 px-3 text-sm font-semibold text-center text-sky-600 dark:text-sky-400">
+              <th className="py-3 px-3 text-sm font-semibold text-center text-primary">
                 Paying ✨
               </th>
             </tr>
@@ -154,7 +155,7 @@ export default function PricingPage() {
       </div>
 
       {loading && (
-        <div className="text-center text-sm text-slate-400">Loading catalog…</div>
+        <div className="text-center text-sm text-muted-foreground">Loading catalog…</div>
       )}
 
       {/* Subscriptions */}
@@ -207,11 +208,11 @@ export default function PricingPage() {
 
       {/* Not logged in CTA */}
       {!user && (
-        <div className="text-center p-6 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/40">
-          <p className="text-slate-500 dark:text-slate-400 mb-3">Register to save your progress and unlock more questions for free.</p>
+        <div className="text-center p-6 rounded-xl border border-dashed border-border bg-muted/40">
+          <p className="text-muted-foreground mb-3">Register to save your progress and unlock more questions for free.</p>
           <button
             onClick={login}
-            className="px-5 py-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold"
+            className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-semibold"
           >
             Sign in with Google
           </button>

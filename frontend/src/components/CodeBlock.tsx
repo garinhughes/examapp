@@ -6,13 +6,13 @@ type Props = { code: string; language?: string; inline?: boolean }
 
 export default function CodeBlock({ code, language = 'bash', inline = false }: Props) {
   if (inline) {
-    return <code className="font-mono text-sm bg-slate-800 px-1 py-0.5 rounded">{code}</code>
+    return <code className="font-mono text-sm bg-card px-1 py-0.5 rounded">{code}</code>
   }
   // For shell/CLI snippets, apply a small tokeniser to highlight options/flags
   if (language === 'bash' || language === 'sh' || language === 'shell') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded bg-slate-900 text-sm overflow-auto font-mono">
+      <pre className="p-3 rounded bg-muted text-sm overflow-auto font-mono">
         {lines.map((ln, i) => (
           <div key={i} className="leading-6">
             {ln.split(/(\s+)/).map((tok, j) => {
@@ -33,7 +33,7 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   if (language === 'yaml' || language === 'yml') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded bg-slate-900 text-sm overflow-auto font-mono">
+      <pre className="p-3 rounded bg-muted text-sm overflow-auto font-mono">
         {lines.map((ln, i) => {
           // Comment lines
           if (/^\s*#/.test(ln)) {
@@ -81,7 +81,7 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   return (
     <Highlight {...defaultProps} code={code} language={language as Language} theme={theme}>
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`${className} p-3 rounded bg-slate-900 text-sm overflow-auto font-mono`} style={{ ...style }}>
+        <pre className={`${className} p-3 rounded bg-muted text-sm overflow-auto font-mono`} style={{ ...style }}>
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line, key: i })}>
               {line.map((token, k) => (

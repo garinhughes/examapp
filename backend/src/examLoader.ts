@@ -48,6 +48,7 @@ export interface Question {
   selectCount: number
   format?: string
   domain?: string
+  skills?: string[]
   services?: string[]
   docs?: string
   tip?: string
@@ -90,6 +91,7 @@ export function normaliseQuestion(raw: any): Question {
     selectCount,
     format: raw.format,
     domain: raw.domain ?? raw.meta?.domain ?? undefined,
+    skills: Array.isArray(raw.skills) ? raw.skills : undefined,
     services: raw.services,
     docs: raw.docs,
     tip: raw.tip,

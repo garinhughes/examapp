@@ -349,7 +349,25 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     // Ensure returned attempt.questions are normalised to the current schema
     try {
       if (Array.isArray(attempt.questions) && attempt.questions.length > 0) {
-        attempt.questions = attempt.questions.map((q: any) => normaliseQuestion(q))
+        // Build a lookup from the live exam so we can backfill fields (like skills)
+        // that may be missing from older snapshotted question objects
+        let examLookup: Map<string, any> | null = null
+        try {
+          const exam = await loadExam(attempt.examCode)
+          if (exam) examLookup = new Map(exam.questions.map((q: any) => [String(q.id), q]))
+        } catch { /* ignore */ }
+        attempt.questions = attempt.questions.map((q: any) => {
+          const normalised = normaliseQuestion(q)
+          // Backfill missing fields from live exam (handles legacy snapshots)
+          if (examLookup) {
+            const live = examLookup.get(String(q.id))
+            if (live) {
+              if (!normalised.skills && Array.isArray(live.skills)) normalised.skills = live.skills
+              if (!normalised.domain && live.domain) normalised.domain = live.domain
+            }
+          }
+          return normalised
+        })
       }
     } catch (err) {
       // If normalization fails, return original attempt but log the error
