@@ -43,16 +43,16 @@ interface Product {
 /* ------------------------------------------------------------------ */
 
 const KIND_COLORS: Record<string, string> = {
-  exam: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300',
+  exam: 'bg-primary/10 text-primary',
   bundle: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
   subscription: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
-  extra: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+  extra: 'bg-primary/10 text-primary',
 }
 
 const STATUS_COLORS: Record<string, string> = {
   active: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
   cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
-  expired: 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400',
+  expired: 'bg-accent text-muted-foreground',
 }
 
 function fmtDate(iso?: string | null) {
@@ -181,7 +181,7 @@ function UserRow({
     <>
       {/* Main row */}
       <tr
-        className={`border-t border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors ${expanded ? 'bg-slate-50/80 dark:bg-slate-800/30' : ''}`}
+        className={`border-t border-border/60 dark:border-border/60 cursor-pointer hover:bg-muted/50 dark:hover:bg-card/40 transition-colors ${expanded ? 'bg-muted/50/80 dark:bg-card/30' : ''}`}
         onClick={() => setExpanded(!expanded)}
       >
         <td className="p-2.5">
@@ -190,7 +190,7 @@ function UserRow({
             <div>
               <div className="font-medium text-sm">{user.name || '—'}</div>
               {user.username && (
-                <div className="text-xs text-sky-500">@{user.username}</div>
+                <div className="text-xs text-primary">@{user.username}</div>
               )}
             </div>
           </div>
@@ -199,14 +199,14 @@ function UserRow({
         <td className="p-2.5">
           <div className="flex items-center gap-1.5">
             {user.isAdmin && (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">ADMIN</span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary">ADMIN</span>
             )}
-            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${user.provider === 'google' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${user.provider === 'google' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' : 'bg-muted text-muted-foreground'}`}>
               {user.provider || 'cognito'}
             </span>
           </div>
         </td>
-        <td className="p-2.5 text-xs text-slate-500 dark:text-slate-400">{fmtDateTime(user.lastLogin)}</td>
+        <td className="p-2.5 text-xs text-muted-foreground">{fmtDateTime(user.lastLogin)}</td>
         <td className="p-2.5 text-right">
           <span className={`text-xs transition-transform inline-block ${expanded ? 'rotate-180' : ''}`}>▼</span>
         </td>
@@ -216,17 +216,17 @@ function UserRow({
       {expanded && (
         <tr>
           <td colSpan={5} className="p-0">
-            <div className="px-4 py-3 bg-slate-50/50 dark:bg-slate-800/20 border-b border-slate-200/60 dark:border-slate-700/60 space-y-4">
+            <div className="px-4 py-3 bg-muted/50/50 dark:bg-card/20 border-b border-border/60 dark:border-border/60 space-y-4">
               {/* User info & quick actions */}
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs text-slate-400 font-mono truncate max-w-[260px]" title={user.userId}>ID: {user.userId}</span>
+                <span className="text-xs text-muted-foreground font-mono truncate max-w-[260px]" title={user.userId}>ID: {user.userId}</span>
                 <div className="flex-1" />
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleFlag('isAdmin', !user.isAdmin) }}
                   className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                     user.isAdmin
-                      ? 'bg-amber-500 text-white hover:bg-amber-600'
-                      : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
+                      ? 'bg-primary/100 text-white hover:bg-primary'
+                      : 'bg-accent text-muted-foreground hover:bg-accent'
                   }`}
                 >
                   {user.isAdmin ? '🛡 Revoke Admin' : '🛡 Make Admin'}
@@ -245,22 +245,22 @@ function UserRow({
 
               {/* Entitlements section */}
               <div>
-                <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   Entitlements
                 </h4>
 
                 {loadingEnts ? (
-                  <div className="text-xs text-slate-400">Loading…</div>
+                  <div className="text-xs text-muted-foreground">Loading…</div>
                 ) : activeEnts.length === 0 && inactiveEnts.length === 0 ? (
-                  <div className="text-xs text-slate-400 italic">No entitlements.</div>
+                  <div className="text-xs text-muted-foreground italic">No entitlements.</div>
                 ) : (
                   <div className="space-y-1.5">
                     {/* Active entitlements */}
                     {activeEnts.map((ent) => {
                       const prod = products.find((p) => p.productId === ent.productId)
                       return (
-                        <div key={ent.productId} className="flex items-center gap-2 p-2 rounded-lg border border-slate-200/60 dark:border-slate-700/60 bg-white dark:bg-slate-900/40">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${KIND_COLORS[ent.kind] ?? 'bg-slate-200 text-slate-600'}`}>
+                        <div key={ent.productId} className="flex items-center gap-2 p-2 rounded-lg border border-border/60 dark:border-border/60 bg-card/40">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${KIND_COLORS[ent.kind] ?? 'bg-accent text-muted-foreground'}`}>
                             {ent.kind}
                           </span>
                           <span className="text-sm font-medium flex-1 truncate">
@@ -270,11 +270,11 @@ function UserRow({
                             {ent.status}
                           </span>
                           {ent.meta?.grantedByAdmin && (
-                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-primary/10 dark:bg-primary/10 text-primary dark:text-primary">
                               Admin-granted
                             </span>
                           )}
-                          <span className="text-[10px] text-slate-400">{fmtDate(ent.purchasedAt)}</span>
+                          <span className="text-[10px] text-muted-foreground">{fmtDate(ent.purchasedAt)}</span>
 
                           {/* Revoke button with confirmation */}
                           {confirmRevoke === ent.productId ? (
@@ -288,7 +288,7 @@ function UserRow({
                               </button>
                               <button
                                 onClick={() => setConfirmRevoke(null)}
-                                className="px-2 py-0.5 rounded text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
+                                className="px-2 py-0.5 rounded text-[10px] bg-accent text-muted-foreground"
                               >
                                 Cancel
                               </button>
@@ -308,7 +308,7 @@ function UserRow({
                     {/* Inactive entitlements (collapsed) */}
                     {inactiveEnts.length > 0 && (
                       <details className="text-xs">
-                        <summary className="cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 select-none">
+                        <summary className="cursor-pointer text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground select-none">
                           {inactiveEnts.length} revoked/expired entitlement{inactiveEnts.length !== 1 ? 's' : ''}
                         </summary>
                         <div className="mt-1 space-y-1">
@@ -316,14 +316,14 @@ function UserRow({
                             const prod = products.find((p) => p.productId === ent.productId)
                             return (
                               <div key={ent.productId} className="flex items-center gap-2 p-1.5 rounded opacity-60">
-                                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${KIND_COLORS[ent.kind] ?? 'bg-slate-200 text-slate-600'}`}>
+                                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${KIND_COLORS[ent.kind] ?? 'bg-accent text-muted-foreground'}`}>
                                   {ent.kind}
                                 </span>
                                 <span className="text-sm truncate flex-1">{prod?.label ?? ent.productId}</span>
                                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${STATUS_COLORS[ent.status]}`}>
                                   {ent.status}
                                 </span>
-                                <span className="text-[10px] text-slate-400">{fmtDate(ent.purchasedAt)}</span>
+                                <span className="text-[10px] text-muted-foreground">{fmtDate(ent.purchasedAt)}</span>
                                 {/* Re-grant button for revoked/expired */}
                                 <button
                                   onClick={(e) => {
@@ -348,7 +348,7 @@ function UserRow({
                   <select
                     value={grantProductId}
                     onChange={(e) => setGrantProductId(e.target.value)}
-                    className="flex-1 px-2 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+                    className="flex-1 px-2 py-1.5 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                   >
                     <option value="">Select product to grant…</option>
                     {grantableProducts.map((p) => (
@@ -453,7 +453,7 @@ export default function AdminPanel() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold">Admin Panel</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {users.length} user{users.length !== 1 ? 's' : ''} registered
             {filtered.length !== users.length && ` · ${filtered.length} shown`}
           </p>
@@ -461,7 +461,7 @@ export default function AdminPanel() {
         <button
           onClick={load}
           disabled={loading}
-          className="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-40 transition-colors"
+          className="px-3 py-1.5 rounded-lg bg-accent text-sm font-medium hover:bg-accent disabled:opacity-40 transition-colors"
         >
           {loading ? 'Loading…' : '↻ Refresh'}
         </button>
@@ -482,22 +482,22 @@ export default function AdminPanel() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, email, username, or ID…"
-            className="w-full pl-8 pr-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+            className="w-full pl-8 pr-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
-          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">🔍</span>
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground text-xs"
             >✕</button>
           )}
         </div>
-        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded">
+        <div className="flex gap-1 bg-muted p-0.5 rounded">
           {([['all', 'All'], ['admin', 'Admins'], ['inactive', 'Inactive']] as const).map(([val, label]) => (
             <button
               key={val}
               onClick={() => setFilterRole(val)}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${filterRole === val ? 'bg-white dark:bg-slate-600 shadow-sm' : 'text-slate-500'}`}
+              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${filterRole === val ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
             >
               {label}
             </button>
@@ -506,19 +506,19 @@ export default function AdminPanel() {
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div className="rounded-lg border border-border overflow-hidden">
         <div className="overflow-auto max-h-[65vh]">
           <table className="w-full table-auto text-sm">
-            <thead className="bg-slate-100 dark:bg-slate-800 sticky top-0 z-10">
-              <tr className="text-left text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                <th className="p-2.5 cursor-pointer hover:text-slate-700 dark:hover:text-slate-200" onClick={() => toggleSort('name')}>
+            <thead className="bg-muted sticky top-0 z-10">
+              <tr className="text-left text-xs text-muted-foreground uppercase tracking-wider">
+                <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('name')}>
                   User{sortIcon('name')}
                 </th>
-                <th className="p-2.5 cursor-pointer hover:text-slate-700 dark:hover:text-slate-200" onClick={() => toggleSort('email')}>
+                <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('email')}>
                   Email{sortIcon('email')}
                 </th>
                 <th className="p-2.5">Flags</th>
-                <th className="p-2.5 cursor-pointer hover:text-slate-700 dark:hover:text-slate-200" onClick={() => toggleSort('lastLogin')}>
+                <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('lastLogin')}>
                   Last Login{sortIcon('lastLogin')}
                 </th>
                 <th className="p-2.5 w-8"></th>
@@ -527,7 +527,7 @@ export default function AdminPanel() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-6 text-center text-slate-400">
+                  <td colSpan={5} className="p-6 text-center text-muted-foreground">
                     {loading ? 'Loading…' : search ? 'No users match your search.' : 'No users found.'}
                   </td>
                 </tr>

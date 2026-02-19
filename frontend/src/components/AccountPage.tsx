@@ -15,10 +15,10 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 const TIER_COLORS: Record<string, string> = {
-  none: 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400',
-  bronze: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
-  silver: 'bg-slate-100 dark:bg-slate-500/20 text-slate-600 dark:text-slate-300',
-  gold: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
+  none: 'bg-accent text-muted-foreground',
+  bronze: 'bg-primary/10 text-primary',
+  silver: 'bg-muted dark:bg-muted/500/20 text-muted-foreground',
+  gold: 'bg-yellow-100 text-primary',
 }
 
 export default function AccountPage() {
@@ -140,34 +140,34 @@ export default function AccountPage() {
   return (
     <div className="space-y-6">
       {/* Profile header */}
-      <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+      <div className="p-5 rounded-xl border border-border bg-card">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center text-white text-2xl font-bold">
+          <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold">
             {user?.name?.[0]?.toUpperCase() ?? '?'}
           </div>
           <div className="flex-1">
             <h2 className="text-lg font-bold">{currentUsername ?? user?.name ?? 'Guest'}</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{user?.email ?? ''}</p>
+            <p className="text-sm text-muted-foreground">{user?.email ?? ''}</p>
             {currentUsername && (
-              <p className="text-xs text-slate-400 mt-0.5">@{currentUsername}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">@{currentUsername}</p>
             )}
           </div>
           <div className="text-right">
-            <div className="text-2xl font-extrabold text-sky-500">Level {level}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">{state.xp.toLocaleString()} XP total</div>
+            <div className="text-2xl font-extrabold text-primary">Level {level}</div>
+            <div className="text-xs text-muted-foreground">{state.xp.toLocaleString()} XP total</div>
           </div>
         </div>
 
         {/* XP progress bar */}
         <div className="mt-4">
-          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+          <div className="flex justify-between text-xs text-muted-foreground mb-1">
             <span>Level {level}</span>
             <span>{currentXP} / {nextLevelXP} XP</span>
             <span>Level {level + 1}</span>
           </div>
-          <div className="h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+          <div className="h-2.5 rounded-full bg-accent overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 transition-all duration-500"
+              className="h-full rounded-full bg-primary transition-all duration-500"
               style={{ width: `${levelProgress}%` }}
             />
           </div>
@@ -175,33 +175,33 @@ export default function AccountPage() {
 
         {/* Quick stats row */}
         <div className="mt-4 grid grid-cols-3 gap-3">
-          <div className="text-center p-2 rounded-lg bg-slate-50 dark:bg-slate-700/40">
-            <div className="text-xl font-bold text-amber-500">🔥 {state.streak}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">Day Streak</div>
+          <div className="text-center p-2 rounded-lg bg-muted/50">
+            <div className="text-xl font-bold text-primary">🔥 {state.streak}</div>
+            <div className="text-xs text-muted-foreground">Day Streak</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-slate-50 dark:bg-slate-700/40">
+          <div className="text-center p-2 rounded-lg bg-muted/50">
             <div className="text-xl font-bold text-emerald-500">{state.badges.length}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">Badges</div>
+            <div className="text-xs text-muted-foreground">Badges</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-slate-50 dark:bg-slate-700/40">
+          <div className="text-center p-2 rounded-lg bg-muted/50">
             <div className="text-xl font-bold text-purple-500">
               {Object.values(state.domainMastery).filter((d) => d.tier !== 'none').length}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">Domains Mastered</div>
+            <div className="text-xs text-muted-foreground">Domains Mastered</div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+      <div className="flex gap-1 bg-muted p-1 rounded-lg">
         {(['overview', 'badges', 'mastery', 'purchases'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`flex-1 px-3 py-1.5 rounded text-sm font-medium transition-colors ${
               tab === t
-                ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                ? 'bg-card shadow-sm text-foreground'
+                : 'text-muted-foreground hover:text-foreground dark:hover:text-foreground'
             }`}
           >
             {t === 'overview' ? '📊 Overview' : t === 'badges' ? '🏅 Badges' : t === 'mastery' ? '🎓 Mastery' : '💳 Purchases'}
@@ -213,18 +213,18 @@ export default function AccountPage() {
       {tab === 'overview' && (
         <div className="space-y-4">
           {/* Username */}
-          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+          <div className="p-4 rounded-lg border border-border bg-card">
             <div className="flex items-center justify-between mb-1">
               <div>
-                <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300">Username</h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <h3 className="text-sm font-semibold text-muted-foreground">Username</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
                   Your public display name on the leaderboard. 3–20 characters, letters/numbers/underscores/hyphens.
                 </p>
               </div>
               {currentUsername && !editingUsername && (
                 <button
                   onClick={() => setEditingUsername(true)}
-                  className="text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                  className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground hover:text-foreground dark:hover:text-foreground"
                 >
                   Edit
                 </button>
@@ -241,10 +241,10 @@ export default function AccountPage() {
                       onChange={(e) => setUsernameInput(e.target.value)}
                       placeholder="Choose a username…"
                       maxLength={20}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
                     />
                     {usernameStatus === 'checking' && (
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">checking…</span>
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">checking…</span>
                     )}
                     {usernameStatus === 'available' && (
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">✓</span>
@@ -256,7 +256,7 @@ export default function AccountPage() {
                   <button
                     onClick={saveUsername}
                     disabled={usernameStatus !== 'available' || usernameInput.trim() === currentUsername}
-                    className="px-4 py-2 rounded-lg bg-sky-500 text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sky-400 transition-colors"
+                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/80 transition-colors"
                   >
                     {usernameStatus === 'saving' ? 'Saving…' : currentUsername ? 'Update' : 'Claim'}
                   </button>
@@ -268,7 +268,7 @@ export default function AccountPage() {
                         setUsernameStatus('idle')
                         setUsernameMessage('')
                       }}
-                      className="px-3 py-2 rounded-lg bg-slate-200 dark:bg-slate-700 text-sm text-slate-600 dark:text-slate-300"
+                      className="px-3 py-2 rounded-lg bg-accent text-sm text-muted-foreground"
                     >
                       Cancel
                     </button>
@@ -279,7 +279,7 @@ export default function AccountPage() {
                     usernameStatus === 'available' || usernameStatus === 'saved'
                       ? 'text-green-500'
                       : usernameStatus === 'checking' || usernameStatus === 'idle'
-                        ? 'text-slate-400'
+                        ? 'text-muted-foreground'
                         : 'text-red-500'
                   }`}>
                     {usernameMessage}
@@ -288,7 +288,7 @@ export default function AccountPage() {
               </div>
             ) : (
               <div className="mt-2 flex items-center gap-2">
-                <span className="text-sm font-mono font-semibold text-sky-500">@{currentUsername}</span>
+                <span className="text-sm font-mono font-semibold text-primary">@{currentUsername}</span>
                 {usernameStatus === 'saved' && (
                   <span className="text-xs text-green-500">✓ Saved</span>
                 )}
@@ -297,17 +297,17 @@ export default function AccountPage() {
           </div>
 
           {/* Recent badges */}
-          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
-            <h3 className="text-sm font-semibold mb-3 text-slate-600 dark:text-slate-300">Recent Badges</h3>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Recent Badges</h3>
             {state.badges.length === 0 ? (
-              <p className="text-sm text-slate-400">Complete exams to earn badges!</p>
+              <p className="text-sm text-muted-foreground">Complete exams to earn badges!</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {state.badges.slice(-6).reverse().map((eb) => {
                   const def = BADGES.find((b) => b.id === eb.id)
                   if (!def) return null
                   return (
-                    <div key={eb.id} className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-50 dark:bg-slate-700/40 text-sm" title={def.description}>
+                    <div key={eb.id} className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/50 text-sm" title={def.description}>
                       <span>{def.icon}</span>
                       <span className="font-medium">{def.name}</span>
                     </div>
@@ -318,20 +318,20 @@ export default function AccountPage() {
           </div>
 
           {/* Leaderboard opt-in */}
-          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+          <div className="p-4 rounded-lg border border-border bg-card">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300">Leaderboard</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Share your XP and streak on the public leaderboard</p>
+                <h3 className="text-sm font-semibold text-muted-foreground">Leaderboard</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Share your XP and streak on the public leaderboard</p>
               </div>
               <button
                 onClick={toggleLeaderboard}
                 className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
-                  state.leaderboardOptIn ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-600'
+                  state.leaderboardOptIn ? 'bg-primary' : 'bg-muted'
                 }`}
               >
                 <span
-                  className={`inline-block w-4 h-4 rounded-full bg-white shadow transform transition-transform mt-1 ${
+                  className={`inline-block w-4 h-4 rounded-full bg-card shadow transform transition-transform mt-1 ${
                     state.leaderboardOptIn ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -344,8 +344,8 @@ export default function AccountPage() {
       {tab === 'badges' && (
         <div className="space-y-4">
           {categories.map(([cat, badges]) => (
-            <div key={cat} className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
-              <h3 className="text-sm font-semibold mb-3 text-slate-600 dark:text-slate-300">
+            <div key={cat} className="p-4 rounded-lg border border-border bg-card">
+              <h3 className="text-sm font-semibold mb-3 text-muted-foreground">
                 {CATEGORY_LABELS[cat] ?? cat}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -357,16 +357,16 @@ export default function AccountPage() {
                       key={b.id}
                       className={`flex items-center gap-3 p-2.5 rounded-lg border transition-all ${
                         earned
-                          ? 'border-amber-300 dark:border-amber-600 bg-amber-50/50 dark:bg-amber-900/10'
-                          : 'border-slate-200 dark:border-slate-700 opacity-50 grayscale'
+                          ? 'border-primary/30 dark:border-primary/30 bg-primary/5'
+                          : 'border-border opacity-50 grayscale'
                       }`}
                     >
                       <span className="text-2xl">{b.icon}</span>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold truncate">{b.name}</div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 truncate">{b.description}</div>
+                        <div className="text-xs text-muted-foreground truncate">{b.description}</div>
                         {earned && eb && (
-                          <div className="text-[10px] text-slate-400 mt-0.5">
+                          <div className="text-[10px] text-muted-foreground mt-0.5">
                             Earned {new Date(eb.earnedAt).toLocaleDateString()}
                           </div>
                         )}
@@ -384,33 +384,33 @@ export default function AccountPage() {
       {tab === 'mastery' && (
         <div className="space-y-3">
           {domainEntries.length === 0 ? (
-            <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 text-center">
-              <p className="text-sm text-slate-400">Complete exams with domain questions to track mastery.</p>
+            <div className="p-4 rounded-lg border border-border bg-card text-center">
+              <p className="text-sm text-muted-foreground">Complete exams with domain questions to track mastery.</p>
             </div>
           ) : (
             domainEntries.map((d) => (
-              <div key={d.domain} className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
+              <div key={d.domain} className="p-3 rounded-lg border border-border bg-card">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-semibold truncate flex-1">{d.domain}</span>
                   <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${TIER_COLORS[d.tier]}`}>
                     {d.tier === 'none' ? 'Unranked' : d.tier}
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                <div className="h-2 rounded-full bg-accent overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       d.tier === 'gold'
                         ? 'bg-yellow-400'
                         : d.tier === 'silver'
-                          ? 'bg-slate-400'
+                          ? 'bg-muted-foreground'
                           : d.tier === 'bronze'
-                            ? 'bg-amber-500'
-                            : 'bg-sky-400'
+                            ? 'bg-primary/100'
+                            : 'bg-primary'
                     }`}
                     style={{ width: `${d.progress}%` }}
                   />
                 </div>
-                <div className="text-xs text-slate-400 mt-1">
+                <div className="text-xs text-muted-foreground mt-1">
                   {d.recentScores.length} attempt{d.recentScores.length !== 1 ? 's' : ''} tracked
                   {d.recentScores.length > 0 &&
                     ` · Avg ${Math.round(d.recentScores.reduce((a, b) => a + b, 0) / d.recentScores.length)}%`}
@@ -424,34 +424,34 @@ export default function AccountPage() {
       {tab === 'purchases' && (
         <div className="space-y-4">
           {/* Current tier */}
-          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
-            <h3 className="text-sm font-semibold mb-2 text-slate-600 dark:text-slate-300">Your Plan</h3>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <h3 className="text-sm font-semibold mb-2 text-muted-foreground">Your Plan</h3>
             <div className="flex items-center gap-3">
               <span className={`px-3 py-1 rounded-full text-sm font-bold capitalize ${
                 tier === 'paying'
                   ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
                   : tier === 'registered'
-                    ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300'
-                    : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-muted text-muted-foreground'
               }`}>
                 {tier}
               </span>
-              <span className="text-sm text-slate-500 dark:text-slate-400">
+              <span className="text-sm text-muted-foreground">
                 {tierConfig.questionLimit === null
                   ? 'Unlimited questions'
                   : `Up to ${tierConfig.questionLimit} questions per exam`}
               </span>
             </div>
             {tier !== 'paying' && (
-              <p className="text-xs text-slate-400 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 Upgrade to unlock all questions, exports, leaderboard, and more.
               </p>
             )}
           </div>
 
           {/* Feature access summary */}
-          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
-            <h3 className="text-sm font-semibold mb-3 text-slate-600 dark:text-slate-300">Feature Access</h3>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Feature Access</h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {[
                 { label: 'Review & explanations', on: tierConfig.reviewEnabled },
@@ -460,10 +460,10 @@ export default function AccountPage() {
                 { label: 'Domain mastery history', on: tierConfig.domainMasteryEnabled },
               ].map((f) => (
                 <div key={f.label} className="flex items-center gap-2">
-                  <span className={f.on ? 'text-emerald-500' : 'text-slate-400'}>
+                  <span className={f.on ? 'text-emerald-500' : 'text-muted-foreground'}>
                     {f.on ? '✓' : '—'}
                   </span>
-                  <span className={f.on ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'}>
+                  <span className={f.on ? 'text-foreground' : 'text-muted-foreground dark:text-muted-foreground'}>
                     {f.label}
                   </span>
                 </div>
@@ -472,12 +472,12 @@ export default function AccountPage() {
           </div>
 
           {/* Active entitlements */}
-          <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60">
-            <h3 className="text-sm font-semibold mb-3 text-slate-600 dark:text-slate-300">Purchases</h3>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Purchases</h3>
             {entLoading ? (
-              <p className="text-sm text-slate-400">Loading…</p>
+              <p className="text-sm text-muted-foreground">Loading…</p>
             ) : entitlements.length === 0 ? (
-              <p className="text-sm text-slate-400">No purchases yet.</p>
+              <p className="text-sm text-muted-foreground">No purchases yet.</p>
             ) : (
               <div className="space-y-2">
                 {entitlements.map((pid) => {
@@ -487,7 +487,7 @@ export default function AccountPage() {
                       <div>
                         <div className="text-sm font-medium">{prod?.label ?? pid}</div>
                         {prod?.description && (
-                          <div className="text-xs text-slate-400">{prod.description}</div>
+                          <div className="text-xs text-muted-foreground">{prod.description}</div>
                         )}
                       </div>
                       <span className="text-emerald-500 text-sm font-semibold">Active</span>
@@ -503,7 +503,7 @@ export default function AccountPage() {
             {entitlements.some((id) => id.startsWith('sub:')) && (
               <button
                 onClick={() => alert('Stripe Customer Portal will be available soon.')}
-                className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                className="px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted/50 dark:hover:bg-card transition-colors"
               >
                 Manage Subscription
               </button>

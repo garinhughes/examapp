@@ -230,10 +230,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /* ---- logout ---- */
   const logout = useCallback(() => {
+    const hadToken = !!localStorage.getItem(TOKEN_KEY)
     clearToken()
     setUser(null)
 
-    if (MODE !== 'dev') {
+    if (MODE !== 'dev' && hadToken) {
       let domain = import.meta.env.VITE_COGNITO_DOMAIN || ''
       const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID
       const logoutUri = encodeURIComponent(window.location.origin)

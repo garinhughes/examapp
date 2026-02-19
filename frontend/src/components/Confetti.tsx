@@ -65,22 +65,22 @@ export function RewardModal({
   return (
     <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50" onClick={onClose}>
       <div
-        className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 text-center animate-[reward-pop_0.4s_ease-out]"
+        className="bg-card rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 text-center animate-[reward-pop_0.4s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-4xl mb-2">🎉</div>
         <h2 className="text-xl font-bold mb-1">{title}</h2>
-        {subtitle && <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-muted-foreground mb-3">{subtitle}</p>}
 
         {xpGained > 0 && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-sm font-semibold mb-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-3">
             +{xpGained} XP
           </div>
         )}
 
         {badges.length > 0 && (
           <div className="mt-2 space-y-2">
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">New Badges</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">New Badges</p>
             {badges.map((b) => (
               <div key={b.name} className="flex items-center gap-2 justify-center">
                 <span className="text-2xl animate-[badge-bounce_0.6s_ease-out]">{b.icon}</span>
@@ -92,7 +92,7 @@ export function RewardModal({
 
         <button
           onClick={onClose}
-          className="mt-4 px-4 py-2 rounded-lg bg-sky-500 text-white hover:bg-sky-600 text-sm font-medium"
+          className="mt-4 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
         >
           Continue
         </button>

@@ -8,13 +8,226 @@ button { cursor: pointer; }
 /* small helper */
 .container { max-width: 1024px; margin-left: auto; margin-right: auto; }
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+button { cursor: pointer; }
+
+/* small helper */
+.container { max-width: 1024px; margin-left: auto; margin-right: auto; }
+
 @layer base {
-	body {
-		@apply bg-slate-50 text-slate-800;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-	}
-	.dark body {
-		@apply bg-slate-900 text-slate-100;
-	}
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
+
+@layer base {
+  :root {
+    /* Outer page background (light grey) */
+    --background: oklch(0.9450 0.0050 262.0000);
+    --foreground: oklch(0.1600 0.0200 262.0000);
+    /* Content panels remain white */
+    --card: oklch(1.0000 0 0);
+    --card-foreground: oklch(0.1600 0.0200 262.0000);
+    --popover: oklch(1.0000 0 0);
+    --popover-foreground: oklch(0.1600 0.0200 262.0000);
+    --primary: oklch(0.6716 0.1368 48.5130);
+    --primary-foreground: oklch(1.0000 0 0);
+    --secondary: oklch(0.5360 0.0398 196.0280);
+    --secondary-foreground: oklch(1.0000 0 0);
+    /* Muted panels slightly lighter than outer background */
+    --muted: oklch(0.9750 0.0035 262.0000);
+    --muted-foreground: oklch(0.4200 0.0200 262.0000);
+    --accent: oklch(0.9491 0 0);
+    --accent-foreground: oklch(0.2101 0.0318 264.6645);
+    --destructive: oklch(0.6368 0.2078 25.3313);
+    /* Borders darker than background for clear separation */
+    --border: oklch(0.8800 0.0100 262.0000);
+    --input: oklch(0.9276 0.0058 264.5313);
+    --ring: oklch(0.6716 0.1368 48.5130);
+    --chart-1: oklch(0.5940 0.0443 196.0233);
+    --chart-2: oklch(0.7214 0.1337 49.9802);
+    --chart-3: oklch(0.8721 0.0864 68.5474);
+    --chart-4: oklch(0.6268 0 0);
+    --chart-5: oklch(0.6830 0 0);
+    /* Sidebar: pure white to match content panels */
+    --sidebar: oklch(1.0000 0 0);
+    --sidebar-foreground: oklch(0.1200 0.0200 262.0000);
+    --sidebar-primary: oklch(0.6716 0.1368 48.5130);
+    --sidebar-primary-foreground: oklch(1.0000 0 0);
+    --sidebar-accent: oklch(1.0000 0 0);
+    --sidebar-accent-foreground: oklch(0.2101 0.0318 264.6645);
+    --sidebar-border: oklch(0.9300 0.0050 262.0000);
+    --sidebar-ring: oklch(0.6716 0.1368 48.5130);
+    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --radius: 0.625rem;
+  }
+  .dark {
+    --background: oklch(0.1797 0.0043 308.1928);
+    --foreground: oklch(0.8109 0 0);
+    --card: oklch(0.1822 0 0);
+    --card-foreground: oklch(0.8109 0 0);
+    --popover: oklch(0.1797 0.0043 308.1928);
+    --popover-foreground: oklch(0.8109 0 0);
+    --primary: oklch(0.7214 0.1337 49.9802);
+    --primary-foreground: oklch(0.1797 0.0043 308.1928);
+    --secondary: oklch(0.5940 0.0443 196.0233);
+    --secondary-foreground: oklch(0.1797 0.0043 308.1928);
+    --muted: oklch(0.2520 0 0);
+    --muted-foreground: oklch(0.6268 0 0);
+    --accent: oklch(0.3211 0 0);
+    --accent-foreground: oklch(0.8109 0 0);
+    --destructive: oklch(0.5940 0.0443 196.0233);
+    --border: oklch(0.2520 0 0);
+    --input: oklch(0.2520 0 0);
+    --ring: oklch(0.7214 0.1337 49.9802);
+    --chart-1: oklch(0.5940 0.0443 196.0233);
+    --chart-2: oklch(0.7214 0.1337 49.9802);
+    --chart-3: oklch(0.8721 0.0864 68.5474);
+    --chart-4: oklch(0.6268 0 0);
+    --chart-5: oklch(0.6830 0 0);
+    --sidebar: oklch(0.1822 0 0);
+    --sidebar-foreground: oklch(0.8109 0 0);
+    --sidebar-primary: oklch(0.7214 0.1337 49.9802);
+    --sidebar-primary-foreground: oklch(0.1797 0.0043 308.1928);
+    --sidebar-accent: oklch(0.3211 0 0);
+    --sidebar-accent-foreground: oklch(0.8109 0 0);
+    --sidebar-border: oklch(0.2520 0 0);
+    --sidebar-ring: oklch(0.7214 0.1337 49.9802);
+    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --radius: 0.625rem;
+  }
+}
+
+/* Provide hex fallbacks for browsers that don't support oklch() */
+:root {
+  --background-hex: #f1f1f3; /* light grey outer */
+  --card-hex: #ffffff; /* white content panels */
+  --sidebar-hex: #ffffff; /* white sidebar */
+  --muted-hex: #f7f7f8; /* subtle muted surface */
+}
+
+/* Prefer OKLCH variables when supported; fall back to hex otherwise */
+.bg-background { background-color: var(--background-hex); background-color: var(--background); }
+.bg-card { background-color: var(--card-hex); background-color: var(--card); }
+.bg-sidebar { background-color: var(--sidebar-hex); background-color: var(--sidebar); }
+.bg-muted { background-color: var(--muted-hex); background-color: var(--muted); }
+
+/* Glassmorphism: make cards and sidebars translucent with backdrop blur */
+:root {
+  --glass-card-rgba: rgba(255,255,255,0.7);
+  --glass-card-border: rgba(0,0,0,0.06);
+  --glass-sidebar-rgba: rgba(255,255,255,0.9);
+}
+
+.dark {
+  --glass-card-rgba: rgba(20,20,22,0.45);
+  --glass-card-border: rgba(255,255,255,0.04);
+  --glass-sidebar-rgba: rgba(10,10,11,0.6);
+}
+
+/* Apply glass effect to card and sidebar backgrounds by default */
+.bg-card {
+  background-color: var(--card-hex);
+  background-color: var(--card);
+  background-color: var(--glass-card-rgba);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--glass-card-border);
+  box-shadow: 0 6px 20px rgba(2,6,23,0.06);
+}
+
+.bg-sidebar {
+  background-color: var(--sidebar-hex);
+  background-color: var(--sidebar);
+  background-color: var(--glass-sidebar-rgba);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-right: 1px solid rgba(0,0,0,0.04);
+}
+
+/* Less aggressive muted surfaces for glassy look */
+.bg-muted { background-color: rgba(247,247,248,0.55); backdrop-filter: blur(4px); }
+
+/* Helper class for more intense glass panels when needed */
+.glass-strong {
+  background-color: rgba(255,255,255,0.85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* Dark overrides to keep strong contrast */
+.dark .bg-card { background-color: var(--glass-card-rgba); border: 1px solid var(--glass-card-border); box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+.dark .bg-sidebar { background-color: var(--glass-sidebar-rgba); border-right: 1px solid rgba(255,255,255,0.03); }
+
+
+/* Dark-mode hex fallbacks and overrides */
+:root {
+  --chart-1-hex: #ffb68a;
+  --chart-2-hex: #ff8a4a;
+  --chart-3-hex: #ffcfb8;
+  --chart-4-hex: #2b2b2b;
+  --chart-5-hex: #3a3a3a;
+}
+
+.dark {
+  --background-dark-hex: #080808; /* outer page */
+  --card-dark-hex: #0f0f10; /* content panels */
+  --sidebar-dark-hex: #0b0b0c; /* sidebar */
+  --muted-dark-hex: #121212; /* muted surfaces */
+  --border-dark-hex: #1e1e1f;
+  --chart-1: oklch(0.62 0.09 35); /* warm orange */
+  --chart-2: oklch(0.55 0.12 40);
+  --chart-3: oklch(0.75 0.06 50);
+}
+
+/* prefer dark hex then var */
+.dark .bg-background { background-color: var(--background-dark-hex); background-color: var(--background); }
+.dark .bg-card { background-color: var(--card-dark-hex); background-color: var(--card); }
+.dark .bg-sidebar { background-color: var(--sidebar-dark-hex); background-color: var(--sidebar); }
+.dark .bg-muted { background-color: var(--muted-dark-hex); background-color: var(--muted); }
+.dark .border-border { border-color: var(--border-dark-hex); border-color: var(--border); }
+
+/* chart color fallbacks */
+.fill-chart-1 { fill: var(--chart-1); }
+.fill-chart-1-fallback { fill: var(--chart-1-hex); }
+
+/* Fallbacks for opacity utility classes that reference OKLCH colors with alpha
+  Many components use classes like `bg-card/60` or `bg-muted/50` which compile
+  to `background-color: color / 0.6` using OKLCH. Older engines may drop those
+  declarations entirely when OKLCH isn't supported. Provide hex/rgba fallbacks
+  for those common variants so panels remain visible. */
+.bg-card\/60 { background-color: rgba(255,255,255,0.6); background-color: var(--card); }
+.bg-card\/5 { background-color: rgba(255,255,255,0.05); background-color: var(--card); }
+.bg-card\/30 { background-color: rgba(255,255,255,0.30); background-color: var(--card); }
+.bg-card\/40 { background-color: rgba(255,255,255,0.40); background-color: var(--card); }
+.bg-muted\/50 { background-color: rgba(247,247,248,0.5); background-color: var(--muted); }
+.bg-muted\/20 { background-color: rgba(247,247,248,0.2); background-color: var(--muted); }
+.bg-muted\/40 { background-color: rgba(247,247,248,0.4); background-color: var(--muted); }
+.bg-card\/60.dark { background-color: rgba(15,15,16,0.6); background-color: var(--card); }
+
+/* Border opacity fallbacks */
+.border-border\/60 { border-color: rgba(136,136,138,0.6); border-color: var(--border); }
+.border-border\/30 { border-color: rgba(136,136,138,0.3); border-color: var(--border); }
+
+/* Chart fill/stroke fallbacks (class-based) */
+.chart-fill-1 { fill: var(--chart-1-hex); }
+.chart-stroke-1 { stroke: var(--chart-1-hex); }
+.chart-fill-2 { fill: var(--chart-2-hex); }
+.chart-stroke-2 { stroke: var(--chart-2-hex); }
+
+/* Make analytics containers have clear card backgrounds where they used to be semi-transparent */
+.analytics-panel { background-color: var(--card-hex); background-color: var(--card); border: 1px solid var(--border); }
+.analytics-panel .chart { background-color: transparent; }
+
+
