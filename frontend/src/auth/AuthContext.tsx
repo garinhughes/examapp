@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react'
 import { apiUrl } from '../apiBase'
 
 /* ------------------------------------------------------------------ */
@@ -17,6 +17,8 @@ interface AuthContextValue {
   login: () => void
   logout: () => void
   getToken: () => string | null
+  /** Attempt to refresh the token. Returns the new token or null on failure. */
+  refreshToken: () => Promise<string | null>
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -25,6 +27,7 @@ const AuthContext = createContext<AuthContextValue>({
   login: () => {},
   logout: () => {},
   getToken: () => null,
+  refreshToken: async () => null,
 })
 
 export const useAuth = () => useContext(AuthContext)
@@ -33,7 +36,11 @@ export const useAuth = () => useContext(AuthContext)
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 const TOKEN_KEY = 'examapp_id_token'
+const REFRESH_TOKEN_KEY = 'examapp_refresh_token'
 const MODE = import.meta.env.VITE_AUTH_MODE || 'dev'
+
+/** Seconds before expiry at which we proactively refresh (5 minutes) */
+const REFRESH_BUFFER_SECS = 300
 
 /** Generate a random string for PKCE code_verifier */
 function generateCodeVerifier(): string {
@@ -64,12 +71,30 @@ function parseJwtPayload(token: string): any {
   }
 }
 
+/** Returns true if the JWT's exp claim is within `bufferSecs` of now or already past */
+function isTokenExpired(token: string, bufferSecs = 0): boolean {
+  const payload = parseJwtPayload(token)
+  if (!payload?.exp) return true // treat missing exp as expired
+  const nowSecs = Math.floor(Date.now() / 1000)
+  return payload.exp - nowSecs <= bufferSecs
+}
+
+/** Returns seconds until the JWT expires (negative if already expired) */
+function tokenExpiresIn(token: string): number {
+  const payload = parseJwtPayload(token)
+  if (!payload?.exp) return -1
+  return payload.exp - Math.floor(Date.now() / 1000)
+}
+
 /* ------------------------------------------------------------------ */
 /*  Provider                                                           */
 /* ------------------------------------------------------------------ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  /** Guard against concurrent refresh calls */
+  const refreshPromiseRef = useRef<Promise<string | null> | null>(null)
 
   /* ---- token helpers ---- */
   const getToken = useCallback((): string | null => {
@@ -82,6 +107,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const clearToken = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(REFRESH_TOKEN_KEY)
+  }, [])
+
+  const getRefreshToken = useCallback((): string | null => {
+    return localStorage.getItem(REFRESH_TOKEN_KEY)
+  }, [])
+
+  const setRefreshToken = useCallback((token: string) => {
+    localStorage.setItem(REFRESH_TOKEN_KEY, token)
   }, [])
 
   /* ---- derive user from token ---- */
@@ -95,6 +129,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       picture: payload.picture,
     }
   }, [])
+
+  /* ---- schedule proactive refresh ---- */
+  const scheduleRefresh = useCallback((token: string) => {
+    if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
+    const expiresIn = tokenExpiresIn(token)
+    // Refresh REFRESH_BUFFER_SECS before expiry, minimum 10s from now
+    const refreshInMs = Math.max((expiresIn - REFRESH_BUFFER_SECS) * 1000, 10_000)
+    refreshTimerRef.current = setTimeout(() => {
+      doRefresh()
+    }, refreshInMs)
+  }, []) // doRefresh defined below, assigned via ref
+
+  /* ---- refresh token exchange ---- */
+  const doRefresh = useCallback(async (): Promise<string | null> => {
+    // Coalesce concurrent calls
+    if (refreshPromiseRef.current) return refreshPromiseRef.current
+
+    const refreshTk = getRefreshToken()
+    if (!refreshTk) {
+      console.warn('[auth] No refresh token available — cannot refresh')
+      return null
+    }
+
+    const promise = (async () => {
+      try {
+        const res = await fetch(apiUrl('/auth/refresh'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: refreshTk }),
+        })
+        if (!res.ok) {
+          console.warn('[auth] Token refresh failed', res.status)
+          return null
+        }
+        const data = await res.json()
+        if (data.id_token) {
+          setToken(data.id_token)
+          const u = userFromToken(data.id_token)
+          setUser(u)
+          scheduleRefresh(data.id_token)
+          return data.id_token as string
+        }
+        return null
+      } catch (err) {
+        console.error('[auth] Token refresh error', err)
+        return null
+      } finally {
+        refreshPromiseRef.current = null
+      }
+    })()
+
+    refreshPromiseRef.current = promise
+    return promise
+  }, [getRefreshToken, setToken, userFromToken, scheduleRefresh])
 
   /* ---- dev mode: auto-login with mock user ---- */
   useEffect(() => {
@@ -122,15 +210,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Cognito mode: check for stored token
     const token = getToken()
     if (token) {
+      // If token is fully expired (not just within buffer), try refreshing
+      if (isTokenExpired(token, 0)) {
+        doRefresh().then((newToken) => {
+          if (newToken) {
+            const u = userFromToken(newToken)
+            setUser(u)
+          }
+          // If refresh fails the user stays logged out — they'll need to login
+          setLoading(false)
+        })
+        return
+      }
       const u = userFromToken(token)
       if (u) {
         setUser(u)
+        scheduleRefresh(token)
         setLoading(false)
         return
       }
     }
     setLoading(false)
-  }, [getToken, setToken, userFromToken])
+
+    return () => {
+      if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
+    }
+  }, [getToken, setToken, userFromToken, doRefresh, scheduleRefresh])
 
   /* ---- handle /callback (Cognito redirect with ?code=...) ---- */
   useEffect(() => {
@@ -140,10 +245,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (window.location.hash && window.location.hash.includes('id_token=')) {
         const h = new URLSearchParams(window.location.hash.replace(/^#/, ''))
         const idToken = h.get('id_token')
+        const refreshTk = h.get('refresh_token')
         if (idToken) {
           setToken(idToken)
+          if (refreshTk) setRefreshToken(refreshTk)
           const u = userFromToken(idToken)
           setUser(u)
+          scheduleRefresh(idToken)
           // clean URL
           window.history.replaceState({}, '', '/')
           setLoading(false)
@@ -177,8 +285,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then((data) => {
         if (data.id_token) {
           setToken(data.id_token)
+          if (data.refresh_token) setRefreshToken(data.refresh_token)
           const u = userFromToken(data.id_token)
           setUser(u)
+          scheduleRefresh(data.id_token)
         }
         sessionStorage.removeItem('pkce_code_verifier')
         // Clean URL
@@ -186,7 +296,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch((err) => console.error('Token exchange failed', err))
       .finally(() => setLoading(false))
-  }, [setToken, userFromToken])
+  }, [setToken, setRefreshToken, userFromToken, scheduleRefresh])
 
   /* ---- login: redirect to Cognito Hosted UI ---- */
   const login = useCallback(async () => {
@@ -231,6 +341,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /* ---- logout ---- */
   const logout = useCallback(() => {
     const hadToken = !!localStorage.getItem(TOKEN_KEY)
+    if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
     clearToken()
     setUser(null)
 
@@ -248,7 +359,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [clearToken])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, getToken }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, getToken, refreshToken: doRefresh }}>
       {children}
     </AuthContext.Provider>
   )

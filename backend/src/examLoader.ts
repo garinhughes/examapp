@@ -156,11 +156,12 @@ export async function loadExam(
         return parseExamJson(raw, idx.examCode, vid)
       }
     } catch (err) {
-      console.warn(`[examLoader] S3 load failed for ${code}, falling back to filesystem`, err)
+      console.error(`[examLoader] S3 load failed for ${code}:`, err)
+      return null
     }
   }
 
-  // Filesystem fallback (local dev or S3 not configured)
+  // Filesystem path (local dev only)
   try {
     const files = await fs.readdir(examsDir)
     const file = files.find((f) => f.toLowerCase().replace(/\.json$/, '') === lc)
@@ -198,14 +199,17 @@ export async function loadAllExams(): Promise<Exam[]> {
           console.error(`[examLoader] Failed to load ${entry.examCode} from S3:`, err)
         }
       }
-      if (exams.length > 0) return exams
-      console.warn('[examLoader] No exams in S3 index, falling back to filesystem')
+      if (exams.length === 0) {
+        console.warn('[examLoader] DynamoDB exam-index returned 0 entries — have you run pnpm publish:exams?')
+      }
+      return exams
     } catch (err) {
-      console.warn('[examLoader] S3 index scan failed, falling back to filesystem', err)
+      console.error('[examLoader] S3 index scan failed:', err)
+      return []
     }
   }
 
-  // Filesystem fallback
+  // Filesystem path (local dev only)
   try {
     const files = await fs.readdir(examsDir)
     const exams: Exam[] = []

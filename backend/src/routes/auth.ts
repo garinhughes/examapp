@@ -181,7 +181,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             // redirect back to frontend with id_token (dev-friendly; consider HttpOnly cookie for prod)
             const frontend = process.env.FRONTEND_ORIGIN || 'http://localhost:5173'
             const sep = frontend.includes('#') ? '&' : '#'
-            return reply.redirect(`${frontend}${sep}id_token=${encodeURIComponent(tokens.id_token)}`)
+            let redirectUrl = `${frontend}${sep}id_token=${encodeURIComponent(tokens.id_token)}`
+            if (tokens.refresh_token) {
+              redirectUrl += `&refresh_token=${encodeURIComponent(tokens.refresh_token)}`
+            }
+            return reply.redirect(redirectUrl)
           }
         } catch (verErr: any) {
           try {
@@ -196,6 +200,83 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
       return reply.send(tokens)
     } catch (err: any) {
+      return reply.status(500).send({ message: err.message })
+    }
+  })
+
+  // ── Token refresh endpoint ──
+  // Frontend sends its refresh_token; backend exchanges it with Cognito for new tokens.
+  server.post('/refresh', async (request, reply) => {
+    if (AUTH_MODE === 'dev') {
+      return {
+        id_token: 'dev-id-token',
+        access_token: 'dev-access-token',
+        token_type: 'Bearer',
+        expires_in: 3600,
+      }
+    }
+
+    const { refresh_token } = request.body as any
+    if (!refresh_token) {
+      return reply.status(400).send({ message: 'refresh_token required' })
+    }
+
+    const domain = process.env.COGNITO_DOMAIN
+    const clientId = process.env.COGNITO_APP_CLIENT_ID
+    if (!domain || !clientId) {
+      return reply.status(500).send({ message: 'Cognito not configured' })
+    }
+
+    const tokenUrl = `https://${domain}/oauth2/token`
+    const params = new URLSearchParams({
+      grant_type: 'refresh_token',
+      client_id: clientId,
+      refresh_token,
+    })
+
+    try {
+      const clientSecret = process.env.COGNITO_APP_CLIENT_SECRET
+      const headers: Record<string, string> = { 'Content-Type': 'application/x-www-form-urlencoded' }
+      if (clientSecret) {
+        const basic = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+        headers['Authorization'] = `Basic ${basic}`
+      }
+
+      const res = await fetch(tokenUrl, { method: 'POST', headers, body: params.toString() })
+      if (!res.ok) {
+        const text = await res.text()
+        request.log?.warn?.({ status: res.status, body: text }, 'Cognito refresh failed')
+        return reply.status(res.status).send({ message: 'refresh failed', detail: text })
+      }
+
+      const tokens = await res.json()
+
+      // verify the new id_token
+      if (tokens.id_token) {
+        try {
+          const region = process.env.COGNITO_REGION
+          const userPoolId = process.env.COGNITO_USER_POOL_ID
+          if (region && userPoolId) {
+            const jwksUrl = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}/.well-known/jwks.json`
+            const JWKS = createRemoteJWKSet(new URL(jwksUrl))
+            const issuer = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`
+            await jwtVerify(tokens.id_token, JWKS, { issuer, audience: clientId })
+          }
+        } catch (verErr: any) {
+          request.log?.warn?.({ err: verErr?.message }, 'refreshed id_token failed verification')
+          return reply.status(401).send({ message: 'refreshed token verification failed' })
+        }
+      }
+
+      // Cognito refresh_token grants do NOT return a new refresh_token — the original stays valid.
+      return {
+        id_token: tokens.id_token,
+        access_token: tokens.access_token,
+        token_type: tokens.token_type || 'Bearer',
+        expires_in: tokens.expires_in || 3600,
+      }
+    } catch (err: any) {
+      request.log?.error?.({ err: err.message }, 'refresh exchange error')
       return reply.status(500).send({ message: err.message })
     }
   })

@@ -58,3 +58,27 @@ coverage/
 /backend/data/gamification.json
 /backend/data/*.db
 /backend/data/*.sqlite
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Docker
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# OS generated
+*.swp
+*.swo
+*~
