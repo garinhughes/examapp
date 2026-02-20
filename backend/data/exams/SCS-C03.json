@@ -67,7 +67,6 @@
       "meta": {
         "domain": "Detection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Detection",
       "selectCount": 1
@@ -117,7 +116,6 @@
       "meta": {
         "domain": "Incident Response"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Incident Response",
       "selectCount": 1
@@ -166,7 +164,6 @@
       "meta": {
         "domain": "Infrastructure Security"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Infrastructure Security",
       "selectCount": 1
@@ -215,7 +212,6 @@
       "meta": {
         "domain": "Identity and Access Management"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Identity and Access Management",
       "selectCount": 1
@@ -265,7 +261,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Data Protection",
       "selectCount": 1
@@ -324,7 +319,6 @@
       "meta": {
         "domain": "Detection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Detection"
     },
@@ -371,7 +365,6 @@
       "meta": {
         "domain": "Identity and Access Management"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Identity and Access Management",
       "selectCount": 1
@@ -420,7 +413,6 @@
       "meta": {
         "domain": "Detection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Detection",
       "selectCount": 1
@@ -470,7 +462,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Data Protection",
       "selectCount": 1
@@ -520,7 +511,6 @@
       "meta": {
         "domain": "Identity and Access Management"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Identity and Access Management",
       "selectCount": 1
@@ -570,7 +560,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Data Protection",
       "selectCount": 1
@@ -619,7 +608,6 @@
       "meta": {
         "domain": "Identity and Access Management"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Identity and Access Management",
       "selectCount": 1
@@ -670,7 +658,6 @@
       "meta": {
         "domain": "Incident Response"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Incident Response",
       "selectCount": 1
@@ -720,7 +707,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Data Protection",
       "selectCount": 1
@@ -770,7 +756,6 @@
       "meta": {
         "domain": "Infrastructure Security"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Infrastructure Security",
       "selectCount": 1
@@ -820,7 +805,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Data Protection",
       "selectCount": 1
@@ -870,7 +854,6 @@
       "meta": {
         "domain": "Detection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Detection",
       "selectCount": 1
@@ -920,7 +903,6 @@
       "meta": {
         "domain": "Identity and Access Management"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Identity and Access Management",
       "selectCount": 1
@@ -970,7 +952,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Data Protection",
       "selectCount": 1
@@ -1020,7 +1001,6 @@
       "meta": {
         "domain": "Detection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Detection",
       "selectCount": 1
@@ -1070,7 +1050,6 @@
       "meta": {
         "domain": "Infrastructure Security"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Infrastructure Security",
       "selectCount": 1
@@ -1120,7 +1099,6 @@
       "meta": {
         "domain": "Incident Response"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Incident Response",
       "selectCount": 1
@@ -1170,7 +1148,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Data Protection",
       "selectCount": 1
@@ -1221,7 +1198,6 @@
       "meta": {
         "domain": "Identity and Access Management"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Identity and Access Management",
       "selectCount": 1
@@ -1272,7 +1248,6 @@
       "meta": {
         "domain": "Infrastructure Security"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Infrastructure Security",
       "selectCount": 1
@@ -1322,7 +1297,6 @@
       "meta": {
         "domain": "Identity and Access Management"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Identity and Access Management",
       "selectCount": 1
@@ -1372,7 +1346,6 @@
       "meta": {
         "domain": "Detection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Detection",
       "selectCount": 1
@@ -1422,7 +1395,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Data Protection",
       "selectCount": 1
@@ -1472,7 +1444,6 @@
       "meta": {
         "domain": "Detection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Detection",
       "selectCount": 1
@@ -1529,7 +1500,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Data Protection"
     },
@@ -1577,7 +1547,6 @@
       "meta": {
         "domain": "Incident Response"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Incident Response",
       "selectCount": 1
@@ -1627,7 +1596,6 @@
       "meta": {
         "domain": "Infrastructure Security"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Infrastructure Security",
       "selectCount": 1
@@ -1676,7 +1644,6 @@
       "meta": {
         "domain": "Incident Response"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Incident Response",
       "selectCount": 1
@@ -1726,7 +1693,6 @@
       "meta": {
         "domain": "Infrastructure Security"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Infrastructure Security",
       "selectCount": 1
@@ -1785,7 +1751,6 @@
       "meta": {
         "domain": "Detection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-16",
       "domain": "Detection"
     },
@@ -1835,7 +1800,6 @@
       "meta": {
         "domain": "Security Foundations and Governance"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-17",
       "domain": "Security Foundations and Governance"
     },
@@ -1862,7 +1826,7 @@
         },
         {
           "id": "c2",
-          "text": "Rely on CloudTrail event history to monitor service health and send alerts",
+          "text": "Use CloudTrail event history to monitor service health and send alerts",
           "isCorrect": false,
           "explanation": "CloudTrail records API activity and is not suitable as a primary source of service health metrics or near-real-time availability alarms."
         },
@@ -1874,7 +1838,7 @@
         },
         {
           "id": "c4",
-          "text": "Attach detailed instance metrics to each EC2 instance and rely on manual inspection",
+          "text": "Attach detailed instance metrics to each EC2 instance and use manual inspection",
           "isCorrect": false,
           "explanation": "Instance-level metrics are useful but relying on manual inspection does not provide automated alerting or aggregated service-level visibility across an Auto Scaling group."
         }
@@ -1884,7 +1848,6 @@
       "meta": {
         "domain": "Detection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-18",
       "domain": "Detection",
       "selectCount": 1
@@ -1933,7 +1896,6 @@
       "meta": {
         "domain": "Infrastructure Security"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-18",
       "domain": "Infrastructure Security",
       "selectCount": 1
@@ -1966,7 +1928,7 @@
         },
         {
           "id": "c3",
-          "text": "Rely solely on security groups to restrict plaintext access",
+          "text": "Use security groups to restrict plaintext access",
           "isCorrect": false,
           "explanation": "Security groups control network access but do not provide TLS encryption or manage certificates."
         },
@@ -1982,7 +1944,6 @@
       "meta": {
         "domain": "Data Protection"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-18",
       "domain": "Data Protection",
       "selectCount": 1
@@ -2015,7 +1976,7 @@
         },
         {
           "id": "c3",
-          "text": "Remove MFA and rely on a complex password rotated monthly",
+          "text": "Remove MFA and use a complex password rotated monthly",
           "isCorrect": false,
           "explanation": "Removing MFA weakens security; passwords alone are insufficient for strong break-glass protections."
         },
@@ -2031,12 +1992,10 @@
       "meta": {
         "domain": "Security Foundations and Governance"
       },
-      "sourceType": "official-doc",
       "lastReviewed": "2026-02-18",
       "domain": "Security Foundations and Governance",
       "selectCount": 1
-    }
-  ,
+    },
     {
       "id": "SCS-C03-0041",
       "docs": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitoring-overview.html",
@@ -2051,423 +2010,1189 @@
       ],
       "question": "When sizing monitoring for a high-throughput API, which combination of metrics should inform your alarm thresholds for availability and performance?",
       "choices": [
-        {"id":"c1","text":"Request count, 5xx error rate, and latency percentiles","isCorrect":true,"explanation":"Combining request volume, error rates and latency percentiles gives a balanced view of availability and performance under load."},
-        {"id":"c2","text":"Only CPU utilization across EC2 instances","isCorrect":false,"explanation":"CPU is useful but insufficient alone to detect request-level failures or latency spikes."},
-        {"id":"c3","text":"Number of open TCP connections to the VPC","isCorrect":false,"explanation":"TCP connection counts may be noisy and do not directly indicate application-level errors or latency."},
-        {"id":"c4","text":"S3 bucket size growth","isCorrect":false,"explanation":"S3 growth is unrelated to API availability metrics for request handling."}
+        {
+          "id": "c1",
+          "text": "Request count, 5xx error rate, and latency percentiles",
+          "isCorrect": true,
+          "explanation": "Combining request volume, error rates and latency percentiles gives a balanced view of availability and performance under load."
+        },
+        {
+          "id": "c2",
+          "text": "Only CPU utilization across EC2 instances",
+          "isCorrect": false,
+          "explanation": "CPU is useful but insufficient alone to detect request-level failures or latency spikes."
+        },
+        {
+          "id": "c3",
+          "text": "Number of open TCP connections to the VPC",
+          "isCorrect": false,
+          "explanation": "TCP connection counts may be noisy and do not directly indicate application-level errors or latency."
+        },
+        {
+          "id": "c4",
+          "text": "S3 bucket size growth",
+          "isCorrect": false,
+          "explanation": "S3 growth is unrelated to API availability metrics for request handling."
+        }
       ],
       "tip": "Combine throughput, error rates, and latency percentiles to set robust thresholds.",
       "explanation": "A monitoring strategy should include throughput (request count), error rates (5xx), and latency percentiles (p95/p99) to detect degradation under load and trigger appropriate alerts.",
-      "meta": {"domain":"Detection"},
-      "sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Detection","selectCount":1
+      "meta": {
+        "domain": "Detection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Detection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0042",
       "docs": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html",
       "format": "yaml",
-      "services": ["CloudWatch Logs","Athena","S3"],
-      "skills": ["1.2.3: Implement log storage and log data lakes (for example, Security Lake) and integrate with third-party security tools"],
+      "services": [
+        "CloudWatch Logs",
+        "Athena",
+        "S3"
+      ],
+      "skills": [
+        "1.2.3: Implement log storage and log data lakes (for example, Security Lake) and integrate with third-party security tools"
+      ],
       "question": "Which architecture most cost-effectively stores months of high-volume logs for ad-hoc forensic queries?",
       "choices": [
-        {"id":"c1","text":"Deliver logs to S3 in partitioned Parquet and query with Athena","isCorrect":true,"explanation":"S3 + Parquet + Athena supports low-cost storage and ad-hoc querying without always-on infrastructure."},
-        {"id":"c2","text":"Stream logs to OpenSearch with 90-day hot storage","isCorrect":false,"explanation":"OpenSearch is efficient for real-time searches but expensive for long-term retention at scale."},
-        {"id":"c3","text":"Store logs in DynamoDB single-table design","isCorrect":false,"explanation":"DynamoDB is not cost-effective for large historical log volumes and analytics queries."},
-        {"id":"c4","text":"Keep logs only on instance disk for speed","isCorrect":false,"explanation":"Instance disks are ephemeral and unsuitable for long-term forensic retention."}
+        {
+          "id": "c1",
+          "text": "Deliver logs to S3 in partitioned Parquet and query with Athena",
+          "isCorrect": true,
+          "explanation": "S3 + Parquet + Athena supports low-cost storage and ad-hoc querying without always-on infrastructure."
+        },
+        {
+          "id": "c2",
+          "text": "Stream logs to OpenSearch with 90-day hot storage",
+          "isCorrect": false,
+          "explanation": "OpenSearch is efficient for real-time searches but expensive for long-term retention at scale."
+        },
+        {
+          "id": "c3",
+          "text": "Store logs in DynamoDB single-table design",
+          "isCorrect": false,
+          "explanation": "DynamoDB is not cost-effective for large historical log volumes and analytics queries."
+        },
+        {
+          "id": "c4",
+          "text": "Keep logs only on instance disk for speed",
+          "isCorrect": false,
+          "explanation": "Instance disks are ephemeral and unsuitable for long-term forensic retention."
+        }
       ],
-      "tip":"Partition logs and use columnar formats to reduce query costs.",
-      "explanation":"Exporting log data to S3 in Parquet with partitioning reduces query scan costs and enables scalable ad-hoc analysis via Athena or Lakehouse tools.",
-      "meta":{"domain":"Detection"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Detection","selectCount":1
+      "tip": "Partition logs and use columnar formats to reduce query costs.",
+      "explanation": "Exporting log data to S3 in Parquet with partitioning reduces query scan costs and enables scalable ad-hoc analysis via Athena or Lakehouse tools.",
+      "meta": {
+        "domain": "Detection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Detection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0043",
       "docs": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
       "format": "text",
-      "services": ["Organizations","IAM","SCPs"],
-      "skills": ["1.1.5: Create and manage automations to perform regular assessments and investigations"],
+      "services": [
+        "Organizations",
+        "IAM",
+        "SCPs"
+      ],
+      "skills": [
+        "1.1.5: Create and manage automations to perform regular assessments and investigations"
+      ],
       "question": "Which approach automates security posture checks across new accounts automatically?",
       "choices": [
-        {"id":"c1","text":"Use Organizations with SCPs and automated Config conformance packs deployed on account creation","isCorrect":true,"explanation":"Combining Organizations lifecycle hooks with automated Config conformance packs provides automatic posture checks for new accounts."},
-        {"id":"c2","text":"Require each team to run a manual checklist during onboarding","isCorrect":false,"explanation":"Manual checklists are error-prone and do not scale automatically for many accounts."},
-        {"id":"c3","text":"Use S3 replication to copy Templates across accounts","isCorrect":false,"explanation":"S3 replication doesn't enforce security posture or run automated assessments."},
-        {"id":"c4","text":"Rely on Control Tower alone without additional automation","isCorrect":false,"explanation":"Control Tower helps but combining it with conformance packs and automated policies gives stronger, automated checks."}
+        {
+          "id": "c1",
+          "text": "Use Organizations with SCPs and automated Config conformance packs deployed on account creation",
+          "isCorrect": true,
+          "explanation": "Combining Organizations lifecycle hooks with automated Config conformance packs provides automatic posture checks for new accounts."
+        },
+        {
+          "id": "c2",
+          "text": "Require each team to run a manual checklist during onboarding",
+          "isCorrect": false,
+          "explanation": "Manual checklists are error-prone and do not scale automatically for many accounts."
+        },
+        {
+          "id": "c3",
+          "text": "Use S3 replication to copy Templates across accounts",
+          "isCorrect": false,
+          "explanation": "S3 replication doesn't enforce security posture or run automated assessments."
+        },
+        {
+          "id": "c4",
+          "text": "Use Control Tower alone without additional automation",
+          "isCorrect": false,
+          "explanation": "Control Tower helps but combining it with conformance packs and automated policies gives stronger, automated checks."
+        }
       ],
-      "tip":"Automate posture checks during account provisioning to enforce baselines.",
-      "explanation":"Provisioning-time automation that deploys Config rules/conformance packs along with SCP guardrails ensures new accounts meet baseline security posture automatically.",
-      "meta":{"domain":"Detection"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Detection","selectCount":1
+      "tip": "Automate posture checks during account provisioning to enforce baselines.",
+      "explanation": "Provisioning-time automation that deploys Config rules/conformance packs along with SCP guardrails ensures new accounts meet baseline security posture automatically.",
+      "meta": {
+        "domain": "Detection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Detection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0044",
       "docs": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html",
       "format": "text",
-      "services": ["ALB","Target Groups","Auto Scaling"],
-      "skills": ["1.2.1: Identify sources for log ingestion and storage based on requirements"],
+      "services": [
+        "ALB",
+        "Target Groups",
+        "Auto Scaling"
+      ],
+      "skills": [
+        "1.2.1: Identify sources for log ingestion and storage based on requirements"
+      ],
       "question": "Which log sources are most relevant when troubleshooting intermittent 502 responses from an ALB?",
       "choices": [
-        {"id":"c1","text":"ALB access logs, target group health checks, and CloudWatch metrics for targets","isCorrect":true,"explanation":"ALB access logs show request/response details; target health and metrics reveal backend errors that cause 502s."},
-        {"id":"c2","text":"S3 server access logs only","isCorrect":false,"explanation":"S3 logs are irrelevant to ALB 502s unless the origin is S3, which is uncommon for dynamic backends."},
-        {"id":"c3","text":"Route 53 DNS query logs","isCorrect":false,"explanation":"DNS logs don't provide HTTP backend error details."},
-        {"id":"c4","text":"IAM access logs","isCorrect":false,"explanation":"IAM logs are unrelated to HTTP 502 responses."}
+        {
+          "id": "c1",
+          "text": "ALB access logs, target group health checks, and CloudWatch metrics for targets",
+          "isCorrect": true,
+          "explanation": "ALB access logs show request/response details; target health and metrics reveal backend errors that cause 502s."
+        },
+        {
+          "id": "c2",
+          "text": "S3 server access logs only",
+          "isCorrect": false,
+          "explanation": "S3 logs are irrelevant to ALB 502s unless the origin is S3, which is uncommon for dynamic backends."
+        },
+        {
+          "id": "c3",
+          "text": "Route 53 DNS query logs",
+          "isCorrect": false,
+          "explanation": "DNS logs don't provide HTTP backend error details."
+        },
+        {
+          "id": "c4",
+          "text": "IAM access logs",
+          "isCorrect": false,
+          "explanation": "IAM logs are unrelated to HTTP 502 responses."
+        }
       ],
-      "tip":"Correlate access logs with backend health and metrics when investigating HTTP errors.",
-      "explanation":"Investigations into 502 errors should include ALB access logs (to see upstream responses), backend target health and metrics (to spot crashes), and application logs where possible.",
-      "meta":{"domain":"Detection"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Detection","selectCount":1
+      "tip": "Correlate access logs with backend health and metrics when investigating HTTP errors.",
+      "explanation": "Investigations into 502 errors should include ALB access logs (to see upstream responses), backend target health and metrics (to spot crashes), and application logs where possible.",
+      "meta": {
+        "domain": "Detection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Detection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0045",
       "docs": "https://docs.aws.amazon.com/iam/latest/UserGuide/id_roles.html",
       "format": "cli",
-      "services": ["IAM","STS"],
-      "skills": ["2.2.2: Search and correlate logs for security events across applications and AWS services"],
+      "services": [
+        "IAM",
+        "STS"
+      ],
+      "skills": [
+        "2.2.2: Search and correlate logs for security events across applications and AWS services"
+      ],
       "question": "Given an IAM role ARN, which CLI command quickly reveals the caller identity to correlate with CloudTrail events?",
       "choices": [
-        {"id":"c1","text":"aws sts get-caller-identity","isCorrect":true,"explanation":"This STS call returns the effective principal; useful for correlating with CloudTrail event ARNs."},
-        {"id":"c2","text":"aws iam list-roles","isCorrect":false,"explanation":"List-roles enumerates roles but doesn't show the runtime caller identity."},
-        {"id":"c3","text":"aws cloudtrail lookup-events","isCorrect":false,"explanation":"Lookup-events finds historical events but does not directly reveal the current caller context."},
-        {"id":"c4","text":"aws sts decode-authorization-message","isCorrect":false,"explanation":"Decoding auth message requires a message from AWS and is not the general approach for caller identity."}
+        {
+          "id": "c1",
+          "text": "aws sts get-caller-identity",
+          "isCorrect": true,
+          "explanation": "This STS call returns the effective principal; useful for correlating with CloudTrail event ARNs."
+        },
+        {
+          "id": "c2",
+          "text": "aws iam list-roles",
+          "isCorrect": false,
+          "explanation": "List-roles enumerates roles but doesn't show the runtime caller identity."
+        },
+        {
+          "id": "c3",
+          "text": "aws cloudtrail lookup-events",
+          "isCorrect": false,
+          "explanation": "Lookup-events finds historical events but does not directly reveal the current caller context."
+        },
+        {
+          "id": "c4",
+          "text": "aws sts decode-authorization-message",
+          "isCorrect": false,
+          "explanation": "Decoding auth message requires a message from AWS and is not the general approach for caller identity."
+        }
       ],
-      "tip":"Use identity-revealing calls to confirm which principal is making API requests.",
-      "explanation":"`get-caller-identity` is the simplest way to determine which principal is currently making API calls; pair it with CloudTrail to find related events.",
-      "meta":{"domain":"Incident Response"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Incident Response","selectCount":1
+      "tip": "Use identity-revealing calls to confirm which principal is making API requests.",
+      "explanation": "`get-caller-identity` is the simplest way to determine which principal is currently making API calls; pair it with CloudTrail to find related events.",
+      "meta": {
+        "domain": "Incident Response"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Incident Response",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0046",
       "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
       "format": "text",
-      "services": ["WAF","CloudFront","Shield"],
-      "skills": ["3.1.1: Define and select edge security strategies based on anticipated threats and attacks"],
+      "services": [
+        "WAF",
+        "CloudFront",
+        "Shield"
+      ],
+      "skills": [
+        "3.1.1: Define and select edge security strategies based on anticipated threats and attacks"
+      ],
       "question": "Faced with application-layer bot traffic and volumetric DDoS, which combined edge strategy provides layered protection?",
       "choices": [
-        {"id":"c1","text":"Use AWS Shield Advanced for DDoS and AWS WAF at CloudFront for application-layer filtering","isCorrect":true,"explanation":"Shield Advanced mitigates volumetric network attacks while WAF filters application-layer patterns such as bots and OWASP threats."},
-        {"id":"c2","text":"Only enable security groups at the origin","isCorrect":false,"explanation":"Security groups do not protect the global edge nor mitigate volumetric attacks effectively."},
-        {"id":"c3","text":"Rely on client-side Captcha only","isCorrect":false,"explanation":"Client-side controls can be bypassed and don't handle volumetric network-level attacks."},
-        {"id":"c4","text":"Increase EC2 instance sizes behind the load balancer","isCorrect":false,"explanation":"Scaling instances may help capacity but does not stop DDoS or malicious application-layer requests at the edge."}
+        {
+          "id": "c1",
+          "text": "Use AWS Shield Advanced for DDoS and AWS WAF at CloudFront for application-layer filtering",
+          "isCorrect": true,
+          "explanation": "Shield Advanced mitigates volumetric network attacks while WAF filters application-layer patterns such as bots and OWASP threats."
+        },
+        {
+          "id": "c2",
+          "text": "Only enable security groups at the origin",
+          "isCorrect": false,
+          "explanation": "Security groups do not protect the global edge nor mitigate volumetric attacks effectively."
+        },
+        {
+          "id": "c3",
+          "text": "Use client-side Captcha only",
+          "isCorrect": false,
+          "explanation": "Client-side controls can be bypassed and don't handle volumetric network-level attacks."
+        },
+        {
+          "id": "c4",
+          "text": "Increase EC2 instance sizes behind the load balancer",
+          "isCorrect": false,
+          "explanation": "Scaling instances may help capacity but does not stop DDoS or malicious application-layer requests at the edge."
+        }
       ],
-      "tip":"Defence-in-depth at the edge combines network- and application-layer protections.",
-      "explanation":"Defence in depth: Shield Advanced for volumetric and network-layer attacks, WAF for application-layer patterns, and CloudFront for caching and geographic distribution.",
-      "meta":{"domain":"Infrastructure Security"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Infrastructure Security","selectCount":1
+      "tip": "Defence-in-depth at the edge combines network- and application-layer protections.",
+      "explanation": "Defence in depth: Shield Advanced for volumetric and network-layer attacks, WAF for application-layer patterns, and CloudFront for caching and geographic distribution.",
+      "meta": {
+        "domain": "Infrastructure Security"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Infrastructure Security",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0047",
       "docs": "https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html",
       "format": "text",
-      "services": ["EKS","IAM","STS"],
-      "skills": ["3.2.2: Apply instance profiles, service roles, and execution roles appropriately to authorize compute workloads"],
+      "services": [
+        "EKS",
+        "IAM",
+        "STS"
+      ],
+      "skills": [
+        "3.2.2: Apply instance profiles, service roles, and execution roles appropriately to authorize compute workloads"
+      ],
       "question": "Which practice grants least-privilege permissions to pods running in EKS for accessing AWS APIs?",
       "choices": [
-        {"id":"c1","text":"Use IRSA (IAM Roles for Service Accounts) to map service accounts to IAM roles with narrow permissions","isCorrect":true,"explanation":"IRSA ties an IAM role to a Kubernetes service account, allowing fine-grained, pod-level permissions."},
-        {"id":"c2","text":"Attach a broad IAM role to all worker nodes","isCorrect":false,"explanation":"Node roles provide host-level permissions and risk privilege escalation from any pod to node-level permissions."},
-        {"id":"c3","text":"Use instance metadata to share credentials across pods","isCorrect":false,"explanation":"Instance metadata exposes node credentials and is not recommended for per-pod least-privilege."},
-        {"id":"c4","text":"Store AWS keys in pod environment variables at build time","isCorrect":false,"explanation":"Hard-coding keys in images is insecure and prevents rotation."}
+        {
+          "id": "c1",
+          "text": "Use IRSA (IAM Roles for Service Accounts) to map service accounts to IAM roles with narrow permissions",
+          "isCorrect": true,
+          "explanation": "IRSA ties an IAM role to a Kubernetes service account, allowing fine-grained, pod-level permissions."
+        },
+        {
+          "id": "c2",
+          "text": "Attach a broad IAM role to all worker nodes",
+          "isCorrect": false,
+          "explanation": "Node roles provide host-level permissions and risk privilege escalation from any pod to node-level permissions."
+        },
+        {
+          "id": "c3",
+          "text": "Use instance metadata to share credentials across pods",
+          "isCorrect": false,
+          "explanation": "Instance metadata exposes node credentials and is not recommended for per-pod least-privilege."
+        },
+        {
+          "id": "c4",
+          "text": "Store AWS keys in pod environment variables at build time",
+          "isCorrect": false,
+          "explanation": "Hard-coding keys in images is insecure and prevents rotation."
+        }
       ],
-      "tip":"Use workload-scoped identity mechanisms to grant narrow, auditable pod permissions.",
-      "explanation":"IRSA provides workload identity that limits permissions to the specific service account and namespace, reducing blast radius and improving auditability.",
-      "meta":{"domain":"Identity and Access Management"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Identity and Access Management","selectCount":1
+      "tip": "Use workload-scoped identity mechanisms to grant narrow, auditable pod permissions.",
+      "explanation": "IRSA provides workload identity that limits permissions to the specific service account and namespace, reducing blast radius and improving auditability.",
+      "meta": {
+        "domain": "Identity and Access Management"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Identity and Access Management",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0048",
       "docs": "https://docs.aws.amazon.com/inspector/latest/userguide/what-is-inspector.html",
       "format": "text",
-      "services": ["Inspector","ECR","Lambda"],
-      "skills": ["3.2.3: Scan compute resources for known vulnerabilities"],
+      "services": [
+        "Inspector",
+        "ECR",
+        "Lambda"
+      ],
+      "skills": [
+        "3.2.3: Scan compute resources for known vulnerabilities"
+      ],
       "question": "Which integration helps ensure container images are scanned for known vulnerabilities before deployment?",
       "choices": [
-        {"id":"c1","text":"Enable Inspector image scanning for ECR and fail CI on high-severity findings","isCorrect":true,"explanation":"Inspector integrates with ECR to scan images and can be used as a gate in CI to prevent deploying vulnerable images."},
-        {"id":"c2","text":"Rely only on runtime detection like GuardDuty","isCorrect":false,"explanation":"Runtime detection is useful but does not prevent vulnerable images from being deployed in the first place."},
-        {"id":"c3","text":"Scan images manually once per quarter","isCorrect":false,"explanation":"Infrequent manual scans miss new vulnerabilities discovered between scans."},
-        {"id":"c4","text":"Use S3 object versioning to store old images","isCorrect":false,"explanation":"S3 versioning stores objects but does not scan or prevent vulnerable images from running."}
+        {
+          "id": "c1",
+          "text": "Enable Inspector image scanning for ECR and fail CI on high-severity findings",
+          "isCorrect": true,
+          "explanation": "Inspector integrates with ECR to scan images and can be used as a gate in CI to prevent deploying vulnerable images."
+        },
+        {
+          "id": "c2",
+          "text": "Use only runtime detection like GuardDuty",
+          "isCorrect": false,
+          "explanation": "Runtime detection is useful but does not prevent vulnerable images from being deployed in the first place."
+        },
+        {
+          "id": "c3",
+          "text": "Scan images manually once per quarter",
+          "isCorrect": false,
+          "explanation": "Infrequent manual scans miss new vulnerabilities discovered between scans."
+        },
+        {
+          "id": "c4",
+          "text": "Use S3 object versioning to store old images",
+          "isCorrect": false,
+          "explanation": "S3 versioning stores objects but does not scan or prevent vulnerable images from running."
+        }
       ],
-      "tip":"Integrate vulnerability scanning into CI/CD and prevent promotion of artifacts with critical findings.",
-      "explanation":"Shifting vulnerability scans left (during build) reduces risk; Inspector/ECR scanning plus CI gates prevents deploying images with known critical vulnerabilities.",
-      "meta":{"domain":"Infrastructure Security"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Infrastructure Security","selectCount":1
+      "tip": "Integrate vulnerability scanning into CI/CD and prevent promotion of artifacts with critical findings.",
+      "explanation": "Shifting vulnerability scans left (during build) reduces risk; Inspector/ECR scanning plus CI gates prevents deploying images with known critical vulnerabilities.",
+      "meta": {
+        "domain": "Infrastructure Security"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Infrastructure Security",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0049",
       "docs": "https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html",
       "format": "text",
-      "services": ["Systems Manager","SSM","CloudTrail"],
-      "skills": ["3.2.5: Configure secure administrative access to compute resources (for example, Systems Manager Session Manager)"],
+      "services": [
+        "Systems Manager",
+        "SSM",
+        "CloudTrail"
+      ],
+      "skills": [
+        "3.2.5: Configure secure administrative access to compute resources (for example, Systems Manager Session Manager)"
+      ],
       "question": "A team must provide audited shell access to instances in private subnets without SSH port exposure. Which solution meets this requirement?",
       "choices": [
-        {"id":"c1","text":"Use Systems Manager Session Manager with logging to CloudWatch or S3 and IAM-based access controls","isCorrect":true,"explanation":"Session Manager provides agent-based access without inbound ports and records sessions for auditing."},
-        {"id":"c2","text":"Open SSH port 22 and enforce key rotation manually","isCorrect":false,"explanation":"Opening SSH ports exposes network surface and complicates auditing compared to agent-based sessions."},
-        {"id":"c3","text":"Use RDP through a bastion host for Linux instances","isCorrect":false,"explanation":"RDP is inappropriate for Linux and bastions reintroduce exposed access vectors."},
-        {"id":"c4","text":"Embed root credentials in AMI for quick access","isCorrect":false,"explanation":"Embedding credentials is insecure and hinders auditing and rotation."}
+        {
+          "id": "c1",
+          "text": "Use Systems Manager Session Manager with logging to CloudWatch or S3 and IAM-based access controls",
+          "isCorrect": true,
+          "explanation": "Session Manager provides agent-based access without inbound ports and records sessions for auditing."
+        },
+        {
+          "id": "c2",
+          "text": "Open SSH port 22 and enforce key rotation manually",
+          "isCorrect": false,
+          "explanation": "Opening SSH ports exposes network surface and complicates auditing compared to agent-based sessions."
+        },
+        {
+          "id": "c3",
+          "text": "Use RDP through a bastion host for Linux instances",
+          "isCorrect": false,
+          "explanation": "RDP is inappropriate for Linux and bastions reintroduce exposed access vectors."
+        },
+        {
+          "id": "c4",
+          "text": "Embed root credentials in AMI for quick access",
+          "isCorrect": false,
+          "explanation": "Embedding credentials is insecure and hinders auditing and rotation."
+        }
       ],
-      "tip":"Agent-based session solutions can record session logs and enforce access via identity policies.",
-      "explanation":"Systems Manager's Session Manager avoids bastions and allows session logging to CloudWatch/S3 and control via IAM, meeting audit requirements.",
-      "meta":{"domain":"Infrastructure Security"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Infrastructure Security","selectCount":1
+      "tip": "Agent-based session solutions can record session logs and enforce access via identity policies.",
+      "explanation": "Systems Manager's Session Manager avoids bastions and allows session logging to CloudWatch/S3 and control via IAM, meeting audit requirements.",
+      "meta": {
+        "domain": "Infrastructure Security"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Infrastructure Security",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0050",
       "docs": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
       "format": "json",
-      "services": ["Secrets Manager","IAM","Lambda"],
-      "skills": ["5.3.1: Design management and rotation of credentials and secrets"],
+      "services": [
+        "Secrets Manager",
+        "IAM",
+        "Lambda"
+      ],
+      "skills": [
+        "5.3.1: Design management and rotation of credentials and secrets"
+      ],
       "question": "Which approach meets the requirement: rotate DB credentials every 30 days without redeploying applications?",
       "choices": [
-        {"id":"c1","text":"Use AWS Secrets Manager rotation with a Lambda rotation function and have apps retrieve secrets at runtime","isCorrect":true,"explanation":"Secrets Manager supports automatic rotation and applications that fetch secrets at runtime do not need redeployment."},
-        {"id":"c2","text":"Bake credentials into container images and rebuild monthly","isCorrect":false,"explanation":"Rebuilding images is operationally heavy and requires redeployment, which the requirement forbids."},
-        {"id":"c3","text":"Store credentials in SSM Parameter Store without rotation","isCorrect":false,"explanation":"Parameter Store can store secrets but does not provide automated rotation like Secrets Manager."},
-        {"id":"c4","text":"Rotate credentials manually and email them to developers","isCorrect":false,"explanation":"Manual rotation and distribution is insecure and error-prone."}
+        {
+          "id": "c1",
+          "text": "Use AWS Secrets Manager rotation with a Lambda rotation function and have apps retrieve secrets at runtime",
+          "isCorrect": true,
+          "explanation": "Secrets Manager supports automatic rotation and applications that fetch secrets at runtime do not need redeployment."
+        },
+        {
+          "id": "c2",
+          "text": "Bake credentials into container images and rebuild monthly",
+          "isCorrect": false,
+          "explanation": "Rebuilding images is operationally heavy and requires redeployment, which the requirement forbids."
+        },
+        {
+          "id": "c3",
+          "text": "Store credentials in SSM Parameter Store without rotation",
+          "isCorrect": false,
+          "explanation": "Parameter Store can store secrets but does not provide automated rotation like Secrets Manager."
+        },
+        {
+          "id": "c4",
+          "text": "Rotate credentials manually and email them to developers",
+          "isCorrect": false,
+          "explanation": "Manual rotation and distribution is insecure and error-prone."
+        }
       ],
-      "tip":"Prefer automated rotation and runtime retrieval of secrets to decouple credentials from deployments.",
-      "explanation":"Automatic rotation decouples credential lifecycles from deployments; applications should fetch secrets at runtime to benefit from rotation without redeployments.",
-      "meta":{"domain":"Data Protection"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Data Protection","selectCount":1
+      "tip": "Prefer automated rotation and runtime retrieval of secrets to decouple credentials from deployments.",
+      "explanation": "Automatic rotation decouples credential lifecycles from deployments; applications should fetch secrets at runtime to benefit from rotation without redeployments.",
+      "meta": {
+        "domain": "Data Protection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Data Protection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0051",
       "docs": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
       "format": "text",
-      "services": ["VPC","Transit Gateway","VPN"],
-      "skills": ["3.3.2: Design secure connectivity between hybrid and multi-cloud networks"],
+      "services": [
+        "VPC",
+        "Transit Gateway",
+        "VPN"
+      ],
+      "skills": [
+        "3.3.2: Design secure connectivity between hybrid and multi-cloud networks"
+      ],
       "question": "For secure, performant connectivity between on-premises and multiple AWS regions, which architecture is recommended?",
       "choices": [
-        {"id":"c1","text":"Use AWS Transit Gateway in each region with Direct Connect and Transit Gateway inter-region peering","isCorrect":true,"explanation":"Transit Gateway with Direct Connect and inter-region peering reduces management complexity and centralizes routing at scale."},
-        {"id":"c2","text":"Create individual Site-to-Site VPNs from on-prem to each VPC","isCorrect":false,"explanation":"Multiple VPNs increase operational overhead and complexity for multi-region connectivity."},
-        {"id":"c3","text":"Rely on internet-based VPNs only","isCorrect":false,"explanation":"Internet VPNs may not meet performance and security requirements compared to Direct Connect."},
-        {"id":"c4","text":"Use S3 transfer acceleration for VPC connectivity","isCorrect":false,"explanation":"S3 Transfer Acceleration is for object transfers and not a network topology solution."}
+        {
+          "id": "c1",
+          "text": "Use AWS Transit Gateway in each region with Direct Connect and Transit Gateway inter-region peering",
+          "isCorrect": true,
+          "explanation": "Transit Gateway with Direct Connect and inter-region peering reduces management complexity and centralizes routing at scale."
+        },
+        {
+          "id": "c2",
+          "text": "Create individual Site-to-Site VPNs from on-prem to each VPC",
+          "isCorrect": false,
+          "explanation": "Multiple VPNs increase operational overhead and complexity for multi-region connectivity."
+        },
+        {
+          "id": "c3",
+          "text": "Use internet-based VPNs only",
+          "isCorrect": false,
+          "explanation": "Internet VPNs may not meet performance and security requirements compared to Direct Connect."
+        },
+        {
+          "id": "c4",
+          "text": "Use S3 transfer acceleration for VPC connectivity",
+          "isCorrect": false,
+          "explanation": "S3 Transfer Acceleration is for object transfers and not a network topology solution."
+        }
       ],
-      "tip":"Combine transit routing and dedicated connectivity for scalable, performant hybrid networking.",
-      "explanation":"Transit Gateway simplifies routing between many VPCs and on-premises, and Direct Connect improves performance and security over internet VPNs.",
-      "meta":{"domain":"Infrastructure Security"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Infrastructure Security","selectCount":1
+      "tip": "Combine transit routing and dedicated connectivity for scalable, performant hybrid networking.",
+      "explanation": "Transit Gateway simplifies routing between many VPCs and on-premises, and Direct Connect improves performance and security over internet VPNs.",
+      "meta": {
+        "domain": "Infrastructure Security"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Infrastructure Security",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0052",
       "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
       "format": "text",
-      "services": ["IAM","Access Analyzer","KMS"],
-      "skills": ["4.2.4: Analyze authorization failures to determine causes or effects (for example, IAM Policy Simulator, IAM Access Analyzer)"],
+      "services": [
+        "IAM",
+        "Access Analyzer",
+        "KMS"
+      ],
+      "skills": [
+        "4.2.4: Analyze authorization failures to determine causes or effects (for example, IAM Policy Simulator, IAM Access Analyzer)"
+      ],
       "question": "Which AWS feature helps simulate a principal's effective permissions to diagnose an unexpected AccessDenied?",
       "choices": [
-        {"id":"c1","text":"IAM Policy Simulator","isCorrect":true,"explanation":"IAM Policy Simulator evaluates policies to determine whether a given action would be allowed for a principal and helps diagnose AccessDenied errors."},
-        {"id":"c2","text":"AWS Config","isCorrect":false,"explanation":"Config tracks resource configurations but does not simulate policy evaluation for a principal."},
-        {"id":"c3","text":"CloudTrail data events","isCorrect":false,"explanation":"CloudTrail records events but does not simulate policy evaluation prior to the request."},
-        {"id":"c4","text":"S3 Access Analyzer","isCorrect":false,"explanation":"Access Analyzer inspects resource-based policies for external access, not per-principal simulation of permissions."}
+        {
+          "id": "c1",
+          "text": "IAM Policy Simulator",
+          "isCorrect": true,
+          "explanation": "IAM Policy Simulator evaluates policies to determine whether a given action would be allowed for a principal and helps diagnose AccessDenied errors."
+        },
+        {
+          "id": "c2",
+          "text": "AWS Config",
+          "isCorrect": false,
+          "explanation": "Config tracks resource configurations but does not simulate policy evaluation for a principal."
+        },
+        {
+          "id": "c3",
+          "text": "CloudTrail data events",
+          "isCorrect": false,
+          "explanation": "CloudTrail records events but does not simulate policy evaluation prior to the request."
+        },
+        {
+          "id": "c4",
+          "text": "S3 Access Analyzer",
+          "isCorrect": false,
+          "explanation": "Access Analyzer inspects resource-based policies for external access, not per-principal simulation of permissions."
+        }
       ],
-      "tip":"Use policy simulation tools to reproduce and diagnose access-denied scenarios.",
-      "explanation":"Policy Simulator can combine identity and resource policies to explain why a request was denied and recommend policy changes.",
-      "meta":{"domain":"Identity and Access Management"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Identity and Access Management","selectCount":1
+      "tip": "Use policy simulation tools to reproduce and diagnose access-denied scenarios.",
+      "explanation": "Policy Simulator can combine identity and resource policies to explain why a request was denied and recommend policy changes.",
+      "meta": {
+        "domain": "Identity and Access Management"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Identity and Access Management",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0053",
       "docs": "https://docs.aws.amazon.com/eks/latest/userguide/security_iam.html",
       "format": "text",
-      "services": ["EKS","IAM","KMS"],
-      "skills": ["4.2.2: Design attribute-based access control (ABAC) and role-based access control (RBAC) strategies"],
+      "services": [
+        "EKS",
+        "IAM",
+        "KMS"
+      ],
+      "skills": [
+        "4.2.2: Design attribute-based access control (ABAC) and role-based access control (RBAC) strategies"
+      ],
       "question": "Which strategy enables workload access policies that scale with many teams and dynamic resources in AWS?",
       "choices": [
-        {"id":"c1","text":"Use ABAC with tags to grant permissions based on attributes such as department or environment","isCorrect":true,"explanation":"ABAC provides scalable, attribute-based permissions without creating many static IAM policies per resource."},
-        {"id":"c2","text":"Create a single monolithic admin role for all teams","isCorrect":false,"explanation":"Monolithic roles violate least privilege and do not scale well."},
-        {"id":"c3","text":"Hardcode permissions into application config files","isCorrect":false,"explanation":"Hardcoding is insecure and prevents centralized management and auditing."},
-        {"id":"c4","text":"Rely solely on VPC-level security groups for access control","isCorrect":false,"explanation":"Security groups operate at network level, not at identity/attribute level."}
+        {
+          "id": "c1",
+          "text": "Use ABAC with tags to grant permissions based on attributes such as department or environment",
+          "isCorrect": true,
+          "explanation": "ABAC provides scalable, attribute-based permissions without creating many static IAM policies per resource."
+        },
+        {
+          "id": "c2",
+          "text": "Create a single monolithic admin role for all teams",
+          "isCorrect": false,
+          "explanation": "Monolithic roles violate least privilege and do not scale well."
+        },
+        {
+          "id": "c3",
+          "text": "Hardcode permissions into application config files",
+          "isCorrect": false,
+          "explanation": "Hardcoding is insecure and prevents centralized management and auditing."
+        },
+        {
+          "id": "c4",
+          "text": "Use VPC-level security groups for access control",
+          "isCorrect": false,
+          "explanation": "Security groups operate at network level, not at identity/attribute level."
+        }
       ],
-      "tip":"Use attribute-based access control (ABAC) with tags for scalable permission models.",
-      "explanation":"ABAC allows policies to reference resource or principal tags, reducing policy proliferation while enabling fine-grained access control aligned to organizational attributes.",
-      "meta":{"domain":"Identity and Access Management"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Identity and Access Management","selectCount":1
+      "tip": "Use attribute-based access control (ABAC) with tags for scalable permission models.",
+      "explanation": "ABAC allows policies to reference resource or principal tags, reducing policy proliferation while enabling fine-grained access control aligned to organizational attributes.",
+      "meta": {
+        "domain": "Identity and Access Management"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Identity and Access Management",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0054",
       "docs": "https://docs.aws.amazon.com/KMS/latest/developerguide/importing-keys.html",
       "format": "text",
-      "services": ["KMS","CloudHSM","Secrets Manager"],
-      "skills": ["5.3.2: Manage and use imported key material"],
+      "services": [
+        "KMS",
+        "CloudHSM",
+        "Secrets Manager"
+      ],
+      "skills": [
+        "5.3.2: Manage and use imported key material"
+      ],
       "question": "What is a key operational difference between imported key material and AWS-generated KMS keys?",
       "choices": [
-        {"id":"c1","text":"Imported key material may have restrictions on automatic rotation and cannot be exported by AWS; customer manages lifecycle","isCorrect":true,"explanation":"Imported key material is under customer control for import/removal and has different rotation/export characteristics than AWS-generated keys."},
-        {"id":"c2","text":"Imported key material automatically rotates daily","isCorrect":false,"explanation":"Automatic daily rotation is not a feature of imported key material; rotation must be managed by the customer."},
-        {"id":"c3","text":"Imported keys are free of charge for cross-region usage","isCorrect":false,"explanation":"Billing is not the defining operational difference; cross-region use still requires correct configuration."},
-        {"id":"c4","text":"AWS may export imported key material to other customers","isCorrect":false,"explanation":"AWS does not export customer-imported key material; it's managed per customer account/CMK."}
+        {
+          "id": "c1",
+          "text": "Imported key material may have restrictions on automatic rotation and cannot be exported by AWS; customer manages lifecycle",
+          "isCorrect": true,
+          "explanation": "Imported key material is under customer control for import/removal and has different rotation/export characteristics than AWS-generated keys."
+        },
+        {
+          "id": "c2",
+          "text": "Imported key material automatically rotates daily",
+          "isCorrect": false,
+          "explanation": "Automatic daily rotation is not a feature of imported key material; rotation must be managed by the customer."
+        },
+        {
+          "id": "c3",
+          "text": "Imported keys are free of charge for cross-region usage",
+          "isCorrect": false,
+          "explanation": "Billing is not the defining operational difference; cross-region use still requires correct configuration."
+        },
+        {
+          "id": "c4",
+          "text": "AWS may export imported key material to other customers",
+          "isCorrect": false,
+          "explanation": "AWS does not export customer-imported key material; it's managed per customer account/CMK."
+        }
       ],
-      "tip":"Imported key material imposes additional lifecycle and rotation responsibilities on the customer.",
-      "explanation":"Choosing imported key material affects rotation, import windows, and export constraints; plan operational processes accordingly.",
-      "meta":{"domain":"Data Protection"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Data Protection","selectCount":1
+      "tip": "Imported key material imposes additional lifecycle and rotation responsibilities on the customer.",
+      "explanation": "Choosing imported key material affects rotation, import windows, and export constraints; plan operational processes accordingly.",
+      "meta": {
+        "domain": "Data Protection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Data Protection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0055",
       "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-security-best-practices/overview.html",
       "format": "text",
-      "services": ["Organizations","IAM","CloudTrail"],
-      "skills": ["6.1.1: Deploy and configure organizations by using AWS Organizations"],
+      "services": [
+        "Organizations",
+        "IAM",
+        "CloudTrail"
+      ],
+      "skills": [
+        "6.1.1: Deploy and configure organizations by using AWS Organizations"
+      ],
       "question": "Which pattern centralizes billing, consolidated policies, and delegated security administration across many accounts?",
       "choices": [
-        {"id":"c1","text":"Use AWS Organizations with an organizational management account, OUs for environment separation, and delegated admin roles","isCorrect":true,"explanation":"Organizations centralize management, apply SCPs, and enable delegated admin accounts for service management across member accounts."},
-        {"id":"c2","text":"Manage each account independently with separate billing","isCorrect":false,"explanation":"Independent accounts increase operational overhead and hinder centralized policy enforcement."},
-        {"id":"c3","text":"Use a single shared AWS account for all teams","isCorrect":false,"explanation":"A single account lacks isolation and governance for multiple teams or environments."},
-        {"id":"c4","text":"Delegate everything to third-party SaaS governance tools only","isCorrect":false,"explanation":"Third-party tools can help but AWS Organizations provides foundational native patterns for central control."}
+        {
+          "id": "c1",
+          "text": "Use AWS Organizations with an organizational management account, OUs for environment separation, and delegated admin roles",
+          "isCorrect": true,
+          "explanation": "Organizations centralize management, apply SCPs, and enable delegated admin accounts for service management across member accounts."
+        },
+        {
+          "id": "c2",
+          "text": "Manage each account independently with separate billing",
+          "isCorrect": false,
+          "explanation": "Independent accounts increase operational overhead and hinder centralized policy enforcement."
+        },
+        {
+          "id": "c3",
+          "text": "Use a single shared AWS account for all teams",
+          "isCorrect": false,
+          "explanation": "A single account lacks isolation and governance for multiple teams or environments."
+        },
+        {
+          "id": "c4",
+          "text": "Delegate everything to third-party SaaS governance tools only",
+          "isCorrect": false,
+          "explanation": "Third-party tools can help but AWS Organizations provides foundational native patterns for central control."
+        }
       ],
-      "tip":"Organize accounts with OUs and delegated administration for scale and governance.",
-      "explanation":"AWS Organizations supports centralized billing, SCPs for guardrails, and delegated admin roles for services such as GuardDuty or Security Hub, enabling scalable governance.",
-      "meta":{"domain":"Security Foundations and Governance"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Security Foundations and Governance","selectCount":1
+      "tip": "Organize accounts with OUs and delegated administration for scale and governance.",
+      "explanation": "AWS Organizations supports centralized billing, SCPs for guardrails, and delegated admin roles for services such as GuardDuty or Security Hub, enabling scalable governance.",
+      "meta": {
+        "domain": "Security Foundations and Governance"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Security Foundations and Governance",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0056",
       "docs": "https://docs.aws.amazon.com/config/latest/developerguide/remediation.html",
       "format": "text",
-      "services": ["Config","SSM","CloudWatch"],
-      "skills": ["1.1.5: Create and manage automations to perform regular assessments and investigations"],
+      "services": [
+        "Config",
+        "SSM",
+        "CloudWatch"
+      ],
+      "skills": [
+        "1.1.5: Create and manage automations to perform regular assessments and investigations"
+      ],
       "question": "Which mechanism should be used to automatically remediate a non-compliant resource detected by AWS Config?",
       "choices": [
-        {"id":"c1","text":"Configure AWS Config automatic remediation using an SSM Automation document","isCorrect":true,"explanation":"Config remediation actions invoke SSM Automation documents to fix identified non-compliance automatically."},
-        {"id":"c2","text":"Send alerts only to email and wait for manual action","isCorrect":false,"explanation":"Manual remediation is slower and does not meet automatic remediation requirements."},
-        {"id":"c3","text":"Use CloudTrail to roll back the resource change","isCorrect":false,"explanation":"CloudTrail records events but does not perform automated remediation by itself."},
-        {"id":"c4","text":"Deploy a Lambda that polls Config every 24 hours","isCorrect":false,"explanation":"Polling is less efficient and misses near-real-time remediation compared to Config automatic remediation."}
+        {
+          "id": "c1",
+          "text": "Configure AWS Config automatic remediation using an SSM Automation document",
+          "isCorrect": true,
+          "explanation": "Config remediation actions invoke SSM Automation documents to fix identified non-compliance automatically."
+        },
+        {
+          "id": "c2",
+          "text": "Send alerts only to email and wait for manual action",
+          "isCorrect": false,
+          "explanation": "Manual remediation is slower and does not meet automatic remediation requirements."
+        },
+        {
+          "id": "c3",
+          "text": "Use CloudTrail to roll back the resource change",
+          "isCorrect": false,
+          "explanation": "CloudTrail records events but does not perform automated remediation by itself."
+        },
+        {
+          "id": "c4",
+          "text": "Deploy a Lambda that polls Config every 24 hours",
+          "isCorrect": false,
+          "explanation": "Polling is less efficient and misses near-real-time remediation compared to Config automatic remediation."
+        }
       ],
-      "tip":"Use built-in remediation mechanisms that invoke automation playbooks or documents for fixes.",
-      "explanation":"AWS Config's remediation model is designed to trigger SSM Automation documents to correct drift promptly and reliably.",
-      "meta":{"domain":"Detection"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Detection","selectCount":1
+      "tip": "Use built-in remediation mechanisms that invoke automation playbooks or documents for fixes.",
+      "explanation": "AWS Config's remediation model is designed to trigger SSM Automation documents to correct drift promptly and reliably.",
+      "meta": {
+        "domain": "Detection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Detection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0057",
       "docs": "https://docs.aws.amazon.com/acm/latest/userguide/acm-certificate.html",
       "format": "text",
-      "services": ["ACM","Route 53","ALB"],
-      "skills": ["5.3.5: Create and manage encryption keys and certificates across Regions"],
+      "services": [
+        "ACM",
+        "Route 53",
+        "ALB"
+      ],
+      "skills": [
+        "5.3.5: Create and manage encryption keys and certificates across Regions"
+      ],
       "question": "Which approach supports zero-downtime TLS certificate renewal for multiple subdomains?",
       "choices": [
-        {"id":"c1","text":"Use ACM certificates with DNS validation and attach to ALB listeners","isCorrect":true,"explanation":"ACM issues public certificates that renew automatically when DNS validation is used; ALB integration ensures rotation without downtime."},
-        {"id":"c2","text":"Use self-signed certs rotated manually via SSH","isCorrect":false,"explanation":"Manual self-signed rotation risks downtime and trust issues."},
-        {"id":"c3","text":"Use a wildcard cert imported into each instance","isCorrect":false,"explanation":"Importing certificates to instances complicates automation and rotation compared to ACM."},
-        {"id":"c4","text":"Disable TLS and rely on internal network controls","isCorrect":false,"explanation":"Disabling TLS violates best practices for encryption in transit.","explanation":"TLS should be used; ACM simplifies automated renewals."}
+        {
+          "id": "c1",
+          "text": "Use ACM certificates with DNS validation and attach to ALB listeners",
+          "isCorrect": true,
+          "explanation": "ACM issues public certificates that renew automatically when DNS validation is used; ALB integration ensures rotation without downtime."
+        },
+        {
+          "id": "c2",
+          "text": "Use self-signed certs rotated manually via SSH",
+          "isCorrect": false,
+          "explanation": "Manual self-signed rotation risks downtime and trust issues."
+        },
+        {
+          "id": "c3",
+          "text": "Use a wildcard cert imported into each instance",
+          "isCorrect": false,
+          "explanation": "Importing certificates to instances complicates automation and rotation compared to ACM."
+        },
+        {
+          "id": "c4",
+          "text": "Disable TLS and use internal network controls",
+          "isCorrect": false,
+          "explanation": "TLS should be used; ACM simplifies automated renewals."
+        }
       ],
-      "tip":"Prefer provider-issued certificates with an automated validation method for renewals.",
-      "explanation":"ACM manages the lifecycle of certificates it issues and integrates with ALB/CloudFront to rotate certificates transparently.",
-      "meta":{"domain":"Data Protection"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Data Protection","selectCount":1
+      "tip": "Prefer provider-issued certificates with an automated validation method for renewals.",
+      "explanation": "ACM manages the lifecycle of certificates it issues and integrates with ALB/CloudFront to rotate certificates transparently.",
+      "meta": {
+        "domain": "Data Protection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Data Protection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0058",
       "docs": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-update-rule.html",
       "format": "text",
-      "services": ["ALB","WAF","Route 53"],
-      "skills": ["3.1.3: Design and implement AWS edge controls and rules based on requirements"],
+      "services": [
+        "ALB",
+        "WAF",
+        "Route 53"
+      ],
+      "skills": [
+        "3.1.3: Design and implement AWS edge controls and rules based on requirements"
+      ],
       "question": "To rate-limit abusive clients at the edge while preserving legitimate traffic, which feature combination should be used?",
       "choices": [
-        {"id":"c1","text":"AWS WAF rate-based rules on CloudFront with CloudFront caching","isCorrect":true,"explanation":"WAF rate-based rules block clients over request thresholds while CloudFront caching reduces backend load for legitimate traffic."},
-        {"id":"c2","text":"NACL rules to block IP ranges","isCorrect":false,"explanation":"NACLs are coarse-grained and do not provide application-layer rate limiting."},
-        {"id":"c3","text":"Increase origin instance capacity","isCorrect":false,"explanation":"Scaling origin capacity doesn't stop abusive traffic or reduce edge processing cost."},
-        {"id":"c4","text":"Use Route 53 geolocation routing only","isCorrect":false,"explanation":"Geolocation routing doesn't provide rate-limiting or application-layer filtering."}
+        {
+          "id": "c1",
+          "text": "AWS WAF rate-based rules on CloudFront with CloudFront caching",
+          "isCorrect": true,
+          "explanation": "WAF rate-based rules block clients over request thresholds while CloudFront caching reduces backend load for legitimate traffic."
+        },
+        {
+          "id": "c2",
+          "text": "NACL rules to block IP ranges",
+          "isCorrect": false,
+          "explanation": "NACLs are coarse-grained and do not provide application-layer rate limiting."
+        },
+        {
+          "id": "c3",
+          "text": "Increase origin instance capacity",
+          "isCorrect": false,
+          "explanation": "Scaling origin capacity doesn't stop abusive traffic or reduce edge processing cost."
+        },
+        {
+          "id": "c4",
+          "text": "Use Route 53 geolocation routing only",
+          "isCorrect": false,
+          "explanation": "Geolocation routing doesn't provide rate-limiting or application-layer filtering."
+        }
       ],
-      "tip":"Implement edge rate-limiting close to users and combine caching to reduce backend load.",
-      "explanation":"WAF's rate-based rules applied at CloudFront prevent abusive clients from reaching origin and, combined with caching, protect backend capacity.",
-      "meta":{"domain":"Infrastructure Security"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Infrastructure Security","selectCount":1
+      "tip": "Implement edge rate-limiting close to users and combine caching to reduce backend load.",
+      "explanation": "WAF's rate-based rules applied at CloudFront prevent abusive clients from reaching origin and, combined with caching, protect backend capacity.",
+      "meta": {
+        "domain": "Infrastructure Security"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Infrastructure Security",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0059",
       "docs": "https://docs.aws.amazon.com/iam/latest/UserGuide/id_users_create.html",
       "format": "text",
-      "services": ["IAM","IAM Identity Center"],
-      "skills": ["4.1.1: Design and establish identity solutions for human, application, and system authentication"],
+      "services": [
+        "IAM",
+        "IAM Identity Center"
+      ],
+      "skills": [
+        "4.1.1: Design and establish identity solutions for human, application, and system authentication"
+      ],
       "question": "For workforce single sign-on with centralized permission sets, which service provides identity federation and permission management?",
       "choices": [
-        {"id":"c1","text":"IAM Identity Center (AWS SSO)","isCorrect":true,"explanation":"IAM Identity Center provides SSO and centralized permission set management for workforce identities."},
-        {"id":"c2","text":"Create IAM Users for each employee","isCorrect":false,"explanation":"IAM Users are not ideal for large-scale workforce SSO and federation scenarios."},
-        {"id":"c3","text":"Use local OS accounts on bastion hosts","isCorrect":false,"explanation":"Local accounts are not centralized or scalable for enterprise SSO needs."},
-        {"id":"c4","text":"Use API keys stored in S3 for employees","isCorrect":false,"explanation":"API keys are for programmatic access and not suitable for workforce SSO."}
+        {
+          "id": "c1",
+          "text": "IAM Identity Center (AWS SSO)",
+          "isCorrect": true,
+          "explanation": "IAM Identity Center provides SSO and centralized permission set management for workforce identities."
+        },
+        {
+          "id": "c2",
+          "text": "Create IAM Users for each employee",
+          "isCorrect": false,
+          "explanation": "IAM Users are not ideal for large-scale workforce SSO and federation scenarios."
+        },
+        {
+          "id": "c3",
+          "text": "Use local OS accounts on bastion hosts",
+          "isCorrect": false,
+          "explanation": "Local accounts are not centralized or scalable for enterprise SSO needs."
+        },
+        {
+          "id": "c4",
+          "text": "Use API keys stored in S3 for employees",
+          "isCorrect": false,
+          "explanation": "API keys are for programmatic access and not suitable for workforce SSO."
+        }
       ],
-      "tip":"Use a centralized identity solution with permission sets for workforce SSO.",
-      "explanation":"IAM Identity Center integrates with external IdPs and maps users to AWS permission sets, simplifying enterprise SSO and access management.",
-      "meta":{"domain":"Identity and Access Management"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Identity and Access Management","selectCount":1
+      "tip": "Use a centralized identity solution with permission sets for workforce SSO.",
+      "explanation": "IAM Identity Center integrates with external IdPs and maps users to AWS permission sets, simplifying enterprise SSO and access management.",
+      "meta": {
+        "domain": "Identity and Access Management"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Identity and Access Management",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0060",
       "docs": "https://docs.aws.amazon.com/efs/latest/ug/what-is-efs.html",
       "format": "text",
-      "services": ["EFS","Lifecycle","S3 Glacier"],
-      "skills": ["5.2.3: Design automatic lifecycle management and retention solutions for data"],
+      "services": [
+        "EFS",
+        "Lifecycle",
+        "S3 Glacier"
+      ],
+      "skills": [
+        "5.2.3: Design automatic lifecycle management and retention solutions for data"
+      ],
       "question": "Which strategy reduces cost while preserving required retention for infrequently accessed file data?",
       "choices": [
-        {"id":"c1","text":"Use lifecycle policies to move infrequently accessed data to lower-cost storage tiers such as EFS Infrequent Access or archival destinations","isCorrect":true,"explanation":"Lifecycle policies move data automatically to cheaper tiers while retaining access and meeting retention policies."},
-        {"id":"c2","text":"Keep all data on high-performance SSD tiers indefinitely","isCorrect":false,"explanation":"Retaining everything on high-cost tiers is inefficient and expensive."},
-        {"id":"c3","text":"Manually archive files to local tape every quarter","isCorrect":false,"explanation":"Manual processes are error-prone and lack automation and auditability."},
-        {"id":"c4","text":"Delete older data to save cost without retention requirements","isCorrect":false,"explanation":"Deletion may violate retention and compliance requirements."}
+        {
+          "id": "c1",
+          "text": "Use lifecycle policies to move infrequently accessed data to lower-cost storage tiers such as EFS Infrequent Access or archival destinations",
+          "isCorrect": true,
+          "explanation": "Lifecycle policies move data automatically to cheaper tiers while retaining access and meeting retention policies."
+        },
+        {
+          "id": "c2",
+          "text": "Keep all data on high-performance SSD tiers indefinitely",
+          "isCorrect": false,
+          "explanation": "Retaining everything on high-cost tiers is inefficient and expensive."
+        },
+        {
+          "id": "c3",
+          "text": "Manually archive files to local tape every quarter",
+          "isCorrect": false,
+          "explanation": "Manual processes are error-prone and lack automation and auditability."
+        },
+        {
+          "id": "c4",
+          "text": "Delete older data to save cost without retention requirements",
+          "isCorrect": false,
+          "explanation": "Deletion may violate retention and compliance requirements."
+        }
       ],
-      "tip":"Automate lifecycle transitions to lower-cost tiers based on access patterns.",
-      "explanation":"Automated lifecycle policies balance cost and retention by moving data to appropriate storage classes based on age and access frequency.",
-      "meta":{"domain":"Data Protection"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Data Protection","selectCount":1
+      "tip": "Automate lifecycle transitions to lower-cost tiers based on access patterns.",
+      "explanation": "Automated lifecycle policies balance cost and retention by moving data to appropriate storage classes based on age and access frequency.",
+      "meta": {
+        "domain": "Data Protection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Data Protection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0061",
       "docs": "https://docs.aws.amazon.com/backup/latest/devguide/whatisbackup.html",
       "format": "text",
-      "services": ["AWS Backup","RDS","S3"],
-      "skills": ["5.2.4: Design and configure secure data replication and backup solutions"],
+      "services": [
+        "AWS Backup",
+        "RDS",
+        "S3"
+      ],
+      "skills": [
+        "5.2.4: Design and configure secure data replication and backup solutions"
+      ],
       "question": "Which solution ensures centralized, policy-driven backups across RDS and EFS with retention controls?",
       "choices": [
-        {"id":"c1","text":"Use AWS Backup with backup plans and vaults to centrally manage backups and retention","isCorrect":true,"explanation":"AWS Backup centralizes backups across supported services and enforces retention and lifecycle rules via backup plans and vaults."},
-        {"id":"c2","text":"Create per-service scripts to snapshot data and copy to S3","isCorrect":false,"explanation":"Custom scripts lack centralized policy management and consistent retention enforcement."},
-        {"id":"c3","text":"Use cross-region replication for S3 only","isCorrect":false,"explanation":"S3 replication is specific to S3 and doesn't manage backups for other services like RDS/EFS."},
-        {"id":"c4","text":"Rely on EC2 AMI snapshots for database backups","isCorrect":false,"explanation":"AMI snapshots are not suitable for database-consistent backups across services without application-level coordination."}
+        {
+          "id": "c1",
+          "text": "Use AWS Backup with backup plans and vaults to centrally manage backups and retention",
+          "isCorrect": true,
+          "explanation": "AWS Backup centralizes backups across supported services and enforces retention and lifecycle rules via backup plans and vaults."
+        },
+        {
+          "id": "c2",
+          "text": "Create per-service scripts to snapshot data and copy to S3",
+          "isCorrect": false,
+          "explanation": "Custom scripts lack centralized policy management and consistent retention enforcement."
+        },
+        {
+          "id": "c3",
+          "text": "Use cross-region replication for S3 only",
+          "isCorrect": false,
+          "explanation": "S3 replication is specific to S3 and doesn't manage backups for other services like RDS/EFS."
+        },
+        {
+          "id": "c4",
+          "text": "Use EC2 AMI snapshots for database backups",
+          "isCorrect": false,
+          "explanation": "AMI snapshots are not suitable for database-consistent backups across services without application-level coordination."
+        }
       ],
-      "tip":"Use a centralized backup orchestration service to manage retention and policies across supported resources.",
-      "explanation":"AWS Backup simplifies centralized backup orchestration, retention policies, and cross-account/cross-region copy workflows for supported AWS resources.",
-      "meta":{"domain":"Data Protection"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Data Protection","selectCount":1
+      "tip": "Use a centralized backup orchestration service to manage retention and policies across supported resources.",
+      "explanation": "AWS Backup simplifies centralized backup orchestration, retention policies, and cross-account/cross-region copy workflows for supported AWS resources.",
+      "meta": {
+        "domain": "Data Protection"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Data Protection",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0062",
       "docs": "https://docs.aws.amazon.com/inspector/latest/userguide/inspector_introduction.html",
       "format": "text",
-      "services": ["Inspector","Security Hub","Lambda"],
-      "skills": ["3.2.6: Configure security tools to discover and remediate vulnerabilities within a pipeline"],
+      "services": [
+        "Inspector",
+        "Security Hub",
+        "Lambda"
+      ],
+      "skills": [
+        "3.2.6: Configure security tools to discover and remediate vulnerabilities within a pipeline"
+      ],
       "question": "How should a CI/CD pipeline handle high-severity image vulnerabilities discovered by Inspector to enforce security gates?",
       "choices": [
-        {"id":"c1","text":"Fail the build when high-severity vulnerabilities are found and require a remediation PR before promotion","isCorrect":true,"explanation":"Blocking promotion of vulnerable images enforces security gates and prevents vulnerable artifacts from reaching production."},
-        {"id":"c2","text":"Allow the build but schedule a follow-up ticket","isCorrect":false,"explanation":"Allowing promotion undermines enforcement and risks running vulnerable code in production."},
-        {"id":"c3","text":"Ignore Inspector findings as false positives","isCorrect":false,"explanation":"Blindly ignoring findings removes an important safety mechanism; investigate and triage findings appropriately."},
-        {"id":"c4","text":"Convert vulnerabilities into user stories without blocking releases","isCorrect":false,"explanation":"Converting to backlog items without blocking promotion fails to protect production environments."}
+        {
+          "id": "c1",
+          "text": "Fail the build when high-severity vulnerabilities are found and require a remediation PR before promotion",
+          "isCorrect": true,
+          "explanation": "Blocking promotion of vulnerable images enforces security gates and prevents vulnerable artifacts from reaching production."
+        },
+        {
+          "id": "c2",
+          "text": "Allow the build but schedule a follow-up ticket",
+          "isCorrect": false,
+          "explanation": "Allowing promotion undermines enforcement and risks running vulnerable code in production."
+        },
+        {
+          "id": "c3",
+          "text": "Ignore Inspector findings as false positives",
+          "isCorrect": false,
+          "explanation": "Blindly ignoring findings removes an important safety mechanism; investigate and triage findings appropriately."
+        },
+        {
+          "id": "c4",
+          "text": "Convert vulnerabilities into user stories without blocking releases",
+          "isCorrect": false,
+          "explanation": "Converting to backlog items without blocking promotion fails to protect production environments."
+        }
       ],
-      "tip":"Enforce CI gates for critical vulnerabilities and require remediation before promotion.",
-      "explanation":"Integrating Inspector into CI/CD and failing builds for critical findings reduces the chance of vulnerable artifacts reaching production and ensures remediation is required.",
-      "meta":{"domain":"Infrastructure Security"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Infrastructure Security","selectCount":1
+      "tip": "Enforce CI gates for critical vulnerabilities and require remediation before promotion.",
+      "explanation": "Integrating Inspector into CI/CD and failing builds for critical findings reduces the chance of vulnerable artifacts reaching production and ensures remediation is required.",
+      "meta": {
+        "domain": "Infrastructure Security"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Infrastructure Security",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0063",
       "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-security-best-practices/incident-response.html",
       "format": "text",
-      "services": ["Incident Manager","CloudWatch","EventBridge"],
-      "skills": ["2.1.3: Recommend procedures to test and validate the effectiveness of an incident response plan"],
+      "services": [
+        "Incident Manager",
+        "CloudWatch",
+        "EventBridge"
+      ],
+      "skills": [
+        "2.1.3: Recommend procedures to test and validate the effectiveness of an incident response plan"
+      ],
       "question": "Which practice validates that an incident response runbook will work under real conditions?",
       "choices": [
-        {"id":"c1","text":"Conduct tabletop exercises and full-scale simulated incident drills using controlled fault injection","isCorrect":true,"explanation":"Tabletops test decision-making; simulated drills and fault injection test technical runbooks and automation under realistic conditions."},
-        {"id":"c2","text":"Only review runbooks annually without testing","isCorrect":false,"explanation":"Reviews without testing may miss operational and technical gaps discovered during live drills."},
-        {"id":"c3","text":"Assume runbooks are valid if written by senior staff","isCorrect":false,"explanation":"Assumptions without testing risk undiscovered issues in execution under pressure."},
-        {"id":"c4","text":"Rely on vendor-provided runbooks without customization","isCorrect":false,"explanation":"Vendor runbooks may not match the customer's environment and need adaptation and testing."}
+        {
+          "id": "c1",
+          "text": "Conduct tabletop exercises and full-scale simulated incident drills using controlled fault injection",
+          "isCorrect": true,
+          "explanation": "Tabletops test decision-making; simulated drills and fault injection test technical runbooks and automation under realistic conditions."
+        },
+        {
+          "id": "c2",
+          "text": "Only review runbooks annually without testing",
+          "isCorrect": false,
+          "explanation": "Reviews without testing may miss operational and technical gaps discovered during live drills."
+        },
+        {
+          "id": "c3",
+          "text": "Assume runbooks are valid if written by senior staff",
+          "isCorrect": false,
+          "explanation": "Assumptions without testing risk undiscovered issues in execution under pressure."
+        },
+        {
+          "id": "c4",
+          "text": "Use vendor-provided runbooks without customization",
+          "isCorrect": false,
+          "explanation": "Vendor runbooks may not match the customer's environment and need adaptation and testing."
+        }
       ],
-      "tip":"Run both tabletop and technical drills to validate people and technical runbooks.",
-      "explanation":"Combining tabletop exercises for roles and decisions with full technical drills (injecting faults) validates both human and automated aspects of incident response.",
-      "meta":{"domain":"Incident Response"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Incident Response","selectCount":1
+      "tip": "Run both tabletop and technical drills to validate people and technical runbooks.",
+      "explanation": "Combining tabletop exercises for roles and decisions with full technical drills (injecting faults) validates both human and automated aspects of incident response.",
+      "meta": {
+        "domain": "Incident Response"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Incident Response",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0064",
       "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
       "format": "text",
-      "services": ["GuardDuty","Security Hub","EventBridge"],
-      "skills": ["2.2.3: Validate findings from AWS security services to assess the scope and impact of an event"],
+      "services": [
+        "GuardDuty",
+        "Security Hub",
+        "EventBridge"
+      ],
+      "skills": [
+        "2.2.3: Validate findings from AWS security services to assess the scope and impact of an event"
+      ],
       "question": "After a GuardDuty finding indicates suspicious API calls from a role, which steps validate scope and impact?",
       "choices": [
-        {"id":"c1","text":"Retrieve CloudTrail management events for the role, query related CloudWatch Logs, and inspect resource changes","isCorrect":true,"explanation":"Correlate GuardDuty findings with CloudTrail events and application logs to scope the impact and timeline."},
-        {"id":"c2","text":"Temporarily revoke the role's active sessions pending investigation","isCorrect":false,"explanation":"Revoking sessions can limit ongoing activity but is disruptive; triage and validation are usually performed first to scope impact before broad actions."},
-        {"id":"c3","text":"Ignore the finding if there are no console alerts","isCorrect":false,"explanation":"Findings should be validated; absence of console alerts doesn't mean no impact."},
-        {"id":"c4","text":"Assume GuardDuty is faulty and open a support ticket","isCorrect":false,"explanation":"While false positives can occur, perform validation steps before concluding GuardDuty is wrong."}
+        {
+          "id": "c1",
+          "text": "Retrieve CloudTrail management events for the role, query related CloudWatch Logs, and inspect resource changes",
+          "isCorrect": true,
+          "explanation": "Correlate GuardDuty findings with CloudTrail events and application logs to scope the impact and timeline."
+        },
+        {
+          "id": "c2",
+          "text": "Temporarily revoke the role's active sessions pending investigation",
+          "isCorrect": false,
+          "explanation": "Revoking sessions can limit ongoing activity but is disruptive; triage and validation are usually performed first to scope impact before broad actions."
+        },
+        {
+          "id": "c3",
+          "text": "Ignore the finding if there are no console alerts",
+          "isCorrect": false,
+          "explanation": "Findings should be validated; absence of console alerts doesn't mean no impact."
+        },
+        {
+          "id": "c4",
+          "text": "Assume GuardDuty is faulty and open a support ticket",
+          "isCorrect": false,
+          "explanation": "While false positives can occur, perform validation steps before concluding GuardDuty is wrong."
+        }
       ],
-      "tip":"Correlate detection alerts with audit trails and application logs to validate scope and impact.",
-      "explanation":"Effective validation uses multiple data sources: CloudTrail shows API callers and timestamps; CloudWatch and application logs show resource-level effects and help identify affected assets.",
-      "meta":{"domain":"Incident Response"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Incident Response","selectCount":1
+      "tip": "Correlate detection alerts with audit trails and application logs to validate scope and impact.",
+      "explanation": "Effective validation uses multiple data sources: CloudTrail shows API callers and timestamps; CloudWatch and application logs show resource-level effects and help identify affected assets.",
+      "meta": {
+        "domain": "Incident Response"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Incident Response",
+      "selectCount": 1
     },
     {
       "id": "SCS-C03-0065",
       "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type.html",
       "format": "text",
-      "services": ["WAF","CloudFront","Lambda"],
-      "skills": ["3.1.4: Configure integrations with AWS edge services and third-party services"],
+      "services": [
+        "WAF",
+        "CloudFront",
+        "Lambda"
+      ],
+      "skills": [
+        "3.1.4: Configure integrations with AWS edge services and third-party services"
+      ],
       "question": "Which integration allows custom request inspection logic at the edge before forwarding to the origin?",
       "choices": [
-        {"id":"c1","text":"Use CloudFront with Lambda@Edge (or CloudFront Functions) to run custom inspection and modify requests","isCorrect":true,"explanation":"Lambda@Edge or CloudFront Functions can execute custom logic during request/response flows at the edge to inspect or mutate requests."},
-        {"id":"c2","text":"Use SQS between CloudFront and origin for inspection","isCorrect":false,"explanation":"SQS is asynchronous and not suitable for synchronous request inspection at the edge."},
-        {"id":"c3","text":"Only use origin-side web servers to inspect requests","isCorrect":false,"explanation":"Origin-side inspection allows attacks to reach the origin and increases bandwidth and processing costs."},
-        {"id":"c4","text":"Rely on DNS-level filtering for application-layer inspection","isCorrect":false,"explanation":"DNS filtering cannot inspect HTTP request content for application-layer threats."}
+        {
+          "id": "c1",
+          "text": "Use CloudFront with Lambda@Edge (or CloudFront Functions) to run custom inspection and modify requests",
+          "isCorrect": true,
+          "explanation": "Lambda@Edge or CloudFront Functions can execute custom logic during request/response flows at the edge to inspect or mutate requests."
+        },
+        {
+          "id": "c2",
+          "text": "Use SQS between CloudFront and origin for inspection",
+          "isCorrect": false,
+          "explanation": "SQS is asynchronous and not suitable for synchronous request inspection at the edge."
+        },
+        {
+          "id": "c3",
+          "text": "Only use origin-side web servers to inspect requests",
+          "isCorrect": false,
+          "explanation": "Origin-side inspection allows attacks to reach the origin and increases bandwidth and processing costs."
+        },
+        {
+          "id": "c4",
+          "text": "Use DNS-level filtering for application-layer inspection",
+          "isCorrect": false,
+          "explanation": "DNS filtering cannot inspect HTTP request content for application-layer threats."
+        }
       ],
-      "tip":"Use edge compute to execute lightweight request inspection close to the client before reaching the origin.",
-      "explanation":"Placing lightweight inspection at the edge reduces origin load and enables early mitigation of malicious requests before they traverse the network to backend systems.",
-      "meta":{"domain":"Infrastructure Security"},"sourceType":"official-doc","lastReviewed":"2026-02-18","domain":"Infrastructure Security","selectCount":1
+      "tip": "Use edge compute to execute lightweight request inspection close to the client before reaching the origin.",
+      "explanation": "Placing lightweight inspection at the edge reduces origin load and enables early mitigation of malicious requests before they traverse the network to backend systems.",
+      "meta": {
+        "domain": "Infrastructure Security"
+      },
+      "lastReviewed": "2026-02-18",
+      "domain": "Infrastructure Security",
+      "selectCount": 1
     }
   ]
 }
