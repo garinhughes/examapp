@@ -307,7 +307,7 @@ resource "aws_cloudwatch_dashboard" "certshack_examapp" {
     table_exams_index   = aws_dynamodb_table.exams_index.name
     table_audit         = aws_dynamodb_table.audit.name
     table_gamification  = module.dynamodb_gamification.table_name
-    lambda_url          = aws_lambda_function_url.itemcount.function_url
+    api_url             = module.apigw_itemcount.invoke_url
   })
 }
 
@@ -387,27 +387,19 @@ resource "aws_lambda_function" "itemcount_publisher" {
 # Public function URL so dashboard can trigger the publisher via HTTPS
 resource "aws_lambda_function_url" "itemcount" {
   function_name     = aws_lambda_function.itemcount_publisher.function_name
-  authorization_type = "NONE"
+  authorization_type = "AWS_IAM"
 }
 
-# If you prefer public (unauthenticated) access to the Function URL, a resource
-# policy granting invoke permissions to all principals is required. Add two
-# permissions: one for the Function URL action, and one for direct function
-# invoke. Keep these if you want browser clicks to work without SigV4.
-resource "aws_lambda_permission" "allow_public_invoke_url" {
-  statement_id           = "AllowPublicInvokeForFunctionUrl"
-  action                 = "lambda:InvokeFunctionUrl"
-  function_name          = aws_lambda_function.itemcount_publisher.function_name
-  principal              = "*"
-  # This must match the Function URL auth type when granting URL permission
-  function_url_auth_type = "NONE"
-}
-
-resource "aws_lambda_permission" "allow_public_invoke" {
-  statement_id  = "AllowPublicInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.itemcount_publisher.function_name
-  principal     = "*"
+# Move API Gateway resources into a reusable module
+module "apigw_itemcount" {
+  source               = "./modules/apigw"
+  project              = var.project
+  region               = var.region
+  lambda_arn           = aws_lambda_function.itemcount_publisher.arn
+  lambda_function_name = aws_lambda_function.itemcount_publisher.function_name
+  stage_name           = "prod"
+  api_name             = "examapp-api"
+  resource_path        = "v1/metrics/itemcount"
 }
 
 resource "aws_cloudwatch_event_rule" "itemcount_schedule" {

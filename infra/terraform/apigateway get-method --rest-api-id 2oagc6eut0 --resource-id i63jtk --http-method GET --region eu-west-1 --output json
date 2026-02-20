@@ -1,0 +1,30 @@
+{
+    "items": [
+        {
+            "id": "8e3fxvrfej",
+            "path": "/"
+        },
+        {
+            "id": "hyx75r",
+            "parentId": "kgdc2y",
+            "pathPart": "metrics",
+            "path": "/v1/metrics"
+        },
+        {
+            "id": "i63jtk",
+            "parentId": "hyx75r",
+            "pathPart": "itemcount",
+            "path": "/v1/metrics/itemcount",
+            "resourceMethods": {
+                "GET": {},
+                "POST": {}
+            }
+        },
+        {
+            "id": "kgdc2y",
+            "parentId": "8e3fxvrfej",
+            "pathPart": "v1",
+            "path": "/v1"
+        }
+    ]
+}

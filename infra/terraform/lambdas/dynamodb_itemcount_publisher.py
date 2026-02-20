@@ -58,7 +58,17 @@ def publish_counts():
 def lambda_handler(event, context):
     if not TABLES or TABLES == [""]:
         log.info("No tables configured in TABLES env var")
-        return {"status": "no-tables"}
+        result = {"status": "no-tables"}
+        try:
+            import json
+            return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps(result)}
+        except Exception:
+            return result
 
     ok = publish_counts()
-    return {"status": "ok" if ok else "error"}
+    result = {"status": "ok" if ok else "error"}
+    try:
+        import json
+        return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps(result)}
+    except Exception:
+        return result
