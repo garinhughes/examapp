@@ -25,7 +25,7 @@
       "x": 0, "y": 2, "width": 4, "height": 4,
       "properties": {
         "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_users}" ]],
-        "period": 60, "stat": "Sum", "region": "${region}",
+        "period": 60, "stat": "Maximum", "region": "${region}",
         "title": "Users", "view": "singleValue",
         "singleValueFullPrecision": true
       }
@@ -35,7 +35,7 @@
       "x": 4, "y": 2, "width": 4, "height": 4,
       "properties": {
         "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_entitlements}" ]],
-        "period": 60, "stat": "Sum", "region": "${region}",
+        "period": 60, "stat": "Maximum", "region": "${region}",
         "title": "Entitlements", "view": "singleValue",
         "singleValueFullPrecision": true
       }
@@ -45,7 +45,7 @@
       "x": 8, "y": 2, "width": 4, "height": 4,
       "properties": {
         "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_attempts}" ]],
-        "period": 60, "stat": "Sum", "region": "${region}",
+        "period": 60, "stat": "Maximum", "region": "${region}",
         "title": "Attempts", "view": "singleValue",
         "singleValueFullPrecision": true
       }
@@ -55,7 +55,7 @@
       "x": 12, "y": 2, "width": 4, "height": 4,
       "properties": {
         "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_exams_index}" ]],
-        "period": 60, "stat": "Sum", "region": "${region}",
+        "period": 60, "stat": "Maximum", "region": "${region}",
         "title": "Published Exams", "view": "singleValue",
         "singleValueFullPrecision": true
       }
@@ -65,7 +65,7 @@
       "x": 16, "y": 2, "width": 4, "height": 4,
       "properties": {
         "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_gamification}" ]],
-        "period": 60, "stat": "Sum", "region": "${region}",
+        "period": 60, "stat": "Maximum", "region": "${region}",
         "title": "Gamification Profiles", "view": "singleValue",
         "singleValueFullPrecision": true
       }
@@ -75,7 +75,7 @@
       "x": 20, "y": 2, "width": 4, "height": 4,
       "properties": {
         "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_audit}" ]],
-        "period": 60, "stat": "Sum", "region": "${region}",
+        "period": 60, "stat": "Maximum", "region": "${region}",
         "title": "Audit Entries", "view": "singleValue",
         "singleValueFullPrecision": true
       }
