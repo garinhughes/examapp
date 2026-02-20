@@ -101,6 +101,24 @@ module "dynamodb" {
   table_name = "${var.project}-sessions"
 }
 
+# DynamoDB table for attempts (userId PK, attemptId SK)
+module "dynamodb_attempts" {
+  source     = "./modules/dynamodb"
+  project    = var.project
+  table_name = "${var.project}-attempts"
+  hash_key   = "userId"
+  range_key  = "attemptId"
+}
+
+# DynamoDB table for gamification (persistent production store)
+module "dynamodb_gamification" {
+  source     = "./modules/dynamodb"
+  project    = var.project
+  table_name = "${var.project}-gamification"
+  hash_key   = "userId"
+  # no range key required for per-user records; use module default for SK if needed
+}
+
 module "s3_cloudfront" {
   source              = "./modules/s3_cloudfront"
   project             = var.project
@@ -130,12 +148,12 @@ module "ecs" {
   # Environment values copied from working ecs task definition
   exam_source               = "s3"
   s3_bucket                = aws_s3_bucket.exam_questions.id
-  exams_index_table        = "examapp-exams-index"
-  attempts_table           = "examapp-attempts"
-  gam_table                = "examapp-gamification"
-  users_table              = "examapp-users"
-  entitlements_table       = "examapp-entitlements"
-  audit_table              = "examapp-audit"
+  exams_index_table        = aws_dynamodb_table.exams_index.name
+  attempts_table           = module.dynamodb_attempts.table_name
+  gam_table                = module.dynamodb_gamification.table_name
+  users_table              = aws_dynamodb_table.users.name
+  entitlements_table       = aws_dynamodb_table.entitlements.name
+  audit_table              = aws_dynamodb_table.audit.name
 
   cognito_domain           = "eu-west-1c6wqup1rx.auth.eu-west-1.amazoncognito.com"
   cognito_app_client_id    = "2b10tfhn1k9pq9rr5f6k14usc3"

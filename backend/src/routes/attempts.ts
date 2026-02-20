@@ -1,18 +1,7 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
-import fs from 'fs/promises'
 import { randomUUID } from 'crypto'
 import { loadExam, shuffleQuestions, normaliseQuestion } from '../examLoader.js'
-
-const attemptsFile = new URL('../../data/attempts.json', import.meta.url)
-
-async function loadAttempts() {
-  const raw = await fs.readFile(attemptsFile)
-  return JSON.parse(raw.toString())
-}
-
-async function saveAttempts(obj: any) {
-  await fs.writeFile(attemptsFile, JSON.stringify(obj, null, 2))
-}
+import { attemptsStore } from '../services/attemptsStore.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Start an attempt
@@ -21,7 +10,6 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const examCode = body?.examCode
     if (!examCode) return reply.status(400).send({ message: 'examCode required' })
 
-    const attemptsDb = await loadAttempts()
     const id = randomUUID()
     const now = new Date().toISOString()
     // build per-attempt question set if metadata.filterKeywords provided
@@ -125,47 +113,40 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       questions: shuffled
     }
 
-    attemptsDb.attempts.push(attempt)
-    await saveAttempts(attemptsDb)
+    await attemptsStore.put(attempt)
 
     return { attemptId: id, startedAt: now }
   })
 
   // List all attempts (filtered to current user)
   server.get('/', { preHandler: [server.authenticate] }, async (request, reply) => {
-    const attemptsDb = await loadAttempts()
     const userId = request.user?.sub
-    const userAttempts = userId
-      ? attemptsDb.attempts.filter((a: any) => a.userId === userId)
-      : attemptsDb.attempts
+    if (!userId) return { attempts: [] }
+    const userAttempts = await attemptsStore.listByUser(userId)
     return { attempts: userAttempts }
   })
 
   // Delete all attempts for current user
   server.delete('/all', { preHandler: [server.authenticate] }, async (request, reply) => {
-    const attemptsDb = await loadAttempts()
     const userId = request.user?.sub
-    const before = attemptsDb.attempts.length
-    attemptsDb.attempts = attemptsDb.attempts.filter((a: any) => a.userId !== userId)
-    const count = before - attemptsDb.attempts.length
-    await saveAttempts(attemptsDb)
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
+    const count = await attemptsStore.deleteAllForUser(userId)
     return { deleted: count }
   })
 
   // Delete an attempt (only allowed when it has 0 answers, owned by user)
   server.delete('/:id', { preHandler: [server.authenticate] }, async (request, reply) => {
     const { id } = request.params as any
-    const attemptsDb = await loadAttempts()
-    const idx = attemptsDb.attempts.findIndex((a: any) => a.attemptId === id)
-    if (idx < 0) return reply.status(404).send({ message: 'attempt not found' })
-    if (attemptsDb.attempts[idx].userId !== request.user?.sub) return reply.status(403).send({ message: 'forbidden' })
-    const attempt = attemptsDb.attempts[idx]
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
+    const attempt = await attemptsStore.get(userId, id)
+    if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
+    if (attempt.userId !== userId) return reply.status(403).send({ message: 'forbidden' })
     const answersCount = Array.isArray(attempt.answers) ? attempt.answers.length : 0
     if (answersCount > 0) {
       return reply.status(400).send({ message: 'Only attempts with 0 answers can be deleted' })
     }
-    attemptsDb.attempts.splice(idx, 1)
-    await saveAttempts(attemptsDb)
+    await attemptsStore.delete(userId, id)
     return { deleted: true, attemptId: id }
   })
 
@@ -175,10 +156,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const body = request.body as any
     if (!body?.questionId) return reply.status(400).send({ message: 'questionId required' })
 
-    const attemptsDb = await loadAttempts()
-    const attempt = attemptsDb.attempts.find((a: any) => a.attemptId === id)
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
+    const attempt = await attemptsStore.get(userId, id)
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
-    if (attempt.userId !== request.user?.sub) return reply.status(403).send({ message: 'forbidden' })
+    if (attempt.userId !== userId) return reply.status(403).send({ message: 'forbidden' })
     if (attempt.finishedAt) return reply.status(400).send({ message: 'attempt already finished' })
 
     // validate question exists in the attempt's question set if present, else fallback to exam questions
@@ -258,7 +240,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } else {
       attempt.answers.push(answerRecord)
     }
-    await saveAttempts(attemptsDb)
+    await attemptsStore.put(attempt)
 
     return { answer: answerRecord, correct: !!isCorrect }
   })
@@ -266,10 +248,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // Finish attempt and compute score
   server.patch('/:id/finish', { preHandler: [server.authenticate] }, async (request, reply) => {
     const { id } = request.params as any
-    const attemptsDb = await loadAttempts()
-    const attempt = attemptsDb.attempts.find((a: any) => a.attemptId === id)
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
+    const attempt = await attemptsStore.get(userId, id)
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
-    if (attempt.userId !== request.user?.sub) return reply.status(403).send({ message: 'forbidden' })
+    if (attempt.userId !== userId) return reply.status(403).send({ message: 'forbidden' })
     if (attempt.finishedAt) return reply.send({ message: 'already finished', attempt })
 
     // Check for early-complete flag from request body
@@ -334,7 +317,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       attempt.totalQuestions = totalQuestions
     }
 
-    await saveAttempts(attemptsDb)
+    await attemptsStore.put(attempt)
 
     return { attemptId: attempt.attemptId, score, correctCount, total, totalQuestions, answeredCount, earlyComplete, perDomain }
   })
@@ -342,10 +325,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // Get attempt (user must own it)
   server.get('/:id', { preHandler: [server.authenticate] }, async (request, reply) => {
     const { id } = request.params as any
-    const attemptsDb = await loadAttempts()
-    const attempt = attemptsDb.attempts.find((a: any) => a.attemptId === id)
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
+    const attempt = await attemptsStore.get(userId, id)
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
-    if (attempt.userId !== request.user?.sub) return reply.status(403).send({ message: 'forbidden' })
+    if (attempt.userId !== userId) return reply.status(403).send({ message: 'forbidden' })
     // Ensure returned attempt.questions are normalised to the current schema
     try {
       if (Array.isArray(attempt.questions) && attempt.questions.length > 0) {
@@ -378,9 +362,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
   // List attempts for a user (legacy — redirects to own attempts only)
   server.get('/user/:userId', { preHandler: [server.authenticate] }, async (request, reply) => {
-    const attemptsDb = await loadAttempts()
     const userId = request.user?.sub
-    const list = attemptsDb.attempts.filter((a: any) => a.userId === userId)
+    if (!userId) return { attempts: [] }
+    const list = await attemptsStore.listByUser(userId)
     return { attempts: list }
   })
 }

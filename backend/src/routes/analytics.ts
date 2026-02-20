@@ -1,12 +1,5 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
-import fs from 'fs/promises'
-
-const attemptsFile = new URL('../../data/attempts.json', import.meta.url)
-
-async function loadAttempts() {
-  const raw = await fs.readFile(attemptsFile)
-  return JSON.parse(raw.toString())
-}
+import { attemptsStore } from '../services/attemptsStore.js'
 
 function computeTotals(attempt: any): { correctCount: number | null; total: number | null; percent: number | null } {
   const totalQuestions = Array.isArray(attempt?.questions) && attempt.questions.length > 0
@@ -56,12 +49,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   server.get('/exam/:code/scores', { preHandler: [server.authenticate] }, async (request, reply) => {
     const { code } = request.params as any
     if (!code) return reply.status(400).send({ message: 'exam code required' })
-    const attemptsDb = await loadAttempts()
     const lc = String(code || '').toLowerCase()
     const userId = request.user?.sub
-    const allAttempts = (attemptsDb.attempts || []).filter(
-      (a: any) => String(a.examCode || '').toLowerCase() === lc && a.userId === userId
-    )
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
+    const userAttempts = await attemptsStore.listByUser(userId)
+    const allAttempts = (userAttempts || []).filter((a: any) => String(a.examCode || '').toLowerCase() === lc)
 
     // scores: only finished attempts with a finishedAt timestamp
     const scores = allAttempts.filter((a: any) => a.finishedAt).map((a: any) => {
