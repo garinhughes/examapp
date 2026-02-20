@@ -10,16 +10,23 @@
 
     {
       "type": "text",
-      "x": 0, "y": 1, "width": 24, "height": 1,
+      "x": 0, "y": 1, "width": 20, "height": 1,
       "properties": { "markdown": "## 📊 Business KPIs" }
+    },
+    {
+      "type": "text",
+      "x": 20, "y": 1, "width": 4, "height": 1,
+      "properties": {
+        "markdown": "🔄 **[ Pull Latest Figures ](${lambda_url})**"
+      }
     },
     {
       "type": "metric",
       "x": 0, "y": 2, "width": 4, "height": 4,
       "properties": {
-        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_users}"]],
-        "period": 21600, "stat": "Maximum", "region": "${region}",
-        "title": "Total Users", "view": "singleValue",
+        "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_users}" ]],
+        "period": 60, "stat": "Sum", "region": "${region}",
+        "title": "Users", "view": "singleValue",
         "singleValueFullPrecision": true
       }
     },
@@ -27,9 +34,9 @@
       "type": "metric",
       "x": 4, "y": 2, "width": 4, "height": 4,
       "properties": {
-        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_entitlements}"]],
-        "period": 21600, "stat": "Maximum", "region": "${region}",
-        "title": "Entitlements (Customers)", "view": "singleValue",
+        "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_entitlements}" ]],
+        "period": 60, "stat": "Sum", "region": "${region}",
+        "title": "Entitlements", "view": "singleValue",
         "singleValueFullPrecision": true
       }
     },
@@ -37,9 +44,9 @@
       "type": "metric",
       "x": 8, "y": 2, "width": 4, "height": 4,
       "properties": {
-        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_attempts}"]],
-        "period": 21600, "stat": "Maximum", "region": "${region}",
-        "title": "Total Attempts", "view": "singleValue",
+        "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_attempts}" ]],
+        "period": 60, "stat": "Sum", "region": "${region}",
+        "title": "Attempts", "view": "singleValue",
         "singleValueFullPrecision": true
       }
     },
@@ -47,8 +54,8 @@
       "type": "metric",
       "x": 12, "y": 2, "width": 4, "height": 4,
       "properties": {
-        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_exams_index}"]],
-        "period": 21600, "stat": "Maximum", "region": "${region}",
+        "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_exams_index}" ]],
+        "period": 60, "stat": "Sum", "region": "${region}",
         "title": "Published Exams", "view": "singleValue",
         "singleValueFullPrecision": true
       }
@@ -57,8 +64,8 @@
       "type": "metric",
       "x": 16, "y": 2, "width": 4, "height": 4,
       "properties": {
-        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_gamification}"]],
-        "period": 21600, "stat": "Maximum", "region": "${region}",
+        "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_gamification}" ]],
+        "period": 60, "stat": "Sum", "region": "${region}",
         "title": "Gamification Profiles", "view": "singleValue",
         "singleValueFullPrecision": true
       }
@@ -67,8 +74,8 @@
       "type": "metric",
       "x": 20, "y": 2, "width": 4, "height": 4,
       "properties": {
-        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_audit}"]],
-        "period": 21600, "stat": "Maximum", "region": "${region}",
+        "metrics": [["${project}/DynamoDB", "ItemCount", "TableName", "${table_audit}" ]],
+        "period": 60, "stat": "Sum", "region": "${region}",
         "title": "Audit Entries", "view": "singleValue",
         "singleValueFullPrecision": true
       }
@@ -258,14 +265,14 @@
       "x": 16, "y": 28, "width": 8, "height": 6,
       "properties": {
         "metrics": [
-          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_users}", {"stat": "Sum", "label": "users"}],
-          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_attempts}", {"stat": "Sum", "label": "attempts"}],
-          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_exams_index}", {"stat": "Sum", "label": "exams-index"}],
-          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_entitlements}", {"stat": "Sum", "label": "entitlements"}],
-          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_gamification}", {"stat": "Sum", "label": "gamification"}]
+          ["AWS/DynamoDB", "SuccessfulRequestLatency", "TableName", "${table_users}", "Operation", "GetItem", {"stat": "Average", "label": "users"}],
+          ["AWS/DynamoDB", "SuccessfulRequestLatency", "TableName", "${table_attempts}", "Operation", "GetItem", {"stat": "Average", "label": "attempts"}],
+          ["AWS/DynamoDB", "SuccessfulRequestLatency", "TableName", "${table_exams_index}", "Operation", "GetItem", {"stat": "Average", "label": "exams-index"}],
+          ["AWS/DynamoDB", "SuccessfulRequestLatency", "TableName", "${table_entitlements}", "Operation", "GetItem", {"stat": "Average", "label": "entitlements"}],
+          ["AWS/DynamoDB", "SuccessfulRequestLatency", "TableName", "${table_gamification}", "Operation", "GetItem", {"stat": "Average", "label": "gamification"}]
         ],
         "period": 300, "region": "${region}",
-        "title": "Throttled Requests ⚠️", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+        "title": "GetItem Avg Latency (ms)", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
       }
     },
 

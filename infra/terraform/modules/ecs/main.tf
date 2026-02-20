@@ -269,7 +269,7 @@ resource "aws_ecs_cluster" "this" {
 
   setting {
     name  = "containerInsights"
-    value = "disabled" # save cost; enable when needed
+    value = "enhanced"
   }
 
   tags = { Project = var.project }

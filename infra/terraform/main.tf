@@ -307,7 +307,126 @@ resource "aws_cloudwatch_dashboard" "certshack_examapp" {
     table_exams_index   = aws_dynamodb_table.exams_index.name
     table_audit         = aws_dynamodb_table.audit.name
     table_gamification  = module.dynamodb_gamification.table_name
+    lambda_url          = aws_lambda_function_url.itemcount.function_url
   })
+}
+
+# ---------- Lambda: publish DynamoDB ItemCount as custom CloudWatch metrics ----------
+data "archive_file" "itemcount_zip" {
+  type        = "zip"
+  source_file = "${path.module}/lambdas/dynamodb_itemcount_publisher.py"
+  output_path = "${path.module}/lambdas/dynamodb_itemcount_publisher.zip"
+}
+
+resource "aws_iam_role" "itemcount_lambda_role" {
+  name = "${var.project}-itemcount-publisher-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = { Service = "lambda.amazonaws.com" }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "itemcount_lambda_policy" {
+  name = "${var.project}-itemcount-publisher-policy"
+  role = aws_iam_role.itemcount_lambda_role.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "dynamodb:DescribeTable",
+          "dynamodb:Scan"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "cloudwatch:PutMetricData"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_lambda_function" "itemcount_publisher" {
+  filename         = data.archive_file.itemcount_zip.output_path
+  function_name    = "${var.project}-dynamodb-itemcount-publisher"
+  role             = aws_iam_role.itemcount_lambda_role.arn
+  handler          = "dynamodb_itemcount_publisher.lambda_handler"
+  runtime          = "python3.11"
+  timeout          = 30
+
+  environment {
+    variables = {
+      TABLES    = join(",", [aws_dynamodb_table.users.name, aws_dynamodb_table.entitlements.name, module.dynamodb_attempts.table_name, aws_dynamodb_table.exams_index.name, aws_dynamodb_table.audit.name, module.dynamodb_gamification.table_name])
+      NAMESPACE = "${var.project}/DynamoDB"
+    }
+  }
+
+  depends_on = [aws_iam_role_policy.itemcount_lambda_policy]
+}
+
+# Public function URL so dashboard can trigger the publisher via HTTPS
+resource "aws_lambda_function_url" "itemcount" {
+  function_name     = aws_lambda_function.itemcount_publisher.function_name
+  authorization_type = "NONE"
+}
+
+# If you prefer public (unauthenticated) access to the Function URL, a resource
+# policy granting invoke permissions to all principals is required. Add two
+# permissions: one for the Function URL action, and one for direct function
+# invoke. Keep these if you want browser clicks to work without SigV4.
+resource "aws_lambda_permission" "allow_public_invoke_url" {
+  statement_id           = "AllowPublicInvokeForFunctionUrl"
+  action                 = "lambda:InvokeFunctionUrl"
+  function_name          = aws_lambda_function.itemcount_publisher.function_name
+  principal              = "*"
+  # This must match the Function URL auth type when granting URL permission
+  function_url_auth_type = "NONE"
+}
+
+resource "aws_lambda_permission" "allow_public_invoke" {
+  statement_id  = "AllowPublicInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.itemcount_publisher.function_name
+  principal     = "*"
+}
+
+resource "aws_cloudwatch_event_rule" "itemcount_schedule" {
+  name                = "examapp-eb-itemcount-scheduler"
+  schedule_expression = "rate(30 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "itemcount_target" {
+  rule      = aws_cloudwatch_event_rule.itemcount_schedule.name
+  target_id = "ItemCountPublisher"
+  arn       = aws_lambda_function.itemcount_publisher.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.itemcount_publisher.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.itemcount_schedule.arn
 }
 
 resource "aws_route53_record" "apex" {
