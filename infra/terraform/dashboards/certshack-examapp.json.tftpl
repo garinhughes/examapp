@@ -1,0 +1,345 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0, "y": 0, "width": 24, "height": 1,
+      "properties": {
+        "markdown": "# 📋 certshack-examapp — Operations Dashboard\nBackend • DynamoDB • ALB • ECS • CloudFront • WAF"
+      }
+    },
+
+    {
+      "type": "text",
+      "x": 0, "y": 1, "width": 24, "height": 1,
+      "properties": { "markdown": "## 📊 Business KPIs" }
+    },
+    {
+      "type": "metric",
+      "x": 0, "y": 2, "width": 4, "height": 4,
+      "properties": {
+        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_users}"]],
+        "period": 21600, "stat": "Maximum", "region": "${region}",
+        "title": "Total Users", "view": "singleValue",
+        "singleValueFullPrecision": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 4, "y": 2, "width": 4, "height": 4,
+      "properties": {
+        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_entitlements}"]],
+        "period": 21600, "stat": "Maximum", "region": "${region}",
+        "title": "Entitlements (Customers)", "view": "singleValue",
+        "singleValueFullPrecision": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8, "y": 2, "width": 4, "height": 4,
+      "properties": {
+        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_attempts}"]],
+        "period": 21600, "stat": "Maximum", "region": "${region}",
+        "title": "Total Attempts", "view": "singleValue",
+        "singleValueFullPrecision": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12, "y": 2, "width": 4, "height": 4,
+      "properties": {
+        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_exams_index}"]],
+        "period": 21600, "stat": "Maximum", "region": "${region}",
+        "title": "Published Exams", "view": "singleValue",
+        "singleValueFullPrecision": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16, "y": 2, "width": 4, "height": 4,
+      "properties": {
+        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_gamification}"]],
+        "period": 21600, "stat": "Maximum", "region": "${region}",
+        "title": "Gamification Profiles", "view": "singleValue",
+        "singleValueFullPrecision": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 20, "y": 2, "width": 4, "height": 4,
+      "properties": {
+        "metrics": [["AWS/DynamoDB", "ItemCount", "TableName", "${table_audit}"]],
+        "period": 21600, "stat": "Maximum", "region": "${region}",
+        "title": "Audit Entries", "view": "singleValue",
+        "singleValueFullPrecision": true
+      }
+    },
+
+    {
+      "type": "text",
+      "x": 0, "y": 6, "width": 24, "height": 1,
+      "properties": { "markdown": "## 🌐 API Traffic (ALB)" }
+    },
+    {
+      "type": "metric",
+      "x": 0, "y": 7, "width": 8, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Sum", "label": "Requests"}]
+        ],
+        "period": 60, "region": "${region}",
+        "title": "Request Count (per min)", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8, "y": 7, "width": 8, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ApplicationELB", "HTTPCode_Target_2XX_Count", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Sum", "color": "#2ca02c", "label": "2xx"}],
+          ["AWS/ApplicationELB", "HTTPCode_Target_3XX_Count", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Sum", "color": "#1f77b4", "label": "3xx"}],
+          ["AWS/ApplicationELB", "HTTPCode_Target_4XX_Count", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Sum", "color": "#ff7f0e", "label": "4xx"}],
+          ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Sum", "color": "#d62728", "label": "5xx"}]
+        ],
+        "period": 60, "region": "${region}",
+        "title": "HTTP Response Codes", "view": "timeSeries", "stacked": true, "yAxis": {"left": {"min": 0}}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16, "y": 7, "width": 8, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "${alb_arn_suffix}", {"stat": "p50", "label": "p50"}],
+          ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "${alb_arn_suffix}", {"stat": "p90", "label": "p90"}],
+          ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "${alb_arn_suffix}", {"stat": "p99", "label": "p99", "color": "#d62728"}]
+        ],
+        "period": 60, "region": "${region}",
+        "title": "Response Time (seconds)", "view": "timeSeries", "yAxis": {"left": {"min": 0, "label": "sec"}}
+      }
+    },
+
+    {
+      "type": "text",
+      "x": 0, "y": 13, "width": 24, "height": 1,
+      "properties": { "markdown": "## 🐳 Backend Health (ECS / ALB)" }
+    },
+    {
+      "type": "metric",
+      "x": 0, "y": 14, "width": 6, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ECS", "CPUUtilization", "ClusterName", "${ecs_cluster_name}", "ServiceName", "${ecs_service_name}", {"stat": "Average", "label": "CPU Avg"}],
+          ["AWS/ECS", "CPUUtilization", "ClusterName", "${ecs_cluster_name}", "ServiceName", "${ecs_service_name}", {"stat": "Maximum", "label": "CPU Max", "color": "#d62728"}]
+        ],
+        "period": 60, "region": "${region}",
+        "title": "ECS CPU Utilization (%)", "view": "timeSeries",
+        "yAxis": {"left": {"min": 0, "max": 100}},
+        "annotations": {"horizontal": [{"label": "High CPU", "value": 80, "color": "#ff7f0e"}]}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6, "y": 14, "width": 6, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ECS", "MemoryUtilization", "ClusterName", "${ecs_cluster_name}", "ServiceName", "${ecs_service_name}", {"stat": "Average", "label": "Mem Avg"}],
+          ["AWS/ECS", "MemoryUtilization", "ClusterName", "${ecs_cluster_name}", "ServiceName", "${ecs_service_name}", {"stat": "Maximum", "label": "Mem Max", "color": "#d62728"}]
+        ],
+        "period": 60, "region": "${region}",
+        "title": "ECS Memory Utilization (%)", "view": "timeSeries",
+        "yAxis": {"left": {"min": 0, "max": 100}},
+        "annotations": {"horizontal": [{"label": "High Mem", "value": 80, "color": "#ff7f0e"}]}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12, "y": 14, "width": 6, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ApplicationELB", "HealthyHostCount", "TargetGroup", "${tg_arn_suffix}", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Minimum", "label": "Healthy", "color": "#2ca02c"}],
+          ["AWS/ApplicationELB", "UnHealthyHostCount", "TargetGroup", "${tg_arn_suffix}", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Maximum", "label": "Unhealthy", "color": "#d62728"}]
+        ],
+        "period": 60, "region": "${region}",
+        "title": "Target Health", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 18, "y": 14, "width": 6, "height": 6,
+      "properties": {
+        "metrics": [
+          ["ECS/ContainerInsights", "RunningTaskCount", "ClusterName", "${ecs_cluster_name}", "ServiceName", "${ecs_service_name}", {"stat": "Average", "label": "Running"}],
+          ["ECS/ContainerInsights", "PendingTaskCount", "ClusterName", "${ecs_cluster_name}", "ServiceName", "${ecs_service_name}", {"stat": "Average", "label": "Pending", "color": "#ff7f0e"}]
+        ],
+        "period": 60, "region": "${region}",
+        "title": "Task Count", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+      }
+    },
+
+    {
+      "type": "text",
+      "x": 0, "y": 20, "width": 24, "height": 1,
+      "properties": { "markdown": "## ☁️ Frontend Delivery (CloudFront)" }
+    },
+    {
+      "type": "metric",
+      "x": 0, "y": 21, "width": 8, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/CloudFront", "Requests", "DistributionId", "${cf_distribution_id}", "Region", "Global", {"stat": "Sum", "label": "Requests"}]
+        ],
+        "period": 300, "region": "us-east-1",
+        "title": "CloudFront Requests", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8, "y": 21, "width": 8, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/CloudFront", "BytesDownloaded", "DistributionId", "${cf_distribution_id}", "Region", "Global", {"stat": "Sum", "label": "Downloaded", "color": "#1f77b4"}],
+          ["AWS/CloudFront", "BytesUploaded", "DistributionId", "${cf_distribution_id}", "Region", "Global", {"stat": "Sum", "label": "Uploaded", "color": "#ff7f0e"}]
+        ],
+        "period": 300, "region": "us-east-1",
+        "title": "CloudFront Bandwidth (bytes)", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16, "y": 21, "width": 8, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/CloudFront", "4xxErrorRate", "DistributionId", "${cf_distribution_id}", "Region", "Global", {"stat": "Average", "label": "4xx %", "color": "#ff7f0e"}],
+          ["AWS/CloudFront", "5xxErrorRate", "DistributionId", "${cf_distribution_id}", "Region", "Global", {"stat": "Average", "label": "5xx %", "color": "#d62728"}],
+          ["AWS/CloudFront", "TotalErrorRate", "DistributionId", "${cf_distribution_id}", "Region", "Global", {"stat": "Average", "label": "Total Error %", "color": "#9467bd"}]
+        ],
+        "period": 300, "region": "us-east-1",
+        "title": "CloudFront Error Rate (%)", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+      }
+    },
+
+    {
+      "type": "text",
+      "x": 0, "y": 27, "width": 24, "height": 1,
+      "properties": { "markdown": "## 🗄️ DynamoDB Performance" }
+    },
+    {
+      "type": "metric",
+      "x": 0, "y": 28, "width": 8, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", "${table_users}", {"stat": "Sum", "label": "users"}],
+          ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", "${table_attempts}", {"stat": "Sum", "label": "attempts"}],
+          ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", "${table_exams_index}", {"stat": "Sum", "label": "exams-index"}],
+          ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", "${table_entitlements}", {"stat": "Sum", "label": "entitlements"}],
+          ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", "${table_gamification}", {"stat": "Sum", "label": "gamification"}]
+        ],
+        "period": 300, "region": "${region}",
+        "title": "Read Capacity Consumed (by table)", "view": "timeSeries", "stacked": true, "yAxis": {"left": {"min": 0}}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8, "y": 28, "width": 8, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/DynamoDB", "ConsumedWriteCapacityUnits", "TableName", "${table_users}", {"stat": "Sum", "label": "users"}],
+          ["AWS/DynamoDB", "ConsumedWriteCapacityUnits", "TableName", "${table_attempts}", {"stat": "Sum", "label": "attempts"}],
+          ["AWS/DynamoDB", "ConsumedWriteCapacityUnits", "TableName", "${table_exams_index}", {"stat": "Sum", "label": "exams-index"}],
+          ["AWS/DynamoDB", "ConsumedWriteCapacityUnits", "TableName", "${table_entitlements}", {"stat": "Sum", "label": "entitlements"}],
+          ["AWS/DynamoDB", "ConsumedWriteCapacityUnits", "TableName", "${table_gamification}", {"stat": "Sum", "label": "gamification"}]
+        ],
+        "period": 300, "region": "${region}",
+        "title": "Write Capacity Consumed (by table)", "view": "timeSeries", "stacked": true, "yAxis": {"left": {"min": 0}}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16, "y": 28, "width": 8, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_users}", {"stat": "Sum", "label": "users"}],
+          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_attempts}", {"stat": "Sum", "label": "attempts"}],
+          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_exams_index}", {"stat": "Sum", "label": "exams-index"}],
+          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_entitlements}", {"stat": "Sum", "label": "entitlements"}],
+          ["AWS/DynamoDB", "ThrottledRequests", "TableName", "${table_gamification}", {"stat": "Sum", "label": "gamification"}]
+        ],
+        "period": 300, "region": "${region}",
+        "title": "Throttled Requests ⚠️", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+      }
+    },
+
+    {
+      "type": "text",
+      "x": 0, "y": 34, "width": 24, "height": 1,
+      "properties": { "markdown": "## 🛡️ WAF (CloudFront)" }
+    },
+    {
+      "type": "metric",
+      "x": 0, "y": 35, "width": 12, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/WAFV2", "AllowedRequests", "WebACL", "${project}-restrict-my-ip", "Rule", "allow-my-ip", "Region", "us-east-1", {"stat": "Sum", "label": "Allowed", "color": "#2ca02c"}],
+          ["AWS/WAFV2", "BlockedRequests", "WebACL", "${project}-restrict-my-ip", "Rule", "ALL", "Region", "us-east-1", {"stat": "Sum", "label": "Blocked", "color": "#d62728"}]
+        ],
+        "period": 300, "region": "us-east-1",
+        "title": "WAF Allowed vs Blocked", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12, "y": 35, "width": 12, "height": 6,
+      "properties": {
+        "metrics": [
+          ["AWS/ApplicationELB", "HTTPCode_ELB_5XX_Count", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Sum", "label": "ALB 5xx", "color": "#d62728"}],
+          ["AWS/ApplicationELB", "RejectedConnectionCount", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Sum", "label": "Rejected Conns", "color": "#ff7f0e"}],
+          ["AWS/ApplicationELB", "ActiveConnectionCount", "LoadBalancer", "${alb_arn_suffix}", {"stat": "Sum", "label": "Active Conns", "color": "#1f77b4"}]
+        ],
+        "period": 60, "region": "${region}",
+        "title": "ALB Connections & Errors", "view": "timeSeries", "yAxis": {"left": {"min": 0}}
+      }
+    },
+
+    {
+      "type": "text",
+      "x": 0, "y": 41, "width": 24, "height": 1,
+      "properties": { "markdown": "## 🔎 Error Spotlight" }
+    },
+    {
+      "type": "log",
+      "x": 0, "y": 42, "width": 12, "height": 6,
+      "properties": {
+        "query": "SOURCE '${log_group}' | filter @message like /(?i)(error|exception|fail|ENOENT|EACCES|timeout|crash)/ | fields @timestamp, @message | sort @timestamp desc | limit 50",
+        "region": "${region}",
+        "title": "Recent Errors (last 3h)",
+        "view": "table"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12, "y": 42, "width": 12, "height": 6,
+      "properties": {
+        "query": "SOURCE '${log_group}' | filter @message like /(?i)(error|exception|fail)/ | stats count(*) as errors by bin(5m) | sort bin desc",
+        "region": "${region}",
+        "title": "Error Count Over Time",
+        "view": "timeSeries"
+      }
+    },
+
+    {
+      "type": "text",
+      "x": 0, "y": 48, "width": 24, "height": 1,
+      "properties": { "markdown": "## 📜 Backend Logs (Live)" }
+    },
+    {
+      "type": "log",
+      "x": 0, "y": 49, "width": 24, "height": 8,
+      "properties": {
+        "query": "SOURCE '${log_group}' | filter @message not like /\\/health/ | fields @timestamp, @message | sort @timestamp desc | limit 200",
+        "region": "${region}",
+        "title": "Backend Log Tail",
+        "view": "table"
+      }
+    }
+  ]
+}

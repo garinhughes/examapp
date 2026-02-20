@@ -288,6 +288,28 @@ resource "aws_dynamodb_table" "audit" {
 # DNS records — point domain to CloudFront / ALB (mgmt-account Route53)
 # ==========================================================================
 
+# ---------- CloudWatch Dashboard ----------
+resource "aws_cloudwatch_dashboard" "certshack_examapp" {
+  dashboard_name = "certshack-examapp"
+
+  dashboard_body = templatefile("${path.module}/dashboards/certshack-examapp.json.tftpl", {
+    region              = var.region
+    project             = var.project
+    alb_arn_suffix      = module.ecs.alb_arn_suffix
+    tg_arn_suffix       = module.ecs.target_group_arn_suffix
+    ecs_cluster_name    = module.ecs.cluster_name
+    ecs_service_name    = module.ecs.backend_service_name
+    cf_distribution_id  = module.s3_cloudfront.cloudfront_distribution_id
+    log_group           = "/ecs/${var.project}-backend"
+    table_users         = aws_dynamodb_table.users.name
+    table_entitlements  = aws_dynamodb_table.entitlements.name
+    table_attempts      = module.dynamodb_attempts.table_name
+    table_exams_index   = aws_dynamodb_table.exams_index.name
+    table_audit         = aws_dynamodb_table.audit.name
+    table_gamification  = module.dynamodb_gamification.table_name
+  })
+}
+
 resource "aws_route53_record" "apex" {
   provider        = aws.mgmt
   zone_id         = data.aws_route53_zone.main.zone_id
