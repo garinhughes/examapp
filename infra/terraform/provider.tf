@@ -23,5 +23,22 @@ provider "aws" {
 provider "aws" {
   alias   = "mgmt"
   region  = var.region
-  profile = "mgmt"
+  # Use assume-role into the management account. Set `var.mgmt_role_arn` to the
+  # role ARN in the mgmt account that this account is allowed to assume.
+  assume_role {
+    role_arn = var.mgmt_role_arn
+  }
 }
+
+/*
+If you need to create the mgmt role from the mgmt account itself (one-time)
+you can temporarily replace the above provider with a profile-based
+configuration and run the apply while authenticated to mgmt. Example:
+
+provider "aws" {
+  alias   = "mgmt"
+  region  = var.region
+  profile = var.mgmt_profile
+}
+
+*/

@@ -45,3 +45,13 @@ output "ecs_cluster_arn" {
 output "ecs_backend_service" {
   value = module.ecs.backend_service_name
 }
+
+output "github_actions_role_arn" {
+  description = "ARN of the IAM role GitHub Actions will assume"
+  value       = module.github_actions.role_arn
+}
+
+output "github_actions_role_name" {
+  description = "Name of the IAM role for GitHub Actions"
+  value       = module.github_actions.role_name
+}

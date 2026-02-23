@@ -1,0 +1,4 @@
+# Local defaults for developer convenience. Avoids passing -var on the CLI.
+github_repo     = "account/repo"
+mgmt_role_arn   = "arn:aws:iam::<mgmt-account-id>:role/examapp-mgmt-cross-account-role"
+account_id      = "<certshack-account-id>"

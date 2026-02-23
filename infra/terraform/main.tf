@@ -89,6 +89,15 @@ module "iam" {
   account_id = data.aws_caller_identity.current.account_id
 }
 
+# GitHub Actions role for OIDC-based assumes
+module "github_actions" {
+  source          = "./modules/github_actions"
+  project         = var.project
+  account_id      = data.aws_caller_identity.current.account_id
+  github_org_repo = var.github_repo
+  # github_environment left as default '*' unless you want to lock to a specific environment
+}
+
 module "ecr" {
   source       = "./modules/ecr"
   project      = var.project
