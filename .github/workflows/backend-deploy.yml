@@ -1,14 +1,18 @@
-name: Deploy examapp
+name: Backend Deploy
+
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - 'backend/**'
+      - 'Dockerfile*'
+
+env:
+  AWS_REGION: eu-west-1
 
 permissions:
   id-token: write
   contents: read
-
-on:
-  workflow_dispatch: {}
-
-env:
-  AWS_REGION: eu-west-1
 
 jobs:
   build-and-push-backend:
@@ -16,16 +20,12 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    outputs:
-      image: ${{ steps.push.outputs.image }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v2
-        # Set the repository secret `GITHUB_ACTIONS_ROLE_ARN` to the role ARN
-        # (e.g. arn:aws:iam::809472479011:role/examapp-github-role)
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -50,9 +50,6 @@ jobs:
 
   deploy-backend:
     needs: build-and-push-backend
-    permissions:
-      id-token: write
-      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -67,61 +64,15 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Download deploy helper
-        run: |
-          mkdir -p infra/terraform/ci
-          # assume the helper is committed in infra/terraform/ci
-          ls -la infra/terraform/ci
-
       - name: Deploy to ECS and wait for stability
         env:
           CLUSTER: ${{ secrets.ECS_CLUSTER }}
           SERVICE: ${{ secrets.ECS_SERVICE }}
           CONTAINER_NAME: ${{ secrets.ECS_CONTAINER_NAME }}
+          IMAGE: ${{ needs.build-and-push-backend.outputs.image }}
         run: |
           set -euo pipefail
-          IMAGE="${{ needs.build-and-push-backend.outputs.image }}"
-          if [ -z "$IMAGE" ]; then
-            echo "Job output image is empty; falling back to :latest tag"
-            IMAGE="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/examapp-backend:latest"
-          fi
+          IMAGE="${IMAGE:-${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/examapp-backend:latest}"
           echo "Using image: $IMAGE"
           chmod +x infra/terraform/ci/ecs-deploy-and-wait.sh
           infra/terraform/ci/ecs-deploy-and-wait.sh --cluster "$CLUSTER" --service "$SERVICE" --container-name "$CONTAINER_NAME" --image "$IMAGE" --region $AWS_REGION
-
-  deploy-frontend:
-    needs: deploy-backend
-    permissions:
-      id-token: write
-      contents: read
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup pnpm
-        run: corepack enable && corepack prepare pnpm@latest --activate
-
-      - name: Build frontend
-        run: |
-          cd frontend
-          pnpm install --frozen-lockfile
-          pnpm run build
-
-      - name: Sync frontend to S3
-        env:
-          FRONTEND_BUCKET: ${{ secrets.FRONTEND_BUCKET }}
-        run: |
-          aws s3 sync frontend/dist s3://$FRONTEND_BUCKET/ --delete
-
-      - name: Invalidate CloudFront
-        env:
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-        run: |
-          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths '/*'
