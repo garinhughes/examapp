@@ -107,11 +107,14 @@ jobs:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
+
       - name: Build frontend
         run: |
           cd frontend
-          npm ci
-          npm run build
+          pnpm install --frozen-lockfile
+          pnpm run build
 
       - name: Sync frontend to S3
         env:
