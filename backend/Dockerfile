@@ -3,6 +3,7 @@ FROM node:18-bullseye AS builder
 WORKDIR /app
 # Ensure a pnpm v10.x compatible with the lockfile is available
 RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+ENV CI=true
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm fetch
 COPY . .
