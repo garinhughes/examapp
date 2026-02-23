@@ -34,17 +34,6 @@ resource "aws_ecr_lifecycle_policy" "repos" {
     rules = [
       {
         rulePriority = 1
-        description  = "Expire images older than 3 days"
-        selection = {
-          tagStatus   = "any"
-          countType   = "sinceImagePushed"
-          countNumber = 3
-          countUnit   = "days"
-        }
-        action = { type = "expire" }
-      },
-      {
-        rulePriority = 2
         description  = "Keep most recent 3 images"
         selection = {
           tagStatus   = "any"
