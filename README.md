@@ -87,3 +87,25 @@ pnpm run dev
 ```
 
 If you want I can also add a short ops section (deploy steps, Terraform snippets, CI pipeline) or a minimal runbook for publishing exams to S3.
+
+**GitHub Actions**
+
+- **Workflows:**
+	- **Full Deploy** (`full-deploy.yml`) — builds backend and frontend and performs the full deployment (ECS + S3/CloudFront). Triggerable via `workflow_dispatch` or pushes to `main`.
+	- **Frontend Deploy** (`frontend-deploy.yml`) — builds and publishes the frontend to S3 and invalidates CloudFront. Triggers on `frontend/**` changes or manual dispatch.
+	- **Backend Deploy** (`backend-deploy.yml`) — builds, pushes the backend Docker image to ECR and updates ECS. Triggers on `backend/**` changes or manual dispatch.
+
+- **Secrets / required repo settings:** ensure the following repo secrets are set:
+	- `AWS_GITHUB_ACTIONS_ROLE_ARN` — ARN of the OIDC-assumable role for GitHub Actions
+	- `FRONTEND_BUCKET` — S3 bucket name for frontend artifacts
+	- `CLOUDFRONT_DISTRIBUTION_ID` — CloudFront distribution id (for invalidation)
+
+- **Manual runs:** use the GitHub CLI to trigger workflows locally, for example:
+
+```bash
+gh workflow run full-deploy.yml --ref main
+gh workflow run frontend-deploy.yml --ref main
+gh workflow run backend-deploy.yml --ref main
+```
+
+These workflows use OIDC to assume the configured AWS role; make sure the role and trust policy are in place before running.
