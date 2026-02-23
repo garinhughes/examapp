@@ -1,4 +1,4 @@
-name: Deploy examapp
+name: Full Deploy
 
 permissions:
   id-token: write
