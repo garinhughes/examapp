@@ -49,7 +49,14 @@ data "aws_iam_policy_document" "deploy_policy" {
   }
 
   statement {
-    actions = ["ecs:UpdateService","ecs:DescribeServices","ecs:DescribeTasks","ecs:ListTasks"]
+    actions = [
+      "ecs:UpdateService",
+      "ecs:DescribeServices",
+      "ecs:DescribeTasks",
+      "ecs:ListTasks",
+      "ecs:RegisterTaskDefinition",
+      "ecs:DescribeTaskDefinition"
+    ]
     resources = ["*"]
   }
 
