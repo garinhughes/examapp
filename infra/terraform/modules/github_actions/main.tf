@@ -74,6 +74,20 @@ data "aws_iam_policy_document" "deploy_policy" {
     actions = ["sts:GetCallerIdentity"]
     resources = ["*"]
   }
+
+  # Allow passing ECS task & execution roles when registering task definitions
+  statement {
+    actions   = ["iam:PassRole"]
+    resources = [
+      "arn:aws:iam::${var.account_id}:role/${var.project}-ecs-task-role",
+      "arn:aws:iam::${var.account_id}:role/${var.project}-ecs-task-exec-role"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
+  }
 }
 
 resource "aws_iam_policy" "github_deploy" {
