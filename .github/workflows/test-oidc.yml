@@ -2,6 +2,8 @@ name: Test GitHub OIDC -> AWS
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   check-oidc:
