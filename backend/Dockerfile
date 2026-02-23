@@ -1,8 +1,8 @@
 # Stage 1 — build
 FROM node:18-bullseye AS builder
 WORKDIR /app
-# pnpm is used in project
-RUN npm i -g pnpm@8
+# Ensure a pnpm v10.x compatible with the lockfile is available
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm fetch
 COPY . .
