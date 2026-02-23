@@ -1,5 +1,9 @@
 name: Deploy examapp
 
+permissions:
+  id-token: write
+  contents: read
+
 on:
   workflow_dispatch:
   push:
@@ -10,6 +14,9 @@ env:
 
 jobs:
   build-and-push-backend:
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       image: ${{ steps.push.outputs.image }}
@@ -45,6 +52,9 @@ jobs:
 
   deploy-backend:
     needs: build-and-push-backend
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -77,6 +87,9 @@ jobs:
 
   deploy-frontend:
     needs: deploy-backend
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
