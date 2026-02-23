@@ -87,6 +87,12 @@ module "iam" {
   source     = "./modules/iam"
   project    = var.project
   account_id = data.aws_caller_identity.current.account_id
+  create_mgmt_role = var.create_mgmt_role
+  mgmt_profile     = var.mgmt_profile
+  mgmt_role_arn    = var.mgmt_role_arn
+  providers = {
+    aws.mgmt = aws.mgmt
+  }
 }
 
 # GitHub Actions role for OIDC-based assumes

@@ -1,13 +1,6 @@
-/*
-Create an IAM role in the management account that allows the certshack
-account (your main account) to assume it. This file should be applied while
-authenticated to the management account (e.g. `aws sso login --profile mgmt`).
-
-Usage (one-time):
-  AWS_PROFILE=mgmt terraform apply -var='account_id=809472479011' -var='mgmt_profile=mgmt'
-
-After this is applied, note the output `mgmt_role_arn` and then update your
-root provider to use `assume_role` for `provider "aws" { alias = "mgmt" }`.
+/* Management-account role and Route53 policy (moved from root mgmt_role.tf)
+   These resources use the aliased provider aws.mgmt and are created only when
+   `var.create_mgmt_role` is true.
 */
 
 resource "aws_iam_role" "examapp_mgmt_assumable_role" {

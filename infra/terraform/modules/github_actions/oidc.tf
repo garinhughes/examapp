@@ -1,7 +1,4 @@
-/* Create the GitHub Actions OIDC provider in the certshack account
-   This allows GitHub Actions to exchange OIDC tokens for AWS STS credentials.
-   Thumbprint is the GitHub OIDC CA thumbprint (SHA1) used by AWS.
-*/
+/* GitHub Actions OIDC provider moved into the github_actions module */
 resource "aws_iam_openid_connect_provider" "github_actions" {
   url = "https://token.actions.githubusercontent.com"
 
