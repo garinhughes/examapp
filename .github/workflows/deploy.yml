@@ -80,8 +80,14 @@ jobs:
           CLUSTER: ${{ secrets.ECS_CLUSTER }}
           SERVICE: ${{ secrets.ECS_SERVICE }}
           CONTAINER_NAME: ${{ secrets.ECS_CONTAINER_NAME }}
-          IMAGE: ${{ needs.build-and-push-backend.outputs.image }}
         run: |
+          set -euo pipefail
+          IMAGE="${{ needs.build-and-push-backend.outputs.image }}"
+          if [ -z "$IMAGE" ]; then
+            echo "Job output image is empty; falling back to :latest tag"
+            IMAGE="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/examapp-backend:latest"
+          fi
+          echo "Using image: $IMAGE"
           chmod +x infra/terraform/ci/ecs-deploy-and-wait.sh
           infra/terraform/ci/ecs-deploy-and-wait.sh --cluster "$CLUSTER" --service "$SERVICE" --container-name "$CONTAINER_NAME" --image "$IMAGE" --region $AWS_REGION
 
