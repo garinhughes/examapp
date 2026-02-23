@@ -36,10 +36,12 @@ data "aws_iam_policy_document" "deploy_policy" {
     actions = [
       "ecr:GetAuthorizationToken",
       "ecr:BatchGetImage",
+      "ecr:BatchCheckLayerAvailability",
       "ecr:PutImage",
       "ecr:InitiateLayerUpload",
       "ecr:UploadLayerPart",
       "ecr:CompleteLayerUpload",
+      "ecr:CreateRepository",
       "ecr:DescribeRepositories",
       "ecr:GetRepositoryPolicy"
     ]
