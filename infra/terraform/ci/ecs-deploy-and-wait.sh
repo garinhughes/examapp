@@ -5,16 +5,16 @@ set -euo pipefail
 # ecs-deploy-and-wait.sh \
 #   --cluster my-cluster --service my-service --container-name my-container \
 #   --image 123456789012.dkr.ecr.eu-west-1.amazonaws.com/myimage:tag \
-#   [--region eu-west-1] [--profile certshack]
+#   [--region eu-west-1] [--profile certshack] [--dry-run]
 
-ARGS=$(getopt -o '' -l cluster:,service:,container-name:,image:,region:,profile: -n "ecs-deploy-and-wait.sh" -- "$@")
+ARGS=$(getopt -o '' -l cluster:,service:,container-name:,image:,region:,profile:,dry-run -n "ecs-deploy-and-wait.sh" -- "$@")
 if [ $? -ne 0 ]; then
   echo "Invalid arguments"
   exit 2
 fi
 eval set -- "$ARGS"
 
-CLUSTER=""; SERVICE=""; CONTAINER=""; IMAGE=""; REGION="eu-west-1"; PROFILE=""
+CLUSTER=""; SERVICE=""; CONTAINER=""; IMAGE=""; REGION="eu-west-1"; PROFILE=""; DRY_RUN="false"
 while true; do
   case "$1" in
     --cluster) CLUSTER="$2"; shift 2;;
@@ -23,14 +23,38 @@ while true; do
     --image) IMAGE="$2"; shift 2;;
     --region) REGION="$2"; shift 2;;
     --profile) PROFILE="$2"; shift 2;;
+    --dry-run) DRY_RUN="true"; shift 1;;
     --) shift; break;;
     *) break;;
   esac
 done
 
 if [[ -z "$CLUSTER" || -z "$SERVICE" || -z "$CONTAINER" || -z "$IMAGE" ]]; then
-  echo "Missing required args. See usage in file header."
+  echo "Missing required args. See usage in file header. Example:"
+  echo "  ecs-deploy-and-wait.sh --cluster my-cluster --service my-service --container-name my-container --image 123456789012.dkr.ecr.eu-west-1.amazonaws.com/myimage:tag [--region eu-west-1] [--profile certshack] [--dry-run]"
   exit 2
+fi
+
+if [[ "$DRY_RUN" == "true" ]]; then
+  echo "DRY-RUN: would perform the following AWS operations with region='$REGION' profile='${PROFILE:-<default>}'"
+  echo
+  echo "1) Describe service to get current task definition:"
+  echo "  ${AWS_CLI[@]} ecs describe-services --cluster \"$CLUSTER\" --services \"$SERVICE\" --query 'services[0].taskDefinition' --output text"
+  echo
+  echo "2) Describe task definition:"
+  echo "  ${AWS_CLI[@]} ecs describe-task-definition --task-definition \"<TD_ARN_from_prev>\" --query 'taskDefinition' --output json"
+  echo
+  echo "3) Register new task definition with updated image for container '$CONTAINER':"
+  echo "  ${AWS_CLI[@]} ecs register-task-definition --cli-input-json \"<updated-taskdef-json>\" --query 'taskDefinition.taskDefinitionArn' --output text"
+  echo
+  echo "4) Update service to use new task definition:"
+  echo "  ${AWS_CLI[@]} ecs update-service --cluster \"$CLUSTER\" --service \"$SERVICE\" --task-definition \"<new-task-def-arn>\""
+  echo
+  echo "5) Wait for service stability:"
+  echo "  ${AWS_CLI[@]} ecs wait services-stable --cluster \"$CLUSTER\" --services \"$SERVICE\""
+  echo
+  echo "DRY-RUN complete. No AWS calls were made."
+  exit 0
 fi
 
 AWS_CLI=(aws --region "$REGION")

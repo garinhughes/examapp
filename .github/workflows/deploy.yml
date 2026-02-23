@@ -38,7 +38,7 @@ jobs:
 
       - name: Build backend image
         run: |
-          IMAGE=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/examapp-backend:${{ github.sha }}
+          IMAGE=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/examapp-backend:latest
           (cd backend && docker build -t examapp-backend .)
           docker tag examapp-backend "$IMAGE"
           echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
@@ -46,7 +46,7 @@ jobs:
       - name: Push backend image
         id: push
         run: |
-          IMAGE=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/examapp-backend:${{ github.sha }}
+          IMAGE=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/examapp-backend:latest
           docker push "$IMAGE"
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
