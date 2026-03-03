@@ -147,6 +147,11 @@ variable "cognito_client_secret_arn" {
   default = ""
 }
 
+variable "cognito_app_client_id_secret_arn" {
+  type    = string
+  default = ""
+}
+
 # ---------- security groups ----------
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project}-alb-"
@@ -309,16 +314,21 @@ locals {
     { name = "AUDIT_TABLE", value = var.audit_table },
     { name = "AUTH_MODE", value = var.auth_mode },
     { name = "COGNITO_DOMAIN", value = var.cognito_domain },
-    { name = "COGNITO_APP_CLIENT_ID", value = var.cognito_app_client_id },
+    # COGNITO_APP_CLIENT_ID is injected from Secrets Manager (see container_secrets)
     { name = "COGNITO_REGION", value = var.cognito_region },
     { name = "COGNITO_USER_POOL_ID", value = var.cognito_user_pool_id },
     { name = "COGNITO_REDIRECT_URI", value = var.cognito_redirect_uri },
     { name = "FRONTEND_ORIGIN", value = var.frontend_origin },
   ]
 
-  container_secrets = var.cognito_client_secret_arn != "" ? [
-    { name = "COGNITO_APP_CLIENT_SECRET", valueFrom = var.cognito_client_secret_arn }
-  ] : []
+  container_secrets = concat(
+    var.cognito_client_secret_arn != "" ? [
+      { name = "COGNITO_APP_CLIENT_SECRET", valueFrom = var.cognito_client_secret_arn }
+    ] : [],
+    var.cognito_app_client_id_secret_arn != "" ? [
+      { name = "COGNITO_APP_CLIENT_ID", valueFrom = var.cognito_app_client_id_secret_arn }
+    ] : []
+  )
 }
 
 resource "aws_ecs_task_definition" "backend" {

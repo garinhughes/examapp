@@ -133,8 +133,9 @@ module "ecs" {
   entitlements_table       = module.dynamodb.table_names["entitlements"]
   audit_table              = module.dynamodb.table_names["audit"]
 
-  cognito_domain           = "eu-west-1c6wqup1rx.auth.eu-west-1.amazoncognito.com"
-  cognito_app_client_id    = "2b10tfhn1k9pq9rr5f6k14usc3"
+  cognito_domain                         = "eu-west-1c6wqup1rx.auth.eu-west-1.amazoncognito.com"
+  # COGNITO_APP_CLIENT_ID is stored in Secrets Manager and read by the ECS task at runtime
+  cognito_app_client_id_secret_arn      = module.secretsmanager.cognito_app_client_id_arn
   cognito_region           = var.region
   cognito_user_pool_id     = "eu-west-1_c6WQUP1RX"
   cognito_redirect_uri     = "https://api.certshack.com/auth/token"
