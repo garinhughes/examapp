@@ -76,7 +76,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
         <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
           <span className="text-xl font-bold tracking-tight text-sidebar-foreground flex items-center gap-2">
             <Target className="h-6 w-6 text-sidebar-primary" />
-            ExamApp
+            certshack
           </span>
         </div>
 
