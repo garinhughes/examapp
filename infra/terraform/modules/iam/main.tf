@@ -90,6 +90,45 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
   })
 }
 
+# ---------- Lambda itemcount role ----------
+resource "aws_iam_role" "lambda_itemcount" {
+  name = "${var.project}-itemcount-publisher-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "lambda.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+  tags = { Project = var.project }
+}
+
+resource "aws_iam_role_policy" "lambda_itemcount" {
+  name = "${var.project}-itemcount-publisher-policy"
+  role = aws_iam_role.lambda_itemcount.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = ["dynamodb:DescribeTable", "dynamodb:Scan"]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = ["cloudwatch:PutMetricData"]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 # ---------- outputs ----------
 output "ecs_task_execution_role_arn" {
   value = aws_iam_role.ecs_task_execution.arn
@@ -97,4 +136,8 @@ output "ecs_task_execution_role_arn" {
 
 output "ecs_task_role_arn" {
   value = aws_iam_role.ecs_task.arn
+}
+
+output "lambda_itemcount_role_arn" {
+  value = aws_iam_role.lambda_itemcount.arn
 }

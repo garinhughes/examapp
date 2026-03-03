@@ -18,20 +18,16 @@ output "ecr_repository_urls" {
   value = module.ecr.repository_urls
 }
 
-output "dynamodb_table_name" {
-  value = module.dynamodb.table_name
-}
-
 output "cloudfront_domain_name" {
-  value = module.s3_cloudfront.cloudfront_domain_name
+  value = module.cloudfront.cloudfront_domain_name
 }
 
 output "cloudfront_distribution_id" {
-  value = module.s3_cloudfront.cloudfront_distribution_id
+  value = module.cloudfront.cloudfront_distribution_id
 }
 
 output "frontend_bucket_name" {
-  value = module.s3_cloudfront.bucket_name
+  value = module.s3.bucket_name
 }
 
 output "alb_dns_name" {

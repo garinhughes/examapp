@@ -8,10 +8,6 @@ variable "domain" {
   type = string
 }
 
-variable "bucket_name" {
-  type = string
-}
-
 variable "acm_certificate_arn" {
   description = "ACM cert ARN in us-east-1 for CloudFront"
   type        = string
@@ -23,59 +19,28 @@ variable "web_acl_arn" {
   default     = null
 }
 
-# ---------- S3 bucket ----------
-resource "aws_s3_bucket" "site" {
-  bucket = var.bucket_name
-  tags   = { Project = var.project }
+variable "s3_bucket_id" {
+  description = "S3 site bucket ID (for bucket policy)"
+  type        = string
 }
 
-resource "aws_s3_bucket_versioning" "site" {
-  bucket = aws_s3_bucket.site.id
-  versioning_configuration { status = "Enabled" }
+variable "s3_bucket_arn" {
+  description = "S3 site bucket ARN (for bucket policy)"
+  type        = string
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "site" {
-  bucket = aws_s3_bucket.site.id
-  rule {
-    apply_server_side_encryption_by_default { sse_algorithm = "AES256" }
-  }
+variable "s3_bucket_regional_domain_name" {
+  description = "S3 site bucket regional domain name (for CloudFront origin)"
+  type        = string
 }
 
-resource "aws_s3_bucket_public_access_block" "site" {
-  bucket                  = aws_s3_bucket.site.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-# ---------- OAC (not legacy OAI) ----------
+# ---------- OAC ----------
 resource "aws_cloudfront_origin_access_control" "oac" {
   name                              = "${var.project}-oac"
   description                       = "OAC for ${var.project} S3 origin"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
-}
-
-# Bucket policy: allow CloudFront OAC to GetObject
-resource "aws_s3_bucket_policy" "site" {
-  bucket = aws_s3_bucket.site.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Sid       = "AllowCloudFrontOAC"
-      Effect    = "Allow"
-      Principal = { Service = "cloudfront.amazonaws.com" }
-      Action    = "s3:GetObject"
-      Resource  = "${aws_s3_bucket.site.arn}/*"
-      Condition = {
-        StringEquals = {
-          "AWS:SourceArn" = aws_cloudfront_distribution.cdn.arn
-        }
-      }
-    }]
-  })
 }
 
 # ---------- CloudFront distribution ----------
@@ -88,7 +53,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   comment             = "${var.project} frontend"
 
   origin {
-    domain_name              = aws_s3_bucket.site.bucket_regional_domain_name
+    domain_name              = var.s3_bucket_regional_domain_name
     origin_id                = "S3"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
   }
@@ -141,6 +106,27 @@ resource "aws_cloudfront_distribution" "cdn" {
   tags = { Project = var.project }
 }
 
+# Bucket policy: allow CloudFront OAC to GetObject
+# Lives here because it depends on the distribution ARN
+resource "aws_s3_bucket_policy" "site" {
+  bucket = var.s3_bucket_id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "AllowCloudFrontOAC"
+      Effect    = "Allow"
+      Principal = { Service = "cloudfront.amazonaws.com" }
+      Action    = "s3:GetObject"
+      Resource  = "${var.s3_bucket_arn}/*"
+      Condition = {
+        StringEquals = {
+          "AWS:SourceArn" = aws_cloudfront_distribution.cdn.arn
+        }
+      }
+    }]
+  })
+}
+
 # ---------- outputs ----------
 output "cloudfront_domain_name" {
   value = aws_cloudfront_distribution.cdn.domain_name
@@ -156,12 +142,4 @@ output "cloudfront_distribution_id" {
 
 output "cloudfront_distribution_arn" {
   value = aws_cloudfront_distribution.cdn.arn
-}
-
-output "bucket_name" {
-  value = aws_s3_bucket.site.id
-}
-
-output "bucket_arn" {
-  value = aws_s3_bucket.site.arn
 }
