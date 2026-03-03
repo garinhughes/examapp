@@ -160,7 +160,7 @@ module "secretsmanager" {
 data "archive_file" "itemcount_zip" {
   type        = "zip"
   source_file = "${path.module}/lambdas/dynamodb_itemcount_publisher.py"
-  output_path = "${path.module}/lambdas/dynamodb_itemcount_publisher.zip"
+  output_path = "${path.module}/.terraform/lambdas/dynamodb_itemcount_publisher.zip"
 }
 
 # CloudWatch EventBridge scheduler for Lambda
