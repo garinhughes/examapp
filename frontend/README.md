@@ -12,4 +12,4 @@ pnpm run dev
 
 Open http://localhost:5173
 
-The Vite dev server proxies `/exams` to the backend at http://localhost:3000.
+The Vite dev server proxies `/exams` to the backend at http://localhost:3000. In production, it uses https://api.certshack.com 
