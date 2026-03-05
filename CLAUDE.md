@@ -81,7 +81,7 @@ backend/src/
     profanityFilter.ts  # Username filter
 
 frontend/src/
-  App.tsx               # Route definitions
+  App.tsx               # Thin shell: ExamProvider wrapping ExamApp
   apiBase.ts            # Base URL config
   auth/
     AuthContext.tsx     # Cognito auth state
@@ -94,6 +94,21 @@ frontend/src/
     Leaderboard.tsx     # Gamification leaderboard
     PricingPage.tsx     # Pricing/paywall UI
     Sidebar.tsx         # Navigation
+  exam/
+    types.ts            # Shared types (Exam, Question, Choice, Slot, etc.)
+    ExamContext.tsx      # Central state: ~160 context props, all useState/useEffect/handlers
+    ExamApp.tsx          # Layout shell: Sidebar, header, route switch, ExamHeader, results
+    ExamSetup.tsx        # Pre-start form: mode, domains, filters, sliders, start/resume
+    ExamReview.tsx       # Post-exam review: domain filter, question-by-question review
+    QuestionNav.tsx      # Question grid, progress bar, Prev/Next, Complete Early
+    QuestionCard.tsx     # Single question: matching/ordering/single-multi choice rendering
+    Modals.tsx           # Pause overlay, cancel/submit/complete-early modals, toasts, confetti
+    PracticeExams.tsx    # Practice exams page: resume banner + provider cards
+    AnalyticsView.tsx    # Analytics: score history chart, stats, domain bars, attempts list
+    ScoreHistoryChart.tsx # SVG score history chart component
+    SortableOrderItem.tsx # DnD sortable wrapper for ordering questions
+    utils.tsx            # Pure helpers: isAnswerCorrect, computeDerivedAttempt, renderChoiceContent
+    downloads.ts         # CSV/PDF download functions (parameterized)
   gamification/
     GamificationContext.tsx
     badges.ts
@@ -188,4 +203,6 @@ Terraform state is remote (S3 backend defined in `infra/terraform/backend.tf`). 
 - **Auth/entitlements change**: `backend/src/plugins/` + `frontend/src/auth/` + `frontend/src/hooks/useEntitlements.ts`
 - **Exam data/schema**: `backend/src/examLoader.ts` + `backend/src/services/examStore.ts`
 - **Infra change**: `infra/terraform/` — confirm before applying
-- **Question rendering** (new types like `matching`/`ordering`): `frontend/src/App.tsx` is the current monolithic view — look there for question rendering logic
+- **Question rendering** (new types like `matching`/`ordering`): `frontend/src/exam/QuestionCard.tsx` for in-exam rendering, `frontend/src/exam/ExamReview.tsx` for post-exam review
+- **Exam state/logic**: `frontend/src/exam/ExamContext.tsx` — central React Context with all state, effects, and handlers
+- **Exam UI components**: `frontend/src/exam/` — ExamApp (layout shell), ExamSetup, QuestionNav, QuestionCard, ExamReview, Modals, PracticeExams, AnalyticsView
