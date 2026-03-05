@@ -1,4 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react'
+import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { Save, X, Flag, Pause, Play, Plus, Download, FileText, Check, Info, BarChart3, Trash2, Trophy, Filter, ChevronDown, ExternalLink, Zap, Clock, Lightbulb } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -29,23 +32,55 @@ type Exam = {
   defaultDuration?: number
   questions?: unknown[]
 }
+type QuestionType = 'single-choice' | 'multiple-choice' | 'matching' | 'ordering'
 type Choice = {
   id: string
   text: string
   isCorrect: boolean
   explanation?: string
+  sequence?: number
+}
+type Slot = {
+  id: string
+  label: string
+  correctChoiceId: string
 }
 type Question = {
   id: string
+  type?: QuestionType
   question: string
   choices: Choice[]
   selectCount?: number
+  slots?: Slot[]
   format?: string
   domain?: string
   skills?: string[]
   tip?: string
   explanation?: string
   docs?: string
+  difficulty?: number
+}
+
+// Sortable item for ordering questions (uses @dnd-kit/sortable)
+function SortableOrderItem({ id, disabled, className, children }: {
+  id: string
+  disabled: boolean
+  className: string
+  children: React.ReactNode
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled })
+  const style = { transform: CSS.Transform.toString(transform), transition }
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`${className}${isDragging ? ' shadow-lg opacity-80 z-50' : ''}`}
+      {...attributes}
+      {...(disabled ? {} : listeners)}
+    >
+      {children}
+    </div>
+  )
 }
 
 export default function App() {
@@ -54,6 +89,10 @@ export default function App() {
   const { state: gamState, recordAttemptFinish, recordPracticeDay } = useGamification()
   const gamLevel = levelFromXP(gamState.xp)
   const isAdmin = useIsAdmin()
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
+  )
 
   // Confetti / reward modal state
   const [showConfetti, setShowConfetti] = useState(false)
@@ -178,6 +217,10 @@ export default function App() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string | string[]>>({})
   // pending multi-select choices (not yet confirmed)
   const [multiSelectPending, setMultiSelectPending] = useState<Record<string, string[]>>({})
+  // matching answers: questionId -> { slotId: choiceId }
+  const [matchingAnswers, setMatchingAnswers] = useState<Record<string, Record<string, string>>>({})
+  // ordering answers: questionId -> [choiceId, ...]
+  const [orderingAnswers, setOrderingAnswers] = useState<Record<string, string[]>>({})
   // Flag questions for review (like real AWS exams)
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(new Set())
   // Navigate to specific question by index
@@ -985,7 +1028,7 @@ ${questionsHTML}
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           examCode: selected,
-          numQuestions,
+          numQuestions: numQuestions > 0 ? numQuestions : (availableFilteredCount > 0 ? availableFilteredCount : (questions.length > 0 ? questions.length : undefined)),
           metadata: { serviceKeywords: keywords, domains: domainFilterList, services: selectedServices }
         })
       })
@@ -1007,7 +1050,10 @@ ${questionsHTML}
             try { localStorage.setItem(key, JSON.stringify({ attemptId: data.attemptId, examVersion: attemptFull?.examVersion ?? attemptFull?.version ?? null, attemptSchemaVersion: 1 })) } catch {}
             setAttemptData(attemptFull)
             // if attempt contains questions (filtered set), use them
-            if (Array.isArray(attemptFull.questions)) setQuestions(attemptFull.questions)
+            if (Array.isArray(attemptFull.questions)) {
+              setQuestions(attemptFull.questions)
+              setNumQuestions(attemptFull.questions.length)
+            }
             setExamStarted(true)
             if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
           } else {
@@ -1031,51 +1077,54 @@ ${questionsHTML}
     }
   }
 
-  // helper to submit an answer programmatically (used by buttons and keyboard shortcuts)
-  // i is a choice ID (string) or array of choice IDs (string[]) for multi-select
-  async function submitAnswer(q: Question, i: string | string[]) {
-    if (isFinished) return
-    if (!examStarted) {
-      setLastError('Start the exam before answering')
-      return
+  // Check if an answer is correct for any question type
+  function isAnswerCorrect(q: Question, sel: string | string[] | undefined): boolean {
+    if (sel === undefined) return false
+    const qType = q.type ?? 'single-choice'
+    if (qType === 'matching') {
+      try {
+        const mappings: Record<string, string> = typeof sel === 'string' ? JSON.parse(sel) : {}
+        const slots = q.slots ?? []
+        return slots.length > 0 && slots.every((s) => mappings[s.id] === s.correctChoiceId)
+      } catch { return false }
     }
-    let aid = attemptId
-    if (!aid) {
-      setLastError('No active attempt. Click Start to begin the exam.')
-      return
+    if (qType === 'ordering') {
+      try {
+        const order: string[] = typeof sel === 'string' ? JSON.parse(sel) : []
+        const correctOrder = [...q.choices]
+          .filter((c) => typeof c.sequence === 'number')
+          .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0))
+          .map((c) => c.id)
+        return correctOrder.length === order.length && correctOrder.every((id, idx) => id === order[idx])
+      } catch { return false }
     }
-
-    const isReAnswer = selectedAnswers[q.id] !== undefined
-    const newSelected = { ...selectedAnswers, [q.id]: i }
-    setSelectedAnswers(newSelected)
-    // clear any pending multi-select state
-    setMultiSelectPending((p) => { const next = { ...p }; delete next[q.id]; return next })
-
-    // Auto-advance to next unanswered question (skip when re-answering or in immediate-reveal mode)
-    if (!isReAnswer && revealAnswers !== 'immediately') {
-      const nextIdx = displayQuestions.findIndex((qq, idx) => idx > currentQuestionIndex && newSelected[qq.id] === undefined)
-      if (nextIdx >= 0) setCurrentQuestionIndex(nextIdx)
-      else {
-        const wrap = displayQuestions.findIndex((qq) => newSelected[qq.id] === undefined)
-        if (wrap >= 0) setCurrentQuestionIndex(wrap)
-      }
+    // single-choice / multiple-choice
+    const correctIds = q.choices.filter((c) => c.isCorrect).map((c) => c.id)
+    if (Array.isArray(sel)) {
+      return sel.length === correctIds.length && sel.every((v) => correctIds.includes(v))
     }
+    return correctIds.length === 1 && correctIds[0] === sel
+  }
 
-    // ── Visitor (unauthenticated) — no server round-trips ──
-    if (!user) return
+  // helper: auto-advance to next unanswered question
+  function autoAdvance(newSelected: Record<string, string | string[]>) {
+    if (revealAnswers === 'immediately') return
+    const nextIdx = displayQuestions.findIndex((qq, idx) => idx > currentQuestionIndex && newSelected[qq.id] === undefined)
+    if (nextIdx >= 0) setCurrentQuestionIndex(nextIdx)
+    else {
+      const wrap = displayQuestions.findIndex((qq) => newSelected[qq.id] === undefined)
+      if (wrap >= 0) setCurrentQuestionIndex(wrap)
+    }
+  }
 
-    // ── Authenticated — save answer to server (no auto-finish; user must opt-in) ──
-    const isMulti = Array.isArray(i)
+  // helper: send answer to server
+  async function sendAnswerToServer(qId: string, payload: Record<string, any>) {
+    if (!user || !attemptId) return
     try {
-      const res = await authFetch(`/attempts/${aid}/answer`, {
+      const res = await authFetch(`/attempts/${attemptId}/answer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          questionId: q.id,
-          ...(isMulti ? { selectedChoiceIds: i } : { selectedChoiceId: i }),
-          timeMs: 0,
-          showTip: !!showTipMap[q.id]
-        })
+        body: JSON.stringify({ questionId: qId, ...payload, timeMs: 0, showTip: !!showTipMap[qId] })
       })
       if (!res.ok) {
         const text = await res.text()
@@ -1086,6 +1135,40 @@ ${questionsHTML}
       console.error('submit answer error', err)
       setLastError(String(err))
     }
+  }
+
+  // Submit answer for single-choice / multiple-choice
+  async function submitAnswer(q: Question, i: string | string[]) {
+    if (isFinished || !examStarted || !attemptId) return
+    const isReAnswer = selectedAnswers[q.id] !== undefined
+    const newSelected = { ...selectedAnswers, [q.id]: i }
+    setSelectedAnswers(newSelected)
+    setMultiSelectPending((p) => { const next = { ...p }; delete next[q.id]; return next })
+    if (!isReAnswer) autoAdvance(newSelected)
+    const isMulti = Array.isArray(i)
+    await sendAnswerToServer(q.id, isMulti ? { selectedChoiceIds: i } : { selectedChoiceId: i })
+  }
+
+  // Submit answer for matching questions
+  async function submitMatchingAnswer(q: Question, mappings: Record<string, string>) {
+    if (isFinished || !examStarted || !attemptId) return
+    const isReAnswer = selectedAnswers[q.id] !== undefined
+    setMatchingAnswers((p) => ({ ...p, [q.id]: mappings }))
+    const newSelected = { ...selectedAnswers, [q.id]: JSON.stringify(mappings) }
+    setSelectedAnswers(newSelected)
+    if (!isReAnswer) autoAdvance(newSelected)
+    await sendAnswerToServer(q.id, { selectedMappings: mappings })
+  }
+
+  // Submit answer for ordering questions
+  async function submitOrderingAnswer(q: Question, order: string[]) {
+    if (isFinished || !examStarted || !attemptId) return
+    const isReAnswer = selectedAnswers[q.id] !== undefined
+    setOrderingAnswers((p) => ({ ...p, [q.id]: order }))
+    const newSelected = { ...selectedAnswers, [q.id]: JSON.stringify(order) }
+    setSelectedAnswers(newSelected)
+    if (!isReAnswer) autoAdvance(newSelected)
+    await sendAnswerToServer(q.id, { selectedOrder: order })
   }
 
   // finish attempt helper
@@ -1440,14 +1523,7 @@ ${questionsHTML}
         if (!perDomain[dom]) perDomain[dom] = { correct: 0, total: 0 }
         if (sel === undefined) { if (!earlyComplete) perDomain[dom].total++; continue }
         perDomain[dom].total++
-        // Check correctness using isCorrect field on choice objects
-        let isRight = false
-        const correctIds = qn.choices.filter((c) => c.isCorrect).map((c) => c.id)
-        if (Array.isArray(sel)) {
-          isRight = sel.length === correctIds.length && sel.every((v) => correctIds.includes(v))
-        } else {
-          isRight = correctIds.length === 1 && correctIds[0] === sel
-        }
+        const isRight = isAnswerCorrect(qn, sel)
         if (isRight) { correct++; perDomain[dom].correct++ }
       }
       for (const k of Object.keys(perDomain)) { const e = perDomain[k]; e.score = e.total > 0 ? Math.round((e.correct / e.total) * 100) : 0 }
@@ -1592,8 +1668,21 @@ ${questionsHTML}
       return <CodeBlock code={s} language="bash" inline={false} />
     }
 
-    // otherwise respect inline preference for compact one-line choices
-    return inline ? <code className="text-sm font-mono">{s}</code> : <span>{s}</span>
+    // otherwise render as plain text matching the question font
+    return <span>{s}</span>
+  }
+
+  // helper to render question text with \n\n as paragraph breaks
+  const renderWithParagraphs = (text: string) => {
+    const parts = text.split('\n\n')
+    if (parts.length <= 1) return <>{text}</>
+    return (
+      <>
+        {parts.map((part, i) => (
+          <p key={i} className={i > 0 ? 'mt-3' : ''}>{part}</p>
+        ))}
+      </>
+    )
   }
 
   return (
@@ -2166,68 +2255,70 @@ ${questionsHTML}
               </div>
             )}
             {route === 'home' && selected ? (
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <h2 className="text-lg font-semibold">Questions</h2>
-                <div className="flex items-center gap-3">
-                  <div className="text-sm text-muted-foreground">{selected}{selectedMeta?.title ? ` — ${selectedMeta.title}` : ''}</div>
-                  <button
-                    className="px-3 py-1 rounded bg-muted-foreground text-white text-sm"
-                    onClick={async () => {
-                      setShowAttempts((s) => !s)
-                      if (!attemptsList) {
-                        try {
-                          const res = await authFetch('/attempts')
-                          const d = await res.json()
-                          setAttemptsList(d.attempts ?? [])
-                        } catch (err) {
-                          console.error(err)
-                          setLastError(String(err))
+                <div className="flex min-w-0 flex-1 flex-col gap-2 lg:items-end">
+                  <div className="text-sm text-muted-foreground break-words lg:text-right">{selected}{selectedMeta?.title ? ` — ${selectedMeta.title}` : ''}</div>
+                  <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                    <button
+                      className="px-3 py-1 rounded-md bg-muted-foreground text-white text-sm whitespace-nowrap"
+                      onClick={async () => {
+                        setShowAttempts((s) => !s)
+                        if (!attemptsList) {
+                          try {
+                            const res = await authFetch('/attempts')
+                            const d = await res.json()
+                            setAttemptsList(d.attempts ?? [])
+                          } catch (err) {
+                            console.error(err)
+                            setLastError(String(err))
+                          }
                         }
-                      }
-                    }}
-                  >
-                    Attempts
-                  </button>
-                  {attemptId && !isFinished && examStarted && (
-                    <>
-                      <button
-                        className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition-colors"
-                        onClick={() => {
-                          // Save progress is already handled by the auto-save effect.
-                          // Just exit the exam view so user can navigate freely and resume later.
-                          setExamStarted(false)
-                          showToast('Progress saved — resume any time', 'info')
-                        }}
-                        title="Save progress and exit — resume later"
-                      >
-                        <Save className="w-4 h-4" />
-                        Save for Later
-                      </button>
-                      <button
-                        className="px-3 py-1 rounded-md bg-red-600 text-white text-sm inline-flex items-center gap-2 shadow-sm hover:bg-red-700 transition-colors"
-                        onClick={() => setShowCancelConfirm(true)}
-                      >
-                        <X className="w-4 h-4" />
-                        Cancel
-                      </button>
-                    </>
-                  )}
-                  {examStarted && timed && timeLeft !== null && (
-                    <div className="flex items-center gap-2">
-                      <button
-                        className={`px-2 py-1 rounded text-sm ${paused ? 'bg-primary/90 text-white' : 'bg-accent'}`}
-                        onClick={() => setPaused((p) => !p)}
-                        title={paused ? 'Resume timer' : 'Pause timer'}
-                      >
-                        {paused ? (
-                          <Play className="w-4 h-4" />
-                        ) : (
-                          <Pause className="w-4 h-4" />
-                        )}
-                      </button>
-                      <div className={`text-sm ${paused ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`}>{Math.floor(timeLeft/60).toString().padStart(2,'0')}:{(timeLeft%60).toString().padStart(2,'0')}{paused ? ' (paused)' : ''}</div>
-                    </div>
-                  )}
+                      }}
+                    >
+                      Attempts
+                    </button>
+                    {attemptId && !isFinished && examStarted && (
+                      <>
+                        <button
+                          className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition-colors whitespace-nowrap"
+                          onClick={() => {
+                            // Save progress is already handled by the auto-save effect.
+                            // Just exit the exam view so user can navigate freely and resume later.
+                            setExamStarted(false)
+                            showToast('Progress saved — resume any time', 'info')
+                          }}
+                          title="Save progress and exit — resume later"
+                        >
+                          <Save className="w-4 h-4" />
+                          Save for Later
+                        </button>
+                        <button
+                          className="px-3 py-1 rounded-md bg-red-600 text-white text-sm inline-flex items-center gap-2 shadow-sm hover:bg-red-700 transition-colors whitespace-nowrap"
+                          onClick={() => setShowCancelConfirm(true)}
+                        >
+                          <X className="w-4 h-4" />
+                          Cancel
+                        </button>
+                      </>
+                    )}
+                    {examStarted && timed && timeLeft !== null && (
+                      <div className="flex items-center gap-2 rounded-md bg-muted/40 px-2 py-1">
+                        <button
+                          className={`px-2 py-1 rounded text-sm ${paused ? 'bg-primary/90 text-white' : 'bg-accent'}`}
+                          onClick={() => setPaused((p) => !p)}
+                          title={paused ? 'Resume timer' : 'Pause timer'}
+                        >
+                          {paused ? (
+                            <Play className="w-4 h-4" />
+                          ) : (
+                            <Pause className="w-4 h-4" />
+                          )}
+                        </button>
+                        <div className={`text-sm whitespace-nowrap ${paused ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`}>{Math.floor(timeLeft/60).toString().padStart(2,'0')}:{(timeLeft%60).toString().padStart(2,'0')}{paused ? ' (paused)' : ''}</div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : null}
@@ -2412,6 +2503,14 @@ ${questionsHTML}
                     >
                       Return to Exam
                     </button>
+                    <button
+                      className="px-3 py-1 rounded-md bg-accent text-foreground text-sm inline-flex items-center gap-2 hover:bg-accent/80 transition-colors"
+                      onClick={() => setRoute('analytics')}
+                      title="View your analytics"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      Analytics
+                    </button>
                   </div>
                 </div>
 
@@ -2514,13 +2613,11 @@ ${questionsHTML}
                       ? baseQuestions
                       : baseQuestions.filter((q) => reviewDomains.includes((q as any).domain))
                     const deriveRecord = (q: Question) => {
-                      // pick the latest answer for this question (answers may contain history)
                       let answerRecord: any = undefined
                       if (Array.isArray(attemptData?.answers)) {
                         const matches = attemptData.answers.filter((a: any) => a.questionId === q.id)
                         if (matches.length === 1) answerRecord = matches[0]
                         else if (matches.length > 1) {
-                          // pick one with latest createdAt
                           matches.sort((a: any, b: any) => {
                             const ta = a?.createdAt ? String(a.createdAt) : ''
                             const tb = b?.createdAt ? String(b.createdAt) : ''
@@ -2529,12 +2626,8 @@ ${questionsHTML}
                           answerRecord = matches[matches.length - 1]
                         }
                       }
-                      const chosen = answerRecord?.selectedChoiceIds ?? answerRecord?.selectedChoiceId ?? answerRecord?.selectedIndices ?? answerRecord?.selectedIndex ?? selectedAnswers[q.id]
-                      const isCorrect = typeof answerRecord?.correct === 'boolean' ? answerRecord.correct : (
-                        Array.isArray(chosen)
-                          ? (Array.isArray(q.choices) && q.choices.filter((c: any) => c.isCorrect).length === chosen.length && q.choices.filter((c: any) => c.isCorrect).every((c: any) => chosen.includes(c.id)))
-                          : (typeof chosen === 'string' && q.choices?.some((c: any) => c.id === chosen && c.isCorrect))
-                      )
+                      const chosen = answerRecord?.selectedMappings ?? answerRecord?.selectedOrder ?? answerRecord?.selectedChoiceIds ?? answerRecord?.selectedChoiceId ?? selectedAnswers[q.id]
+                      const isCorrect = typeof answerRecord?.correct === 'boolean' ? answerRecord.correct : isAnswerCorrect(q, typeof chosen === 'object' && chosen !== null ? JSON.stringify(chosen) : chosen)
                       return { answerRecord, chosen, isCorrect }
                     }
 
@@ -2570,7 +2663,7 @@ ${questionsHTML}
                               {/* Redesigned review card */}
                               <div className={`p-4 rounded-lg border-l-4 ${item.isCorrect ? 'border-l-green-500' : 'border-l-red-500'} border border-border bg-card`}>
                                 <div className="flex items-start justify-between gap-3">
-                                  <div className="font-medium text-base flex-1">{item.q.question}</div>
+                                  <div className="font-medium text-base flex-1">{renderWithParagraphs(item.q.question)}</div>
                                   <span className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${item.isCorrect ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>
                                     {item.isCorrect ? '✓ Correct' : '✗ Incorrect'}
                                   </span>
@@ -2583,46 +2676,108 @@ ${questionsHTML}
                                   </div>
                                 )}
 
-                                {/* All choices list */}
-                                <div className="mt-3 space-y-1.5">
-                                  {(item.q.choices ?? []).map((c: any, ci: number) => {
-                                    const cid = typeof c === 'string' ? String(ci) : (c?.id ?? String(ci))
-                                    const cText = typeof c === 'string' ? c : (c?.text ?? '')
-                                    const isChosen = chosenIds.includes(cid)
-                                    const isCorrectChoice = typeof c === 'object' && !!c?.isCorrect
-                                    const letter = String.fromCharCode(65 + ci)
-                                    // determine visual style
-                                    let bg = 'bg-muted/50 border-border/40'
-                                    let icon: React.ReactNode = <span className="text-muted-foreground text-xs font-mono">{letter}</span>
-                                    if (isChosen && isCorrectChoice) {
-                                      bg = 'bg-green-50 dark:bg-green-900/25 border-green-400/50 dark:border-green-600/40'
-                                      icon = <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                    } else if (isChosen && !isCorrectChoice) {
-                                      bg = 'bg-red-50 dark:bg-red-900/25 border-red-400/50 dark:border-red-600/40'
-                                      icon = <X className="w-4 h-4 text-red-500" />
-                                    } else if (isCorrectChoice) {
-                                      bg = 'bg-green-50 dark:bg-green-900/25 border-green-400/50 dark:border-green-600/40'
-                                      icon = <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                    }
+                                {/* Review: type-specific rendering */}
+                                {(() => {
+                                  const reviewType: QuestionType = item.q.type ?? 'single-choice'
+
+                                  if (reviewType === 'matching') {
+                                    const slots = item.q.slots ?? []
+                                    const userMappings: Record<string, string> = item.answerRecord?.selectedMappings ?? (typeof item.chosen === 'string' ? (() => { try { return JSON.parse(item.chosen) } catch { return {} } })() : (typeof item.chosen === 'object' && item.chosen !== null ? item.chosen : {}))
+                                    const choiceMap = new Map((item.q.choices ?? []).map((c: any) => [c.id, c]))
                                     return (
-                                      <div key={cid} className={`flex items-start gap-2.5 px-3 py-2 rounded-lg border text-sm ${bg}`}>
-                                        <span className="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">{icon}</span>
-                                        <div className="flex-1">
-                                          <span className={`${isChosen ? 'font-semibold' : ''}`}>{renderChoiceContent(c, item.q, true)}</span>
-                                          {isChosen && !isCorrectChoice && <span className="ml-2 text-[10px] text-red-500 font-medium">your answer</span>}
-                                          {!isChosen && isCorrectChoice && <span className="ml-2 text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
-                                          {typeof c === 'object' && c?.explanation && (
-                                            <div className="mt-1 text-xs text-muted-foreground">{c.explanation}</div>
-                                          )}
-                                        </div>
+                                      <div className="mt-3 space-y-2">
+                                        {slots.map((slot: any, si: number) => {
+                                          const userChoice = userMappings[slot.id]
+                                          const isCorrectSlot = userChoice === slot.correctChoiceId
+                                          const bg = isCorrectSlot ? 'bg-green-50 dark:bg-green-900/25 border-green-400/50' : 'bg-red-50 dark:bg-red-900/25 border-red-400/50'
+                                          return (
+                                            <div key={slot.id} className={`px-3 py-2 rounded-lg border text-sm ${bg}`}>
+                                              <div className="font-medium">{si + 1}. {slot.label}</div>
+                                              <div className="mt-1">Your answer: <strong>{choiceMap.get(userChoice)?.text ?? '—'}</strong></div>
+                                              {!isCorrectSlot && <div className="mt-0.5 text-green-600 dark:text-green-400 text-xs">Correct: {choiceMap.get(slot.correctChoiceId)?.text}</div>}
+                                            </div>
+                                          )
+                                        })}
+                                        {(item.q.choices ?? []).map((c: any) => c.explanation && (
+                                          <div key={c.id} className="text-xs text-muted-foreground p-2 rounded bg-muted/30">
+                                            <strong>{c.text}:</strong> {c.explanation}
+                                          </div>
+                                        ))}
                                       </div>
                                     )
-                                  })}
-                                </div>
+                                  }
+
+                                  if (reviewType === 'ordering') {
+                                    const userOrder: string[] = item.answerRecord?.selectedOrder ?? (typeof item.chosen === 'string' ? (() => { try { return JSON.parse(item.chosen) } catch { return [] } })() : [])
+                                    const correctOrder = [...(item.q.choices ?? [])]
+                                      .filter((c: any) => typeof c.sequence === 'number')
+                                      .sort((a: any, b: any) => (a.sequence ?? 0) - (b.sequence ?? 0))
+                                      .map((c: any) => c.id)
+                                    const choiceMap = new Map((item.q.choices ?? []).map((c: any) => [c.id, c]))
+                                    return (
+                                      <div className="mt-3 space-y-1.5">
+                                        {userOrder.map((cid: string, idx: number) => {
+                                          const c = choiceMap.get(cid)
+                                          const isCorrectPos = correctOrder[idx] === cid
+                                          const bg = isCorrectPos ? 'bg-green-50 dark:bg-green-900/25 border-green-400/50' : 'bg-red-50 dark:bg-red-900/25 border-red-400/50'
+                                          return (
+                                            <div key={cid} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border text-sm ${bg}`}>
+                                              <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${isCorrectPos ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{idx + 1}</span>
+                                              <span className="flex-1">{c?.text ?? cid}</span>
+                                              {!isCorrectPos && <span className="text-xs text-green-600 dark:text-green-400">Should be #{correctOrder.indexOf(cid) + 1}</span>}
+                                            </div>
+                                          )
+                                        })}
+                                        {(item.q.choices ?? []).map((c: any) => c.explanation && (
+                                          <div key={c.id} className="text-xs text-muted-foreground p-2 rounded bg-muted/30">
+                                            <strong>Step {c.sequence}:</strong> {c.explanation}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )
+                                  }
+
+                                  // single-choice / multiple-choice (original rendering)
+                                  return (
+                                    <div className="mt-3 space-y-1.5">
+                                      {(item.q.choices ?? []).map((c: any, ci: number) => {
+                                        const cid = typeof c === 'string' ? String(ci) : (c?.id ?? String(ci))
+                                        const isChosen = chosenIds.includes(cid)
+                                        const isCorrectChoice = typeof c === 'object' && !!c?.isCorrect
+                                        const letter = String.fromCharCode(65 + ci)
+                                        let bg = 'bg-muted/50 border-border/40'
+                                        let icon: React.ReactNode = <span className="text-muted-foreground text-xs font-mono">{letter}</span>
+                                        if (isChosen && isCorrectChoice) {
+                                          bg = 'bg-green-50 dark:bg-green-900/25 border-green-400/50 dark:border-green-600/40'
+                                          icon = <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                        } else if (isChosen && !isCorrectChoice) {
+                                          bg = 'bg-red-50 dark:bg-red-900/25 border-red-400/50 dark:border-red-600/40'
+                                          icon = <X className="w-4 h-4 text-red-500" />
+                                        } else if (isCorrectChoice) {
+                                          bg = 'bg-green-50 dark:bg-green-900/25 border-green-400/50 dark:border-green-600/40'
+                                          icon = <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                        }
+                                        return (
+                                          <div key={cid} className={`flex items-start gap-2.5 px-3 py-2 rounded-lg border text-sm ${bg}`}>
+                                            <span className="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">{icon}</span>
+                                            <div className="flex-1">
+                                              <span className={`${isChosen ? 'font-semibold' : ''}`}>{renderChoiceContent(c, item.q, true)}</span>
+                                              {isChosen && !isCorrectChoice && <span className="ml-2 text-[10px] text-red-500 font-medium">your answer</span>}
+                                              {!isChosen && isCorrectChoice && <span className="ml-2 text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
+                                              {typeof c === 'object' && c?.explanation && (
+                                                <div className="mt-1 text-xs text-muted-foreground">{c.explanation}</div>
+                                              )}
+                                            </div>
+                                          </div>
+                                        )
+                                      })}
+                                    </div>
+                                  )
+                                })()}
 
                                 {/* Explanation */}
                                 {item.q.explanation && (
-                                  <div className="mt-3 text-sm p-3 rounded-lg bg-primary/5 border border-primary/20 dark:border-border/30">
+                                  <div className="mt-3 text-base p-3 rounded-lg bg-primary/5 border border-primary/20 dark:border-border/30">
                                     <div className="flex items-start justify-between gap-4">
                                       <div><span className="font-semibold">Explanation:</span> {item.q.explanation}</div>
                                       {item.q.docs && (
@@ -2652,9 +2807,6 @@ ${questionsHTML}
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-semibold">Start exam</h3>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
-                      ⚡ Lv{gamLevel.level} · {gamState.xp} XP
-                    </span>
                   </div>
                   {/* removed available count */}
                 </div>
@@ -3146,7 +3298,7 @@ ${questionsHTML}
               </div>
             )}
             {!isFinished && examStarted && displayQuestions.length > 0 && route === 'home' && (
-              <div className="mb-3 space-y-2">
+              <div className="mb-2 space-y-2">
                 {/* Question navigation bar */}
                 <div className="flex flex-wrap gap-1">
                   {displayQuestions.map((qq, idx) => {
@@ -3175,28 +3327,26 @@ ${questionsHTML}
                   const pct = Math.round((answeredCount / Math.max(1, displayQuestions.length)) * 100)
                   const allAnswered = answeredCount >= displayQuestions.length
                   const flaggedCount = displayQuestions.filter(q => flaggedQuestions.has(q.id)).length
+                  const curQ = displayQuestions[Math.min(currentQuestionIndex, displayQuestions.length - 1)]
+                  const curAnswered = curQ && selectedAnswers[curQ.id] !== undefined
+                  const curShowFeedback = isFinished || (curQ && revealedQuestions.has(curQ.id))
+                  const immediateMode = revealAnswers === 'immediately'
                   return (
                     <div>
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <div className="flex items-center gap-3">
+                      <div className="mb-1 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                           <span>Question {Math.min(currentQuestionIndex + 1, displayQuestions.length)}/{displayQuestions.length}</span>
                           <span className="text-xs text-muted-foreground">{answeredCount} answered · {pct}%</span>
                           {flaggedCount > 0 && <span className="text-xs text-primary">🚩 {flaggedCount} flagged</span>}
                         </div>
-                        <div className="flex items-center gap-2">
-                          {!allAnswered && answeredCount > 0 && (
-                            <button className="px-3 py-1 rounded-md bg-emerald-600 text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm hover:bg-emerald-700 transition-colors" onClick={() => setShowCompleteEarlyConfirm(true)}>
-                              <Check className="w-4 h-4" aria-hidden />
-                              Complete Early
-                            </button>
-                          )}
+                        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                           {flaggedCount > 0 && (
-                            <button className="px-2 py-1 rounded bg-accent text-primary text-xs font-medium hover:bg-accent transition-colors" onClick={() => setFlaggedQuestions(new Set())}>
+                            <button className="px-2 py-1 rounded bg-accent text-primary text-xs font-medium hover:bg-accent transition-colors whitespace-nowrap" onClick={() => setFlaggedQuestions(new Set())}>
                               🚩 Unflag All
                             </button>
                           )}
                           {allAnswered && (
-                            <button className="px-3 py-1 rounded bg-primary text-white text-xs font-semibold animate-pulse" onClick={() => setShowSubmitConfirm(true)}>
+                            <button className="px-3 py-1 rounded bg-primary text-white text-xs font-semibold animate-pulse whitespace-nowrap" onClick={() => setShowSubmitConfirm(true)}>
                               Submit Exam
                             </button>
                           )}
@@ -3205,6 +3355,36 @@ ${questionsHTML}
                       <div className="w-full h-2 bg-accent/60 rounded overflow-hidden">
                         <div className="h-2 bg-primary bg-primary transition-all" style={{ width: `${pct}%` }} />
                       </div>
+                      {/* Prev / Next navigation — right-aligned with Complete Early */}
+                      <div className="mt-1.5 flex items-center gap-2 justify-between w-full">
+                        <div className="flex-1" />
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setCurrentQuestionIndex((i) => Math.max(0, i - 1))}
+                            disabled={currentQuestionIndex <= 0}
+                            className="px-3 py-1 rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 whitespace-nowrap"
+                          >← Prev</button>
+                          {immediateMode && curShowFeedback && curAnswered ? (
+                            <button
+                              onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
+                              disabled={currentQuestionIndex >= displayQuestions.length - 1}
+                              className="px-3 py-1 rounded-md bg-primary text-white text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors whitespace-nowrap"
+                            >Next →</button>
+                          ) : (
+                            <button
+                              onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
+                              disabled={currentQuestionIndex >= displayQuestions.length - 1}
+                              className="px-3 py-1 rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 whitespace-nowrap"
+                            >Next →</button>
+                          )}
+                          {!allAnswered && answeredCount > 0 && (
+                            <button className="px-3 py-1 rounded-md bg-emerald-600 text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm hover:bg-emerald-700 transition-colors whitespace-nowrap" onClick={() => setShowCompleteEarlyConfirm(true)}>
+                              <Check className="w-4 h-4" aria-hidden />
+                              Complete Early
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   )
                 })()}
@@ -3212,20 +3392,17 @@ ${questionsHTML}
             )}
 
             {!isFinished && examStarted && route === 'home' && (
-            <div className="space-y-4">
+            <div className={`${displayQuestions.length > 0 ? '!mt-2' : ''} space-y-4`}>
               {(() => {
                 const clampedIdx = Math.min(currentQuestionIndex, displayQuestions.length - 1)
                 const visible = displayQuestions.length > 0 ? [displayQuestions[Math.max(0, clampedIdx)]] : []
                 return visible.map((q) => {
                   const chosen = selectedAnswers[q.id]
                   const answered = chosen !== undefined
-                  const isMultiSelect = typeof q.selectCount === 'number' && q.selectCount > 1
+                  const qType: QuestionType = q.type ?? 'single-choice'
+                  const isMultiSelect = qType === 'multiple-choice' || (typeof q.selectCount === 'number' && q.selectCount > 1)
                   const pending = multiSelectPending[q.id] ?? []
-                  const correct = answered && (
-                    isMultiSelect
-                      ? (Array.isArray(chosen) && Array.isArray(q.choices) && q.choices.filter((c) => c.isCorrect).length === (chosen as string[]).length && q.choices.filter((c) => c.isCorrect).every((c) => (chosen as string[]).includes(c.id)))
-                      : (typeof chosen === 'string' && q.choices?.some((c) => c.id === chosen && c.isCorrect))
-                  )
+                  const correct = answered && isAnswerCorrect(q, chosen)
                   // Should we show correct/incorrect feedback for this question?
                   const showFeedback = isFinished || revealedQuestions.has(q.id)
                   // Staged single-select answer (not yet submitted, for immediate reveal mode)
@@ -3241,8 +3418,10 @@ ${questionsHTML}
                     >
                       <div className="mb-2">
                         <div className="font-semibold text-foreground">
-                          {q.question}
-                          {isMultiSelect && <span className="ml-2 text-xs font-medium text-primary">(Select {q.selectCount})</span>}
+                          {renderWithParagraphs(q.question)}
+                          {qType === 'multiple-choice' && <span className="ml-2 text-xs font-medium text-primary">(Select {q.selectCount})</span>}
+                          {qType === 'matching' && <span className="ml-2 text-xs font-medium text-primary">(Match each item)</span>}
+                          {qType === 'ordering' && <span className="ml-2 text-xs font-medium text-primary">(Drag or use arrows to order)</span>}
                         </div>
                         {/* Tip toggle + Flag for Review — right-aligned row under the question */}
                         {!isFinished && (
@@ -3281,6 +3460,170 @@ ${questionsHTML}
                         )}
                       </div>
 
+                      {/* ── Matching question ── */}
+                      {qType === 'matching' && (() => {
+                        const slots = q.slots ?? []
+                        const curMappings = matchingAnswers[q.id] ?? {}
+                        const allMapped = slots.length > 0 && slots.every((s) => curMappings[s.id])
+                        return (
+                          <div className="space-y-3">
+                            {slots.map((slot, si) => {
+                              const selectedChoice = curMappings[slot.id]
+                              const isCorrectMapping = showFeedback && answered && selectedChoice === slot.correctChoiceId
+                              const isIncorrectMapping = showFeedback && answered && selectedChoice && selectedChoice !== slot.correctChoiceId
+                              return (
+                                <div key={slot.id} className={`p-3 rounded-lg border ${isCorrectMapping ? 'border-green-400/40 bg-green-50 dark:bg-green-900/25' : isIncorrectMapping ? 'border-red-400/40 bg-red-50 dark:bg-red-900/25' : 'border-border'}`}>
+                                  <div className="font-medium text-sm mb-2">{si + 1}. {slot.label}</div>
+                                  <select
+                                    value={selectedChoice ?? ''}
+                                    disabled={questionLocked}
+                                    onChange={(e) => {
+                                      const val = e.target.value
+                                      setMatchingAnswers((p) => ({
+                                        ...p,
+                                        [q.id]: { ...(p[q.id] ?? {}), [slot.id]: val }
+                                      }))
+                                    }}
+                                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
+                                  >
+                                    <option value="">— Select —</option>
+                                    {q.choices.map((c) => (
+                                      <option key={c.id} value={c.id}>{c.text}</option>
+                                    ))}
+                                  </select>
+                                  {showFeedback && answered && isIncorrectMapping && (
+                                    <div className="mt-1 text-xs text-green-600 dark:text-green-400">
+                                      Correct: {q.choices.find((c) => c.id === slot.correctChoiceId)?.text}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })}
+                            {!answered && allMapped && (
+                              <button
+                                className="mt-2 px-4 py-2 rounded-md font-semibold text-sm bg-primary text-white hover:bg-primary/80 transition-colors"
+                                onClick={async () => {
+                                  await submitMatchingAnswer(q, curMappings)
+                                  if (immediateMode) setRevealedQuestions((prev) => new Set(prev).add(q.id))
+                                }}
+                              >
+                                Confirm Matching
+                              </button>
+                            )}
+                            {showFeedback && answered && q.choices.map((c) => c.explanation && (
+                              <div key={c.id} className="text-xs text-muted-foreground p-2 rounded bg-muted/30">
+                                <strong>{c.text}:</strong> {c.explanation}
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      })()}
+
+                      {/* ── Ordering question ── */}
+                      {qType === 'ordering' && (() => {
+                        const curOrder = orderingAnswers[q.id] ?? q.choices.map((c) => c.id)
+                        // ensure ordering state is initialized
+                        if (!orderingAnswers[q.id]) {
+                          // defer state set to avoid render-during-render
+                          setTimeout(() => setOrderingAnswers((p) => p[q.id] ? p : { ...p, [q.id]: q.choices.map((c) => c.id) }), 0)
+                        }
+                        const choiceMap = new Map(q.choices.map((c) => [c.id, c]))
+                        const correctOrder = [...q.choices]
+                          .filter((c) => typeof c.sequence === 'number')
+                          .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0))
+                          .map((c) => c.id)
+                        return (
+                          <div className="space-y-2">
+                            <DndContext
+                              sensors={dndSensors}
+                              collisionDetection={closestCenter}
+                              onDragEnd={(event: DragEndEvent) => {
+                                const { active, over } = event
+                                if (!over || active.id === over.id || questionLocked) return
+                                setOrderingAnswers((p) => {
+                                  const arr = [...(p[q.id] ?? curOrder)]
+                                  const oldIdx = arr.indexOf(String(active.id))
+                                  const newIdx = arr.indexOf(String(over.id))
+                                  if (oldIdx < 0 || newIdx < 0) return p
+                                  return { ...p, [q.id]: arrayMove(arr, oldIdx, newIdx) }
+                                })
+                              }}
+                            >
+                              <SortableContext items={curOrder} strategy={verticalListSortingStrategy}>
+                                <div className="space-y-2">
+                                  {curOrder.map((cid, idx) => {
+                                    const c = choiceMap.get(cid)
+                                    if (!c) return null
+                                    const isCorrectPos = showFeedback && answered && correctOrder[idx] === cid
+                                    const isIncorrectPos = showFeedback && answered && correctOrder[idx] !== cid
+                                    const correctIdx = correctOrder.indexOf(cid)
+                                    return (
+                                      <SortableOrderItem
+                                        key={cid}
+                                        id={cid}
+                                        disabled={questionLocked}
+                                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border ${isCorrectPos ? 'border-green-400/40 bg-green-50 dark:bg-green-900/25' : isIncorrectPos ? 'border-red-400/40 bg-red-50 dark:bg-red-900/25' : 'border-border'} ${!questionLocked ? 'cursor-grab active:cursor-grabbing select-none' : ''} transition-colors`}
+                                      >
+                                        <span className={`inline-flex flex-col items-center justify-center w-10 min-w-[2.5rem] rounded-md text-xs font-bold flex-shrink-0 py-0.5 ${isCorrectPos ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : isIncorrectPos ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : 'bg-muted text-muted-foreground'}`}>
+                                          <span className="text-[10px] leading-none opacity-70">Step</span>
+                                          <span className="text-sm leading-tight">{idx + 1}</span>
+                                        </span>
+                                        <span className="flex-1 text-sm">{c.text}</span>
+                                        {!questionLocked && (
+                                          <div className="flex flex-col gap-0.5 shrink-0">
+                                            <button className="text-xs px-1 rounded hover:bg-muted disabled:opacity-30" disabled={idx === 0} onClick={(e) => { e.stopPropagation(); setOrderingAnswers((p) => { const arr = [...(p[q.id] ?? curOrder)]; [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]]; return { ...p, [q.id]: arr } }) }}>▲</button>
+                                            <button className="text-xs px-1 rounded hover:bg-muted disabled:opacity-30" disabled={idx === curOrder.length - 1} onClick={(e) => { e.stopPropagation(); setOrderingAnswers((p) => { const arr = [...(p[q.id] ?? curOrder)]; [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]]; return { ...p, [q.id]: arr } }) }}>▼</button>
+                                          </div>
+                                        )}
+                                        {showFeedback && answered && isCorrectPos && <span className="text-xs text-green-600 dark:text-green-400 font-medium shrink-0">✓ Correct</span>}
+                                        {showFeedback && answered && isIncorrectPos && <span className="text-xs text-red-600 dark:text-red-400 font-medium shrink-0">→ #{correctIdx + 1}</span>}
+                                      </SortableOrderItem>
+                                    )
+                                  })}
+                                </div>
+                              </SortableContext>
+                            </DndContext>
+                            {showFeedback && answered && (
+                              <div className="mt-3 p-3 rounded-lg border border-green-400/40 bg-green-50 dark:bg-green-900/20">
+                                <div className="text-xs font-semibold text-green-700 dark:text-green-400 mb-2 uppercase tracking-wide">✓ Correct order:</div>
+                                <div className="space-y-1">
+                                  {correctOrder.map((cid, idx) => {
+                                    const c = choiceMap.get(cid)
+                                    return (
+                                      <div key={cid} className="flex items-center gap-2 text-sm">
+                                        <span className="inline-flex flex-col items-center justify-center w-10 min-w-[2.5rem] rounded-md bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 py-0.5 flex-shrink-0">
+                                          <span className="text-[10px] leading-none opacity-70">Step</span>
+                                          <span className="text-xs font-bold leading-tight">{idx + 1}</span>
+                                        </span>
+                                        <span>{c?.text ?? cid}</span>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                            {!answered && (
+                              <button
+                                className="mt-2 px-4 py-2 rounded-md font-semibold text-sm bg-primary text-white hover:bg-primary/80 transition-colors"
+                                onClick={async () => {
+                                  await submitOrderingAnswer(q, curOrder)
+                                  if (immediateMode) setRevealedQuestions((prev) => new Set(prev).add(q.id))
+                                }}
+                              >
+                                Confirm Order
+                              </button>
+                            )}
+                            {showFeedback && answered && q.choices.map((c) => c.explanation && (
+                              <div key={c.id} className="text-xs text-muted-foreground p-2 rounded bg-muted/30">
+                                <strong>Step {c.sequence}:</strong> {c.explanation}
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      })()}
+
+                      {/* ── Single/Multiple-choice ── */}
+                      {(qType === 'single-choice' || qType === 'multiple-choice') && (
                       <ol className="list-none pl-0 space-y-2">
                         {q.choices.map((c, i) => {
                           const isSelectedSingle = !isMultiSelect && chosen === c.id
@@ -3305,11 +3648,9 @@ ${questionsHTML}
                                 onClick={() => {
                                   if (isFinished || questionLocked) return
                                   if (isMultiSelect) {
-                                    // If already answered, move old answer into pending so user can adjust
                                     if (answered && !multiSelectPending[q.id]) {
                                       const prev = Array.isArray(chosen) ? (chosen as string[]) : []
                                       setMultiSelectPending((p) => ({ ...p, [q.id]: prev }))
-                                      // clear the committed answer so the UI shows pending state
                                       setSelectedAnswers((sa) => { const next = { ...sa }; delete next[q.id]; return next })
                                       return
                                     }
@@ -3320,36 +3661,39 @@ ${questionsHTML}
                                     })
                                     return
                                   }
-                                  // Single-select: in immediate mode, stage instead of submitting
                                   if (immediateMode && !answered) {
                                     setStagedAnswer((prev) => ({ ...prev, [q.id]: c.id }))
                                     return
                                   }
                                   submitAnswer(q, c.id)
                                 }}
-                                className={`w-full text-left px-3 py-2.5 rounded-lg border ${showFeedback && answered ? (isCorrectChoice ? 'border-green-400/40 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-400/40 dark:border-red-500/30' : 'border-border/60 dark:border-border/60') : isStagedChoice ? 'border-primary dark:border-primary' : isSelected ? 'border-primary dark:border-primary' : 'border-border/60 dark:border-border/60'} ${bg} ${(isStagedChoice || isSelected) && !showFeedback ? 'hover:bg-primary/90' : 'hover:bg-muted'} flex items-start gap-3 transition-colors`}
+                                className={`w-full text-left px-3 py-2.5 rounded-lg border ${showFeedback && answered ? (isCorrectChoice ? 'border-green-500/50 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-500/50 dark:border-red-500/30' : 'border-border/60 dark:border-border/60') : isStagedChoice ? 'border-primary dark:border-primary' : isSelected ? 'border-primary dark:border-primary' : 'border-border/60 dark:border-border/60'} ${bg} ${(isStagedChoice || isSelected) && !showFeedback ? 'hover:bg-primary/90' : 'hover:bg-muted'} flex items-start gap-2.5 transition-colors`}
                               >
-                                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold flex-shrink-0 mt-0.5 ${showFeedback && answered ? (isCorrectChoice ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : isSelected && !isCorrectChoice ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : 'bg-muted text-muted-foreground') : isStagedChoice ? 'bg-primary text-primary-foreground' : isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}> 
-                                  {String.fromCharCode(65 + i)}
-                                </span>
+                                {showFeedback && answered ? (
+                                  <span className="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">
+                                    {isCorrectChoice
+                                      ? <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                      : (isSelected && !isCorrectChoice)
+                                        ? <X className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                        : <span className="text-muted-foreground text-xs font-mono">{String.fromCharCode(65 + i)}</span>
+                                    }
+                                  </span>
+                                ) : (
+                                  <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold flex-shrink-0 mt-0.5 ${isStagedChoice ? 'bg-primary text-primary-foreground' : isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                                    {String.fromCharCode(65 + i)}
+                                  </span>
+                                )}
                                 <span className="flex-1 min-w-0">
-                                  <span className="flex items-center gap-2">
-                                    {isMultiSelect && !answered && (
-                                      <span className={`inline-flex items-center justify-center w-5 h-5 rounded border-2 flex-shrink-0 ${isSelected ? 'border-primary bg-primary text-white' : 'border-muted-foreground'}`}>
-                                        {isSelected && <Check className="w-3 h-3" />}
-                                      </span>
-                                    )}
+                                  <span className="flex items-center gap-2 flex-wrap">
                                     <span className={`${isSelected ? 'font-semibold' : ''}`}>{renderChoiceContent(c, q, true)}</span>
+                                    {showFeedback && answered && isSelected && !isCorrectChoice && <span className="ml-1 text-[10px] text-red-600 dark:text-red-400 font-medium">your answer</span>}
+                                    {showFeedback && answered && !isSelected && isCorrectChoice && <span className="ml-1 text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
                                   </span>
                                 </span>
-                                <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
-                                                  {showFeedback && answered && isCorrectChoice && <span className="text-xs text-green-400">Correct</span>}
-                                                  {showFeedback && answered && isSelected && !isCorrectChoice && <span className="text-xs text-red-300">Incorrect</span>}
-                                </div>
                               </button>
 
                               {showFeedback && answered && c.explanation && (
-                                <div className="mt-1 text-sm text-muted-foreground p-2 rounded">
+                                <div className="mt-1 text-base text-muted-foreground p-2 rounded">
                                   {c.explanation}
                                 </div>
                               )}
@@ -3357,9 +3701,10 @@ ${questionsHTML}
                           )
                         })}
                       </ol>
+                      )}
 
                       {/* Single-select Submit Answer button (immediate reveal mode) */}
-                      {immediateMode && !isMultiSelect && hasStaged && !answered && !isFinished && (
+                      {immediateMode && !isMultiSelect && qType !== 'matching' && qType !== 'ordering' && hasStaged && !answered && !isFinished && (
                         <div className="mt-3">
                           <button
                             className="px-4 py-2 rounded-md font-semibold text-sm bg-primary text-white hover:bg-primary/80 transition-colors"
@@ -3369,13 +3714,13 @@ ${questionsHTML}
                               setStagedAnswer((prev) => { const next = { ...prev }; delete next[q.id]; return next })
                             }}
                           >
-                            ✅ Submit Answer
+                            Submit Answer
                           </button>
                         </div>
                       )}
 
                       {/* Multi-select confirm button */}
-                      {isMultiSelect && !answered && pending.length > 0 && (
+                      {isMultiSelect && qType !== 'matching' && qType !== 'ordering' && !answered && pending.length > 0 && (
                         <div className="mt-3 flex items-center gap-3">
                           <button
                             className={`px-4 py-2 rounded-md font-semibold text-sm ${pending.length === (q.selectCount ?? 2) ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground cursor-not-allowed'}`}
@@ -3396,32 +3741,8 @@ ${questionsHTML}
                         </div>
                       )}
 
-                      {/* Navigation buttons */}
-                      {!isFinished && (
-                        <div className="mt-3 flex items-center gap-2 border-t border-border/40 dark:border-border/40 pt-3">
-                          <button
-                            onClick={() => setCurrentQuestionIndex((i) => Math.max(0, i - 1))}
-                            disabled={currentQuestionIndex <= 0}
-                            className="px-3 py-1.5 rounded bg-accent text-sm disabled:opacity-40"
-                          >← Prev</button>
-                          {immediateMode && showFeedback && answered ? (
-                            <button
-                              onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
-                              disabled={currentQuestionIndex >= displayQuestions.length - 1}
-                              className="px-4 py-1.5 rounded-md bg-primary text-white text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors"
-                            >Next Question →</button>
-                          ) : (
-                            <button
-                              onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
-                              disabled={currentQuestionIndex >= displayQuestions.length - 1}
-                              className="px-3 py-1.5 rounded bg-accent text-sm disabled:opacity-40"
-                            >Next →</button>
-                          )}
-                        </div>
-                      )}
-
                       {showFeedback && answered && (
-                        <div className="mt-3 text-sm space-y-2">
+                        <div className="mt-3 text-base space-y-2">
                           {q.explanation && (
                             <div className="p-2 rounded bg-muted/50 dark:bg-card text-foreground">
                               <div className="flex items-start justify-between gap-4">
@@ -3592,46 +3913,6 @@ ${questionsHTML}
           ))}
         </div>
       )}
-
-      {/* Debug panel */}
-      <div className="mt-6 p-4 rounded bg-black/5 dark:bg-card/5 text-sm">
-        <details>
-          <summary className="cursor-pointer font-medium">Debug</summary>
-          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <div><strong>attemptId:</strong> {attemptId ?? '—'}</div>
-              <div><strong>lastError:</strong> <pre className="inline">{lastError ?? '—'}</pre></div>
-              <div className="mt-2">
-                <button
-                  className="px-2 py-1 rounded bg-accent"
-                  onClick={async () => {
-                    if (!attemptId) return setLastError('no attemptId')
-                    try {
-                      const res = await authFetch(`/attempts/${attemptId}`)
-                      const d = await res.json()
-                      setAttemptData(d)
-                    } catch (err) {
-                      console.error(err)
-                      setLastError(String(err))
-                    }
-                  }}
-                >
-                  Fetch attempt
-                </button>
-              </div>
-            </div>
-            <div>
-              <div><strong>selectedAnswers</strong></div>
-              <pre className="overflow-auto max-h-48">{JSON.stringify(selectedAnswers, null, 2)}</pre>
-              {/* savedMap removed — only server attempt data is shown */}
-            </div>
-          </div>
-          <div className="mt-3">
-            <strong>Attempt data (server):</strong>
-            <pre className="overflow-auto max-h-80">{attemptData ? JSON.stringify(attemptData, null, 2) : '—'}</pre>
-          </div>
-        </details>
-      </div>
 
       {/* Confetti overlay */}
       {showConfetti && <Confetti duration={3500} onDone={() => setShowConfetti(false)} />}

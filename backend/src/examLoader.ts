@@ -33,19 +33,32 @@ const examsDir = path.resolve(__dirname, '../data/exams')
 const EXAM_SOURCE: 'local' | 's3' = (process.env.EXAM_SOURCE ?? 'local') as any
 const USE_S3 = EXAM_SOURCE === 's3'
 
+export type QuestionType = 'single-choice' | 'multiple-choice' | 'matching' | 'ordering'
+
 export interface Choice {
   id: string
   text: string
   isCorrect: boolean
   explanation?: string
+  /** Position in the correct sequence (ordering) or marks a correct choice (single/multiple-choice). */
+  sequence?: number
+}
+
+export interface Slot {
+  id: string
+  label: string
+  correctChoiceId: string
 }
 
 export interface Question {
   id: string
+  type: QuestionType
   question: string
   choices: Choice[]
   /** number of correct choices the user must select (derived from isCorrect count) */
   selectCount: number
+  /** matching questions only — slots the user must map to choices */
+  slots?: Slot[]
   format?: string
   domain?: string
   skills?: string[]
@@ -53,6 +66,8 @@ export interface Question {
   docs?: string
   tip?: string
   explanation?: string
+  difficulty?: number
+  lastReviewed?: string
 }
 
 export interface Exam {
@@ -77,18 +92,49 @@ export interface Exam {
  * Handles `meta.domain` → `domain` flattening and derives `selectCount`.
  */
 export function normaliseQuestion(raw: any): Question {
-  const choices: Choice[] = (raw.choices ?? []).map((c: any) =>
-    typeof c === 'string'
-      ? { id: String(Math.random().toString(36).slice(2)), text: c, isCorrect: false }
-      : { id: c.id, text: c.text, isCorrect: !!c.isCorrect, ...(c.explanation ? { explanation: c.explanation } : {}) }
-  )
-  const selectCount = choices.filter((c) => c.isCorrect).length || 1
+  const type: QuestionType = raw.type ?? 'single-choice'
+
+  const choices: Choice[] = (raw.choices ?? []).map((c: any) => {
+    if (typeof c === 'string') {
+      return { id: String(Math.random().toString(36).slice(2)), text: c, isCorrect: false }
+    }
+    // New schema: `sequence` marks correct choices (single/multiple-choice)
+    // or defines position (ordering). Legacy: `isCorrect` field.
+    const hasSequence = typeof c.sequence === 'number'
+    const isCorrect = 'isCorrect' in c ? !!c.isCorrect : hasSequence
+    return {
+      id: c.id,
+      text: c.text,
+      isCorrect,
+      ...(c.explanation ? { explanation: c.explanation } : {}),
+      ...(hasSequence ? { sequence: c.sequence } : {}),
+    }
+  })
+
+  // For matching questions, selectCount is the number of slots
+  // For ordering, it's the number of choices (all must be ordered)
+  // For single/multiple-choice, derive from correct count
+  let selectCount: number
+  if (type === 'matching') {
+    selectCount = Array.isArray(raw.slots) ? raw.slots.length : 1
+  } else if (type === 'ordering') {
+    selectCount = choices.length
+  } else {
+    selectCount = choices.filter((c) => c.isCorrect).length || 1
+  }
+
+  // Normalise slots for matching questions
+  const slots: Slot[] | undefined = type === 'matching' && Array.isArray(raw.slots)
+    ? raw.slots.map((s: any) => ({ id: s.id, label: s.label, correctChoiceId: s.correctChoiceId }))
+    : undefined
 
   return {
     id: String(raw.id),
+    type,
     question: raw.question,
     choices,
     selectCount,
+    ...(slots ? { slots } : {}),
     format: raw.format,
     domain: raw.domain ?? raw.meta?.domain ?? undefined,
     skills: Array.isArray(raw.skills) ? raw.skills : undefined,
@@ -96,6 +142,8 @@ export function normaliseQuestion(raw: any): Question {
     docs: raw.docs,
     tip: raw.tip,
     explanation: raw.explanation,
+    difficulty: raw.difficulty,
+    lastReviewed: raw.lastReviewed,
   }
 }
 
@@ -242,17 +290,18 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
- * Shuffle the choices within each question.
- * Returns new question objects (originals are not mutated).
- * `isCorrect` is preserved so the client / visitor can score locally.
- */
-/**
  * Shuffle both the order of questions AND the choices within each question.
  * Returns new arrays (originals are not mutated).
+ *
+ * - single/multiple-choice: shuffle choices.
+ * - matching: shuffle both slots and choices independently.
+ * - ordering: shuffle choices (user must drag them into the correct sequence).
  */
 export function shuffleQuestions(questions: Question[]): Question[] {
-  return shuffle(questions).map((q) => ({
-    ...q,
-    choices: shuffle(q.choices),
-  }))
+  return shuffle(questions).map((q) => {
+    if (q.type === 'matching') {
+      return { ...q, slots: q.slots ? shuffle(q.slots) : q.slots, choices: shuffle(q.choices) }
+    }
+    return { ...q, choices: shuffle(q.choices) }
+  })
 }

@@ -12,16 +12,16 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   if (language === 'bash' || language === 'sh' || language === 'shell') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded bg-muted text-sm overflow-auto font-mono">
+      <pre className="p-3 rounded text-sm overflow-auto font-mono" style={{ backgroundColor: '#282a36', color: '#f8f8f2' }}>
         {lines.map((ln, i) => (
           <div key={i} className="leading-6">
             {ln.split(/(\s+)/).map((tok, j) => {
               if (/^\s+$/.test(tok)) return <span key={j}>{tok}</span>
-              if (/^--[A-Za-z0-9\-_=]+/.test(tok)) return <span key={j} style={{ color: 'var(--color-correct-2)' }}>{tok}</span>
-              if (/^-[A-Za-z0-9]+/.test(tok)) return <span key={j} style={{ color: '#f59e0b' }}>{tok}</span>
-              if (/^aws$/.test(tok)) return <span key={j} style={{ color: '#7dd3fc' }}>{tok}</span>
-              if (/^[a-z0-9_\-]+\/[a-z0-9_\-]+/.test(tok)) return <span key={j} style={{ color: '#7dd3fc' }}>{tok}</span>
-              return <span key={j} style={{ color: '#e2e8f0' }}>{tok}</span>
+              if (/^--[A-Za-z0-9\-_=]+/.test(tok)) return <span key={j} style={{ color: '#8be9fd' }}>{tok}</span>
+              if (/^-[A-Za-z0-9]+/.test(tok)) return <span key={j} style={{ color: '#ffb86c' }}>{tok}</span>
+              if (/^aws$/.test(tok)) return <span key={j} style={{ color: '#50fa7b' }}>{tok}</span>
+              if (/^[a-z0-9_\-]+\/[a-z0-9_\-]+/.test(tok)) return <span key={j} style={{ color: '#8be9fd' }}>{tok}</span>
+              return <span key={j} style={{ color: 'inherit' }}>{tok}</span>
             })}
           </div>
         ))}
@@ -33,7 +33,7 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   if (language === 'yaml' || language === 'yml') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded bg-muted text-sm overflow-auto font-mono">
+      <pre className="p-3 rounded text-sm overflow-auto font-mono" style={{ backgroundColor: '#282a36', color: '#f8f8f2' }}>
         {lines.map((ln, i) => {
           // Comment lines
           if (/^\s*#/.test(ln)) {
@@ -52,9 +52,9 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
             else if (trimmed.startsWith('!')) valStyle = { color: '#ff79c6' }
             return (
               <div key={i} className="leading-6">
-                <span style={{ color: '#e2e8f0' }}>{indent}</span>
+                <span style={{ color: 'inherit' }}>{indent}</span>
                 <span style={{ color: '#8be9fd' }}>{key}</span>
-                <span style={{ color: '#e2e8f0' }}>{colon}</span>
+                <span style={{ color: 'inherit' }}>{colon}</span>
                 <span style={valStyle}>{rest}</span>
               </div>
             )
@@ -65,14 +65,14 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
             const [, indent, dash, space, val] = listMatch
             return (
               <div key={i} className="leading-6">
-                <span style={{ color: '#e2e8f0' }}>{indent}</span>
+                <span style={{ color: 'inherit' }}>{indent}</span>
                 <span style={{ color: '#ff79c6' }}>{dash}</span>
-                <span style={{ color: '#e2e8f0' }}>{space}</span>
+                <span style={{ color: 'inherit' }}>{space}</span>
                 <span style={{ color: '#f1fa8c' }}>{val}</span>
               </div>
             )
           }
-          return <div key={i} className="leading-6" style={{ color: '#e2e8f0' }}>{ln}</div>
+          return <div key={i} className="leading-6" style={{ color: 'inherit' }}>{ln}</div>
         })}
       </pre>
     )
@@ -81,7 +81,7 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   return (
     <Highlight {...defaultProps} code={code} language={language as Language} theme={theme}>
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`${className} p-3 rounded bg-muted text-sm overflow-auto font-mono`} style={{ ...style }}>
+        <pre className={`${className} p-3 rounded text-sm overflow-auto font-mono`} style={{ ...style }}>
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line, key: i })}>
               {line.map((token, k) => (

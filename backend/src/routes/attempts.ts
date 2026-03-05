@@ -177,22 +177,47 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     const timeMs = body.timeMs ?? null
     const showTip = !!body.showTip
+    const questionType: string = question.type ?? 'single-choice'
 
-    // --- New format: choices are objects with { id, text, isCorrect } ---
-    // Accept selectedChoiceId (string) or selectedChoiceIds (string[]) for multi-select
+    // --- Accept answer fields per question type ---
     const selectedChoiceId: string | null = body.selectedChoiceId ?? null
     const selectedChoiceIds: string[] | null = Array.isArray(body.selectedChoiceIds) ? body.selectedChoiceIds : null
+    // matching: { slotId: choiceId, ... }
+    const selectedMappings: Record<string, string> | null =
+      body.selectedMappings && typeof body.selectedMappings === 'object' ? body.selectedMappings : null
+    // ordering: [choiceId, choiceId, ...]
+    const selectedOrder: string[] | null = Array.isArray(body.selectedOrder) ? body.selectedOrder : null
 
-    // Also support legacy selectedIndex / selectedIndices for backwards compat
+    // Legacy fields
     const selectedIndex = body.selectedIndex
     const selectedIndices: number[] | null = Array.isArray(body.selectedIndices) ? body.selectedIndices : null
 
     let isCorrect: boolean
     const choices = question.choices ?? []
-    const hasObjectChoices = choices.length > 0 && typeof choices[0] === 'object' && 'isCorrect' in choices[0]
 
-    if (hasObjectChoices) {
-      // New format: check isCorrect on the selected choice(s)
+    if (questionType === 'matching') {
+      // Correct when every slot is mapped to its correctChoiceId
+      const slots: any[] = question.slots ?? []
+      if (!selectedMappings || slots.length === 0) {
+        isCorrect = false
+      } else {
+        isCorrect = slots.every((s: any) => selectedMappings[s.id] === s.correctChoiceId)
+      }
+    } else if (questionType === 'ordering') {
+      // Correct when the submitted order matches the sequence-defined order
+      if (!selectedOrder || selectedOrder.length !== choices.length) {
+        isCorrect = false
+      } else {
+        // Build the correct order from sequence field
+        const correctOrder = [...choices]
+          .filter((c: any) => typeof c.sequence === 'number')
+          .sort((a: any, b: any) => a.sequence - b.sequence)
+          .map((c: any) => c.id)
+        isCorrect = correctOrder.length === selectedOrder.length &&
+          correctOrder.every((id: string, idx: number) => id === selectedOrder[idx])
+      }
+    } else {
+      // single-choice / multiple-choice
       const correctIds = new Set<string>(choices.filter((c: any) => c.isCorrect).map((c: any) => c.id))
       if (selectedChoiceIds && selectedChoiceIds.length > 0) {
         const actual = new Set(selectedChoiceIds)
@@ -200,7 +225,6 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       } else if (selectedChoiceId) {
         isCorrect = correctIds.size === 1 && correctIds.has(selectedChoiceId)
       } else if (typeof selectedIndex === 'number') {
-        // legacy fallback: translate index to choice id
         const choice = choices[selectedIndex]
         isCorrect = !!choice?.isCorrect
       } else if (selectedIndices && selectedIndices.length > 0) {
@@ -209,21 +233,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       } else {
         isCorrect = false
       }
-    } else {
-      // Legacy format: answerIndex / answerIndices
-      if (Array.isArray(question.answerIndices) && question.answerIndices.length > 0) {
-        const expected = new Set(question.answerIndices as number[])
-        const actual = new Set(selectedIndices ?? (typeof selectedIndex === 'number' ? [selectedIndex] : []))
-        isCorrect = expected.size === actual.size && [...expected].every((v) => actual.has(v))
-      } else {
-        isCorrect = typeof question.answerIndex === 'number' && question.answerIndex === selectedIndex
-      }
     }
 
     const answerRecord = {
       questionId: question.id,
       selectedChoiceId: selectedChoiceId ?? null,
       selectedChoiceIds: selectedChoiceIds ?? null,
+      selectedMappings: selectedMappings ?? null,
+      selectedOrder: selectedOrder ?? null,
       // keep legacy fields for backwards compat
       selectedIndex: selectedIndex ?? null,
       selectedIndices: selectedIndices ?? null,

@@ -30,7 +30,7 @@ import {
 /*  Config                                                             */
 /* ------------------------------------------------------------------ */
 const REGION = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'eu-west-1'
-const BUCKET = process.env.EXAM_BUCKET || 'certshack-examapp-questions'
+const BUCKET = process.env.EXAM_BUCKET || 'examapp-exam-questions-809472479011'
 const INDEX_TABLE = process.env.EXAM_INDEX_TABLE || 'examapp-exams-index'
 
 const s3 = new S3Client({ region: REGION })
