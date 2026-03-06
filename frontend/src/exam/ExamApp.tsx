@@ -5,6 +5,7 @@ import AccountPage from '../components/AccountPage'
 import Leaderboard from '../components/Leaderboard'
 import AdminPanel from '../components/AdminPanel'
 import PricingPage from '../components/PricingPage'
+import { DiagramsView } from '../components/DiagramsView'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
 import { PracticeExams } from './PracticeExams'
@@ -68,9 +69,13 @@ export default function ExamApp() {
                   {route === 'account' && 'Account Settings'}
                   {route === 'pricing' && 'Plans & Pricing'}
                   {route === 'admin' && 'Admin Console'}
+                  {route === 'diagrams' && 'Architecture Diagrams'}
                 </h1>
               </div>
             </header>
+
+            {/* Diagrams page */}
+            {route === 'diagrams' && <DiagramsView />}
 
             {/* Practice Exams page */}
             {route === 'practice' && <PracticeExams />}

@@ -48,4 +48,4 @@ export type Question = {
 
 export type ExamMode = 'casual' | 'timed' | 'weakest-link'
 export type RevealMode = 'immediately' | 'on-completion'
-export type AppRoute = 'home' | 'practice' | 'analytics' | 'account' | 'admin' | 'pricing'
+export type AppRoute = 'home' | 'practice' | 'analytics' | 'account' | 'admin' | 'pricing' | 'diagrams'
