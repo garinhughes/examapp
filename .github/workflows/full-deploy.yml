@@ -109,8 +109,17 @@ jobs:
         run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Build frontend
+        env:
+            VITE_AUTH_MODE: cognito
+            VITE_AUTH_FLOW: server
+            VITE_API_URL: ${{ secrets.VITE_API_URL }}
+            VITE_COGNITO_DOMAIN: ${{ secrets.VITE_COGNITO_DOMAIN }}
+            VITE_COGNITO_CLIENT_ID: ${{ secrets.VITE_COGNITO_CLIENT_ID }}
+            VITE_BACKEND_TOKEN_CALLBACK: ${{ secrets.VITE_BACKEND_TOKEN_CALLBACK }}
         run: |
           cd frontend
+          corepack enable
+          corepack prepare pnpm@10.30.1 --activate
           pnpm install --frozen-lockfile
           pnpm run build
 
