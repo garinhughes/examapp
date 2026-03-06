@@ -300,7 +300,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /* ---- login: redirect to Cognito Hosted UI ---- */
   const login = useCallback(async () => {
-    if (MODE === 'dev') return // already logged in
+    // In dev mode, attempt a simple dev-user login when not already signed-in.
+    if (MODE === 'dev') {
+      if (user) return
+      try {
+        const res = await fetch(apiUrl('/auth/config'))
+        if (!res.ok) return
+        const data = await res.json()
+        if (data.devUser) {
+          const u: AuthUser = {
+            sub: data.devUser.sub,
+            email: data.devUser.email,
+            name: data.devUser.name,
+          }
+          setUser(u)
+          setToken('dev-token')
+        }
+      } catch (err) {
+        console.error('[auth] dev login failed', err)
+      }
+      return
+    }
+
     let domain = import.meta.env.VITE_COGNITO_DOMAIN || ''
     const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID
 
@@ -336,7 +357,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       `&redirect_uri=${encodeURIComponent(backendCallback)}` +
       `&scope=openid+email+profile&identity_provider=Google`
     window.location.href = url
-  }, [])
+  }, [user, setUser, setToken])
 
   /* ---- logout ---- */
   const logout = useCallback(() => {
