@@ -1,18 +1,19 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom"; 
+import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Settings, 
+import {
+  LayoutDashboard,
+  BookOpen,
+  Settings,
   LogOut,
   LogIn,
-  Target, 
+  Target,
   Menu,
   X,
   CreditCard,
   User,
-  Activity
+  Activity,
+  Network,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -23,6 +24,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/home", key: 'home' },
   { icon: BookOpen, label: "Exams", href: "/practice", key: 'practice' },
   { icon: Activity, label: "Analytics", href: "/analytics", key: 'analytics' },
+  { icon: Network, label: "Diagrams", href: "/diagrams", key: 'diagrams' },
   { icon: User, label: "Account", href: "/account", key: 'account' },
   { icon: CreditCard, label: "Pricing", href: "/pricing", key: 'pricing' },
   { icon: Settings, label: "Admin", href: "/admin", key: 'admin' },
