@@ -94,6 +94,7 @@ frontend/src/
     Leaderboard.tsx     # Gamification leaderboard
     PricingPage.tsx     # Pricing/paywall UI
     Sidebar.tsx         # Navigation
+    DiagramsView.tsx    # Mermaid architecture diagrams
   exam/
     types.ts            # Shared types (Exam, Question, Choice, Slot, etc.)
     ExamContext.tsx      # Central state: ~160 context props, all useState/useEffect/handlers
