@@ -56,4 +56,10 @@ gh secret set ECS_CONTAINER_NAME --body "$ECS_CONTAINER_NAME" --repo "$REPO"
 gh secret set FRONTEND_BUCKET --body "$FRONTEND_BUCKET" --repo "$REPO"
 gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$CLOUDFRONT_DISTRIBUTION_ID" --repo "$REPO"
 
+# frontend vars
+gh secret set VITE_API_URL --body "https://api.certshack.com" --repo garinhughes/examapp
+gh secret set VITE_COGNITO_DOMAIN --body "eu-west-1c6wqup1rx.auth.eu-west-1.amazoncognito.com" --repo garinhughes/examapp
+gh secret set VITE_COGNITO_CLIENT_ID --body "2b10tfhn1k9pq9rr5f6k14usc3" --repo garinhughes/examapp
+gh secret set VITE_BACKEND_TOKEN_CALLBACK --body "https://api.certshack.com/auth/token" --repo garinhughes/examapp
+
 echo "Secrets set. Verify with: gh secret list --repo $REPO"
