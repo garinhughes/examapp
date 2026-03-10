@@ -3,7 +3,7 @@ import { DynamoDBDocumentClient, UpdateCommand, PutCommand, GetCommand, ScanComm
 
 const REGION = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'eu-west-1'
 const client = new DynamoDBClient({ region: REGION })
-const ddb = DynamoDBDocumentClient.from(client)
+const ddb = DynamoDBDocumentClient.from(client, { marshallOptions: { removeUndefinedValues: true } })
 
 const USERS_TABLE = process.env.USERS_TABLE || 'examapp-users'
 const ENTITLEMENTS_TABLE = process.env.ENTITLEMENTS_TABLE || 'examapp-entitlements'

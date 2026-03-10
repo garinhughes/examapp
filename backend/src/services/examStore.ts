@@ -35,7 +35,7 @@ const INDEX_TABLE = process.env.EXAM_INDEX_TABLE || 'examapp-exams-index'
 
 const s3 = new S3Client({ region: REGION })
 const ddbClient = new DynamoDBClient({ region: REGION })
-const ddb = DynamoDBDocumentClient.from(ddbClient)
+const ddb = DynamoDBDocumentClient.from(ddbClient, { marshallOptions: { removeUndefinedValues: true } })
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */

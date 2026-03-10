@@ -54,7 +54,7 @@ export interface AttemptsStore {
 
 function createDynamoStore(): AttemptsStore {
   const client = new DynamoDBClient({ region: REGION })
-  const ddb = DynamoDBDocumentClient.from(client)
+  const ddb = DynamoDBDocumentClient.from(client, { marshallOptions: { removeUndefinedValues: true } })
 
   return {
     async listByUser(userId: string) {
