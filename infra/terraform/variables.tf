@@ -31,5 +31,5 @@ variable "github_repo" {
 variable "enable_waf" {
   description = "When true, enable the WAF restriction rule that only allows configured IPs. Set false to allow all traffic."
   type        = bool
-  default     = true
+  default     = false
 }
