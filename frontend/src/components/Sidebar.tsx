@@ -40,9 +40,10 @@ interface SidebarProps {
   xp?: number;
   level?: number;
   streak?: number;
+  showAdmin?: boolean;
 }
 
-export function Sidebar({ className, currentRoute, onNavigate, logout, login, user, xp, level, streak }: SidebarProps) {
+export function Sidebar({ className, currentRoute, onNavigate, logout, login, user, xp, level, streak, showAdmin }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation(); 
 
@@ -70,7 +71,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
 
       <aside 
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 md:translate-x-0 md:static flex flex-col h-full text-sidebar-foreground",
+          "fixed top-7 bottom-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 md:translate-x-0 md:static flex flex-col h-full text-sidebar-foreground",
           isOpen ? "translate-x-0" : "-translate-x-full",
           className
         )}
@@ -83,7 +84,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
         </div>
 
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-          {navItems.map((item) => (
+          {navItems.filter(item => item.key !== 'admin' || showAdmin).map((item) => (
             <button
               key={item.key}
               onClick={() => handleNav(item.key)}

@@ -27,11 +27,18 @@ export default function ExamApp() {
     user, login, logout, gamState, gamLevel,
     authFetch, showToast, resumeExam, setupExamFromMeta,
     downloadAttemptCSV, downloadAttemptPDF,
-    setShowCancelConfirm,
+    setShowCancelConfirm, isAdmin,
   } = useExam()
 
+  const userIsAdmin = isAdmin()
+
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
+    <div className="flex flex-col h-screen w-full overflow-hidden bg-background text-foreground">
+      {/* Work-in-progress banner */}
+      <div className="shrink-0 bg-amber-500 text-amber-950 text-xs font-medium text-center py-1.5 px-4">
+        This site is a work in progress and is not ready for use. Features may be incomplete or change without notice.
+      </div>
+      <div className="flex flex-1 overflow-hidden">
       <Sidebar
         currentRoute={route}
         onNavigate={(key) => {
@@ -44,6 +51,7 @@ export default function ExamApp() {
         xp={gamState.xp}
         level={gamLevel.level}
         streak={gamState.streak}
+        showAdmin={userIsAdmin}
       />
 
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
@@ -94,9 +102,15 @@ export default function ExamApp() {
               </div>
             )}
 
-            {route === 'admin' && (
+            {route === 'admin' && userIsAdmin && (
               <div className="mb-6">
                 <AdminPanel />
+              </div>
+            )}
+
+            {route === 'admin' && !userIsAdmin && (
+              <div className="p-8 text-center text-muted-foreground">
+                You do not have permission to access this page.
               </div>
             )}
 
@@ -449,6 +463,7 @@ export default function ExamApp() {
         {/* Modals, toasts, confetti, etc. */}
         <Modals />
       </main>
+      </div>
     </div>
   )
 }
