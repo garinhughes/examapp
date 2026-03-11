@@ -446,16 +446,7 @@ export default function ExamApp() {
             {/* Question card (during exam) */}
             {!isFinished && examStarted && route === 'home' && <QuestionCard />}
 
-            {/* Return to Practice Exams button below pre-start form */}
-            {!examStarted && selected && !isFinished && route === 'home' && (
-              <div className="container px-4 mt-3 md:col-span-4">
-                <div className="mb-6 flex justify-center">
-                  <button className="px-4 py-2 rounded bg-accent text-sm" onClick={() => { setRoute('practice'); setSelected(null); setShowAttempts(false); setAttemptsList(null) }}>
-                    Return to Practice Exams
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Return to Practice Exams button removed here (kept inside ExamSetup) */}
 
           </div>
         </div>
