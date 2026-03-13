@@ -72,6 +72,8 @@ module "dynamodb" {
     entitlements = { table_name = "${var.project}-entitlements", hash_key = "userId",   range_key = "productId" }
     audit        = { table_name = "${var.project}-audit",        hash_key = "adminId",  range_key = "createdAt" }
     sessions     = { table_name = "${var.project}-sessions",     hash_key = "PK",       range_key = "SK" }
+    skill_labs_index    = { table_name = "${var.project}-skill-labs-index",    hash_key = "labId" }
+    skill_lab_attempts  = { table_name = "${var.project}-skill-lab-attempts",  hash_key = "userId", range_key = "attemptId" }
   }
 }
 
@@ -132,6 +134,10 @@ module "ecs" {
   users_table              = module.dynamodb.table_names["users"]
   entitlements_table       = module.dynamodb.table_names["entitlements"]
   audit_table              = module.dynamodb.table_names["audit"]
+  skill_lab_source         = "s3"
+  skill_lab_s3_bucket      = module.s3.skill_labs_bucket_name
+  skill_lab_index_table    = module.dynamodb.table_names["skill_labs_index"]
+  skill_lab_attempts_table = module.dynamodb.table_names["skill_lab_attempts"]
 
   cognito_domain           = "eu-west-1c6wqup1rx.auth.eu-west-1.amazoncognito.com"
   cognito_app_client_id    = "2b10tfhn1k9pq9rr5f6k14usc3"

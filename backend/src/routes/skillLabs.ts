@@ -4,24 +4,85 @@ import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { skillLabAttemptsStore } from '../services/skillLabAttemptsStore.js'
+import {
+  getLabFromS3,
+  getLabIndex,
+  listLabIndex,
+} from '../services/skillLabStore.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const LABS_FILE = path.join(__dirname, '..', '..', 'data', 'skill-labs.json')
 
-async function loadLabs(): Promise<any[]> {
+/**
+ * Skill lab source switch — mirrors EXAM_SOURCE pattern.
+ *   'local' = filesystem (default for dev)
+ *   's3'    = S3 + DynamoDB index (production)
+ */
+const SKILL_LAB_SOURCE: 'local' | 's3' =
+  (process.env.SKILL_LAB_SOURCE ?? 'local') as any
+const USE_S3 = SKILL_LAB_SOURCE === 's3'
+
+/* ------------------------------------------------------------------ */
+/*  Local-file helpers (dev only)                                      */
+/* ------------------------------------------------------------------ */
+
+async function loadLabsLocal(): Promise<any[]> {
   try {
     const raw = await fs.readFile(LABS_FILE, 'utf-8')
     return JSON.parse(raw)
   } catch (err) {
-    console.error('[skill-labs] Failed to load labs data', err)
+    console.error('[skill-labs] Failed to load labs data from disk', err)
     return []
+  }
+}
+
+async function findLabLocal(id: string): Promise<any | null> {
+  const labs = await loadLabsLocal()
+  return labs.find((l) => l.id === id) ?? null
+}
+
+/* ------------------------------------------------------------------ */
+/*  S3 helpers (production)                                            */
+/* ------------------------------------------------------------------ */
+
+async function loadLabsS3Summary(): Promise<any[]> {
+  try {
+    const entries = await listLabIndex()
+    return entries.map((e) => ({
+      id: e.labId,
+      title: e.title ?? e.labId,
+      type: e.type,
+      platform: e.platform ?? 'AWS',
+      category: e.category ?? 'General',
+      difficulty: e.difficulty ?? 'beginner',
+    }))
+  } catch (err) {
+    console.error('[skill-labs] Failed to scan DynamoDB index', err)
+    return []
+  }
+}
+
+async function findLabS3(id: string): Promise<any | null> {
+  try {
+    const idx = await getLabIndex(id)
+    if (!idx) return null
+    const { body } = await getLabFromS3(idx.labId, idx.s3VersionId)
+    return JSON.parse(body)
+  } catch (err) {
+    console.error(`[skill-labs] S3 load failed for ${id}:`, err)
+    return null
   }
 }
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // GET /skill-labs — list available labs (public metadata only)
   server.get('/', async (_request, reply) => {
-    const labs = await loadLabs()
+    if (USE_S3) {
+      const list = await loadLabsS3Summary()
+      return reply.send(list)
+    }
+
+    const labs = await loadLabsLocal()
     const list = labs.map((lab) => ({
       id: lab.id,
       title: lab.title,
@@ -49,8 +110,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // GET /skill-labs/:id — full lab definition
   server.get('/:id', async (request, reply) => {
     const { id } = request.params as { id: string }
-    const labs = await loadLabs()
-    const lab = labs.find((l) => l.id === id)
+    const lab = USE_S3 ? await findLabS3(id) : await findLabLocal(id)
     if (!lab) return reply.status(404).send({ message: 'Lab not found' })
     return reply.send(lab)
   })
@@ -58,8 +118,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // POST /skill-labs/:id/validate-policy — validate policy-fix lab submission
   server.post('/:id/validate-policy', async (request, reply) => {
     const { id: labId } = request.params as { id: string }
-    const labs = await loadLabs()
-    const lab = labs.find((l) => l.id === labId)
+    const lab = USE_S3 ? await findLabS3(labId) : await findLabLocal(labId)
     if (!lab) return reply.status(404).send({ message: 'Lab not found' })
     if (lab.type !== 'policy-fix') return reply.status(400).send({ message: 'Not a policy-fix lab' })
 

@@ -81,6 +81,7 @@ backend/src/
     weakestLink.ts      # Adaptive question selection
     profanityFilter.ts  # Username filter
     skillLabAttemptsStore.ts # Skill lab attempt persistence (local JSON / DynamoDB)
+    skillLabStore.ts    # Skill lab S3 + DynamoDB store (mirrors examStore.ts)
 
 frontend/src/
   App.tsx               # Thin shell: ExamProvider wrapping ExamApp
@@ -181,6 +182,10 @@ pnpm build            # production build to dist/
 cd backend
 pnpm publish:exams
 pnpm publish:exams:dry   # dry run - no writes
+
+# Publish skill-lab definitions to S3/DynamoDB
+pnpm publish:skill-labs
+pnpm publish:skill-labs:dry   # dry run - no writes
 ```
 
 ---
@@ -188,8 +193,8 @@ pnpm publish:exams:dry   # dry run - no writes
 ## Infrastructure
 
 - **ECS Fargate** — backend container; task def at `backend/infra/ecs-task-def.json`
-- **S3** — exam JSON storage + frontend static hosting
-- **DynamoDB** — attempts, users, entitlements
+- **S3** — exam JSON storage (`examapp-exams-*`), skill-lab definitions (`examapp-skill-labs-*`), frontend static hosting
+- **DynamoDB** — attempts, users, entitlements, exam index (`examapp-exams-index`), skill-lab index (`examapp-skill-labs-index`), skill-lab attempts (`examapp-skill-lab-attempts`)
 - **Cognito** — auth (JWT issued by Cognito user pool)
 - **CloudFront** — frontend CDN
 - **WAF** — IP allowlist managed via `backend/infra/waf-allowlist.sh`
@@ -219,4 +224,4 @@ Terraform state is remote (S3 backend defined in `infra/terraform/backend.tf`). 
 - **Question rendering** (new types like `matching`/`ordering`): `frontend/src/exam/QuestionCard.tsx` for in-exam rendering, `frontend/src/exam/ExamReview.tsx` for post-exam review
 - **Exam state/logic**: `frontend/src/exam/ExamContext.tsx` — central React Context with all state, effects, and handlers
 - **Exam UI components**: `frontend/src/exam/` — ExamApp (layout shell), ExamSetup, QuestionNav, QuestionCard, ExamReview, Modals, PracticeExams, AnalyticsView
-- **Skill Labs**: `frontend/src/skill-labs/` (pages + types) + `backend/src/routes/skillLabs.ts` + `backend/src/services/skillLabAttemptsStore.ts` + `backend/data/skill-labs.json` (lab definitions). Supports three lab types: `diagnose` (React Flow diagram), `cli` (simulated AWS CLI terminal), `policy-fix` (Monaco Editor IAM policy repair). The runner page (`SkillLabRunnerPage`) dispatches to the correct component by `lab.type`. Lab runner components live in `frontend/src/skill-labs/labs/` and share a common `LabHeader` component.
+- **Skill Labs**: `frontend/src/skill-labs/` (pages + types) + `backend/src/routes/skillLabs.ts` + `backend/src/services/skillLabStore.ts` + `backend/src/services/skillLabAttemptsStore.ts` + `backend/data/skill-labs.json` (lab definitions). Supports three lab types: `diagnose` (React Flow diagram), `cli` (simulated AWS CLI terminal), `policy-fix` (Monaco Editor IAM policy repair). The runner page (`SkillLabRunnerPage`) dispatches to the correct component by `lab.type` using `React.lazy` + dynamic imports for code-splitting. Lab runner components live in `frontend/src/skill-labs/labs/` and share a common `LabHeader` component. Publishing mirrors the exam pipeline: `pnpm publish:skill-labs` uploads each lab to S3 and writes a summary index to DynamoDB. `SKILL_LAB_SOURCE=local|s3` toggles data source (same pattern as `EXAM_SOURCE`).

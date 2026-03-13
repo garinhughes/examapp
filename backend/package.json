@@ -10,6 +10,8 @@
     "start": "node dist/index.js",
     "publish:exams": "node --loader ts-node/esm scripts/publishExam.ts --all",
     "publish:exams:dry": "node --loader ts-node/esm scripts/publishExam.ts --all --dry-run",
+    "publish:skill-labs": "node --loader ts-node/esm scripts/publishSkillLabs.ts --all",
+    "publish:skill-labs:dry": "node --loader ts-node/esm scripts/publishSkillLabs.ts --all --dry-run",
     "test:workflow": "node --loader ts-node/esm scripts/testWorkflow.ts"
   },
   "dependencies": {

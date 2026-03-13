@@ -58,6 +58,7 @@ Backend
 Data layer & storage
 - Canonical exam authoring: JSON files under `backend/data/exams/` (local) and published to a versioned S3 bucket when `EXAM_SOURCE=s3`.
 - Runtime index: DynamoDB `examapp-exams-index` maps exam codes to S3 keys + version IDs.
+- Skill labs: JSON definitions in `backend/data/skill-labs.json` (local) and published to S3 (`examapp-skill-labs-*`) + DynamoDB index (`examapp-skill-labs-index`) when `SKILL_LAB_SOURCE=s3`. Attempts stored in `examapp-skill-lab-attempts`.
 - Attempts & gamification: persisted in DynamoDB (and demo JSON in `backend/data/attempts.json` for local/dev runs).
 
 Infrastructure & deployment notes
@@ -67,6 +68,7 @@ Infrastructure & deployment notes
 Dev flows & environment toggles
 - `AUTH_MODE`: `dev` or `cognito` — toggles authentication mode for local development vs production.
 - `EXAM_SOURCE`: `local` or `s3` — toggle whether the backend loads exams from disk or from S3 (versioned publishing workflow supported).
+- `SKILL_LAB_SOURCE`: `local` or `s3` — toggle whether skill-lab definitions load from `backend/data/skill-labs.json` or from S3/DynamoDB. Publish with `pnpm publish:skill-labs` (dry run: `pnpm publish:skill-labs:dry`).
 
 Recent important fixes (2026-02-18)
 - Analytics bug: `backend/src/routes/analytics.ts` — `computeTotals()` incorrectly cast answer `questionId` to Number which produced `NaN` for string IDs; fixed to use string keys so `correctCount` and percentages reflect real answers.

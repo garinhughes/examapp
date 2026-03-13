@@ -60,6 +60,27 @@ resource "aws_s3_bucket_versioning" "exam_questions_versioning" {
   }
 }
 
+# ---------- Skill labs S3 bucket ----------
+resource "aws_s3_bucket" "skill_labs" {
+  bucket = "${var.project}-skill-labs-${var.account_id}"
+  tags   = { Project = var.project }
+}
+
+resource "aws_s3_bucket_public_access_block" "skill_labs_block" {
+  bucket                  = aws_s3_bucket.skill_labs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "skill_labs_versioning" {
+  bucket = aws_s3_bucket.skill_labs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 # ---------- outputs ----------
 output "bucket_name" {
   value = aws_s3_bucket.site.id
@@ -75,4 +96,8 @@ output "bucket_regional_domain_name" {
 
 output "exam_questions_bucket_name" {
   value = aws_s3_bucket.exam_questions.id
+}
+
+output "skill_labs_bucket_name" {
+  value = aws_s3_bucket.skill_labs.id
 }

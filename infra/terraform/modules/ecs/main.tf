@@ -112,6 +112,26 @@ variable "audit_table" {
   default = ""
 }
 
+variable "skill_lab_source" {
+  type    = string
+  default = "s3"
+}
+
+variable "skill_lab_s3_bucket" {
+  type    = string
+  default = ""
+}
+
+variable "skill_lab_index_table" {
+  type    = string
+  default = ""
+}
+
+variable "skill_lab_attempts_table" {
+  type    = string
+  default = ""
+}
+
 variable "cognito_domain" {
   type    = string
   default = ""
@@ -307,6 +327,10 @@ locals {
     { name = "USERS_TABLE", value = var.users_table },
     { name = "ENTITLEMENTS_TABLE", value = var.entitlements_table },
     { name = "AUDIT_TABLE", value = var.audit_table },
+    { name = "SKILL_LAB_SOURCE", value = var.skill_lab_source },
+    { name = "SKILL_LAB_S3_BUCKET", value = var.skill_lab_s3_bucket },
+    { name = "SKILL_LAB_INDEX_TABLE", value = var.skill_lab_index_table },
+    { name = "SKILL_LAB_ATTEMPTS_TABLE", value = var.skill_lab_attempts_table },
     { name = "AUTH_MODE", value = var.auth_mode },
     { name = "COGNITO_DOMAIN", value = var.cognito_domain },
     { name = "COGNITO_APP_CLIENT_ID", value = var.cognito_app_client_id },
