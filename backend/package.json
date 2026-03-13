@@ -4,15 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --loader ts-node/esm src/index.ts",
+    "dev": "NODE_NO_WARNINGS=1 node --import ./register.mjs src/index.ts",
     "dev:reload": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p .",
     "start": "node dist/index.js",
-    "publish:exams": "node --loader ts-node/esm scripts/publishExam.ts --all",
-    "publish:exams:dry": "node --loader ts-node/esm scripts/publishExam.ts --all --dry-run",
-    "publish:skill-labs": "node --loader ts-node/esm scripts/publishSkillLabs.ts --all",
-    "publish:skill-labs:dry": "node --loader ts-node/esm scripts/publishSkillLabs.ts --all --dry-run",
-    "test:workflow": "node --loader ts-node/esm scripts/testWorkflow.ts"
+    "publish:exams": "node --import ./register.mjs scripts/publishExam.ts --all",
+    "publish:exams:dry": "node --import ./register.mjs scripts/publishExam.ts --all --dry-run",
+    "publish:skill-labs": "node --import ./register.mjs scripts/publishSkillLabs.ts --all",
+    "publish:skill-labs:dry": "node --import ./register.mjs scripts/publishSkillLabs.ts --all --dry-run",
+    "test:workflow": "node --import ./register.mjs scripts/testWorkflow.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.988.0",

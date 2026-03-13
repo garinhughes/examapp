@@ -25,8 +25,8 @@ declare module 'fastify' {
 
 async function entitlementPlugin(server: FastifyInstance) {
   server.decorateRequest('tier', 'visitor')
-  server.decorateRequest('tierConfig', TIERS.visitor)
-  server.decorateRequest('entitlements', [])
+  server.decorateRequest('tierConfig', { getter: () => ({ ...TIERS.visitor }) })
+  server.decorateRequest('entitlements', { getter: () => [] as string[] })
 
   /**
    * preHandler hook — resolves entitlements from DynamoDB (when authenticated)
