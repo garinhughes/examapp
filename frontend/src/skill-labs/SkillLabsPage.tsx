@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useExam } from '@/exam/ExamContext'
-import { Play, Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark } from 'lucide-react'
+import { Play, Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search } from 'lucide-react'
 import type { LabSummary, SkillLevel } from './types'
 import { apiUrl } from '@/apiBase'
 import { SearchableFilter } from './SearchableFilter'
@@ -35,8 +35,11 @@ export function SkillLabsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Timed/casual toggle
-  const [timed, setTimed] = useState(true)
+  // Timed/casual toggle (default to casual)
+  const [timed, setTimed] = useState(false)
+
+  // Search query for titles & descriptions
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Filters
   const [selectedDifficulty, setSelectedDifficulty] = useState<SkillLevel | null>(null)
@@ -137,6 +140,14 @@ export function SkillLabsPage() {
         if (completedLabIds.has(lab.id)) return false
       }
 
+      // Search query: match title or description
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase()
+        const title = (lab.title || '').toLowerCase()
+        const desc = (lab.description || '').toLowerCase()
+        if (!title.includes(q) && !desc.includes(q)) return false
+      }
+
       if (showSavedOnly && !bookmarkedLabIds.has(lab.id)) return false
       if (selectedDifficulty && lab.difficulty !== selectedDifficulty) return false
       if (selectedPlatforms.size > 0 && !selectedPlatforms.has(lab.platform)) return false
@@ -147,21 +158,26 @@ export function SkillLabsPage() {
       }
       return true
     })
-  }, [labs, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showCompleted, completedLabIds, showSavedOnly, bookmarkedLabIds])
+  }, [labs, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showCompleted, completedLabIds, showSavedOnly, bookmarkedLabIds, searchQuery])
 
-  // Reset page when filters change
-  useEffect(() => { setPage(1) }, [selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showCompleted, showSavedOnly])
+  // Reset page when filters change (including search)
+  useEffect(() => { setPage(1) }, [selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showCompleted, showSavedOnly, searchQuery])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / LABS_PER_PAGE))
   const paginated = filtered.slice((page - 1) * LABS_PER_PAGE, page * LABS_PER_PAGE)
 
-  const hasActiveFilters = selectedDifficulty || selectedPlatforms.size > 0 || selectedCategories.size > 0 || selectedTechnologies.size > 0
+  const hasActiveFilters = Boolean(selectedDifficulty) || selectedPlatforms.size > 0 || selectedCategories.size > 0 || selectedTechnologies.size > 0 || searchQuery.trim().length > 0
 
   const clearFilters = () => {
     setSelectedDifficulty(null)
     setSelectedPlatforms(new Set())
     setSelectedCategories(new Set())
     setSelectedTechnologies(new Set())
+  }
+  // Clear filters and search
+  const clearAllFilters = () => {
+    clearFilters()
+    setSearchQuery('')
   }
 
   if (loading) return <div className="text-muted-foreground">Loading skill labs…</div>
@@ -172,33 +188,48 @@ export function SkillLabsPage() {
       {/* Controls bar: timed toggle + filters */}
       <div className="flex flex-col gap-3">
         {/* Top row: mode toggle + clear */}
-        <div className="flex items-center justify-between">
-          {/* Timed / Casual toggle */}
-          <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50 border border-border">
-            <button
-              onClick={() => setTimed(true)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition ${
-                timed ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Timer className="w-3.5 h-3.5" />
-              Timed
-            </button>
-            <button
-              onClick={() => setTimed(false)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition ${
-                !timed ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Coffee className="w-3.5 h-3.5" />
-              Casual
-            </button>
-          </div>
+          <div className="flex items-center justify-between">
+            {/* Timed / Casual toggle + Search */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50 border border-border">
+                <button
+                  onClick={() => setTimed(false)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                    !timed ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Coffee className="w-3.5 h-3.5" />
+                  Casual
+                </button>
+                <button
+                  onClick={() => setTimed(true)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                    timed ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Timer className="w-3.5 h-3.5" />
+                  Timed
+                </button>
+              </div>
 
-          <div className="text-sm text-muted-foreground">
-            {filtered.length} lab{filtered.length !== 1 ? 's' : ''}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                  <Search className="w-4 h-4 text-muted-foreground" />
+                </div>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search labs..."
+                  className="ml-1 pl-8 w-64 sm:w-80 px-3 py-1.5 rounded-md border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div className="text-sm text-muted-foreground">
+              {filtered.length} lab{filtered.length !== 1 ? 's' : ''}
+            </div>
           </div>
-        </div>
 
         {/* Filter row */}
         <div className="flex items-center gap-2 flex-wrap">
@@ -268,7 +299,7 @@ export function SkillLabsPage() {
 
           {hasActiveFilters && (
             <button
-              onClick={clearFilters}
+              onClick={clearAllFilters}
               className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground transition"
             >
               <RotateCcw className="w-3 h-3" />
@@ -322,7 +353,7 @@ export function SkillLabsPage() {
                     {lab.platform}
                   </span>
                   {completedLabIds.has(lab.id) && (
-                    <span className="px-2 py-0.5 rounded-full bg-green-500/15 text-green-700 dark:text-green-400 text-xs font-medium inline-flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-medium inline-flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" />
                       Completed
                     </span>

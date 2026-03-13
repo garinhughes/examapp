@@ -165,7 +165,12 @@ export default function ExamApp() {
                   <h2 className="text-3xl sm:text-4xl font-extrabold mb-3">Practice smarter. Pass faster.</h2>
                   <p className="text-muted-foreground mb-6">Timed or casual practice exams, focused by domain, with per-question explanations and review sessions to help you improve.</p>
 
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <div className="flex items-center justify-center gap-4 mb-6">
+                    <button onClick={() => setRoute('practice')} className="px-4 py-2 rounded bg-primary text-white font-semibold">Browse Practice Exams</button>
+                    <button onClick={() => setRoute('skill-labs')} className="px-4 py-2 rounded border border-primary text-primary font-semibold bg-primary/5">Browse Skill Labs</button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 text-left">
                     <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
                       <div className="text-2xl">⏱️</div>
                       <div className="font-semibold mt-2">Timed & Casual</div>
@@ -203,11 +208,9 @@ export default function ExamApp() {
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-center gap-4">
-                    <button onClick={() => setRoute('practice')} className="px-4 py-2 rounded bg-primary text-white font-semibold">Browse Practice Exams</button>
-                  </div>
+                  
                 </div>
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
                     <div className="text-2xl">🧭</div>
                     <div className="font-semibold mt-2">Domain Focus</div>
@@ -219,6 +222,11 @@ export default function ExamApp() {
                     </div>
                     <div className="font-semibold mt-2">Advanced Question Filtering</div>
                     <div className="text-sm text-muted-foreground">Filter question sets by services or keywords.</div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
+                    <div className="text-2xl">🧪</div>
+                    <div className="font-semibold mt-2">Skill Labs</div>
+                    <div className="text-sm text-muted-foreground">Hands-on simulations: interactive labs to practice real-world tasks.</div>
                   </div>
                 </div>
               </div>

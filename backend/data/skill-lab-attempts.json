@@ -77,5 +77,45 @@
     "correct": true,
     "timeTaken": 50,
     "createdAt": "2026-03-13T16:12:33.708Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "e2132c1f-9f13-45be-91c1-21a0a614233e",
+    "labId": "ha-web-app-builder",
+    "labType": "architecture-builder",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 56,
+    "createdAt": "2026-03-13T17:18:57.281Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "1882e7b8-70d5-43b8-9216-6ce2d711ee04",
+    "labId": "handle-traffic-spike",
+    "labType": "service-limits",
+    "selectedAnswer": "{\"ec2-scaling\":\"Increase ASG max capacity to 50 and set target tracking to 60% CPU\",\"lambda-concurrency\":\"Request concurrency limit increase and set reserved concurrency for critical functions\",\"dynamo-throttle\":\"Switch to on-demand capacity mode for automatic scaling\",\"queue-backlog\":\"Delete old messages from the queue\",\"api-gw-throttle\":\"Enable API Gateway caching\"}",
+    "correct": false,
+    "timeTaken": 112,
+    "createdAt": "2026-03-13T17:21:48.017Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "e5cc6dd0-c4c2-423d-b683-3c390d7bf919",
+    "labId": "reduce-monthly-aws-cost",
+    "labType": "cost-optimization",
+    "selectedAnswer": "{\"compute\":\"ECS Fargate (~2 vCPU avg) ($120/mo)\",\"database\":\"DynamoDB On-Demand (~5M requests/mo) ($85/mo)\",\"networking\":\"VPC Endpoints for S3/DynamoDB ($20/mo)\",\"storage\":\"S3 Intelligent-Tiering 2TB ($210/mo)\"}",
+    "correct": true,
+    "timeTaken": 48,
+    "createdAt": "2026-03-13T17:24:25.710Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "55a73ed0-390c-449a-b358-a8b357313c71",
+    "labId": "lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 61,
+    "createdAt": "2026-03-13T17:27:49.448Z"
   }
 ]

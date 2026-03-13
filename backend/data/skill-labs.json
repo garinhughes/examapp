@@ -141,7 +141,7 @@
     "category": "Architecture",
     "technologies": ["EC2", "ALB", "RDS", "CloudFront", "Auto Scaling"],
     "labCategory": "Design",
-    "scenario": "Your team needs a highly available web application that can survive an AZ failure. Build the architecture by placing the required components and connecting them correctly.",
+    "scenario": "Design a multi-AZ highly available web application that survives a single AZ failure. Use CDN for edge caching, an autoscaling web tier across AZs behind an ALB, durable object storage for static assets, and a multi-AZ managed database with automated failover.",
     "availableComponents": [
       { "id": "cloudfront", "label": "CloudFront", "icon": "🌐", "category": "CDN" },
       { "id": "alb", "label": "Application Load Balancer", "icon": "⚖️", "category": "Networking" },

@@ -3,8 +3,11 @@ import ReactFlow, {
   Background,
   Controls,
   addEdge,
+  useNodesState,
+  useEdgesState,
+  useReactFlow,
+  ReactFlowProvider,
   type Node,
-  type Edge,
   type Connection,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
@@ -19,12 +22,22 @@ interface Props {
   timed?: boolean
 }
 
-export function ArchitectureBuilderRunner({ lab, timed = true }: Props) {
+export function ArchitectureBuilderRunner(props: Props) {
+  return (
+    <ReactFlowProvider>
+      <ArchitectureBuilderInner {...props} />
+    </ReactFlowProvider>
+  )
+}
+
+function ArchitectureBuilderInner({ lab, timed = true }: Props) {
   const { authFetch, user } = useExam()
+  const reactFlowInstance = useReactFlow()
 
   const [placedComponents, setPlacedComponents] = useState<Set<string>>(new Set())
-  const [nodes, setNodes] = useState<Node[]>([])
-  const [edges, setEdges] = useState<Edge[]>([])
+  const [nodes, setNodes, onNodesChange] = useNodesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const nodeCountRef = useRef(0)
   const [submitted, setSubmitted] = useState(false)
   const [validationResults, setValidationResults] = useState<{ check: string; pass: boolean }[]>([])
   const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
@@ -49,11 +62,13 @@ export function ArchitectureBuilderRunner({ lab, timed = true }: Props) {
   const addComponent = useCallback((comp: typeof lab.availableComponents[0]) => {
     if (placedComponents.has(comp.id) || submitted) return
     setPlacedComponents((prev) => new Set([...prev, comp.id]))
-    const col = nodes.length % 3
-    const row = Math.floor(nodes.length / 3)
+    const n = nodeCountRef.current++
+    const col = n % 3
+    const row = Math.floor(n / 3)
+    // Place in a grid that maps to viewport flow coordinates
     const newNode: Node = {
       id: comp.id,
-      position: { x: 100 + col * 200, y: 80 + row * 120 },
+      position: { x: 50 + col * 220, y: 40 + row * 130 },
       data: { label: `${comp.icon} ${comp.label}` },
       style: {
         background: 'hsl(var(--card))',
@@ -65,17 +80,18 @@ export function ArchitectureBuilderRunner({ lab, timed = true }: Props) {
         fontSize: '13px',
       },
     }
-    setNodes((prev) => [...prev, newNode])
-  }, [placedComponents, nodes.length, submitted])
+    setNodes((prev) => {
+      const next = [...prev, newNode]
+      // Fit viewport to show all nodes after a tick
+      requestAnimationFrame(() => reactFlowInstance.fitView({ padding: 0.25, duration: 200 }))
+      return next
+    })
+  }, [placedComponents, submitted, reactFlowInstance])
 
   const onConnect = useCallback((connection: Connection) => {
     if (submitted) return
-    setEdges((prev) => addEdge({
-      ...connection,
-      animated: true,
-      style: { stroke: 'hsl(var(--muted-foreground))' },
-    }, prev))
-  }, [submitted])
+    setEdges((prev) => addEdge({ ...connection, animated: true }, prev))
+  }, [submitted, setEdges])
 
   const handleValidate = useCallback(async () => {
     if (submitted) return
@@ -91,10 +107,11 @@ export function ArchitectureBuilderRunner({ lab, timed = true }: Props) {
       pass: missingComps.length === 0,
     })
 
-    // Check required connections
+    // Check required connections (accept either direction since handles are on all sides)
     for (const req of lab.requiredConnections) {
       const found = edges.some(
-        (e) => e.source === req.from && e.target === req.to
+        (e) => (e.source === req.from && e.target === req.to) ||
+               (e.source === req.to && e.target === req.from)
       )
       const fromLabel = lab.availableComponents.find((c) => c.id === req.from)?.label || req.from
       const toLabel = lab.availableComponents.find((c) => c.id === req.to)?.label || req.to
@@ -136,35 +153,44 @@ export function ArchitectureBuilderRunner({ lab, timed = true }: Props) {
     return map
   }, [lab.availableComponents])
 
+  // Expand scenario text with extra guidance so learners understand constraints
+  const displayScenario = `${lab.scenario} Your design must remain available if a single Availability Zone fails. Prefer managed, multi-AZ services with automated failover (single-AZ read-replicas alone are not sufficient for AZ-failure resilience). Consider serving static assets via a CDN, using an autoscaling web tier spread across AZs behind a load balancer, caching for read-heavy workloads, and durable object storage for static content.`
+
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id} />
+      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={displayScenario} labId={lab.id} />
 
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Component palette */}
-        <div className="w-56 shrink-0 rounded-lg border border-border bg-card p-3 overflow-y-auto">
-          <h3 className="font-semibold text-sm mb-3">Components</h3>
-          {Object.entries(grouped).map(([cat, comps]) => (
-            <div key={cat} className="mb-3">
-              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{cat}</div>
-              <div className="space-y-1">
-                {comps.map((comp) => (
-                  <button
-                    key={comp.id}
-                    onClick={() => addComponent(comp)}
-                    disabled={placedComponents.has(comp.id) || submitted}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm transition ${
-                      placedComponents.has(comp.id)
-                        ? 'bg-primary/10 text-primary border border-primary/30'
-                        : 'border border-border hover:bg-muted/50 cursor-pointer'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    {comp.icon} {comp.label}
-                  </button>
-                ))}
+        <div className="w-56 shrink-0 rounded-lg border border-border bg-card p-3 overflow-y-auto flex flex-col gap-4">
+          <div>
+            <h3 className="font-semibold text-sm mb-3">Components</h3>
+            {Object.entries(grouped).map(([cat, comps]) => (
+              <div key={cat} className="mb-3">
+                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{cat}</div>
+                <div className="space-y-1">
+                  {comps.map((comp) => (
+                    <button
+                      key={comp.id}
+                      onClick={() => addComponent(comp)}
+                      disabled={placedComponents.has(comp.id) || submitted}
+                      className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm transition ${
+                        placedComponents.has(comp.id)
+                          ? 'bg-primary/10 text-primary border border-primary/30'
+                          : 'border border-border hover:bg-muted/50 cursor-pointer'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      {comp.icon} {comp.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <div className="border-t border-border pt-3">
+            <p className="text-xs text-muted-foreground mt-2 leading-relaxed">Tip: Drag from a node's edge handle to connect it to another node. Click "Validate Architecture" when ready to evaluate your design.</p>
+          </div>
         </div>
 
         {/* Canvas */}
@@ -172,10 +198,13 @@ export function ArchitectureBuilderRunner({ lab, timed = true }: Props) {
           <ReactFlow
             nodes={nodes}
             edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             fitView
             proOptions={{ hideAttribution: true }}
             nodesConnectable={!submitted}
+            nodesDraggable={!submitted}
           >
             <Background />
             <Controls showInteractive={false} />
