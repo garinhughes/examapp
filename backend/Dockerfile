@@ -1,5 +1,5 @@
 # Stage 1 — build
-FROM node:18-bullseye AS builder
+FROM node:25-bookworm AS builder
 WORKDIR /app
 # Ensure a pnpm v10.x compatible with the lockfile is available
 RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
@@ -11,7 +11,7 @@ RUN pnpm install --frozen-lockfile --prod=false
 RUN pnpm run build
 
 # Stage 2 — runtime
-FROM node:18-bullseye-slim
+FROM node:25-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production
 # create non-root user (security best practice)
