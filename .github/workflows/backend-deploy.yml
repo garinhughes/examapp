@@ -47,6 +47,9 @@ jobs:
   deploy-backend:
     needs: build-and-push-backend
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
