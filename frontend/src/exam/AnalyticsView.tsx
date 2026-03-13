@@ -5,7 +5,7 @@ import { ScoreHistoryChart } from './ScoreHistoryChart'
 
 export function AnalyticsView() {
   const {
-    selected, selectedMeta, exams, scoreHistory, loadingScoreHistory,
+    selected, selectedMeta, exams, providers, scoreHistory, loadingScoreHistory,
     analyticsAttempts, analyticsDomains, deletingAttemptId, setDeletingAttemptId,
     gamState, fetchScoreHistory, downloadAnalyticsCSV, setupExamFromMeta,
     setRoute, authFetch, setAttemptData, setSelected, questions, setQuestions,
@@ -18,7 +18,6 @@ export function AnalyticsView() {
     <div className="mb-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold">Analytics</h2>
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             {selected ? (
               <>
@@ -26,14 +25,20 @@ export function AnalyticsView() {
                 {selectedMeta?.code ? ` (${selectedMeta.code})` : ''}
               </>
             ) : (
-              'Choose an exam from Practice Exams'
+              'Select an exam below to view analytics'
             )}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="px-3 py-1 rounded bg-accent text-sm" onClick={() => setRoute('practice')}>
-            Back
-          </button>
+          {selected ? (
+            <button className="px-3 py-1 rounded bg-accent text-sm" onClick={() => setSelected(null)}>
+              ← All exams
+            </button>
+          ) : (
+            <button className="px-3 py-1 rounded bg-accent text-sm" onClick={() => setRoute('practice')}>
+              Back
+            </button>
+          )}
           {selected && (
             <>
               <button
@@ -58,6 +63,31 @@ export function AnalyticsView() {
           )}
         </div>
       </div>
+
+      {!selected && providers.length > 0 && (
+        <div className="mt-4 space-y-4">
+          {providers.map((p) => (
+            <div key={p.provider}>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">{p.provider}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {p.exams.map((ex: any) => (
+                  <button
+                    key={ex.code}
+                    className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm text-left hover:border-primary transition-colors"
+                    onClick={() => {
+                      setSelected(ex.code)
+                      void fetchScoreHistory(ex.code)
+                    }}
+                  >
+                    <div className="font-medium text-sm">{ex.title ?? ex.code}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{ex.code}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {selected && (
         <div className="mt-4 space-y-4">

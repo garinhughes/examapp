@@ -29,7 +29,6 @@ export function PracticeExams() {
         </div>
       )}
 
-      <h2 className="text-xl font-semibold mb-4">Practice Exams</h2>
       <div role="note" className="mb-4 p-3 rounded-lg border border-border bg-muted/30 text-sm text-muted-foreground flex items-start gap-3">
         <Info className="w-5 h-5 flex-shrink-0 mt-0.5 text-primary" aria-hidden />
         <div className="leading-snug">This product is not affiliated with or endorsed by any certification provider. All questions are original and created for practice purposes only.</div>
@@ -50,7 +49,7 @@ export function PracticeExams() {
                   </div>
                   <div className="mt-3 flex items-center gap-2">
                     <button
-                      className={`px-3 py-1 rounded font-medium transition-colors ${examStarted || anySavedExam || (selected && savedProgress) ? 'bg-muted/60 text-muted-foreground/60 border border-border cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'}`}
+                      className={`px-3 py-1 rounded font-medium text-sm inline-flex items-center gap-2 transition-colors ${examStarted || anySavedExam || (selected && savedProgress) ? 'bg-muted/60 text-muted-foreground/60 border border-border cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'}`}
                       disabled={!!(examStarted || anySavedExam || (selected && savedProgress))}
                       title={examStarted || anySavedExam || (selected && savedProgress) ? 'Complete or cancel your current exam first' : 'Setup this exam'}
                       onClick={() => { if (examStarted || anySavedExam || (selected && savedProgress)) return; setupExamFromMeta(ex) }}

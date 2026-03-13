@@ -14,7 +14,7 @@ RUN pnpm run build
 FROM node:18-bullseye-slim
 WORKDIR /app
 ENV NODE_ENV=production
-# create non-root user (optional)
+# create non-root user (security best practice)
 RUN addgroup --system app && adduser --system --ingroup app app
 # copy only needed artifacts
 COPY --from=builder /app/dist ./dist

@@ -13,14 +13,16 @@ const SAMPLE_DIAGRAM = `architecture-beta
   service dns(logos:aws-route53)[Route 53] in edge
   service waf(logos:aws-waf)[WAF] in edge
   service cf(logos:aws-cloudfront)[CloudFront] in edge
-  service s3fe(logos:aws-s3)[Frontend] in edge
+  service s3fe(logos:aws-s3)[S3 frontend] in edge
 
   service alb(logos:aws-elb)[ALB] in compute
   service ecs(logos:aws-fargate)[ECS Fargate] in compute
+  service ecr(logos:aws-ecs)[ECR] in compute
+  service sm(logos:aws-secrets-manager)[Secrets Mgr] in data
 
   service cognito(logos:aws-cognito)[Cognito] in edge
   service dynamo(logos:aws-dynamodb)[DynamoDB] in data
-  service s3exams(logos:aws-s3)[Exams] in data
+  service s3exams(logos:aws-s3)[S3 exams] in data
 
   service eb(logos:aws-eventbridge)[EventBridge] in monitoring
   service lambda(logos:aws-lambda)[Lambda] in monitoring
@@ -34,6 +36,9 @@ const SAMPLE_DIAGRAM = `architecture-beta
   cognito:R -- R:s3fe
 
   alb:R -- L:ecs
+
+  ecr:B -- T:ecs
+  sm:B -- T:ecs
 
   ecs:B -- T:dynamo
   ecs:R -- L:s3exams
@@ -245,6 +250,7 @@ export function DiagramsView() {
             'logos:aws-ecs',
             'logos:aws-eks',
             'logos:aws-fargate',
+            'logos:aws-ecr',
             'logos:aws-elastic-beanstalk',
             'logos:aws-batch',
           ]},

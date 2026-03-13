@@ -70,15 +70,15 @@ export default function ExamApp() {
                     {examTier && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs capitalize">{examTier}</span>}
                   </div>
                 )}
-                <h1 className="text-3xl font-bold tracking-tight">
-                  {route === 'home' && 'Overview'}
-                  {route === 'practice' && 'Practice Exams'}
-                  {route === 'analytics' && 'Analytics'}
-                  {route === 'account' && 'Account Settings'}
-                  {route === 'pricing' && 'Plans & Pricing'}
-                  {route === 'admin' && 'Admin Console'}
-                  {route === 'diagrams' && 'Architecture Diagrams'}
-                </h1>
+                {['practice', 'analytics', 'account', 'admin', 'diagrams'].includes(route) && (
+                  <h1 className="text-3xl font-bold tracking-tight">
+                    {route === 'practice' && 'Practice Exams'}
+                    {route === 'analytics' && 'Analytics'}
+                    {route === 'account' && 'Account Settings'}
+                    {route === 'admin' && 'Admin Console'}
+                    {route === 'diagrams' && 'Architecture Diagrams'}
+                  </h1>
+                )}
               </div>
             </header>
 

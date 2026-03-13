@@ -452,7 +452,6 @@ export default function AdminPanel() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold">Admin Panel</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             {users.length} user{users.length !== 1 ? 's' : ''} registered
             {filtered.length !== users.length && ` · ${filtered.length} shown`}
