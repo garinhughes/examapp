@@ -2,7 +2,6 @@ import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { randomUUID } from 'crypto'
 import fs from 'fs/promises'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import { skillLabAttemptsStore } from '../services/skillLabAttemptsStore.js'
 import {
   getLabFromS3,
@@ -10,8 +9,7 @@ import {
   listLabIndex,
 } from '../services/skillLabStore.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const LABS_FILE = path.join(__dirname, '..', '..', 'data', 'skill-labs.json')
+const LABS_FILE = path.join(process.cwd(), 'data', 'skill-labs.json')
 
 /**
  * Skill lab source switch — mirrors EXAM_SOURCE pattern.

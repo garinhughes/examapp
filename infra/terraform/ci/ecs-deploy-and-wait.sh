@@ -5,22 +5,28 @@ set -euo pipefail
 # ecs-deploy-and-wait.sh \
 #   --cluster my-cluster --service my-service --container-name my-container \
 #   --image 123456789012.dkr.ecr.eu-west-1.amazonaws.com/myimage:tag \
+#   [--task-def-file path/to/ecs-task-def.json] \
 #   [--region eu-west-1] [--profile certshack] [--dry-run]
+#
+# When --task-def-file is provided, that file is used as the base task
+# definition (image is swapped for the given container). Without it, the
+# live task definition is fetched from the ECS service.
 
-ARGS=$(getopt -o '' -l cluster:,service:,container-name:,image:,region:,profile:,dry-run -n "ecs-deploy-and-wait.sh" -- "$@")
+ARGS=$(getopt -o '' -l cluster:,service:,container-name:,image:,task-def-file:,region:,profile:,dry-run -n "ecs-deploy-and-wait.sh" -- "$@")
 if [ $? -ne 0 ]; then
   echo "Invalid arguments"
   exit 2
 fi
 eval set -- "$ARGS"
 
-CLUSTER=""; SERVICE=""; CONTAINER=""; IMAGE=""; REGION="eu-west-1"; PROFILE=""; DRY_RUN="false"
+CLUSTER=""; SERVICE=""; CONTAINER=""; IMAGE=""; TASK_DEF_FILE=""; REGION="eu-west-1"; PROFILE=""; DRY_RUN="false"
 while true; do
   case "$1" in
     --cluster) CLUSTER="$2"; shift 2;;
     --service) SERVICE="$2"; shift 2;;
     --container-name) CONTAINER="$2"; shift 2;;
     --image) IMAGE="$2"; shift 2;;
+    --task-def-file) TASK_DEF_FILE="$2"; shift 2;;
     --region) REGION="$2"; shift 2;;
     --profile) PROFILE="$2"; shift 2;;
     --dry-run) DRY_RUN="true"; shift 1;;
@@ -71,15 +77,23 @@ fi
 
 echo "Current task definition: $TD_ARN"
 
-# 2) Fetch task definition JSON
-TD_JSON=$(${AWS_CLI[@]} ecs describe-task-definition --task-definition "$TD_ARN" --query 'taskDefinition' --output json)
+# 2) Build task definition JSON — from file or from live service
+if [[ -n "$TASK_DEF_FILE" ]]; then
+  echo "Using task definition file: $TASK_DEF_FILE"
+  if [[ ! -f "$TASK_DEF_FILE" ]]; then
+    echo "Task definition file not found: $TASK_DEF_FILE"
+    exit 3
+  fi
+  CLEANED=$(cat "$TASK_DEF_FILE")
+else
+  TD_JSON=$(${AWS_CLI[@]} ecs describe-task-definition --task-definition "$TD_ARN" --query 'taskDefinition' --output json)
+  CLEANED=$(
+    echo "$TD_JSON" |
+    jq 'del(.status, .revision, .compatibilities, .compatibilities, .requiresAttributes, .registeredAt, .registeredBy, .taskDefinitionArn)'
+  )
+fi
 
-# 3) Strip unwanted fields and replace image for the specified container
-CLEANED=$(
-  echo "$TD_JSON" |
-  jq 'del(.status, .revision, .compatibilities, .compatibilities, .requiresAttributes, .registeredAt, .registeredBy, .taskDefinitionArn)'
-)
-
+# 3) Replace image for the specified container
 UPDATED=$(
   echo "$CLEANED" |
   jq --arg cname "$CONTAINER" --arg img "$IMAGE" '.containerDefinitions |= map(if .name == $cname then .image = $img else . end)'
