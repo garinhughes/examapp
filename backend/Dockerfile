@@ -1,8 +1,8 @@
 # Stage 1 — build
 FROM node:25-bookworm AS builder
 WORKDIR /app
-# Ensure a pnpm v10.x compatible with the lockfile is available
-RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+# corepack is not bundled in node:25; install it then enable pnpm
+RUN npm install -g corepack && corepack enable && corepack prepare pnpm@10.30.1 --activate
 ENV CI=true
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm fetch
