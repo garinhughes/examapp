@@ -77,19 +77,31 @@ fi
 
 echo "Current task definition: $TD_ARN"
 
-# 2) Build task definition JSON — from file or from live service
+# 2) Fetch live task definition JSON
+TD_JSON=$(${AWS_CLI[@]} ecs describe-task-definition --task-definition "$TD_ARN" --query 'taskDefinition' --output json)
+CLEANED=$(
+  echo "$TD_JSON" |
+  jq 'del(.status, .revision, .compatibilities, .compatibilities, .requiresAttributes, .registeredAt, .registeredBy, .taskDefinitionArn)'
+)
+
+# 2b) If --task-def-file provided, merge its environment + secrets into the live task def
 if [[ -n "$TASK_DEF_FILE" ]]; then
-  echo "Using task definition file: $TASK_DEF_FILE"
+  echo "Merging environment from task definition file: $TASK_DEF_FILE"
   if [[ ! -f "$TASK_DEF_FILE" ]]; then
     echo "Task definition file not found: $TASK_DEF_FILE"
     exit 3
   fi
-  CLEANED=$(cat "$TASK_DEF_FILE")
-else
-  TD_JSON=$(${AWS_CLI[@]} ecs describe-task-definition --task-definition "$TD_ARN" --query 'taskDefinition' --output json)
   CLEANED=$(
-    echo "$TD_JSON" |
-    jq 'del(.status, .revision, .compatibilities, .compatibilities, .requiresAttributes, .registeredAt, .registeredBy, .taskDefinitionArn)'
+    jq -s --arg cname "$CONTAINER" '
+      .[0] as $live | .[1] as $file |
+      ($file.containerDefinitions[] | select(.name == $cname)) as $fc |
+      $live | .containerDefinitions |= map(
+        if .name == $cname then
+          .environment = $fc.environment |
+          if $fc.secrets then .secrets = $fc.secrets else . end
+        else . end
+      )
+    ' <(echo "$CLEANED") "$TASK_DEF_FILE"
   )
 fi
 
