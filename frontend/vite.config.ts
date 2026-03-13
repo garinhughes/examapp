@@ -22,6 +22,7 @@ export default defineConfig({
       '/stripe': 'http://localhost:3000',
       '/gamification': 'http://localhost:3000',
       '/username': 'http://localhost:3000',
+      '/skill-labs': 'http://localhost:3000',
     }
   }
 })

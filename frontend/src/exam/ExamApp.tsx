@@ -6,6 +6,8 @@ import Leaderboard from '../components/Leaderboard'
 import AdminPanel from '../components/AdminPanel'
 import PricingPage from '../components/PricingPage'
 import { DiagramsView } from '../components/DiagramsView'
+import { SkillLabsPage } from '../skill-labs/SkillLabsPage'
+import { SkillLabRunnerPage } from '../skill-labs/SkillLabRunnerPage'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
 import { PracticeExams } from './PracticeExams'
@@ -70,13 +72,14 @@ export default function ExamApp() {
                     {examTier && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs capitalize">{examTier}</span>}
                   </div>
                 )}
-                {['practice', 'analytics', 'account', 'admin', 'diagrams'].includes(route) && (
+                {['practice', 'analytics', 'account', 'admin', 'diagrams', 'skill-labs'].includes(route) && (
                   <h1 className="text-3xl font-bold tracking-tight">
                     {route === 'practice' && 'Practice Exams'}
                     {route === 'analytics' && 'Analytics'}
                     {route === 'account' && 'Account Settings'}
                     {route === 'admin' && 'Admin Console'}
                     {route === 'diagrams' && 'Architecture Diagrams'}
+                    {route === 'skill-labs' && 'Skill Labs'}
                   </h1>
                 )}
               </div>
@@ -84,6 +87,16 @@ export default function ExamApp() {
 
             {/* Diagrams page */}
             {route === 'diagrams' && <DiagramsView />}
+
+            {/* Skill Labs pages */}
+            {route === 'skill-labs' && <SkillLabsPage />}
+            {route.startsWith('skill-lab:') && (() => {
+              const parts = route.slice('skill-lab:'.length)
+              const lastColon = parts.lastIndexOf(':')
+              const labId = lastColon > 0 ? parts.slice(0, lastColon) : parts
+              const mode = lastColon > 0 ? parts.slice(lastColon + 1) : 'timed'
+              return <SkillLabRunnerPage labId={labId} timed={mode !== 'casual'} />
+            })()}
 
             {/* Practice Exams page */}
             {route === 'practice' && <PracticeExams />}

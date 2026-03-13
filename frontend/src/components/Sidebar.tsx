@@ -14,6 +14,7 @@ import {
   User,
   Activity,
   Network,
+  FlaskConical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -25,6 +26,7 @@ const navItems = [
   { icon: BookOpen, label: "Exams", href: "/practice", key: 'practice' },
   { icon: Activity, label: "Analytics", href: "/analytics", key: 'analytics' },
   { icon: Network, label: "Diagrams", href: "/diagrams", key: 'diagrams' },
+  { icon: FlaskConical, label: "Skill Labs", href: "/skill-labs", key: 'skill-labs' },
   { icon: User, label: "Account", href: "/account", key: 'account' },
   { icon: CreditCard, label: "Pricing", href: "/pricing", key: 'pricing' },
   { icon: Settings, label: "Admin", href: "/admin", key: 'admin' },
@@ -84,21 +86,23 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
         </div>
 
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-          {navItems.filter(item => item.key !== 'admin' || showAdmin).map((item) => (
+          {navItems.filter(item => item.key !== 'admin' || showAdmin).map((item) => {
+            const isActive = currentRoute === item.key || (item.key === 'skill-labs' && currentRoute?.startsWith('skill-lab:'))
+            return (
             <button
               key={item.key}
               onClick={() => handleNav(item.key)}
               className={cn(
                 "w-full group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
-                currentRoute === item.key 
+                isActive 
                   ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                   : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
               )}
             >
-              <item.icon className={cn("h-4 w-4", currentRoute === item.key ? "text-sidebar-primary" : "text-sidebar-foreground/70 group-hover:text-sidebar-accent-foreground")} />
+              <item.icon className={cn("h-4 w-4", isActive ? "text-sidebar-primary" : "text-sidebar-foreground/70 group-hover:text-sidebar-accent-foreground")} />
               {item.label}
             </button>
-          ))}
+          )})}
         </nav>
 
         <div className="p-4 border-t border-sidebar-border space-y-2">

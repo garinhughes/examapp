@@ -69,6 +69,7 @@ backend/src/
     pricing.ts          # Pricing tiers
     stripe.ts           # Stripe webhook + checkout
     username.ts         # Username management
+    skillLabs.ts        # GET/POST /skill-labs — lab definitions + attempt storage
   plugins/
     auth.ts             # JWT verification plugin
     entitlements.ts     # Access control (free vs paid)
@@ -79,6 +80,7 @@ backend/src/
     entitlements.ts     # Entitlement checks
     weakestLink.ts      # Adaptive question selection
     profanityFilter.ts  # Username filter
+    skillLabAttemptsStore.ts # Skill lab attempt persistence (local JSON / DynamoDB)
 
 frontend/src/
   App.tsx               # Thin shell: ExamProvider wrapping ExamApp
@@ -114,6 +116,16 @@ frontend/src/
     GamificationContext.tsx
     badges.ts
     types.ts
+  skill-labs/
+    types.ts            # LabDefinition, LabSummary, Inspection types
+    SkillLabsPage.tsx   # Lab list page (/skill-labs) with filters, pagination, timed/casual toggle
+    SearchableFilter.tsx # Reusable multi-select dropdown with search
+    SkillLabRunnerPage.tsx # Lab runner dispatcher — routes to correct component by lab.type
+    labs/
+      LabHeader.tsx       # Shared header: back link + title card + timer/casual badge
+      DiagnoseLabRunner.tsx  # Diagnose lab: React Flow diagram with node inspection
+      CliLabRunner.tsx       # CLI lab: simulated AWS CLI terminal (no real commands)
+      PolicyFixLabRunner.tsx # Policy fix lab: Monaco Editor for IAM policy repair
   hooks/
     useEntitlements.ts  # Checks user access tier
 ```
@@ -207,3 +219,4 @@ Terraform state is remote (S3 backend defined in `infra/terraform/backend.tf`). 
 - **Question rendering** (new types like `matching`/`ordering`): `frontend/src/exam/QuestionCard.tsx` for in-exam rendering, `frontend/src/exam/ExamReview.tsx` for post-exam review
 - **Exam state/logic**: `frontend/src/exam/ExamContext.tsx` — central React Context with all state, effects, and handlers
 - **Exam UI components**: `frontend/src/exam/` — ExamApp (layout shell), ExamSetup, QuestionNav, QuestionCard, ExamReview, Modals, PracticeExams, AnalyticsView
+- **Skill Labs**: `frontend/src/skill-labs/` (pages + types) + `backend/src/routes/skillLabs.ts` + `backend/src/services/skillLabAttemptsStore.ts` + `backend/data/skill-labs.json` (lab definitions). Supports three lab types: `diagnose` (React Flow diagram), `cli` (simulated AWS CLI terminal), `policy-fix` (Monaco Editor IAM policy repair). The runner page (`SkillLabRunnerPage`) dispatches to the correct component by `lab.type`. Lab runner components live in `frontend/src/skill-labs/labs/` and share a common `LabHeader` component.

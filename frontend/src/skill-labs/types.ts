@@ -1,0 +1,282 @@
+// --- Shared types ---
+
+export type SkillLabType =
+  | 'diagnose' | 'cli' | 'policy-fix'
+  | 'architecture-builder' | 'log-analysis' | 'network-path'
+  | 'ordering' | 'config-toggle' | 'cost-optimization'
+  | 'security-hardening' | 'performance-optimization'
+  | 'policy-simulation' | 'service-limits'
+
+export type SkillLevel = 'beginner' | 'intermediate' | 'advanced'
+
+export interface LabAnswer {
+  id: string
+  text: string
+  correct?: boolean
+}
+
+export interface LabSummary {
+  id: string
+  title: string
+  description: string
+  type: SkillLabType
+  timeLimit: number
+  difficulty: SkillLevel
+  platform: string
+  category: string
+  technologies: string[]
+  labCategory: string      // e.g. "Troubleshoot", "Design", "Implement"
+}
+
+// --- Diagnose lab types ---
+
+export interface LabNode {
+  id: string
+  label: string
+  x: number
+  y: number
+}
+
+export interface LabEdge {
+  source: string
+  target: string
+  label?: string
+}
+
+export interface InspectionDetail {
+  label: string
+  value: string
+}
+
+export interface Inspection {
+  title: string
+  details: InspectionDetail[]
+}
+
+export interface DiagnoseLabDefinition extends LabSummary {
+  type: 'diagnose'
+  nodes: LabNode[]
+  edges: LabEdge[]
+  inspections: Record<string, Inspection>
+  answers: LabAnswer[]
+  explanation: string
+}
+
+// --- CLI lab types ---
+
+export interface CliCommand {
+  command: string
+  output: string
+}
+
+export interface CliLabDefinition extends LabSummary {
+  type: 'cli'
+  scenario: string
+  commands: CliCommand[]
+  expectedCommands: string[]
+  answers: LabAnswer[]
+  explanation: string
+}
+
+// --- Policy Fix lab types ---
+
+export interface PolicyValidation {
+  field: string
+  expected: string
+}
+
+export interface PolicyFixLabDefinition extends LabSummary {
+  type: 'policy-fix'
+  scenario: string
+  brokenPolicy: string
+  correctPolicy: string
+  validations: PolicyValidation[]
+  explanation: string
+}
+
+// --- Architecture Builder lab types ---
+
+export interface ArchitectureComponent {
+  id: string
+  label: string
+  icon: string
+  category: string
+}
+
+export interface ArchitectureBuilderLabDefinition extends LabSummary {
+  type: 'architecture-builder'
+  scenario: string
+  availableComponents: ArchitectureComponent[]
+  requiredComponents: string[]
+  requiredConnections: { from: string; to: string }[]
+  validationChecks: string[]
+  explanation: string
+}
+
+// --- Log Analysis lab types ---
+
+export interface LogEntry {
+  timestamp: string
+  level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG'
+  source: string
+  message: string
+}
+
+export interface LogAnalysisLabDefinition extends LabSummary {
+  type: 'log-analysis'
+  scenario: string
+  logs: LogEntry[]
+  answers: LabAnswer[]
+  explanation: string
+}
+
+// --- Network Path Debugging lab types ---
+
+export interface NetworkStep {
+  id: string
+  label: string
+  checkLabel: string
+  status: 'pass' | 'fail'
+  detail: string
+}
+
+export interface NetworkPathLabDefinition extends LabSummary {
+  type: 'network-path'
+  scenario: string
+  nodes: LabNode[]
+  edges: LabEdge[]
+  steps: NetworkStep[]
+  answers: LabAnswer[]
+  explanation: string
+}
+
+// --- Ordering lab types ---
+
+export interface OrderingStep {
+  id: string
+  text: string
+  correctPosition: number
+}
+
+export interface OrderingLabDefinition extends LabSummary {
+  type: 'ordering'
+  scenario: string
+  steps: OrderingStep[]
+  explanation: string
+}
+
+// --- Config Toggle lab types ---
+
+export interface ConfigItem {
+  id: string
+  label: string
+  currentValue: string
+  correctValue: string
+  inputType: 'text' | 'select'
+  options?: string[]
+}
+
+export interface ConfigToggleLabDefinition extends LabSummary {
+  type: 'config-toggle'
+  scenario: string
+  configItems: ConfigItem[]
+  explanation: string
+}
+
+// --- Cost Optimization lab types ---
+
+export interface CostComponent {
+  id: string
+  name: string
+  currentService: string
+  currentCost: number
+  alternatives: { service: string; cost: number }[]
+  correctService: string
+}
+
+export interface CostOptimizationLabDefinition extends LabSummary {
+  type: 'cost-optimization'
+  scenario: string
+  targetCost: number
+  components: CostComponent[]
+  explanation: string
+}
+
+// --- Security Hardening lab types ---
+
+export interface SecurityIssue {
+  id: string
+  resource: string
+  issue: string
+  options: string[]
+  correctOption: string
+}
+
+export interface SecurityHardeningLabDefinition extends LabSummary {
+  type: 'security-hardening'
+  scenario: string
+  issues: SecurityIssue[]
+  explanation: string
+}
+
+// --- Performance Optimization lab types ---
+
+export interface PerformanceProblem {
+  id: string
+  area: string
+  problem: string
+  options: string[]
+  correctOption: string
+}
+
+export interface PerformanceOptLabDefinition extends LabSummary {
+  type: 'performance-optimization'
+  scenario: string
+  architectureDescription: string
+  problems: PerformanceProblem[]
+  explanation: string
+}
+
+// --- Policy Simulation lab types ---
+
+export interface PolicyTestCase {
+  description: string
+  action: string
+  resource: string
+  expectedResult: 'Allow' | 'Deny'
+}
+
+export interface PolicySimulationLabDefinition extends LabSummary {
+  type: 'policy-simulation'
+  scenario: string
+  requirements: string[]
+  testCases: PolicyTestCase[]
+  initialPolicy: string
+  explanation: string
+}
+
+// --- Service Limits / Scaling lab types ---
+
+export interface ScalingMetric {
+  id: string
+  metric: string
+  currentValue: string
+  targetValue: string
+  options: string[]
+  correctOption: string
+}
+
+export interface ServiceLimitsLabDefinition extends LabSummary {
+  type: 'service-limits'
+  scenario: string
+  metrics: ScalingMetric[]
+  explanation: string
+}
+
+// Union of all lab definitions
+export type LabDefinition =
+  | DiagnoseLabDefinition | CliLabDefinition | PolicyFixLabDefinition
+  | ArchitectureBuilderLabDefinition | LogAnalysisLabDefinition | NetworkPathLabDefinition
+  | OrderingLabDefinition | ConfigToggleLabDefinition | CostOptimizationLabDefinition
+  | SecurityHardeningLabDefinition | PerformanceOptLabDefinition
+  | PolicySimulationLabDefinition | ServiceLimitsLabDefinition

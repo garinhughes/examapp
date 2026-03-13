@@ -1,0 +1,81 @@
+[
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "9a2d6da3-38d9-4242-b8d0-74132bc4153e",
+    "labId": "cloudfront-403",
+    "selectedAnswer": "policy",
+    "correct": true,
+    "timeTaken": 81,
+    "createdAt": "2026-03-13T13:12:16.157Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "637e3c8c-b80f-470d-9394-c4cc779c8f6b",
+    "labId": "s3-access-denied-cli",
+    "labType": "cli",
+    "selectedAnswer": "no-iam",
+    "correct": false,
+    "timeTaken": 202,
+    "createdAt": "2026-03-13T13:39:14.051Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "a43e661f-9b82-406f-89d9-40a0d1b5ed6a",
+    "labId": "s3-access-denied-cli",
+    "labType": "cli",
+    "selectedAnswer": "deny-policy",
+    "correct": true,
+    "timeTaken": 48,
+    "createdAt": "2026-03-13T13:40:33.958Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "efbb4b17-9b8c-4826-9496-8e50a76344e8",
+    "labId": "s3-iam-policy-fix",
+    "labType": "policy-fix",
+    "selectedAnswer": "solved",
+    "correct": true,
+    "timeTaken": 56,
+    "createdAt": "2026-03-13T13:45:49.043Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "7c0bca57-7f72-4d8d-9545-0d9c7badee7a",
+    "labId": "s3-access-denied-cli",
+    "labType": "cli",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 392,
+    "createdAt": "2026-03-13T13:54:11.829Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "23c0f507-084d-4a66-9db2-fe8885462708",
+    "labId": "s3-access-denied-cli",
+    "labType": "cli",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 301,
+    "createdAt": "2026-03-13T14:05:04.799Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "a4a1e3de-2074-45a0-bbad-cc720f27aa35",
+    "labId": "s3-access-denied-cli",
+    "labType": "cli",
+    "selectedAnswer": "no-iam",
+    "correct": false,
+    "timeTaken": 6,
+    "createdAt": "2026-03-13T14:31:02.934Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "84884e24-054a-45ed-8cfc-9f26785d17a3",
+    "labId": "api-request-network-debug",
+    "labType": "network-path",
+    "selectedAnswer": "sg-port",
+    "correct": true,
+    "timeTaken": 50,
+    "createdAt": "2026-03-13T16:12:33.708Z"
+  }
+]

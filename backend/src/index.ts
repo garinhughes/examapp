@@ -19,6 +19,7 @@ import adminRoutes from './routes/admin.js'
 import pricingRoutes from './routes/pricing.js'
 import stripeRoutes from './routes/stripe.js'
 import usernameRoutes from './routes/username.js'
+import skillLabsRoutes from './routes/skillLabs.js'
 
 const server = Fastify({ logger: true })
 
@@ -46,6 +47,8 @@ await server.register(gamificationRoutes, { prefix: '/gamification' })
 await server.register(usernameRoutes, { prefix: '/username' })
 // Admin routes
 await server.register(adminRoutes, { prefix: '/admin' })
+// Skill Labs routes
+await server.register(skillLabsRoutes, { prefix: '/skill-labs' })
 
 // Health check for ALB
 server.get('/health', async () => ({ status: 'ok' }))
