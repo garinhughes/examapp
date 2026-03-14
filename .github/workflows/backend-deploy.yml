@@ -75,4 +75,4 @@ jobs:
           IMAGE="${IMAGE:-${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/examapp-backend:latest}"
           echo "Using image: $IMAGE"
           chmod +x infra/terraform/ci/ecs-deploy-and-wait.sh
-          infra/terraform/ci/ecs-deploy-and-wait.sh --cluster "$CLUSTER" --service "$SERVICE" --container-name "$CONTAINER_NAME" --image "$IMAGE" --region $AWS_REGION
+          infra/terraform/ci/ecs-deploy-and-wait.sh --cluster "$CLUSTER" --service "$SERVICE" --container-name "$CONTAINER_NAME" --image "$IMAGE" --task-def-file backend/infra/ecs-task-def.json --region $AWS_REGION

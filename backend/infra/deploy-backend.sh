@@ -36,11 +36,13 @@ set -euo pipefail
 #     --query 'SecretList[].{Name:Name,ARN:ARN}' --output table
 #
 # Current secrets:
-#   examapp/cognito-client-secret  → COGNITO_APP_CLIENT_SECRET
+#   examapp-cognito-app-client-secret  → COGNITO_APP_CLIENT_SECRET
+#   examapp-gocardless-access-token    → GOCARDLESS_ACCESS_TOKEN
+#   examapp-gocardless-webhook-secret  → GOCARDLESS_WEBHOOK_SECRET
 # ─────────────────────────────────────────────────────────────────────
 
 REGION=${AWS_REGION:-eu-west-1}
-ACCOUNT=${ACCOUNT_ID:-030461496359}
+ACCOUNT=${ACCOUNT_ID:-809472479011}
 ECR_REPO=examapp-backend
 IMAGE_TAG=${IMAGE_TAG:-latest}
 CLUSTER=examapp-cluster

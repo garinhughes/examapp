@@ -88,7 +88,7 @@ jobs:
           fi
           echo "Using image: $IMAGE"
           chmod +x infra/terraform/ci/ecs-deploy-and-wait.sh
-          infra/terraform/ci/ecs-deploy-and-wait.sh --cluster "$CLUSTER" --service "$SERVICE" --container-name "$CONTAINER_NAME" --image "$IMAGE" --region $AWS_REGION
+          infra/terraform/ci/ecs-deploy-and-wait.sh --cluster "$CLUSTER" --service "$SERVICE" --container-name "$CONTAINER_NAME" --image "$IMAGE" --task-def-file backend/infra/ecs-task-def.json --region $AWS_REGION
 
   deploy-frontend:
     needs: deploy-backend

@@ -36,7 +36,7 @@ resource "aws_iam_role_policy" "ecs_exec_secrets" {
     Statement = [{
       Effect   = "Allow"
       Action   = ["secretsmanager:GetSecretValue"]
-      Resource = "arn:aws:secretsmanager:*:${var.account_id}:secret:${var.project}/*"
+      Resource = "arn:aws:secretsmanager:*:${var.account_id}:secret:${var.project}-*"
     }]
   })
 }
@@ -84,7 +84,7 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         Sid      = "Secrets"
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-        Resource = "arn:aws:secretsmanager:*:${var.account_id}:secret:${var.project}/*"
+        Resource = "arn:aws:secretsmanager:*:${var.account_id}:secret:${var.project}-*"
       }
     ]
   })
