@@ -53,6 +53,9 @@ async function loadLabsS3Summary(): Promise<any[]> {
       platform: e.platform ?? 'AWS',
       category: e.category ?? 'General',
       difficulty: e.difficulty ?? 'beginner',
+      timeLimit: (e as any).timeLimit ?? 0,
+      technologies: (e as any).technologies ?? [],
+      labCategory: (e as any).labCategory ?? 'Troubleshoot',
     }))
   } catch (err) {
     console.error('[skill-labs] Failed to scan DynamoDB index', err)

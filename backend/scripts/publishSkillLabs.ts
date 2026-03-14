@@ -74,6 +74,7 @@ async function main() {
     console.log(`    title:           ${lab.title ?? '(untitled)'}`)
     console.log(`    type:            ${lab.type ?? '(unknown)'}`)
     console.log(`    platform:        ${lab.platform ?? 'AWS'}`)
+    console.log(`    timeLimit:       ${lab.timeLimit ?? '(none)'}`)
     console.log(`    version (file):  ${version}`)
     console.log(`    version (index): ${currentVersion || '(not published)'}`)
 
@@ -89,6 +90,8 @@ async function main() {
       platform: lab.platform,
       category: lab.category,
       difficulty: lab.difficulty,
+      timeLimit: lab.timeLimit,
+      technologies: lab.technologies,
     })
     console.log(`    → published: s3VersionId=${entry.s3VersionId}`)
     console.log(`    → index updated: version=${entry.version} publishedAt=${entry.publishedAt}\n`)

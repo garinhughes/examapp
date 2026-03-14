@@ -366,9 +366,9 @@ export function SkillLabsPage() {
                 {/* Meta row */}
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {Math.floor(lab.timeLimit / 60)} min
-                  </span>
+                      <Clock className="w-3 h-3" />
+                      {typeof lab.timeLimit === 'number' && lab.timeLimit > 0 ? `${Math.floor(lab.timeLimit / 60)} min` : '—'}
+                    </span>
                   <span className="capitalize">{lab.category}</span>
                 </div>
               </div>

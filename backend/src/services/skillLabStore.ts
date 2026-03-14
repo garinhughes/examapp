@@ -48,6 +48,8 @@ export interface SkillLabIndexEntry {
   platform?: string
   category?: string
   difficulty?: string
+  timeLimit?: number
+  technologies?: string[]
 }
 
 /* ------------------------------------------------------------------ */
@@ -140,6 +142,8 @@ export async function publishLab(
     platform?: string
     category?: string
     difficulty?: string
+    timeLimit?: number
+    technologies?: string[]
   },
 ): Promise<SkillLabIndexEntry> {
   const { s3Key, s3VersionId } = await uploadLabToS3(labId, jsonBody)
@@ -154,6 +158,8 @@ export async function publishLab(
     platform: meta.platform,
     category: meta.category,
     difficulty: meta.difficulty,
+    timeLimit: meta.timeLimit,
+    technologies: meta.technologies,
   }
   await putLabIndex(entry)
   return entry
