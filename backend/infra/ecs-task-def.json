@@ -41,7 +41,7 @@
       "secrets": [
         {
           "name": "COGNITO_APP_CLIENT_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:eu-west-1:030461496359:secret:examapp/cognito-client-secret-jSS1a8"
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-cognito-app-client-secret-Yw5Yg5"
         },
         {
           "name": "GOCARDLESS_ACCESS_TOKEN",
