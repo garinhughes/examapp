@@ -68,7 +68,7 @@ jobs:
         env:
           CLUSTER: ${{ secrets.ECS_CLUSTER }}
           SERVICE: ${{ secrets.ECS_SERVICE }}
-          CONTAINER_NAME: ${{ secrets.ECS_CONTAINER_NAME }}
+          CONTAINER_NAME: backend
           IMAGE: ${{ needs.build-and-push-backend.outputs.image }}
         run: |
           set -euo pipefail

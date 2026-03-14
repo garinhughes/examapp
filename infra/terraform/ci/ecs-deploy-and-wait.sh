@@ -50,6 +50,11 @@ if [[ "$DRY_RUN" == "true" ]]; then
   echo "2) Describe task definition:"
   echo "  ${AWS_CLI[@]} ecs describe-task-definition --task-definition \"<TD_ARN_from_prev>\" --query 'taskDefinition' --output json"
   echo
+  if [[ -n "$TASK_DEF_FILE" ]]; then
+    echo "2b) Use task definition file as base (env/secrets/roles from file, family from live):"
+    echo "  jq --arg family \"<live_family>\" 'del(...) | .family = \$family' \"$TASK_DEF_FILE\""
+    echo
+  fi
   echo "3) Register new task definition with updated image for container '$CONTAINER':"
   echo "  ${AWS_CLI[@]} ecs register-task-definition --cli-input-json \"<updated-taskdef-json>\" --query 'taskDefinition.taskDefinitionArn' --output text"
   echo
@@ -84,24 +89,21 @@ CLEANED=$(
   jq 'del(.status, .revision, .compatibilities, .compatibilities, .requiresAttributes, .registeredAt, .registeredBy, .taskDefinitionArn)'
 )
 
-# 2b) If --task-def-file provided, merge its environment + secrets into the live task def
+# 2b) If --task-def-file provided, use the file as the base task definition.
+# This replaces the live task def entirely (env vars, secrets, roles, cpu/memory, etc.)
+# Only the family name is preserved from the live task def so we register a new revision
+# under the same family. The image is then updated in step 3.
 if [[ -n "$TASK_DEF_FILE" ]]; then
-  echo "Merging environment from task definition file: $TASK_DEF_FILE"
+  echo "Using task definition file as base: $TASK_DEF_FILE"
   if [[ ! -f "$TASK_DEF_FILE" ]]; then
     echo "Task definition file not found: $TASK_DEF_FILE"
     exit 3
   fi
+  LIVE_FAMILY=$(echo "$CLEANED" | jq -r '.family')
   CLEANED=$(
-    jq -s --arg cname "$CONTAINER" '
-      .[0] as $live | .[1] as $file |
-      ($file.containerDefinitions[] | select(.name == $cname)) as $fc |
-      $live | .containerDefinitions |= map(
-        if .name == $cname then
-          .environment = $fc.environment |
-          if $fc.secrets then .secrets = $fc.secrets else . end
-        else . end
-      )
-    ' <(echo "$CLEANED") "$TASK_DEF_FILE"
+    jq --arg family "$LIVE_FAMILY" \
+      'del(.status, .revision, .compatibilities, .requiresAttributes, .registeredAt, .registeredBy, .taskDefinitionArn) | .family = $family' \
+      "$TASK_DEF_FILE"
   )
 fi
 
