@@ -1,11 +1,26 @@
 import { useExam } from './ExamContext'
-import { Play, Info, BarChart3 } from 'lucide-react'
+import { Play, Info, BarChart3, ShoppingCart } from 'lucide-react'
+import { useBasket } from '@/basket/BasketContext'
+import { useEntitlements } from '@/hooks/useEntitlements'
+import { useState, useEffect } from 'react'
 
 export function PracticeExams() {
   const {
     providers, examStarted, anySavedExam, selected, savedProgress,
     setupExamFromMeta, resumeExam, setSelected, setRoute
   } = useExam()
+  const basket = useBasket()
+  const { products } = useEntitlements()
+  const [actionError, setActionError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (basket.lastError) setActionError(basket.lastError)
+  }, [basket.lastError])
+
+  function formatPrice(pence: number): string {
+    const pounds = pence / 100
+    return pounds % 1 === 0 ? `£${pounds}` : `£${pounds.toFixed(2)}`
+  }
 
   return (
     <div className="mb-6">
@@ -40,8 +55,8 @@ export function PracticeExams() {
             <h3 className="font-semibold mb-2">{p.provider}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {p.exams.map((ex: any) => (
-                <div key={ex.code} className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm relative">
-                  <div>
+                <div key={ex.code} className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm relative flex flex-col">
+                  <div className="flex-1">
                     <div className="font-medium">{ex.title ?? ex.code}</div>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-muted-foreground">{ex.code}</span>
@@ -65,6 +80,30 @@ export function PracticeExams() {
                       <BarChart3 className="w-4 h-4" aria-hidden />
                       <span className="sr-only">Analytics</span>
                     </button>
+                    {(() => {
+                      const productId = `exam:${ex.code}`
+                      const product = products.find((p) => p.productId === productId)
+                      if (!product || product.owned) return null
+                      const inBasket = basket.has(productId)
+                      return (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); if (!inBasket) {
+                            const ok = basket.add(product)
+                            if (!ok) setActionError(basket.lastError)
+                          } }}
+                          title={inBasket ? 'Already in basket' : `Add ${ex.code} to basket`}
+                          className={`px-2 py-1 rounded text-sm inline-flex items-center gap-2 ${
+                            inBasket
+                              ? 'bg-primary/10 text-primary cursor-default'
+                              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                          }`}
+                          aria-label={inBasket ? `${ex.code} in basket` : `Add ${ex.code} to basket`}
+                        >
+                          <ShoppingCart className="w-4 h-4" aria-hidden />
+                          {!inBasket && <span className="text-xs font-medium">{formatPrice(product.priceGBP)}</span>}
+                        </button>
+                      )
+                    })()}
                   </div>
                   {ex.logo && (
                     ex.logoHref ? (

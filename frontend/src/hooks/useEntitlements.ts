@@ -35,6 +35,7 @@ export interface CatalogProduct {
   priceGBP: number
   billingPeriod?: 'monthly' | 'annual'
   examCodes?: string[]
+  provider?: string
   owned: boolean
 }
 

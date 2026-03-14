@@ -15,7 +15,9 @@ import {
   Activity,
   Network,
   FlaskConical,
+  ShoppingCart,
 } from "lucide-react";
+import { useBasket } from "@/basket/BasketContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import type { AuthUser } from "@/auth/AuthContext";
@@ -29,6 +31,7 @@ const navItems = [
   { icon: FlaskConical, label: "Skill Labs", href: "/skill-labs", key: 'skill-labs' },
   { icon: User, label: "Account", href: "/account", key: 'account' },
   { icon: CreditCard, label: "Pricing", href: "/pricing", key: 'pricing' },
+  { icon: ShoppingCart, label: "Basket", href: "/basket", key: 'basket' },
   { icon: Settings, label: "Admin", href: "/admin", key: 'admin' },
 ];
 
@@ -47,7 +50,8 @@ interface SidebarProps {
 
 export function Sidebar({ className, currentRoute, onNavigate, logout, login, user, xp, level, streak, showAdmin }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation(); 
+  const location = useLocation();
+  const { itemCount: basketCount } = useBasket();
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -101,6 +105,11 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
             >
               <item.icon className={cn("h-4 w-4", isActive ? "text-sidebar-primary" : "text-sidebar-foreground/70 group-hover:text-sidebar-accent-foreground")} />
               {item.label}
+              {item.key === 'basket' && basketCount > 0 && (
+                <span className="ml-auto inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                  {basketCount}
+                </span>
+              )}
             </button>
           )})}
         </nav>

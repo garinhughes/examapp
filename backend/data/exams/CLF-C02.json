@@ -1,0 +1,49 @@
+{
+  "code": "CLF-C02",
+  "provider": "AWS",
+  "passMark": 70,
+  "logo": "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
+  "defaultQuestions": 65,
+  "defaultDuration": 90,
+  "title": "AWS Certified Cloud Practitioner",
+  "level": "Foundational",
+  "questions": [
+    {
+      "id": "CLF-C02-0001",
+      "type": "single-choice",
+      "format": "text",
+      "services": ["AWS Shared Responsibility Model"],
+      "skills": ["Define the AWS shared responsibility model"],
+      "domain": "Cloud Concepts",
+      "question": "Under the AWS Shared Responsibility Model, which of the following is the customer's responsibility?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Patching the hypervisor software on Amazon EC2 host servers.",
+          "explanation": "AWS is responsible for maintaining and patching the infrastructure that runs AWS services, including hypervisors."
+        },
+        {
+          "id": "c2",
+          "text": "Configuring security group rules and network ACLs for an Amazon VPC.",
+          "sequence": 1,
+          "explanation": "Security groups and network ACLs are customer-managed controls. Customers are responsible for configuring these firewall rules to control traffic to and from their resources."
+        },
+        {
+          "id": "c3",
+          "text": "Maintaining the physical security of AWS data centres.",
+          "explanation": "Physical security of data centres is entirely AWS's responsibility under the shared responsibility model."
+        },
+        {
+          "id": "c4",
+          "text": "Replacing failed hard drives on Amazon S3 storage servers.",
+          "explanation": "Hardware maintenance, including storage device replacement, is an AWS responsibility as part of the 'security of the cloud' domain."
+        }
+      ],
+      "tip": "Think about what falls under 'security IN the cloud' (customer) versus 'security OF the cloud' (AWS).",
+      "explanation": "The AWS Shared Responsibility Model divides security duties: AWS handles 'security of the cloud' (hardware, networking, facilities, hypervisor), while customers handle 'security in the cloud' (data, IAM, OS patching on EC2, firewall/network configuration, encryption). Configuring security groups and NACLs is a core customer responsibility — these are the virtual firewalls that customers must set up correctly to protect their workloads.",
+      "difficulty": 1,
+      "docs": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+      "lastReviewed": "2026-03-14"
+    }
+  ]
+}

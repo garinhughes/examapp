@@ -67,7 +67,7 @@ backend/src/
     analytics.ts        # Usage stats
     gamification.ts     # Badges/streaks
     pricing.ts          # Pricing tiers
-    stripe.ts           # Stripe webhook + checkout
+    stripe.ts           # Stripe webhook + checkout (RENAMED to gocardless.ts)
     username.ts         # Username management
     skillLabs.ts        # GET/POST /skill-labs — lab definitions + attempt storage
   plugins/
@@ -84,7 +84,7 @@ backend/src/
     skillLabStore.ts    # Skill lab S3 + DynamoDB store (mirrors examStore.ts)
 
 frontend/src/
-  App.tsx               # Thin shell: ExamProvider wrapping ExamApp
+  App.tsx               # Thin shell: ExamProvider + BasketProvider wrapping ExamApp
   apiBase.ts            # Base URL config
   auth/
     AuthContext.tsx     # Cognito auth state
@@ -129,6 +129,9 @@ frontend/src/
       PolicyFixLabRunner.tsx # Policy fix lab: Monaco Editor for IAM policy repair
   hooks/
     useEntitlements.ts  # Checks user access tier
+  basket/
+    BasketContext.tsx   # Shopping basket state (localStorage persistence, smart suggestions)
+    BasketPage.tsx      # Basket view: item list, suggestion banners, GoCardless checkout
 ```
 
 ---
@@ -198,7 +201,7 @@ pnpm publish:skill-labs:dry   # dry run - no writes
 - **Cognito** — auth (JWT issued by Cognito user pool)
 - **CloudFront** — frontend CDN
 - **WAF** — IP allowlist managed via `backend/infra/waf-allowlist.sh`
-- **Stripe** — payments via webhook in `backend/src/routes/stripe.ts`
+- **GoCardless** - payments via webhook in `backend/src/routes/gocardless.ts` (route prefix `/payments`)
 
 Terraform state is remote (S3 backend defined in `infra/terraform/backend.tf`). Never run `terraform destroy` without explicit confirmation.
 
@@ -225,3 +228,4 @@ Terraform state is remote (S3 backend defined in `infra/terraform/backend.tf`). 
 - **Exam state/logic**: `frontend/src/exam/ExamContext.tsx` — central React Context with all state, effects, and handlers
 - **Exam UI components**: `frontend/src/exam/` — ExamApp (layout shell), ExamSetup, QuestionNav, QuestionCard, ExamReview, Modals, PracticeExams, AnalyticsView
 - **Skill Labs**: `frontend/src/skill-labs/` (pages + types) + `backend/src/routes/skillLabs.ts` + `backend/src/services/skillLabStore.ts` + `backend/src/services/skillLabAttemptsStore.ts` + `backend/data/skill-labs.json` (lab definitions). Supports three lab types: `diagnose` (React Flow diagram), `cli` (simulated AWS CLI terminal), `policy-fix` (Monaco Editor IAM policy repair). The runner page (`SkillLabRunnerPage`) dispatches to the correct component by `lab.type` using `React.lazy` + dynamic imports for code-splitting. Lab runner components live in `frontend/src/skill-labs/labs/` and share a common `LabHeader` component. Publishing mirrors the exam pipeline: `pnpm publish:skill-labs` uploads each lab to S3 and writes a summary index to DynamoDB. `SKILL_LAB_SOURCE=local|s3` toggles data source (same pattern as `EXAM_SOURCE`).
+- **Basket / Payments**: `frontend/src/basket/` (BasketContext + BasketPage) + `backend/src/routes/gocardless.ts` + `backend/src/catalog.ts`. The basket uses localStorage persistence (`certshack:basket`), smart upsell suggestions (e.g. nudge to subscribe when 2+ exams in basket), and a single GoCardless checkout entry point. Pricing: single exams £5, bundles £9/£12, monthly sub £10, annual sub £96. GoCardless routes are stubbed under `/payments` prefix. The `PricingPage` "Add to Basket" buttons and `PracticeExams` cart icons both feed into the basket context.

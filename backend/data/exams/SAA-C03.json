@@ -1,0 +1,49 @@
+{
+  "code": "SAA-C03",
+  "provider": "AWS",
+  "passMark": 72,
+  "logo": "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
+  "defaultQuestions": 65,
+  "defaultDuration": 130,
+  "title": "AWS Certified Solutions Architect - Associate",
+  "level": "Associate",
+  "questions": [
+    {
+      "id": "SAA-C03-0001",
+      "type": "single-choice",
+      "format": "text",
+      "services": ["Amazon S3", "Amazon CloudFront"],
+      "skills": ["Design secure architectures"],
+      "domain": "Design Resilient Architectures",
+      "question": "A company hosts a static website on Amazon S3 and wants to serve the content globally with low latency while restricting direct access to the S3 bucket. The solution must ensure that users can only access content through the distribution endpoint.\n\nWhich combination of services and configurations meets these requirements?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Create an Amazon CloudFront distribution with the S3 bucket as the origin. Configure an Origin Access Control (OAC) policy and update the S3 bucket policy to allow access only from the CloudFront distribution.",
+          "sequence": 1,
+          "explanation": "Origin Access Control (OAC) is the recommended method to restrict S3 access to CloudFront only. The bucket policy grants read permission exclusively to the CloudFront distribution's service principal, preventing direct S3 URL access."
+        },
+        {
+          "id": "c2",
+          "text": "Enable S3 static website hosting with public read access and place an Application Load Balancer in front of the S3 website endpoint.",
+          "explanation": "An ALB cannot use an S3 website endpoint as a target. Additionally, enabling public read access on the bucket means anyone with the S3 URL can bypass the ALB entirely."
+        },
+        {
+          "id": "c3",
+          "text": "Create an Amazon CloudFront distribution pointing to the S3 bucket and enable S3 Block Public Access. Rely on CloudFront signed URLs for all requests.",
+          "explanation": "While signed URLs can restrict access, they add complexity for a public static website and do not alone prevent direct S3 access. Without an OAC or OAI, CloudFront cannot authenticate to a non-public bucket."
+        },
+        {
+          "id": "c4",
+          "text": "Configure an S3 bucket policy that allows access from all IP addresses in AWS's published CloudFront IP ranges.",
+          "explanation": "Allowing CloudFront IP ranges in the bucket policy is fragile — the IP list changes over time, any CloudFront distribution (not just yours) could access the bucket, and it requires ongoing maintenance. OAC is the purpose-built, secure approach."
+        }
+      ],
+      "tip": "Consider which AWS feature provides a direct trust relationship between CloudFront and S3 without exposing the bucket publicly.",
+      "explanation": "Amazon CloudFront Origin Access Control (OAC) is the recommended way to serve S3 content through CloudFront while keeping the bucket private. OAC uses the CloudFront service principal in the S3 bucket policy, ensuring only your specific distribution can fetch objects. OAI (Origin Access Identity) is the legacy approach. ALBs cannot target S3 website endpoints, and IP-based restrictions are unreliable for CloudFront.",
+      "difficulty": 2,
+      "docs": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html",
+      "lastReviewed": "2026-03-14"
+    }
+  ]
+}

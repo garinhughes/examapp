@@ -9,6 +9,7 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { PRODUCTS, TIERS, resolveUserTier, type Tier } from '../catalog.js'
 import { getActiveProductIds } from '../services/entitlements.js'
+import { loadAllExams } from '../examLoader.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   /** Public: return the full product catalog */
@@ -26,11 +27,23 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     const tier: Tier = resolveUserTier({ isAuthenticated, ownedProductIds })
 
+    // Only surface exam products that have actual JSON data on disk
+    const allExams = await loadAllExams()
+    const availableExamCodes = new Set(allExams.map((e) => String((e as any).code).toUpperCase()))
+
+    const visibleProducts = PRODUCTS.filter((p) => {
+      if (p.kind === 'exam') {
+        const code = p.productId.replace('exam:', '').toUpperCase()
+        return availableExamCodes.has(code)
+      }
+      return true
+    })
+
     return {
       tier,
       tierConfig: TIERS[tier],
       entitlements: ownedProductIds,
-      products: PRODUCTS.map((p) => ({
+      products: visibleProducts.map((p) => ({
         productId: p.productId,
         kind: p.kind,
         label: p.label,
@@ -38,6 +51,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         priceGBP: p.priceGBP,
         billingPeriod: p.billingPeriod,
         examCodes: p.examCodes,
+        provider: p.provider,
         owned: ownedProductIds.includes(p.productId),
       })),
       tiers: Object.values(TIERS),

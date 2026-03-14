@@ -12,6 +12,8 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
+      // Proxy payments endpoints to backend
+      '/payments': 'http://localhost:3000',
       // proxy API calls to backend running on port 3000
       '/exams': 'http://localhost:3000',
       '/attempts': 'http://localhost:3000',

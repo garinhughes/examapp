@@ -1,8 +1,8 @@
 /**
- * Product & tier catalog — single source of truth for pricing,
+ * Product & tier catalog - single source of truth for pricing,
  * feature gating, and what each tier unlocks.
  *
- * Stripe integration is scaffolded but will be wired later.
+ * GoCardless integration is scaffolded but will be wired later.
  */
 
 /* ------------------------------------------------------------------ */
@@ -33,11 +33,11 @@ export const TIERS: Record<Tier, TierConfig> = {
     tier: 'visitor',
     label: 'Free / Visitor',
     questionLimit: 10,
-    attemptLimit: null,
-    reviewEnabled: true,
-    exportEnabled: true,
-    leaderboardEnabled: true,
-    domainMasteryEnabled: true,
+    attemptLimit: 0,
+    reviewEnabled: false,
+    exportEnabled: false,
+    leaderboardEnabled: false,
+    domainMasteryEnabled: false,
   },
   registered: {
     tier: 'registered',
@@ -51,7 +51,7 @@ export const TIERS: Record<Tier, TierConfig> = {
   },
   paying: {
     tier: 'paying',
-    label: 'Paying',
+    label: 'Paid',
     questionLimit: null,
     attemptLimit: null,
     reviewEnabled: true,
@@ -62,7 +62,7 @@ export const TIERS: Record<Tier, TierConfig> = {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Products (Stripe SKUs)                                             */
+/*  Products (GoCardless SKUs)                                         */
 /* ------------------------------------------------------------------ */
 
 export type ProductKind = 'exam' | 'bundle' | 'subscription' | 'extra'
@@ -73,100 +73,111 @@ export interface Product {
   kind: ProductKind
   label: string
   description: string
-  /** Price in pence (GBP) — e.g. 300 = £3.00 */
+  /** Price in pence (GBP) - e.g. 300 = £3.00 */
   priceGBP: number
   /** If subscription, the billing period */
   billingPeriod?: 'monthly' | 'annual'
   /** If bundle, list of exam codes included */
   examCodes?: string[]
-  /** Stripe Price ID — filled in when Stripe products are created */
-  stripePriceId?: string
+  /** Cloud provider — used to group exam passes in the UI */
+  provider?: string
+  /** GoCardless Price ID - filled in when GoCardless products are created */
+  goCardlessPriceId?: string
 }
 
 /**
  * Master product list.
- * New exams/bundles are added here; Stripe Price IDs are populated later.
+ * New exams/bundles are added here; GoCardless Price IDs are populated later.
  */
 export const PRODUCTS: Product[] = [
-  // ── Single exams ──
+  // -- Single exams (Exam Pass - £9 each, 1 year access) --
   {
     productId: 'exam:SAA-C03',
     kind: 'exam',
-    label: 'AWS SAA-C03',
-    description: 'Full access to AWS Solutions Architect Associate practice exam',
-    priceGBP: 300,
+    label: 'Exam Pass - SAA-C03',
+    description: 'AWS Solutions Architect Associate - full question bank + all AWS skill labs for 1 year',
+    priceGBP: 900,
+    examCodes: ['SAA-C03'],
+    provider: 'AWS',
   },
   {
     productId: 'exam:CLF-C02',
     kind: 'exam',
-    label: 'AWS CLF-C02',
-    description: 'Full access to AWS Cloud Practitioner practice exam',
-    priceGBP: 300,
+    label: 'Exam Pass - CLF-C02',
+    description: 'AWS Cloud Practitioner - full question bank + all AWS skill labs for 1 year',
+    priceGBP: 900,
+    examCodes: ['CLF-C02'],
+    provider: 'AWS',
   },
   {
     productId: 'exam:DVA-C02',
     kind: 'exam',
-    label: 'AWS DVA-C02',
-    description: 'Full access to AWS Developer Associate practice exam',
-    priceGBP: 300,
+    label: 'Exam Pass - DVA-C02',
+    description: 'AWS Developer Associate - full question bank + all AWS skill labs for 1 year',
+    priceGBP: 900,
+    examCodes: ['DVA-C02'],
+    provider: 'AWS',
   },
   {
     productId: 'exam:SOA-C02',
     kind: 'exam',
-    label: 'AWS SOA-C02',
-    description: 'Full access to AWS CloudOps Engineer Associate practice exam',
-    priceGBP: 300,
-  },
-  {
-    productId: 'exam:AZ-900',
-    kind: 'exam',
-    label: 'Azure AZ-900',
-    description: 'Full access to Azure Fundamentals practice exam',
-    priceGBP: 300,
+    label: 'Exam Pass - SOA-C02',
+    description: 'AWS SysOps Administrator Associate - full question bank + all AWS skill labs for 1 year',
+    priceGBP: 900,
+    examCodes: ['SOA-C02'],
+    provider: 'AWS',
   },
   {
     productId: 'exam:SCS-C03',
     kind: 'exam',
-    label: 'AWS SCS-C03',
-    description: 'Full access to AWS Security Specialty practice exam',
-    priceGBP: 300,
+    label: 'Exam Pass - SCS-C03',
+    description: 'AWS Security Specialty - full question bank + all AWS skill labs for 1 year',
+    priceGBP: 900,
+    examCodes: ['SCS-C03'],
+    provider: 'AWS',
   },
-
-  // ── Bundles ──
   {
-    productId: 'bundle:aws',
-    kind: 'bundle',
-    label: 'AWS Bundle',
-    description: 'All AWS certification practice exams',
-    priceGBP: 1200,
-    examCodes: ['SAA-C03', 'CLF-C02', 'DVA-C02', 'SOA-C02', 'SCS-C03'],
+    productId: 'exam:AZ-900',
+    kind: 'exam',
+    label: 'Exam Pass - AZ-900',
+    description: 'Azure Fundamentals - full question bank + all Azure skill labs for 1 year',
+    priceGBP: 900,
+    examCodes: ['AZ-900'],
+    provider: 'Azure',
   },
 
-  // ── Subscription ──
+  // -- Bundles (Exam Pack - pick 2 for £17, pick 3 for £25) --
+  {
+    productId: 'bundle:pick-2',
+    kind: 'bundle',
+    label: 'Exam Pack - Any 2 Exams',
+    description: 'Choose any 2 practice exams + provider skill labs for 1 year (save over individual purchases)',
+    priceGBP: 1700,
+  },
+  {
+    productId: 'bundle:pick-3',
+    kind: 'bundle',
+    label: 'Exam Pack - Any 3 Exams',
+    description: 'Choose any 3 practice exams + provider skill labs for 1 year (best multi-exam value)',
+    priceGBP: 2500,
+  },
+
+  // -- Subscription (All-Access) --
   {
     productId: 'sub:all-access',
     kind: 'subscription',
-    label: 'Unlimited (Monthly)',
-    description: 'Full access to every exam — billed monthly',
-    priceGBP: 600,
+    label: 'All-Access Monthly',
+    description: 'Unlimited access to every exam, all skill labs, certificates, leaderboard & more',
+    priceGBP: 1000,
     billingPeriod: 'monthly',
   },
   {
     productId: 'sub:all-access-annual',
     kind: 'subscription',
-    label: 'Unlimited (Annual)',
-    description: 'Full access to every exam — billed annually (save 25%)',
-    priceGBP: 5400,
+    label: 'All-Access Annual',
+    description: 'Unlimited access - billed annually at £8/mo (save 20%)',
+    priceGBP: 9600,
     billingPeriod: 'annual',
-  },
-
-  // ── Extras ──
-  {
-    productId: 'extra:pdf-report',
-    kind: 'extra',
-    label: 'PDF Report Export',
-    description: 'Export detailed PDF reports of your exam attempts',
-    priceGBP: 99,
   },
 ]
 

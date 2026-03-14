@@ -17,11 +17,23 @@ import analyticsRoutes from './routes/analytics.js'
 import gamificationRoutes from './routes/gamification.js'
 import adminRoutes from './routes/admin.js'
 import pricingRoutes from './routes/pricing.js'
-import stripeRoutes from './routes/stripe.js'
+import goCardlessRoutes from './routes/gocardless.js'
 import usernameRoutes from './routes/username.js'
 import skillLabsRoutes from './routes/skillLabs.js'
 
 const server = Fastify({ logger: true })
+
+// Capture raw body string so the GoCardless webhook handler can verify the
+// HMAC-SHA256 signature over the exact bytes GoCardless signed.
+server.addContentTypeParser('application/json', { parseAs: 'string' }, function (_req, body, done) {
+  ;(_req as any).rawBody = body
+  try {
+    done(null, JSON.parse(body as string))
+  } catch (err: any) {
+    err.statusCode = 400
+    done(err, undefined)
+  }
+})
 
 await server.register(cors, { origin: '*' })
 
@@ -34,9 +46,9 @@ await server.register(authRoutes, { prefix: '/auth' })
 // Entitlement plugin — decorates request.tier, request.tierConfig, request.entitlements
 await server.register(entitlementPlugin)
 
-// Pricing & Stripe (scaffolded)
+// Pricing & GoCardless (scaffolded)
 await server.register(pricingRoutes, { prefix: '/pricing' })
-await server.register(stripeRoutes, { prefix: '/stripe' })
+await server.register(goCardlessRoutes, { prefix: '/payments' })
 
 // App routes
 await server.register(examsRoutes, { prefix: '/exams' })
