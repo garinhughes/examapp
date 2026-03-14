@@ -33,7 +33,12 @@
         { "name": "COGNITO_REGION", "value": "eu-west-1" },
         { "name": "COGNITO_USER_POOL_ID", "value": "eu-west-1_c6WQUP1RX" },
         { "name": "COGNITO_REDIRECT_URI", "value": "https://api.certshack.com/auth/token" },
-        { "name": "FRONTEND_ORIGIN", "value": "https://certshack.com" }
+        { "name": "FRONTEND_ORIGIN", "value": "https://certshack.com" },
+        { "name": "GOCARDLESS_ACCESS_TOKEN", "value": "sandbox_x1vBvKGbBEmlsqXC53_vIdn-Vk81ZCCFcP1KYWSi" },
+        { "name": "GOCARDLESS_ENVIRONMENT", "value": "sandbox" },
+        { "name": "GOCARDLESS_API_BASE", "value": "https://api-sandbox.gocardless.com" },
+        { "name": "GOCARDLESS_WEBHOOK_SECRET", "value": "zWS9ppvWyaWm8Dy5AxxN081-aMgPrZoE3o2B-Cax" },
+        { "name": "GOCARDLESS_ENABLE_REAL", "value": "1" }
       ],
       "secrets": [
         {
