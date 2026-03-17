@@ -71,7 +71,7 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
         await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: JSON.stringify(selections), correct, timeTaken, labType: 'cost-optimization' }),
+          body: JSON.stringify({ selectedAnswer: JSON.stringify(selections), correct, timeTaken }),
         })
       } catch { /* non-critical */ }
     }

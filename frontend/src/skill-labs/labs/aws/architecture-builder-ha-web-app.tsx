@@ -136,7 +136,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
         await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: '', correct: allPass, timeTaken, labType: 'architecture-builder' }),
+          body: JSON.stringify({ selectedAnswer: '', correct: allPass, timeTaken }),
         })
       } catch { /* non-critical */ }
     }

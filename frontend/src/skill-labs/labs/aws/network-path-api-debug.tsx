@@ -59,7 +59,7 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
         await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: selectedAnswer || '', correct, timeTaken, labType: 'network-path' }),
+          body: JSON.stringify({ selectedAnswer: selectedAnswer || '', correct, timeTaken }),
         })
       } catch { /* non-critical */ }
     }

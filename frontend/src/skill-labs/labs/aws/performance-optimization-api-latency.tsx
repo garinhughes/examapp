@@ -66,7 +66,7 @@ export function PerformanceOptRunner({ lab, timed = true }: Props) {
         await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: JSON.stringify(selections), correct: allCorrect, timeTaken, labType: 'performance-optimization' }),
+          body: JSON.stringify({ selectedAnswer: JSON.stringify(selections), correct: allCorrect, timeTaken }),
         })
       } catch { /* non-critical */ }
     }

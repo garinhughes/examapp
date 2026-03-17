@@ -75,7 +75,7 @@ export function OrderingRunner({ lab, timed = true }: Props) {
         await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: steps.map((s) => s.id).join(','), correct, timeTaken, labType: 'ordering' }),
+          body: JSON.stringify({ selectedAnswer: steps.map((s) => s.id).join(','), correct, timeTaken }),
         })
       } catch { /* non-critical */ }
     }

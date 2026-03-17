@@ -75,7 +75,6 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
             selectedAnswer: selectedAnswer || '',
             correct,
             timeTaken,
-            labType: 'diagnose',
           }),
         })
       } catch {

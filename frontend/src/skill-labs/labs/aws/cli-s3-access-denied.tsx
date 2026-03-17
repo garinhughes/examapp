@@ -200,7 +200,6 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
             selectedAnswer: selectedAnswer || '',
             correct,
             timeTaken,
-            labType: 'cli',
           }),
         })
       } catch {

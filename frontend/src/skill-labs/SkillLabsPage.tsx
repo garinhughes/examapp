@@ -12,21 +12,6 @@ const DIFFICULTY_COLORS: Record<SkillLevel, string> = {
   intermediate: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
   advanced: 'bg-red-500/15 text-red-700 dark:text-red-400',
 }
-const TYPE_ICON: Record<string, string> = {
-  diagnose: '🔍',
-  cli: '💻',
-  'policy-fix': '🛠️',
-  'architecture-builder': '🧩',
-  'log-analysis': '📋',
-  'network-path': '🔧',
-  ordering: '🧱',
-  'config-toggle': '🎛️',
-  'cost-optimization': '🧠',
-  'security-hardening': '🔐',
-  'performance-optimization': '⚡',
-  'policy-simulation': '🧪',
-  'service-limits': '📡',
-}
 const LABS_PER_PAGE = 12 // 3 cols × 4 rows
 
 export function SkillLabsPage() {
@@ -337,7 +322,6 @@ export function SkillLabsPage() {
                         }`}
                       />
                     </button>
-                    <span className="text-lg" title={lab.type}>{TYPE_ICON[lab.type] || '📋'}</span>
                   </div>
                 </div>
 

@@ -65,7 +65,7 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
         await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: JSON.stringify(values), correct: allCorrect, timeTaken, labType: 'config-toggle' }),
+          body: JSON.stringify({ selectedAnswer: JSON.stringify(values), correct: allCorrect, timeTaken }),
         })
       } catch { /* non-critical */ }
     }

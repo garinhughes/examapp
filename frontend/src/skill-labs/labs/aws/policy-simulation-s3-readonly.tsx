@@ -116,7 +116,6 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
           await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ selectedAnswer: policy, correct: true, timeTaken, labType: 'policy-simulation' }),
           })
         } catch { /* non-critical */ }
       }
@@ -134,7 +133,6 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
         await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: '', correct: false, timeTaken, labType: 'policy-simulation' }),
         })
       } catch { /* non-critical */ }
     }

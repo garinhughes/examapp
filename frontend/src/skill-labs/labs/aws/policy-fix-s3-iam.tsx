@@ -98,7 +98,6 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
           selectedAnswer: correct ? 'solved' : 'gave-up',
           correct,
           timeTaken,
-          labType: 'policy-fix',
         }),
       })
     } catch {
