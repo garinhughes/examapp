@@ -46,6 +46,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
 
   // Timer
   const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [labPaused, setLabPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
 
@@ -97,7 +98,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
 
   // Timer
   useEffect(() => {
-    if (submitted || !timed) return
+    if (submitted || !timed || labPaused) return
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -108,7 +109,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
       })
     }, 1000)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed])
+  }, [submitted, timed, labPaused])
 
   useEffect(() => {
     if (timed && timeLeft === 0 && !submitted) handleSubmit()
@@ -210,7 +211,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id} />
+      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id} onPauseChange={setLabPaused} />
 
       {/* Terminal */}
       <div

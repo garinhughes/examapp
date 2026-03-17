@@ -1,12 +1,18 @@
-import { Check } from 'lucide-react'
+import { useState } from 'react'
+import { Check, Flag } from 'lucide-react'
 import { useExam } from './ExamContext'
+import { ReportIssueModal } from '../components/ReportIssueModal'
 
 export function QuestionNav() {
   const {
     displayQuestions, selectedAnswers, flaggedQuestions, currentQuestionIndex,
     setCurrentQuestionIndex, setFlaggedQuestions, isFinished, revealAnswers,
     revealedQuestions, setShowSubmitConfirm, setShowCompleteEarlyConfirm,
+    userTier, examTier, timed, setPaused, selected, selectedMeta,
   } = useExam()
+
+  const isPaying = userTier === 'paying' || examTier === 'paying'
+  const [reporting, setReporting] = useState(false)
 
   const answeredCount = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === id)).length
   const pct = Math.round((answeredCount / Math.max(1, displayQuestions.length)) * 100)
@@ -18,6 +24,7 @@ export function QuestionNav() {
   const immediateMode = revealAnswers === 'immediately'
 
   return (
+    <>
     <div className="mb-2 space-y-2">
       {/* Question navigation bar */}
       <div className="flex flex-wrap gap-1">
@@ -70,6 +77,14 @@ export function QuestionNav() {
         <div className="mt-1.5 flex items-center gap-2 justify-between w-full">
           <div className="flex-1" />
           <div className="flex items-center gap-2">
+            {isPaying && curQ && !isFinished && (
+              <button
+                onClick={() => { setReporting(true); setPaused(true) }}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground border border-border hover:border-primary/50 transition-colors whitespace-nowrap"
+              >
+                <Flag className="w-3 h-3" /> Report Issue
+              </button>
+            )}
             <button
               onClick={() => setCurrentQuestionIndex((i) => Math.max(0, i - 1))}
               disabled={currentQuestionIndex <= 0}
@@ -98,5 +113,16 @@ export function QuestionNav() {
         </div>
       </div>
     </div>
+    {reporting && curQ && (
+      <ReportIssueModal
+        contentType="question"
+        contentId={String(curQ.id)}
+        examCode={selected ?? undefined}
+        provider={(selectedMeta as any)?.provider}
+        showPauseNotice={timed}
+        onClose={() => { setReporting(false); setPaused(false) }}
+      />
+    )}
+    </>
   )
 }

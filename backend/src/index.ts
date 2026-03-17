@@ -20,6 +20,7 @@ import pricingRoutes from './routes/pricing.js'
 import goCardlessRoutes from './routes/gocardless.js'
 import usernameRoutes from './routes/username.js'
 import skillLabsRoutes from './routes/skillLabs.js'
+import reportsRoutes from './routes/reports.js'
 
 const server = Fastify({ logger: true })
 
@@ -40,11 +41,12 @@ await server.register(cors, { origin: '*' })
 // Auth plugin — decorates request.user + server.authenticate / server.optionalAuth
 await server.register(authPlugin)
 
+// Entitlement plugin — decorates request.tier, request.tierConfig, request.entitlements
+// Must be registered before any routes that use server.resolveEntitlements
+await server.register(entitlementPlugin)
+
 // Auth routes (public: /auth/config, protected: /auth/me)
 await server.register(authRoutes, { prefix: '/auth' })
-
-// Entitlement plugin — decorates request.tier, request.tierConfig, request.entitlements
-await server.register(entitlementPlugin)
 
 // Pricing & GoCardless (scaffolded)
 await server.register(pricingRoutes, { prefix: '/pricing' })
@@ -61,6 +63,8 @@ await server.register(usernameRoutes, { prefix: '/username' })
 await server.register(adminRoutes, { prefix: '/admin' })
 // Skill Labs routes
 await server.register(skillLabsRoutes, { prefix: '/skill-labs' })
+// Issue reports
+await server.register(reportsRoutes, { prefix: '/reports' })
 
 // Health check for ALB
 server.get('/health', async () => ({ status: 'ok' }))

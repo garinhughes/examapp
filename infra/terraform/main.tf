@@ -74,6 +74,7 @@ module "dynamodb" {
     sessions     = { table_name = "${var.project}-sessions",     hash_key = "PK",       range_key = "SK" }
     skill_labs_index    = { table_name = "${var.project}-skill-labs-index",    hash_key = "labId" }
     skill_lab_attempts  = { table_name = "${var.project}-skill-lab-attempts",  hash_key = "userId", range_key = "attemptId" }
+    issue_reports       = { table_name = "${var.project}-issue-reports",       hash_key = "reportId" }
   }
 }
 
@@ -147,6 +148,10 @@ module "ecs" {
   frontend_origin          = "https://certshack.com"
   # Wire in the certshack-managed secret (created in secretsmanager module)
   cognito_client_secret_arn = module.secretsmanager.cognito_client_secret_arn
+
+  ses_from_address    = "noreply@certshack.com"
+  ses_support_address = "support@certshack.com"
+  issue_reports_table = module.dynamodb.table_names["issue_reports"]
 
   depends_on = [module.acm]
 }
@@ -223,6 +228,13 @@ module "route53" {
   zone_id                 = data.aws_route53_zone.main.zone_id
   domain                  = var.domain
   acm_dvos                = local.all_cert_dvos
+}
+
+module "ses" {
+  source  = "./modules/ses"
+  project = var.project
+  domain  = var.domain
+  zone_id = data.aws_route53_zone.main.zone_id
 }
 
 module "waf" {

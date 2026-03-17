@@ -1,7 +1,8 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useExam } from '@/exam/ExamContext'
-import { ArrowLeft, Heart } from 'lucide-react'
+import { ArrowLeft, Heart, Flag } from 'lucide-react'
 import { getBookmarkedLabs, toggleBookmark } from './shared'
+import { ReportIssueModal } from '@/components/ReportIssueModal'
 
 interface LabHeaderProps {
   title: string
@@ -9,11 +10,18 @@ interface LabHeaderProps {
   timeLeft: number
   subtitle?: string
   labId?: string
+  onPauseChange?: (paused: boolean) => void
 }
 
-export function LabHeader({ title, timed, timeLeft, subtitle, labId }: LabHeaderProps) {
-  const { setRoute } = useExam()
+export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChange }: LabHeaderProps) {
+  const { setRoute, userTier, examTier } = useExam()
+  const isPaying = userTier === 'paying' || examTier === 'paying'
   const [isBookmarked, setIsBookmarked] = useState(() => labId ? getBookmarkedLabs().has(labId) : false)
+  const [reporting, setReporting] = useState(false)
+
+  useEffect(() => {
+    onPauseChange?.(reporting)
+  }, [reporting])
 
   const handleBookmark = useCallback(() => {
     if (!labId) return
@@ -45,6 +53,15 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId }: LabHeader
           {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
         </div>
         <div className="shrink-0 flex items-center gap-2">
+          {labId && isPaying && (
+            <button
+              onClick={() => setReporting(true)}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground border border-border hover:border-primary/50 transition-colors"
+              title="Report an issue with this lab"
+            >
+              <Flag className="w-3 h-3" /> Report
+            </button>
+          )}
           {labId && (
             <button
               onClick={handleBookmark}
@@ -53,6 +70,14 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId }: LabHeader
             >
               <Heart className={`w-4 h-4 transition ${isBookmarked ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
             </button>
+          )}
+          {reporting && labId && (
+            <ReportIssueModal
+              contentType="lab"
+              contentId={labId}
+              showPauseNotice={timed}
+              onClose={() => setReporting(false)}
+            />
           )}
           {timed ? (
             <div className={`font-mono text-sm font-semibold px-3 py-1 rounded-md ${timeLeft <= 30 ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>

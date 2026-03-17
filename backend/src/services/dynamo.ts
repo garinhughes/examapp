@@ -132,6 +132,29 @@ export async function findUserByUsername(username: string): Promise<any | null> 
   }
 }
 
-export default { upsertUserFromCognito, getUserBySub, addEntitlement, listUsers, recordAdminAudit, updateUserFields, findUserByUsername }
+const ISSUE_REPORTS_TABLE = process.env.ISSUE_REPORTS_TABLE || ''
+
+export async function putIssueReport(report: {
+  reportId: string
+  userId: string
+  reporterEmail: string
+  reporterName: string
+  contentType: string
+  contentId: string
+  examCode?: string
+  issueType?: string
+  description: string
+  createdAt: string
+  status: 'open'
+}): Promise<void> {
+  if (!ISSUE_REPORTS_TABLE) return
+  try {
+    await ddb.send(new PutCommand({ TableName: ISSUE_REPORTS_TABLE, Item: report }))
+  } catch (err) {
+    console.warn('[dynamo] putIssueReport failed', err)
+  }
+}
+
+export default { upsertUserFromCognito, getUserBySub, addEntitlement, listUsers, recordAdminAudit, updateUserFields, findUserByUsername, putIssueReport }
 
 export { ddb, USERS_TABLE, ENTITLEMENTS_TABLE, AUDIT_TABLE }

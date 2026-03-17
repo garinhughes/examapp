@@ -85,6 +85,12 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
         Resource = "arn:aws:secretsmanager:*:${var.account_id}:secret:${var.project}-*"
+      },
+      {
+        Sid      = "SES"
+        Effect   = "Allow"
+        Action   = ["ses:SendEmail", "ses:SendRawEmail"]
+        Resource = "arn:aws:ses:eu-west-1:${var.account_id}:identity/*"
       }
     ]
   })

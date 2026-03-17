@@ -30,11 +30,12 @@ export function OrderingRunner({ lab, timed = true }: Props) {
   const [submitted, setSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
   const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [labPaused, setLabPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
-    if (submitted || !timed) return
+    if (submitted || !timed || labPaused) return
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) { clearInterval(timerRef.current!); return 0 }
@@ -42,7 +43,7 @@ export function OrderingRunner({ lab, timed = true }: Props) {
       })
     }, 1000)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed])
+  }, [submitted, timed, labPaused])
 
   useEffect(() => {
     if (timed && timeLeft === 0 && !submitted) handleSubmit()
@@ -85,7 +86,7 @@ export function OrderingRunner({ lab, timed = true }: Props) {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id} />
+      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id} onPauseChange={setLabPaused} />
 
       <div className="flex-1 flex gap-6 min-h-0">
         {/* Ordering area */}

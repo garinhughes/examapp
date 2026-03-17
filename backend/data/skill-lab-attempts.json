@@ -117,5 +117,35 @@
     "correct": true,
     "timeTaken": 61,
     "createdAt": "2026-03-13T17:27:49.448Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "751e242a-16e8-4ddd-bdd2-f6c36b37fdae",
+    "labId": "incident-response-ordering",
+    "labType": "diagnose",
+    "selectedAnswer": "step-5,step-4,step-1,step-3,step-6,step-2",
+    "correct": false,
+    "timeTaken": 5,
+    "createdAt": "2026-03-17T15:01:53.789Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "b4741dc7-8951-4210-b061-c930967f31eb",
+    "labId": "fix-alb-health-check",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"protocol\":\"HTTPS\",\"port\":\"80\",\"path\":\"/health\",\"healthy-threshold\":\"5\",\"interval\":\"30\",\"timeout\":\"5\"}",
+    "correct": false,
+    "timeTaken": 2,
+    "createdAt": "2026-03-17T15:08:43.368Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "c3d2d49e-a5a7-45d6-a4f1-c72ba0cf0de4",
+    "labId": "secure-s3-app",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"public-access\":\"Enable versioning on the bucket\",\"encryption\":\"Enable SSE-S3 (AES-256) as default encryption\",\"iam-wildcard\":\"Add a condition key restricting to the current VPC\",\"logging\":\"Enable CloudTrail S3 data events for the bucket\",\"versioning\":\"Take daily snapshots using AWS Backup\"}",
+    "correct": false,
+    "timeTaken": 8,
+    "createdAt": "2026-03-17T15:09:29.335Z"
   }
 ]

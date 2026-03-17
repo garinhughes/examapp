@@ -33,11 +33,12 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
 
   // Timer
   const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [labPaused, setLabPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
-    if (submitted || !timed) return
+    if (submitted || !timed || labPaused) return
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -48,7 +49,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
       })
     }, 1000)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed])
+  }, [submitted, timed, labPaused])
 
   useEffect(() => {
     if (timed && timeLeft === 0 && !submitted) handleTestPolicy()
@@ -107,7 +108,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} labId={lab.id} />
+      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} labId={lab.id} onPauseChange={setLabPaused} />
 
       {/* Three-panel layout */}
       <div className="flex-1 flex gap-4 min-h-0">

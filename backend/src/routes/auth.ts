@@ -13,11 +13,12 @@ import { upsertUserFromCognito } from '../services/dynamo.js'
 const AUTH_MODE = process.env.AUTH_MODE || 'dev'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
-  // Return current user (requires valid auth)
-  server.get('/me', { preHandler: [server.authenticate] }, async (request) => {
+  // Return current user + global tier (requires valid auth)
+  server.get('/me', { preHandler: [server.authenticate, server.resolveEntitlements] }, async (request) => {
     return {
       user: request.user,
-      authMode: AUTH_MODE
+      authMode: AUTH_MODE,
+      tier: request.tier,
     }
   })
 

@@ -32,12 +32,13 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
   const [submitted, setSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
   const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [labPaused, setLabPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
 
   // Timer
   useEffect(() => {
-    if (submitted || !timed) return
+    if (submitted || !timed || labPaused) return
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -48,7 +49,7 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
       })
     }, 1000)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed])
+  }, [submitted, timed, labPaused])
 
   useEffect(() => {
     if (timed && timeLeft === 0 && !submitted) handleSubmit()
@@ -114,7 +115,7 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} labId={lab.id} />
+      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} labId={lab.id} onPauseChange={setLabPaused} />
 
       {/* Main layout: diagram + inspection panel */}
       <div className="flex-1 flex gap-4 min-h-0">

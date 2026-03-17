@@ -167,6 +167,21 @@ variable "cognito_client_secret_arn" {
   default = ""
 }
 
+variable "ses_from_address" {
+  type    = string
+  default = "noreply@certshack.com"
+}
+
+variable "ses_support_address" {
+  type    = string
+  default = "support@certshack.com"
+}
+
+variable "issue_reports_table" {
+  type    = string
+  default = ""
+}
+
 # ---------- security groups ----------
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project}-alb-"
@@ -338,6 +353,9 @@ locals {
     { name = "COGNITO_USER_POOL_ID", value = var.cognito_user_pool_id },
     { name = "COGNITO_REDIRECT_URI", value = var.cognito_redirect_uri },
     { name = "FRONTEND_ORIGIN", value = var.frontend_origin },
+    { name = "SES_FROM_ADDRESS", value = var.ses_from_address },
+    { name = "SES_SUPPORT_ADDRESS", value = var.ses_support_address },
+    { name = "ISSUE_REPORTS_TABLE", value = var.issue_reports_table },
   ]
 
   container_secrets = var.cognito_client_secret_arn != "" ? [

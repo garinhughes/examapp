@@ -39,6 +39,7 @@ export interface ExamContextType {
   questions: Question[]
   setQuestions: React.Dispatch<React.SetStateAction<Question[]>>
   examTier: string | null
+  userTier: string | null
   examTotalAvailable: number
   examLimited: boolean
 
@@ -222,6 +223,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const [selected, setSelected] = useState<string | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
   const [examTier, setExamTier] = useState<string | null>(null)
+  const [userTier, setUserTier] = useState<string | null>(null)
   const [examTotalAvailable, setExamTotalAvailable] = useState<number>(0)
   const [examLimited, setExamLimited] = useState<boolean>(false)
 
@@ -907,6 +909,15 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     try { localStorage.setItem('theme', dark ? 'dark' : 'light') } catch {}
   }, [dark])
 
+  // Fetch global user tier (paying / registered / visitor) — independent of any exam
+  useEffect(() => {
+    if (!user) { setUserTier(null); return }
+    authFetch('/auth/me')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data?.tier) setUserTier(data.tier) })
+      .catch(() => {})
+  }, [user])
+
   // Fetch exams list
   useEffect(() => {
     fetch(apiUrl('/exams'))
@@ -1041,7 +1052,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const value: ExamContextType = {
     user, authLoading, login, logout, authFetch, isAdmin, gamState, gamLevel, dndSensors,
     route, setRoute,
-    exams, selected, setSelected, selectedMeta, providers, questions, setQuestions, examTier, examTotalAvailable, examLimited,
+    exams, selected, setSelected, selectedMeta, providers, questions, setQuestions, examTier, userTier, examTotalAvailable, examLimited,
     dark, setDark, themePreset, setThemePreset, customCorrect, setCustomCorrect, customCorrect2, setCustomCorrect2, customIncorrect, setCustomIncorrect, customIncorrect2, setCustomIncorrect2,
     selectedAnswers, setSelectedAnswers, multiSelectPending, setMultiSelectPending, matchingAnswers, setMatchingAnswers, orderingAnswers, setOrderingAnswers, flaggedQuestions, setFlaggedQuestions, currentQuestionIndex, setCurrentQuestionIndex,
     showSubmitConfirm, setShowSubmitConfirm, showCompleteEarlyConfirm, setShowCompleteEarlyConfirm, showCancelConfirm, setShowCancelConfirm, showTipMap, setShowTipMap, paused, setPaused, lastError, setLastError, toasts, setToasts, showToast, showConfetti, setShowConfetti, rewardModal, setRewardModal, mobileOpen, setMobileOpen,
