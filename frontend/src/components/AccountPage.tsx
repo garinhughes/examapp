@@ -12,20 +12,15 @@ const CATEGORY_LABELS: Record<string, string> = {
   streak: '🔥 Streaks',
   mastery: '🏅 Mastery',
   special: '✨ Special',
+  journey: '🗺️ Journey',
 }
 
-const TIER_COLORS: Record<string, string> = {
-  none: 'bg-accent text-muted-foreground',
-  bronze: 'bg-primary/10 text-primary',
-  silver: 'bg-muted dark:bg-muted/500/20 text-muted-foreground',
-  gold: 'bg-yellow-100 text-primary',
-}
 
 export default function AccountPage() {
   const { user } = useAuth()
   const authFetch = useAuthFetch()
   const { state, toggleLeaderboard } = useGamification()
-  const [tab, setTab] = useState<'overview' | 'badges' | 'mastery' | 'purchases'>('overview')
+  const [tab, setTab] = useState<'overview' | 'badges' | 'purchases'>('overview')
   const { level, currentXP, nextLevelXP, progress: levelProgress } = levelFromXP(state.xp)
   const { tier, tierConfig, entitlements, products, loading: entLoading } = useEntitlements()
 
@@ -132,11 +127,6 @@ export default function AccountPage() {
     }, {})
   )
 
-  const domainEntries = Object.values(state.domainMastery).sort((a, b) => {
-    const tierOrder = { gold: 0, silver: 1, bronze: 2, none: 3 }
-    return (tierOrder[a.tier] ?? 4) - (tierOrder[b.tier] ?? 4)
-  })
-
   return (
     <div className="space-y-6">
       {/* Profile header */}
@@ -181,7 +171,7 @@ export default function AccountPage() {
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
             <div className="text-xl font-bold text-emerald-500">{state.badges.length}</div>
-            <div className="text-xs text-muted-foreground">Badges</div>
+            <div className="text-xs text-muted-foreground">Achievements</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
             <div className="text-xl font-bold text-purple-500">
@@ -194,7 +184,7 @@ export default function AccountPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-muted p-1 rounded-lg">
-        {(['overview', 'badges', 'mastery', 'purchases'] as const).map((t) => (
+        {(['overview', 'badges', 'purchases'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -204,7 +194,7 @@ export default function AccountPage() {
                 : 'text-muted-foreground hover:text-foreground dark:hover:text-foreground'
             }`}
           >
-            {t === 'overview' ? '📊 Overview' : t === 'badges' ? '🏅 Badges' : t === 'mastery' ? '🎓 Mastery' : '💳 Purchases'}
+            {t === 'overview' ? '📊 Overview' : t === 'badges' ? '🏅 Achievements' : '💳 Purchases'}
           </button>
         ))}
       </div>
@@ -298,9 +288,9 @@ export default function AccountPage() {
 
           {/* Recent badges */}
           <div className="p-4 rounded-lg border border-border bg-card">
-            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Recent Badges</h3>
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Recent Achievements</h3>
             {state.badges.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Complete exams to earn badges!</p>
+              <p className="text-sm text-muted-foreground">Complete exams to earn achievements!</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {state.badges.slice(-6).reverse().map((eb) => {
@@ -381,46 +371,6 @@ export default function AccountPage() {
         </div>
       )}
 
-      {tab === 'mastery' && (
-        <div className="space-y-3">
-          {domainEntries.length === 0 ? (
-            <div className="p-4 rounded-lg border border-border bg-card text-center">
-              <p className="text-sm text-muted-foreground">Complete exams with domain questions to track mastery.</p>
-            </div>
-          ) : (
-            domainEntries.map((d) => (
-              <div key={d.domain} className="p-3 rounded-lg border border-border bg-card">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold truncate flex-1">{d.domain}</span>
-                  <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${TIER_COLORS[d.tier]}`}>
-                    {d.tier === 'none' ? 'Unranked' : d.tier}
-                  </span>
-                </div>
-                <div className="h-2 rounded-full bg-accent overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      d.tier === 'gold'
-                        ? 'bg-yellow-400'
-                        : d.tier === 'silver'
-                          ? 'bg-muted-foreground'
-                          : d.tier === 'bronze'
-                            ? 'bg-primary/100'
-                            : 'bg-primary'
-                    }`}
-                    style={{ width: `${d.progress}%` }}
-                  />
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {d.recentScores.length} attempt{d.recentScores.length !== 1 ? 's' : ''} tracked
-                  {d.recentScores.length > 0 &&
-                    ` · Avg ${Math.round(d.recentScores.reduce((a, b) => a + b, 0) / d.recentScores.length)}%`}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
       {tab === 'purchases' && (
         <div className="space-y-4">
           {/* Current tier */}
@@ -498,17 +448,6 @@ export default function AccountPage() {
             )}
           </div>
 
-          {/* Manage / Stripe portal stub */}
-          <div className="flex flex-wrap gap-3">
-            {entitlements.some((id) => id.startsWith('sub:')) && (
-              <button
-                onClick={() => alert('Stripe Customer Portal will be available soon.')}
-                className="px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted/50 dark:hover:bg-card transition-colors"
-              >
-                Manage Subscription
-              </button>
-            )}
-          </div>
         </div>
       )}
     </div>

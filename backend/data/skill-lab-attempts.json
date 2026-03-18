@@ -147,5 +147,25 @@
     "correct": false,
     "timeTaken": 8,
     "createdAt": "2026-03-17T15:09:29.335Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "c54731f8-5c66-48ca-97b0-3120cec00f60",
+    "labId": "cloudfront-403",
+    "labType": "diagnose",
+    "selectedAnswer": "policy",
+    "correct": true,
+    "timeTaken": 4,
+    "createdAt": "2026-03-18T14:43:27.767Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "f9de6077-6fc5-442d-91f4-2bab8c4eef32",
+    "labId": "cloudfront-403",
+    "labType": "diagnose",
+    "selectedAnswer": "policy",
+    "correct": true,
+    "timeTaken": 8,
+    "createdAt": "2026-03-18T14:43:41.018Z"
   }
 ]

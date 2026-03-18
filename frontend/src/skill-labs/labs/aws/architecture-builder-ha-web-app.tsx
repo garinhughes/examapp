@@ -15,7 +15,7 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { ArchitectureBuilderLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { markLabCompleted } from '../shared'
+import { useLabComplete } from '../shared'
 
 interface Props {
   lab: ArchitectureBuilderLabDefinition
@@ -33,6 +33,7 @@ export function ArchitectureBuilderRunner(props: Props) {
 function ArchitectureBuilderInner({ lab, timed = true }: Props) {
   const { authFetch, user } = useExam()
   const reactFlowInstance = useReactFlow()
+  const completeWithGamification = useLabComplete(lab)
 
   const [placedComponents, setPlacedComponents] = useState<Set<string>>(new Set())
   const [nodes, setNodes, onNodesChange] = useNodesState([])
@@ -129,7 +130,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
 
     setValidationResults(results)
     const allPass = results.every((r) => r.pass)
-    markLabCompleted(lab.id)
+    completeWithGamification(allPass)
 
     const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
     if (user) {

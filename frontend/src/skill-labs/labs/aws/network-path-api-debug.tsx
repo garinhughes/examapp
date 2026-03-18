@@ -3,7 +3,7 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { NetworkPathLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { markLabCompleted } from '../shared'
+import { useLabComplete } from '../shared'
 
 interface Props {
   lab: NetworkPathLabDefinition
@@ -12,6 +12,7 @@ interface Props {
 
 export function NetworkPathRunner({ lab, timed = true }: Props) {
   const { authFetch, user } = useExam()
+  const completeWithGamification = useLabComplete(lab)
 
   const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>({})
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
@@ -52,7 +53,7 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
     const correctAnswer = lab.answers.find((a) => a.correct)
     const correct = selectedAnswer === correctAnswer?.id
     setIsCorrect(correct)
-    markLabCompleted(lab.id)
+    completeWithGamification(correct)
 
     const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
     if (user) {

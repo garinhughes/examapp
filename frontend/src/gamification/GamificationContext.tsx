@@ -1,6 +1,6 @@
 import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from 'react'
-import type { GamificationState, EarnedBadge, BadgeCheckContext, DomainMastery } from './types'
-import { XP_PER_QUESTION, XP_BONUS_PASS, XP_BONUS_PERFECT, levelFromXP, computeMasteryTier } from './types'
+import type { GamificationState, EarnedBadge, BadgeCheckContext, PassedExam, LabCompletion } from './types'
+import { levelFromXP, computeMasteryTier, computeExamXP, computeCmrGain, LAB_DIFFICULTY_XP, LAB_DIFFICULTY_XP_DEFAULT } from './types'
 import { BADGES } from './badges'
 
 /* ------------------------------------------------------------------ */
@@ -17,6 +17,9 @@ function defaultState(): GamificationState {
     badges: [],
     domainMastery: {},
     leaderboardOptIn: false,
+    passedExams: {},
+    labsCompleted: [],
+    cmr: 0,
   }
 }
 
@@ -43,11 +46,12 @@ export interface GamificationEvent {
   newBadges: EarnedBadge[]
   streakUpdated: boolean
   passed: boolean
+  cmrGained: number
 }
 
 interface GamificationContextValue {
   state: GamificationState
-  /** Call after an attempt is finished. Returns events for reward UIs. */
+  /** Call after an exam attempt is finished. Returns events for reward UIs. */
   recordAttemptFinish: (data: {
     examCode: string
     score: number
@@ -57,6 +61,17 @@ interface GamificationContextValue {
     allScores: number[]
     finishedCount: number
     passMark: number
+    avgDifficulty?: number
+    examLevel?: string
+    provider?: string
+    prevScoresForExam?: number[]
+  }) => GamificationEvent
+  /** Call after a skill lab is completed. */
+  recordLabFinish: (data: {
+    labId: string
+    labType: string
+    difficulty: string
+    correct: boolean
   }) => GamificationEvent
   /** Mark today as a practice day (call on attempt start) */
   recordPracticeDay: () => { streakBefore: number; streakAfter: number }
@@ -68,7 +83,8 @@ interface GamificationContextValue {
 
 const GamificationContext = createContext<GamificationContextValue>({
   state: defaultState(),
-  recordAttemptFinish: () => ({ xpGained: 0, newLevel: null, newBadges: [], streakUpdated: false, passed: false }),
+  recordAttemptFinish: () => ({ xpGained: 0, newLevel: null, newBadges: [], streakUpdated: false, passed: false, cmrGained: 0 }),
+  recordLabFinish: () => ({ xpGained: 0, newLevel: null, newBadges: [], streakUpdated: false, passed: false, cmrGained: 0 }),
   recordPracticeDay: () => ({ streakBefore: 0, streakAfter: 0 }),
   toggleLeaderboard: () => {},
   refresh: () => {},
@@ -92,7 +108,6 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   /* ---- record a practice day (streak logic) ---- */
   const recordPracticeDay = useCallback((): { streakBefore: number; streakAfter: number } => {
     const today = todayStr()
-    let updated = false
     let before = 0, after = 0
 
     setState((prev) => {
@@ -113,12 +128,31 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         newStreak = 1
       }
       after = newStreak
-      updated = true
       return { ...prev, streak: newStreak, lastPracticeDate: today }
     })
 
     return { streakBefore: before, streakAfter: after }
   }, [])
+
+  /* ---- shared badge checker ---- */
+  function checkBadges(
+    next: GamificationState,
+    prev: GamificationState,
+    badgeCtx: BadgeCheckContext,
+  ): EarnedBadge[] {
+    const earned: EarnedBadge[] = []
+    const earnedIds = new Set(prev.badges.map((b) => b.id))
+    for (const badge of BADGES) {
+      if (earnedIds.has(badge.id)) continue
+      try {
+        if (badge.check(next, badgeCtx)) {
+          earned.push({ id: badge.id, earnedAt: new Date().toISOString() })
+          earnedIds.add(badge.id)
+        }
+      } catch {}
+    }
+    return earned
+  }
 
   /* ---- record attempt finish ---- */
   const recordAttemptFinish = useCallback((data: {
@@ -130,18 +164,30 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     allScores: number[]
     finishedCount: number
     passMark: number
+    avgDifficulty?: number
+    examLevel?: string
+    provider?: string
+    prevScoresForExam?: number[]
   }): GamificationEvent => {
+    const passed = data.score >= data.passMark
     let xpGained = 0
+    let cmrGained = 0
     let newLevel: number | null = null
     const newBadges: EarnedBadge[] = []
-    const passed = data.score >= data.passMark
-
-    // XP calculation
-    xpGained += data.total * XP_PER_QUESTION
-    if (passed) xpGained += XP_BONUS_PASS
-    if (data.score >= 100) xpGained += XP_BONUS_PERFECT
 
     setState((prev) => {
+      const isFirstPassForThisExam = passed && !prev.passedExams[data.examCode]
+
+      // XP calculation
+      xpGained = computeExamXP({
+        total: data.total,
+        avgDifficulty: data.avgDifficulty,
+        score: data.score,
+        passed,
+        examLevel: data.examLevel,
+        isFirstPassForThisExam,
+      })
+
       const next = { ...prev }
 
       // XP + level
@@ -151,12 +197,32 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
       next.level = nl
       if (nl > oldLevel) newLevel = nl
 
+      // CMR (only on first-time pass)
+      if (isFirstPassForThisExam) {
+        cmrGained = computeCmrGain(data.examLevel, data.score)
+        next.cmr = prev.cmr + cmrGained
+      }
+
+      // Track passed exams
+      if (passed) {
+        const existing = prev.passedExams[data.examCode]
+        const updatedExam: PassedExam = {
+          examCode: data.examCode,
+          examLevel: data.examLevel ?? '',
+          provider: data.provider ?? '',
+          firstPassedAt: existing?.firstPassedAt ?? new Date().toISOString(),
+          bestScore: Math.max(data.score, existing?.bestScore ?? 0),
+          attempts: data.finishedCount,
+        }
+        next.passedExams = { ...prev.passedExams, [data.examCode]: updatedExam }
+      }
+
       // Domain mastery update
       const newMastery = { ...prev.domainMastery }
       if (data.perDomain) {
         for (const [domain, vals] of Object.entries(data.perDomain)) {
           const existing = newMastery[domain] || { domain, recentScores: [], tier: 'none' as const, progress: 0 }
-          const scores = [...existing.recentScores, vals.score].slice(-10) // keep last 10
+          const scores = [...existing.recentScores, vals.score].slice(-10)
           const { tier, progress } = computeMasteryTier(scores)
           newMastery[domain] = { domain, recentScores: scores, tier, progress }
         }
@@ -174,27 +240,77 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         },
         finishedCount: data.finishedCount,
         allScores: data.allScores,
+        examLevel: data.examLevel,
+        provider: data.provider,
+        prevScoresForExam: data.prevScoresForExam,
       }
 
-      const earnedIds = new Set(prev.badges.map((b) => b.id))
-      for (const badge of BADGES) {
-        if (earnedIds.has(badge.id)) continue
-        try {
-          if (badge.check(next, badgeCtx)) {
-            const earned: EarnedBadge = { id: badge.id, earnedAt: new Date().toISOString() }
-            newBadges.push(earned)
-            earnedIds.add(badge.id)
-          }
-        } catch {}
-      }
-      if (newBadges.length > 0) {
-        next.badges = [...prev.badges, ...newBadges]
+      const earned = checkBadges(next, prev, badgeCtx)
+      newBadges.push(...earned)
+      if (earned.length > 0) {
+        next.badges = [...prev.badges, ...earned]
       }
 
       return next
     })
 
-    return { xpGained, newLevel, newBadges, streakUpdated: false, passed }
+    return { xpGained, newLevel, newBadges, streakUpdated: false, passed, cmrGained }
+  }, [])
+
+  /* ---- record skill lab finish ---- */
+  const recordLabFinish = useCallback((data: {
+    labId: string
+    labType: string
+    difficulty: string
+    correct: boolean
+  }): GamificationEvent => {
+    const xpEarned = LAB_DIFFICULTY_XP[data.difficulty] ?? LAB_DIFFICULTY_XP_DEFAULT
+    let xpGained = 0
+    let newLevel: number | null = null
+    const newBadges: EarnedBadge[] = []
+
+    setState((prev) => {
+      // Prevent double-counting already completed labs
+      const alreadyDone = prev.labsCompleted.some((l) => l.labId === data.labId)
+      xpGained = alreadyDone ? 0 : xpEarned
+
+      const next = { ...prev }
+
+      // XP + level
+      if (xpGained > 0) {
+        const oldLevel = levelFromXP(prev.xp).level
+        next.xp = prev.xp + xpGained
+        const nl = levelFromXP(next.xp).level
+        next.level = nl
+        if (nl > oldLevel) newLevel = nl
+      }
+
+      // Track lab completion
+      if (!alreadyDone) {
+        const completion: LabCompletion = {
+          labId: data.labId,
+          labType: data.labType,
+          completedAt: new Date().toISOString(),
+          correct: data.correct,
+        }
+        next.labsCompleted = [...prev.labsCompleted, completion]
+      }
+
+      // Badge checks (no attempt context for labs)
+      const badgeCtx: BadgeCheckContext = {
+        finishedCount: 0,
+        allScores: [],
+      }
+      const earned = checkBadges(next, prev, badgeCtx)
+      newBadges.push(...earned)
+      if (earned.length > 0) {
+        next.badges = [...prev.badges, ...earned]
+      }
+
+      return next
+    })
+
+    return { xpGained, newLevel, newBadges, streakUpdated: false, passed: data.correct, cmrGained: 0 }
   }, [])
 
   const toggleLeaderboard = useCallback(() => {
@@ -206,7 +322,7 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <GamificationContext.Provider value={{ state, recordAttemptFinish, recordPracticeDay, toggleLeaderboard, refresh }}>
+    <GamificationContext.Provider value={{ state, recordAttemptFinish, recordLabFinish, recordPracticeDay, toggleLeaderboard, refresh }}>
       {children}
     </GamificationContext.Provider>
   )

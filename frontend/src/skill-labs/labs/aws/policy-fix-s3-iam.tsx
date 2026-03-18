@@ -4,6 +4,7 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { PolicyFixLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { useLabComplete } from '../shared'
 
 interface PolicyFixLabRunnerProps {
   lab: PolicyFixLabDefinition
@@ -15,16 +16,9 @@ interface ValidationResult {
   errors: string[]
 }
 
-function markLabCompleted(labId: string) {
-  const stored = JSON.parse(localStorage.getItem('skill-labs-completed') || '[]')
-  if (!stored.includes(labId)) {
-    stored.push(labId)
-    localStorage.setItem('skill-labs-completed', JSON.stringify(stored))
-  }
-}
-
 export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProps) {
   const { authFetch, user } = useExam()
+  const completeWithGamification = useLabComplete(lab)
 
   const [policy, setPolicy] = useState(lab.brokenPolicy)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
@@ -69,7 +63,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
       if (result.success && !submitted) {
         setSubmitted(true)
         if (timerRef.current) clearInterval(timerRef.current)
-        markLabCompleted(lab.id)
+        completeWithGamification(true)
         await saveAttempt(true)
       }
     } catch {
@@ -84,7 +78,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
     if (timerRef.current) clearInterval(timerRef.current)
     setPolicy(lab.correctPolicy)
     setValidationResult({ success: false, errors: ['You gave up. The correct policy is now shown.'] })
-    markLabCompleted(lab.id)
+    completeWithGamification(false)
     await saveAttempt(false)
   }, [lab])
 

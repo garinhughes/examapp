@@ -3,7 +3,7 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { ConfigToggleLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { markLabCompleted } from '../shared'
+import { useLabComplete } from '../shared'
 
 interface Props {
   lab: ConfigToggleLabDefinition
@@ -12,6 +12,7 @@ interface Props {
 
 export function ConfigToggleRunner({ lab, timed = true }: Props) {
   const { authFetch, user } = useExam()
+  const completeWithGamification = useLabComplete(lab)
 
   const [values, setValues] = useState<Record<string, string>>(() => {
     const init: Record<string, string> = {}
@@ -58,7 +59,7 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
       if (!pass) allCorrect = false
     }
     setResults(res)
-    markLabCompleted(lab.id)
+    completeWithGamification(allCorrect)
 
     const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
     if (user) {

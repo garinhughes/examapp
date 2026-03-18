@@ -6,7 +6,7 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { OrderingLabDefinition, OrderingStep } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { markLabCompleted } from '../shared'
+import { useLabComplete } from '../shared'
 import { SortableOrderItem } from '@/exam/SortableOrderItem'
 
 interface Props {
@@ -25,6 +25,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 
 export function OrderingRunner({ lab, timed = true }: Props) {
   const { authFetch, user } = useExam()
+  const completeWithGamification = useLabComplete(lab)
 
   const [steps, setSteps] = useState<OrderingStep[]>(() => shuffleArray(lab.steps))
   const [submitted, setSubmitted] = useState(false)
@@ -68,7 +69,7 @@ export function OrderingRunner({ lab, timed = true }: Props) {
 
     const correct = steps.every((step, idx) => step.correctPosition === idx + 1)
     setIsCorrect(correct)
-    markLabCompleted(lab.id)
+    completeWithGamification(correct)
 
     const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
     if (user) {

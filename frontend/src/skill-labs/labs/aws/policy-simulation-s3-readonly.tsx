@@ -4,7 +4,7 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { PolicySimulationLabDefinition, PolicyTestCase } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { markLabCompleted } from '../shared'
+import { useLabComplete } from '../shared'
 
 interface Props {
   lab: PolicySimulationLabDefinition
@@ -70,6 +70,7 @@ function evaluatePolicy(policyJson: string, testCases: PolicyTestCase[]): { resu
 
 export function PolicySimulationRunner({ lab, timed = true }: Props) {
   const { authFetch, user } = useExam()
+  const completeWithGamification = useLabComplete(lab)
 
   const [policy, setPolicy] = useState(lab.initialPolicy)
   const [testResults, setTestResults] = useState<TestResult[] | null>(null)
@@ -109,7 +110,7 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
     if (allPass && !submitted) {
       setSubmitted(true)
       if (timerRef.current) clearInterval(timerRef.current)
-      markLabCompleted(lab.id)
+      completeWithGamification(true)
 
       const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
       if (user) {
@@ -126,7 +127,7 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
   const handleGiveUp = useCallback(async () => {
     setSubmitted(true)
     if (timerRef.current) clearInterval(timerRef.current)
-    markLabCompleted(lab.id)
+    completeWithGamification(false)
 
     const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
     if (user) {

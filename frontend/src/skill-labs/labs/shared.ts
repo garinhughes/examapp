@@ -1,9 +1,25 @@
+import { useCallback } from 'react'
+import { useGamification } from '@/gamification/GamificationContext'
+import type { LabSummary } from '../types'
+
 export function markLabCompleted(labId: string) {
   const stored = JSON.parse(localStorage.getItem('skill-labs-completed') || '[]')
   if (!stored.includes(labId)) {
     stored.push(labId)
     localStorage.setItem('skill-labs-completed', JSON.stringify(stored))
   }
+}
+
+/**
+ * Hook that returns a completion handler which marks the lab done in
+ * localStorage AND fires gamification rewards.
+ */
+export function useLabComplete(lab: Pick<LabSummary, 'id' | 'type' | 'difficulty'>) {
+  const { recordLabFinish } = useGamification()
+  return useCallback((correct: boolean) => {
+    markLabCompleted(lab.id)
+    recordLabFinish({ labId: lab.id, labType: lab.type, difficulty: lab.difficulty, correct })
+  }, [lab.id, lab.type, lab.difficulty, recordLabFinish])
 }
 
 export function getBookmarkedLabs(): Set<string> {

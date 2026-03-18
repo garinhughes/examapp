@@ -765,17 +765,32 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   function handleGamificationReward(finData: any) {
     if (typeof finData?.score !== 'number') return
     try {
+      const examCode = finData.examCode ?? selected ?? ''
       const allAttemptScores = (attemptsList ?? [])
         .filter((a: any) => a.finishedAt && typeof a.score === 'number')
         .map((a: any) => a.score as number)
       allAttemptScores.push(finData.score)
       const finCount = allAttemptScores.length
       const pm = selectedMeta?.passMark ?? 70
+
+      // Compute average difficulty from the questions in this attempt
+      const diffs = (displayQuestions as any[]).map((q) => q.difficulty).filter((d) => typeof d === 'number')
+      const avgDifficulty = diffs.length > 0 ? diffs.reduce((a: number, b: number) => a + b, 0) / diffs.length : undefined
+
+      // Previous scores for this specific exam (excluding the current attempt)
+      const prevScoresForExam = (attemptsList ?? [])
+        .filter((a: any) => a.finishedAt && typeof a.score === 'number' && a.examCode === examCode)
+        .map((a: any) => a.score as number)
+
       const event = recordAttemptFinish({
-        examCode: finData.examCode ?? selected ?? '', score: finData.score,
+        examCode, score: finData.score,
         correctCount: finData.correctCount ?? 0, total: finData.total ?? 0,
         perDomain: finData.perDomain, allScores: allAttemptScores,
         finishedCount: finCount, passMark: pm,
+        avgDifficulty,
+        examLevel: selectedMeta?.level != null ? String(selectedMeta.level) : undefined,
+        provider: selectedMeta?.provider != null ? String(selectedMeta.provider) : undefined,
+        prevScoresForExam,
       })
       const passed = finData.score >= pm
       if (passed || event.newLevel !== null || event.newBadges.length > 0) {
@@ -790,7 +805,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       } else if (event.xpGained > 0) { showToast(`+${event.xpGained} XP earned!`, 'info') }
       authFetch('/gamification/sync', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ xp: gamState.xp + event.xpGained, level: event.newLevel ?? gamState.level, streak: gamState.streak, leaderboardOptIn: gamState.leaderboardOptIn, displayName: user?.name ?? 'Anonymous' }),
+        body: JSON.stringify({ xp: gamState.xp + event.xpGained, level: event.newLevel ?? gamState.level, streak: gamState.streak, leaderboardOptIn: gamState.leaderboardOptIn, displayName: user?.name ?? 'Anonymous', cmr: gamState.cmr + event.cmrGained }),
       }).catch(() => {})
     } catch (err) { console.error('gamification reward error', err) }
   }

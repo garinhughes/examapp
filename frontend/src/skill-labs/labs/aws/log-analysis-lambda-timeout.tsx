@@ -4,7 +4,7 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { LogAnalysisLabDefinition, LogEntry } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { markLabCompleted } from '../shared'
+import { useLabComplete } from '../shared'
 
 interface Props {
   lab: LogAnalysisLabDefinition
@@ -20,6 +20,7 @@ const LEVEL_COLORS: Record<string, string> = {
 
 export function LogAnalysisRunner({ lab, timed = true }: Props) {
   const { authFetch, user } = useExam()
+  const completeWithGamification = useLabComplete(lab)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [levelFilter, setLevelFilter] = useState<string | null>(null)
@@ -81,7 +82,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
     const correctAnswer = lab.answers.find((a) => a.correct)
     const correct = selectedAnswer === correctAnswer?.id
     setIsCorrect(correct)
-    markLabCompleted(lab.id)
+    completeWithGamification(correct)
 
     const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
     if (user) {

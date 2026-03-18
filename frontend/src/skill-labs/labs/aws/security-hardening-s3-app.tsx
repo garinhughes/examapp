@@ -4,7 +4,7 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { SecurityHardeningLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { markLabCompleted } from '../shared'
+import { useLabComplete } from '../shared'
 
 interface Props {
   lab: SecurityHardeningLabDefinition
@@ -13,6 +13,7 @@ interface Props {
 
 export function SecurityHardeningRunner({ lab, timed = true }: Props) {
   const { authFetch, user } = useExam()
+  const completeWithGamification = useLabComplete(lab)
 
   const [selections, setSelections] = useState<Record<string, string>>(() => {
     const init: Record<string, string> = {}
@@ -59,7 +60,7 @@ export function SecurityHardeningRunner({ lab, timed = true }: Props) {
       if (!pass) allCorrect = false
     }
     setResults(res)
-    markLabCompleted(lab.id)
+    completeWithGamification(allCorrect)
 
     const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
     if (user) {

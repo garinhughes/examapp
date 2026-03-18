@@ -44,6 +44,40 @@ export const BADGES: BadgeDefinition[] = [
     check: (_s, ctx) => ctx.finishedCount >= 50,
   },
 
+  // ── Skill Lab Milestones ──
+  {
+    id: 'lab_initiate',
+    name: 'Lab Initiate',
+    description: 'Complete your first skill lab',
+    icon: '🔬',
+    category: 'milestone',
+    check: (s) => s.labsCompleted.length >= 1,
+  },
+  {
+    id: 'lab_explorer',
+    name: 'Lab Explorer',
+    description: 'Complete 5 skill labs',
+    icon: '🧪',
+    category: 'milestone',
+    check: (s) => s.labsCompleted.length >= 5,
+  },
+  {
+    id: 'lab_master',
+    name: 'Lab Master',
+    description: 'Complete 15 skill labs',
+    icon: '⚗️',
+    category: 'milestone',
+    check: (s) => s.labsCompleted.length >= 15,
+  },
+  {
+    id: 'lab_diversity',
+    name: 'Polymath',
+    description: 'Complete skill labs across 3 different lab types',
+    icon: '🔭',
+    category: 'milestone',
+    check: (s) => new Set(s.labsCompleted.map((l) => l.labType)).size >= 3,
+  },
+
   // ── Score-based ──
   {
     id: 'perfect_score',
@@ -83,6 +117,41 @@ export const BADGES: BadgeDefinition[] = [
       }
       return false
     },
+  },
+  {
+    id: 'perseverance',
+    name: 'Iron Will',
+    description: 'Fail the same exam twice, then pass it',
+    icon: '🪨',
+    category: 'score',
+    check: (_s, ctx) => {
+      const prev = ctx.prevScoresForExam ?? []
+      if (prev.length < 2) return false
+      // Need at least 2 fails (< passMark assumed 70) before current pass
+      const failsBefore = prev.filter((s) => s < 70).length
+      return failsBefore >= 2 && (ctx.attempt?.score ?? 0) >= 70
+    },
+  },
+  {
+    id: 'comeback_kid',
+    name: 'Comeback Kid',
+    description: 'Improve your score by 30+ points on the same exam',
+    icon: '🚀',
+    category: 'score',
+    check: (_s, ctx) => {
+      const prev = ctx.prevScoresForExam ?? []
+      if (prev.length === 0) return false
+      const best = Math.max(...prev)
+      return (ctx.attempt?.score ?? 0) - best >= 30
+    },
+  },
+  {
+    id: 'full_exam_perfect',
+    name: 'Flawless',
+    description: 'Score 100% on an exam with 60 or more questions',
+    icon: '✨',
+    category: 'score',
+    check: (_s, ctx) => (ctx.attempt?.score ?? 0) >= 100 && (ctx.attempt?.total ?? 0) >= 60,
   },
 
   // ── Streaks ──
@@ -156,6 +225,48 @@ export const BADGES: BadgeDefinition[] = [
     },
   },
 
+  // ── Journey (certification breadth) ──
+  {
+    id: 'dual_certified',
+    name: 'Double Down',
+    description: 'Pass 2 different exams',
+    icon: '🎓',
+    category: 'journey',
+    check: (s) => Object.keys(s.passedExams).length >= 2,
+  },
+  {
+    id: 'triple_certified',
+    name: 'Triple Threat',
+    description: 'Pass 3 different exams',
+    icon: '🏅',
+    category: 'journey',
+    check: (s) => Object.keys(s.passedExams).length >= 3,
+  },
+  {
+    id: 'quad_certified',
+    name: 'Quad Elite',
+    description: 'Pass 4 different exams',
+    icon: '💠',
+    category: 'journey',
+    check: (s) => Object.keys(s.passedExams).length >= 4,
+  },
+  {
+    id: 'specialist_achieved',
+    name: 'Specialist',
+    description: 'Pass a Specialty-level exam',
+    icon: '🔶',
+    category: 'journey',
+    check: (s) => Object.values(s.passedExams).some((e) => e.examLevel.toLowerCase() === 'specialty'),
+  },
+  {
+    id: 'multi_provider',
+    name: 'Platform Agnostic',
+    description: 'Pass exams from 2 different providers',
+    icon: '🌐',
+    category: 'journey',
+    check: (s) => new Set(Object.values(s.passedExams).map((e) => e.provider)).size >= 2,
+  },
+
   // ── Special ──
   {
     id: 'night_owl',
@@ -210,5 +321,37 @@ export const BADGES: BadgeDefinition[] = [
     icon: '💰',
     category: 'special',
     check: (s) => s.xp >= 5000,
+  },
+  {
+    id: 'xp_10000',
+    name: 'XP Veteran',
+    description: 'Earn 10,000 XP total',
+    icon: '🏺',
+    category: 'special',
+    check: (s) => s.xp >= 10000,
+  },
+  {
+    id: 'xp_25000',
+    name: 'XP Legend',
+    description: 'Earn 25,000 XP total',
+    icon: '🌠',
+    category: 'special',
+    check: (s) => s.xp >= 25000,
+  },
+  {
+    id: 'cmr_100',
+    name: 'Rising Star',
+    description: 'Reach a Mastery Rating of 100',
+    icon: '⭐',
+    category: 'special',
+    check: (s) => s.cmr >= 100,
+  },
+  {
+    id: 'cmr_500',
+    name: 'Certified Authority',
+    description: 'Reach a Mastery Rating of 500',
+    icon: '🔱',
+    category: 'special',
+    check: (s) => s.cmr >= 500,
   },
 ]

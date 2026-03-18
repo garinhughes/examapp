@@ -10,22 +10,16 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { DiagnoseLabDefinition, Inspection } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { useLabComplete } from '../shared'
 
 interface DiagnoseLabRunnerProps {
   lab: DiagnoseLabDefinition
   timed?: boolean
 }
 
-function markLabCompleted(labId: string) {
-  const stored = JSON.parse(localStorage.getItem('skill-labs-completed') || '[]')
-  if (!stored.includes(labId)) {
-    stored.push(labId)
-    localStorage.setItem('skill-labs-completed', JSON.stringify(stored))
-  }
-}
-
 export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps) {
   const { authFetch, user } = useExam()
+  const completeWithGamification = useLabComplete(lab)
 
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
@@ -63,7 +57,7 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
     const correctAnswer = lab.answers.find((a) => a.correct)
     const correct = selectedAnswer === correctAnswer?.id
     setIsCorrect(correct)
-    markLabCompleted(lab.id)
+    completeWithGamification(correct)
 
     const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
 
