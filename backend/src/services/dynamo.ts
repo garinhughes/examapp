@@ -132,7 +132,7 @@ export async function findUserByUsername(username: string): Promise<any | null> 
   }
 }
 
-const ISSUE_REPORTS_TABLE = process.env.ISSUE_REPORTS_TABLE || ''
+const ISSUE_REPORTS_TABLE = process.env.ISSUE_REPORTS_TABLE || 'examapp-issue-reports'
 
 export async function putIssueReport(report: {
   reportId: string
@@ -147,7 +147,6 @@ export async function putIssueReport(report: {
   createdAt: string
   status: 'open'
 }): Promise<void> {
-  if (!ISSUE_REPORTS_TABLE) return
   try {
     await ddb.send(new PutCommand({ TableName: ISSUE_REPORTS_TABLE, Item: report }))
   } catch (err) {
