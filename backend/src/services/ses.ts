@@ -15,7 +15,7 @@ export interface IssueReportPayload {
 }
 
 export async function sendIssueReportEmail(p: IssueReportPayload): Promise<void> {
-  const subject = `[CertShack] ${p.contentType} issue — ${p.examCode ?? p.contentId}`
+  const subject = `[certshack] ${p.contentType} issue - ${p.examCode ?? p.contentId}`
   const body = [
     `Reporter:     ${p.reporterName} <${p.reporterEmail}>`,
     `Content Type: ${p.contentType}`,

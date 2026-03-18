@@ -23,7 +23,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       },
     },
     async (request, reply) => {
-      if (request.tier !== 'paying') {
+      if (request.entitlements.length === 0) {
         return reply.status(403).send({ message: 'Issue reporting requires a paid plan.' })
       }
 

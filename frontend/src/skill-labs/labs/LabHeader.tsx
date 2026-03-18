@@ -14,8 +14,8 @@ interface LabHeaderProps {
 }
 
 export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChange }: LabHeaderProps) {
-  const { setRoute, userTier, examTier } = useExam()
-  const isPaying = userTier === 'paying' || examTier === 'paying'
+  const { setRoute, userTier } = useExam()
+  const canReport = userTier !== 'visitor'
   const [isBookmarked, setIsBookmarked] = useState(() => labId ? getBookmarkedLabs().has(labId) : false)
   const [reporting, setReporting] = useState(false)
 
@@ -53,7 +53,7 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
           {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
         </div>
         <div className="shrink-0 flex items-center gap-2">
-          {labId && isPaying && (
+          {labId && canReport && (
             <button
               onClick={() => setReporting(true)}
               className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground border border-border hover:border-primary/50 transition-colors"

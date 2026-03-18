@@ -8,10 +8,10 @@ export function QuestionNav() {
     displayQuestions, selectedAnswers, flaggedQuestions, currentQuestionIndex,
     setCurrentQuestionIndex, setFlaggedQuestions, isFinished, revealAnswers,
     revealedQuestions, setShowSubmitConfirm, setShowCompleteEarlyConfirm,
-    userTier, examTier, timed, setPaused, selected, selectedMeta,
+    userTier, timed, setPaused, selected, selectedMeta,
   } = useExam()
 
-  const isPaying = userTier === 'paying' || examTier === 'paying'
+  const canReport = userTier !== 'visitor'
   const [reporting, setReporting] = useState(false)
 
   const answeredCount = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === id)).length
@@ -77,7 +77,7 @@ export function QuestionNav() {
         <div className="mt-1.5 flex items-center gap-2 justify-between w-full">
           <div className="flex-1" />
           <div className="flex items-center gap-2">
-            {isPaying && curQ && !isFinished && (
+            {canReport && curQ && !isFinished && (
               <button
                 onClick={() => { setReporting(true); setPaused(true) }}
                 className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground border border-border hover:border-primary/50 transition-colors whitespace-nowrap"

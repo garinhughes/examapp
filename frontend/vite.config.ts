@@ -25,6 +25,7 @@ export default defineConfig({
       '/gamification': 'http://localhost:3000',
       '/username': 'http://localhost:3000',
       '/skill-labs': 'http://localhost:3000',
+      '/reports': 'http://localhost:3000',
     }
   }
 })

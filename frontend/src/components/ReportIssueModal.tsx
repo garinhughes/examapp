@@ -56,7 +56,7 @@ export function ReportIssueModal({ contentType, contentId, examCode, provider, s
   const [submitted, setSubmitted] = useState(false)
 
   const options = ISSUE_TYPES[contentType]
-  const canSubmit = issueType !== '' && description.trim().length >= 10
+  const canSubmit = issueType !== ''
 
   async function handleSubmit() {
     if (!issueType) {
