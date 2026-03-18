@@ -64,6 +64,7 @@ backend/src/
     attempts.ts         # POST/GET attempts (DynamoDB)
     auth.ts             # Cognito token exchange
     admin.ts            # Admin-only routes
+    certificates.ts     # Certificate token signing + public verify endpoint
     analytics.ts        # Usage stats
     gamification.ts     # Badges/streaks
     pricing.ts          # Pricing tiers
@@ -97,6 +98,10 @@ frontend/src/
   components/
     AdminPanel.tsx      # Admin UI
     AccountPage.tsx     # User account/settings
+    CertificateOptions.tsx # Certificate generation options UI
+    CertificatePreview.tsx # Inline-styled certificate visual + QR code
+    CertificatesTab.tsx     # Orchestrator: options → generate → preview
+    VerifyPage.tsx          # Public verification page (/verify/:token)
     CodeBlock.tsx       # Syntax-highlighted code display
     Leaderboard.tsx     # Gamification leaderboard
     PricingPage.tsx     # Pricing/paywall UI

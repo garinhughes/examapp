@@ -26,6 +26,7 @@ export default defineConfig({
       '/username': 'http://localhost:3000',
       '/skill-labs': 'http://localhost:3000',
       '/reports': 'http://localhost:3000',
+      '/certificates': 'http://localhost:3000',
     }
   }
 })

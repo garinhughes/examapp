@@ -167,5 +167,25 @@
     "correct": true,
     "timeTaken": 8,
     "createdAt": "2026-03-18T14:43:41.018Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "b652303b-933d-4610-8620-f60660fcbc8a",
+    "labId": "cloudfront-403",
+    "labType": "diagnose",
+    "selectedAnswer": "policy",
+    "correct": true,
+    "timeTaken": 2,
+    "createdAt": "2026-03-18T16:19:41.175Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "6e08a01f-584e-49b6-a38a-6cc2a6e725ac",
+    "labId": "lambda-timeout-logs",
+    "labType": "diagnose",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 2,
+    "createdAt": "2026-03-18T16:19:49.788Z"
   }
 ]

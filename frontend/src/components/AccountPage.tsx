@@ -5,6 +5,7 @@ import { useGamification } from '../gamification/GamificationContext'
 import { levelFromXP } from '../gamification/types'
 import { BADGES } from '../gamification/badges'
 import { useEntitlements } from '../hooks/useEntitlements'
+import CertificatesTab from './CertificatesTab'
 
 const CATEGORY_LABELS: Record<string, string> = {
   milestone: '📚 Milestones',
@@ -20,7 +21,7 @@ export default function AccountPage() {
   const { user } = useAuth()
   const authFetch = useAuthFetch()
   const { state, toggleLeaderboard } = useGamification()
-  const [tab, setTab] = useState<'overview' | 'badges' | 'purchases'>('overview')
+  const [tab, setTab] = useState<'overview' | 'badges' | 'certificates' | 'purchases'>('overview')
   const { level, currentXP, nextLevelXP, progress: levelProgress } = levelFromXP(state.xp)
   const { tier, tierConfig, entitlements, products, loading: entLoading } = useEntitlements()
 
@@ -184,7 +185,7 @@ export default function AccountPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-muted p-1 rounded-lg">
-        {(['overview', 'badges', 'purchases'] as const).map((t) => (
+        {(['overview', 'badges', 'certificates', 'purchases'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -194,7 +195,7 @@ export default function AccountPage() {
                 : 'text-muted-foreground hover:text-foreground dark:hover:text-foreground'
             }`}
           >
-            {t === 'overview' ? '📊 Overview' : t === 'badges' ? '🏅 Achievements' : '💳 Purchases'}
+            {{ overview: '📊 Overview', badges: '🏅 Achievements', certificates: '🎓 Certificates', purchases: '💳 Purchases' }[t]}
           </button>
         ))}
       </div>
@@ -370,6 +371,8 @@ export default function AccountPage() {
           ))}
         </div>
       )}
+
+      {tab === 'certificates' && <CertificatesTab />}
 
       {tab === 'purchases' && (
         <div className="space-y-4">

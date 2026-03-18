@@ -23,6 +23,7 @@ import paypalRoutes from './routes/paypal.js'
 import usernameRoutes from './routes/username.js'
 import skillLabsRoutes from './routes/skillLabs.js'
 import reportsRoutes from './routes/reports.js'
+import certificatesRoutes from './routes/certificates.js'
 
 const server = Fastify({ logger: true })
 
@@ -70,6 +71,8 @@ await server.register(metricsRoutes, { prefix: '/admin/metrics' })
 await server.register(skillLabsRoutes, { prefix: '/skill-labs' })
 // Issue reports
 await server.register(reportsRoutes, { prefix: '/reports' })
+// Certificates
+await server.register(certificatesRoutes, { prefix: '/certificates' })
 
 // Health check for ALB
 server.get('/health', async () => ({ status: 'ok' }))

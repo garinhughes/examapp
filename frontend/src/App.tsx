@@ -1,13 +1,20 @@
+import { Routes, Route } from 'react-router-dom'
 import { ExamProvider } from './exam/ExamContext'
 import { BasketProvider } from './basket/BasketContext'
 import ExamApp from './exam/ExamApp'
+import VerifyPage from './components/VerifyPage'
 
 export default function App() {
   return (
-    <ExamProvider>
-      <BasketProvider>
-        <ExamApp />
-      </BasketProvider>
-    </ExamProvider>
+    <Routes>
+      <Route path="/verify/:token" element={<VerifyPage />} />
+      <Route path="*" element={
+        <ExamProvider>
+          <BasketProvider>
+            <ExamApp />
+          </BasketProvider>
+        </ExamProvider>
+      } />
+    </Routes>
   )
 }
