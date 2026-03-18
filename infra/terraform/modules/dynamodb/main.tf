@@ -30,6 +30,14 @@ resource "aws_dynamodb_table" "this" {
     }
   }
 
+  dynamic "ttl" {
+    for_each = lookup(each.value, "ttl_attribute", "") != "" ? [lookup(each.value, "ttl_attribute", "")] : []
+    content {
+      attribute_name = ttl.value
+      enabled        = true
+    }
+  }
+
   point_in_time_recovery { enabled = false }
   tags = { Project = var.project }
 }

@@ -71,7 +71,7 @@ module "dynamodb" {
     exams_index  = { table_name = "${var.project}-exams-index",  hash_key = "examCode" }
     entitlements = { table_name = "${var.project}-entitlements", hash_key = "userId",   range_key = "productId" }
     audit        = { table_name = "${var.project}-audit",        hash_key = "adminId",  range_key = "createdAt" }
-    sessions     = { table_name = "${var.project}-sessions",     hash_key = "PK",       range_key = "SK" }
+    sessions     = { table_name = "${var.project}-sessions",     hash_key = "PK",       range_key = "SK", ttl_attribute = "ttl" }
     skill_labs_index    = { table_name = "${var.project}-skill-labs-index",    hash_key = "labId" }
     skill_lab_attempts  = { table_name = "${var.project}-skill-lab-attempts",  hash_key = "userId", range_key = "attemptId" }
     issue_reports       = { table_name = "${var.project}-issue-reports",       hash_key = "reportId" }
@@ -229,6 +229,22 @@ module "route53" {
   domain                  = var.domain
   acm_dvos                = local.all_cert_dvos
 }
+
+# ==========================================================================
+# PayPal / Apple Pay: domain verification file served via CloudFront + S3
+# ==========================================================================
+# Upload the domain association file that Apple requires for Apple Pay.
+# Content is sourced from infra/terraform/apple-developer-merchantid-domain-association
+# (no file extension). Obtain this file from the PayPal dashboard after
+# registering your domain for Apple Pay under Payment Methods → Apple Pay.
+resource "aws_s3_object" "apple_pay_domain_association" {
+  bucket       = module.s3.bucket_name
+  key          = ".well-known/apple-developer-merchantid-domain-association"
+  source       = "${path.module}/apple-developer-merchantid-domain-association"
+  content_type = "application/json"
+  etag         = filemd5("${path.module}/apple-developer-merchantid-domain-association")
+}
+
 
 module "ses" {
   source  = "./modules/ses"

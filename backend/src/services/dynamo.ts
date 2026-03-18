@@ -156,4 +156,6 @@ export async function putIssueReport(report: {
 
 export default { upsertUserFromCognito, getUserBySub, addEntitlement, listUsers, recordAdminAudit, updateUserFields, findUserByUsername, putIssueReport }
 
+export const SESSIONS_TABLE = process.env.SESSIONS_TABLE || 'examapp-sessions'
+
 export { ddb, USERS_TABLE, ENTITLEMENTS_TABLE, AUDIT_TABLE }

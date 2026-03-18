@@ -18,6 +18,7 @@ import gamificationRoutes from './routes/gamification.js'
 import adminRoutes from './routes/admin.js'
 import pricingRoutes from './routes/pricing.js'
 import goCardlessRoutes from './routes/gocardless.js'
+import paypalRoutes from './routes/paypal.js'
 import usernameRoutes from './routes/username.js'
 import skillLabsRoutes from './routes/skillLabs.js'
 import reportsRoutes from './routes/reports.js'
@@ -51,6 +52,7 @@ await server.register(authRoutes, { prefix: '/auth' })
 // Pricing & GoCardless (scaffolded)
 await server.register(pricingRoutes, { prefix: '/pricing' })
 await server.register(goCardlessRoutes, { prefix: '/payments' })
+await server.register(paypalRoutes, { prefix: '/payments/paypal' })
 
 // App routes
 await server.register(examsRoutes, { prefix: '/exams' })

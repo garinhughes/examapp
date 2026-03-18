@@ -67,7 +67,8 @@ backend/src/
     analytics.ts        # Usage stats
     gamification.ts     # Badges/streaks
     pricing.ts          # Pricing tiers
-    stripe.ts           # Stripe webhook + checkout (RENAMED to gocardless.ts)
+    gocardless.ts       # GoCardless Direct Debit checkout + webhook (prefix /payments)
+    paypal.ts           # PayPal Orders + Subscriptions + webhook (prefix /payments/paypal)
     username.ts         # Username management
     skillLabs.ts        # GET/POST /skill-labs — lab definitions + attempt storage
     reports.ts          # POST /reports — issue reporting (paid-only, SES + DynamoDB)
@@ -76,7 +77,8 @@ backend/src/
     entitlements.ts     # Access control (free vs paid)
   services/
     ses.ts              # SES client + sendIssueReportEmail
-    dynamo.ts           # DynamoDB client + helpers
+    dynamo.ts           # DynamoDB client + helpers (exports ddb, SESSIONS_TABLE, etc.)
+    paypalSessions.ts   # PayPal checkout session store (examapp-sessions table, TTL 24h)
     examStore.ts        # Exam CRUD via DynamoDB/S3
     attemptsStore.ts    # Attempt persistence
     entitlements.ts     # Entitlement checks
@@ -133,7 +135,8 @@ frontend/src/
     useEntitlements.ts  # Checks user access tier
   basket/
     BasketContext.tsx   # Shopping basket state (localStorage persistence, smart suggestions)
-    BasketPage.tsx      # Basket view: item list, suggestion banners, GoCardless checkout
+    BasketPage.tsx      # Basket view: item list, suggestion banners, GoCardless + PayPal checkout
+    PayPalCheckout.tsx  # Lazy-loaded PayPal buttons (one-time orders + subscriptions)
 ```
 
 ---
@@ -203,7 +206,8 @@ pnpm publish:skill-labs:dry   # dry run - no writes
 - **Cognito** — auth (JWT issued by Cognito user pool)
 - **CloudFront** — frontend CDN
 - **WAF** — IP allowlist managed via `backend/infra/waf-allowlist.sh`
-- **GoCardless** - payments via webhook in `backend/src/routes/gocardless.ts` (route prefix `/payments`)
+- **GoCardless** — Direct Debit payments via webhook in `backend/src/routes/gocardless.ts` (route prefix `/payments`)
+- **PayPal** — one-time (Orders API v2) and subscription (Billing Plans API) payments. Backend route: `backend/src/routes/paypal.ts` (prefix `/payments/paypal`). Session store: `backend/src/services/paypalSessions.ts` (uses `examapp-sessions` DynamoDB table, TTL 24h). Frontend component: `frontend/src/basket/PayPalCheckout.tsx` (lazy-loaded into BasketPage). Env vars: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `PAYPAL_API_BASE`, `PAYPAL_PLAN_ID_MONTHLY`, `PAYPAL_PLAN_ID_ANNUAL`, `SESSIONS_TABLE`. Frontend: `VITE_PAYPAL_CLIENT_ID`. Sandbox billing plans created: monthly `P-7S2032886L4467328NG5KSUI` (£10), annual `P-466167562P531510YNG5KSWI` (£96). Apple Pay wired but disabled (remove `applepay` from `components` string); enable when domain is registered with PayPal.
 - **SES** — production-approved (out of sandbox). Domain: `certshack.com`. Terraform module at `infra/terraform/modules/ses/main.tf` manages domain identity, DKIM CNAMEs, SES verification TXT, SPF TXT, and WorkMail MX record. Service: `backend/src/services/ses.ts`. Env vars: `SES_FROM_ADDRESS` (default `noreply@certshack.com`), `SES_SUPPORT_ADDRESS` (default `support@certshack.com`).
 - **WorkMail** — `support@certshack.com` receives issue reports. MX record points to `inbound-smtp.eu-west-1.amazonaws.com` (eu-west-1), managed in the SES Terraform module. WorkMail itself is configured manually in the AWS console (not Terraform).
 - **Report Issue** — paid-only feature (`tier === 'paying'`). Frontend modal: `frontend/src/components/ReportIssueModal.tsx`. Backend route: `POST /reports` in `backend/src/routes/reports.ts`. On submit: sends email via SES (`sendIssueReportEmail`) AND persists to DynamoDB (`putIssueReport`). Content types: `question`, `answer`, `explanation`, `lab`.
@@ -234,4 +238,4 @@ Terraform state is remote (S3 backend defined in `infra/terraform/backend.tf`). 
 - **Exam UI components**: `frontend/src/exam/` — ExamApp (layout shell), ExamSetup, QuestionNav, QuestionCard, ExamReview, Modals, PracticeExams, AnalyticsView
 - **Skill Labs**: `frontend/src/skill-labs/` (pages + types) + `backend/src/routes/skillLabs.ts` + `backend/src/services/skillLabStore.ts` + `backend/src/services/skillLabAttemptsStore.ts` + `backend/data/skill-labs.json` (lab definitions). Supports three lab types: `diagnose` (React Flow diagram), `cli` (simulated AWS CLI terminal), `policy-fix` (Monaco Editor IAM policy repair). The runner page (`SkillLabRunnerPage`) dispatches to the correct component by `lab.type` using `React.lazy` + dynamic imports for code-splitting. Lab runner components live in `frontend/src/skill-labs/labs/` and share a common `LabHeader` component. Publishing mirrors the exam pipeline: `pnpm publish:skill-labs` uploads each lab to S3 and writes a summary index to DynamoDB. `SKILL_LAB_SOURCE=local|s3` toggles data source (same pattern as `EXAM_SOURCE`).
 - **Report Issue**: `frontend/src/components/ReportIssueModal.tsx` + `backend/src/routes/reports.ts` + `backend/src/services/ses.ts`. Paid-only (`tier === 'paying'`). SES env vars: `SES_FROM_ADDRESS`, `SES_SUPPORT_ADDRESS`. Terraform: `infra/terraform/modules/ses/`.
-- **Basket / Payments**: `frontend/src/basket/` (BasketContext + BasketPage) + `backend/src/routes/gocardless.ts` + `backend/src/catalog.ts`. The basket uses localStorage persistence (`certshack:basket`), smart upsell suggestions (e.g. nudge to subscribe when 2+ exams in basket), and a single GoCardless checkout entry point. Pricing: single exams £5, bundles £9/£12, monthly sub £10, annual sub £96. GoCardless routes are stubbed under `/payments` prefix. The `PricingPage` "Add to Basket" buttons and `PracticeExams` cart icons both feed into the basket context.
+- **Basket / Payments**: `frontend/src/basket/` (BasketContext + BasketPage + PayPalCheckout) + `backend/src/routes/gocardless.ts` + `backend/src/routes/paypal.ts` + `backend/src/catalog.ts`. The basket uses localStorage persistence (`certshack:basket`), smart upsell suggestions, and two checkout paths: GoCardless (Direct Debit) and PayPal (one-time + subscriptions). Pricing: single exams £9, bundles £17/£25, monthly sub £10, annual sub £96. The `PricingPage` "Add to Basket" buttons and `PracticeExams` cart icons both feed into the basket context.

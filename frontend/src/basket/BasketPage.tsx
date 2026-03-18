@@ -1,9 +1,12 @@
 /**
  * BasketPage -- shows basket contents, smart upgrade suggestions,
- * and a single GoCardless checkout button.
+ * and checkout options: GoCardless (Direct Debit) and PayPal (+ Apple Pay).
  */
 
+import { lazy, Suspense } from 'react'
 import { Trash2, ShoppingCart, ArrowRight, Sparkles, X } from 'lucide-react'
+
+const PayPalCheckout = lazy(() => import('./PayPalCheckout'))
 import { useBasket } from './BasketContext'
 import { useEntitlements, type CatalogProduct } from '../hooks/useEntitlements'
 import { useAuth } from '../auth/AuthContext'
@@ -133,10 +136,21 @@ export default function BasketPage() {
           onClick={handleCheckout}
           className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition inline-flex items-center justify-center gap-2"
         >
-          Proceed to checkout <ArrowRight className="w-4 h-4" />
+          Pay by Direct Debit (GoCardless) <ArrowRight className="w-4 h-4" />
         </button>
+
+        <div className="relative flex items-center py-1">
+          <div className="flex-1 border-t border-border" />
+          <span className="mx-3 text-xs text-muted-foreground">or pay with</span>
+          <div className="flex-1 border-t border-border" />
+        </div>
+
+        <Suspense fallback={<div className="h-12 animate-pulse rounded-lg bg-muted" />}>
+          <PayPalCheckout />
+        </Suspense>
+
         <p className="text-[11px] text-muted-foreground text-center">
-          Payments processed securely via GoCardless. You'll be redirected to complete payment.
+          Payments processed securely via GoCardless or PayPal.
         </p>
       </div>
     </div>
