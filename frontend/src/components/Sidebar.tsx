@@ -90,7 +90,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
         </div>
 
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-          {navItems.filter(item => item.key !== 'admin' || showAdmin).map((item) => {
+          {navItems.filter(item => (item.key !== 'admin' && item.key !== 'diagrams') || showAdmin).map((item) => {
             const isActive = currentRoute === item.key || (item.key === 'skill-labs' && currentRoute?.startsWith('skill-lab:'))
             return (
             <button

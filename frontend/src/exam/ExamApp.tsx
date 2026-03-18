@@ -29,7 +29,7 @@ export default function ExamApp() {
     selectedAnswers, flaggedQuestions,
     user, login, logout, gamState, gamLevel,
     authFetch, showToast, resumeExam, setupExamFromMeta,
-    downloadAttemptCSV, downloadAttemptPDF,
+    downloadAttemptCSV, downloadAttemptPDF, userTier,
     setShowCancelConfirm, isAdmin,
   } = useExam()
 
@@ -441,6 +441,7 @@ export default function ExamApp() {
                       })()}
                     </div>
                   </div>
+                  {userTier && userTier !== 'visitor' && (
                   <div className="flex flex-col gap-2">
                     <button
                       className="px-3 py-1.5 rounded bg-accent text-sm inline-flex items-center gap-2 hover:bg-accent transition-colors"
@@ -459,6 +460,7 @@ export default function ExamApp() {
                       PDF
                     </button>
                   </div>
+                  )}
                 </div>
               </div>
             )}

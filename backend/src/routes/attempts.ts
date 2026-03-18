@@ -2,6 +2,8 @@ import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { randomUUID } from 'crypto'
 import { loadExam, shuffleQuestions, normaliseQuestion } from '../examLoader.js'
 import { attemptsStore } from '../services/attemptsStore.js'
+import { getActiveProductIds } from '../services/entitlements.js'
+import { resolveUserTier, TIERS } from '../catalog.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Start an attempt
@@ -16,6 +18,23 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const lc = String(examCode || '').toLowerCase()
     const exam = await loadExam(lc)
     if (!exam) return reply.status(400).send({ message: 'exam not found' })
+
+    // Enforce per-exam attempt limit based on user tier
+    const userId = request.user?.sub ?? ''
+    {
+      const ownedProductIds = await getActiveProductIds(userId).catch(() => [])
+      const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds, examCode })
+      const tierConfig = TIERS[tier]
+      if (tierConfig.attemptLimit !== null) {
+        const userAttempts = await attemptsStore.listByUser(userId)
+        const finishedForExam = userAttempts.filter((a: any) => a.examCode === examCode && a.finishedAt)
+        if (finishedForExam.length >= tierConfig.attemptLimit) {
+          return reply.status(403).send({
+            message: `Attempt limit reached. You can save up to ${tierConfig.attemptLimit} attempt${tierConfig.attemptLimit === 1 ? '' : 's'} per exam on your current plan.`
+          })
+        }
+      }
+    }
 
     let filteredQuestions = exam.questions.slice()
 

@@ -9,7 +9,7 @@ export function AnalyticsView() {
     analyticsAttempts, analyticsDomains, deletingAttemptId, setDeletingAttemptId,
     gamState, fetchScoreHistory, downloadAnalyticsCSV, setupExamFromMeta,
     setRoute, authFetch, setAttemptData, setSelected, questions, setQuestions,
-    attemptId, setAttemptId, showToast, setExamStarted,
+    attemptId, setAttemptId, showToast, setExamStarted, userTier,
   } = useExam()
 
   const passMark = typeof selectedMeta?.passMark === 'number' ? selectedMeta.passMark : 70
@@ -41,6 +41,7 @@ export function AnalyticsView() {
           )}
           {selected && (
             <>
+              {userTier && userTier !== 'visitor' && (
               <button
                 className="px-3 py-1 rounded bg-accent text-sm inline-flex items-center gap-1.5 hover:bg-accent transition-colors"
                 onClick={downloadAnalyticsCSV}
@@ -49,6 +50,7 @@ export function AnalyticsView() {
                 <Download className="w-3.5 h-3.5" />
                 CSV
               </button>
+              )}
               <button
                 className="px-3 py-1 rounded bg-primary text-white text-sm"
                 onClick={() => {
