@@ -8,6 +8,7 @@ import {
   getLabIndex,
   listLabIndex,
 } from '../services/skillLabStore.js'
+import { updateMetricsOnLabAttempt } from '../services/metricsStore.js'
 
 const LABS_FILE = path.join(process.cwd(), 'data', 'skill-labs.json')
 
@@ -182,6 +183,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     await skillLabAttemptsStore.put(attempt)
+
+    updateMetricsOnLabAttempt({ labId, labType: attempt.labType, correct, timeTaken })
+      .catch((err) => console.error('[metrics] updateMetricsOnLabAttempt failed', err))
+
     return reply.status(201).send(attempt)
   })
 }

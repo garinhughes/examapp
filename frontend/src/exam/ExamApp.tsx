@@ -4,6 +4,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import AccountPage from '../components/AccountPage'
 import Leaderboard from '../components/Leaderboard'
 import AdminPanel from '../components/AdminPanel'
+import { MetricsView } from './MetricsView'
 import PricingPage from '../components/PricingPage'
 import { DiagramsView } from '../components/DiagramsView'
 import { SkillLabsPage } from '../skill-labs/SkillLabsPage'
@@ -73,12 +74,13 @@ export default function ExamApp() {
                     {examTier && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs capitalize">{examTier}</span>}
                   </div>
                 )}
-                {['practice', 'analytics', 'account', 'admin', 'diagrams', 'skill-labs', 'basket'].includes(route) && (
+                {['practice', 'analytics', 'account', 'admin', 'metrics', 'diagrams', 'skill-labs', 'basket'].includes(route) && (
                   <h1 className="text-3xl font-bold tracking-tight">
                     {route === 'practice' && 'Practice Exams'}
                     {route === 'analytics' && 'Analytics'}
                     {route === 'account' && 'Account Settings'}
                     {route === 'admin' && 'Admin Console'}
+                    {route === 'metrics' && 'Metrics'}
                     {route === 'diagrams' && 'Architecture Diagrams'}
                     {route === 'skill-labs' && 'Skill Labs'}
                     {route === 'basket' && 'Basket'}
@@ -124,6 +126,18 @@ export default function ExamApp() {
             )}
 
             {route === 'admin' && !userIsAdmin && (
+              <div className="p-8 text-center text-muted-foreground">
+                You do not have permission to access this page.
+              </div>
+            )}
+
+            {route === 'metrics' && userIsAdmin && (
+              <div className="mb-6">
+                <MetricsView />
+              </div>
+            )}
+
+            {route === 'metrics' && !userIsAdmin && (
               <div className="p-8 text-center text-muted-foreground">
                 You do not have permission to access this page.
               </div>

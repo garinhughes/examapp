@@ -13,6 +13,7 @@ import {
   CreditCard,
   User,
   Activity,
+  BarChart2,
   Network,
   FlaskConical,
   ShoppingCart,
@@ -27,6 +28,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/home", key: 'home' },
   { icon: BookOpen, label: "Exams", href: "/practice", key: 'practice' },
   { icon: Activity, label: "Analytics", href: "/analytics", key: 'analytics' },
+  { icon: BarChart2, label: "Metrics", href: "/metrics", key: 'metrics' },
   { icon: Network, label: "Diagrams", href: "/diagrams", key: 'diagrams' },
   { icon: FlaskConical, label: "Skill Labs", href: "/skill-labs", key: 'skill-labs' },
   { icon: User, label: "Account", href: "/account", key: 'account' },
@@ -90,7 +92,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
         </div>
 
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-          {navItems.filter(item => (item.key !== 'admin' && item.key !== 'diagrams') || showAdmin).map((item) => {
+          {navItems.filter(item => (item.key !== 'admin' && item.key !== 'diagrams' && item.key !== 'metrics') || showAdmin).map((item) => {
             const isActive = currentRoute === item.key || (item.key === 'skill-labs' && currentRoute?.startsWith('skill-lab:'))
             return (
             <button

@@ -16,6 +16,7 @@ import attemptsRoutes from './routes/attempts.js'
 import analyticsRoutes from './routes/analytics.js'
 import gamificationRoutes from './routes/gamification.js'
 import adminRoutes from './routes/admin.js'
+import metricsRoutes from './routes/metrics.js'
 import pricingRoutes from './routes/pricing.js'
 import goCardlessRoutes from './routes/gocardless.js'
 import paypalRoutes from './routes/paypal.js'
@@ -63,6 +64,8 @@ await server.register(gamificationRoutes, { prefix: '/gamification' })
 await server.register(usernameRoutes, { prefix: '/username' })
 // Admin routes
 await server.register(adminRoutes, { prefix: '/admin' })
+// Admin metrics routes
+await server.register(metricsRoutes, { prefix: '/admin/metrics' })
 // Skill Labs routes
 await server.register(skillLabsRoutes, { prefix: '/skill-labs' })
 // Issue reports

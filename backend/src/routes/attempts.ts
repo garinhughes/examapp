@@ -4,6 +4,7 @@ import { loadExam, shuffleQuestions, normaliseQuestion } from '../examLoader.js'
 import { attemptsStore } from '../services/attemptsStore.js'
 import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS } from '../catalog.js'
+import { updateMetricsOnAttemptFinish } from '../services/metricsStore.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Start an attempt
@@ -354,6 +355,17 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     await attemptsStore.put(attempt)
+
+    // Fire-and-forget metrics aggregation — failures must not break the attempt response
+    updateMetricsOnAttemptFinish({
+      examCode: attempt.examCode,
+      userId: attempt.userId ?? '',
+      score,
+      perDomain,
+      answers: Array.isArray(attempt.answers) ? attempt.answers : [],
+      questions: Array.isArray(attempt.questions) ? attempt.questions : [],
+      metadata: attempt.metadata as any,
+    }).catch((err) => console.error('[metrics] updateMetricsOnAttemptFinish failed', err))
 
     return { attemptId: attempt.attemptId, score, correctCount, total, totalQuestions, answeredCount, earlyComplete, perDomain }
   })
