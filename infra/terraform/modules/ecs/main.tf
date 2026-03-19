@@ -187,6 +187,11 @@ variable "metrics_table" {
   default = ""
 }
 
+variable "interactions_table" {
+  type    = string
+  default = ""
+}
+
 # ---------- security groups ----------
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project}-alb-"
@@ -362,6 +367,7 @@ locals {
     { name = "SES_SUPPORT_ADDRESS", value = var.ses_support_address },
     { name = "ISSUE_REPORTS_TABLE", value = var.issue_reports_table },
     { name = "METRICS_TABLE", value = var.metrics_table },
+    { name = "INTERACTIONS_TABLE", value = var.interactions_table },
   ]
 
   container_secrets = var.cognito_client_secret_arn != "" ? [

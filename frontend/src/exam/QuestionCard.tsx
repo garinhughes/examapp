@@ -1,4 +1,6 @@
-import { X, Check, ExternalLink, Lightbulb } from 'lucide-react'
+import { X, Check, ExternalLink, Lightbulb, Star } from 'lucide-react'
+import { useState } from 'react'
+import { RatingModal } from '@/feedback/RatingModal'
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { useExam } from './ExamContext'
@@ -19,6 +21,7 @@ export function QuestionCard() {
 
   const clampedIdx = Math.min(currentQuestionIndex, displayQuestions.length - 1)
   const visible = displayQuestions.length > 0 ? [displayQuestions[Math.max(0, clampedIdx)]] : []
+  const [ratingTarget, setRatingTarget] = useState<string | null>(null)
 
   return (
     <div className={`${displayQuestions.length > 0 ? '!mt-2' : ''} space-y-4`}>
@@ -69,6 +72,13 @@ export function QuestionCard() {
                     className={`text-sm px-2 py-1 rounded font-medium transition-colors ${flaggedQuestions.has(q.id) ? 'bg-primary text-white' : 'bg-accent text-primary border border-border'}`}
                   >
                     🚩 {flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}
+                  </button>
+                  <button
+                    onClick={() => setRatingTarget(q.id)}
+                    className="text-sm px-2 py-1 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center gap-1"
+                    aria-label="Rate this question"
+                  >
+                    <Star className="w-3.5 h-3.5" /> Rate
                   </button>
                 </div>
               )}
@@ -379,6 +389,13 @@ export function QuestionCard() {
           </article>
         )
       })}
+      {ratingTarget && (
+        <RatingModal
+          contentType="question"
+          contentId={ratingTarget}
+          onClose={() => setRatingTarget(null)}
+        />
+      )}
     </div>
   )
 }

@@ -76,6 +76,7 @@ module "dynamodb" {
     skill_lab_attempts  = { table_name = "${var.project}-skill-lab-attempts",  hash_key = "userId", range_key = "attemptId" }
     issue_reports       = { table_name = "${var.project}-issue-reports",       hash_key = "reportId" }
     metrics             = { table_name = "${var.project}-metrics",             hash_key = "pk",      range_key = "sk" }
+    interactions        = { table_name = "${var.project}-interactions",        hash_key = "userId",  range_key = "SK" }
   }
 }
 
@@ -154,6 +155,7 @@ module "ecs" {
   ses_support_address = "support@certshack.com"
   issue_reports_table = module.dynamodb.table_names["issue_reports"]
   metrics_table       = module.dynamodb.table_names["metrics"]
+  interactions_table  = module.dynamodb.table_names["interactions"]
 
   depends_on = [module.acm]
 }

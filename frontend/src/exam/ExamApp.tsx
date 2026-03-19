@@ -10,6 +10,8 @@ import { DiagramsView } from '../components/DiagramsView'
 import { SkillLabsPage } from '../skill-labs/SkillLabsPage'
 import { SkillLabRunnerPage } from '../skill-labs/SkillLabRunnerPage'
 import BasketPage from '../basket/BasketPage'
+import { FeedbackProvider } from '../feedback/FeedbackContext'
+import { FeedbackPage } from '../feedback/FeedbackPage'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
 import { PracticeExams } from './PracticeExams'
@@ -37,6 +39,7 @@ export default function ExamApp() {
   const userIsAdmin = isAdmin()
 
   return (
+    <FeedbackProvider authFetch={authFetch} isAdmin={userIsAdmin}>
     <div className="flex flex-col h-screen w-full overflow-hidden bg-background text-foreground">
       {/* Work-in-progress banner */}
       <div className="shrink-0 bg-amber-500 text-amber-950 text-xs font-medium text-center py-1.5 px-4">
@@ -74,7 +77,7 @@ export default function ExamApp() {
                     {examTier && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs capitalize">{examTier}</span>}
                   </div>
                 )}
-                {['practice', 'analytics', 'account', 'admin', 'metrics', 'diagrams', 'skill-labs', 'basket'].includes(route) && (
+                {['practice', 'analytics', 'account', 'admin', 'metrics', 'diagrams', 'skill-labs', 'basket', 'feedback'].includes(route) && (
                   <h1 className="text-3xl font-bold tracking-tight">
                     {route === 'practice' && 'Practice Exams'}
                     {route === 'analytics' && 'Analytics'}
@@ -84,6 +87,7 @@ export default function ExamApp() {
                     {route === 'diagrams' && 'Architecture Diagrams'}
                     {route === 'skill-labs' && 'Skill Labs'}
                     {route === 'basket' && 'Basket'}
+                    {route === 'feedback' && 'Feedback'}
                   </h1>
                 )}
               </div>
@@ -138,6 +142,18 @@ export default function ExamApp() {
             )}
 
             {route === 'metrics' && !userIsAdmin && (
+              <div className="p-8 text-center text-muted-foreground">
+                You do not have permission to access this page.
+              </div>
+            )}
+
+            {route === 'feedback' && userIsAdmin && (
+              <div className="mb-6">
+                <FeedbackPage />
+              </div>
+            )}
+
+            {route === 'feedback' && !userIsAdmin && (
               <div className="p-8 text-center text-muted-foreground">
                 You do not have permission to access this page.
               </div>
@@ -501,6 +517,7 @@ export default function ExamApp() {
       </main>
       </div>
     </div>
+    </FeedbackProvider>
   )
 }
 

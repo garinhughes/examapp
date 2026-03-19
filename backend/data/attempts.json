@@ -11366,6 +11366,1350 @@
           "score": 0
         }
       }
+    },
+    {
+      "attemptId": "f49ee1a6-a032-4bfb-a28c-1010c8239d39",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SCS-C03",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-03-19T15:20:58.218Z",
+      "finishedAt": null,
+      "score": null,
+      "answers": [
+        {
+          "questionId": "SCS-C03-0004",
+          "selectedChoiceId": "c1",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-03-19T15:21:37.632Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "SCS-C03-0007",
+          "type": "matching",
+          "question": "A cloud security team is reviewing data integrity controls across their AWS environment. Each scenario describes a protection requirement. Match each requirement to the AWS feature that best satisfies it.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "KMS key deletion cancellation / key policy with DenyScheduleKeyDeletion",
+              "isCorrect": false,
+              "explanation": "A KMS key policy condition can deny kms:ScheduleKeyDeletion and kms:DisableKey to all principals during a retention window. This ensures the encryption key protecting the S3 data cannot be removed, which would render stored ciphertexts permanently unrecoverable."
+            },
+            {
+              "id": "c2",
+              "text": "S3 Object Lock - Compliance mode",
+              "isCorrect": false,
+              "explanation": "Compliance mode applies WORM protection that no AWS principal — including the root account — can override during the retention period. This is the correct control when regulatory mandates require absolute immutability (e.g., SEC 17a-4, HIPAA)."
+            },
+            {
+              "id": "c1",
+              "text": "CloudTrail log file validation",
+              "isCorrect": false,
+              "explanation": "CloudTrail generates hourly SHA-256 digest files signed with AWS's private key. Running aws cloudtrail validate-logs recomputes file hashes and verifies signatures, cryptographically proving whether any log was altered or deleted since delivery."
+            },
+            {
+              "id": "c3",
+              "text": "S3 Versioning",
+              "isCorrect": false,
+              "explanation": "S3 Versioning converts PUT operations into new object versions rather than replacements. Any previous version can be restored by referencing its version ID, making accidental overwrites fully recoverable."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Prevent S3 objects from being overwritten or deleted for a fixed period, enforced even against the root account",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s2",
+              "label": "Detect whether a CloudTrail log file was modified or deleted after it was delivered to S3",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Recover a specific earlier version of an S3 object after an accidental overwrite",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s4",
+              "label": "Ensure a KMS key used for S3 encryption cannot be deleted or disabled during a retention window",
+              "correctChoiceId": "c4"
+            }
+          ],
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3",
+            "AWS CloudTrail",
+            "Amazon S3 Glacier",
+            "AWS KMS"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+          "tip": "Consider what level of immutability each control provides and whether it applies to the data itself, the audit trail, previous versions, or the encryption key.",
+          "explanation": "CloudTrail log file validation (c1) detects post-delivery tampering of audit logs via signed digests — it does not prevent writes but proves integrity after the fact. S3 Object Lock Compliance mode (c2) enforces WORM immutability that cannot be overridden by any account, satisfying hard regulatory retention mandates. S3 Versioning (c3) preserves every object state, enabling point-in-time recovery after accidental overwrites. KMS key policy controls (c4) protect the encryption layer — without the key, encrypted S3 data is irretrievable, so preventing key deletion is itself a data integrity control.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0012",
+          "type": "matching",
+          "question": "A cloud security architect is designing the detection layer for a large enterprise AWS environment. Each detection requirement has a specific service best suited to address it. Match each requirement to the AWS security service that natively satisfies it.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Amazon Macie",
+              "isCorrect": false,
+              "explanation": "Macie uses machine learning and pattern matching to discover sensitive data — including PCI DSS payment card numbers — within S3 objects. It produces per-bucket and per-object findings with the specific sensitive data type detected, making it the right tool for data classification requirements."
+            },
+            {
+              "id": "c1",
+              "text": "Amazon GuardDuty",
+              "isCorrect": false,
+              "explanation": "GuardDuty continuously analyzes CloudTrail, VPC Flow Logs, and DNS logs using threat intelligence feeds. It has built-in detection for Tor-related activity (finding type: UnauthorizedAccess:IAMUser/TorIPCaller) and other network-based anomalies without any configuration beyond enablement."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Security Hub",
+              "isCorrect": false,
+              "explanation": "Security Hub aggregates findings from integrated services (GuardDuty, Macie, Inspector, Config, etc.), maps them to compliance framework controls (CIS, PCI DSS, NIST 800-53), and computes a consolidated security score per account and region — exactly the correlation and scoring use case described."
+            },
+            {
+              "id": "c4",
+              "text": "Amazon Security Lake",
+              "isCorrect": false,
+              "explanation": "Security Lake automatically collects, transforms, and normalizes security data from AWS services and third-party sources into the Open Cybersecurity Schema Framework (OCSF) format, storing it in S3 in Parquet for scalable, long-term analysis. It is purpose-built for the data lake use case."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "Identify S3 buckets that contain unencrypted payment card numbers",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s4",
+              "label": "Correlate findings across multiple AWS security services and apply compliance framework controls to produce a consolidated security score",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "Detect IAM credentials being used from a Tor exit node",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Aggregate and normalize findings from GuardDuty, Inspector, and Macie into a single OCSF-formatted data lake for long-term analysis",
+              "correctChoiceId": "c4"
+            }
+          ],
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon GuardDuty",
+            "Amazon Macie",
+            "AWS Security Hub",
+            "Amazon Security Lake"
+          ],
+          "docs": "https://docs.aws.amazon.com/security-hub/latest/userguide/what-is-securityhub.html",
+          "tip": "Consider each service's primary design purpose: threat detection, data classification, finding aggregation/scoring, or security data lake.",
+          "explanation": "GuardDuty (c1) is the threat intelligence and behavioral detection service — it identifies malicious network activity including Tor-based credential use from integrated log sources. Macie (c2) is the sensitive data discovery service for S3, detecting PCI, PII, and other regulated data categories using ML and pattern matching. Security Hub (c3) is the aggregation and compliance posture layer — it imports findings, maps them to control frameworks, and scores security posture. Security Lake (c4) is the OCSF-normalized security data lake — it provides centralized, long-term retention and analysis across AWS and third-party sources without each service being its own silo.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0010",
+          "type": "multiple-choice",
+          "question": "A security team manages a multi-account AWS environment and uses AWS Security Hub as their central finding aggregation point. They need to build a Security Hub custom insight that surfaces the five S3 buckets with the highest number of CRITICAL severity findings over the past 30 days across all member accounts.\n\nWhich TWO actions are required to build this custom insight? (Select TWO)",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Configure each GuardDuty member account to forward findings directly to Security Hub in the administrator account using a GuardDuty cross-account publishing rule.",
+              "isCorrect": false,
+              "explanation": "GuardDuty findings reach Security Hub through the standard integration (enabled per-account), not through a cross-account publishing rule. The aggregation model is: GuardDuty -> Security Hub (per account) -> Security Hub administrator via cross-account membership, not a direct GuardDuty-to-admin-Security-Hub path."
+            },
+            {
+              "id": "c1",
+              "text": "Define the insight with a filter that sets Severity Label to CRITICAL, Resource Type to AwsS3Bucket, and record state to ACTIVE, then group results by Resource Id.",
+              "isCorrect": true,
+              "explanation": "Security Hub custom insights require a filter set to scope findings (severity, resource type, record state) and a grouping attribute to aggregate counts. Grouping by Resource Id (the bucket ARN) produces a ranked list of buckets by finding count.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Set the workflow status filter to NEW and NOTIFIED to exclude already-remediated findings from the insight results.",
+              "isCorrect": false,
+              "explanation": "Filtering on workflow status NEW and NOTIFIED ensures the insight reflects open, actionable findings rather than those already resolved. However, this is not required to create a functional insight — the filter set and grouping attribute (c1) plus the aggregation scope (c2) are the minimum requirements for the described goal."
+            },
+            {
+              "id": "c3",
+              "text": "Create an EventBridge rule that matches Security Hub findings, writes them to a DynamoDB table, and query the table to compute the top-five bucket ranking.",
+              "isCorrect": false,
+              "explanation": "This builds a custom pipeline around Security Hub rather than using its built-in custom insights feature. The question asks specifically for the built-in capability. EventBridge + DynamoDB adds unnecessary complexity and is not how Security Hub insights work."
+            },
+            {
+              "id": "c2",
+              "text": "Enable Security Hub cross-Region aggregation or ensure the finding aggregator is configured to pull findings from all member account Regions into the administrator account.",
+              "isCorrect": true,
+              "explanation": "Security Hub custom insights only surface findings visible in the account and Region where the insight is defined. Without cross-account aggregation (delegated administrator with all member accounts enabled) and cross-Region aggregation, findings from member accounts and non-home Regions are invisible to the insight.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "AWS Security Hub",
+            "Amazon GuardDuty",
+            "Amazon Inspector",
+            "AWS Config"
+          ],
+          "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-insights-create.html",
+          "tip": "Break this into two concerns: what data must be visible, and how the insight groups that data into a ranked list.",
+          "explanation": "A Security Hub custom insight requires (1) a filter that defines which findings to include — CRITICAL severity, S3 resource type, ACTIVE record state — and a grouping attribute (Resource Id) that produces a count-ranked list of bucket ARNs; and (2) cross-account (and optionally cross-Region) aggregation so that findings from all member accounts are visible in the administrator account's insight. Without both, the insight either cannot be created correctly (c1) or does not see all relevant findings (c2). EventBridge+DynamoDB (c3) is a custom workaround, not the insight feature. GuardDuty cross-account publishing rules (c4) do not exist as described. Workflow status filtering (c5) is optional refinement, not a requirement.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0006",
+          "type": "ordering",
+          "question": "A security engineer is implementing an immutable archive using S3 Glacier Vault Lock to satisfy a compliance requirement that audit logs cannot be deleted or modified for seven years.\n\nArrange the following steps in the correct order to complete the Vault Lock policy enforcement process.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Call complete-vault-lock with the lock ID to permanently enforce the Compliance-mode policy",
+              "isCorrect": true,
+              "explanation": "complete-vault-lock commits the policy irreversibly. Once called, the policy cannot be changed or deleted by any principal for the duration of the retention period.",
+              "sequence": 3
+            },
+            {
+              "id": "c1",
+              "text": "Call initiate-vault-lock to attach a policy and receive a lock ID in the In-Progress state",
+              "isCorrect": true,
+              "explanation": "initiate-vault-lock is always first — it creates the policy in a 24-hour trial window. You cannot complete the lock without this lock ID.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Abort the lock (if policy is incorrect) and restart from initiate-vault-lock with a corrected policy",
+              "isCorrect": true,
+              "explanation": "abort-vault-lock is only used when validation in step 2 reveals a problem. It cancels the In-Progress lock so you can start over. If validation passes, this step is skipped and you proceed to complete-vault-lock. It is listed last because in the correct flow it is a conditional rollback, not a required step — however the compliance path ends at step 3.",
+              "sequence": 4
+            },
+            {
+              "id": "c2",
+              "text": "Validate the policy by testing deny conditions against the vault during the 24-hour window",
+              "isCorrect": true,
+              "explanation": "The 24-hour In-Progress window exists specifically for validation. Testing deny conditions before committing ensures the policy does what you intend — you cannot modify a Compliance-mode policy after locking.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3 Glacier"
+          ],
+          "docs": "https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html",
+          "tip": "Vault Lock has a two-phase commit design. Think about what happens before and after the policy becomes permanent.",
+          "explanation": "S3 Glacier Vault Lock uses a two-phase commit: (1) initiate-vault-lock attaches a draft policy and returns a lock ID — the vault enters 'In-Progress' state with a 24-hour window; (2) during that window you should test deny conditions to confirm the policy is correct; (3) complete-vault-lock permanently enforces the policy in Compliance mode — no principal, including root, can delete or alter it for the retention period; (4) abort-vault-lock is the escape hatch if step 2 reveals an error, resetting the vault so you can restart. In a compliant deployment, the flow is always initiate → validate → complete.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0001",
+          "type": "single-choice",
+          "question": "A financial services company stores compliance audit logs in Amazon S3 and must retain them immutably for 7 years to satisfy SEC 17a-4 regulations. The security architect must ensure that no user, including those with Administrator access or root credentials, can delete or shorten the retention period during that window.\n\nWhich S3 Object Lock configuration satisfies this requirement?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Enable S3 Versioning on the bucket and configure an S3 Lifecycle policy to expire objects after 7 years, combined with an S3 bucket policy that denies s3:DeleteObject.",
+              "isCorrect": false,
+              "explanation": "Versioning with a bucket policy can prevent casual deletion but does not enforce immutability. A bucket owner with sufficient permissions can modify or remove the bucket policy itself, and Lifecycle expiration actively deletes objects rather than protecting them."
+            },
+            {
+              "id": "c1",
+              "text": "Apply S3 Object Lock in Governance mode with a 7-year retention period and deny the s3:BypassGovernanceRetention action in all IAM policies.",
+              "isCorrect": false,
+              "explanation": "Governance mode can still be overridden by users who are granted the s3:BypassGovernanceRetention permission, including root. Denying it in IAM policies does not prevent root from bypassing it, since IAM denies do not apply to the root account."
+            },
+            {
+              "id": "c4",
+              "text": "Enable S3 Versioning on the bucket, configure MFA Delete, and apply an SCP that denies s3:PutBucketPolicy changes for 7 years.",
+              "isCorrect": false,
+              "explanation": "MFA Delete protects individual version deletions but does not enforce a fixed retention window. SCPs govern member accounts in AWS Organizations but cannot prevent the management account or root from modifying policies. This combination does not satisfy the immutability guarantee required by SEC 17a-4."
+            },
+            {
+              "id": "c2",
+              "text": "Apply S3 Object Lock in Compliance mode with a 7-year retention period on the bucket.",
+              "isCorrect": true,
+              "explanation": "Compliance mode enforces WORM (Write Once Read Many) immutability that cannot be overridden by any user, including root, for the duration of the retention period. This is the only Object Lock mode that satisfies strict regulatory requirements such as SEC 17a-4.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html",
+          "tip": "Consider which retention mode provides guarantees that cannot be overridden by any AWS principal, including privileged ones.",
+          "explanation": "S3 Object Lock in Compliance mode (c2) is purpose-built for regulatory WORM requirements: once set, no user (including root) can shorten the retention period or delete locked objects before it expires. Governance mode (c1) is incorrect because the s3:BypassGovernanceRetention permission can be granted, and root always retains bypass capability regardless of IAM denies. Versioning with Lifecycle and bucket policies (c3) does not enforce immutability since the bucket owner can alter policies. MFA Delete with SCPs (c4) lacks a tamper-proof retention window. To implement: enable Object Lock at bucket creation, then apply a default retention rule using aws s3api put-object-lock-configuration with Mode set to COMPLIANCE.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0003",
+          "type": "multiple-choice",
+          "question": "A media company stores master video assets in S3 and requires that accidental overwrites by developers preserve the previous object content and that permanent deletion of any specific version requires multi-factor authentication from the bucket owner. The solution must use native S3 capabilities without restricting the development team's ability to upload new versions.\n\nWhich TWO configurations should the security engineer apply? (Select TWO)",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Configure an S3 bucket policy that denies s3:DeleteObject for all IAM principals except the bucket owner, and enable S3 Versioning.",
+              "isCorrect": false,
+              "explanation": "Denying s3:DeleteObject via bucket policy prevents deletion of the current object but does not protect versioned states once versioning is enabled — s3:DeleteObjectVersion is the relevant action for permanent version removal. The policy also lacks MFA enforcement and can be modified by the bucket owner."
+            },
+            {
+              "id": "c1",
+              "text": "Enable S3 Versioning on the bucket so that all PUT operations create a new version rather than overwriting the existing object.",
+              "isCorrect": true,
+              "explanation": "Versioning converts every overwrite into a new object version, preserving all prior states. Developers retain full write access while the original content remains recoverable. Delete operations create a delete marker, leaving previous versions intact.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Apply S3 Object Lock in Governance mode with a 90-day retention period and grant all developers the s3:BypassGovernanceRetention permission for operational flexibility.",
+              "isCorrect": false,
+              "explanation": "Granting s3:BypassGovernanceRetention to all developers negates any protection Object Lock provides. Additionally, Governance mode's fixed retention period prevents developers from correcting accidental uploads within the lock window, conflicting with the operational requirement."
+            },
+            {
+              "id": "c5",
+              "text": "Enable S3 Cross-Region Replication with delete marker replication disabled and rely on the replica bucket as the authoritative copy for recovery.",
+              "isCorrect": false,
+              "explanation": "CRR creates a copy in another region for availability purposes but does not prevent permanent deletion in the source bucket. Disabling delete marker replication causes the replica to diverge from the source over time and does not add MFA enforcement to any delete operations."
+            },
+            {
+              "id": "c2",
+              "text": "Enable MFA Delete on the versioned bucket, requiring the bucket owner to supply a valid MFA code when permanently deleting a specific object version or suspending versioning.",
+              "isCorrect": true,
+              "explanation": "MFA Delete gates the most destructive S3 operations — permanent version deletion and versioning suspension — behind a hardware MFA factor that only the bucket owner can provide. This prevents any developer or compromised credential from permanently destroying object history.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiFactorAuthenticationDelete.html",
+          "tip": "Identify which two independent features address overwrite preservation and permanent deletion authorization separately.",
+          "explanation": "S3 Versioning (c1) addresses the overwrite scenario by maintaining all object versions, allowing recovery of any prior state without blocking developer uploads. MFA Delete (c2) addresses permanent deletion by requiring a hardware MFA token specifically for version deletion and versioning suspension — preventing both individual compromised credentials and broad IAM policies from bypassing this control. Object Lock with Governance bypass (c3) actively weakens protection. A bucket policy denying s3:DeleteObject (c4) is incomplete — it targets the wrong S3 action for versioned objects and lacks MFA enforcement. CRR (c5) provides availability but no deletion protection for the source. To configure MFA Delete, use the AWS CLI as the root account: aws s3api put-bucket-versioning with MFADelete=Enabled.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0009",
+          "type": "single-choice",
+          "question": "A financial services company enables Amazon Macie to monitor all S3 buckets for sensitive data exposure. After a week, the security team notices that Macie is generating hundreds of daily findings for intentionally public marketing asset buckets, obscuring genuine alerts. The team needs to suppress Macie findings for these known-safe buckets while continuing to alert on all other S3 findings.\n\nWhich Macie feature directly addresses this without disabling monitoring on those buckets?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Disable the Macie classification job for the marketing buckets and enable it only for remaining buckets.",
+              "isCorrect": false,
+              "explanation": "Disabling a classification job stops Macie from scanning those buckets entirely, which removes visibility. Suppression rules are the correct approach because they retain audit history and still run discovery — they just filter findings from operational dashboards."
+            },
+            {
+              "id": "c1",
+              "text": "Create Macie suppression rules that filter findings based on the S3 bucket name, setting the finding status to Suppressed for findings matching the marketing buckets.",
+              "isCorrect": true,
+              "explanation": "Macie suppression rules allow findings matching specified criteria (bucket name, finding type, classification job ARN, etc.) to be automatically archived with status Suppressed. The findings still exist in Macie for audit purposes but are hidden from the active findings view and do not trigger downstream EventBridge events.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Add the marketing buckets to the Macie allow list so that sensitive data detected in those buckets is not reported as a finding.",
+              "isCorrect": false,
+              "explanation": "Macie allow lists suppress findings for specific text patterns or regular expressions that match expected sensitive data (e.g., known test credit card numbers). They do not suppress all findings for a bucket — a bucket containing real sensitive data outside the allow list pattern would still generate findings."
+            },
+            {
+              "id": "c4",
+              "text": "Publish all Macie findings to Security Hub and create a Security Hub suppression filter scoped to the marketing bucket ARNs.",
+              "isCorrect": false,
+              "explanation": "Security Hub suppression filters operate on findings after they arrive in Security Hub and do suppress them from the Security Hub console, but the Macie findings still appear in the native Macie console and generate EventBridge events. Suppressing at the Macie layer with suppression rules is more complete."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon Macie",
+            "Amazon S3",
+            "AWS Security Hub"
+          ],
+          "docs": "https://docs.aws.amazon.com/macie/latest/user/findings-suppression.html",
+          "tip": "Consider where in the pipeline the suppression should occur to prevent the findings from appearing in operational views and triggering downstream alerts.",
+          "explanation": "Macie suppression rules (c1) are purpose-built for this scenario: they filter findings by criteria such as bucket name and set their status to Suppressed, removing them from the active findings view and preventing EventBridge from routing them to downstream systems. Allow lists (c2) suppress based on matched text patterns, not by bucket. Disabling classification jobs (c3) removes all visibility, not just alert noise. Security Hub filters (c4) suppress in Security Hub but leave Macie-level noise intact, meaning EventBridge still receives the findings.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0004",
+          "type": "single-choice",
+          "question": "A compliance engineer must lock a Glacier vault's access policy to enforce a 10-year retention requirement for archived medical records. The vault and an InProgress vault lock policy have already been created. The engineer must complete the lock using the AWS CLI and only has the lock ID from the initiate-vault-lock response.\n\nWhich command correctly completes the vault lock?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "aws glacier initiate-vault-lock \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --policy file://lock-policy.json",
+              "isCorrect": false,
+              "explanation": "initiate-vault-lock creates a new InProgress vault lock policy, but the policy is already InProgress. Calling initiate-vault-lock again would abort the existing InProgress policy and start a new 24-hour completion window, resetting progress rather than completing the lock."
+            },
+            {
+              "id": "c1",
+              "text": "aws glacier complete-vault-lock \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --lock-id <lockId>",
+              "isCorrect": true,
+              "explanation": "complete-vault-lock transitions the vault lock from InProgress to Locked state using the lock ID issued by initiate-vault-lock. The --account-id - instructs the CLI to use the current caller's account. Once locked, the policy is immutable and cannot be deleted or modified.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "aws glacier put-vault-lock \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --lock-id <lockId>",
+              "isCorrect": false,
+              "explanation": "put-vault-lock is not a valid Glacier CLI subcommand. The correct two-step process is initiate-vault-lock (to create the InProgress policy and obtain a lock ID) followed by complete-vault-lock (to finalize it). Using an invalid subcommand returns an error."
+            },
+            {
+              "id": "c2",
+              "text": "aws glacier set-vault-access-policy \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --policy file://lock-policy.json",
+              "isCorrect": false,
+              "explanation": "set-vault-access-policy sets a standard (non-lock) vault access policy, not a vault lock policy. It does not transition the InProgress lock to Locked state and the policy set this way remains mutable — it does not satisfy Glacier Vault Lock compliance requirements."
+            }
+          ],
+          "selectCount": 1,
+          "format": "cli",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3 Glacier"
+          ],
+          "docs": "https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html",
+          "tip": "Glacier Vault Lock uses a two-phase commit process — consider which phase finalizes the immutable state.",
+          "explanation": "Glacier Vault Lock is a two-phase process: (1) initiate-vault-lock creates an InProgress policy and returns a lock ID, starting a 24-hour completion window; (2) complete-vault-lock (c1) uses that lock ID to transition the policy to the permanent Locked state. Once locked, the vault lock policy is immutable and cannot be deleted by any user. set-vault-access-policy (c2) manages regular (mutable) access policies, not vault locks. Re-running initiate-vault-lock (c3) would abort the existing InProgress lock and restart the 24-hour window from zero. put-vault-lock (c4) does not exist in the Glacier API. The --account-id - flag is required by the Glacier CLI to identify the calling account.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0002",
+          "type": "single-choice",
+          "question": "A security team at a healthcare company suspects that CloudTrail log files stored in their centralized S3 bucket were deleted and recreated with modified content by a compromised administrator account. The team needs a native AWS mechanism that can cryptographically prove whether logs were altered after CloudTrail delivered them to S3.\n\nWhich feature provides this capability?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Amazon Macie configured to scan the CloudTrail S3 bucket for sensitive data patterns and alert when log file sizes deviate from a baseline.",
+              "isCorrect": false,
+              "explanation": "Macie performs sensitive data discovery and anomaly detection on data content but does not provide cryptographic proof of file integrity. Size deviation alerts are heuristic and would not detect content modifications that preserve file size."
+            },
+            {
+              "id": "c3",
+              "text": "S3 Object Lock in Governance mode applied to the CloudTrail bucket, preventing modification of log files during the retention window.",
+              "isCorrect": false,
+              "explanation": "Governance mode prevents deletion during a retention period but does not retroactively verify the integrity of files already delivered. It also cannot detect whether a privileged user with BypassGovernanceRetention permission replaced files before the lock was applied."
+            },
+            {
+              "id": "c1",
+              "text": "CloudTrail log file validation, which generates hourly digest files containing SHA-256 hashes of all delivered log files, signed by AWS using a private key.",
+              "isCorrect": true,
+              "explanation": "Log file validation creates digest files every hour that record SHA-256 hashes of every log delivered in that period. The digests are signed by AWS's RSA private key, enabling the CLI command aws cloudtrail validate-logs to detect any modification, deletion, or injection after delivery - even if the attacker recreated log files.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "AWS Config rule cloudtrail-s3-dataevents-enabled to monitor whether the CloudTrail bucket receives new objects, triggering an SNS alert on anomalies.",
+              "isCorrect": false,
+              "explanation": "AWS Config managed rules evaluate configuration compliance states but cannot perform cryptographic verification of log file content. This rule checks whether data events are enabled, not whether delivered log content is authentic or unmodified."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "AWS CloudTrail",
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html",
+          "tip": "Think about which mechanism creates a cryptographic proof of file state at the time of delivery that can be independently verified.",
+          "explanation": "CloudTrail log file validation (c1) is the only native mechanism that uses cryptography — hourly SHA-256 digest files are signed by AWS's RSA private key, forming a tamper-evident chain. Running aws cloudtrail validate-logs recomputes hashes and compares them against signed digests, detecting any file that was modified, deleted, or injected after delivery. Macie (c2) performs content classification, not integrity verification. Object Lock (c3) prevents future writes but has no visibility into past tampering and can be bypassed via Governance mode. Config rules (c4) check configuration states, not cryptographic file integrity. Enable log file validation by adding --enable-log-file-validation when creating or updating a trail.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0008",
+          "type": "single-choice",
+          "question": "A security operations team has enabled Amazon GuardDuty across all accounts in an AWS Organization. The team wants to receive a Slack notification within five minutes whenever GuardDuty generates a HIGH severity finding in any member account. The solution must require no additional infrastructure to poll for findings.\n\nWhich approach delivers near-real-time Slack alerts with the least operational overhead?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Enable GuardDuty S3 export, configure an S3 event notification to trigger Lambda when new finding files arrive, and post to Slack from Lambda.",
+              "isCorrect": false,
+              "explanation": "GuardDuty S3 export uses GZIP-compressed NDJSON files delivered periodically (every 6 hours by default for active findings), not event-driven. This introduces latency far beyond 5 minutes and misses the real-time EventBridge stream."
+            },
+            {
+              "id": "c4",
+              "text": "Create a CloudWatch Metrics Alarm on the GuardDuty finding count metric filtered by HIGH severity, set an SNS action, and subscribe Lambda to the SNS topic.",
+              "isCorrect": false,
+              "explanation": "GuardDuty does not publish a standard CloudWatch metric for finding severity. CloudWatch Metric Alarms also have a minimum evaluation period of 60 seconds with no finer granularity for event-driven detection. EventBridge is the purpose-built real-time routing mechanism for GuardDuty findings."
+            },
+            {
+              "id": "c3",
+              "text": "Enable AWS Security Hub in the administrator account, configure Security Hub to forward HIGH findings to an SNS topic, and subscribe the Slack webhook URL directly to the SNS topic.",
+              "isCorrect": false,
+              "explanation": "SNS does not natively support Slack webhooks as a subscription protocol. Security Hub integration with SNS would still require a Lambda intermediary. Additionally this introduces an extra hop (GuardDuty -> Security Hub -> SNS -> Lambda) when EventBridge handles it directly."
+            },
+            {
+              "id": "c1",
+              "text": "Create an EventBridge rule in the GuardDuty delegated administrator account that matches GuardDuty findings with severity >= 7, invoke a Lambda function as the target, and have the function post to a Slack webhook.",
+              "isCorrect": true,
+              "explanation": "GuardDuty publishes findings as EventBridge events in near-real time. A single EventBridge rule in the delegated administrator account receives aggregated findings from all member accounts. Filtering on severity >= 7 limits to HIGH findings. Lambda invoked by EventBridge requires no polling infrastructure.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon GuardDuty",
+            "Amazon EventBridge",
+            "AWS Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings_cloudwatch.html",
+          "tip": "Think about which service GuardDuty natively publishes events to in real time, and which approach eliminates polling entirely.",
+          "explanation": "GuardDuty generates EventBridge events within minutes of detecting a finding. A rule in the delegated administrator account matches all member account findings because GuardDuty aggregates them there. Filtering 'severity >= 7' targets HIGH findings (7-8.9) and CRITICAL (9+). Lambda triggered by EventBridge posts to Slack with sub-minute latency and no infrastructure to manage. The S3 export option (c2) is batch-oriented. Security Hub with SNS (c3) requires Lambda anyway and adds an unnecessary aggregation hop. CloudWatch metrics (c4) do not exist for per-finding severity in GuardDuty.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0005",
+          "type": "matching",
+          "question": "A security architect is documenting the data integrity controls for a multi-tier compliance platform on AWS. Each control addresses a distinct data integrity scenario. Match each integrity requirement to the AWS mechanism that best satisfies it.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "CloudTrail log file validation with SHA-256 digest files",
+              "isCorrect": false,
+              "explanation": "CloudTrail log file validation generates hourly SHA-256 digest files signed by AWS's RSA private key. The aws cloudtrail validate-logs command recomputes hashes and verifies signatures to cryptographically detect any modification, deletion, or injection after delivery."
+            },
+            {
+              "id": "c4",
+              "text": "Digital code signing verified against a trusted certificate authority",
+              "isCorrect": false,
+              "explanation": "Digital code signing uses asymmetric cryptography: a publisher signs a release with their private key, and any recipient can verify the signature against the corresponding public certificate. A mismatch indicates tampering or corruption since the original signing."
+            },
+            {
+              "id": "c2",
+              "text": "S3 Versioning to convert overwrites into new object versions",
+              "isCorrect": false,
+              "explanation": "S3 Versioning preserves every object version by converting PUT operations into new versions instead of replacements, and DELETE operations into recoverable delete markers. Any prior state can be restored by referencing its version ID."
+            },
+            {
+              "id": "c3",
+              "text": "S3 Object Lock in Compliance mode with a fixed retention period",
+              "isCorrect": false,
+              "explanation": "Compliance mode enforces WORM immutability that no AWS principal — including root — can override during the retention window. This is the definitive control for regulatory archive requirements such as SEC 17a-4 or HIPAA retention mandates."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s4",
+              "label": "Preserve all previous object states when developers overwrite S3 objects",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s2",
+              "label": "Prevent any user from deleting archived records for a fixed regulatory period",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "Detect tampering of audit log files after delivery to S3",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Ensure software releases have not been altered since the publisher signed them",
+              "correctChoiceId": "c4"
+            }
+          ],
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3",
+            "AWS CloudTrail",
+            "Amazon S3 Glacier",
+            "AWS KMS"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+          "tip": "Each mechanism addresses a distinct layer of integrity: cryptographic audit trails, access-controlled immutability, version history, and publisher authentication.",
+          "explanation": "CloudTrail log file validation (c1) is purpose-built for post-delivery tamper detection of audit logs via signed SHA-256 digests. S3 Object Lock Compliance mode (c3) enforces immutable retention windows that prevent deletion by any principal, satisfying regulatory archive mandates. Digital code signing (c4) uses public-key cryptography to authenticate software provenance — verifying that a release was produced by the legitimate publisher and has not been altered. S3 Versioning (c2) preserves object history automatically, enabling recovery of any prior version after developer overwrites. Each control addresses a separate dimension of data integrity: authenticity, immutability, origin verification, and history preservation respectively.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0011",
+          "type": "single-choice",
+          "question": "A security engineer is writing an EventBridge rule pattern to match GuardDuty findings of type UnauthorizedAccess:EC2/SSHBruteForce with a severity of HIGH or CRITICAL (numeric value 7.0 or above). The rule must match the finding source correctly and avoid triggering on lower-severity variants of the same finding type.\n\nWhich EventBridge rule pattern correctly captures these findings?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "{\n  \"source\": [\"aws.guardduty\"],\n  \"detail-type\": [\"Security Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [{ \"numeric\": [\">=\", 7] }]\n  }\n}",
+              "isCorrect": false,
+              "explanation": "The correct detail-type for GuardDuty EventBridge events is 'GuardDuty Finding', not 'Security Finding'. 'Security Finding' is used by AWS Security Hub for its aggregated findings format (ASFF). Using the wrong detail-type means the rule will not match GuardDuty-native events."
+            },
+            {
+              "id": "c3",
+              "text": "{\n  \"source\": [\"guardduty.amazonaws.com\"],\n  \"detail-type\": [\"GuardDuty Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [{ \"numeric\": [\">=\", 7] }]\n  }\n}",
+              "isCorrect": false,
+              "explanation": "The source for GuardDuty EventBridge events is 'aws.guardduty', not 'guardduty.amazonaws.com'. Using the wrong source string means the rule will never match any GuardDuty finding regardless of the correct detail filter."
+            },
+            {
+              "id": "c2",
+              "text": "{\n  \"source\": [\"aws.guardduty\"],\n  \"detail-type\": [\"GuardDuty Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [\"HIGH\", \"CRITICAL\"]\n  }\n}",
+              "isCorrect": false,
+              "explanation": "GuardDuty severity in EventBridge events is a numeric float (e.g., 7.8), not a string label like 'HIGH' or 'CRITICAL'. String matching against 'HIGH' or 'CRITICAL' will never match and the rule will never fire."
+            },
+            {
+              "id": "c1",
+              "text": "{\n  \"source\": [\"aws.guardduty\"],\n  \"detail-type\": [\"GuardDuty Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [{ \"numeric\": [\">=\", 7] }]\n  }\n}",
+              "isCorrect": true,
+              "explanation": "GuardDuty publishes events with source 'aws.guardduty' and detail-type 'GuardDuty Finding'. The detail block contains the finding type and numeric severity. EventBridge numeric matching with '>=' 7 correctly captures HIGH (7-8.9) and CRITICAL (9+) while excluding MEDIUM and LOW.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "json",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon GuardDuty",
+            "Amazon EventBridge"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings_cloudwatch.html",
+          "tip": "Focus on the exact values GuardDuty uses for source, detail-type, and the data type of the severity field in its EventBridge event schema.",
+          "explanation": "GuardDuty EventBridge events have: source='aws.guardduty', detail-type='GuardDuty Finding', and a numeric severity float in the detail object. Only option c1 has all three correct — the right source, the right detail-type, and numeric comparison matching >= 7. Option c2 uses string labels for severity which do not match the float field. Option c3 uses the wrong source ('guardduty.amazonaws.com' is an API endpoint, not an EventBridge source). Option c4 uses 'Security Finding' which is the Security Hub finding schema detail-type, not GuardDuty's.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        }
+      ]
+    },
+    {
+      "attemptId": "e2bc1f03-4bb6-48cb-9f50-7ac75fa0aa58",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SCS-C03",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-03-19T15:34:44.994Z",
+      "finishedAt": null,
+      "score": null,
+      "answers": [],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "SCS-C03-0008",
+          "type": "single-choice",
+          "question": "A security operations team has enabled Amazon GuardDuty across all accounts in an AWS Organization. The team wants to receive a Slack notification within five minutes whenever GuardDuty generates a HIGH severity finding in any member account. The solution must require no additional infrastructure to poll for findings.\n\nWhich approach delivers near-real-time Slack alerts with the least operational overhead?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Enable GuardDuty S3 export, configure an S3 event notification to trigger Lambda when new finding files arrive, and post to Slack from Lambda.",
+              "isCorrect": false,
+              "explanation": "GuardDuty S3 export uses GZIP-compressed NDJSON files delivered periodically (every 6 hours by default for active findings), not event-driven. This introduces latency far beyond 5 minutes and misses the real-time EventBridge stream."
+            },
+            {
+              "id": "c4",
+              "text": "Create a CloudWatch Metrics Alarm on the GuardDuty finding count metric filtered by HIGH severity, set an SNS action, and subscribe Lambda to the SNS topic.",
+              "isCorrect": false,
+              "explanation": "GuardDuty does not publish a standard CloudWatch metric for finding severity. CloudWatch Metric Alarms also have a minimum evaluation period of 60 seconds with no finer granularity for event-driven detection. EventBridge is the purpose-built real-time routing mechanism for GuardDuty findings."
+            },
+            {
+              "id": "c1",
+              "text": "Create an EventBridge rule in the GuardDuty delegated administrator account that matches GuardDuty findings with severity >= 7, invoke a Lambda function as the target, and have the function post to a Slack webhook.",
+              "isCorrect": true,
+              "explanation": "GuardDuty publishes findings as EventBridge events in near-real time. A single EventBridge rule in the delegated administrator account receives aggregated findings from all member accounts. Filtering on severity >= 7 limits to HIGH findings. Lambda invoked by EventBridge requires no polling infrastructure.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Enable AWS Security Hub in the administrator account, configure Security Hub to forward HIGH findings to an SNS topic, and subscribe the Slack webhook URL directly to the SNS topic.",
+              "isCorrect": false,
+              "explanation": "SNS does not natively support Slack webhooks as a subscription protocol. Security Hub integration with SNS would still require a Lambda intermediary. Additionally this introduces an extra hop (GuardDuty -> Security Hub -> SNS -> Lambda) when EventBridge handles it directly."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon GuardDuty",
+            "Amazon EventBridge",
+            "AWS Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings_cloudwatch.html",
+          "tip": "Think about which service GuardDuty natively publishes events to in real time, and which approach eliminates polling entirely.",
+          "explanation": "GuardDuty generates EventBridge events within minutes of detecting a finding. A rule in the delegated administrator account matches all member account findings because GuardDuty aggregates them there. Filtering 'severity >= 7' targets HIGH findings (7-8.9) and CRITICAL (9+). Lambda triggered by EventBridge posts to Slack with sub-minute latency and no infrastructure to manage. The S3 export option (c2) is batch-oriented. Security Hub with SNS (c3) requires Lambda anyway and adds an unnecessary aggregation hop. CloudWatch metrics (c4) do not exist for per-finding severity in GuardDuty.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0002",
+          "type": "single-choice",
+          "question": "A security team at a healthcare company suspects that CloudTrail log files stored in their centralized S3 bucket were deleted and recreated with modified content by a compromised administrator account. The team needs a native AWS mechanism that can cryptographically prove whether logs were altered after CloudTrail delivered them to S3.\n\nWhich feature provides this capability?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "CloudTrail log file validation, which generates hourly digest files containing SHA-256 hashes of all delivered log files, signed by AWS using a private key.",
+              "isCorrect": true,
+              "explanation": "Log file validation creates digest files every hour that record SHA-256 hashes of every log delivered in that period. The digests are signed by AWS's RSA private key, enabling the CLI command aws cloudtrail validate-logs to detect any modification, deletion, or injection after delivery - even if the attacker recreated log files.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Amazon Macie configured to scan the CloudTrail S3 bucket for sensitive data patterns and alert when log file sizes deviate from a baseline.",
+              "isCorrect": false,
+              "explanation": "Macie performs sensitive data discovery and anomaly detection on data content but does not provide cryptographic proof of file integrity. Size deviation alerts are heuristic and would not detect content modifications that preserve file size."
+            },
+            {
+              "id": "c3",
+              "text": "S3 Object Lock in Governance mode applied to the CloudTrail bucket, preventing modification of log files during the retention window.",
+              "isCorrect": false,
+              "explanation": "Governance mode prevents deletion during a retention period but does not retroactively verify the integrity of files already delivered. It also cannot detect whether a privileged user with BypassGovernanceRetention permission replaced files before the lock was applied."
+            },
+            {
+              "id": "c4",
+              "text": "AWS Config rule cloudtrail-s3-dataevents-enabled to monitor whether the CloudTrail bucket receives new objects, triggering an SNS alert on anomalies.",
+              "isCorrect": false,
+              "explanation": "AWS Config managed rules evaluate configuration compliance states but cannot perform cryptographic verification of log file content. This rule checks whether data events are enabled, not whether delivered log content is authentic or unmodified."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "AWS CloudTrail",
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html",
+          "tip": "Think about which mechanism creates a cryptographic proof of file state at the time of delivery that can be independently verified.",
+          "explanation": "CloudTrail log file validation (c1) is the only native mechanism that uses cryptography — hourly SHA-256 digest files are signed by AWS's RSA private key, forming a tamper-evident chain. Running aws cloudtrail validate-logs recomputes hashes and compares them against signed digests, detecting any file that was modified, deleted, or injected after delivery. Macie (c2) performs content classification, not integrity verification. Object Lock (c3) prevents future writes but has no visibility into past tampering and can be bypassed via Governance mode. Config rules (c4) check configuration states, not cryptographic file integrity. Enable log file validation by adding --enable-log-file-validation when creating or updating a trail.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0005",
+          "type": "matching",
+          "question": "A security architect is documenting the data integrity controls for a multi-tier compliance platform on AWS. Each control addresses a distinct data integrity scenario. Match each integrity requirement to the AWS mechanism that best satisfies it.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "S3 Object Lock in Compliance mode with a fixed retention period",
+              "isCorrect": false,
+              "explanation": "Compliance mode enforces WORM immutability that no AWS principal — including root — can override during the retention window. This is the definitive control for regulatory archive requirements such as SEC 17a-4 or HIPAA retention mandates."
+            },
+            {
+              "id": "c1",
+              "text": "CloudTrail log file validation with SHA-256 digest files",
+              "isCorrect": false,
+              "explanation": "CloudTrail log file validation generates hourly SHA-256 digest files signed by AWS's RSA private key. The aws cloudtrail validate-logs command recomputes hashes and verifies signatures to cryptographically detect any modification, deletion, or injection after delivery."
+            },
+            {
+              "id": "c2",
+              "text": "S3 Versioning to convert overwrites into new object versions",
+              "isCorrect": false,
+              "explanation": "S3 Versioning preserves every object version by converting PUT operations into new versions instead of replacements, and DELETE operations into recoverable delete markers. Any prior state can be restored by referencing its version ID."
+            },
+            {
+              "id": "c4",
+              "text": "Digital code signing verified against a trusted certificate authority",
+              "isCorrect": false,
+              "explanation": "Digital code signing uses asymmetric cryptography: a publisher signs a release with their private key, and any recipient can verify the signature against the corresponding public certificate. A mismatch indicates tampering or corruption since the original signing."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "Prevent any user from deleting archived records for a fixed regulatory period",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s4",
+              "label": "Preserve all previous object states when developers overwrite S3 objects",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s3",
+              "label": "Ensure software releases have not been altered since the publisher signed them",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s1",
+              "label": "Detect tampering of audit log files after delivery to S3",
+              "correctChoiceId": "c1"
+            }
+          ],
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3",
+            "AWS CloudTrail",
+            "Amazon S3 Glacier",
+            "AWS KMS"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+          "tip": "Each mechanism addresses a distinct layer of integrity: cryptographic audit trails, access-controlled immutability, version history, and publisher authentication.",
+          "explanation": "CloudTrail log file validation (c1) is purpose-built for post-delivery tamper detection of audit logs via signed SHA-256 digests. S3 Object Lock Compliance mode (c3) enforces immutable retention windows that prevent deletion by any principal, satisfying regulatory archive mandates. Digital code signing (c4) uses public-key cryptography to authenticate software provenance — verifying that a release was produced by the legitimate publisher and has not been altered. S3 Versioning (c2) preserves object history automatically, enabling recovery of any prior version after developer overwrites. Each control addresses a separate dimension of data integrity: authenticity, immutability, origin verification, and history preservation respectively.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0004",
+          "type": "single-choice",
+          "question": "A compliance engineer must lock a Glacier vault's access policy to enforce a 10-year retention requirement for archived medical records. The vault and an InProgress vault lock policy have already been created. The engineer must complete the lock using the AWS CLI and only has the lock ID from the initiate-vault-lock response.\n\nWhich command correctly completes the vault lock?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "aws glacier initiate-vault-lock \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --policy file://lock-policy.json",
+              "isCorrect": false,
+              "explanation": "initiate-vault-lock creates a new InProgress vault lock policy, but the policy is already InProgress. Calling initiate-vault-lock again would abort the existing InProgress policy and start a new 24-hour completion window, resetting progress rather than completing the lock."
+            },
+            {
+              "id": "c2",
+              "text": "aws glacier set-vault-access-policy \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --policy file://lock-policy.json",
+              "isCorrect": false,
+              "explanation": "set-vault-access-policy sets a standard (non-lock) vault access policy, not a vault lock policy. It does not transition the InProgress lock to Locked state and the policy set this way remains mutable — it does not satisfy Glacier Vault Lock compliance requirements."
+            },
+            {
+              "id": "c4",
+              "text": "aws glacier put-vault-lock \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --lock-id <lockId>",
+              "isCorrect": false,
+              "explanation": "put-vault-lock is not a valid Glacier CLI subcommand. The correct two-step process is initiate-vault-lock (to create the InProgress policy and obtain a lock ID) followed by complete-vault-lock (to finalize it). Using an invalid subcommand returns an error."
+            },
+            {
+              "id": "c1",
+              "text": "aws glacier complete-vault-lock \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --lock-id <lockId>",
+              "isCorrect": true,
+              "explanation": "complete-vault-lock transitions the vault lock from InProgress to Locked state using the lock ID issued by initiate-vault-lock. The --account-id - instructs the CLI to use the current caller's account. Once locked, the policy is immutable and cannot be deleted or modified.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "cli",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3 Glacier"
+          ],
+          "docs": "https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html",
+          "tip": "Glacier Vault Lock uses a two-phase commit process — consider which phase finalizes the immutable state.",
+          "explanation": "Glacier Vault Lock is a two-phase process: (1) initiate-vault-lock creates an InProgress policy and returns a lock ID, starting a 24-hour completion window; (2) complete-vault-lock (c1) uses that lock ID to transition the policy to the permanent Locked state. Once locked, the vault lock policy is immutable and cannot be deleted by any user. set-vault-access-policy (c2) manages regular (mutable) access policies, not vault locks. Re-running initiate-vault-lock (c3) would abort the existing InProgress lock and restart the 24-hour window from zero. put-vault-lock (c4) does not exist in the Glacier API. The --account-id - flag is required by the Glacier CLI to identify the calling account.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0011",
+          "type": "single-choice",
+          "question": "A security engineer is writing an EventBridge rule pattern to match GuardDuty findings of type UnauthorizedAccess:EC2/SSHBruteForce with a severity of HIGH or CRITICAL (numeric value 7.0 or above). The rule must match the finding source correctly and avoid triggering on lower-severity variants of the same finding type.\n\nWhich EventBridge rule pattern correctly captures these findings?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "{\n  \"source\": [\"guardduty.amazonaws.com\"],\n  \"detail-type\": [\"GuardDuty Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [{ \"numeric\": [\">=\", 7] }]\n  }\n}",
+              "isCorrect": false,
+              "explanation": "The source for GuardDuty EventBridge events is 'aws.guardduty', not 'guardduty.amazonaws.com'. Using the wrong source string means the rule will never match any GuardDuty finding regardless of the correct detail filter."
+            },
+            {
+              "id": "c4",
+              "text": "{\n  \"source\": [\"aws.guardduty\"],\n  \"detail-type\": [\"Security Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [{ \"numeric\": [\">=\", 7] }]\n  }\n}",
+              "isCorrect": false,
+              "explanation": "The correct detail-type for GuardDuty EventBridge events is 'GuardDuty Finding', not 'Security Finding'. 'Security Finding' is used by AWS Security Hub for its aggregated findings format (ASFF). Using the wrong detail-type means the rule will not match GuardDuty-native events."
+            },
+            {
+              "id": "c2",
+              "text": "{\n  \"source\": [\"aws.guardduty\"],\n  \"detail-type\": [\"GuardDuty Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [\"HIGH\", \"CRITICAL\"]\n  }\n}",
+              "isCorrect": false,
+              "explanation": "GuardDuty severity in EventBridge events is a numeric float (e.g., 7.8), not a string label like 'HIGH' or 'CRITICAL'. String matching against 'HIGH' or 'CRITICAL' will never match and the rule will never fire."
+            },
+            {
+              "id": "c1",
+              "text": "{\n  \"source\": [\"aws.guardduty\"],\n  \"detail-type\": [\"GuardDuty Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [{ \"numeric\": [\">=\", 7] }]\n  }\n}",
+              "isCorrect": true,
+              "explanation": "GuardDuty publishes events with source 'aws.guardduty' and detail-type 'GuardDuty Finding'. The detail block contains the finding type and numeric severity. EventBridge numeric matching with '>=' 7 correctly captures HIGH (7-8.9) and CRITICAL (9+) while excluding MEDIUM and LOW.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "json",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon GuardDuty",
+            "Amazon EventBridge"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings_cloudwatch.html",
+          "tip": "Focus on the exact values GuardDuty uses for source, detail-type, and the data type of the severity field in its EventBridge event schema.",
+          "explanation": "GuardDuty EventBridge events have: source='aws.guardduty', detail-type='GuardDuty Finding', and a numeric severity float in the detail object. Only option c1 has all three correct — the right source, the right detail-type, and numeric comparison matching >= 7. Option c2 uses string labels for severity which do not match the float field. Option c3 uses the wrong source ('guardduty.amazonaws.com' is an API endpoint, not an EventBridge source). Option c4 uses 'Security Finding' which is the Security Hub finding schema detail-type, not GuardDuty's.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0012",
+          "type": "matching",
+          "question": "A cloud security architect is designing the detection layer for a large enterprise AWS environment. Each detection requirement has a specific service best suited to address it. Match each requirement to the AWS security service that natively satisfies it.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Amazon Macie",
+              "isCorrect": false,
+              "explanation": "Macie uses machine learning and pattern matching to discover sensitive data — including PCI DSS payment card numbers — within S3 objects. It produces per-bucket and per-object findings with the specific sensitive data type detected, making it the right tool for data classification requirements."
+            },
+            {
+              "id": "c1",
+              "text": "Amazon GuardDuty",
+              "isCorrect": false,
+              "explanation": "GuardDuty continuously analyzes CloudTrail, VPC Flow Logs, and DNS logs using threat intelligence feeds. It has built-in detection for Tor-related activity (finding type: UnauthorizedAccess:IAMUser/TorIPCaller) and other network-based anomalies without any configuration beyond enablement."
+            },
+            {
+              "id": "c4",
+              "text": "Amazon Security Lake",
+              "isCorrect": false,
+              "explanation": "Security Lake automatically collects, transforms, and normalizes security data from AWS services and third-party sources into the Open Cybersecurity Schema Framework (OCSF) format, storing it in S3 in Parquet for scalable, long-term analysis. It is purpose-built for the data lake use case."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Security Hub",
+              "isCorrect": false,
+              "explanation": "Security Hub aggregates findings from integrated services (GuardDuty, Macie, Inspector, Config, etc.), maps them to compliance framework controls (CIS, PCI DSS, NIST 800-53), and computes a consolidated security score per account and region — exactly the correlation and scoring use case described."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s4",
+              "label": "Correlate findings across multiple AWS security services and apply compliance framework controls to produce a consolidated security score",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "Detect IAM credentials being used from a Tor exit node",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Aggregate and normalize findings from GuardDuty, Inspector, and Macie into a single OCSF-formatted data lake for long-term analysis",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s2",
+              "label": "Identify S3 buckets that contain unencrypted payment card numbers",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon GuardDuty",
+            "Amazon Macie",
+            "AWS Security Hub",
+            "Amazon Security Lake"
+          ],
+          "docs": "https://docs.aws.amazon.com/security-hub/latest/userguide/what-is-securityhub.html",
+          "tip": "Consider each service's primary design purpose: threat detection, data classification, finding aggregation/scoring, or security data lake.",
+          "explanation": "GuardDuty (c1) is the threat intelligence and behavioral detection service — it identifies malicious network activity including Tor-based credential use from integrated log sources. Macie (c2) is the sensitive data discovery service for S3, detecting PCI, PII, and other regulated data categories using ML and pattern matching. Security Hub (c3) is the aggregation and compliance posture layer — it imports findings, maps them to control frameworks, and scores security posture. Security Lake (c4) is the OCSF-normalized security data lake — it provides centralized, long-term retention and analysis across AWS and third-party sources without each service being its own silo.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0003",
+          "type": "multiple-choice",
+          "question": "A media company stores master video assets in S3 and requires that accidental overwrites by developers preserve the previous object content and that permanent deletion of any specific version requires multi-factor authentication from the bucket owner. The solution must use native S3 capabilities without restricting the development team's ability to upload new versions.\n\nWhich TWO configurations should the security engineer apply? (Select TWO)",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Apply S3 Object Lock in Governance mode with a 90-day retention period and grant all developers the s3:BypassGovernanceRetention permission for operational flexibility.",
+              "isCorrect": false,
+              "explanation": "Granting s3:BypassGovernanceRetention to all developers negates any protection Object Lock provides. Additionally, Governance mode's fixed retention period prevents developers from correcting accidental uploads within the lock window, conflicting with the operational requirement."
+            },
+            {
+              "id": "c1",
+              "text": "Enable S3 Versioning on the bucket so that all PUT operations create a new version rather than overwriting the existing object.",
+              "isCorrect": true,
+              "explanation": "Versioning converts every overwrite into a new object version, preserving all prior states. Developers retain full write access while the original content remains recoverable. Delete operations create a delete marker, leaving previous versions intact.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Enable S3 Cross-Region Replication with delete marker replication disabled and rely on the replica bucket as the authoritative copy for recovery.",
+              "isCorrect": false,
+              "explanation": "CRR creates a copy in another region for availability purposes but does not prevent permanent deletion in the source bucket. Disabling delete marker replication causes the replica to diverge from the source over time and does not add MFA enforcement to any delete operations."
+            },
+            {
+              "id": "c2",
+              "text": "Enable MFA Delete on the versioned bucket, requiring the bucket owner to supply a valid MFA code when permanently deleting a specific object version or suspending versioning.",
+              "isCorrect": true,
+              "explanation": "MFA Delete gates the most destructive S3 operations — permanent version deletion and versioning suspension — behind a hardware MFA factor that only the bucket owner can provide. This prevents any developer or compromised credential from permanently destroying object history.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Configure an S3 bucket policy that denies s3:DeleteObject for all IAM principals except the bucket owner, and enable S3 Versioning.",
+              "isCorrect": false,
+              "explanation": "Denying s3:DeleteObject via bucket policy prevents deletion of the current object but does not protect versioned states once versioning is enabled — s3:DeleteObjectVersion is the relevant action for permanent version removal. The policy also lacks MFA enforcement and can be modified by the bucket owner."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiFactorAuthenticationDelete.html",
+          "tip": "Identify which two independent features address overwrite preservation and permanent deletion authorization separately.",
+          "explanation": "S3 Versioning (c1) addresses the overwrite scenario by maintaining all object versions, allowing recovery of any prior state without blocking developer uploads. MFA Delete (c2) addresses permanent deletion by requiring a hardware MFA token specifically for version deletion and versioning suspension — preventing both individual compromised credentials and broad IAM policies from bypassing this control. Object Lock with Governance bypass (c3) actively weakens protection. A bucket policy denying s3:DeleteObject (c4) is incomplete — it targets the wrong S3 action for versioned objects and lacks MFA enforcement. CRR (c5) provides availability but no deletion protection for the source. To configure MFA Delete, use the AWS CLI as the root account: aws s3api put-bucket-versioning with MFADelete=Enabled.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0006",
+          "type": "ordering",
+          "question": "A security engineer is implementing an immutable archive using S3 Glacier Vault Lock to satisfy a compliance requirement that audit logs cannot be deleted or modified for seven years.\n\nArrange the following steps in the correct order to complete the Vault Lock policy enforcement process.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Call initiate-vault-lock to attach a policy and receive a lock ID in the In-Progress state",
+              "isCorrect": true,
+              "explanation": "initiate-vault-lock is always first — it creates the policy in a 24-hour trial window. You cannot complete the lock without this lock ID.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Abort the lock (if policy is incorrect) and restart from initiate-vault-lock with a corrected policy",
+              "isCorrect": true,
+              "explanation": "abort-vault-lock is only used when validation in step 2 reveals a problem. It cancels the In-Progress lock so you can start over. If validation passes, this step is skipped and you proceed to complete-vault-lock. It is listed last because in the correct flow it is a conditional rollback, not a required step — however the compliance path ends at step 3.",
+              "sequence": 4
+            },
+            {
+              "id": "c2",
+              "text": "Validate the policy by testing deny conditions against the vault during the 24-hour window",
+              "isCorrect": true,
+              "explanation": "The 24-hour In-Progress window exists specifically for validation. Testing deny conditions before committing ensures the policy does what you intend — you cannot modify a Compliance-mode policy after locking.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Call complete-vault-lock with the lock ID to permanently enforce the Compliance-mode policy",
+              "isCorrect": true,
+              "explanation": "complete-vault-lock commits the policy irreversibly. Once called, the policy cannot be changed or deleted by any principal for the duration of the retention period.",
+              "sequence": 3
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3 Glacier"
+          ],
+          "docs": "https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html",
+          "tip": "Vault Lock has a two-phase commit design. Think about what happens before and after the policy becomes permanent.",
+          "explanation": "S3 Glacier Vault Lock uses a two-phase commit: (1) initiate-vault-lock attaches a draft policy and returns a lock ID — the vault enters 'In-Progress' state with a 24-hour window; (2) during that window you should test deny conditions to confirm the policy is correct; (3) complete-vault-lock permanently enforces the policy in Compliance mode — no principal, including root, can delete or alter it for the retention period; (4) abort-vault-lock is the escape hatch if step 2 reveals an error, resetting the vault so you can restart. In a compliant deployment, the flow is always initiate → validate → complete.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0007",
+          "type": "matching",
+          "question": "A cloud security team is reviewing data integrity controls across their AWS environment. Each scenario describes a protection requirement. Match each requirement to the AWS feature that best satisfies it.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "CloudTrail log file validation",
+              "isCorrect": false,
+              "explanation": "CloudTrail generates hourly SHA-256 digest files signed with AWS's private key. Running aws cloudtrail validate-logs recomputes file hashes and verifies signatures, cryptographically proving whether any log was altered or deleted since delivery."
+            },
+            {
+              "id": "c4",
+              "text": "KMS key deletion cancellation / key policy with DenyScheduleKeyDeletion",
+              "isCorrect": false,
+              "explanation": "A KMS key policy condition can deny kms:ScheduleKeyDeletion and kms:DisableKey to all principals during a retention window. This ensures the encryption key protecting the S3 data cannot be removed, which would render stored ciphertexts permanently unrecoverable."
+            },
+            {
+              "id": "c3",
+              "text": "S3 Versioning",
+              "isCorrect": false,
+              "explanation": "S3 Versioning converts PUT operations into new object versions rather than replacements. Any previous version can be restored by referencing its version ID, making accidental overwrites fully recoverable."
+            },
+            {
+              "id": "c2",
+              "text": "S3 Object Lock - Compliance mode",
+              "isCorrect": false,
+              "explanation": "Compliance mode applies WORM protection that no AWS principal — including the root account — can override during the retention period. This is the correct control when regulatory mandates require absolute immutability (e.g., SEC 17a-4, HIPAA)."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s4",
+              "label": "Ensure a KMS key used for S3 encryption cannot be deleted or disabled during a retention window",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s2",
+              "label": "Detect whether a CloudTrail log file was modified or deleted after it was delivered to S3",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Recover a specific earlier version of an S3 object after an accidental overwrite",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "Prevent S3 objects from being overwritten or deleted for a fixed period, enforced even against the root account",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3",
+            "AWS CloudTrail",
+            "Amazon S3 Glacier",
+            "AWS KMS"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+          "tip": "Consider what level of immutability each control provides and whether it applies to the data itself, the audit trail, previous versions, or the encryption key.",
+          "explanation": "CloudTrail log file validation (c1) detects post-delivery tampering of audit logs via signed digests — it does not prevent writes but proves integrity after the fact. S3 Object Lock Compliance mode (c2) enforces WORM immutability that cannot be overridden by any account, satisfying hard regulatory retention mandates. S3 Versioning (c3) preserves every object state, enabling point-in-time recovery after accidental overwrites. KMS key policy controls (c4) protect the encryption layer — without the key, encrypted S3 data is irretrievable, so preventing key deletion is itself a data integrity control.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0009",
+          "type": "single-choice",
+          "question": "A financial services company enables Amazon Macie to monitor all S3 buckets for sensitive data exposure. After a week, the security team notices that Macie is generating hundreds of daily findings for intentionally public marketing asset buckets, obscuring genuine alerts. The team needs to suppress Macie findings for these known-safe buckets while continuing to alert on all other S3 findings.\n\nWhich Macie feature directly addresses this without disabling monitoring on those buckets?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Disable the Macie classification job for the marketing buckets and enable it only for remaining buckets.",
+              "isCorrect": false,
+              "explanation": "Disabling a classification job stops Macie from scanning those buckets entirely, which removes visibility. Suppression rules are the correct approach because they retain audit history and still run discovery — they just filter findings from operational dashboards."
+            },
+            {
+              "id": "c4",
+              "text": "Publish all Macie findings to Security Hub and create a Security Hub suppression filter scoped to the marketing bucket ARNs.",
+              "isCorrect": false,
+              "explanation": "Security Hub suppression filters operate on findings after they arrive in Security Hub and do suppress them from the Security Hub console, but the Macie findings still appear in the native Macie console and generate EventBridge events. Suppressing at the Macie layer with suppression rules is more complete."
+            },
+            {
+              "id": "c1",
+              "text": "Create Macie suppression rules that filter findings based on the S3 bucket name, setting the finding status to Suppressed for findings matching the marketing buckets.",
+              "isCorrect": true,
+              "explanation": "Macie suppression rules allow findings matching specified criteria (bucket name, finding type, classification job ARN, etc.) to be automatically archived with status Suppressed. The findings still exist in Macie for audit purposes but are hidden from the active findings view and do not trigger downstream EventBridge events.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Add the marketing buckets to the Macie allow list so that sensitive data detected in those buckets is not reported as a finding.",
+              "isCorrect": false,
+              "explanation": "Macie allow lists suppress findings for specific text patterns or regular expressions that match expected sensitive data (e.g., known test credit card numbers). They do not suppress all findings for a bucket — a bucket containing real sensitive data outside the allow list pattern would still generate findings."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon Macie",
+            "Amazon S3",
+            "AWS Security Hub"
+          ],
+          "docs": "https://docs.aws.amazon.com/macie/latest/user/findings-suppression.html",
+          "tip": "Consider where in the pipeline the suppression should occur to prevent the findings from appearing in operational views and triggering downstream alerts.",
+          "explanation": "Macie suppression rules (c1) are purpose-built for this scenario: they filter findings by criteria such as bucket name and set their status to Suppressed, removing them from the active findings view and preventing EventBridge from routing them to downstream systems. Allow lists (c2) suppress based on matched text patterns, not by bucket. Disabling classification jobs (c3) removes all visibility, not just alert noise. Security Hub filters (c4) suppress in Security Hub but leave Macie-level noise intact, meaning EventBridge still receives the findings.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0010",
+          "type": "multiple-choice",
+          "question": "A security team manages a multi-account AWS environment and uses AWS Security Hub as their central finding aggregation point. They need to build a Security Hub custom insight that surfaces the five S3 buckets with the highest number of CRITICAL severity findings over the past 30 days across all member accounts.\n\nWhich TWO actions are required to build this custom insight? (Select TWO)",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Set the workflow status filter to NEW and NOTIFIED to exclude already-remediated findings from the insight results.",
+              "isCorrect": false,
+              "explanation": "Filtering on workflow status NEW and NOTIFIED ensures the insight reflects open, actionable findings rather than those already resolved. However, this is not required to create a functional insight — the filter set and grouping attribute (c1) plus the aggregation scope (c2) are the minimum requirements for the described goal."
+            },
+            {
+              "id": "c4",
+              "text": "Configure each GuardDuty member account to forward findings directly to Security Hub in the administrator account using a GuardDuty cross-account publishing rule.",
+              "isCorrect": false,
+              "explanation": "GuardDuty findings reach Security Hub through the standard integration (enabled per-account), not through a cross-account publishing rule. The aggregation model is: GuardDuty -> Security Hub (per account) -> Security Hub administrator via cross-account membership, not a direct GuardDuty-to-admin-Security-Hub path."
+            },
+            {
+              "id": "c3",
+              "text": "Create an EventBridge rule that matches Security Hub findings, writes them to a DynamoDB table, and query the table to compute the top-five bucket ranking.",
+              "isCorrect": false,
+              "explanation": "This builds a custom pipeline around Security Hub rather than using its built-in custom insights feature. The question asks specifically for the built-in capability. EventBridge + DynamoDB adds unnecessary complexity and is not how Security Hub insights work."
+            },
+            {
+              "id": "c1",
+              "text": "Define the insight with a filter that sets Severity Label to CRITICAL, Resource Type to AwsS3Bucket, and record state to ACTIVE, then group results by Resource Id.",
+              "isCorrect": true,
+              "explanation": "Security Hub custom insights require a filter set to scope findings (severity, resource type, record state) and a grouping attribute to aggregate counts. Grouping by Resource Id (the bucket ARN) produces a ranked list of buckets by finding count.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Enable Security Hub cross-Region aggregation or ensure the finding aggregator is configured to pull findings from all member account Regions into the administrator account.",
+              "isCorrect": true,
+              "explanation": "Security Hub custom insights only surface findings visible in the account and Region where the insight is defined. Without cross-account aggregation (delegated administrator with all member accounts enabled) and cross-Region aggregation, findings from member accounts and non-home Regions are invisible to the insight.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "AWS Security Hub",
+            "Amazon GuardDuty",
+            "Amazon Inspector",
+            "AWS Config"
+          ],
+          "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-insights-create.html",
+          "tip": "Break this into two concerns: what data must be visible, and how the insight groups that data into a ranked list.",
+          "explanation": "A Security Hub custom insight requires (1) a filter that defines which findings to include — CRITICAL severity, S3 resource type, ACTIVE record state — and a grouping attribute (Resource Id) that produces a count-ranked list of bucket ARNs; and (2) cross-account (and optionally cross-Region) aggregation so that findings from all member accounts are visible in the administrator account's insight. Without both, the insight either cannot be created correctly (c1) or does not see all relevant findings (c2). EventBridge+DynamoDB (c3) is a custom workaround, not the insight feature. GuardDuty cross-account publishing rules (c4) do not exist as described. Workflow status filtering (c5) is optional refinement, not a requirement.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0001",
+          "type": "single-choice",
+          "question": "A financial services company stores compliance audit logs in Amazon S3 and must retain them immutably for 7 years to satisfy SEC 17a-4 regulations. The security architect must ensure that no user, including those with Administrator access or root credentials, can delete or shorten the retention period during that window.\n\nWhich S3 Object Lock configuration satisfies this requirement?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Enable S3 Versioning on the bucket, configure MFA Delete, and apply an SCP that denies s3:PutBucketPolicy changes for 7 years.",
+              "isCorrect": false,
+              "explanation": "MFA Delete protects individual version deletions but does not enforce a fixed retention window. SCPs govern member accounts in AWS Organizations but cannot prevent the management account or root from modifying policies. This combination does not satisfy the immutability guarantee required by SEC 17a-4."
+            },
+            {
+              "id": "c1",
+              "text": "Apply S3 Object Lock in Governance mode with a 7-year retention period and deny the s3:BypassGovernanceRetention action in all IAM policies.",
+              "isCorrect": false,
+              "explanation": "Governance mode can still be overridden by users who are granted the s3:BypassGovernanceRetention permission, including root. Denying it in IAM policies does not prevent root from bypassing it, since IAM denies do not apply to the root account."
+            },
+            {
+              "id": "c3",
+              "text": "Enable S3 Versioning on the bucket and configure an S3 Lifecycle policy to expire objects after 7 years, combined with an S3 bucket policy that denies s3:DeleteObject.",
+              "isCorrect": false,
+              "explanation": "Versioning with a bucket policy can prevent casual deletion but does not enforce immutability. A bucket owner with sufficient permissions can modify or remove the bucket policy itself, and Lifecycle expiration actively deletes objects rather than protecting them."
+            },
+            {
+              "id": "c2",
+              "text": "Apply S3 Object Lock in Compliance mode with a 7-year retention period on the bucket.",
+              "isCorrect": true,
+              "explanation": "Compliance mode enforces WORM (Write Once Read Many) immutability that cannot be overridden by any user, including root, for the duration of the retention period. This is the only Object Lock mode that satisfies strict regulatory requirements such as SEC 17a-4.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html",
+          "tip": "Consider which retention mode provides guarantees that cannot be overridden by any AWS principal, including privileged ones.",
+          "explanation": "S3 Object Lock in Compliance mode (c2) is purpose-built for regulatory WORM requirements: once set, no user (including root) can shorten the retention period or delete locked objects before it expires. Governance mode (c1) is incorrect because the s3:BypassGovernanceRetention permission can be granted, and root always retains bypass capability regardless of IAM denies. Versioning with Lifecycle and bucket policies (c3) does not enforce immutability since the bucket owner can alter policies. MFA Delete with SCPs (c4) lacks a tamper-proof retention window. To implement: enable Object Lock at bucket creation, then apply a default retention rule using aws s3api put-object-lock-configuration with Mode set to COMPLIANCE.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        }
+      ]
     }
   ]
 }

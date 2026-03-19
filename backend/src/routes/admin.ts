@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
-import { getUserBySub, listUsers, recordAdminAudit, updateUserFields } from '../services/dynamo.js'
+import { getUserBySub, listUsers, recordAdminAudit, updateUserFields, listIssueReports, resolveIssueReport, countNewIssueReports } from '../services/dynamo.js'
+import { listAllRatings, countNewRatings } from '../services/interactions.js'
 import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement, findUsersWithActiveEntitlement } from '../services/entitlements.js'
 import { PRODUCTS } from '../catalog.js'
 import { loadAllExams } from '../examLoader.js'
@@ -206,5 +207,43 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       request.log?.error?.('admin revoke entitlement failed', err)
       return reply.code(500).send({ message: 'revoke failed' })
     }
+  })
+
+  // GET /admin/feedback?tab=ratings|issues&limit=50&lastKey=...
+  server.get('/feedback', async (request, reply) => {
+    const q = request.query as any
+    const tab = q.tab === 'ratings' ? 'ratings' : 'issues'
+    const limit = Math.min(Number(q.limit || 50), 200)
+    const lastKey = q.lastKey ? JSON.parse(decodeURIComponent(q.lastKey)) : undefined
+
+    if (tab === 'ratings') {
+      const { items, lastKey: nextKey } = await listAllRatings(limit, lastKey)
+      return { items, lastKey: nextKey ?? null }
+    } else {
+      const res = await listIssueReports(limit, lastKey)
+      return { items: res.Items ?? [], lastKey: (res as any).LastEvaluatedKey ?? null }
+    }
+  })
+
+  // GET /admin/feedback/count?since=<ISO>
+  server.get('/feedback/count', async (request, reply) => {
+    const q = request.query as any
+    const since = q.since || new Date(0).toISOString()
+    const [ratings, issues] = await Promise.all([
+      countNewRatings(since),
+      countNewIssueReports(since),
+    ])
+    return { total: ratings + issues, ratings, issues }
+  })
+
+  // PATCH /admin/issues/:reportId
+  server.patch('/issues/:reportId', async (request, reply) => {
+    const { reportId } = request.params as any
+    const body = request.body as any
+    if (body?.status !== 'resolved') {
+      return reply.code(400).send({ message: 'Only status "resolved" is supported' })
+    }
+    await resolveIssueReport(reportId)
+    return { ok: true }
   })
 }

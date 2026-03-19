@@ -134,6 +134,50 @@ export async function findUserByUsername(username: string): Promise<any | null> 
 
 const ISSUE_REPORTS_TABLE = process.env.ISSUE_REPORTS_TABLE || 'examapp-issue-reports'
 
+export async function listIssueReports(limit = 50, lastKey?: any) {
+  try {
+    const params: any = { TableName: ISSUE_REPORTS_TABLE, Limit: limit }
+    if (lastKey) params.ExclusiveStartKey = lastKey
+    const res = await ddb.send(new ScanCommand(params as any))
+    return res
+  } catch (err) {
+    console.warn('[dynamo] listIssueReports failed', err)
+    throw err
+  }
+}
+
+export async function resolveIssueReport(reportId: string): Promise<void> {
+  const now = new Date().toISOString()
+  try {
+    await ddb.send(new UpdateCommand({
+      TableName: ISSUE_REPORTS_TABLE,
+      Key: { reportId },
+      UpdateExpression: 'SET #s = :s, resolvedAt = :now',
+      ExpressionAttributeNames: { '#s': 'status' },
+      ExpressionAttributeValues: { ':s': 'resolved', ':now': now },
+    } as any))
+  } catch (err) {
+    console.warn('[dynamo] resolveIssueReport failed', err)
+    throw err
+  }
+}
+
+export async function countNewIssueReports(since: string): Promise<number> {
+  try {
+    const res = await ddb.send(new ScanCommand({
+      TableName: ISSUE_REPORTS_TABLE,
+      FilterExpression: '#s = :s AND createdAt > :since',
+      ExpressionAttributeNames: { '#s': 'status' },
+      ExpressionAttributeValues: { ':s': 'open', ':since': since },
+      Select: 'COUNT',
+    } as any))
+    return res.Count || 0
+  } catch (err) {
+    console.warn('[dynamo] countNewIssueReports failed', err)
+    return 0
+  }
+}
+
 export async function putIssueReport(report: {
   reportId: string
   userId: string

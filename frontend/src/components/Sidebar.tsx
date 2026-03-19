@@ -17,8 +17,10 @@ import {
   Network,
   FlaskConical,
   ShoppingCart,
+  MessageSquare,
 } from "lucide-react";
 import { useBasket } from "@/basket/BasketContext";
+import { useFeedback } from "@/feedback/FeedbackContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import type { AuthUser } from "@/auth/AuthContext";
@@ -31,6 +33,7 @@ const navItems = [
   { icon: BarChart2, label: "Metrics", href: "/metrics", key: 'metrics' },
   { icon: Network, label: "Diagrams", href: "/diagrams", key: 'diagrams' },
   { icon: FlaskConical, label: "Skill Labs", href: "/skill-labs", key: 'skill-labs' },
+  { icon: MessageSquare, label: "Feedback", href: "/feedback", key: 'feedback' },
   { icon: User, label: "Account", href: "/account", key: 'account' },
   { icon: CreditCard, label: "Pricing", href: "/pricing", key: 'pricing' },
   { icon: ShoppingCart, label: "Basket", href: "/basket", key: 'basket' },
@@ -54,6 +57,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { itemCount: basketCount } = useBasket();
+  const { badgeCount: feedbackCount } = useFeedback();
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -92,7 +96,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
         </div>
 
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-          {navItems.filter(item => (item.key !== 'admin' && item.key !== 'diagrams' && item.key !== 'metrics') || showAdmin).map((item) => {
+          {navItems.filter(item => (item.key !== 'admin' && item.key !== 'diagrams' && item.key !== 'metrics' && item.key !== 'feedback') || showAdmin).map((item) => {
             const isActive = currentRoute === item.key || (item.key === 'skill-labs' && currentRoute?.startsWith('skill-lab:'))
             return (
             <button
@@ -110,6 +114,11 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
               {item.key === 'basket' && basketCount > 0 && (
                 <span className="ml-auto inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
                   {basketCount}
+                </span>
+              )}
+              {item.key === 'feedback' && feedbackCount > 0 && (
+                <span className="ml-auto inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                  {feedbackCount > 99 ? '99+' : feedbackCount}
                 </span>
               )}
             </button>
