@@ -13,7 +13,7 @@
  *   meta: Record<string, any>
  */
 
-import { QueryCommand, PutCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb'
+import { QueryCommand, PutCommand, UpdateCommand, DeleteCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
 import { ddb, ENTITLEMENTS_TABLE } from './dynamo.js'
 
 export interface Entitlement {
@@ -108,6 +108,28 @@ export async function revokeEntitlement(userId: string, productId: string): Prom
     console.warn('[entitlements] revokeEntitlement failed', err)
     throw err
   }
+}
+
+/** Scan the entitlements table for all users who have an active entitlement for a given product */
+export async function findUsersWithActiveEntitlement(productId: string): Promise<Entitlement[]> {
+  const results: Entitlement[] = []
+  let lastKey: Record<string, any> | undefined = undefined
+
+  do {
+    const res = await ddb.send(
+      new ScanCommand({
+        TableName: ENTITLEMENTS_TABLE,
+        FilterExpression: 'productId = :pid AND #st = :active',
+        ExpressionAttributeNames: { '#st': 'status' },
+        ExpressionAttributeValues: { ':pid': productId, ':active': 'active' },
+        ExclusiveStartKey: lastKey,
+      })
+    )
+    results.push(...((res.Items ?? []) as Entitlement[]))
+    lastKey = res.LastEvaluatedKey as Record<string, any> | undefined
+  } while (lastKey)
+
+  return results
 }
 
 /** Admin: grant entitlement by sub + product (no Stripe) */

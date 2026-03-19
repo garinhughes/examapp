@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react'
 import { Download, Trash2 } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
@@ -13,6 +14,43 @@ export function AnalyticsView() {
   } = useExam()
 
   const passMark = typeof selectedMeta?.passMark === 'number' ? selectedMeta.passMark : 70
+
+  // Previous version analytics state
+  const [showPrev, setShowPrev] = useState(false)
+  const [prevLoading, setPrevLoading] = useState(false)
+  const [prevAttempts, setPrevAttempts] = useState<any[] | null>(null)
+  const [prevScores, setPrevScores] = useState<any[]>([])
+
+  const predecessorCode: string | undefined = selectedMeta?.predecessorCode ?? (exams.find((e: any) => e.code === selected) as any)?.predecessorCode
+
+  // Reset previous version state whenever the selected exam changes
+  const [prevSelectedKey, setPrevSelectedKey] = useState(selected)
+  if (prevSelectedKey !== selected) {
+    setPrevSelectedKey(selected)
+    setShowPrev(false)
+    setPrevAttempts(null)
+    setPrevScores([])
+  }
+
+  const loadPrevVersions = useCallback(async (code: string) => {
+    setPrevLoading(true)
+    try {
+      const res = await authFetch(`/analytics/exam/${encodeURIComponent(code)}/scores`)
+      if (res.ok) {
+        const d = await res.json()
+        setPrevAttempts(Array.isArray(d.attempts) ? d.attempts : [])
+        setPrevScores(Array.isArray(d.scores) ? d.scores : [])
+      } else {
+        setPrevAttempts([])
+        setPrevScores([])
+      }
+    } catch {
+      setPrevAttempts([])
+      setPrevScores([])
+    } finally {
+      setPrevLoading(false)
+    }
+  }, [authFetch])
 
   return (
     <div className="mb-6">
@@ -193,6 +231,82 @@ export function AnalyticsView() {
               </div>
             )
           })()}
+
+          {/* Previous version attempts */}
+          {predecessorCode && (
+            <div className="p-4 rounded bg-card/60 dark:bg-card">
+              <button
+                className="flex items-center gap-2 text-sm font-semibold w-full text-left"
+                onClick={() => {
+                  const next = !showPrev
+                  setShowPrev(next)
+                  if (next && prevAttempts === null) void loadPrevVersions(predecessorCode)
+                }}
+              >
+                <span className={`transition-transform ${showPrev ? 'rotate-90' : ''}`}>▶</span>
+                Show previous version attempts ({predecessorCode})
+              </button>
+              {showPrev && (
+                <div className="mt-3">
+                  {prevLoading ? (
+                    <div className="text-sm text-muted-foreground">Loading…</div>
+                  ) : prevAttempts === null ? null : prevAttempts.length === 0 ? (
+                    <div className="text-sm text-muted-foreground">No attempts for {predecessorCode}.</div>
+                  ) : (
+                    <>
+                      <ScoreHistoryChart data={prevScores} passMark={passMark} showEmptyText={false} />
+                      <ul className="space-y-2 text-sm mt-3">
+                        {prevAttempts
+                          .slice()
+                          .sort((a: any, b: any) => String(b.finishedAt || b.startedAt || '').localeCompare(String(a.finishedAt || a.startedAt || '')))
+                          .map((a: any) => (
+                            <li key={a.attemptId} className="flex items-center justify-between gap-3 opacity-80">
+                              <div className="min-w-0">
+                                <div className="font-medium truncate">
+                                  {a.finishedAt
+                                    ? `Finished: ${new Date(a.finishedAt).toLocaleString()}`
+                                    : `Started: ${a.startedAt ? new Date(a.startedAt).toLocaleString() : '—'}`}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {typeof a.score === 'number'
+                                    ? (() => {
+                                        const ratio = (typeof a.correctCount === 'number' && typeof a.total === 'number') ? ` (${a.correctCount}/${a.total})` : ''
+                                        return `${a.score}%${ratio} — ${a.score >= passMark ? 'pass' : 'fail'}`
+                                      })()
+                                    : (a.finishedAt ? '—' : `${a.answersCount ?? 0} answers`)}
+                                </div>
+                              </div>
+                              <button
+                                className="px-2 py-1 rounded bg-accent text-sm flex-shrink-0"
+                                onClick={async () => {
+                                  try {
+                                    const res = await authFetch(`/attempts/${a.attemptId}`)
+                                    if (res.ok) {
+                                      const d = await res.json()
+                                      const computed = computeDerivedAttempt(d, Array.isArray(d.questions) ? d.questions : questions)
+                                      setAttemptData(computed)
+                                      if (Array.isArray(computed.questions)) setQuestions(computed.questions)
+                                      setSelected(d.examCode)
+                                      setRoute('home')
+                                    } else {
+                                      showToast(await res.text(), 'error')
+                                    }
+                                  } catch (err) {
+                                    showToast(String(err), 'error')
+                                  }
+                                }}
+                              >
+                                View
+                              </button>
+                            </li>
+                          ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Attempts list */}
           <div className="p-4 rounded bg-card/60 dark:bg-card">

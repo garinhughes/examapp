@@ -82,6 +82,8 @@ export interface Exam {
   level?: string
   version?: number | string
   publishedAt?: string
+  /** If this exam supersedes an older version, the code of the previous exam (e.g. "CLF-C02" for "CLF-C03"). */
+  predecessorCode?: string
   /** S3 VersionId of the object this exam was loaded from (null when loaded from filesystem). */
   s3VersionId?: string | null
   questions: Question[]
@@ -163,6 +165,7 @@ function parseExamJson(raw: any, code: string, s3VersionId?: string | null): Exa
     level: raw.level,
     version: raw.version ?? raw.v ?? undefined,
     publishedAt: raw.publishedAt ?? undefined,
+    predecessorCode: raw.predecessorCode ?? undefined,
     s3VersionId: s3VersionId ?? null,
     questions: (raw.questions ?? []).map(normaliseQuestion),
   }

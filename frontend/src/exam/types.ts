@@ -11,6 +11,7 @@ export type Exam = {
   defaultDuration?: number
   questions?: unknown[]
   level?: string
+  predecessorCode?: string
 }
 
 export type QuestionType = 'single-choice' | 'multiple-choice' | 'matching' | 'ordering'

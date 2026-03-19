@@ -37,7 +37,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       defaultQuestions: e.defaultQuestions,
       defaultDuration: e.defaultDuration,
       // include level where present so frontend can render badges
-      level: e.level
+      level: e.level,
+      predecessorCode: e.predecessorCode ?? undefined,
     }))
   })
 

@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { getUserBySub, listUsers, recordAdminAudit, updateUserFields } from '../services/dynamo.js'
-import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement } from '../services/entitlements.js'
+import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement, findUsersWithActiveEntitlement } from '../services/entitlements.js'
 import { PRODUCTS } from '../catalog.js'
 import { loadAllExams } from '../examLoader.js'
 
@@ -73,6 +73,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     return { products }
   })
 
+  /** List all exams available in the exam source (S3 or local) */
+  server.get('/exams', async (_request, _reply) => {
+    const exams = await loadAllExams()
+    return {
+      exams: exams.map((e) => ({ code: e.code, title: e.title, provider: e.provider ?? null })),
+    }
+  })
+
   /** Get all entitlements for a specific user (including expired/cancelled) */
   server.get('/users/:sub/entitlements', async (request, reply) => {
     const { sub } = request.params as any
@@ -111,6 +119,76 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err: any) {
       request.log?.error?.('admin grant entitlement failed', err)
       return reply.code(500).send({ message: 'grant failed' })
+    }
+  })
+
+  /** Bulk migrate entitlements from one exam product to another */
+  server.post('/bulk-migrate-entitlements', async (request, reply) => {
+    const body = request.body as any
+    const { fromProductId, toProductId, dryRun = false } = body ?? {}
+
+    if (!fromProductId || typeof fromProductId !== 'string') {
+      return reply.code(400).send({ message: 'fromProductId is required' })
+    }
+    if (!toProductId || typeof toProductId !== 'string') {
+      return reply.code(400).send({ message: 'toProductId is required' })
+    }
+    if (fromProductId === toProductId) {
+      return reply.code(400).send({ message: 'fromProductId and toProductId must be different' })
+    }
+
+    // Both productIds must be exam-type (exam:<CODE>)
+    if (!fromProductId.startsWith('exam:') || !toProductId.startsWith('exam:')) {
+      return reply.code(400).send({ message: 'Only exam products are supported for bulk migration' })
+    }
+
+    // Validate that both exam codes exist in the exam source (S3 / local)
+    const availableExams = await loadAllExams()
+    const availableCodes = new Set(availableExams.map((e) => e.code))
+    const fromCode = fromProductId.replace('exam:', '')
+    const toCode = toProductId.replace('exam:', '')
+    if (!availableCodes.has(fromCode)) {
+      return reply.code(400).send({ message: `Exam not found in exam source: ${fromCode}` })
+    }
+    if (!availableCodes.has(toCode)) {
+      return reply.code(400).send({ message: `Exam not found in exam source: ${toCode}` })
+    }
+    const toProduct = { kind: 'exam' as const }
+
+    try {
+      const affected = await findUsersWithActiveEntitlement(fromProductId)
+
+      const userResults: { userId: string; status: 'granted' | 'skipped' }[] = []
+
+      for (const ent of affected) {
+        const existing = await getUserEntitlements(ent.userId)
+        const alreadyHas = existing.some((e) => e.productId === toProductId && e.status === 'active')
+        if (alreadyHas) {
+          userResults.push({ userId: ent.userId, status: 'skipped' })
+          continue
+        }
+        if (!dryRun) {
+          await adminGrantEntitlement(ent.userId, toProductId, toProduct.kind)
+        }
+        userResults.push({ userId: ent.userId, status: 'granted' })
+      }
+
+      const grantedCount = userResults.filter((u) => u.status === 'granted').length
+      const skippedCount = userResults.filter((u) => u.status === 'skipped').length
+
+      if (!dryRun) {
+        await recordAdminAudit((request.user as any).sub, null, 'bulk_migrate_entitlements', {
+          fromProductId,
+          toProductId,
+          grantedCount,
+          skippedCount,
+        })
+      }
+
+      return { grantedCount, skippedCount, dryRun, users: userResults }
+    } catch (err: any) {
+      request.log?.error?.('bulk migrate entitlements failed', err)
+      return reply.code(500).send({ message: 'bulk migrate failed' })
     }
   })
 

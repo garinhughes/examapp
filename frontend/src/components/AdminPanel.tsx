@@ -375,6 +375,192 @@ function UserRow({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Sub-component: Bulk Exam Migration                                 */
+/* ------------------------------------------------------------------ */
+
+interface ExamEntry { code: string; title: string; provider: string | null }
+interface MigrateUser { userId: string; status: 'granted' | 'skipped' }
+interface MigrateResult { grantedCount: number; skippedCount: number; dryRun: boolean; users: MigrateUser[] }
+
+function BulkMigratePanel({
+  authFetch,
+}: {
+  authFetch: ReturnType<typeof useAuthFetch>
+}) {
+  const [open, setOpen] = useState(false)
+  const [exams, setExams] = useState<ExamEntry[]>([])
+  const [loadingExams, setLoadingExams] = useState(false)
+  const [fromCode, setFromCode] = useState('')
+  const [toCode, setToCode] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [preview, setPreview] = useState<MigrateResult | null>(null)
+  const [result, setResult] = useState<MigrateResult | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+  const [confirm, setConfirm] = useState(false)
+
+  useEffect(() => {
+    if (!open || exams.length > 0) return
+    setLoadingExams(true)
+    authFetch('/admin/exams')
+      .then((r) => r.json())
+      .then((d) => setExams(Array.isArray(d.exams) ? d.exams : []))
+      .catch(() => setErr('Failed to load exams'))
+      .finally(() => setLoadingExams(false))
+  }, [open, authFetch, exams.length])
+
+  async function runMigrate(dryRun: boolean) {
+    setErr(null)
+    setBusy(true)
+    try {
+      const res = await authFetch('/admin/bulk-migrate-entitlements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fromProductId: `exam:${fromCode}`, toProductId: `exam:${toCode}`, dryRun }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Request failed')
+      if (dryRun) {
+        setPreview(data)
+        setConfirm(false)
+      } else {
+        setResult(data)
+        setPreview(null)
+        setConfirm(false)
+      }
+    } catch (e: any) {
+      setErr(e.message || 'Failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  function reset() {
+    setPreview(null)
+    setResult(null)
+    setConfirm(false)
+    setErr(null)
+  }
+
+  return (
+    <div className="rounded-lg border border-border overflow-hidden">
+      <button
+        className="w-full flex items-center justify-between px-4 py-3 bg-muted text-sm font-semibold hover:bg-muted/80 transition-colors"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span>Exam Version Migration</span>
+        <span className={`text-xs transition-transform inline-block ${open ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {open && (
+        <div className="p-4 space-y-4 bg-card">
+          <p className="text-xs text-muted-foreground">
+            Bulk-grant a new exam version to all users who actively purchased an older version.
+          </p>
+
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex flex-col gap-1 min-w-[200px] flex-1">
+              <label className="text-xs font-medium text-muted-foreground">From (old exam)</label>
+              <select
+                value={fromCode}
+                onChange={(e) => { setFromCode(e.target.value); reset() }}
+                disabled={loadingExams}
+                className="px-2 py-1.5 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
+              >
+                <option value="">{loadingExams ? 'Loading…' : 'Select exam…'}</option>
+                {exams.map((e) => (
+                  <option key={e.code} value={e.code}>{e.code} — {e.title}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1 min-w-[200px] flex-1">
+              <label className="text-xs font-medium text-muted-foreground">To (new exam)</label>
+              <select
+                value={toCode}
+                onChange={(e) => { setToCode(e.target.value); reset() }}
+                disabled={loadingExams}
+                className="px-2 py-1.5 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
+              >
+                <option value="">{loadingExams ? 'Loading…' : 'Select exam…'}</option>
+                {exams.filter((e) => e.code !== fromCode).map((e) => (
+                  <option key={e.code} value={e.code}>{e.code} — {e.title}</option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={() => { reset(); runMigrate(true) }}
+              disabled={!fromCode || !toCode || busy || loadingExams}
+              className="px-3 py-1.5 rounded-lg bg-accent text-sm font-medium hover:bg-accent disabled:opacity-40 transition-colors"
+            >
+              {busy && !confirm ? 'Loading…' : 'Preview'}
+            </button>
+          </div>
+
+          {err && (
+            <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
+              {err}
+            </div>
+          )}
+
+          {/* Preview results */}
+          {preview && !result && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-sm">
+                <p className="font-semibold text-amber-800 dark:text-amber-300">
+                  Preview: {preview.grantedCount} user{preview.grantedCount !== 1 ? 's' : ''} will be granted
+                  {preview.skippedCount > 0 && `, ${preview.skippedCount} already have it (will be skipped)`}
+                </p>
+                {preview.users.filter((u) => u.status === 'granted').length > 0 && (
+                  <ul className="mt-2 text-xs text-amber-700 dark:text-amber-400 space-y-0.5 max-h-32 overflow-auto">
+                    {preview.users.filter((u) => u.status === 'granted').map((u) => (
+                      <li key={u.userId} className="font-mono truncate">{u.userId}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {preview.grantedCount > 0 && !confirm && (
+                <button
+                  onClick={() => setConfirm(true)}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-400 transition-colors"
+                >
+                  Grant to {preview.grantedCount} user{preview.grantedCount !== 1 ? 's' : ''}
+                </button>
+              )}
+
+              {confirm && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Are you sure?</span>
+                  <button
+                    onClick={() => runMigrate(false)}
+                    disabled={busy}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-400 disabled:opacity-40 transition-colors"
+                  >
+                    {busy ? 'Migrating…' : 'Confirm & Migrate'}
+                  </button>
+                  <button onClick={() => setConfirm(false)} className="px-3 py-1.5 rounded-lg bg-accent text-sm">
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Final result */}
+          {result && (
+            <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-800 dark:text-emerald-300">
+              Done — {result.grantedCount} granted, {result.skippedCount} skipped (already had it).
+              <button onClick={reset} className="ml-3 underline text-xs">Clear</button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /*  Main AdminPanel                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -472,6 +658,8 @@ export default function AdminPanel() {
           <button onClick={() => setError(null)} className="ml-2 underline text-xs">dismiss</button>
         </div>
       )}
+
+      <BulkMigratePanel authFetch={authFetch} />
 
       {/* Toolbar: search + filters */}
       <div className="flex flex-wrap items-center gap-2">
