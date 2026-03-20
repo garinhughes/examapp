@@ -22,6 +22,7 @@ import { ExamSetup } from './ExamSetup'
 import { QuestionNav } from './QuestionNav'
 import { QuestionCard } from './QuestionCard'
 import { Modals } from './Modals'
+import Footer from '@/components/Footer'
 
 export default function ExamApp() {
   const {
@@ -512,6 +513,7 @@ export default function ExamApp() {
             {/* Return to Practice Exams button removed here (kept inside ExamSetup) */}
 
           </div>
+          <Footer />
         </div>
 
         {/* Modals, toasts, confetti, etc. */}

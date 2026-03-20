@@ -189,12 +189,8 @@ export default function LoginPage() {
               <Button variant="outline" size="icon" onClick={() => loginWithProvider('Google')} title="Continue with Google">
                 <GoogleIcon />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => loginWithProvider('Facebook')} title="Continue with Facebook">
-                <FacebookIcon />
-              </Button>
-              <Button variant="outline" size="icon" onClick={() => loginWithProvider('Apple')} title="Continue with Apple">
-                <AppleIcon />
-              </Button>
+              {/* Facebook login disabled — requires business verification */}
+              {/* Apple login disabled — requires paid Apple Developer account; revisit if building iOS app */}
             </div>
 
             <div className="relative py-2">

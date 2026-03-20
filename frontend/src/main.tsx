@@ -11,7 +11,7 @@ const el = document.getElementById('root')!
 createRoot(el).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <AuthProvider>
           <GamificationProvider>
             <App />

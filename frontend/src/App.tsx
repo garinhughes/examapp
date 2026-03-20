@@ -4,12 +4,18 @@ import { BasketProvider } from './basket/BasketContext'
 import ExamApp from './exam/ExamApp'
 import VerifyPage from './components/VerifyPage'
 import LoginPage from './components/LoginPage'
+import PrivacyPolicy from './components/PrivacyPolicy'
+import TermsOfService from './components/TermsOfService'
+import RefundPolicy from './components/RefundPolicy'
 
 export default function App() {
   return (
     <Routes>
       <Route path="/verify/:token" element={<VerifyPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/refund" element={<RefundPolicy />} />
       <Route path="*" element={
         <ExamProvider>
           <BasketProvider>
