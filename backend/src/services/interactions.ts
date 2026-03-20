@@ -1,5 +1,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, PutCommand, GetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
+import { DynamoDBDocumentClient, PutCommand, GetCommand, ScanCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb'
+import { randomUUID } from 'crypto'
 
 const REGION = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'eu-west-1'
 const client = new DynamoDBClient({ region: REGION })
@@ -76,6 +77,231 @@ export async function countNewRatings(since: string): Promise<number> {
     return res.Count || 0
   } catch (err) {
     console.warn('[interactions] countNewRatings failed', err)
+    return 0
+  }
+}
+
+// ── Polls ──────────────────────────────────────────────────────────────────
+
+export interface PollOption {
+  id: string
+  label: string
+}
+
+export interface PollDef {
+  userId: 'SYSTEM'
+  SK: string
+  interactionType: 'POLL_DEF'
+  pollId: string
+  question: string
+  options: PollOption[]
+  visible: boolean
+  createdAt: string
+  createdBy: string
+}
+
+export interface PollVote {
+  userId: string
+  SK: string
+  interactionType: 'POLL_VOTE'
+  pollId: string
+  selectedOptions: string[]
+  userEmail?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export async function putPollDef(def: PollDef): Promise<void> {
+  try {
+    await ddb.send(new PutCommand({ TableName: INTERACTIONS_TABLE, Item: def }))
+  } catch (err) {
+    console.warn('[interactions] putPollDef failed', err)
+    throw err
+  }
+}
+
+export async function createPoll(
+  question: string,
+  options: PollOption[],
+  createdBy: string,
+  visible = false
+): Promise<PollDef> {
+  const pollId = randomUUID()
+  const now = new Date().toISOString()
+  const def: PollDef = {
+    userId: 'SYSTEM',
+    SK: `POLL_DEF#${pollId}`,
+    interactionType: 'POLL_DEF',
+    pollId,
+    question,
+    options,
+    visible,
+    createdAt: now,
+    createdBy,
+  }
+  await putPollDef(def)
+  return def
+}
+
+export async function getActivePoll(): Promise<PollDef | null> {
+  try {
+    const res = await ddb.send(new ScanCommand({
+      TableName: INTERACTIONS_TABLE,
+      FilterExpression: 'interactionType = :t AND visible = :v',
+      ExpressionAttributeValues: { ':t': 'POLL_DEF', ':v': true },
+    }))
+    const items = res.Items as PollDef[] | undefined
+    return items?.[0] ?? null
+  } catch (err) {
+    console.warn('[interactions] getActivePoll failed', err)
+    return null
+  }
+}
+
+export async function getPollDef(pollId: string): Promise<PollDef | null> {
+  try {
+    const res = await ddb.send(new GetCommand({
+      TableName: INTERACTIONS_TABLE,
+      Key: { userId: 'SYSTEM', SK: `POLL_DEF#${pollId}` },
+    }))
+    return (res.Item as PollDef) || null
+  } catch (err) {
+    console.warn('[interactions] getPollDef failed', err)
+    return null
+  }
+}
+
+export async function listPollDefs(
+  limit = 50,
+  lastKey?: any
+): Promise<{ items: PollDef[]; lastKey: any }> {
+  try {
+    const params: any = {
+      TableName: INTERACTIONS_TABLE,
+      FilterExpression: 'interactionType = :t',
+      ExpressionAttributeValues: { ':t': 'POLL_DEF' },
+      Limit: limit,
+    }
+    if (lastKey) params.ExclusiveStartKey = lastKey
+    const res = await ddb.send(new ScanCommand(params))
+    return { items: (res.Items as PollDef[]) || [], lastKey: res.LastEvaluatedKey }
+  } catch (err) {
+    console.warn('[interactions] listPollDefs failed', err)
+    throw err
+  }
+}
+
+export async function deactivateAllPolls(): Promise<void> {
+  try {
+    const res = await ddb.send(new ScanCommand({
+      TableName: INTERACTIONS_TABLE,
+      FilterExpression: 'interactionType = :t AND visible = :v',
+      ExpressionAttributeValues: { ':t': 'POLL_DEF', ':v': true },
+    }))
+    const items = (res.Items as PollDef[]) || []
+    await Promise.all(items.map((item) =>
+      ddb.send(new UpdateCommand({
+        TableName: INTERACTIONS_TABLE,
+        Key: { userId: 'SYSTEM', SK: item.SK },
+        UpdateExpression: 'SET visible = :f',
+        ExpressionAttributeValues: { ':f': false },
+      }))
+    ))
+  } catch (err) {
+    console.warn('[interactions] deactivateAllPolls failed', err)
+    throw err
+  }
+}
+
+export async function deletePollDef(pollId: string): Promise<void> {
+  try {
+    await ddb.send(new DeleteCommand({
+      TableName: INTERACTIONS_TABLE,
+      Key: { userId: 'SYSTEM', SK: `POLL_DEF#${pollId}` },
+    }))
+  } catch (err) {
+    console.warn('[interactions] deletePollDef failed', err)
+    throw err
+  }
+}
+
+export async function updatePollDef(
+  pollId: string,
+  updates: Partial<Pick<PollDef, 'question' | 'options' | 'visible'>>
+): Promise<void> {
+  const sets: string[] = []
+  const vals: Record<string, any> = {}
+  if (updates.question !== undefined) { sets.push('question = :q'); vals[':q'] = updates.question }
+  if (updates.options !== undefined) { sets.push('options = :o'); vals[':o'] = updates.options }
+  if (updates.visible !== undefined) { sets.push('visible = :v'); vals[':v'] = updates.visible }
+  if (sets.length === 0) return
+  try {
+    await ddb.send(new UpdateCommand({
+      TableName: INTERACTIONS_TABLE,
+      Key: { userId: 'SYSTEM', SK: `POLL_DEF#${pollId}` },
+      UpdateExpression: `SET ${sets.join(', ')}`,
+      ExpressionAttributeValues: vals,
+    }))
+  } catch (err) {
+    console.warn('[interactions] updatePollDef failed', err)
+    throw err
+  }
+}
+
+export async function putPollVote(vote: PollVote): Promise<void> {
+  try {
+    await ddb.send(new PutCommand({ TableName: INTERACTIONS_TABLE, Item: vote }))
+  } catch (err) {
+    console.warn('[interactions] putPollVote failed', err)
+    throw err
+  }
+}
+
+export async function getPollVote(userId: string, pollId: string): Promise<PollVote | null> {
+  try {
+    const res = await ddb.send(new GetCommand({
+      TableName: INTERACTIONS_TABLE,
+      Key: { userId, SK: `POLL#${pollId}` },
+    }))
+    return (res.Item as PollVote) || null
+  } catch (err) {
+    console.warn('[interactions] getPollVote failed', err)
+    return null
+  }
+}
+
+export async function listPollVotes(
+  pollId: string,
+  limit = 50,
+  lastKey?: any
+): Promise<{ items: PollVote[]; lastKey: any }> {
+  try {
+    const params: any = {
+      TableName: INTERACTIONS_TABLE,
+      FilterExpression: 'interactionType = :t AND pollId = :p',
+      ExpressionAttributeValues: { ':t': 'POLL_VOTE', ':p': pollId },
+      Limit: limit,
+    }
+    if (lastKey) params.ExclusiveStartKey = lastKey
+    const res = await ddb.send(new ScanCommand(params))
+    return { items: (res.Items as PollVote[]) || [], lastKey: res.LastEvaluatedKey }
+  } catch (err) {
+    console.warn('[interactions] listPollVotes failed', err)
+    throw err
+  }
+}
+
+export async function countNewPollVotes(since: string): Promise<number> {
+  try {
+    const res = await ddb.send(new ScanCommand({
+      TableName: INTERACTIONS_TABLE,
+      FilterExpression: 'interactionType = :t AND createdAt > :since',
+      ExpressionAttributeValues: { ':t': 'POLL_VOTE', ':since': since },
+      Select: 'COUNT',
+    }))
+    return res.Count || 0
+  } catch (err) {
+    console.warn('[interactions] countNewPollVotes failed', err)
     return 0
   }
 }

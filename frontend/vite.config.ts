@@ -28,6 +28,7 @@ export default defineConfig({
       '/reports': 'http://localhost:3000',
       '/ratings': 'http://localhost:3000',
       '/certificates': 'http://localhost:3000',
+      '/polls': 'http://localhost:3000',
     }
   }
 })

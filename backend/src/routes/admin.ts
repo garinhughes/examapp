@@ -1,6 +1,9 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { getUserBySub, listUsers, recordAdminAudit, updateUserFields, listIssueReports, resolveIssueReport, countNewIssueReports } from '../services/dynamo.js'
-import { listAllRatings, countNewRatings } from '../services/interactions.js'
+import {
+  listAllRatings, countNewRatings,
+  createPoll, getPollDef, listPollDefs, listPollVotes, updatePollDef, deletePollDef, deactivateAllPolls, countNewPollVotes,
+} from '../services/interactions.js'
 import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement, findUsersWithActiveEntitlement } from '../services/entitlements.js'
 import { PRODUCTS } from '../catalog.js'
 import { loadAllExams } from '../examLoader.js'
@@ -209,15 +212,20 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
   })
 
-  // GET /admin/feedback?tab=ratings|issues&limit=50&lastKey=...
+  // GET /admin/feedback?tab=ratings|issues|polls&limit=50&lastKey=...&pollId=...
   server.get('/feedback', async (request, reply) => {
     const q = request.query as any
-    const tab = q.tab === 'ratings' ? 'ratings' : 'issues'
+    const tab = q.tab === 'ratings' ? 'ratings' : q.tab === 'polls' ? 'polls' : 'issues'
     const limit = Math.min(Number(q.limit || 50), 200)
     const lastKey = q.lastKey ? JSON.parse(decodeURIComponent(q.lastKey)) : undefined
 
     if (tab === 'ratings') {
       const { items, lastKey: nextKey } = await listAllRatings(limit, lastKey)
+      return { items, lastKey: nextKey ?? null }
+    } else if (tab === 'polls') {
+      const pollId = q.pollId
+      if (!pollId) return reply.code(400).send({ message: 'pollId is required for polls tab' })
+      const { items, lastKey: nextKey } = await listPollVotes(pollId, limit, lastKey)
       return { items, lastKey: nextKey ?? null }
     } else {
       const res = await listIssueReports(limit, lastKey)
@@ -229,11 +237,74 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   server.get('/feedback/count', async (request, reply) => {
     const q = request.query as any
     const since = q.since || new Date(0).toISOString()
-    const [ratings, issues] = await Promise.all([
+    const [ratings, issues, polls] = await Promise.all([
       countNewRatings(since),
       countNewIssueReports(since),
+      countNewPollVotes(since),
     ])
-    return { total: ratings + issues, ratings, issues }
+    return { total: ratings + issues + polls, ratings, issues, polls }
+  })
+
+  // ── Poll management ──
+
+  // GET /admin/polls — list all poll definitions
+  server.get('/polls', async (_request, _reply) => {
+    const { items, lastKey } = await listPollDefs(100)
+    return { items, lastKey: lastKey ?? null }
+  })
+
+  // POST /admin/polls — create a new poll
+  server.post('/polls', async (request, reply) => {
+    const body = request.body as any
+    const { question, options, active = false } = body ?? {}
+
+    if (!question || typeof question !== 'string') {
+      return reply.code(400).send({ message: 'question is required' })
+    }
+    if (!Array.isArray(options) || options.length < 2) {
+      return reply.code(400).send({ message: 'at least 2 options are required' })
+    }
+    if (options.some((o: any) => !o.id || !o.label)) {
+      return reply.code(400).send({ message: 'each option must have id and label' })
+    }
+
+    if (active) await deactivateAllPolls()
+
+    const def = await createPoll(question, options, (request.user as any).sub, active ?? false)
+    return { ok: true, poll: def }
+  })
+
+  // PATCH /admin/polls/:pollId — update question/options or toggle active
+  server.patch('/polls/:pollId', async (request, reply) => {
+    const { pollId } = request.params as any
+    const body = request.body as any
+
+    const existing = await getPollDef(pollId)
+    if (!existing) return reply.code(404).send({ message: 'Poll not found' })
+
+    const updates: any = {}
+    if (body.question !== undefined) updates.question = body.question
+    if (body.options !== undefined) updates.options = body.options
+    if (body.visible !== undefined) {
+      updates.visible = body.visible
+      if (body.visible === true) await deactivateAllPolls()
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return reply.code(400).send({ message: 'no updatable fields' })
+    }
+
+    await updatePollDef(pollId, updates)
+    return { ok: true }
+  })
+
+  // DELETE /admin/polls/:pollId
+  server.delete('/polls/:pollId', async (request, reply) => {
+    const { pollId } = request.params as any
+    const existing = await getPollDef(pollId)
+    if (!existing) return reply.code(404).send({ message: 'Poll not found' })
+    await deletePollDef(pollId)
+    return { ok: true }
   })
 
   // PATCH /admin/issues/:reportId

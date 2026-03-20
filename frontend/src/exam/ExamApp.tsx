@@ -11,6 +11,7 @@ import { SkillLabsPage } from '../skill-labs/SkillLabsPage'
 import { SkillLabRunnerPage } from '../skill-labs/SkillLabRunnerPage'
 import BasketPage from '../basket/BasketPage'
 import { FeedbackProvider } from '../feedback/FeedbackContext'
+import { PollWidget } from '../components/PollWidget'
 import { FeedbackPage } from '../feedback/FeedbackPage'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
@@ -267,6 +268,7 @@ export default function ExamApp() {
                     <div className="text-sm text-muted-foreground">Hands-on simulations: interactive labs to practice real-world tasks.</div>
                   </div>
                 </div>
+                <PollWidget />
               </div>
             )}
 

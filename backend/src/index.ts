@@ -25,6 +25,7 @@ import skillLabsRoutes from './routes/skillLabs.js'
 import reportsRoutes from './routes/reports.js'
 import ratingsRoutes from './routes/ratings.js'
 import certificatesRoutes from './routes/certificates.js'
+import pollsRoutes from './routes/polls.js'
 
 const server = Fastify({ logger: true })
 
@@ -76,6 +77,8 @@ await server.register(reportsRoutes, { prefix: '/reports' })
 await server.register(ratingsRoutes, { prefix: '/ratings' })
 // Certificates
 await server.register(certificatesRoutes, { prefix: '/certificates' })
+// Polls
+await server.register(pollsRoutes, { prefix: '/polls' })
 
 // Health check for ALB
 server.get('/health', async () => ({ status: 'ok' }))
