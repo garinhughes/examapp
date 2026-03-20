@@ -113,6 +113,22 @@ module "route53_aliases" {
   create_aliases            = true
 }
 
+# SES DKIM records for management-account SES identity (certshack.com)
+resource "aws_route53_record" "ses_dkim" {
+  for_each = toset([
+    "wxdsv7nctabtpuyogiumg6riaghlahwx",
+    "frx5cxu7lcxyqfprmd2756bbrwm2yxh2",
+    "5t47p6sfbz332ohvuy5vlchm2ocgydrj",
+  ])
+
+  zone_id         = data.aws_route53_zone.main.zone_id
+  name            = "${each.value}._domainkey.${var.domain}"
+  type            = "CNAME"
+  ttl             = 300
+  records         = ["${each.value}.dkim.amazonses.com"]
+  allow_overwrite = true
+}
+
 module "ecs" {
   source                     = "./modules/ecs"
   project                    = var.project

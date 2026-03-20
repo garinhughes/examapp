@@ -11,10 +11,19 @@ export interface AuthUser {
   picture?: string
 }
 
+export type AuthProvider = 'Google' | 'Facebook' | 'Apple'
+
 interface AuthContextValue {
   user: AuthUser | null
   loading: boolean
   login: () => void
+  loginWithProvider: (provider: AuthProvider) => void
+  loginWithEmail: (email: string, password: string) => Promise<void>
+  registerWithEmail: (email: string, password: string) => Promise<void>
+  confirmEmail: (email: string, code: string) => Promise<void>
+  resendConfirmation: (email: string) => Promise<void>
+  forgotPassword: (email: string) => Promise<void>
+  resetPassword: (email: string, code: string, newPassword: string) => Promise<void>
   logout: () => void
   getToken: () => string | null
   /** Attempt to refresh the token. Returns the new token or null on failure. */
@@ -25,6 +34,13 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
   login: () => {},
+  loginWithProvider: () => {},
+  loginWithEmail: async () => {},
+  registerWithEmail: async () => {},
+  confirmEmail: async () => {},
+  resendConfirmation: async () => {},
+  forgotPassword: async () => {},
+  resetPassword: async () => {},
   logout: () => {},
   getToken: () => null,
   refreshToken: async () => null,
@@ -298,8 +314,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false))
   }, [setToken, setRefreshToken, userFromToken, scheduleRefresh])
 
-  /* ---- login: redirect to Cognito Hosted UI ---- */
-  const login = useCallback(async () => {
+  /* ---- loginWithProvider: redirect to Cognito Hosted UI for a specific IdP ---- */
+  const loginWithProvider = useCallback(async (provider: AuthProvider) => {
     // In dev mode, attempt a simple dev-user login when not already signed-in.
     if (MODE === 'dev') {
       if (user) return
@@ -324,17 +340,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     let domain = import.meta.env.VITE_COGNITO_DOMAIN || ''
     const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID
-
-    // Choose flow: 'server' -> confidential client redirects to backend callback
-    // 'pkce' -> SPA does PKCE exchange. Default to 'server' for this app.
     const flow = import.meta.env.VITE_AUTH_FLOW || 'server'
 
     if (!domain) {
       console.error('VITE_COGNITO_DOMAIN is not set')
       return
     }
-
-    // Ensure domain includes protocol so it's treated as absolute URL by the browser
     if (!/^https?:\/\//i.test(domain)) domain = `https://${domain}`
 
     if (flow === 'pkce') {
@@ -342,22 +353,90 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const verifier = generateCodeVerifier()
       const challenge = await generateCodeChallenge(verifier)
       sessionStorage.setItem('pkce_code_verifier', verifier)
-
       const url =
         `${domain}/oauth2/authorize?response_type=code&client_id=${clientId}` +
         `&redirect_uri=${redirectUri}&scope=openid+email+profile` +
-        `&code_challenge=${challenge}&code_challenge_method=S256&identity_provider=Google`
+        `&code_challenge=${challenge}&code_challenge_method=S256&identity_provider=${provider}`
       window.location.href = url
       return
     }
 
-    // server flow: redirect to Cognito and let Cognito redirect to backend /auth/token
     const backendCallback = import.meta.env.VITE_BACKEND_TOKEN_CALLBACK || 'http://localhost:3000/auth/token'
-    const url = `${domain}/oauth2/authorize?response_type=code&client_id=${clientId}` +
+    const url =
+      `${domain}/oauth2/authorize?response_type=code&client_id=${clientId}` +
       `&redirect_uri=${encodeURIComponent(backendCallback)}` +
-      `&scope=openid+email+profile&identity_provider=Google`
+      `&scope=openid+email+profile&identity_provider=${provider}`
     window.location.href = url
   }, [user, setUser, setToken])
+
+  /** Convenience alias — keeps backward compat for any code calling login() */
+  const login = useCallback(() => loginWithProvider('Google'), [loginWithProvider])
+
+  /* ---- email/password auth methods ---- */
+  const loginWithEmail = useCallback(async (email: string, password: string) => {
+    const res = await fetch(apiUrl('/auth/email/login'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw Object.assign(new Error(data.message || 'Login failed'), { code: data.code })
+    if (data.id_token) {
+      setToken(data.id_token)
+      if (data.refresh_token) setRefreshToken(data.refresh_token)
+      const u = userFromToken(data.id_token)
+      setUser(u)
+      scheduleRefresh(data.id_token)
+    }
+  }, [setToken, setRefreshToken, userFromToken, setUser, scheduleRefresh])
+
+  const registerWithEmail = useCallback(async (email: string, password: string) => {
+    const res = await fetch(apiUrl('/auth/email/register'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Registration failed')
+  }, [])
+
+  const confirmEmail = useCallback(async (email: string, code: string) => {
+    const res = await fetch(apiUrl('/auth/email/confirm'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Confirmation failed')
+  }, [])
+
+  const resendConfirmation = useCallback(async (email: string) => {
+    const res = await fetch(apiUrl('/auth/email/resend'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Resend failed')
+  }, [])
+
+  const forgotPassword = useCallback(async (email: string) => {
+    await fetch(apiUrl('/auth/email/forgot'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+  }, [])
+
+  const resetPassword = useCallback(async (email: string, code: string, newPassword: string) => {
+    const res = await fetch(apiUrl('/auth/email/reset'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code, newPassword }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Reset failed')
+  }, [])
 
   /* ---- logout ---- */
   const logout = useCallback(() => {
@@ -380,7 +459,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [clearToken])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, getToken, refreshToken: doRefresh }}>
+    <AuthContext.Provider value={{
+      user, loading,
+      login, loginWithProvider,
+      loginWithEmail, registerWithEmail, confirmEmail, resendConfirmation,
+      forgotPassword, resetPassword,
+      logout, getToken, refreshToken: doRefresh,
+    }}>
       {children}
     </AuthContext.Provider>
   )

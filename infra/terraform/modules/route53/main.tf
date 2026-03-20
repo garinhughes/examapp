@@ -55,3 +55,4 @@ resource "aws_route53_record" "api" {
     evaluate_target_health = true
   }
 }
+

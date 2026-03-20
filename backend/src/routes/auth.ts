@@ -6,9 +6,19 @@
  * /auth/config returns non-secret Cognito config so the frontend can build login URLs.
  */
 
+import { createHmac } from 'crypto'
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { jwtVerify, createRemoteJWKSet, decodeProtectedHeader } from 'jose'
 import { upsertUserFromCognito } from '../services/dynamo.js'
+import {
+  CognitoIdentityProviderClient,
+  SignUpCommand,
+  ConfirmSignUpCommand,
+  InitiateAuthCommand,
+  ForgotPasswordCommand,
+  ConfirmForgotPasswordCommand,
+  ResendConfirmationCodeCommand,
+} from '@aws-sdk/client-cognito-identity-provider'
 
 const AUTH_MODE = process.env.AUTH_MODE || 'dev'
 
@@ -279,6 +289,161 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err: any) {
       request.log?.error?.({ err: err.message }, 'refresh exchange error')
       return reply.status(500).send({ message: err.message })
+    }
+  })
+
+  // ── Email / password auth (Cognito native) ──
+  // Requires USER_PASSWORD_AUTH enabled on the Cognito app client.
+
+  const cognitoClient = new CognitoIdentityProviderClient({
+    region: process.env.COGNITO_REGION || 'eu-west-1',
+  })
+
+  function getCognitoClientId() {
+    const id = process.env.COGNITO_APP_CLIENT_ID
+    if (!id) throw new Error('COGNITO_APP_CLIENT_ID not set')
+    return id
+  }
+
+  function getSecretHash(username: string): string | undefined {
+    const clientSecret = process.env.COGNITO_APP_CLIENT_SECRET
+    if (!clientSecret) return undefined
+    return createHmac('sha256', clientSecret).update(username + getCognitoClientId()).digest('base64')
+  }
+
+  server.post('/email/register', async (request, reply) => {
+    if (AUTH_MODE === 'dev') return { message: 'dev mode — no real signup' }
+    const { email, password } = request.body as any
+    if (!email || !password) return reply.status(400).send({ message: 'email and password required' })
+    try {
+      await cognitoClient.send(new SignUpCommand({
+        ClientId: getCognitoClientId(),
+        SecretHash: getSecretHash(email),
+        Username: email,
+        Password: password,
+        UserAttributes: [{ Name: 'email', Value: email }],
+      }))
+      return { message: 'Verification code sent to email' }
+    } catch (err: any) {
+      return reply.status(400).send({ message: err.message })
+    }
+  })
+
+  server.post('/email/confirm', async (request, reply) => {
+    if (AUTH_MODE === 'dev') return { message: 'dev mode — confirmed' }
+    const { email, code } = request.body as any
+    if (!email || !code) return reply.status(400).send({ message: 'email and code required' })
+    try {
+      await cognitoClient.send(new ConfirmSignUpCommand({
+        ClientId: getCognitoClientId(),
+        SecretHash: getSecretHash(email),
+        Username: email,
+        ConfirmationCode: code,
+      }))
+      return { message: 'Email confirmed — you can now sign in' }
+    } catch (err: any) {
+      return reply.status(400).send({ message: err.message })
+    }
+  })
+
+  server.post('/email/resend', async (request, reply) => {
+    if (AUTH_MODE === 'dev') return { message: 'dev mode — resent' }
+    const { email } = request.body as any
+    if (!email) return reply.status(400).send({ message: 'email required' })
+    try {
+      await cognitoClient.send(new ResendConfirmationCodeCommand({
+        ClientId: getCognitoClientId(),
+        SecretHash: getSecretHash(email),
+        Username: email,
+      }))
+      return { message: 'Verification code resent' }
+    } catch (err: any) {
+      return reply.status(400).send({ message: err.message })
+    }
+  })
+
+  server.post('/email/login', async (request, reply) => {
+    if (AUTH_MODE === 'dev') {
+      return { id_token: 'dev-id-token', refresh_token: 'dev-refresh-token' }
+    }
+    const { email, password } = request.body as any
+    if (!email || !password) return reply.status(400).send({ message: 'email and password required' })
+
+    const clientId = getCognitoClientId()
+    const authParams: Record<string, string> = { USERNAME: email, PASSWORD: password }
+    const secretHash = getSecretHash(email)
+    if (secretHash) authParams['SECRET_HASH'] = secretHash
+
+    try {
+      const res = await cognitoClient.send(new InitiateAuthCommand({
+        AuthFlow: 'USER_PASSWORD_AUTH',
+        ClientId: clientId,
+        AuthParameters: authParams,
+      }))
+
+      const tokens = res.AuthenticationResult
+      if (!tokens?.IdToken) return reply.status(401).send({ message: 'Authentication failed' })
+
+      // Verify id_token via JWKS and upsert user
+      const region = process.env.COGNITO_REGION
+      const userPoolId = process.env.COGNITO_USER_POOL_ID
+      if (region && userPoolId) {
+        const jwksUrl = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}/.well-known/jwks.json`
+        const JWKS = createRemoteJWKSet(new URL(jwksUrl))
+        const issuer = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`
+        const verified = await jwtVerify(tokens.IdToken, JWKS, { issuer, audience: clientId })
+        try { await upsertUserFromCognito(verified.payload) } catch { /* ignore */ }
+      }
+
+      return {
+        id_token: tokens.IdToken,
+        refresh_token: tokens.RefreshToken,
+        access_token: tokens.AccessToken,
+        expires_in: tokens.ExpiresIn,
+      }
+    } catch (err: any) {
+      // UserNotConfirmedException means they need to verify their email first
+      if (err.name === 'UserNotConfirmedException') {
+        return reply.status(403).send({ message: 'Email not confirmed', code: 'UserNotConfirmed' })
+      }
+      return reply.status(401).send({ message: err.message })
+    }
+  })
+
+  server.post('/email/forgot', async (request, reply) => {
+    if (AUTH_MODE === 'dev') return { message: 'dev mode — reset code sent' }
+    const { email } = request.body as any
+    if (!email) return reply.status(400).send({ message: 'email required' })
+    try {
+      await cognitoClient.send(new ForgotPasswordCommand({
+        ClientId: getCognitoClientId(),
+        SecretHash: getSecretHash(email),
+        Username: email,
+      }))
+      // Always return success to avoid user enumeration
+      return { message: 'If an account exists, a reset code has been sent' }
+    } catch (err: any) {
+      return { message: 'If an account exists, a reset code has been sent' }
+    }
+  })
+
+  server.post('/email/reset', async (request, reply) => {
+    if (AUTH_MODE === 'dev') return { message: 'dev mode — password reset' }
+    const { email, code, newPassword } = request.body as any
+    if (!email || !code || !newPassword) {
+      return reply.status(400).send({ message: 'email, code, and newPassword required' })
+    }
+    try {
+      await cognitoClient.send(new ConfirmForgotPasswordCommand({
+        ClientId: getCognitoClientId(),
+        SecretHash: getSecretHash(email),
+        Username: email,
+        ConfirmationCode: code,
+        Password: newPassword,
+      }))
+      return { message: 'Password reset successful — you can now sign in' }
+    } catch (err: any) {
+      return reply.status(400).send({ message: err.message })
     }
   })
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -56,6 +56,7 @@ interface SidebarProps {
 export function Sidebar({ className, currentRoute, onNavigate, logout, login, user, xp, level, streak, showAdmin }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { itemCount: basketCount } = useBasket();
   const { badgeCount: feedbackCount } = useFeedback();
 
@@ -147,7 +148,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
               </Button>
             </>
           ) : (
-            <Button variant="ghost" className="w-full justify-start text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50" onClick={login}>
+            <Button variant="ghost" className="w-full justify-start text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50" onClick={() => navigate('/login')}>
               <LogIn className="mr-2 h-4 w-4" />
               Log in
             </Button>
