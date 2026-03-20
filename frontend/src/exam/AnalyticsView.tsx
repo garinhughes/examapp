@@ -113,7 +113,7 @@ export function AnalyticsView() {
                 {p.exams.map((ex: any) => (
                   <button
                     key={ex.code}
-                    className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm text-left hover:border-primary transition-colors"
+                    className="p-4 pb-10 rounded-lg border border-border bg-card text-card-foreground shadow-sm text-left hover:border-primary transition-colors relative h-full flex flex-col items-start"
                     onClick={() => {
                       setSelected(ex.code)
                       void fetchScoreHistory(ex.code)
@@ -121,6 +121,11 @@ export function AnalyticsView() {
                   >
                     <div className="font-medium text-sm">{ex.title ?? ex.code}</div>
                     <div className="text-xs text-muted-foreground mt-0.5">{ex.code}</div>
+                    {ex.logo && (
+                      <div className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-background rounded-full p-1 shadow-sm" aria-hidden>
+                        <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
+                      </div>
+                    )}
                   </button>
                 ))}
               </div>

@@ -1,5 +1,6 @@
 import React from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
+import certshackLogo from '@/assets/certshack_logo.png'
 import type { PassedExam } from '../gamification/types'
 
 export interface CertOptions {
@@ -103,15 +104,15 @@ const CertificatePreview = React.forwardRef<HTMLDivElement, CertificatePreviewPr
             flexShrink: 0,
           }}
         >
-          <div
-            style={{
-              color: '#FFFFFF',
-              fontSize: 28,
-              fontWeight: 'bold',
-              letterSpacing: 1,
-            }}
-          >
-            certshack
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img
+              src={certshackLogo}
+              alt="CertShack"
+              style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 6, backgroundColor: '#FFFFFF', padding: 2 }}
+            />
+            <div style={{ color: '#FFFFFF', fontSize: 28, fontWeight: 'bold', letterSpacing: 1 }}>
+              certshack
+            </div>
           </div>
           {/* Dot grid accent */}
           <div style={{ display: 'flex', gap: 6, opacity: 0.5 }}>

@@ -73,7 +73,7 @@ export function PollWidget() {
 
   return (
     <div className="mt-6 p-5 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent text-left">
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Quick Poll</p>
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Feedback request</p>
       <p className="font-semibold text-sm mb-3">{poll.question}</p>
 
       {submitted ? (

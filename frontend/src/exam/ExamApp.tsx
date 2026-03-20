@@ -1,4 +1,4 @@
-import { Save, X, Play, Pause, Download, FileText, Info, BarChart3, Trophy, Filter, Check } from 'lucide-react'
+import { Save, X, Play, Pause, Download, FileText, Info, BarChart3, BookOpen, Terminal } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import AccountPage from '../components/AccountPage'
@@ -202,48 +202,29 @@ export default function ExamApp() {
             {route === 'home' && !selected && (
               <div className="mb-8 p-8 rounded-lg bg-card border border-border shadow-sm">
                 <div className="max-w-4xl mx-auto text-center">
-                  <h2 className="text-3xl sm:text-4xl font-extrabold mb-3">Practice smarter. Pass faster.</h2>
-                  <p className="text-muted-foreground mb-6">Timed or casual practice exams, focused by domain, with per-question explanations and review sessions to help you improve.</p>
+                  <h2 className="text-3xl sm:text-3xl font-extrabold mb-3">Practice smarter. Pass faster.</h2>
+                  <p className="text-muted-foreground mb-6">Timed or casual practice exams, focused by domain, with per-question explanations and analytics to help you improve.</p>
 
                   <div className="flex items-center justify-center gap-4 mb-6">
-                    <button onClick={() => setRoute('practice')} className="px-4 py-2 rounded bg-primary text-white font-semibold">Browse Practice Exams</button>
-                    <button onClick={() => setRoute('skill-labs')} className="px-4 py-2 rounded border border-primary text-primary font-semibold bg-primary/5">Browse Skill Labs</button>
+                    <button onClick={() => setRoute('practice')} className="px-4 py-2 rounded bg-primary text-white text-sm font-medium inline-flex items-center gap-2"><BookOpen className="w-4 h-4" />Browse Practice Exams</button>
+                    <button onClick={() => setRoute('skill-labs')} className="px-4 py-2 rounded border border-primary text-primary text-sm font-medium bg-primary/5 inline-flex items-center gap-2"><Terminal className="w-4 h-4" />Browse Skill Labs</button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 text-left">
                     <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                      <div className="text-2xl">⏱️</div>
-                      <div className="font-semibold mt-2">Timed & Casual</div>
-                      <div className="text-sm text-muted-foreground">Practice under exam-like timing or take a relaxed walkthrough.</div>
+                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Timed & Casual</div>
+                      <div className="text-sm text-muted-foreground">Practice under exam-like conditions or take a relaxed walkthrough.</div>
                     </div>
                     <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                      <div className="text-2xl">
-                        <svg role="img" aria-label="Exam checklist" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className="w-7 h-7 inline-block">
-                          <defs>
-                            <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
-                              <stop offset="0" stopColor="#06b6d4" />
-                              <stop offset="1" stopColor="#8b5cf6" />
-                            </linearGradient>
-                          </defs>
-                          <rect x="6" y="8" width="40" height="48" rx="3" className="fill-muted" stroke="url(#g1)" strokeWidth="2.5" />
-                          <path d="M16 18h20M16 26h20M16 34h20" className="stroke-muted-foreground" strokeWidth="3" strokeLinecap="round" />
-                          <rect x="44" y="4" width="16" height="16" rx="3" fill="url(#g1)" />
-                          <path d="M48 10l3 3L58 6" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                        </svg>
-                      </div>
-                      <div className="font-semibold mt-2">Exam Checklists</div>
+                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Exam Checklists</div>
                       <div className="text-sm text-muted-foreground">Organise your study with focused checklists and topic goals.</div>
                     </div>
                     <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                      <div className="text-2xl">📈</div>
-                      <div className="font-semibold mt-2">Review & Insights</div>
+                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Review & Insights</div>
                       <div className="text-sm text-muted-foreground">View per-domain scores and detailed explanations after each attempt.</div>
                     </div>
                     <button onClick={() => setRoute('account')} className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent hover:border-primary transition-colors text-left">
-                      <div className="text-2xl">
-                        <Trophy className="w-7 h-7 inline-block text-primary" />
-                      </div>
-                      <div className="font-semibold mt-2">Leaderboard</div>
+                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Leaderboard</div>
                       <div className="text-sm text-muted-foreground">Compete with fellow learners and climb the ranks.</div>
                     </button>
                   </div>
@@ -252,20 +233,15 @@ export default function ExamApp() {
                 </div>
                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                    <div className="text-2xl">🧭</div>
-                    <div className="font-semibold mt-2">Domain Focus</div>
+                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Domain Focus</div>
                     <div className="text-sm text-muted-foreground">Choose specific domains to drill into weaker areas.</div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                    <div className="text-2xl">
-                      <Filter className="w-7 h-7 inline-block text-muted-foreground" />
-                    </div>
-                    <div className="font-semibold mt-2">Advanced Question Filtering</div>
+                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Advanced Question Filtering</div>
                     <div className="text-sm text-muted-foreground">Filter question sets by services or keywords.</div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                    <div className="text-2xl">🧪</div>
-                    <div className="font-semibold mt-2">Skill Labs</div>
+                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Skill Labs</div>
                     <div className="text-sm text-muted-foreground">Hands-on simulations: interactive labs to practice real-world tasks.</div>
                   </div>
                 </div>

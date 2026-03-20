@@ -7,7 +7,6 @@ import {
   Settings,
   LogOut,
   LogIn,
-  Target,
   Menu,
   X,
   CreditCard,
@@ -15,7 +14,7 @@ import {
   Activity,
   BarChart2,
   Network,
-  FlaskConical,
+  Terminal,
   ShoppingCart,
   MessageSquare,
 } from "lucide-react";
@@ -32,7 +31,7 @@ const navItems = [
   { icon: Activity, label: "Analytics", href: "/analytics", key: 'analytics' },
   { icon: BarChart2, label: "Metrics", href: "/metrics", key: 'metrics' },
   { icon: Network, label: "Diagrams", href: "/diagrams", key: 'diagrams' },
-  { icon: FlaskConical, label: "Skill Labs", href: "/skill-labs", key: 'skill-labs' },
+  { icon: Terminal, label: "Skill Labs", href: "/skill-labs", key: 'skill-labs' },
   { icon: MessageSquare, label: "Feedback", href: "/feedback", key: 'feedback' },
   { icon: User, label: "Account", href: "/account", key: 'account' },
   { icon: CreditCard, label: "Pricing", href: "/pricing", key: 'pricing' },
@@ -91,7 +90,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
       >
         <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
           <span className="text-xl font-bold tracking-tight text-sidebar-foreground flex items-center gap-2">
-            <Target className="h-6 w-6 text-sidebar-primary" />
+            <img src="/favicon.png" alt="CertShack" className="h-7 w-7 object-contain rounded-lg bg-white" />
             certshack
           </span>
         </div>

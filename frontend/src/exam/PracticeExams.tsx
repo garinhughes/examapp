@@ -1,5 +1,5 @@
 import { useExam } from './ExamContext'
-import { Play, Info, BarChart3, ShoppingCart } from 'lucide-react'
+import { Play, Info, Activity, ShoppingCart } from 'lucide-react'
 import { useBasket } from '@/basket/BasketContext'
 import { useEntitlements } from '@/hooks/useEntitlements'
 import { useState, useEffect } from 'react'
@@ -46,7 +46,7 @@ export function PracticeExams() {
 
       <div role="note" className="mb-4 p-3 rounded-lg border border-border bg-muted/30 text-sm text-muted-foreground flex items-start gap-3">
         <Info className="w-5 h-5 flex-shrink-0 mt-0.5 text-primary" aria-hidden />
-        <div className="leading-snug">This product is not affiliated with or endorsed by any certification provider. All questions are original and created for practice purposes only.</div>
+        <div className="leading-snug">These products are not affiliated with or endorsed by any certification provider. All questions are original and created for practice purposes only.</div>
       </div>
 
       <div className="space-y-6">
@@ -64,7 +64,7 @@ export function PracticeExams() {
                   </div>
                   <div className="mt-3 flex items-center gap-2">
                     <button
-                      className={`px-3 py-1 rounded font-medium text-sm inline-flex items-center gap-2 transition-colors ${examStarted || anySavedExam || (selected && savedProgress) ? 'bg-muted/60 text-muted-foreground/60 border border-border cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'}`}
+                      className={`h-7 px-2 rounded font-medium text-sm inline-flex items-center gap-2 transition-colors ${examStarted || anySavedExam || (selected && savedProgress) ? 'bg-muted/60 text-muted-foreground/60 border border-border cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'}`}
                       disabled={!!(examStarted || anySavedExam || (selected && savedProgress))}
                       title={examStarted || anySavedExam || (selected && savedProgress) ? 'Complete or cancel your current exam first' : 'Setup this exam'}
                       onClick={() => { if (examStarted || anySavedExam || (selected && savedProgress)) return; setupExamFromMeta(ex) }}
@@ -74,10 +74,10 @@ export function PracticeExams() {
                     <button
                       onClick={(e) => { e.stopPropagation(); setSelected(ex.code); setRoute('analytics') }}
                       title={`View analytics for ${ex.title ?? ex.code}`}
-                      className="px-2 py-1 rounded bg-secondary text-secondary-foreground hover:bg-secondary/80 text-sm inline-flex items-center gap-2"
+                      className="h-7 w-7 rounded bg-secondary text-secondary-foreground hover:bg-secondary/80 text-sm inline-flex items-center justify-center"
                       aria-label={`Analytics for ${ex.title ?? ex.code}`}
                     >
-                      <BarChart3 className="w-4 h-4" aria-hidden />
+                      <Activity className="w-4 h-4" aria-hidden />
                       <span className="sr-only">Analytics</span>
                     </button>
                     {(() => {
@@ -92,7 +92,7 @@ export function PracticeExams() {
                             if (!ok) setActionError(basket.lastError)
                           } }}
                           title={inBasket ? 'Already in basket' : `Add ${ex.code} to basket`}
-                          className={`px-2 py-1 rounded text-sm inline-flex items-center gap-2 ${
+                          className={`h-7 px-2 rounded text-sm inline-flex items-center gap-2 ${
                             inBasket
                               ? 'bg-primary/10 text-primary cursor-default'
                               : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
