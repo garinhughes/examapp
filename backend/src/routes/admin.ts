@@ -20,7 +20,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // List users (simple scan with pagination)
-  server.get('/users', async (request, reply) => {
+  server.get('/users', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const q = request.query as any
     const limit = Math.min(Number(q.limit || 50), 200)
     const res = await listUsers(limit, q.lastKey)
@@ -28,7 +28,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Get single user by sub
-  server.get('/users/:sub', async (request, reply) => {
+  server.get('/users/:sub', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { sub } = request.params as any
     const user = await getUserBySub(sub)
     if (!user) return reply.code(404).send({ message: 'user not found' })
@@ -36,7 +36,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Toggle isAdmin or isActive
-  server.patch('/users/:sub', async (request, reply) => {
+  server.patch('/users/:sub', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { sub } = request.params as any
     const body = request.body as any
     // minimal validation: only allow isAdmin, isActive
@@ -61,7 +61,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // ── Entitlements ──
 
   /** List all products from catalog — annotate exam products with availability */
-  server.get('/products', async (_request, reply) => {
+  server.get('/products', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, reply) => {
     // Load available exam codes so we can flag which exam products exist
     const availableExams = await loadAllExams()
     const availableCodes = new Set(availableExams.map((e) => e.code))
@@ -78,7 +78,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   /** List all exams available in the exam source (S3 or local) */
-  server.get('/exams', async (_request, _reply) => {
+  server.get('/exams', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, _reply) => {
     const exams = await loadAllExams()
     return {
       exams: exams.map((e) => ({ code: e.code, title: e.title, provider: e.provider ?? null })),
@@ -86,14 +86,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   /** Get all entitlements for a specific user (including expired/cancelled) */
-  server.get('/users/:sub/entitlements', async (request, reply) => {
+  server.get('/users/:sub/entitlements', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { sub } = request.params as any
     const entitlements = await getUserEntitlements(sub, true)
     return { entitlements }
   })
 
   /** Grant an entitlement to a user */
-  server.post('/users/:sub/entitlements', async (request, reply) => {
+  server.post('/users/:sub/entitlements', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { sub } = request.params as any
     const body = request.body as any
 
@@ -127,7 +127,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   /** Bulk migrate entitlements from one exam product to another */
-  server.post('/bulk-migrate-entitlements', async (request, reply) => {
+  server.post('/bulk-migrate-entitlements', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const body = request.body as any
     const { fromProductId, toProductId, dryRun = false } = body ?? {}
 
@@ -197,7 +197,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   /** Revoke an entitlement from a user */
-  server.delete('/users/:sub/entitlements/:productId', async (request, reply) => {
+  server.delete('/users/:sub/entitlements/:productId', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { sub, productId } = request.params as any
 
     try {
@@ -213,7 +213,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /admin/feedback?tab=ratings|issues|polls&limit=50&lastKey=...&pollId=...
-  server.get('/feedback', async (request, reply) => {
+  server.get('/feedback', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const q = request.query as any
     const tab = q.tab === 'ratings' ? 'ratings' : q.tab === 'polls' ? 'polls' : 'issues'
     const limit = Math.min(Number(q.limit || 50), 200)
@@ -234,7 +234,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /admin/feedback/count?since=<ISO>
-  server.get('/feedback/count', async (request, reply) => {
+  server.get('/feedback/count', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const q = request.query as any
     const since = q.since || new Date(0).toISOString()
     const [ratings, issues, polls] = await Promise.all([
@@ -248,13 +248,13 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // ── Poll management ──
 
   // GET /admin/polls — list all poll definitions
-  server.get('/polls', async (_request, _reply) => {
+  server.get('/polls', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, _reply) => {
     const { items, lastKey } = await listPollDefs(100)
     return { items, lastKey: lastKey ?? null }
   })
 
   // POST /admin/polls — create a new poll
-  server.post('/polls', async (request, reply) => {
+  server.post('/polls', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const body = request.body as any
     const { question, options, active = false } = body ?? {}
 
@@ -275,7 +275,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // PATCH /admin/polls/:pollId — update question/options or toggle active
-  server.patch('/polls/:pollId', async (request, reply) => {
+  server.patch('/polls/:pollId', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { pollId } = request.params as any
     const body = request.body as any
 
@@ -299,7 +299,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // DELETE /admin/polls/:pollId
-  server.delete('/polls/:pollId', async (request, reply) => {
+  server.delete('/polls/:pollId', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { pollId } = request.params as any
     const existing = await getPollDef(pollId)
     if (!existing) return reply.code(404).send({ message: 'Poll not found' })
@@ -308,7 +308,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // PATCH /admin/issues/:reportId
-  server.patch('/issues/:reportId', async (request, reply) => {
+  server.patch('/issues/:reportId', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { reportId } = request.params as any
     const body = request.body as any
     if (body?.status !== 'resolved') {

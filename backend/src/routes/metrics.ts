@@ -26,7 +26,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /admin/metrics/overview — global KPIs + 30-day trend
-  server.get('/overview', async (_request, _reply) => {
+  server.get('/overview', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, _reply) => {
     const [examMetas, labMetas, dailyItems] = await Promise.all([
       getAllExamMetas(),
       getAllLabMetas(),
@@ -80,7 +80,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /admin/metrics/exams — per-exam summary with mode breakdown
-  server.get('/exams', async (_request, _reply) => {
+  server.get('/exams', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, _reply) => {
     const examMetas = await getAllExamMetas()
 
     const results = await Promise.all(
@@ -125,7 +125,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /admin/metrics/exams/:code/questions — per-question stats
-  server.get('/exams/:code/questions', async (request, _reply) => {
+  server.get('/exams/:code/questions', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, _reply) => {
     const { code } = request.params as { code: string }
     const items = await queryQuestionItems(code)
 
@@ -154,7 +154,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /admin/metrics/exams/:code/domains — per-domain breakdown
-  server.get('/exams/:code/domains', async (request, _reply) => {
+  server.get('/exams/:code/domains', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, _reply) => {
     const { code } = request.params as { code: string }
     const items = await queryExamItems(code)
 
@@ -176,7 +176,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /admin/metrics/labs — per-lab stats
-  server.get('/labs', async (_request, _reply) => {
+  server.get('/labs', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, _reply) => {
     const labMetas = await getAllLabMetas()
 
     return labMetas.map((item) => {
@@ -199,7 +199,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /admin/metrics/suggestions — auto-generated content recommendations
-  server.get('/suggestions', async (request, _reply) => {
+  server.get('/suggestions', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, _reply) => {
     const params = request.query as any
     const tooHardThreshold = Number(params.tooHard ?? THRESHOLD_TOO_HARD)
     const tooEasyThreshold = Number(params.tooEasy ?? THRESHOLD_TOO_EASY)

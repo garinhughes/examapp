@@ -164,8 +164,9 @@ module "ecs" {
   cognito_user_pool_id     = "eu-west-1_c6WQUP1RX"
   cognito_redirect_uri     = "https://api.certshack.com/auth/token"
   frontend_origin          = "https://certshack.com"
-  # Wire in the certshack-managed secret (created in secretsmanager module)
-  cognito_client_secret_arn = module.secretsmanager.cognito_client_secret_arn
+  # Wire in the certshack-managed secrets (created in secretsmanager module)
+  cognito_client_secret_arn  = module.secretsmanager.cognito_client_secret_arn
+  origin_verify_secret_arn   = module.secretsmanager.origin_verify_secret_arn
 
   ses_from_address    = "noreply@certshack.com"
   ses_support_address = "support@certshack.com"
@@ -176,7 +177,7 @@ module "ecs" {
   depends_on = [module.acm]
 }
 
-# Secrets Manager for Cognito client secret
+# Secrets Manager for Cognito client secret and origin-verify header
 module "secretsmanager" {
   source                       = "./modules/secretsmanager"
   project                      = var.project
@@ -274,9 +275,10 @@ module "ses" {
 }
 
 module "waf" {
-  source     = "./modules/waf"
-  project    = var.project
-  enable_waf = var.enable_waf
+  source               = "./modules/waf"
+  project              = var.project
+  enable_waf           = var.enable_waf
+  enable_rate_limiting = var.enable_rate_limiting
   addresses  = [
     "185.77.56.49/32",
     "86.8.179.69/32",

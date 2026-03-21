@@ -202,4 +202,34 @@ export default { upsertUserFromCognito, getUserBySub, addEntitlement, listUsers,
 
 export const SESSIONS_TABLE = process.env.SESSIONS_TABLE || 'examapp-sessions'
 
+const SESSION_TTL_DAYS = 30
+
+/** Returns the set of skill lab IDs a visitor session has accessed (or empty set). */
+export async function getVisitorLabSession(sessionId: string): Promise<Set<string>> {
+  try {
+    const result = await ddb.send(new GetCommand({
+      TableName: SESSIONS_TABLE,
+      Key: { PK: `visitor#${sessionId}`, SK: 'skill-lab' },
+    }))
+    const labs: string[] = result.Item?.labs ?? []
+    return new Set(labs)
+  } catch {
+    return new Set()
+  }
+}
+
+/** Records a lab ID as accessed for the visitor session and refreshes TTL. */
+export async function recordVisitorLabAccess(sessionId: string, labId: string, currentLabs: Set<string>): Promise<void> {
+  const updatedLabs = Array.from(new Set([...currentLabs, labId]))
+  const ttl = Math.floor(Date.now() / 1000) + SESSION_TTL_DAYS * 86400
+  try {
+    await ddb.send(new PutCommand({
+      TableName: SESSIONS_TABLE,
+      Item: { PK: `visitor#${sessionId}`, SK: 'skill-lab', labs: updatedLabs, ttl },
+    }))
+  } catch (err) {
+    console.warn('[dynamo] recordVisitorLabAccess failed', err)
+  }
+}
+
 export { ddb, USERS_TABLE, ENTITLEMENTS_TABLE, AUDIT_TABLE }

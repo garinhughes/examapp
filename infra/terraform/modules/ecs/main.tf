@@ -167,6 +167,12 @@ variable "cognito_client_secret_arn" {
   default = ""
 }
 
+variable "origin_verify_secret_arn" {
+  description = "ARN of Secrets Manager secret for X-Origin-Verify header validation"
+  type        = string
+  default     = ""
+}
+
 variable "ses_from_address" {
   type    = string
   default = "noreply@certshack.com"
@@ -192,26 +198,24 @@ variable "interactions_table" {
   default = ""
 }
 
+# ---------- CloudFront managed prefix list ----------
+# Restricts ALB to only accept traffic originating from CloudFront edge nodes.
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
 # ---------- security groups ----------
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project}-alb-"
-  description = "ALB - allow 80/443 inbound"
+  description = "ALB - allow HTTPS from CloudFront only"
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "HTTP"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "HTTPS"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "HTTPS from CloudFront"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
   }
 
   egress {
@@ -370,9 +374,14 @@ locals {
     { name = "INTERACTIONS_TABLE", value = var.interactions_table },
   ]
 
-  container_secrets = var.cognito_client_secret_arn != "" ? [
-    { name = "COGNITO_APP_CLIENT_SECRET", valueFrom = var.cognito_client_secret_arn }
-  ] : []
+  container_secrets = concat(
+    var.cognito_client_secret_arn != "" ? [
+      { name = "COGNITO_APP_CLIENT_SECRET", valueFrom = var.cognito_client_secret_arn }
+    ] : [],
+    var.origin_verify_secret_arn != "" ? [
+      { name = "ORIGIN_VERIFY_SECRET", valueFrom = var.origin_verify_secret_arn }
+    ] : [],
+  )
 }
 
 resource "aws_ecs_task_definition" "backend" {

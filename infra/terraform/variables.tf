@@ -33,3 +33,9 @@ variable "enable_waf" {
   type        = bool
   default     = false
 }
+
+variable "enable_rate_limiting" {
+  description = "When true, add a WAF rate-based rule blocking IPs that exceed 2000 requests per 5 minutes."
+  type        = bool
+  default     = true
+}

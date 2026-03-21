@@ -207,7 +207,7 @@ export async function loadExam(
         return parseExamJson(raw, idx.examCode, vid)
       }
     } catch (err) {
-      console.error(`[examLoader] S3 load failed for ${code}:`, err)
+      console.error('[examLoader] S3 load failed for code:', code, err)
       return null
     }
   }
@@ -221,7 +221,7 @@ export async function loadExam(
     const raw = JSON.parse(await fs.readFile(path.join(examsDir, file), 'utf-8'))
     return parseExamJson(raw, code, null)
   } catch (err) {
-    console.warn(`[examLoader] Filesystem fallback failed for ${code}:`, err)
+    console.warn('[examLoader] Filesystem fallback failed for code:', code, err)
     return null
   }
 }

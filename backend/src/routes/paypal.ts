@@ -241,6 +241,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   server.post('/capture-order', { preHandler: [server.authenticate] }, async (request: any, reply) => {
     const { orderId } = request.body as any
     if (!orderId) return reply.status(400).send({ message: 'orderId required' })
+    if (!/^[A-Z0-9]{1,64}$/i.test(orderId)) return reply.status(400).send({ message: 'Invalid orderId' })
 
     try {
       const token = await getPaypalToken()

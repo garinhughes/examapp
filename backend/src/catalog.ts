@@ -26,6 +26,8 @@ export interface TierConfig {
   leaderboardEnabled: boolean
   /** Can view domain mastery history */
   domainMasteryEnabled: boolean
+  /** Max skill labs a visitor (unauthenticated) can access in full (null = unlimited) */
+  skillLabVisitorLimit: number | null
 }
 
 export const TIERS: Record<Tier, TierConfig> = {
@@ -38,6 +40,7 @@ export const TIERS: Record<Tier, TierConfig> = {
     exportEnabled: false,
     leaderboardEnabled: false,
     domainMasteryEnabled: false,
+    skillLabVisitorLimit: 3,
   },
   registered: {
     tier: 'registered',
@@ -48,6 +51,7 @@ export const TIERS: Record<Tier, TierConfig> = {
     exportEnabled: true,
     leaderboardEnabled: false,
     domainMasteryEnabled: false,
+    skillLabVisitorLimit: null,
   },
   paying: {
     tier: 'paying',
@@ -58,6 +62,7 @@ export const TIERS: Record<Tier, TierConfig> = {
     exportEnabled: true,
     leaderboardEnabled: true,
     domainMasteryEnabled: true,
+    skillLabVisitorLimit: null,
   },
 }
 

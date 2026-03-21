@@ -8,6 +8,8 @@ if (!(globalThis as any).crypto) {
 
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
+import rateLimit from '@fastify/rate-limit'
+import cookie from '@fastify/cookie'
 import authPlugin from './plugins/auth.js'
 import entitlementPlugin from './plugins/entitlements.js'
 import authRoutes from './routes/auth.js'
@@ -41,7 +43,30 @@ server.addContentTypeParser('application/json', { parseAs: 'string' }, function 
   }
 })
 
-await server.register(cors, { origin: '*' })
+await server.register(cors, {
+  origin: process.env.FRONTEND_ORIGIN ?? 'https://certshack.com',
+  credentials: true,
+})
+
+await server.register(rateLimit, {
+  global: true,
+  max: 100,
+  timeWindow: '1 minute',
+  keyGenerator: (req) => req.ip,
+})
+
+await server.register(cookie)
+
+// Origin-verify: reject requests that don't carry the CloudFront shared secret.
+// No-op when ORIGIN_VERIFY_SECRET is not set (dev / local).
+const ORIGIN_VERIFY_SECRET = process.env.ORIGIN_VERIFY_SECRET
+if (ORIGIN_VERIFY_SECRET) {
+  server.addHook('onRequest', async (request, reply) => {
+    if (request.headers['x-origin-verify'] !== ORIGIN_VERIFY_SECRET) {
+      return reply.status(403).send({ message: 'Forbidden' })
+    }
+  })
+}
 
 // Auth plugin — decorates request.user + server.authenticate / server.optionalAuth
 await server.register(authPlugin)

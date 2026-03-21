@@ -73,7 +73,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    * GET /certificates/verify/:token — public verification endpoint
    * No auth required.
    */
-  server.get('/verify/:token', async (request, reply) => {
+  server.get('/verify/:token', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => {
     const secret = process.env.CERTIFICATE_SECRET
     if (!secret) {
       return reply.status(503).send({ valid: false, message: 'Verification is unavailable.' })

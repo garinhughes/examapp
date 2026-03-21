@@ -181,11 +181,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   <button id="fail">Simulate failure</button>
   <script>
     async function postEvent(action) {
-      const body = { events: [ { id: 'evt-' + Math.random().toString(36).slice(2), resource_type: 'payments', action, metadata: { sessionId: '${sessionId}' } } ] }
+      const body = { events: [ { id: 'evt-' + Math.random().toString(36).slice(2), resource_type: 'payments', action, metadata: { sessionId: ${JSON.stringify(sessionId)} } } ] }
       await fetch('/payments/webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       alert('Posted event: ' + action + '\nYou can now close this window or follow redirects if configured.')
-      if (action === 'confirmed' && ${!!sess.successUrl}) {
-        window.location.href = '${sess.successUrl ?? ''}'
+      if (action === 'confirmed' && ${JSON.stringify(!!sess.successUrl)}) {
+        window.location.href = ${JSON.stringify(sess.successUrl ?? '')}
       }
     }
     document.getElementById('success').addEventListener('click', () => postEvent('confirmed'))

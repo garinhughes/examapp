@@ -9,6 +9,18 @@ import {
   listLabIndex,
 } from '../services/skillLabStore.js'
 import { updateMetricsOnLabAttempt } from '../services/metricsStore.js'
+import { getVisitorLabSession, recordVisitorLabAccess } from '../services/dynamo.js'
+import { TIERS } from '../catalog.js'
+
+const VISITOR_LAB_LIMIT = TIERS.visitor.skillLabVisitorLimit ?? 3
+const SESSION_COOKIE = 'sid'
+const SESSION_COOKIE_MAX_AGE = 30 * 24 * 60 * 60 // 30 days in seconds
+
+/** Strip sensitive lab content, returning metadata-only shape. */
+function labMetadataOnly(lab: any) {
+  const { tasks: _t, scenario: _s, initialPolicy: _i, solution: _sol, hints: _h, validations: _v, ...meta } = lab
+  return meta
+}
 
 const LABS_FILE = path.join(process.cwd(), 'data', 'skill-labs.json')
 
@@ -71,7 +83,7 @@ async function findLabS3(id: string): Promise<any | null> {
     const { body } = await getLabFromS3(idx.labId, idx.s3VersionId)
     return JSON.parse(body)
   } catch (err) {
-    console.error(`[skill-labs] S3 load failed for ${id}:`, err)
+    console.error('[skill-labs] S3 load failed for id:', id, err)
     return null
   }
 }
@@ -109,12 +121,41 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     return reply.send({ completedLabIds })
   })
 
-  // GET /skill-labs/:id — full lab definition
-  server.get('/:id', async (request, reply) => {
+  // GET /skill-labs/:id — full lab definition (visitors limited to 3 labs)
+  server.get('/:id', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as { id: string }
     const lab = USE_S3 ? await findLabS3(id) : await findLabLocal(id)
     if (!lab) return reply.status(404).send({ message: 'Lab not found' })
-    return reply.send(lab)
+
+    // Authenticated users get full content
+    await server.optionalAuth(request, reply)
+    if (request.user) {
+      return reply.send(lab)
+    }
+
+    // Unauthenticated visitors: enforce per-session lab limit
+    let sessionId = request.cookies?.[SESSION_COOKIE]
+    if (!sessionId) {
+      sessionId = randomUUID()
+      reply.setCookie(SESSION_COOKIE, sessionId, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: SESSION_COOKIE_MAX_AGE,
+        path: '/',
+      })
+    }
+
+    const accessedLabs = await getVisitorLabSession(sessionId)
+
+    if (accessedLabs.has(id) || accessedLabs.size < VISITOR_LAB_LIMIT) {
+      // Within limit or already accessed this lab — return full content
+      await recordVisitorLabAccess(sessionId, id, accessedLabs)
+      return reply.send(lab)
+    }
+
+    // Over limit — return metadata only
+    return reply.send({ ...labMetadataOnly(lab), _limited: true })
   })
 
   // POST /skill-labs/:id/validate-policy — validate policy-fix lab submission

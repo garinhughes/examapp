@@ -13,3 +13,9 @@ variable "addresses" {
   type        = list(string)
   default     = []
 }
+
+variable "enable_rate_limiting" {
+  description = "When true, add a rate-based rule blocking IPs exceeding 2000 requests per 5 minutes"
+  type        = bool
+  default     = true
+}
