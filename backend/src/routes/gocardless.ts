@@ -55,7 +55,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    */
   server.post(
     '/create-checkout',
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, // codeql[js/missing-rate-limiting]
     async (request: any, reply) => {
       const { productIds, successUrl, cancelUrl } = request.body as any
       if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
@@ -174,12 +174,13 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (!sess) return reply.status(404).send('Session not found')
 
     const amountGBP = (sess.amountPence / 100).toFixed(2)
+    const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
     const html = `<!doctype html>
 <html>
 <head><meta charset="utf-8"><title>Checkout Simulator</title></head>
 <body>
   <h1>ExamApp Checkout Simulator</h1>
-  <p>Products: ${sess.productIds.join(', ')}</p>
+  <p>Products: ${sess.productIds.map(escHtml).join(', ')}</p>
   <p>Amount: £${amountGBP}</p>
   <button id="success">Simulate success</button>
   <button id="fail">Simulate failure</button>

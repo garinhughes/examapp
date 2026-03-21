@@ -7,6 +7,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     '/',
     {
       preHandler: [server.authenticate],
+      config: { rateLimit: { max: 100, timeWindow: '1 minute' } }, // codeql[js/missing-rate-limiting]
       schema: {
         body: {
           type: 'object',
@@ -54,6 +55,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     '/mine',
     {
       preHandler: [server.authenticate],
+      config: { rateLimit: { max: 100, timeWindow: '1 minute' } }, // codeql[js/missing-rate-limiting]
       schema: {
         querystring: {
           type: 'object',

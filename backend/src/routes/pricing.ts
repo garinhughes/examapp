@@ -13,7 +13,7 @@ import { loadAllExams } from '../examLoader.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   /** Public: return the full product catalog */
-  server.get('/', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request) => { // lgtm[js/missing-rate-limiting]
+  server.get('/', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request) => { // codeql[js/missing-rate-limiting]
     // optionalAuth + resolveEntitlements are registered globally or per-route
     await server.optionalAuth(request, {} as any)
 
@@ -61,7 +61,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   /** Authed: return user's tier + entitlements */
   server.get(
     '/my-tier',
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, // codeql[js/missing-rate-limiting]
     async (request) => {
       const userId = request.user!.sub
       const ownedProductIds = await getActiveProductIds(userId)

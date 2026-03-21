@@ -11,6 +11,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     '/token',
     {
       preHandler: [server.authenticate, server.resolveEntitlements],
+      config: { rateLimit: { max: 100, timeWindow: '1 minute' } }, // codeql[js/missing-rate-limiting]
     },
     async (request, reply) => {
       if (request.tier !== 'paying') {
@@ -73,7 +74,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    * GET /certificates/verify/:token — public verification endpoint
    * No auth required.
    */
-  server.get('/verify/:token', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => { // lgtm[js/missing-rate-limiting]
+  server.get('/verify/:token', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const secret = process.env.CERTIFICATE_SECRET
     if (!secret) {
       return reply.status(503).send({ valid: false, message: 'Verification is unavailable.' })

@@ -6,7 +6,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   /**
    * GET /username — get the current user's username
    */
-  server.get('/', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.get('/', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
 
@@ -41,7 +41,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   /**
    * PUT /username — claim or change username
    */
-  server.put('/', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.put('/', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
 

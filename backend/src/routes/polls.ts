@@ -6,6 +6,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // Requires authentication (visitors cannot vote)
   server.get('/active', {
     preHandler: [server.authenticate],
+    config: { rateLimit: { max: 100, timeWindow: '1 minute' } }, // codeql[js/missing-rate-limiting]
   }, async (request, reply) => {
     if (!request.user) return reply.code(401).send({ message: 'Unauthorized' })
 
@@ -20,7 +21,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // Requires authentication; upserts user's vote
   server.post<{ Params: { pollId: string }; Body: { selectedOptions: string[] } }>(
     '/:pollId/vote',
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, // codeql[js/missing-rate-limiting]
     async (request, reply) => {
       if (!request.user) return reply.code(401).send({ message: 'Unauthorized' })
 

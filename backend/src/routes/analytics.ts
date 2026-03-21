@@ -46,7 +46,7 @@ function computeTotals(attempt: any): { correctCount: number | null; total: numb
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Return score history and attempts for a given exam code (scoped to current user)
-  server.get('/exam/:code/scores', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.get('/exam/:code/scores', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { code } = request.params as any
     if (!code) return reply.status(400).send({ message: 'exam code required' })
     const lc = String(code || '').toLowerCase()

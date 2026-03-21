@@ -95,7 +95,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    * Create a PayPal Order for one-time purchases (exams, bundles).
    * Returns { orderId } — the PayPal JS SDK uses this directly to open the checkout modal.
    */
-  server.post('/create-order', { preHandler: [server.authenticate] }, async (request: any, reply) => {
+  server.post('/create-order', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request: any, reply) => {
     const { productIds, successUrl, cancelUrl } = request.body as any
     if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
       return reply.status(400).send({ message: 'productIds array required' })
@@ -168,7 +168,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    * Create a PayPal Subscription for recurring products (sub:all-access, sub:all-access-annual).
    * Returns { subscriptionId } — the PayPal JS SDK uses this in createSubscription callback.
    */
-  server.post('/create-subscription', { preHandler: [server.authenticate] }, async (request: any, reply) => {
+  server.post('/create-subscription', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request: any, reply) => {
     const { productId, successUrl, cancelUrl } = request.body as any
     if (!productId) {
       return reply.status(400).send({ message: 'productId required' })
@@ -238,7 +238,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    * Capture an approved PayPal Order and immediately grant entitlements.
    * Called by the frontend after PayPal's onApprove fires.
    */
-  server.post('/capture-order', { preHandler: [server.authenticate] }, async (request: any, reply) => {
+  server.post('/capture-order', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request: any, reply) => {
     const { orderId } = request.body as any
     if (!orderId) return reply.status(400).send({ message: 'orderId required' })
     if (!/^[A-Z0-9]{1,64}$/i.test(orderId)) return reply.status(400).send({ message: 'Invalid orderId' })

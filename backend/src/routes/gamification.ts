@@ -42,7 +42,7 @@ async function saveDb(db: GamificationDb) {
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Sync gamification state from client — enabled only in local/dev mode.
-  server.post('/sync', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.post('/sync', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     if (!USE_LOCAL_GAM) {
       return reply.status(501).send({ message: 'gamification sync disabled in production' })
     }
@@ -73,7 +73,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Get leaderboard (public entries only)
-  server.get('/leaderboard', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.get('/leaderboard', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     // In production there is no local gam db — return empty leaderboard.
     if (!USE_LOCAL_GAM) return { entries: [] }
 
@@ -108,7 +108,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Get own gamification data from server
-  server.get('/me', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.get('/me', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     if (!USE_LOCAL_GAM) return reply.status(404).send({ message: 'gamification data not available in production' })
     const db = await loadDb()
     const userId = request.user?.sub

@@ -8,7 +8,7 @@ import { updateMetricsOnAttemptFinish } from '../services/metricsStore.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Start an attempt
-  server.post('/', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.post('/', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const body = request.body as any
     const examCode = body?.examCode
     if (!examCode) return reply.status(400).send({ message: 'examCode required' })
@@ -139,7 +139,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // List all attempts (filtered to current user)
-  server.get('/', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.get('/', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const userId = request.user?.sub
     if (!userId) return { attempts: [] }
     const userAttempts = await attemptsStore.listByUser(userId)
@@ -147,7 +147,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Delete all attempts for current user
-  server.delete('/all', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.delete('/all', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
     const count = await attemptsStore.deleteAllForUser(userId)
@@ -155,7 +155,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Delete an attempt (only allowed when it has 0 answers, owned by user)
-  server.delete('/:id', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.delete('/:id', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
@@ -171,7 +171,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Submit an answer for an attempt
-  server.post('/:id/answer', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.post('/:id/answer', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
     const body = request.body as any
     if (!body?.questionId) return reply.status(400).send({ message: 'questionId required' })
@@ -283,7 +283,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Finish attempt and compute score
-  server.patch('/:id/finish', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.patch('/:id/finish', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
@@ -371,7 +371,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Get attempt (user must own it)
-  server.get('/:id', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.get('/:id', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
@@ -409,7 +409,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // List attempts for a user (legacy — redirects to own attempts only)
-  server.get('/user/:userId', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.get('/user/:userId', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const userId = request.user?.sub
     if (!userId) return { attempts: [] }
     const list = await attemptsStore.listByUser(userId)

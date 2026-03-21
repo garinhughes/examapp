@@ -113,7 +113,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /skill-labs/my-attempts — get current user's lab attempts
-  server.get('/my-attempts', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.get('/my-attempts', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'Unauthorized' })
     const attempts = await skillLabAttemptsStore.listByUser(userId)
@@ -122,7 +122,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /skill-labs/:id — full lab definition (visitors limited to 3 labs)
-  server.get('/:id', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => { // lgtm[js/missing-rate-limiting]
+  server.get('/:id', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const { id } = request.params as { id: string }
     const lab = USE_S3 ? await findLabS3(id) : await findLabLocal(id)
     if (!lab) return reply.status(404).send({ message: 'Lab not found' })
@@ -200,7 +200,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // POST /skill-labs/:id/attempt — store result
-  server.post('/:id/attempt', { preHandler: [server.authenticate] }, async (request, reply) => {
+  server.post('/:id/attempt', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const { id: labId } = request.params as { id: string }
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'Unauthorized' })

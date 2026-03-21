@@ -8,6 +8,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     '/',
     {
       preHandler: [server.authenticate, server.resolveEntitlements],
+      config: { rateLimit: { max: 100, timeWindow: '1 minute' } }, // codeql[js/missing-rate-limiting]
       schema: {
         body: {
           type: 'object',
