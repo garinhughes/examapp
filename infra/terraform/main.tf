@@ -166,7 +166,6 @@ module "ecs" {
   frontend_origin          = "https://certshack.com"
   # Wire in the certshack-managed secrets (created in secretsmanager module)
   cognito_client_secret_arn  = module.secretsmanager.cognito_client_secret_arn
-  origin_verify_secret_arn   = module.secretsmanager.origin_verify_secret_arn
 
   ses_from_address    = "noreply@certshack.com"
   ses_support_address = "support@certshack.com"

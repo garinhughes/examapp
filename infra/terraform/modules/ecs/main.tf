@@ -198,24 +198,18 @@ variable "interactions_table" {
   default = ""
 }
 
-# ---------- CloudFront managed prefix list ----------
-# Restricts ALB to only accept traffic originating from CloudFront edge nodes.
-data "aws_ec2_managed_prefix_list" "cloudfront" {
-  name = "com.amazonaws.global.cloudfront.origin-facing"
-}
-
 # ---------- security groups ----------
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project}-alb-"
-  description = "ALB - allow HTTPS from CloudFront only"
+  description = "ALB - allow HTTPS from internet"
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "HTTPS from CloudFront"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {

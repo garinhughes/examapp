@@ -25,9 +25,3 @@ variable "gocardless_webhook_secret_name" {
   type        = string
   default     = "examapp-gocardless-webhook-secret"
 }
-
-variable "origin_verify_secret_name" {
-  description = "Name of the existing Secrets Manager secret holding the X-Origin-Verify shared secret"
-  type        = string
-  default     = "examapp-origin-verify-secret"
-}

@@ -57,19 +57,6 @@ await server.register(rateLimit, {
 
 await server.register(cookie)
 
-// Origin-verify: reject requests that don't carry the CloudFront shared secret.
-// No-op when ORIGIN_VERIFY_SECRET is not set (dev / local).
-const ORIGIN_VERIFY_SECRET = process.env.ORIGIN_VERIFY_SECRET
-if (ORIGIN_VERIFY_SECRET) {
-  server.addHook('onRequest', async (request, reply) => {
-    // Allow ALB health checks through without the CloudFront secret
-    if (request.url === '/health') return
-    if (request.headers['x-origin-verify'] !== ORIGIN_VERIFY_SECRET) {
-      return reply.status(403).send({ message: 'Forbidden' })
-    }
-  })
-}
-
 // Auth plugin — decorates request.user + server.authenticate / server.optionalAuth
 await server.register(authPlugin)
 

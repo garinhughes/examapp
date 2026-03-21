@@ -61,24 +61,3 @@ resource "aws_secretsmanager_secret_policy" "gocardless_webhook_secret_policy" {
     ]
   })
 }
-
-# ---- Origin verify secret (CloudFront → ALB custom header) ----
-# Managed out-of-band (already exists in Secrets Manager).
-# Inject as X-Origin-Verify header from CloudFront; backend rejects requests missing it.
-data "aws_secretsmanager_secret" "origin_verify" {
-  name = var.origin_verify_secret_name
-}
-
-resource "aws_secretsmanager_secret_policy" "origin_verify_policy" {
-  secret_arn = data.aws_secretsmanager_secret.origin_verify.arn
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Sid    = "AllowEcsTaskGetSecret",
-      Effect = "Allow",
-      Principal = { AWS = var.ecs_task_execution_role_arn },
-      Action   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
-      Resource = data.aws_secretsmanager_secret.origin_verify.arn
-    }]
-  })
-}
