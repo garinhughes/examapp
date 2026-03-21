@@ -92,6 +92,8 @@ async function main() {
       difficulty: lab.difficulty,
       timeLimit: lab.timeLimit,
       technologies: lab.technologies,
+      showcase: lab.showcase,
+      showcaseOrder: lab.showcaseOrder,
     })
     console.log(`    → published: s3VersionId=${entry.s3VersionId}`)
     console.log(`    → index updated: version=${entry.version} publishedAt=${entry.publishedAt}\n`)

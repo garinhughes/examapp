@@ -34,12 +34,12 @@ export function SkillLabsPage() {
 
   // Completion tracking
   const [completedLabIds, setCompletedLabIds] = useState<Set<string>>(new Set())
-  const [showCompleted, setShowCompleted] = useState<boolean>(() => {
+  const [completionFilter, setCompletionFilter] = useState<'all' | 'incomplete' | 'completed'>(() => {
     try {
-      const v = localStorage.getItem('skill-labs-show-completed')
-      return v ? JSON.parse(v) : false
+      const v = localStorage.getItem('skill-labs-completion-filter')
+      return (v === 'incomplete' || v === 'completed') ? v : 'all'
     } catch {
-      return false
+      return 'all'
     }
   })
 
@@ -59,7 +59,7 @@ export function SkillLabsPage() {
     let cancelled = false
     async function fetchLabs() {
       try {
-        const res = await fetch(apiUrl('/skill-labs'))
+        const res = await authFetch(apiUrl('/skill-labs'))
         if (!res.ok) throw new Error('Failed to fetch')
         const data = await res.json()
         if (!cancelled) setLabs(data)
@@ -90,12 +90,12 @@ export function SkillLabsPage() {
     }
   }, [user])
 
-  // persist show/hide completed preference
+  // persist completion filter preference
   useEffect(() => {
     try {
-      localStorage.setItem('skill-labs-show-completed', JSON.stringify(showCompleted))
+      localStorage.setItem('skill-labs-completion-filter', completionFilter)
     } catch {}
-  }, [showCompleted])
+  }, [completionFilter])
 
   // Derive unique filter options from lab data
   const filterOptions = useMemo(() => {
@@ -117,13 +117,8 @@ export function SkillLabsPage() {
   // Filtered labs
   const filtered = useMemo(() => {
     return labs.filter((lab) => {
-      // When "Show Completed" is active, only include completed labs.
-      // Otherwise hide completed labs from the main list.
-      if (showCompleted) {
-        if (!completedLabIds.has(lab.id)) return false
-      } else {
-        if (completedLabIds.has(lab.id)) return false
-      }
+      if (completionFilter === 'completed' && !completedLabIds.has(lab.id)) return false
+      if (completionFilter === 'incomplete' && completedLabIds.has(lab.id)) return false
 
       // Search query: match title or description
       if (searchQuery.trim()) {
@@ -143,10 +138,10 @@ export function SkillLabsPage() {
       }
       return true
     })
-  }, [labs, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showCompleted, completedLabIds, showSavedOnly, bookmarkedLabIds, searchQuery])
+  }, [labs, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, completionFilter, completedLabIds, showSavedOnly, bookmarkedLabIds, searchQuery])
 
   // Reset page when filters change (including search)
-  useEffect(() => { setPage(1) }, [selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showCompleted, showSavedOnly, searchQuery])
+  useEffect(() => { setPage(1) }, [selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, completionFilter, showSavedOnly, searchQuery])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / LABS_PER_PAGE))
   const paginated = filtered.slice((page - 1) * LABS_PER_PAGE, page * LABS_PER_PAGE)
@@ -258,17 +253,21 @@ export function SkillLabsPage() {
 
           <div className="w-px h-6 bg-border" />
 
-          <button
-            onClick={() => setShowCompleted((s) => !s)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition border ${
-              showCompleted
-                ? 'border-primary bg-primary/10 text-primary'
-                : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-          >
-            <CheckCircle2 className="w-3 h-3" />
-            {showCompleted ? 'Hide Completed' : 'Show Completed'}
-          </button>
+          <div className="flex items-center gap-1 p-0.5 rounded-md border border-border bg-card">
+            {(['all', 'incomplete', 'completed'] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setCompletionFilter(f)}
+                className={`px-2.5 py-1 rounded text-xs font-medium capitalize transition ${
+                  completionFilter === f
+                    ? 'bg-muted text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
 
           <button
             onClick={() => setShowSavedOnly(!showSavedOnly)}
