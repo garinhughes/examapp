@@ -37,7 +37,9 @@
         { "name": "GOCARDLESS_ENVIRONMENT", "value": "sandbox" },
         { "name": "GOCARDLESS_API_BASE", "value": "https://api-sandbox.gocardless.com" },
         { "name": "GOCARDLESS_ENABLE_REAL", "value": "1" },
-        { "name": "METRICS_TABLE", "value": "examapp-metrics" }
+        { "name": "METRICS_TABLE", "value": "examapp-metrics" },
+        { "name": "INTERACTIONS_TABLE", "value": "examapp-interactions" },
+        { "name": "SESSIONS_TABLE", "value": "examapp-sessions" }
       ],
       "secrets": [
         {

@@ -29,7 +29,7 @@ import ratingsRoutes from './routes/ratings.js'
 import certificatesRoutes from './routes/certificates.js'
 import pollsRoutes from './routes/polls.js'
 
-const server = Fastify({ logger: true })
+const server = Fastify({ logger: true, trustProxy: true })
 
 // Capture raw body string so the GoCardless webhook handler can verify the
 // HMAC-SHA256 signature over the exact bytes GoCardless signed.
