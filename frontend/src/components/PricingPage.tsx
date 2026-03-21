@@ -44,18 +44,17 @@ interface FeatureDef {
 }
 
 const FEATURES: FeatureDef[] = [
-  { label: 'Practice questions',     visitor: '10 sample', registered: '1 full exam (3 days)', paid: 'Full question bank' },
+  { label: 'Practice questions',     visitor: '10 sample', registered: '40 questions per exam', paid: 'Full question bank' },
   { label: 'Skill Labs',             visitor: '3 labs',     registered: '6 labs',               paid: 'All labs' },
+  { label: 'Review & explanations',  visitor: CHECK,       registered: CHECK,                  paid: CHECK },
   { label: 'Saved attempts',         visitor: CROSS,       registered: '3 per exam',           paid: 'Unlimited' },
-  { label: 'Review & explanations',  visitor: CROSS,       registered: CHECK,                  paid: CHECK },
-  { label: 'Analytics',              visitor: 'Demo',      registered: CHECK,                  paid: CHECK },
+  { label: 'Analytics',              visitor: CROSS,      registered: CHECK,                  paid: CHECK },
   { label: 'CSV / PDF export',       visitor: CROSS,       registered: '1 per exam',           paid: CHECK },
   { label: 'Leaderboard',            visitor: CROSS,       registered: CROSS,                  paid: CHECK },
   { label: 'Rewards & badges',       visitor: CROSS,       registered: CHECK,                  paid: CHECK },
   { label: 'Report issues',          visitor: CROSS,       registered: CROSS,                  paid: CHECK },
   { label: 'Request features',       visitor: CROSS,       registered: CROSS,                  paid: CHECK },
-  { label: 'Certificates',           visitor: CROSS,       registered: CROSS,                  paid: CHECK, comingSoon: true },
-  { label: 'Podcasts',               visitor: CROSS,       registered: CROSS,                  paid: CHECK, comingSoon: true },
+  { label: 'Certificates',           visitor: CROSS,       registered: CROSS,                  paid: CHECK },
 ]
 
 function FeatureRow({ f }: { f: FeatureDef }) {
@@ -453,8 +452,8 @@ export default function PricingPage() {
               <tr className="border-b-2 border-border">
                 <th className="py-3 px-3 text-sm font-semibold text-muted-foreground w-1/3">Feature</th>
                 <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">Visitor</th>
-                <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">Registered</th>
-                <th className="py-3 px-3 text-sm font-semibold text-center text-primary">Paid ✨</th>
+                <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">Registered (3 day trial)</th>
+                <th className="py-3 px-3 text-sm font-semibold text-center text-primary">Paid</th>
               </tr>
             </thead>
             <tbody>

@@ -12,8 +12,13 @@
       "id": "SAA-C03-0001",
       "type": "single-choice",
       "format": "text",
-      "services": ["Amazon S3", "Amazon CloudFront"],
-      "skills": ["Design secure architectures"],
+      "services": [
+        "Amazon S3",
+        "Amazon CloudFront"
+      ],
+      "skills": [
+        "Design secure architectures"
+      ],
       "domain": "Design Resilient Architectures",
       "question": "A company hosts a static website on Amazon S3 and wants to serve the content globally with low latency while restricting direct access to the S3 bucket. The solution must ensure that users can only access content through the distribution endpoint.\n\nWhich combination of services and configurations meets these requirements?",
       "choices": [
@@ -36,7 +41,7 @@
         {
           "id": "c4",
           "text": "Configure an S3 bucket policy that allows access from all IP addresses in AWS's published CloudFront IP ranges.",
-          "explanation": "Allowing CloudFront IP ranges in the bucket policy is fragile — the IP list changes over time, any CloudFront distribution (not just yours) could access the bucket, and it requires ongoing maintenance. OAC is the purpose-built, secure approach."
+          "explanation": "Allowing CloudFront IP ranges in the bucket policy is fragile \u2014 the IP list changes over time, any CloudFront distribution (not just yours) could access the bucket, and it requires ongoing maintenance. OAC is the purpose-built, secure approach."
         }
       ],
       "tip": "Consider which AWS feature provides a direct trust relationship between CloudFront and S3 without exposing the bucket publicly.",
@@ -45,5 +50,8 @@
       "docs": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html",
       "lastReviewed": "2026-03-14"
     }
+  ],
+  "showcaseQuestionIds": [
+    "SAA-C03-0001"
   ]
 }

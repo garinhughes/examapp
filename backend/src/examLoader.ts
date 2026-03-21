@@ -293,6 +293,20 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
+ * Return a fixed, ordered slice of hand-picked showcase questions for non-paying tiers.
+ * Returns null if the exam has no showcaseQuestionIds (caller falls back to random slice).
+ */
+export function getShowcaseQuestions(exam: any, count: number): any[] | null {
+  const ids: (number | string)[] | undefined = exam.showcaseQuestionIds
+  if (!ids || ids.length === 0) return null
+  const indexById = new Map<number | string, any>(exam.questions.map((q: any) => [q.id, q]))
+  return ids.slice(0, count).flatMap((id) => {
+    const q = indexById.get(id)
+    return q ? [q] : []
+  })
+}
+
+/**
  * Shuffle both the order of questions AND the choices within each question.
  * Returns new arrays (originals are not mutated).
  *

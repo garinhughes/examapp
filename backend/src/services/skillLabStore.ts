@@ -50,6 +50,10 @@ export interface SkillLabIndexEntry {
   difficulty?: string
   timeLimit?: number
   technologies?: string[]
+  /** If true, this lab is part of the visitor/registered showcase */
+  showcase?: boolean
+  /** Position in the showcase ordering (lower = shown first) */
+  showcaseOrder?: number
 }
 
 /* ------------------------------------------------------------------ */
@@ -144,6 +148,8 @@ export async function publishLab(
     difficulty?: string
     timeLimit?: number
     technologies?: string[]
+    showcase?: boolean
+    showcaseOrder?: number
   },
 ): Promise<SkillLabIndexEntry> {
   const { s3Key, s3VersionId } = await uploadLabToS3(labId, jsonBody)
@@ -160,6 +166,8 @@ export async function publishLab(
     difficulty: meta.difficulty,
     timeLimit: meta.timeLimit,
     technologies: meta.technologies,
+    showcase: meta.showcase,
+    showcaseOrder: meta.showcaseOrder,
   }
   await putLabIndex(entry)
   return entry

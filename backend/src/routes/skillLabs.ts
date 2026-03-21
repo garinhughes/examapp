@@ -9,18 +9,8 @@ import {
   listLabIndex,
 } from '../services/skillLabStore.js'
 import { updateMetricsOnLabAttempt } from '../services/metricsStore.js'
-import { getVisitorLabSession, recordVisitorLabAccess } from '../services/dynamo.js'
+import { getUserBySub } from '../services/dynamo.js'
 import { TIERS } from '../catalog.js'
-
-const VISITOR_LAB_LIMIT = TIERS.visitor.skillLabVisitorLimit ?? 3
-const SESSION_COOKIE = 'sid'
-const SESSION_COOKIE_MAX_AGE = 30 * 24 * 60 * 60 // 30 days in seconds
-
-/** Strip sensitive lab content, returning metadata-only shape. */
-function labMetadataOnly(lab: any) {
-  const { tasks: _t, scenario: _s, initialPolicy: _i, solution: _sol, hints: _h, validations: _v, ...meta } = lab
-  return meta
-}
 
 const LABS_FILE = path.join(process.cwd(), 'data', 'skill-labs.json')
 
@@ -32,6 +22,12 @@ const LABS_FILE = path.join(process.cwd(), 'data', 'skill-labs.json')
 const SKILL_LAB_SOURCE: 'local' | 's3' =
   (process.env.SKILL_LAB_SOURCE ?? 'local') as any
 const USE_S3 = SKILL_LAB_SOURCE === 's3'
+
+/** Strip sensitive lab content, returning metadata-only shape. */
+function labMetadataOnly(lab: any) {
+  const { tasks: _t, scenario: _s, initialPolicy: _i, solution: _sol, hints: _h, validations: _v, ...meta } = lab
+  return meta
+}
 
 /* ------------------------------------------------------------------ */
 /*  Local-file helpers (dev only)                                      */
@@ -69,6 +65,8 @@ async function loadLabsS3Summary(): Promise<any[]> {
       timeLimit: (e as any).timeLimit ?? 0,
       technologies: (e as any).technologies ?? [],
       labCategory: (e as any).labCategory ?? 'Troubleshoot',
+      showcase: e.showcase ?? false,
+      showcaseOrder: e.showcaseOrder ?? 99,
     }))
   } catch (err) {
     console.error('[skill-labs] Failed to scan DynamoDB index', err)
@@ -88,28 +86,81 @@ async function findLabS3(id: string): Promise<any | null> {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/*  Tier helpers                                                       */
+/* ------------------------------------------------------------------ */
+
+function isTrialActive(registeredAt: string | null, trialDays: number): boolean {
+  if (!registeredAt) return true
+  return Date.now() - Date.parse(registeredAt) < trialDays * 86_400_000
+}
+
+/**
+ * How many showcase labs this tier can access.
+ * null = all labs (paying).
+ */
+function effectiveLabShowcaseCount(
+  tier: 'visitor' | 'registered' | 'paying',
+  trialActive: boolean,
+): number | null {
+  if (tier === 'paying') return null
+  if (tier === 'registered' && trialActive) return TIERS.registered.labShowcaseCount ?? 6
+  return TIERS.visitor.labShowcaseCount ?? 3
+}
+
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
-  // GET /skill-labs — list available labs (public metadata only)
-  server.get('/', async (_request, reply) => {
-    if (USE_S3) {
-      const list = await loadLabsS3Summary()
-      return reply.send(list)
+  // GET /skill-labs — list available labs
+  server.get('/', async (request, reply) => {
+    await server.optionalAuth(request, reply)
+
+    const allLabs = USE_S3
+      ? await loadLabsS3Summary()
+      : (await loadLabsLocal()).map((lab) => ({
+          id: lab.id,
+          title: lab.title,
+          description: lab.description,
+          type: lab.type,
+          timeLimit: lab.timeLimit,
+          difficulty: lab.difficulty || 'beginner',
+          platform: lab.platform || 'AWS',
+          category: lab.category || 'General',
+          technologies: lab.technologies || [],
+          labCategory: lab.labCategory || 'Troubleshoot',
+          showcase: lab.showcase ?? false,
+          showcaseOrder: lab.showcaseOrder ?? 99,
+        }))
+
+    if (request.user) {
+      // Resolve tier for authenticated users
+      const userId = request.user.sub
+      const { getActiveProductIds } = await import('../services/entitlements.js')
+      const { resolveUserTier } = await import('../catalog.js')
+      let ownedProductIds: string[] = []
+      try { ownedProductIds = await getActiveProductIds(userId) } catch { /* ignore */ }
+      const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds })
+
+      if (tier === 'paying') {
+        return reply.send(allLabs)
+      }
+
+      const profile = await getUserBySub(userId)
+      const trialActive = isTrialActive(profile?.registeredAt ?? null, TIERS.registered.trialDays ?? 3)
+      const count = effectiveLabShowcaseCount('registered', trialActive) ?? 6
+
+      const showcase = allLabs
+        .filter((l: any) => l.showcase)
+        .sort((a: any, b: any) => (a.showcaseOrder ?? 99) - (b.showcaseOrder ?? 99))
+        .slice(0, count)
+      return reply.send(showcase)
     }
 
-    const labs = await loadLabsLocal()
-    const list = labs.map((lab) => ({
-      id: lab.id,
-      title: lab.title,
-      description: lab.description,
-      type: lab.type,
-      timeLimit: lab.timeLimit,
-      difficulty: lab.difficulty || 'beginner',
-      platform: lab.platform || 'AWS',
-      category: lab.category || 'General',
-      technologies: lab.technologies || [],
-      labCategory: lab.labCategory || 'Troubleshoot',
-    }))
-    return reply.send(list)
+    // Unauthenticated: visitor showcase only
+    const count = effectiveLabShowcaseCount('visitor', false) ?? 3
+    const showcase = allLabs
+      .filter((l: any) => l.showcase)
+      .sort((a: any, b: any) => (a.showcaseOrder ?? 99) - (b.showcaseOrder ?? 99))
+      .slice(0, count)
+    return reply.send(showcase)
   })
 
   // GET /skill-labs/my-attempts — get current user's lab attempts
@@ -121,41 +172,46 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     return reply.send({ completedLabIds })
   })
 
-  // GET /skill-labs/:id — full lab definition (visitors limited to 3 labs)
+  // GET /skill-labs/:id — full lab definition
   server.get('/:id', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const { id } = request.params as { id: string }
     const lab = USE_S3 ? await findLabS3(id) : await findLabLocal(id)
     if (!lab) return reply.status(404).send({ message: 'Lab not found' })
 
-    // Authenticated users get full content
     await server.optionalAuth(request, reply)
+
     if (request.user) {
+      const userId = request.user.sub
+      const { getActiveProductIds } = await import('../services/entitlements.js')
+      const { resolveUserTier } = await import('../catalog.js')
+      let ownedProductIds: string[] = []
+      try { ownedProductIds = await getActiveProductIds(userId) } catch { /* ignore */ }
+      const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds })
+
+      if (tier === 'paying') return reply.send(lab)
+
+      const profile = await getUserBySub(userId)
+      const trialActive = isTrialActive(profile?.registeredAt ?? null, TIERS.registered.trialDays ?? 3)
+      const count = effectiveLabShowcaseCount('registered', trialActive) ?? 6
+
+      if (!lab.showcase) {
+        return reply.status(403).send({ message: 'Sign in and upgrade to access this lab.' })
+      }
+      if ((lab.showcaseOrder ?? 99) > count) {
+        return reply.status(403).send({ message: 'Upgrade to access more labs.' })
+      }
       return reply.send(lab)
     }
 
-    // Unauthenticated visitors: enforce per-session lab limit
-    let sessionId = request.cookies?.[SESSION_COOKIE]
-    if (!sessionId) {
-      sessionId = randomUUID()
-      reply.setCookie(SESSION_COOKIE, sessionId, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: SESSION_COOKIE_MAX_AGE,
-        path: '/',
-      })
+    // Unauthenticated visitor: must be in visitor showcase (positions 1–3)
+    const visitorCount = effectiveLabShowcaseCount('visitor', false) ?? 3
+    if (!lab.showcase) {
+      return reply.status(403).send({ message: 'Sign in to access this lab.' })
     }
-
-    const accessedLabs = await getVisitorLabSession(sessionId)
-
-    if (accessedLabs.has(id) || accessedLabs.size < VISITOR_LAB_LIMIT) {
-      // Within limit or already accessed this lab — return full content
-      await recordVisitorLabAccess(sessionId, id, accessedLabs)
-      return reply.send(lab)
+    if ((lab.showcaseOrder ?? 99) > visitorCount) {
+      return reply.status(403).send({ message: 'Sign in to access more labs.' })
     }
-
-    // Over limit — return metadata only
-    return reply.send({ ...labMetadataOnly(lab), _limited: true })
+    return reply.send(lab)
   })
 
   // POST /skill-labs/:id/validate-policy — validate policy-fix lab submission

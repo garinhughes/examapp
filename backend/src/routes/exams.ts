@@ -3,7 +3,13 @@ import fs from 'fs/promises'
 import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS, hasExamAccess } from '../catalog.js'
 import { computeDomainWeights, selectWeakestLinkQuestions, type DomainStats } from '../services/weakestLink.js'
-import { loadAllExams, loadExam, shuffleQuestions } from '../examLoader.js'
+import { loadAllExams, loadExam, shuffleQuestions, getShowcaseQuestions } from '../examLoader.js'
+import { getUserBySub } from '../services/dynamo.js'
+
+function isTrialActive(registeredAt: string | null, trialDays: number): boolean {
+  if (!registeredAt) return true // no record yet → just registered
+  return Date.now() - Date.parse(registeredAt) < trialDays * 86_400_000
+}
 
 const attemptsFile = new URL('../../data/attempts.json', import.meta.url)
 
@@ -74,15 +80,45 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const tierConfig = TIERS[tier]
 
     const allQuestions = exam.questions as any[]
-    const limit = tierConfig.questionLimit
-    const pool = limit != null ? allQuestions.slice(0, limit) : allQuestions
-    const questions = shuffleQuestions(pool)
 
+    if (tier !== 'paying') {
+      // Determine showcase count: registered trial → 40, visitor/expired → 10
+      let showcaseCount = tierConfig.questionLimit ?? 10
+      if (tier === 'registered' && request.user) {
+        const profile = await getUserBySub(request.user.sub)
+        const trialDays = TIERS.registered.trialDays ?? 3
+        if (!isTrialActive(profile?.registeredAt ?? null, trialDays)) {
+          showcaseCount = TIERS.visitor.questionLimit ?? 10
+        }
+      }
+      const showcase = getShowcaseQuestions(exam, showcaseCount)
+      if (showcase) {
+        return {
+          questions: showcase,
+          tier,
+          totalAvailable: allQuestions.length,
+          limited: true,
+          showcase: true,
+        }
+      }
+      // fallback: random slice (exam has no showcaseQuestionIds)
+      const pool = allQuestions.slice(0, showcaseCount)
+      return {
+        questions: shuffleQuestions(pool),
+        tier,
+        totalAvailable: allQuestions.length,
+        limited: allQuestions.length > showcaseCount,
+        showcase: false,
+      }
+    }
+
+    // paying: full shuffled bank
+    const questions = shuffleQuestions(allQuestions)
     return {
       questions,
       tier,
       totalAvailable: allQuestions.length,
-      limited: limit != null && allQuestions.length > limit,
+      limited: false,
     }
   })
 

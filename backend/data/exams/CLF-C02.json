@@ -12,8 +12,12 @@
       "id": "CLF-C02-0001",
       "type": "single-choice",
       "format": "text",
-      "services": ["AWS Shared Responsibility Model"],
-      "skills": ["Define the AWS shared responsibility model"],
+      "services": [
+        "AWS Shared Responsibility Model"
+      ],
+      "skills": [
+        "Define the AWS shared responsibility model"
+      ],
       "domain": "Cloud Concepts",
       "question": "Under the AWS Shared Responsibility Model, which of the following is the customer's responsibility?",
       "choices": [
@@ -40,10 +44,13 @@
         }
       ],
       "tip": "Think about what falls under 'security IN the cloud' (customer) versus 'security OF the cloud' (AWS).",
-      "explanation": "The AWS Shared Responsibility Model divides security duties: AWS handles 'security of the cloud' (hardware, networking, facilities, hypervisor), while customers handle 'security in the cloud' (data, IAM, OS patching on EC2, firewall/network configuration, encryption). Configuring security groups and NACLs is a core customer responsibility — these are the virtual firewalls that customers must set up correctly to protect their workloads.",
+      "explanation": "The AWS Shared Responsibility Model divides security duties: AWS handles 'security of the cloud' (hardware, networking, facilities, hypervisor), while customers handle 'security in the cloud' (data, IAM, OS patching on EC2, firewall/network configuration, encryption). Configuring security groups and NACLs is a core customer responsibility \u2014 these are the virtual firewalls that customers must set up correctly to protect their workloads.",
       "difficulty": 1,
       "docs": "https://aws.amazon.com/compliance/shared-responsibility-model/",
       "lastReviewed": "2026-03-14"
     }
+  ],
+  "showcaseQuestionIds": [
+    "CLF-C02-0001"
   ]
 }

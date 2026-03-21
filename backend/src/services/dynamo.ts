@@ -232,4 +232,25 @@ export async function recordVisitorLabAccess(sessionId: string, labId: string, c
   }
 }
 
+/**
+ * Sets registeredAt on the user record the first time they log in.
+ * Uses a condition expression so subsequent logins are a no-op.
+ */
+export async function setRegisteredAtIfNew(userId: string): Promise<void> {
+  try {
+    await ddb.send(new UpdateCommand({
+      TableName: USERS_TABLE,
+      Key: { userId },
+      UpdateExpression: 'SET registeredAt = :now',
+      ConditionExpression: 'attribute_not_exists(registeredAt)',
+      ExpressionAttributeValues: { ':now': new Date().toISOString() },
+    } as any))
+  } catch (err: any) {
+    // ConditionalCheckFailedException = already set, safe to ignore
+    if (err?.name !== 'ConditionalCheckFailedException') {
+      console.warn('[dynamo] setRegisteredAtIfNew failed', err)
+    }
+  }
+}
+
 export { ddb, USERS_TABLE, ENTITLEMENTS_TABLE, AUDIT_TABLE }

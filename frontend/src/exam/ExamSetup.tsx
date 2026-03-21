@@ -1,9 +1,9 @@
-import { X, Zap, Clock, ChevronDown } from 'lucide-react'
+import { X, Coffee, Timer, Brain, Eye, Lock, ChevronDown } from 'lucide-react'
 import { useExam } from './ExamContext'
 
 export function ExamSetup() {
   const {
-    selected, selectedMeta, exams, questions, examTier, examTotalAvailable, examLimited,
+    selected, selectedMeta, exams, questions, examTier, examTotalAvailable, examLimited, examShowcase, trialDaysRemaining,
     examMode, setExamMode, revealAnswers, setRevealAnswers, timed, setTimed,
     durationMinutes, setDurationMinutes, numQuestions, setNumQuestions,
     availableFilteredCount, attemptId, isFinished, user, login,
@@ -41,9 +41,31 @@ export function ExamSetup() {
           <div className="mb-4 p-3 rounded-lg border border-primary/30 dark:border-primary/30 bg-primary/10 text-sm">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <span className="text-primary">
-                🔒 You have access to <strong>{questions.length}</strong> of <strong>{examTotalAvailable}</strong> questions
-                {examTier === 'visitor' && ' (sign in to unlock more)'}
-                {examTier === 'registered' && ' (upgrade to unlock all)'}
+                {examTier === 'visitor' && (
+                  <>
+                    {examShowcase
+                      ? <>These <strong>{questions.length}</strong> questions are hand-picked and the same for all visitors — they don't change between sessions.</>
+                      : <>You have access to <strong>{questions.length}</strong> of <strong>{examTotalAvailable}</strong> questions.</>
+                    }
+                    {' '}Sign in for more.
+                  </>
+                )}
+                {examTier === 'registered' && (
+                  <>
+                    {examShowcase
+                      ? <>These <strong>{questions.length}</strong> questions are hand-picked and the same for your account — they don't rotate.</>
+                      : <>You have access to <strong>{questions.length}</strong> of <strong>{examTotalAvailable}</strong> questions.</>
+                    }
+                    {' '}
+                    {trialDaysRemaining !== null && trialDaysRemaining > 0
+                      ? <>{trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} left on your free trial. </>
+                      : trialDaysRemaining === 0
+                        ? <>Your free trial has ended. </>
+                        : null
+                    }
+                    Upgrade to unlock the full question bank.
+                  </>
+                )}
               </span>
               <button
                 onClick={() => examTier === 'visitor' ? login() : setRoute('pricing')}
@@ -138,7 +160,7 @@ export function ExamSetup() {
                 aria-pressed={examMode === 'casual'}
                 title="Casual mode"
               >
-                <Zap className="w-5 h-5 text-primary" />
+                <Coffee className="w-5 h-5 text-primary" />
                 <span>Casual</span>
               </button>
 
@@ -154,7 +176,7 @@ export function ExamSetup() {
                 aria-pressed={examMode === 'timed'}
                 title="Timed mode"
               >
-                <Clock className="w-5 h-5 text-primary" />
+                <Timer className="w-5 h-5 text-primary" />
                 <span>Timed</span>
               </button>
 
@@ -162,47 +184,47 @@ export function ExamSetup() {
                 type="button"
                 onClick={() => { setExamMode('weakest-link'); setTimed(false); setRevealAnswers('immediately') }}
                 disabled={locked || !user}
-                className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${examMode === 'weakest-link' ? 'border-purple-400 bg-purple-50 dark:bg-purple-900/30' : 'border-transparent bg-transparent hover:bg-muted/20'} text-sm ${!user ? 'opacity-40 cursor-not-allowed' : ''}`}
+                className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${examMode === 'weakest-link' ? 'border-primary bg-primary/10' : 'border-transparent bg-transparent hover:bg-muted/20'} text-sm ${!user ? 'opacity-40 cursor-not-allowed' : ''}`}
                 aria-pressed={examMode === 'weakest-link'}
                 title={user ? 'Weakest Link — prioritises your weakest domains and previously wrong questions' : 'Sign in to use Weakest Link mode'}
               >
-                <span className="text-lg">🧠</span>
+                <Brain className="w-5 h-5 text-primary" />
                 <span>Weakest Link</span>
               </button>
             </div>
 
             {/* Mode descriptions */}
             {examMode === 'casual' && (
-              <div className="mt-3 p-3 rounded-lg border border-primary/30 bg-primary/5 text-sm text-primary">
+              <div className="mt-3 p-3 rounded-lg border border-border bg-muted/30 text-sm text-foreground">
                 <div className="flex items-start gap-2">
-                  <Zap className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                  <Coffee className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="font-medium">Casual Mode</p>
-                    <p className="text-xs mt-1 text-primary/80">No time pressure - work through questions at your own pace. Perfect for learning, reviewing explanations, and building confidence.</p>
+                    <p className="text-xs mt-1 text-muted-foreground">No time pressure - work through questions at your own pace. Perfect for learning, reviewing explanations, and building confidence.</p>
                   </div>
                 </div>
               </div>
             )}
 
             {examMode === 'timed' && (
-              <div className="mt-3 p-3 rounded-lg border border-primary/20 dark:border-primary/30 bg-primary/5 dark:bg-primary/5 text-sm text-primary dark:text-primary">
+              <div className="mt-3 p-3 rounded-lg border border-border bg-muted/30 text-sm text-foreground">
                 <div className="flex items-start gap-2">
-                  <Clock className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                  <Timer className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="font-medium">Timed Mode</p>
-                    <p className="text-xs mt-1 text-primary dark:text-primary">Simulate real exam conditions with a countdown timer. The exam auto-submits when time runs out. Great for building time management skills.</p>
+                    <p className="text-xs mt-1 text-muted-foreground">Simulate real exam conditions with a countdown timer. The exam auto-submits when time runs out. Great for building time management skills.</p>
                   </div>
                 </div>
               </div>
             )}
 
             {examMode === 'weakest-link' && (
-              <div className="mt-3 p-3 rounded-lg border border-purple-200 dark:border-purple-700/50 bg-purple-50/50 dark:bg-purple-900/10 text-sm text-purple-800 dark:text-purple-200">
+              <div className="mt-3 p-3 rounded-lg border border-border bg-muted/30 text-sm text-foreground">
                 <div className="flex items-start gap-2">
-                  <span className="text-lg mt-0.5">🧠</span>
+                  <Brain className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="font-medium">Weakest Link Mode</p>
-                    <p className="text-xs mt-1 text-purple-600 dark:text-purple-300/80">
+                    <p className="text-xs mt-1 text-muted-foreground">
                       Questions are weighted toward your historically weakest domains. Previously wrong questions appear more frequently.
                       {analyticsDomains ? '' : ' Complete at least one attempt first for best results.'}
                     </p>
@@ -241,11 +263,11 @@ export function ExamSetup() {
                   disabled={locked}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition ${
                     revealAnswers === 'immediately'
-                      ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+                      ? 'border-primary bg-primary/10 text-primary'
                       : 'border-transparent bg-transparent hover:bg-muted/20 text-muted-foreground dark:text-muted-foreground'
                   }`}
                 >
-                  <span className="text-sm">👁️</span>
+                  <Eye className="w-4 h-4" />
                   <span>Immediately</span>
                 </button>
                 <button
@@ -254,11 +276,11 @@ export function ExamSetup() {
                   disabled={locked}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition ${
                     revealAnswers === 'on-completion'
-                      ? 'border-primary/40 bg-primary/10 text-primary'
+                      ? 'border-primary bg-primary/10 text-primary'
                       : 'border-transparent bg-transparent hover:bg-muted/20 text-muted-foreground dark:text-muted-foreground'
                   }`}
                 >
-                  <span className="text-sm">🔒</span>
+                  <Lock className="w-4 h-4" />
                   <span>On completion</span>
                 </button>
               </div>
@@ -380,11 +402,19 @@ export function ExamSetup() {
 
           <div className="text-xs text-muted-foreground">Filters narrow down which questions appear. Leave blank for all questions.</div>
 
-          {lastError && <div className="mt-1 text-sm text-red-400">{lastError}</div>}
         </div>
 
+        {lastError && (
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="mt-0.5 size-4 shrink-0">
+              <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clipRule="evenodd" />
+            </svg>
+            {lastError}
+          </div>
+        )}
+
         {/* Action buttons */}
-        <div className="mt-4 md:mt-0 flex items-center justify-end gap-3 md:self-end">
+        <div className="mt-4 flex items-center justify-end gap-3 md:self-end">
           <button className="px-3 py-2 rounded-md bg-accent text-foreground hover:bg-accent/80 transition" onClick={() => {
             try { if (selected) localStorage.removeItem(`attempt:${selected}`) } catch {}
             try { if (selected) localStorage.removeItem(`examProgress:${selected}`) } catch {}
@@ -414,7 +444,7 @@ export function ExamSetup() {
             onClick={() => createAttempt()}
             disabled={loadingWeakestLink}
           >
-            {loadingWeakestLink ? '🧠 Preparing…' : examMode === 'weakest-link' ? '🧠 Start Weakest Link' : savedProgress ? 'Start new' : 'Start exam'}
+            {loadingWeakestLink ? 'Preparing…' : savedProgress ? 'Start new' : 'Start exam'}
           </button>
         </div>
       </div>

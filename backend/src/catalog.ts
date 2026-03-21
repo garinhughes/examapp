@@ -26,8 +26,10 @@ export interface TierConfig {
   leaderboardEnabled: boolean
   /** Can view domain mastery history */
   domainMasteryEnabled: boolean
-  /** Max skill labs a visitor (unauthenticated) can access in full (null = unlimited) */
-  skillLabVisitorLimit: number | null
+  /** Days after registration the showcase trial is active (null = no trial limit) */
+  trialDays: number | null
+  /** Max showcase skill labs this tier can access (null = all labs) */
+  labShowcaseCount: number | null
 }
 
 export const TIERS: Record<Tier, TierConfig> = {
@@ -40,18 +42,20 @@ export const TIERS: Record<Tier, TierConfig> = {
     exportEnabled: false,
     leaderboardEnabled: false,
     domainMasteryEnabled: false,
-    skillLabVisitorLimit: 3,
+    trialDays: null,
+    labShowcaseCount: 3,
   },
   registered: {
     tier: 'registered',
     label: 'Registered (Free)',
-    questionLimit: 65,
+    questionLimit: 40,
     attemptLimit: 3,
     reviewEnabled: true,
     exportEnabled: true,
     leaderboardEnabled: false,
     domainMasteryEnabled: false,
-    skillLabVisitorLimit: null,
+    trialDays: 3,
+    labShowcaseCount: 6,
   },
   paying: {
     tier: 'paying',
@@ -62,7 +66,8 @@ export const TIERS: Record<Tier, TierConfig> = {
     exportEnabled: true,
     leaderboardEnabled: true,
     domainMasteryEnabled: true,
-    skillLabVisitorLimit: null,
+    trialDays: null,
+    labShowcaseCount: null,
   },
 }
 

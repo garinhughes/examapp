@@ -42,6 +42,8 @@ export interface ExamContextType {
   userTier: string | null
   examTotalAvailable: number
   examLimited: boolean
+  examShowcase: boolean
+  trialDaysRemaining: number | null
 
   // Theme
   dark: boolean
@@ -226,6 +228,8 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const [userTier, setUserTier] = useState<string | null>(null)
   const [examTotalAvailable, setExamTotalAvailable] = useState<number>(0)
   const [examLimited, setExamLimited] = useState<boolean>(false)
+  const [examShowcase, setExamShowcase] = useState<boolean>(false)
+  const [trialDaysRemaining, setTrialDaysRemaining] = useState<number | null>(null)
 
   const selectedMeta = useMemo(() => {
     if (!selected) return null
@@ -561,6 +565,14 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     finally { setLoadingScoreHistory(false) }
   }
 
+  /** Extract a human-readable message from an error response body (JSON or plain text). */
+  async function extractErrorMessage(res: Response, fallback: string): Promise<string> {
+    try {
+      const text = await res.text()
+      try { const j = JSON.parse(text); return j?.message ?? j?.error ?? text } catch { return text || fallback }
+    } catch { return fallback }
+  }
+
   async function createAttempt() {
     if (!selected) return
     setSelectedAnswers({})
@@ -591,7 +603,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         setLoadingWeakestLink(true)
         try {
           const wlRes = await authFetch(`/exams/${encodeURIComponent(selected)}/weakest-link?count=${numQuestions}`)
-          if (!wlRes.ok) { const errText = await wlRes.text().catch(() => 'weakest-link fetch failed'); setLastError(errText); return }
+          if (!wlRes.ok) { setLastError(await extractErrorMessage(wlRes, 'weakest-link fetch failed')); return }
           const wlData = await wlRes.json()
           const wlQuestions = wlData.questions || []
           if (wlQuestions.length === 0) { setLastError('No questions available for Weakest Link mode. Complete some attempts first!'); return }
@@ -603,7 +615,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
               metadata: { mode: 'weakest-link', domainWeights: wlData.domainWeights, wrongQuestionCount: wlData.wrongQuestionCount }
             })
           })
-          if (!res.ok) { const text = await res.text().catch(() => 'create attempt failed'); setLastError(text); return }
+          if (!res.ok) { setLastError(await extractErrorMessage(res, 'create attempt failed')); return }
           const data = await res.json()
           if (data?.attemptId) {
             recordPracticeDay()
@@ -662,7 +674,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
           metadata: { serviceKeywords: keywords, domains: domainFilterList, services: selectedServices }
         })
       })
-      if (!res.ok) { const text = await res.text().catch(() => 'create attempt failed'); setLastError(text); return }
+      if (!res.ok) { setLastError(await extractErrorMessage(res, 'create attempt failed')); return }
       const data = await res.json()
       if (data?.attemptId) {
         recordPracticeDay()
@@ -709,7 +721,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ questionId: qId, ...payload, timeMs: 0, showTip: !!showTipMap[qId] })
       })
-      if (!res.ok) { const text = await res.text(); console.error('save answer failed', text); setLastError(text) }
+      if (!res.ok) { const msg = await extractErrorMessage(res, 'save answer failed'); console.error('save answer failed', msg); setLastError(msg) }
     } catch (err) { console.error('submit answer error', err); setLastError(String(err)) }
   }
 
@@ -758,7 +770,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         setExamStarted(false)
         setTimeLeft(null)
         handleGamificationReward(computed)
-      } else { setLastError(JSON.stringify(finData)) }
+      } else { setLastError(finData?.message ?? finData?.error ?? 'Failed to finish attempt') }
     } catch (err) { console.error('finishAttempt error', err); setLastError(String(err)) }
   }
 
@@ -859,7 +871,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         handleGamificationReward(computed)
         setExamStarted(false); setTimeLeft(null)
         if (showAttempts) { try { const r3 = await authFetch('/attempts'); const dd = await r3.json(); setAttemptsList(dd.attempts ?? []) } catch {} }
-      } else { setLastError(JSON.stringify(finData)) }
+      } else { setLastError(finData?.message ?? finData?.error ?? 'Failed to submit exam') }
     } catch (err) { console.error('handleSubmitExam error', err); setLastError(String(err)) }
     setShowSubmitConfirm(false); setShowCompleteEarlyConfirm(false)
   }
@@ -926,10 +938,13 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch global user tier (paying / registered / visitor) — independent of any exam
   useEffect(() => {
-    if (!user) { setUserTier(null); return }
+    if (!user) { setUserTier(null); setTrialDaysRemaining(null); return }
     authFetch('/auth/me')
       .then((r) => r.ok ? r.json() : null)
-      .then((data) => { if (data?.tier) setUserTier(data.tier) })
+      .then((data) => {
+        if (data?.tier) setUserTier(data.tier)
+        setTrialDaysRemaining(typeof data?.trialDaysRemaining === 'number' ? data.trialDaysRemaining : null)
+      })
       .catch(() => {})
   }, [user])
 
@@ -970,8 +985,8 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     authFetch(`/exams/${selected}/questions`)
       .then((r) => { if (!r.ok) throw new Error(`Failed to load questions (${r.status})`); return r.json() })
       .then((data) => {
-        if (Array.isArray(data)) { setQuestions(data); setExamTier(null); setExamTotalAvailable(data.length); setExamLimited(false) }
-        else if (data && Array.isArray(data.questions)) { setQuestions(data.questions); setExamTier(data.tier ?? null); setExamTotalAvailable(data.totalAvailable ?? data.questions.length); setExamLimited(!!data.limited) }
+        if (Array.isArray(data)) { setQuestions(data); setExamTier(null); setExamTotalAvailable(data.length); setExamLimited(false); setExamShowcase(false) }
+        else if (data && Array.isArray(data.questions)) { setQuestions(data.questions); setExamTier(data.tier ?? null); setExamTotalAvailable(data.totalAvailable ?? data.questions.length); setExamLimited(!!data.limited); setExamShowcase(!!data.showcase) }
       })
       .catch((e) => { console.error(e); setLastError(String(e)) })
   }, [selected, user])
@@ -1067,7 +1082,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const value: ExamContextType = {
     user, authLoading, login, logout, authFetch, isAdmin, gamState, gamLevel, dndSensors,
     route, setRoute,
-    exams, selected, setSelected, selectedMeta, providers, questions, setQuestions, examTier, userTier, examTotalAvailable, examLimited,
+    exams, selected, setSelected, selectedMeta, providers, questions, setQuestions, examTier, userTier, examTotalAvailable, examLimited, examShowcase, trialDaysRemaining,
     dark, setDark, themePreset, setThemePreset, customCorrect, setCustomCorrect, customCorrect2, setCustomCorrect2, customIncorrect, setCustomIncorrect, customIncorrect2, setCustomIncorrect2,
     selectedAnswers, setSelectedAnswers, multiSelectPending, setMultiSelectPending, matchingAnswers, setMatchingAnswers, orderingAnswers, setOrderingAnswers, flaggedQuestions, setFlaggedQuestions, currentQuestionIndex, setCurrentQuestionIndex,
     showSubmitConfirm, setShowSubmitConfirm, showCompleteEarlyConfirm, setShowCompleteEarlyConfirm, showCancelConfirm, setShowCancelConfirm, showTipMap, setShowTipMap, paused, setPaused, lastError, setLastError, toasts, setToasts, showToast, showConfetti, setShowConfetti, rewardModal, setRewardModal, mobileOpen, setMobileOpen,

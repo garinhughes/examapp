@@ -9,7 +9,8 @@
 import { createHmac } from 'crypto'
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { jwtVerify, createRemoteJWKSet, decodeProtectedHeader } from 'jose'
-import { upsertUserFromCognito } from '../services/dynamo.js'
+import { upsertUserFromCognito, getUserBySub, setRegisteredAtIfNew } from '../services/dynamo.js'
+import { TIERS } from '../catalog.js'
 import {
   CognitoIdentityProviderClient,
   SignUpCommand,
@@ -25,10 +26,21 @@ const AUTH_MODE = process.env.AUTH_MODE || 'dev'
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Return current user + global tier (requires valid auth)
   server.get('/me', { preHandler: [server.authenticate, server.resolveEntitlements] }, async (request) => {
+    const userId = request.user!.sub
+    const profile = await getUserBySub(userId)
+    const registeredAt: string | null = profile?.registeredAt ?? null
+    let trialDaysRemaining: number | null = null
+    if (request.tier === 'registered' && registeredAt) {
+      const trialDays = TIERS.registered.trialDays ?? 3
+      const elapsed = Math.floor((Date.now() - Date.parse(registeredAt)) / 86_400_000)
+      trialDaysRemaining = Math.max(0, trialDays - elapsed)
+    }
     return {
       user: request.user,
       authMode: AUTH_MODE,
       tier: request.tier,
+      registeredAt,
+      trialDaysRemaining,
     }
   })
 
@@ -122,8 +134,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             const JWKS = createRemoteJWKSet(new URL(jwksUrl))
             const issuer = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`
             const verified = await jwtVerify(tokens.id_token, JWKS, { issuer, audience: clientId })
-            // upsert user in DynamoDB
+            // upsert user in DynamoDB and stamp registeredAt on first login
             try { await upsertUserFromCognito(verified.payload) } catch (e) { /* ignore */ }
+            try { await setRegisteredAtIfNew(String(verified.payload.sub)) } catch (e) { /* ignore */ }
             // attach user info
             return { ...tokens, user: verified.payload }
           }
@@ -187,8 +200,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             const JWKS = createRemoteJWKSet(new URL(jwksUrl))
             const issuer = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`
             const verified = await jwtVerify(tokens.id_token, JWKS, { issuer, audience: clientId })
-            // upsert user in DynamoDB
+            // upsert user in DynamoDB and stamp registeredAt on first login
             try { await upsertUserFromCognito(verified.payload) } catch (e) { /* ignore */ }
+            try { await setRegisteredAtIfNew(String(verified.payload.sub)) } catch (e) { /* ignore */ }
             // redirect back to frontend with id_token (dev-friendly; consider HttpOnly cookie for prod)
             const frontend = process.env.FRONTEND_ORIGIN || 'http://localhost:5173'
             const sep = frontend.includes('#') ? '&' : '#'
@@ -393,6 +407,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         const issuer = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`
         const verified = await jwtVerify(tokens.IdToken, JWKS, { issuer, audience: clientId })
         try { await upsertUserFromCognito(verified.payload) } catch { /* ignore */ }
+        try { await setRegisteredAtIfNew(String(verified.payload.sub)) } catch { /* ignore */ }
       }
 
       return {
