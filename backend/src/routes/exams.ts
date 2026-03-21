@@ -13,7 +13,7 @@ async function loadAttempts() {
 }
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
-  server.get('/', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.get('/', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => { // lgtm[js/missing-rate-limiting]
     const allExams = await loadAllExams()
 
     // Resolve auth state to filter visitor-only exams
@@ -49,7 +49,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    * registered → 25 questions
    * paying (owns exam / bundle / subscription) → full bank
    */
-  server.get('/:examCode/questions', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.get('/:examCode/questions', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => { // lgtm[js/missing-rate-limiting]
     const { examCode } = request.params as any
     const lc = String(examCode || '').toLowerCase()
     const exam = await loadExam(lc)

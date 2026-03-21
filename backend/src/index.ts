@@ -62,6 +62,8 @@ await server.register(cookie)
 const ORIGIN_VERIFY_SECRET = process.env.ORIGIN_VERIFY_SECRET
 if (ORIGIN_VERIFY_SECRET) {
   server.addHook('onRequest', async (request, reply) => {
+    // Allow ALB health checks through without the CloudFront secret
+    if (request.url === '/health') return
     if (request.headers['x-origin-verify'] !== ORIGIN_VERIFY_SECRET) {
       return reply.status(403).send({ message: 'Forbidden' })
     }

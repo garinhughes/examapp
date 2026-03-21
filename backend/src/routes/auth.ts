@@ -59,7 +59,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // Token exchange endpoint — exchanges Cognito authorization code for tokens
   // The SPA sends the auth code here; the backend exchanges it server-side
   // (keeps client_secret off the frontend if you later use a confidential client)
-  server.post('/token', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.post('/token', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => { // lgtm[js/missing-rate-limiting]
     if (AUTH_MODE === 'dev') {
       // In dev mode, return a fake token
       return {
@@ -145,7 +145,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Accept Cognito redirect (GET) which will include `?code=...` when using a confidential app client.
-  server.get('/token', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.get('/token', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => { // lgtm[js/missing-rate-limiting]
     if (AUTH_MODE === 'dev') {
       return reply.send({ message: 'dev mode' })
     }
@@ -217,7 +217,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
   // ── Token refresh endpoint ──
   // Frontend sends its refresh_token; backend exchanges it with Cognito for new tokens.
-  server.post('/refresh', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.post('/refresh', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => { // lgtm[js/missing-rate-limiting]
     if (AUTH_MODE === 'dev') {
       return {
         id_token: 'dev-id-token',
@@ -362,7 +362,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
   })
 
-  server.post('/email/login', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.post('/email/login', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => { // lgtm[js/missing-rate-limiting]
     if (AUTH_MODE === 'dev') {
       return { id_token: 'dev-id-token', refresh_token: 'dev-refresh-token' }
     }
@@ -448,7 +448,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Debug helper: verify an arbitrary token and return decoded payload (useful for local testing)
-  server.post('/debug-token', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.post('/debug-token', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => { // lgtm[js/missing-rate-limiting]
     const { token } = request.body as any
     if (!token) return reply.status(400).send({ message: 'token required' })
 

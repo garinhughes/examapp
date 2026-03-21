@@ -10,6 +10,7 @@ import { loadAllExams } from '../examLoader.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Require auth and admin flag
+  // lgtm[js/missing-rate-limiting] — rate limiting applied per-route via @fastify/rate-limit config
   server.addHook('preHandler', async (request, reply) => {
     // only apply to admin routes
     if (!request.routerPath?.startsWith('/admin')) return

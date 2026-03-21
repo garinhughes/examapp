@@ -166,6 +166,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    */
   server.get('/checkout-simulator', async (request: any, reply) => {
     const sessionId = String(request.query.session || '')
+    // Validate sessionId is a UUID before using it in HTML to prevent XSS
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)) {
+      return reply.status(400).send('Invalid session')
+    }
     const sess = SESSIONS.get(sessionId)
     if (!sess) return reply.status(404).send('Session not found')
 

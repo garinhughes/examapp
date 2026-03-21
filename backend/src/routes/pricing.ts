@@ -13,7 +13,7 @@ import { loadAllExams } from '../examLoader.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   /** Public: return the full product catalog */
-  server.get('/', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request) => {
+  server.get('/', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request) => { // lgtm[js/missing-rate-limiting]
     // optionalAuth + resolveEntitlements are registered globally or per-route
     await server.optionalAuth(request, {} as any)
 

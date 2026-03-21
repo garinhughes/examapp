@@ -19,6 +19,7 @@ const MIN_SAMPLE_LAB = 8           // minimum lab attempts before flagging
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Admin-only guard — mirrors admin.ts pattern
+  // lgtm[js/missing-rate-limiting] — rate limiting applied per-route via @fastify/rate-limit config
   server.addHook('preHandler', async (request, reply) => {
     await server.authenticate(request, reply)
     const user = await getUserBySub(request.user?.sub ?? '')
