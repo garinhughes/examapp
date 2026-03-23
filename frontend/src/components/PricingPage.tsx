@@ -75,7 +75,7 @@ function FeatureRow({ f }: { f: FeatureDef }) {
 /*  Product card                                                       */
 /* ------------------------------------------------------------------ */
 
-function ProductCard({ product, onBuy, bestValue, inBasket }: { product: CatalogProduct; onBuy: (p: CatalogProduct) => void; bestValue?: boolean; inBasket?: boolean }) {
+function ProductCard({ product, onBuy, optionLabel, inBasket }: { product: CatalogProduct; onBuy: (p: CatalogProduct) => void; optionLabel?: string; inBasket?: boolean }) {
   const kindLabels: Record<string, string> = {
     exam: 'Exam Pass',
     bundle: 'Exam Pack',
@@ -86,13 +86,13 @@ function ProductCard({ product, onBuy, bestValue, inBasket }: { product: Catalog
     <div className={`relative p-4 rounded-xl border transition-all flex flex-col ${
       product.owned
         ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-900/10'
-        : bestValue
+        : optionLabel
           ? 'border-primary ring-2 ring-primary/30 bg-card'
           : 'border-border bg-card hover:border-primary'
     }`}>
-      {bestValue && (
+      {optionLabel && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-primary text-primary-foreground">
-          Best value
+          {optionLabel}
         </div>
       )}
       <div className="flex items-start justify-between">
@@ -162,8 +162,7 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
   const examProducts = products.filter((p) => p.kind === 'exam')
   const availableExams = examProducts.map((p) => ({
     code: p.examCodes?.[0] ?? p.productId.replace('exam:', ''),
-    label: p.label.replace('Exam Pass - ', ''),
-    description: p.description,
+    title: p.description.replace(/ - full question bank.*$/, ''),
   }))
 
   const recommendation = useMemo(() => {
@@ -286,8 +285,8 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
                         : 'border-border bg-card hover:border-primary'
                   }`}
                 >
-                  <span className="font-medium">{ex.code}</span>
-                  <span className="block text-xs text-muted-foreground mt-0.5">{ex.label}</span>
+                  <span className="font-medium">{ex.title}</span>
+                  <span className="block text-xs text-muted-foreground mt-0.5">{ex.code}</span>
                 </button>
               )
             })}
@@ -316,13 +315,12 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
           </div>
 
           {recommendation.primary && (
-            <ProductCard product={recommendation.primary} onBuy={onBuy} bestValue inBasket={basket.has(recommendation.primary.productId)} />
+            <ProductCard product={recommendation.primary} onBuy={onBuy} optionLabel="Option 1" inBasket={basket.has(recommendation.primary.productId)} />
           )}
 
           {recommendation.alternative && recommendation.alternative.productId !== recommendation.primary?.productId && (
             <div>
-              <p className="text-xs text-muted-foreground mb-2">Or consider:</p>
-              <ProductCard product={recommendation.alternative} onBuy={onBuy} inBasket={basket.has(recommendation.alternative.productId)} />
+              <ProductCard product={recommendation.alternative} onBuy={onBuy} optionLabel="Option 2" inBasket={basket.has(recommendation.alternative.productId)} />
             </div>
           )}
 
@@ -472,12 +470,12 @@ export default function PricingPage() {
         <section>
           <h3 className="text-lg font-bold mb-3">🔑 All-Access</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {subs.map((p) => (
+            {subs.map((p, i) => (
               <ProductCard
                 key={p.productId}
                 product={p}
                 onBuy={handleBuy}
-                bestValue={p.billingPeriod === 'annual'}
+                optionLabel={`Option ${i + 1}`}
                 inBasket={basket.has(p.productId)}
               />
             ))}

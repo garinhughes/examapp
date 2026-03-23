@@ -158,17 +158,12 @@ export default function BasketPage() {
 }
 
 function SuggestionBanner({ suggestion, products }: { suggestion: { message: string; suggestedProductId: string; saving: number }; products: CatalogProduct[] }) {
-  const { add, remove, items } = useBasket()
+  const { switchTo } = useBasket()
   const suggested = products.find((p) => p.productId === suggestion.suggestedProductId)
 
   const handleUpgrade = () => {
     if (!suggested) return
-    // Remove all individual exams and bundles, replace with the suggested product
-    const toRemove = items
-      .filter((i) => i.product.kind === 'exam' || i.product.kind === 'bundle')
-      .map((i) => i.product.productId)
-    toRemove.forEach((id) => remove(id))
-    add(suggested)
+    switchTo(suggested)
   }
 
   return (
@@ -185,7 +180,7 @@ function SuggestionBanner({ suggestion, products }: { suggestion: { message: str
           onClick={handleUpgrade}
           className="text-xs px-3 py-1.5 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition flex-shrink-0"
         >
-          Switch to {suggested.kind === 'subscription' ? 'All-Access' : suggested.label}
+          Switch to {suggested.productId === 'sub:all-access' ? 'All-Access Monthly' : suggested.productId === 'sub:all-access-annual' ? 'All-Access Annual' : suggested.label}
         </button>
       )}
     </div>

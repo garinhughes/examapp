@@ -25,6 +25,7 @@ interface BasketState {
   remove: (productId: string) => void
   clear: () => void
   has: (productId: string) => boolean
+  switchTo: (product: CatalogProduct) => void
   total: number
   suggestions: BasketSuggestion[]
   lastError: string | null
@@ -194,10 +195,17 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     return result
   }, [items])
 
+  const switchTo = useCallback((product: CatalogProduct) => {
+    const next = [{ product, addedAt: Date.now() }]
+    setItems(next)
+    saveToStorage(next)
+    setLastError(null)
+  }, [])
+
   const clearError = useCallback(() => setLastError(null), [])
 
   return (
-    <BasketCtx.Provider value={{ items, add, remove, clear, has, total, suggestions, lastError, clearError, itemCount: items.length }}>
+    <BasketCtx.Provider value={{ items, add, remove, clear, has, switchTo, total, suggestions, lastError, clearError, itemCount: items.length }}>
       {children}
     </BasketCtx.Provider>
   )
