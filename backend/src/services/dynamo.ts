@@ -22,7 +22,12 @@ export async function upsertUserFromCognito(payload: any) {
     ExpressionAttributeNames: { '#email': 'email', '#name': 'name' },
     ExpressionAttributeValues: {
       ':email': payload.email ?? payload.preferred_username ?? null,
-      ':name': payload.name ?? payload.preferred_username ?? null,
+      ':name': payload.name ??
+               ((payload.given_name || payload.family_name)
+                 ? [payload.given_name, payload.family_name].filter(Boolean).join(' ')
+                 : null) ??
+               payload.preferred_username ??
+               null,
       ':provider': payload.iss?.includes('google') ? 'google' : 'cognito',
       ':isAdmin': Array.isArray(payload['cognito:groups']) && payload['cognito:groups'].includes('admins'),
       ':now': now

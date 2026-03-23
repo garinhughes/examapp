@@ -202,7 +202,7 @@ export default function ExamApp() {
             {route === 'home' && !selected && (
               <div className="mb-8 p-8 rounded-lg bg-card border border-border shadow-sm">
                 <div className="max-w-4xl mx-auto text-center">
-                  <h2 className="text-3xl sm:text-3xl font-extrabold mb-3">Practice smarter. Pass faster.</h2>
+                  <h2 className="text-3xl sm:text-3xl font-extrabold mb-3">Train with intent. Certify with confidence.</h2>
                   <p className="text-muted-foreground mb-6">Timed or casual practice exams, focused by domain, with per-question explanations and analytics to help you improve.</p>
 
                   <div className="flex items-center justify-center gap-4 mb-6">

@@ -138,8 +138,11 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
                   {typeof streak === 'number' && streak > 0 && <span>🔥 {streak}d</span>}
                 </div>
               )}
-              <div className="px-3 py-1.5 text-xs text-sidebar-foreground/50 truncate" title={user.email}>
+              <div className="px-3 py-1.5 text-xs text-sidebar-foreground/70 font-medium truncate" title={user.name}>
                 {user.name}
+              </div>
+              <div className="px-3 pb-1 text-[11px] text-sidebar-foreground/50 truncate" title={user.email}>
+                {user.email}
               </div>
               <Button variant="ghost" className="w-full justify-start text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50" onClick={logout}>
                 <LogOut className="mr-2 h-4 w-4" />

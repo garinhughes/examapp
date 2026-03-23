@@ -561,6 +561,237 @@ function BulkMigratePanel({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Sub-component: Cognito User Management (unconfirmed etc.)          */
+/* ------------------------------------------------------------------ */
+
+interface CognitoUser {
+  username: string
+  email: string | null
+  status: string
+  enabled: boolean
+  createdAt: string | null
+}
+
+function CognitoUsersPanel({
+  authFetch,
+}: {
+  authFetch: ReturnType<typeof useAuthFetch>
+}) {
+  const [open, setOpen] = useState(false)
+  const [users, setUsers] = useState<CognitoUser[]>([])
+  const [loading, setLoading] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const [statusFilter, setStatusFilter] = useState<string>('UNCONFIRMED')
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [resent, setResent] = useState<Set<string>>(new Set())
+
+  const loadUsers = useCallback(async (status?: string) => {
+    setLoading(true)
+    setErr(null)
+    try {
+      const qs = status ? `?status=${encodeURIComponent(status)}` : ''
+      const res = await authFetch(`/admin/cognito/users${qs}`)
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ message: 'Request failed' }))
+        throw new Error(data.detail || data.message || `HTTP ${res.status}`)
+      }
+      const data = await res.json()
+      setUsers(Array.isArray(data.users) ? data.users : [])
+    } catch (e: any) {
+      setErr(e.message || 'Failed to load Cognito users')
+    } finally {
+      setLoading(false)
+    }
+  }, [authFetch])
+
+  useEffect(() => {
+    if (open) loadUsers(statusFilter)
+  }, [open, statusFilter, loadUsers])
+
+  async function deleteUser(username: string) {
+    setBusy(username)
+    setErr(null)
+    try {
+      const res = await authFetch(`/admin/cognito/users/${encodeURIComponent(username)}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ message: 'Delete failed' }))
+        throw new Error(data.detail || data.message)
+      }
+      setConfirmDelete(null)
+      setUsers((prev) => prev.filter((u) => u.username !== username))
+    } catch (e: any) {
+      setErr(e.message || 'Delete failed')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function resendConfirmation(username: string) {
+    setBusy(username)
+    setErr(null)
+    try {
+      const res = await authFetch(`/admin/cognito/users/${encodeURIComponent(username)}/resend`, { method: 'POST' })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ message: 'Resend failed' }))
+        throw new Error(data.detail || data.message)
+      }
+      setResent((prev) => new Set(prev).add(username))
+    } catch (e: any) {
+      setErr(e.message || 'Resend failed')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const STATUS_BADGE: Record<string, string> = {
+    UNCONFIRMED: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+    CONFIRMED: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
+    FORCE_CHANGE_PASSWORD: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+    RESET_REQUIRED: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
+    DISABLED: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
+  }
+
+  return (
+    <div className="rounded-lg border border-border overflow-hidden">
+      <button
+        className="w-full flex items-center justify-between px-4 py-3 bg-muted text-sm font-semibold hover:bg-muted/80 transition-colors"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span>Cognito User Management</span>
+        <span className={`text-xs transition-transform inline-block ${open ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {open && (
+        <div className="p-4 space-y-4 bg-card">
+          <p className="text-xs text-muted-foreground">
+            View and manage users directly in the Cognito user pool. Useful for clearing stuck registrations and resending verification emails.
+          </p>
+
+          {/* Filter bar */}
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="text-xs font-medium text-muted-foreground">Status:</label>
+            <div className="flex gap-1 bg-muted p-0.5 rounded">
+              {['UNCONFIRMED', 'CONFIRMED', 'ALL'].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStatusFilter(s === 'ALL' ? '' : s)}
+                  className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                    (s === 'ALL' ? !statusFilter : statusFilter === s) ? 'bg-card shadow-sm' : 'text-muted-foreground'
+                  }`}
+                >
+                  {s === 'ALL' ? 'All' : s.charAt(0) + s.slice(1).toLowerCase().replace(/_/g, ' ')}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1" />
+            <button
+              onClick={() => loadUsers(statusFilter)}
+              disabled={loading}
+              className="px-3 py-1.5 rounded-lg bg-accent text-xs font-medium hover:bg-accent disabled:opacity-40 transition-colors"
+            >
+              {loading ? 'Loading…' : '↻ Refresh'}
+            </button>
+          </div>
+
+          {err && (
+            <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
+              {err}
+              <button onClick={() => setErr(null)} className="ml-2 underline text-xs">dismiss</button>
+            </div>
+          )}
+
+          {/* Users list */}
+          {loading && users.length === 0 ? (
+            <div className="text-xs text-muted-foreground text-center py-4">Loading…</div>
+          ) : users.length === 0 ? (
+            <div className="text-xs text-muted-foreground text-center py-4 italic">
+              No {statusFilter ? statusFilter.toLowerCase().replace(/_/g, ' ') : ''} users found.
+            </div>
+          ) : (
+            <div className="rounded-lg border border-border overflow-hidden">
+              <table className="w-full table-auto text-sm">
+                <thead className="bg-muted">
+                  <tr className="text-left text-xs text-muted-foreground uppercase tracking-wider">
+                    <th className="p-2.5">Email / Username</th>
+                    <th className="p-2.5">Status</th>
+                    <th className="p-2.5">Created</th>
+                    <th className="p-2.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((u) => (
+                    <tr key={u.username} className="border-t border-border/60 hover:bg-muted/50 transition-colors">
+                      <td className="p-2.5">
+                        <div className="font-medium text-sm">{u.email || u.username}</div>
+                        {u.email && u.email !== u.username && (
+                          <div className="text-[10px] text-muted-foreground font-mono truncate max-w-[240px]">{u.username}</div>
+                        )}
+                      </td>
+                      <td className="p-2.5">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${STATUS_BADGE[u.status] ?? 'bg-accent text-muted-foreground'}`}>
+                          {u.status.replace(/_/g, ' ')}
+                        </span>
+                      </td>
+                      <td className="p-2.5 text-xs text-muted-foreground">{fmtDateTime(u.createdAt)}</td>
+                      <td className="p-2.5">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {/* Resend confirmation (only for UNCONFIRMED) */}
+                          {u.status === 'UNCONFIRMED' && (
+                            <button
+                              onClick={() => resendConfirmation(u.username)}
+                              disabled={busy === u.username || resent.has(u.username)}
+                              className="px-2 py-1 rounded text-[11px] font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-40 transition-colors"
+                            >
+                              {busy === u.username ? 'Sending…' : resent.has(u.username) ? 'Sent' : 'Resend code'}
+                            </button>
+                          )}
+
+                          {/* Delete with confirmation */}
+                          {confirmDelete === u.username ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => deleteUser(u.username)}
+                                disabled={busy === u.username}
+                                className="px-2 py-1 rounded text-[11px] font-semibold bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
+                              >
+                                {busy === u.username ? 'Deleting…' : 'Confirm'}
+                              </button>
+                              <button
+                                onClick={() => setConfirmDelete(null)}
+                                className="px-2 py-1 rounded text-[11px] bg-accent text-muted-foreground transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmDelete(u.username)}
+                              className="px-2 py-1 rounded text-[11px] font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <p className="text-[10px] text-muted-foreground">
+            Showing {users.length} user{users.length !== 1 ? 's' : ''} from Cognito.
+            {statusFilter === 'UNCONFIRMED' && ' These users registered but never confirmed their email.'}
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /*  Main AdminPanel                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -660,6 +891,7 @@ export default function AdminPanel() {
       )}
 
       <BulkMigratePanel authFetch={authFetch} />
+      <CognitoUsersPanel authFetch={authFetch} />
 
       {/* Toolbar: search + filters */}
       <div className="flex flex-wrap items-center gap-2">

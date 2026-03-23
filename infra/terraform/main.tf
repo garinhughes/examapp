@@ -43,9 +43,10 @@ module "vpc" {
 }
 
 module "iam" {
-  source     = "./modules/iam"
-  project    = var.project
-  account_id = data.aws_caller_identity.current.account_id
+  source                 = "./modules/iam"
+  project                = var.project
+  account_id             = data.aws_caller_identity.current.account_id
+  cognito_admin_role_arn = var.cognito_admin_role_arn
 }
 
 module "github_actions" {
@@ -167,7 +168,8 @@ module "ecs" {
   # Wire in the certshack-managed secrets (created in secretsmanager module)
   cognito_client_secret_arn  = module.secretsmanager.cognito_client_secret_arn
 
-  ses_from_address    = "noreply@certshack.com"
+  cognito_admin_role_arn = var.cognito_admin_role_arn
+  ses_from_address       = "noreply@certshack.com"
   ses_support_address = "support@certshack.com"
   issue_reports_table = module.dynamodb.table_names["issue_reports"]
   metrics_table       = module.dynamodb.table_names["metrics"]

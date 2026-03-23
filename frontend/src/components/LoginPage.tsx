@@ -38,6 +38,8 @@ export default function LoginPage() {
 
   const [view, setView] = useState<EmailView>('signin')
   const [email, setEmail] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [code, setCode] = useState('')
@@ -74,8 +76,8 @@ export default function LoginPage() {
     }
     setLoading(true)
     try {
-      await registerWithEmail(email, password)
-      setInfo('Check your email for a verification code.')
+      await registerWithEmail(email, password, firstName.trim() || undefined, lastName.trim() || undefined)
+      setInfo('Check your email for a verification code. If you don\'t see it, check your junk or spam folder.')
       setView('confirm')
     } catch (err: any) {
       setError(err.message)
@@ -237,6 +239,23 @@ export default function LoginPage() {
         {/* Register form */}
         {view === 'register' && (
           <form onSubmit={handleRegister} className="space-y-3">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                required
+                placeholder="First name"
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <input
+                type="text"
+                placeholder="Last name"
+                value={lastName}
+                onChange={e => setLastName(e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
             <input
               type="email"
               required
@@ -289,6 +308,9 @@ export default function LoginPage() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Confirming…' : 'Confirm email'}
             </Button>
+            <p className="text-xs text-center text-muted-foreground">
+              Can't find the email? Check your junk or spam folder.
+            </p>
             <button type="button" className="w-full text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground" onClick={handleResend}>
               Resend code
             </button>

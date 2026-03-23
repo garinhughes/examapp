@@ -198,6 +198,12 @@ variable "interactions_table" {
   default = ""
 }
 
+variable "cognito_admin_role_arn" {
+  description = "ARN of cross-account IAM role for Cognito admin operations (empty = use default creds)"
+  type        = string
+  default     = "arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role"
+}
+
 # ---------- security groups ----------
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project}-alb-"
@@ -366,6 +372,7 @@ locals {
     { name = "ISSUE_REPORTS_TABLE", value = var.issue_reports_table },
     { name = "METRICS_TABLE", value = var.metrics_table },
     { name = "INTERACTIONS_TABLE", value = var.interactions_table },
+    { name = "COGNITO_ADMIN_ROLE_ARN", value = var.cognito_admin_role_arn },
   ]
 
   container_secrets = concat(

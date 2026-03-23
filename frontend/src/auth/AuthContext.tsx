@@ -19,7 +19,7 @@ interface AuthContextValue {
   login: () => void
   loginWithProvider: (provider: AuthProvider) => void
   loginWithEmail: (email: string, password: string) => Promise<void>
-  registerWithEmail: (email: string, password: string) => Promise<void>
+  registerWithEmail: (email: string, password: string, firstName?: string, lastName?: string) => Promise<void>
   confirmEmail: (email: string, code: string) => Promise<void>
   resendConfirmation: (email: string) => Promise<void>
   forgotPassword: (email: string) => Promise<void>
@@ -28,6 +28,8 @@ interface AuthContextValue {
   getToken: () => string | null
   /** Attempt to refresh the token. Returns the new token or null on failure. */
   refreshToken: () => Promise<string | null>
+  /** Immediately update the user's display name in React state (for post-save UI). */
+  updateUserName: (name: string) => void
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -44,6 +46,7 @@ const AuthContext = createContext<AuthContextValue>({
   logout: () => {},
   getToken: () => null,
   refreshToken: async () => null,
+  updateUserName: () => {},
 })
 
 export const useAuth = () => useContext(AuthContext)
@@ -138,10 +141,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const userFromToken = useCallback((token: string): AuthUser | null => {
     const payload = parseJwtPayload(token)
     if (!payload) return null
+    const derivedName = payload.name ??
+      ((payload.given_name || payload.family_name)
+        ? [payload.given_name, payload.family_name].filter(Boolean).join(' ')
+        : null) ??
+      payload['cognito:username'] ??
+      payload.email ??
+      'User'
     return {
       sub: payload.sub ?? payload.username ?? 'unknown',
       email: payload.email ?? '',
-      name: payload.name ?? payload['cognito:username'] ?? payload.email ?? 'User',
+      name: derivedName,
       picture: payload.picture,
     }
   }, [])
@@ -390,11 +400,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [setToken, setRefreshToken, userFromToken, setUser, scheduleRefresh])
 
-  const registerWithEmail = useCallback(async (email: string, password: string) => {
+  const registerWithEmail = useCallback(async (email: string, password: string, firstName?: string, lastName?: string) => {
     const res = await fetch(apiUrl('/auth/email/register'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, firstName, lastName }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.message || 'Registration failed')
@@ -458,6 +468,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [clearToken])
 
+  const updateUserName = useCallback((name: string) => {
+    setUser((prev) => prev ? { ...prev, name } : prev)
+  }, [])
+
   return (
     <AuthContext.Provider value={{
       user, loading,
@@ -465,6 +479,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loginWithEmail, registerWithEmail, confirmEmail, resendConfirmation,
       forgotPassword, resetPassword,
       logout, getToken, refreshToken: doRefresh,
+      updateUserName,
     }}>
       {children}
     </AuthContext.Provider>

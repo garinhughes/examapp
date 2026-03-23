@@ -7,6 +7,7 @@ import {
 import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement, findUsersWithActiveEntitlement } from '../services/entitlements.js'
 import { PRODUCTS } from '../catalog.js'
 import { loadAllExams } from '../examLoader.js'
+import { listCognitoUsers, getCognitoUser, deleteCognitoUser, resendUserConfirmation } from '../services/cognitoAdmin.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Require auth and admin flag
@@ -317,5 +318,63 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
     await resolveIssueReport(reportId)
     return { ok: true }
+  })
+
+  // ── Cognito user management ──
+
+  // GET /admin/cognito/users?status=UNCONFIRMED&limit=60&paginationToken=...
+  server.get('/cognito/users', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const q = request.query as any
+    try {
+      const res = await listCognitoUsers({
+        status: q.status || undefined,
+        limit: q.limit ? Math.min(Number(q.limit), 60) : 60,
+        paginationToken: q.paginationToken || undefined,
+      })
+      return res
+    } catch (err: any) {
+      request.log?.error?.({ err: err.message }, 'listCognitoUsers failed')
+      return reply.code(502).send({ message: 'Failed to list Cognito users', detail: err.message })
+    }
+  })
+
+  // GET /admin/cognito/users/:username
+  server.get('/cognito/users/:username', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { username } = request.params as any
+    try {
+      const user = await getCognitoUser(decodeURIComponent(username))
+      if (!user) return reply.code(404).send({ message: 'User not found in Cognito' })
+      return user
+    } catch (err: any) {
+      request.log?.error?.({ err: err.message }, 'getCognitoUser failed')
+      return reply.code(502).send({ message: 'Failed to get Cognito user', detail: err.message })
+    }
+  })
+
+  // DELETE /admin/cognito/users/:username
+  server.delete('/cognito/users/:username', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { username } = request.params as any
+    const decoded = decodeURIComponent(username)
+    try {
+      await deleteCognitoUser(decoded)
+      await recordAdminAudit((request.user as any).sub, decoded, 'delete_cognito_user', { username: decoded })
+      return { ok: true }
+    } catch (err: any) {
+      request.log?.error?.({ err: err.message }, 'deleteCognitoUser failed')
+      return reply.code(502).send({ message: 'Failed to delete Cognito user', detail: err.message })
+    }
+  })
+
+  // POST /admin/cognito/users/:username/resend
+  server.post('/cognito/users/:username/resend', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { username } = request.params as any
+    const decoded = decodeURIComponent(username)
+    try {
+      await resendUserConfirmation(decoded)
+      return { ok: true, message: 'Confirmation code resent' }
+    } catch (err: any) {
+      request.log?.error?.({ err: err.message }, 'resendUserConfirmation failed')
+      return reply.code(502).send({ message: 'Failed to resend confirmation', detail: err.message })
+    }
   })
 }

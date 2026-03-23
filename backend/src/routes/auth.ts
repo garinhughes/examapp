@@ -9,7 +9,7 @@
 import { createHmac } from 'crypto'
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { jwtVerify, createRemoteJWKSet, decodeProtectedHeader } from 'jose'
-import { upsertUserFromCognito, getUserBySub, setRegisteredAtIfNew } from '../services/dynamo.js'
+import { upsertUserFromCognito, getUserBySub, setRegisteredAtIfNew, updateUserFields } from '../services/dynamo.js'
 import { TIERS } from '../catalog.js'
 import {
   CognitoIdentityProviderClient,
@@ -19,7 +19,9 @@ import {
   ForgotPasswordCommand,
   ConfirmForgotPasswordCommand,
   ResendConfirmationCodeCommand,
+  AdminUpdateUserAttributesCommand,
 } from '@aws-sdk/client-cognito-identity-provider'
+import { fromSSO } from '@aws-sdk/credential-providers'
 
 const AUTH_MODE = process.env.AUTH_MODE || 'dev'
 
@@ -309,8 +311,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // ── Email / password auth (Cognito native) ──
   // Requires USER_PASSWORD_AUTH enabled on the Cognito app client.
 
+  const cognitoAwsProfile = process.env.COGNITO_AWS_PROFILE || ''
   const cognitoClient = new CognitoIdentityProviderClient({
     region: process.env.COGNITO_REGION || 'eu-west-1',
+    ...(cognitoAwsProfile ? { credentials: fromSSO({ profile: cognitoAwsProfile }) } : {}),
   })
 
   function getCognitoClientId() {
@@ -327,15 +331,18 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
   server.post('/email/register', async (request, reply) => {
     if (AUTH_MODE === 'dev') return { message: 'dev mode — no real signup' }
-    const { email, password } = request.body as any
+    const { email, password, firstName, lastName } = request.body as any
     if (!email || !password) return reply.status(400).send({ message: 'email and password required' })
     try {
+      const userAttributes: { Name: string; Value: string }[] = [{ Name: 'email', Value: email }]
+      if (firstName) userAttributes.push({ Name: 'given_name', Value: String(firstName) })
+      if (lastName) userAttributes.push({ Name: 'family_name', Value: String(lastName) })
       await cognitoClient.send(new SignUpCommand({
         ClientId: getCognitoClientId(),
         SecretHash: getSecretHash(email),
         Username: email,
         Password: password,
-        UserAttributes: [{ Name: 'email', Value: email }],
+        UserAttributes: userAttributes,
       }))
       return { message: 'Verification code sent to email' }
     } catch (err: any) {
@@ -460,6 +467,46 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err: any) {
       return reply.status(400).send({ message: err.message })
     }
+  })
+
+  /**
+   * PUT /auth/profile — update first/last name for the authenticated user.
+   * Updates Cognito attributes (given_name / family_name) and DynamoDB.
+   */
+  server.put('/profile', { preHandler: [server.authenticate] }, async (request, reply) => {
+    const userId = request.user!.sub
+    const email = request.user!.email
+    const { firstName, lastName } = request.body as any
+    const trimFirst = typeof firstName === 'string' ? firstName.trim() : undefined
+    const trimLast = typeof lastName === 'string' ? lastName.trim() : undefined
+    if (!trimFirst) return reply.status(400).send({ message: 'firstName is required' })
+
+    // Update Cognito attributes (best-effort; federated users may not support this)
+    if (AUTH_MODE !== 'dev') {
+      const userAttributes: { Name: string; Value: string }[] = [
+        { Name: 'given_name', Value: trimFirst },
+      ]
+      if (trimLast !== undefined) userAttributes.push({ Name: 'family_name', Value: trimLast })
+      try {
+        await cognitoClient.send(new AdminUpdateUserAttributesCommand({
+          UserPoolId: process.env.COGNITO_USER_POOL_ID!,
+          Username: email,
+          UserAttributes: userAttributes,
+        }))
+      } catch (err: any) {
+        request.log?.warn?.({ err: err.message }, 'AdminUpdateUserAttributes failed')
+      }
+    }
+
+    // Update DynamoDB
+    const nameParts = [trimFirst, trimLast].filter(Boolean) as string[]
+    await updateUserFields(userId, {
+      firstName: trimFirst,
+      lastName: trimLast ?? '',
+      name: nameParts.join(' '),
+    })
+
+    return { message: 'Profile updated', name: nameParts.join(' ') }
   })
 
   // Debug helper: verify an arbitrary token and return decoded payload (useful for local testing)

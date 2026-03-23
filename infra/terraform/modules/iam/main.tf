@@ -8,6 +8,12 @@ variable "account_id" {
   type = string
 }
 
+variable "cognito_admin_role_arn" {
+  description = "ARN of the cross-account role for Cognito admin operations (empty = skip)"
+  type        = string
+  default     = ""
+}
+
 # ---------- ECS task execution role (pulls images, writes logs) ----------
 resource "aws_iam_role" "ecs_task_execution" {
   name = "${var.project}-ecs-task-exec-role"
@@ -93,6 +99,22 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         Resource = "arn:aws:ses:eu-west-1:${var.account_id}:identity/*"
       }
     ]
+  })
+}
+
+# Optional: allow ECS task role to assume the cross-account Cognito admin role
+resource "aws_iam_role_policy" "ecs_task_assume_cognito_admin" {
+  count = var.cognito_admin_role_arn != "" ? 1 : 0
+  name  = "${var.project}-ecs-task-assume-cognito-admin"
+  role  = aws_iam_role.ecs_task.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid      = "AssumeCognitoAdminRole"
+      Effect   = "Allow"
+      Action   = "sts:AssumeRole"
+      Resource = var.cognito_admin_role_arn
+    }]
   })
 }
 

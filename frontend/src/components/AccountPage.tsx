@@ -18,12 +18,55 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 
 export default function AccountPage() {
-  const { user } = useAuth()
+  const { user, refreshToken, updateUserName } = useAuth()
   const authFetch = useAuthFetch()
   const { state, toggleLeaderboard } = useGamification()
   const [tab, setTab] = useState<'overview' | 'badges' | 'certificates' | 'purchases'>('overview')
   const { level, currentXP, nextLevelXP, progress: levelProgress } = levelFromXP(state.xp)
   const { tier, tierConfig, entitlements, products, loading: entLoading } = useEntitlements()
+
+  // ── Name state ──
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [nameSaving, setNameSaving] = useState(false)
+  const [nameMessage, setNameMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+
+  useEffect(() => {
+    if (user?.name) {
+      const parts = user.name.trim().split(/\s+/)
+      setFirstName(parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0] ?? '')
+      setLastName(parts.length > 1 ? parts[parts.length - 1] : '')
+    }
+  }, [user?.name])
+
+  const saveName = useCallback(async () => {
+    const f = firstName.trim()
+    const l = lastName.trim()
+    if (!f) return
+    setNameSaving(true)
+    setNameMessage(null)
+    try {
+      const res = await authFetch('/auth/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName: f, lastName: l || undefined }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: 'Failed to save.' }))
+        setNameMessage({ type: 'err', text: err.message || 'Failed to save.' })
+        return
+      }
+      const data = await res.json().catch(() => ({}))
+      // Update sidebar immediately, then refresh token in background so next reload also reflects it
+      if (data.name) updateUserName(data.name)
+      refreshToken().catch(() => {})
+      setNameMessage({ type: 'ok', text: 'Name updated!' })
+    } catch {
+      setNameMessage({ type: 'err', text: 'Network error.' })
+    } finally {
+      setNameSaving(false)
+    }
+  }, [firstName, lastName, authFetch, refreshToken])
 
   // ── Username state ──
   const [currentUsername, setCurrentUsername] = useState<string | null>(null)
@@ -203,6 +246,44 @@ export default function AccountPage() {
       {/* Tab content */}
       {tab === 'overview' && (
         <div className="space-y-4">
+          {/* Name */}
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Name</h3>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  required
+                  placeholder="First name"
+                  value={firstName}
+                  onChange={e => { setFirstName(e.target.value); setNameMessage(null) }}
+                  className="flex-1 px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                />
+                <input
+                  type="text"
+                  placeholder="Last name"
+                  value={lastName}
+                  onChange={e => { setLastName(e.target.value); setNameMessage(null) }}
+                  className="flex-1 px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={saveName}
+                  disabled={nameSaving || !firstName.trim()}
+                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/80 transition-colors"
+                >
+                  {nameSaving ? 'Saving…' : 'Save name'}
+                </button>
+                {nameMessage && (
+                  <p className={`text-xs ${nameMessage.type === 'ok' ? 'text-green-500' : 'text-red-500'}`}>
+                    {nameMessage.text}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Username */}
           <div className="p-4 rounded-lg border border-border bg-card">
             <div className="flex items-center justify-between mb-1">

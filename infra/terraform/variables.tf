@@ -28,6 +28,12 @@ variable "github_repo" {
   default     = "garinhughes/examapp"
 }
 
+variable "cognito_admin_role_arn" {
+  description = "ARN of the IAM role in the management account that grants Cognito admin access. The ECS task role will be allowed to assume this role."
+  type        = string
+  default     = ""
+}
+
 variable "enable_waf" {
   description = "When true, enable the WAF restriction rule that only allows configured IPs. Set false to allow all traffic."
   type        = bool
