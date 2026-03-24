@@ -221,6 +221,39 @@ Terraform state is remote (S3 backend defined in `infra/terraform/backend.tf`). 
 
 ---
 
+### AWS Accounts and SSO Profiles
+
+Two AWS accounts are in use:
+
+| Profile | Account | Services |
+|---|---|---|
+| `certshack` | `809472479011` | ECS, DynamoDB, S3, CloudFront, WAF, ACM, SES (production identity + WorkMail), Route53 hosted zone (`certshack.com`) |
+| `mgmt` | `030461496359` | Cognito user pool (`ExamAppPool`, `eu-west-1_c6WQUP1RX`), SES domain identity (certshack.com — separate from prod) |
+
+Switch between profiles using `aws-sso-login`:
+```bash
+aws-sso-login certshack   # prod account
+aws-sso-login mgmt        # management account
+```
+Always pass `--profile certshack` or `--profile mgmt` to AWS CLI commands accordingly.
+
+### Cognito is in the mgmt account
+
+The Cognito user pool (`eu-west-1_c6WQUP1RX`, ExamAppPool) lives in **account 030461496359 (mgmt)**, not the prod account. The prod account has no Cognito user pools.
+
+Any Cognito admin operations (e.g. `ListUsers`, `AdminGetUser`) must be performed by first assuming the cross-account role `arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role`. The ECS task role (`examapp-ecs-task-role` in prod) has `sts:AssumeRole` permission on that role, and the backend uses the `COGNITO_ADMIN_ROLE_ARN` env var to determine which role to assume before calling Cognito. If that env var is empty or missing, the backend calls Cognito directly with prod credentials and gets an access denied error.
+
+The cross-account role (`examapp-mgmt-cross-account-role` in mgmt account) must have Cognito permissions in its inline policy (`examapp-cognito-admin-policy`). Its trust policy must allow `sts:AssumeRole` from the prod account's ECS task role. Route53 is in the certshack (prod) account — not mgmt — so the cross-account role is Cognito-only.
+
+### ECS Task Definition: GitHub Actions owns the deployed version
+
+Terraform creates the **initial** ECS task definition but the lifecycle is set to `ignore_changes = [task_definition]`. After the first deploy, the authoritative task definition is **`backend/infra/ecs-task-def.json`**, which GitHub Actions uses in the backend deploy workflow.
+
+- Terraform changes to the ECS task definition (env vars, image, secrets) will **not** take effect in production unless they are also reflected in `backend/infra/ecs-task-def.json` and a deployment is triggered.
+- When adding new env vars or secrets to the backend, update **both** `infra/terraform/modules/ecs/main.tf` (for infra consistency) **and** `backend/infra/ecs-task-def.json` (for actual deployed task).
+
+---
+
 ## Conventions
 
 - Backend uses **ESM** (`"type": "module"`). Use `import`/`export`, not `require`.
