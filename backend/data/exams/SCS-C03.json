@@ -86,7 +86,7 @@
         }
       ],
       "tip": "Think about which mechanism creates a cryptographic proof of file state at the time of delivery that can be independently verified.",
-      "explanation": "CloudTrail log file validation (c1) is the only native mechanism that uses cryptography \u2014 hourly SHA-256 digest files are signed by AWS's RSA private key, forming a tamper-evident chain. Running aws cloudtrail validate-logs recomputes hashes and compares them against signed digests, detecting any file that was modified, deleted, or injected after delivery. Macie (c2) performs content classification, not integrity verification. Object Lock (c3) prevents future writes but has no visibility into past tampering and can be bypassed via Governance mode. Config rules (c4) check configuration states, not cryptographic file integrity. Enable log file validation by adding --enable-log-file-validation when creating or updating a trail.",
+      "explanation": "CloudTrail log file validation (c1) is the only native mechanism that uses cryptography — hourly SHA-256 digest files are signed by AWS's RSA private key, forming a tamper-evident chain. Running aws cloudtrail validate-logs recomputes hashes and compares them against signed digests, detecting any file that was modified, deleted, or injected after delivery. Macie (c2) performs content classification, not integrity verification. Object Lock (c3) prevents future writes but has no visibility into past tampering and can be bypassed via Governance mode. Config rules (c4) check configuration states, not cryptographic file integrity. Enable log file validation by adding --enable-log-file-validation when creating or updating a trail.",
       "difficulty": 4,
       "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html",
       "lastReviewed": "2026-03-05"
@@ -115,7 +115,7 @@
           "id": "c2",
           "text": "Enable MFA Delete on the versioned bucket, requiring the bucket owner to supply a valid MFA code when permanently deleting a specific object version or suspending versioning.",
           "sequence": 2,
-          "explanation": "MFA Delete gates the most destructive S3 operations \u2014 permanent version deletion and versioning suspension \u2014 behind a hardware MFA factor that only the bucket owner can provide. This prevents any developer or compromised credential from permanently destroying object history."
+          "explanation": "MFA Delete gates the most destructive S3 operations — permanent version deletion and versioning suspension — behind a hardware MFA factor that only the bucket owner can provide. This prevents any developer or compromised credential from permanently destroying object history."
         },
         {
           "id": "c3",
@@ -125,7 +125,7 @@
         {
           "id": "c4",
           "text": "Configure an S3 bucket policy that denies s3:DeleteObject for all IAM principals except the bucket owner, and enable S3 Versioning.",
-          "explanation": "Denying s3:DeleteObject via bucket policy prevents deletion of the current object but does not protect versioned states once versioning is enabled \u2014 s3:DeleteObjectVersion is the relevant action for permanent version removal. The policy also lacks MFA enforcement and can be modified by the bucket owner."
+          "explanation": "Denying s3:DeleteObject via bucket policy prevents deletion of the current object but does not protect versioned states once versioning is enabled — s3:DeleteObjectVersion is the relevant action for permanent version removal. The policy also lacks MFA enforcement and can be modified by the bucket owner."
         },
         {
           "id": "c5",
@@ -134,7 +134,7 @@
         }
       ],
       "tip": "Identify which two independent features address overwrite preservation and permanent deletion authorization separately.",
-      "explanation": "S3 Versioning (c1) addresses the overwrite scenario by maintaining all object versions, allowing recovery of any prior state without blocking developer uploads. MFA Delete (c2) addresses permanent deletion by requiring a hardware MFA token specifically for version deletion and versioning suspension \u2014 preventing both individual compromised credentials and broad IAM policies from bypassing this control. Object Lock with Governance bypass (c3) actively weakens protection. A bucket policy denying s3:DeleteObject (c4) is incomplete \u2014 it targets the wrong S3 action for versioned objects and lacks MFA enforcement. CRR (c5) provides availability but no deletion protection for the source. To configure MFA Delete, use the AWS CLI as the root account: aws s3api put-bucket-versioning with MFADelete=Enabled.",
+      "explanation": "S3 Versioning (c1) addresses the overwrite scenario by maintaining all object versions, allowing recovery of any prior state without blocking developer uploads. MFA Delete (c2) addresses permanent deletion by requiring a hardware MFA token specifically for version deletion and versioning suspension — preventing both individual compromised credentials and broad IAM policies from bypassing this control. Object Lock with Governance bypass (c3) actively weakens protection. A bucket policy denying s3:DeleteObject (c4) is incomplete — it targets the wrong S3 action for versioned objects and lacks MFA enforcement. CRR (c5) provides availability but no deletion protection for the source. To configure MFA Delete, use the AWS CLI as the root account: aws s3api put-bucket-versioning with MFADelete=Enabled.",
       "difficulty": 4,
       "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiFactorAuthenticationDelete.html",
       "lastReviewed": "2026-03-05"
@@ -161,7 +161,7 @@
         {
           "id": "c2",
           "text": "aws glacier set-vault-access-policy \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --policy file://lock-policy.json",
-          "explanation": "set-vault-access-policy sets a standard (non-lock) vault access policy, not a vault lock policy. It does not transition the InProgress lock to Locked state and the policy set this way remains mutable \u2014 it does not satisfy Glacier Vault Lock compliance requirements."
+          "explanation": "set-vault-access-policy sets a standard (non-lock) vault access policy, not a vault lock policy. It does not transition the InProgress lock to Locked state and the policy set this way remains mutable — it does not satisfy Glacier Vault Lock compliance requirements."
         },
         {
           "id": "c3",
@@ -174,7 +174,7 @@
           "explanation": "put-vault-lock is not a valid Glacier CLI subcommand. The correct two-step process is initiate-vault-lock (to create the InProgress policy and obtain a lock ID) followed by complete-vault-lock (to finalize it). Using an invalid subcommand returns an error."
         }
       ],
-      "tip": "Glacier Vault Lock uses a two-phase commit process \u2014 consider which phase finalizes the immutable state.",
+      "tip": "Glacier Vault Lock uses a two-phase commit process — consider which phase finalizes the immutable state.",
       "explanation": "Glacier Vault Lock is a two-phase process: (1) initiate-vault-lock creates an InProgress policy and returns a lock ID, starting a 24-hour completion window; (2) complete-vault-lock (c1) uses that lock ID to transition the policy to the permanent Locked state. Once locked, the vault lock policy is immutable and cannot be deleted by any user. set-vault-access-policy (c2) manages regular (mutable) access policies, not vault locks. Re-running initiate-vault-lock (c3) would abort the existing InProgress lock and restart the 24-hour window from zero. put-vault-lock (c4) does not exist in the Glacier API. The --account-id - flag is required by the Glacier CLI to identify the calling account.",
       "difficulty": 4,
       "docs": "https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html",
@@ -230,7 +230,7 @@
         {
           "id": "c3",
           "text": "S3 Object Lock in Compliance mode with a fixed retention period",
-          "explanation": "Compliance mode enforces WORM immutability that no AWS principal \u2014 including root \u2014 can override during the retention window. This is the definitive control for regulatory archive requirements such as SEC 17a-4 or HIPAA retention mandates."
+          "explanation": "Compliance mode enforces WORM immutability that no AWS principal — including root — can override during the retention window. This is the definitive control for regulatory archive requirements such as SEC 17a-4 or HIPAA retention mandates."
         },
         {
           "id": "c4",
@@ -239,7 +239,7 @@
         }
       ],
       "tip": "Each mechanism addresses a distinct layer of integrity: cryptographic audit trails, access-controlled immutability, version history, and publisher authentication.",
-      "explanation": "CloudTrail log file validation (c1) is purpose-built for post-delivery tamper detection of audit logs via signed SHA-256 digests. S3 Object Lock Compliance mode (c3) enforces immutable retention windows that prevent deletion by any principal, satisfying regulatory archive mandates. Digital code signing (c4) uses public-key cryptography to authenticate software provenance \u2014 verifying that a release was produced by the legitimate publisher and has not been altered. S3 Versioning (c2) preserves object history automatically, enabling recovery of any prior version after developer overwrites. Each control addresses a separate dimension of data integrity: authenticity, immutability, origin verification, and history preservation respectively.",
+      "explanation": "CloudTrail log file validation (c1) is purpose-built for post-delivery tamper detection of audit logs via signed SHA-256 digests. S3 Object Lock Compliance mode (c3) enforces immutable retention windows that prevent deletion by any principal, satisfying regulatory archive mandates. Digital code signing (c4) uses public-key cryptography to authenticate software provenance — verifying that a release was produced by the legitimate publisher and has not been altered. S3 Versioning (c2) preserves object history automatically, enabling recovery of any prior version after developer overwrites. Each control addresses a separate dimension of data integrity: authenticity, immutability, origin verification, and history preservation respectively.",
       "difficulty": 3,
       "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
       "lastReviewed": "2026-03-05"
@@ -260,13 +260,13 @@
           "id": "c1",
           "text": "Call initiate-vault-lock to attach a policy and receive a lock ID in the In-Progress state",
           "sequence": 1,
-          "explanation": "initiate-vault-lock is always first \u2014 it creates the policy in a 24-hour trial window. You cannot complete the lock without this lock ID."
+          "explanation": "initiate-vault-lock is always first — it creates the policy in a 24-hour trial window. You cannot complete the lock without this lock ID."
         },
         {
           "id": "c2",
           "text": "Validate the policy by testing deny conditions against the vault during the 24-hour window",
           "sequence": 2,
-          "explanation": "The 24-hour In-Progress window exists specifically for validation. Testing deny conditions before committing ensures the policy does what you intend \u2014 you cannot modify a Compliance-mode policy after locking."
+          "explanation": "The 24-hour In-Progress window exists specifically for validation. Testing deny conditions before committing ensures the policy does what you intend — you cannot modify a Compliance-mode policy after locking."
         },
         {
           "id": "c3",
@@ -278,11 +278,11 @@
           "id": "c4",
           "text": "Abort the lock (if policy is incorrect) and restart from initiate-vault-lock with a corrected policy",
           "sequence": 4,
-          "explanation": "abort-vault-lock is only used when validation in step 2 reveals a problem. It cancels the In-Progress lock so you can start over. If validation passes, this step is skipped and you proceed to complete-vault-lock. It is listed last because in the correct flow it is a conditional rollback, not a required step \u2014 however the compliance path ends at step 3."
+          "explanation": "abort-vault-lock is only used when validation in step 2 reveals a problem. It cancels the In-Progress lock so you can start over. If validation passes, this step is skipped and you proceed to complete-vault-lock. It is listed last because in the correct flow it is a conditional rollback, not a required step — however the compliance path ends at step 3."
         }
       ],
       "tip": "Vault Lock has a two-phase commit design. Think about what happens before and after the policy becomes permanent.",
-      "explanation": "S3 Glacier Vault Lock uses a two-phase commit: (1) initiate-vault-lock attaches a draft policy and returns a lock ID \u2014 the vault enters 'In-Progress' state with a 24-hour window; (2) during that window you should test deny conditions to confirm the policy is correct; (3) complete-vault-lock permanently enforces the policy in Compliance mode \u2014 no principal, including root, can delete or alter it for the retention period; (4) abort-vault-lock is the escape hatch if step 2 reveals an error, resetting the vault so you can restart. In a compliant deployment, the flow is always initiate \u2192 validate \u2192 complete.",
+      "explanation": "S3 Glacier Vault Lock uses a two-phase commit: (1) initiate-vault-lock attaches a draft policy and returns a lock ID — the vault enters 'In-Progress' state with a 24-hour window; (2) during that window you should test deny conditions to confirm the policy is correct; (3) complete-vault-lock permanently enforces the policy in Compliance mode — no principal, including root, can delete or alter it for the retention period; (4) abort-vault-lock is the escape hatch if step 2 reveals an error, resetting the vault so you can restart. In a compliant deployment, the flow is always initiate → validate → complete.",
       "difficulty": 3,
       "docs": "https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html",
       "lastReviewed": "2026-03-05"
@@ -332,7 +332,7 @@
         {
           "id": "c2",
           "text": "S3 Object Lock - Compliance mode",
-          "explanation": "Compliance mode applies WORM protection that no AWS principal \u2014 including the root account \u2014 can override during the retention period. This is the correct control when regulatory mandates require absolute immutability (e.g., SEC 17a-4, HIPAA)."
+          "explanation": "Compliance mode applies WORM protection that no AWS principal — including the root account — can override during the retention period. This is the correct control when regulatory mandates require absolute immutability (e.g., SEC 17a-4, HIPAA)."
         },
         {
           "id": "c3",
@@ -346,7 +346,7 @@
         }
       ],
       "tip": "Consider what level of immutability each control provides and whether it applies to the data itself, the audit trail, previous versions, or the encryption key.",
-      "explanation": "CloudTrail log file validation (c1) detects post-delivery tampering of audit logs via signed digests \u2014 it does not prevent writes but proves integrity after the fact. S3 Object Lock Compliance mode (c2) enforces WORM immutability that cannot be overridden by any account, satisfying hard regulatory retention mandates. S3 Versioning (c3) preserves every object state, enabling point-in-time recovery after accidental overwrites. KMS key policy controls (c4) protect the encryption layer \u2014 without the key, encrypted S3 data is irretrievable, so preventing key deletion is itself a data integrity control.",
+      "explanation": "CloudTrail log file validation (c1) detects post-delivery tampering of audit logs via signed digests — it does not prevent writes but proves integrity after the fact. S3 Object Lock Compliance mode (c2) enforces WORM immutability that cannot be overridden by any account, satisfying hard regulatory retention mandates. S3 Versioning (c3) preserves every object state, enabling point-in-time recovery after accidental overwrites. KMS key policy controls (c4) protect the encryption layer — without the key, encrypted S3 data is irretrievable, so preventing key deletion is itself a data integrity control.",
       "difficulty": 4,
       "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
       "lastReviewed": "2026-03-05"
@@ -418,12 +418,12 @@
         {
           "id": "c2",
           "text": "Add the marketing buckets to the Macie allow list so that sensitive data detected in those buckets is not reported as a finding.",
-          "explanation": "Macie allow lists suppress findings for specific text patterns or regular expressions that match expected sensitive data (e.g., known test credit card numbers). They do not suppress all findings for a bucket \u2014 a bucket containing real sensitive data outside the allow list pattern would still generate findings."
+          "explanation": "Macie allow lists suppress findings for specific text patterns or regular expressions that match expected sensitive data (e.g., known test credit card numbers). They do not suppress all findings for a bucket — a bucket containing real sensitive data outside the allow list pattern would still generate findings."
         },
         {
           "id": "c3",
           "text": "Disable the Macie classification job for the marketing buckets and enable it only for remaining buckets.",
-          "explanation": "Disabling a classification job stops Macie from scanning those buckets entirely, which removes visibility. Suppression rules are the correct approach because they retain audit history and still run discovery \u2014 they just filter findings from operational dashboards."
+          "explanation": "Disabling a classification job stops Macie from scanning those buckets entirely, which removes visibility. Suppression rules are the correct approach because they retain audit history and still run discovery — they just filter findings from operational dashboards."
         },
         {
           "id": "c4",
@@ -479,11 +479,11 @@
         {
           "id": "c5",
           "text": "Set the workflow status filter to NEW and NOTIFIED to exclude already-remediated findings from the insight results.",
-          "explanation": "Filtering on workflow status NEW and NOTIFIED ensures the insight reflects open, actionable findings rather than those already resolved. However, this is not required to create a functional insight \u2014 the filter set and grouping attribute (c1) plus the aggregation scope (c2) are the minimum requirements for the described goal."
+          "explanation": "Filtering on workflow status NEW and NOTIFIED ensures the insight reflects open, actionable findings rather than those already resolved. However, this is not required to create a functional insight — the filter set and grouping attribute (c1) plus the aggregation scope (c2) are the minimum requirements for the described goal."
         }
       ],
       "tip": "Break this into two concerns: what data must be visible, and how the insight groups that data into a ranked list.",
-      "explanation": "A Security Hub custom insight requires (1) a filter that defines which findings to include \u2014 CRITICAL severity, S3 resource type, ACTIVE record state \u2014 and a grouping attribute (Resource Id) that produces a count-ranked list of bucket ARNs; and (2) cross-account (and optionally cross-Region) aggregation so that findings from all member accounts are visible in the administrator account's insight. Without both, the insight either cannot be created correctly (c1) or does not see all relevant findings (c2). EventBridge+DynamoDB (c3) is a custom workaround, not the insight feature. GuardDuty cross-account publishing rules (c4) do not exist as described. Workflow status filtering (c5) is optional refinement, not a requirement.",
+      "explanation": "A Security Hub custom insight requires (1) a filter that defines which findings to include — CRITICAL severity, S3 resource type, ACTIVE record state — and a grouping attribute (Resource Id) that produces a count-ranked list of bucket ARNs; and (2) cross-account (and optionally cross-Region) aggregation so that findings from all member accounts are visible in the administrator account's insight. Without both, the insight either cannot be created correctly (c1) or does not see all relevant findings (c2). EventBridge+DynamoDB (c3) is a custom workaround, not the insight feature. GuardDuty cross-account publishing rules (c4) do not exist as described. Workflow status filtering (c5) is optional refinement, not a requirement.",
       "difficulty": 4,
       "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-insights-create.html",
       "lastReviewed": "2026-03-05"
@@ -525,7 +525,7 @@
         }
       ],
       "tip": "Focus on the exact values GuardDuty uses for source, detail-type, and the data type of the severity field in its EventBridge event schema.",
-      "explanation": "GuardDuty EventBridge events have: source='aws.guardduty', detail-type='GuardDuty Finding', and a numeric severity float in the detail object. Only option c1 has all three correct \u2014 the right source, the right detail-type, and numeric comparison matching >= 7. Option c2 uses string labels for severity which do not match the float field. Option c3 uses the wrong source ('guardduty.amazonaws.com' is an API endpoint, not an EventBridge source). Option c4 uses 'Security Finding' which is the Security Hub finding schema detail-type, not GuardDuty's.",
+      "explanation": "GuardDuty EventBridge events have: source='aws.guardduty', detail-type='GuardDuty Finding', and a numeric severity float in the detail object. Only option c1 has all three correct — the right source, the right detail-type, and numeric comparison matching >= 7. Option c2 uses string labels for severity which do not match the float field. Option c3 uses the wrong source ('guardduty.amazonaws.com' is an API endpoint, not an EventBridge source). Option c4 uses 'Security Finding' which is the Security Hub finding schema detail-type, not GuardDuty's.",
       "difficulty": 4,
       "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings_cloudwatch.html",
       "lastReviewed": "2026-03-05"
@@ -575,12 +575,12 @@
         {
           "id": "c2",
           "text": "Amazon Macie",
-          "explanation": "Macie uses machine learning and pattern matching to discover sensitive data \u2014 including PCI DSS payment card numbers \u2014 within S3 objects. It produces per-bucket and per-object findings with the specific sensitive data type detected, making it the right tool for data classification requirements."
+          "explanation": "Macie uses machine learning and pattern matching to discover sensitive data — including PCI DSS payment card numbers — within S3 objects. It produces per-bucket and per-object findings with the specific sensitive data type detected, making it the right tool for data classification requirements."
         },
         {
           "id": "c3",
           "text": "AWS Security Hub",
-          "explanation": "Security Hub aggregates findings from integrated services (GuardDuty, Macie, Inspector, Config, etc.), maps them to compliance framework controls (CIS, PCI DSS, NIST 800-53), and computes a consolidated security score per account and region \u2014 exactly the correlation and scoring use case described."
+          "explanation": "Security Hub aggregates findings from integrated services (GuardDuty, Macie, Inspector, Config, etc.), maps them to compliance framework controls (CIS, PCI DSS, NIST 800-53), and computes a consolidated security score per account and region — exactly the correlation and scoring use case described."
         },
         {
           "id": "c4",
@@ -589,24 +589,235 @@
         }
       ],
       "tip": "Consider each service's primary design purpose: threat detection, data classification, finding aggregation/scoring, or security data lake.",
-      "explanation": "GuardDuty (c1) is the threat intelligence and behavioral detection service \u2014 it identifies malicious network activity including Tor-based credential use from integrated log sources. Macie (c2) is the sensitive data discovery service for S3, detecting PCI, PII, and other regulated data categories using ML and pattern matching. Security Hub (c3) is the aggregation and compliance posture layer \u2014 it imports findings, maps them to control frameworks, and scores security posture. Security Lake (c4) is the OCSF-normalized security data lake \u2014 it provides centralized, long-term retention and analysis across AWS and third-party sources without each service being its own silo.",
+      "explanation": "GuardDuty (c1) is the threat intelligence and behavioral detection service — it identifies malicious network activity including Tor-based credential use from integrated log sources. Macie (c2) is the sensitive data discovery service for S3, detecting PCI, PII, and other regulated data categories using ML and pattern matching. Security Hub (c3) is the aggregation and compliance posture layer — it imports findings, maps them to control frameworks, and scores security posture. Security Lake (c4) is the OCSF-normalized security data lake — it provides centralized, long-term retention and analysis across AWS and third-party sources without each service being its own silo.",
       "difficulty": 3,
       "docs": "https://docs.aws.amazon.com/security-hub/latest/userguide/what-is-securityhub.html",
       "lastReviewed": "2026-03-05"
+    },
+    {
+      "id": "SCS-C03-0013",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html",
+      "format": "text",
+      "services": [
+        "CloudTrail",
+        "S3",
+        "AWS Organizations"
+      ],
+      "skills": [
+        "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+      ],
+      "question": "A security engineer is replacing 50 per-account CloudTrail trails in an AWS Organization with a single centralized trail. The management account hosts an S3 bucket named 'org-audit-logs' where all management events must be delivered. The engineer has created a trail in the management account but events from member accounts are not appearing in the bucket.\n\nWhich configuration change will resolve this?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Enable the IsOrganizationTrail flag on the trail and update the S3 bucket policy to grant cloudtrail.amazonaws.com s3:PutObject with a condition on aws:SourceArn matching the organization trail ARN.",
+          "sequence": 1,
+          "explanation": "An organization trail must have IsOrganizationTrail set to true so CloudTrail automatically propagates it to all member accounts. The S3 bucket policy must allow the CloudTrail service principal to write objects using the aws:SourceArn condition to prevent cross-service confused deputy attacks. This is the standard, supported mechanism for centralized organization-level audit logging."
+        },
+        {
+          "id": "c2",
+          "text": "Enable the IsOrganizationTrail flag on the trail and update the S3 bucket policy to allow s3:PutObject from all member account root principals using aws:PrincipalOrgID as the condition key, eliminating the need for service principal grants in the bucket policy.",
+          "explanation": "Granting PutObject to member account root principals is not how CloudTrail organization trails deliver logs. The CloudTrail service principal writes on behalf of all accounts; individual accounts do not push directly to S3. A bucket policy scoped to account principals would not allow the service to write and would not resolve the missing event delivery."
+        },
+        {
+          "id": "c3",
+          "text": "Enable the IsOrganizationTrail flag on the trail and update the S3 bucket policy to use a Principal of \"*\" with an aws:PrincipalOrgID condition restricting writes to the organization, then apply an SCP that prevents trail modification in all member accounts.",
+          "explanation": "Using a wildcard Principal with aws:PrincipalOrgID allows any identity in the organization to call PutObject, which is overly permissive and not the correct model. CloudTrail needs to be the granted principal, not all organization members. An SCP preventing trail modification is a useful governance control but does not fix log delivery to S3."
+        },
+        {
+          "id": "c4",
+          "text": "Deploy a CloudFormation StackSet from the management account to re-create a matching CloudTrail trail in each member account referencing the same S3 bucket, then update the bucket policy to allow s3:PutObject from the CloudFormation StackSet service role ARN.",
+          "explanation": "Deploying per-account trails via StackSets reproduces the original distributed architecture the engineer is trying to replace. It increases operational overhead and cost. Granting PutObject to the CloudFormation service role is also incorrect - CloudTrail, not CloudFormation, is the principal that writes log files. This approach does not use the organization trail feature."
+        }
+      ],
+      "tip": "Focus on two things: which trail flag enables organization-wide propagation, and which principal must be authorized in the destination bucket policy for the trail to write log files.",
+      "explanation": "An organization trail requires two changes: (1) set IsOrganizationTrail to true on the trail in the management account - this causes CloudTrail to automatically replicate the trail to all member accounts; (2) update the S3 bucket policy to grant cloudtrail.amazonaws.com s3:GetBucketAcl and s3:PutObject permissions, ideally with aws:SourceArn scoped to the trail ARN to prevent the confused deputy problem. Granting PutObject to member account root principals using aws:PrincipalOrgID is incorrect - the CloudTrail service writes on behalf of all accounts, not the accounts themselves. Using a wildcard Principal (*) with aws:PrincipalOrgID is overly permissive, and applying an SCP to prevent trail modification is a governance control that does not fix log delivery. Deploying per-account trails via CloudFormation StackSets reproduces the original distributed architecture and does not leverage the organization trail feature. To implement: in the CloudTrail console edit the trail, check 'Enable for all accounts in my organization', then update the bucket policy using the policy template provided in the CloudTrail documentation.",
+      "domain": "Detection",
+      "difficulty": 4,
+      "lastReviewed": "2026-03-24"
+    },
+    {
+      "id": "SCS-C03-0014",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html",
+      "format": "text",
+      "services": [
+        "CloudWatch Logs",
+        "EC2",
+        "IAM"
+      ],
+      "skills": [
+        "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+      ],
+      "question": "A DevOps engineer deployed the CloudWatch agent on a fleet of Amazon Linux 2 EC2 instances using AWS Systems Manager. The agent configuration specifies /var/log/app/application.log as the source and /app/prod-logs as the target CloudWatch Logs log group. Three days after deployment, the log group exists in CloudWatch but contains no log streams or events.\n\nWhat is the most likely cause and remediation?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "The EC2 instance profile role lacks the CloudWatchAgentServerPolicy permissions. Attach this managed policy to the role and restart the CloudWatch agent on each affected instance.",
+          "sequence": 1,
+          "explanation": "The CloudWatch agent requires logs:CreateLogGroup, logs:CreateLogStream, and logs:PutLogEvents IAM permissions. The log group existing confirms CreateLogGroup succeeded, but missing PutLogEvents prevents log stream creation and event delivery. Attaching CloudWatchAgentServerPolicy to the instance profile role grants all required permissions. Restarting the agent allows it to retry delivery with the updated credentials."
+        },
+        {
+          "id": "c2",
+          "text": "The log group '/app/prod-logs' was auto-created without a retention policy, causing all ingested log events to expire immediately. Set the log group retention to at least 90 days using the CloudWatch console, then redeploy the agent configuration using the SSM Run Command document AWS-ConfigureAWSPackage.",
+          "explanation": "CloudWatch log groups created without an explicit retention policy default to 'Never expire', meaning no logs are deleted automatically. A missing retention policy cannot cause log events to disappear immediately after ingestion. Redeploying the agent via SSM does not address an IAM permissions gap and would not resolve the underlying delivery failure."
+        },
+        {
+          "id": "c3",
+          "text": "The EC2 instances are in a private subnet with no VPC endpoint for CloudWatch Logs, blocking all API calls from the agent. Create an interface VPC endpoint for com.amazonaws.region.logs, attach an endpoint policy allowing the required logs actions, and update the agent configuration with the endpoint URL.",
+          "explanation": "A missing VPC endpoint would block all CloudWatch Logs API calls, which would prevent the log group from being created as well. Because the log group already exists, the agent has already made at least one successful API call. The symptom of a log group with no streams points to a permissions issue on write operations specifically, not a network connectivity failure."
+        },
+        {
+          "id": "c4",
+          "text": "The agent is using the legacy awslogs daemon configuration format, which is incompatible with the unified CloudWatch agent on Amazon Linux 2. Regenerate the configuration using the amazon-cloudwatch-agent-config-wizard, upload the result to SSM Parameter Store, and redeploy it across the fleet using the AmazonCloudWatch-ManageAgent SSM document.",
+          "explanation": "A configuration format incompatibility would typically cause the agent to fail at startup with a parse error, which would also prevent the initial CreateLogGroup call. Since the log group was successfully created, the agent started and ran at least one API call successfully. The issue is not a configuration format problem but a missing IAM permission for write operations."
+        }
+      ],
+      "tip": "When a resource is created successfully but data is not flowing into it, consider what specific permissions govern the write operation versus the creation operation.",
+      "explanation": "The diagnostic key is that the log group exists but has no streams or events. CreateLogGroup succeeded, but CreateLogStream and PutLogEvents are failing silently. This is a classic symptom of partial IAM permissions - the instance profile role likely has logs:CreateLogGroup but is missing logs:CreateLogStream and logs:PutLogEvents. Attaching the CloudWatchAgentServerPolicy managed policy to the instance profile role grants all required permissions in one step. A missing VPC endpoint would block all CloudWatch Logs API calls, which would also prevent CreateLogGroup from succeeding - the pre-existing log group rules out a connectivity failure. A missing retention policy defaults to never-expire and cannot cause log events to disappear immediately after ingestion. A configuration format incompatibility would prevent the agent from starting at all, which would also block the initial CreateLogGroup call. To fix: in IAM, attach CloudWatchAgentServerPolicy to the EC2 instance profile role, then run 'sudo systemctl restart amazon-cloudwatch-agent' on the instances.",
+      "domain": "Detection",
+      "difficulty": 3,
+      "lastReviewed": "2026-03-24"
+    },
+    {
+      "id": "SCS-C03-0015",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-create-and-update-a-trail-by-using-the-aws-cli.html",
+      "format": "cli",
+      "services": [
+        "CloudTrail",
+        "CloudWatch Logs",
+        "IAM"
+      ],
+      "skills": [
+        "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+      ],
+      "question": "A security architect must create a multi-region CloudTrail organization trail in management account 123456789012. The trail must deliver logs to S3 bucket 'org-audit-logs' and also stream copies to a CloudWatch Logs log group '/cloudtrail/org-trail' for real-time alerting. An IAM role named 'CloudTrail_CWLogs_Role' already exists in the account for log streaming.\n\nWhich AWS CLI command correctly creates this trail?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "aws cloudtrail create-trail --name org-trail --s3-bucket-name org-audit-logs --is-multi-region-trail --is-organization-trail --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:* --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
+          "sequence": 1,
+          "explanation": "This command includes all required parameters: --is-multi-region-trail for cross-region coverage, --is-organization-trail to propagate the trail to all member accounts, --cloud-watch-logs-log-group-arn with the required :* suffix referencing the log group and its streams, and --cloud-watch-logs-role-arn specifying the IAM role CloudTrail uses to deliver to CloudWatch Logs. Both CloudWatch Logs parameters must be present together."
+        },
+        {
+          "id": "c2",
+          "text": "aws cloudtrail create-trail --name org-trail --s3-bucket-name org-audit-logs --is-multi-region-trail --is-organization-trail --enable-log-file-validation --kms-key-id arn:aws:kms:us-east-1:123456789012:alias/cloudtrail-key --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:*",
+          "explanation": "--enable-log-file-validation and --kms-key-id are valid but optional parameters. However, this command is missing the required --cloud-watch-logs-role-arn parameter. When specifying --cloud-watch-logs-log-group-arn, the role ARN is mandatory - CloudTrail needs it to assume the delivery role and write to CloudWatch Logs. The command will fail with a validation error."
+        },
+        {
+          "id": "c3",
+          "text": "aws cloudtrail create-trail --name org-trail --s3-bucket-name org-audit-logs --include-global-service-events --is-organization-trail --enable-log-file-validation --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:* --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
+          "explanation": "--include-global-service-events enables logging of global services like IAM and STS but does not make the trail multi-region. Without --is-multi-region-trail, CloudTrail only captures API calls in the single region where the trail was created. The requirement specifies a multi-region trail, so this command leaves all other regions unmonitored."
+        },
+        {
+          "id": "c4",
+          "text": "aws cloudtrail create-trail --name org-trail --s3-bucket-name org-audit-logs --s3-key-prefix AWSLogs --is-multi-region-trail --is-organization-trail --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
+          "explanation": "This command is missing the :* suffix on the log group ARN. CloudTrail requires the log group ARN to end with :* when specified via the CLI, because the ARN must reference the log group and all its associated log streams. Without the suffix, the command returns a validation error indicating the log group ARN format is invalid."
+        }
+      ],
+      "tip": "When configuring two delivery destinations for a CloudTrail trail, identify every required parameter for each destination and verify that ARN formats match exactly what the API expects.",
+      "explanation": "Creating a CloudTrail trail with CloudWatch Logs delivery requires four key parameters to be present together: --is-organization-trail, --is-multi-region-trail, --cloud-watch-logs-log-group-arn (with :* suffix), and --cloud-watch-logs-role-arn. The command that includes --enable-log-file-validation and --kms-key-id adds valid optional parameters but omits --cloud-watch-logs-role-arn - both CloudWatch Logs parameters must be supplied together or the log streaming configuration is rejected. The command that uses --include-global-service-events instead of --is-multi-region-trail only enables logging of global services like IAM and STS; it does not make the trail multi-region, leaving all regions except the home region uncovered. The command that includes --s3-key-prefix AWSLogs is missing the :* wildcard suffix on the log group ARN, which CloudTrail requires to identify the log group and its associated streams - this causes a format validation error. After creating the trail, run 'aws cloudtrail start-logging --name org-trail' to begin capturing events.",
+      "domain": "Detection",
+      "difficulty": 4,
+      "lastReviewed": "2026-03-24"
+    },
+    {
+      "id": "SCS-C03-0016",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CrossAccountSubscriptions.html",
+      "format": "text",
+      "services": [
+        "CloudWatch Logs",
+        "Kinesis Data Streams",
+        "IAM"
+      ],
+      "skills": [
+        "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+      ],
+      "question": "A security team is building a dedicated logging account (999888777666) to centralize CloudWatch Logs from 20 application accounts. A Kinesis Data Stream named 'central-log-stream' already exists in the logging account. An application account (111222333444) has a log group '/prod/app-server' that must stream events to this central stream in near real time.\n\nWhich TWO actions must be performed to enable streaming from the application account to the logging account? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "In the logging account, create a CloudWatch Logs destination that wraps 'central-log-stream' and attach a destination access policy granting logs:PutSubscriptionFilter to account 111222333444.",
+          "sequence": 1,
+          "explanation": "A CloudWatch Logs destination in the receiving account exposes the Kinesis stream as a cross-account target. The destination access policy is the authorization mechanism that permits the source account to create a subscription filter pointing to this destination. Without the destination and its policy, the source account cannot reference the Kinesis stream across account boundaries."
+        },
+        {
+          "id": "c2",
+          "text": "In account 111222333444, create a CloudWatch Logs subscription filter on '/prod/app-server' specifying the destination ARN from the logging account as the target.",
+          "sequence": 2,
+          "explanation": "A subscription filter in the source account connects the log group to the cross-account destination. It specifies the destination ARN and an optional filter pattern, then causes CloudWatch Logs to forward all matching events to the Kinesis stream in near real time. Without the subscription filter, no data flows from the source log group to the destination."
+        },
+        {
+          "id": "c3",
+          "text": "In the logging account, configure an Amazon EventBridge cross-account event bus and create a rule matching CloudWatch Logs delivery events from account 111222333444, using a resource-based policy granting events:PutEvents to the source account.",
+          "explanation": "EventBridge handles structured AWS service events and custom application events. It does not receive raw CloudWatch Logs log stream data and cannot serve as a replacement for the CloudWatch Logs destination mechanism. Creating an event bus rule for CloudWatch Logs delivery events does not stream log group data to Kinesis."
+        },
+        {
+          "id": "c4",
+          "text": "In account 111222333444, configure a CloudWatch Logs export task to periodically export '/prod/app-server' to an S3 bucket in the logging account, then deploy a Lambda function in the logging account that reads the S3 exports and writes them into 'central-log-stream'.",
+          "explanation": "Export tasks deliver CloudWatch Logs data to S3 in batches on a scheduled basis, not in near real time. The requirement specifies near real-time streaming, which is only achievable via subscription filters. Adding a Lambda re-import step introduces latency, operational complexity, and additional failure points - it does not fulfill the streaming requirement."
+        },
+        {
+          "id": "c5",
+          "text": "In the logging account, enable AWS Organizations delegated administrator for CloudWatch and apply an organizations-managed log aggregation policy that automatically subscribes all member account log groups to 'central-log-stream' without additional per-account configuration.",
+          "explanation": "AWS Organizations integration with CloudWatch exists for certain features like cross-account observability, but there is no Organizations-managed policy that automatically subscribes log groups in member accounts to a Kinesis stream. Cross-account CloudWatch Logs streaming requires explicit destination creation and per-log-group subscription filter configuration in each source account."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Cross-account log streaming requires one configuration step in the receiving account to expose the target and authorize access, and a separate configuration step in the source account to activate the data flow.",
+      "explanation": "Cross-account CloudWatch Logs streaming uses a two-sided setup: the logging account creates a CloudWatch Logs destination that wraps the Kinesis stream and attaches a destination access policy authorizing the source account to write; the source account then creates a subscription filter on the log group referencing that destination ARN, activating near real-time forwarding. EventBridge cross-account event buses handle structured AWS service events and custom events - they do not receive raw CloudWatch Logs stream data and cannot substitute for the destination-and-subscription-filter mechanism. CloudWatch Logs export tasks deliver data to S3 in batches on a scheduled basis, not in near real time, and routing those exports back into a Kinesis stream via Lambda adds latency and does not fulfill the streaming requirement. There is no AWS Organizations-managed policy that automatically subscribes log groups across member accounts to a Kinesis stream; cross-account streaming requires explicit per-log-group subscription filter configuration. To configure: run 'aws logs put-destination' and 'aws logs put-destination-policy' in the logging account, then 'aws logs put-subscription-filter' in the application account referencing the returned destination ARN.",
+      "domain": "Detection",
+      "difficulty": 4,
+      "lastReviewed": "2026-03-24"
+    },
+    {
+      "id": "SCS-C03-0017",
+      "type": "ordering",
+      "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html",
+      "services": [
+        "CloudTrail",
+        "S3",
+        "AWS Organizations",
+        "CloudWatch Logs"
+      ],
+      "skills": [
+        "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+      ],
+      "question": "A security architect is setting up a centralized CloudTrail organization trail for a newly created AWS Organization. The trail must deliver logs to an S3 bucket in a dedicated logging account and also stream copies to CloudWatch Logs for real-time alerting. Arrange the following steps in the correct order to complete the configuration.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Enable CloudTrail as a trusted service in AWS Organizations from the management account console or by running 'aws organizations enable-aws-service-access --service-principal cloudtrail.amazonaws.com'.",
+          "sequence": 1,
+          "explanation": "Enabling CloudTrail as a trusted service in Organizations is the first prerequisite. This creates the CloudTrail service-linked role (AWSServiceRoleForCloudTrail) and grants CloudTrail the permissions it needs to create and manage trails in member accounts. Without this step, the IsOrganizationTrail flag cannot be used successfully."
+        },
+        {
+          "id": "c2",
+          "text": "Create an S3 bucket in the logging account and attach a bucket policy granting cloudtrail.amazonaws.com s3:GetBucketAcl and s3:PutObject, with a StringEquals condition on aws:SourceOrgID matching the organization ID.",
+          "sequence": 2,
+          "explanation": "The destination S3 bucket and its policy must exist before the trail is created. During trail creation, CloudTrail validates that it has write access to the specified bucket. If the bucket policy is missing or incorrect at creation time, the API call fails with an InsufficientS3BucketPolicyException, requiring the policy to be fixed before retrying."
+        },
+        {
+          "id": "c3",
+          "text": "Create the organization trail in the management account with IsOrganizationTrail enabled, specifying the S3 bucket as the primary destination and providing the CloudWatch Logs log group ARN and IAM role ARN for log streaming.",
+          "sequence": 3,
+          "explanation": "With Organizations integration active and the S3 bucket policy in place, the trail can be created. Setting IsOrganizationTrail automatically deploys the trail configuration to all current and future member accounts. Providing both CloudWatch Logs parameters at creation time enables dual delivery - to S3 for durable storage and to CloudWatch Logs for real-time alerting."
+        },
+        {
+          "id": "c4",
+          "text": "Enable logging on the trail using 'aws cloudtrail start-logging --name org-trail', then verify delivery by checking for log files in the S3 bucket prefix and confirming that log streams appear in the CloudWatch Logs log group.",
+          "sequence": 4,
+          "explanation": "Creating a trail does not automatically start log delivery - the trail must be explicitly started with start-logging. Verifying that both delivery paths are working (S3 and CloudWatch Logs) confirms that the end-to-end configuration is correct and that management events from all member accounts are being captured and routed to both destinations."
+        }
+      ],
+      "tip": "Consider which resources and permissions must exist before each step can succeed - the sequence is determined by the dependencies between steps.",
+      "explanation": "The steps follow a strict dependency chain: (1) Enable CloudTrail in Organizations first - this creates the service-linked role needed for org-wide trail management; (2) Create and configure the S3 bucket before trail creation - CloudTrail validates bucket access during the create-trail API call, so the bucket policy must be ready; (3) Create the organization trail referencing the pre-configured destinations - this simultaneously deploys the trail to all member accounts; (4) Start logging and verify both delivery paths to confirm the configuration is operational. Attempting steps out of order results in API errors: creating the trail before step 1 fails because the service-linked role does not exist, and creating the trail before step 2 fails because the bucket policy check fails.",
+      "domain": "Detection",
+      "difficulty": 5,
+      "lastReviewed": "2026-03-24"
     }
-  ],
-  "showcaseQuestionIds": [
-    "SCS-C03-0001",
-    "SCS-C03-0002",
-    "SCS-C03-0003",
-    "SCS-C03-0004",
-    "SCS-C03-0005",
-    "SCS-C03-0006",
-    "SCS-C03-0007",
-    "SCS-C03-0008",
-    "SCS-C03-0009",
-    "SCS-C03-0010",
-    "SCS-C03-0011",
-    "SCS-C03-0012"
   ]
 }
