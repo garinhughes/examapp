@@ -31,7 +31,7 @@ variable "github_repo" {
 variable "cognito_admin_role_arn" {
   description = "ARN of the IAM role in the management account that grants Cognito admin access. The ECS task role will be allowed to assume this role."
   type        = string
-  default     = ""
+  default     = "arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role"
 }
 
 variable "enable_waf" {

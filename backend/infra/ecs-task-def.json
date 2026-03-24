@@ -39,7 +39,8 @@
         { "name": "GOCARDLESS_ENABLE_REAL", "value": "1" },
         { "name": "METRICS_TABLE", "value": "examapp-metrics" },
         { "name": "INTERACTIONS_TABLE", "value": "examapp-interactions" },
-        { "name": "SESSIONS_TABLE", "value": "examapp-sessions" }
+        { "name": "SESSIONS_TABLE", "value": "examapp-sessions" },
+        { "name": "COGNITO_ADMIN_ROLE_ARN", "value": "arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role" }
       ],
       "secrets": [
         {
