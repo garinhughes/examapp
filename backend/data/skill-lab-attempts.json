@@ -227,5 +227,25 @@
     "correct": false,
     "timeTaken": 2,
     "createdAt": "2026-03-24T08:08:08.449Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "62955396-60e4-4b30-9a11-b3fcf5953ac1",
+    "labId": "s3-access-denied-cli",
+    "labType": "diagnose",
+    "selectedAnswer": "wrong-region",
+    "correct": false,
+    "timeTaken": 6,
+    "createdAt": "2026-03-24T09:25:36.435Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "079bc689-fd66-4373-aac1-2f8b04ff4f87",
+    "labId": "lambda-timeout-logs",
+    "labType": "diagnose",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 11,
+    "createdAt": "2026-03-24T10:15:22.390Z"
   }
 ]

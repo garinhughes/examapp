@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useExam } from '@/exam/ExamContext'
-import { apiUrl } from '@/apiBase'
 import type { CliLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { useLabComplete } from '../shared'
-import { useLabProgress } from '../useLabProgress'
+import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
 interface CliLabRunnerProps {
@@ -27,9 +25,8 @@ interface CliProgress {
 }
 
 export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
-  const { authFetch, user, setRoute } = useExam()
-  const completeWithGamification = useLabComplete(lab)
-  const { savedProgress, saveProgress, clearProgress } = useLabProgress<CliProgress>(lab.id, timed)
+  const { setRoute } = useExam()
+  const session = useLabSession<CliProgress>({ lab, timed })
 
   const defaultLines: TerminalLine[] = [
     { type: 'output', text: `Lab: ${lab.title}` },
@@ -39,65 +36,48 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
     { type: 'output', text: '' },
   ]
 
-  // Terminal state
-  const [lines, setLines] = useState<TerminalLine[]>(savedProgress?.lines ?? defaultLines)
+  const [lines, setLines] = useState<TerminalLine[]>(session.savedProgress?.lines ?? defaultLines)
   const [input, setInput] = useState('')
-  const [commandHistory, setCommandHistory] = useState<string[]>(savedProgress?.commandHistory ?? [])
+  const [commandHistory, setCommandHistory] = useState<string[]>(session.savedProgress?.commandHistory ?? [])
   const [historyIndex, setHistoryIndex] = useState(-1)
-
-  // Answer state
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(savedProgress?.selectedAnswer ?? null)
-  const [submitted, setSubmitted] = useState(false)
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(session.savedProgress?.selectedAnswer ?? null)
   const [isCorrect, setIsCorrect] = useState(false)
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
-
-  // Timer
-  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
-  const [labPaused, setLabPaused] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startTimeRef = useRef<number>(Date.now())
 
   const terminalEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Build command lookup map
   const commandMap = useRef(
     new Map(lab.commands.map((c) => [c.command.trim().toLowerCase(), c.output]))
   ).current
 
-  // Auto-dismiss resume notice
   useEffect(() => {
-    if (!resumeNotice) return
-    const t = setTimeout(() => setResumeNotice(false), 3000)
-    return () => clearTimeout(t)
-  }, [resumeNotice])
+    if (session.submitted) return
+    session.saveProgress({ lines, commandHistory, selectedAnswer, timeLeft: session.timeLeft })
+  }, [lines, commandHistory, selectedAnswer, session.timeLeft, session.submitted])
 
-  // Auto-save progress
   useEffect(() => {
-    if (submitted) return
-    saveProgress({ lines, commandHistory, selectedAnswer, timeLeft })
-  }, [lines, commandHistory, selectedAnswer, timeLeft, submitted])
+    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+  }, [session.timeLeft])
 
-  /** Simulate `| jq` piping: pretty-print JSON, optionally extract a top-level key */
+  useEffect(() => {
+    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [lines])
+
   function applyJq(raw: string, jqArg: string): string {
     try {
       const parsed = JSON.parse(raw)
-      if (jqArg === '' || jqArg === '.') {
-        return JSON.stringify(parsed, null, 4)
-      }
+      if (jqArg === '' || jqArg === '.') return JSON.stringify(parsed, null, 4)
       const key = jqArg.startsWith('.') ? jqArg.slice(1) : jqArg
       if (key in parsed) {
         const val = parsed[key]
         return typeof val === 'object' ? JSON.stringify(val, null, 4) : String(val)
       }
-      return `null`
+      return 'null'
     } catch {
       return raw
     }
   }
 
-  /** Resolve a command string, handling `| jq` pipes */
   function resolveCommand(input: string): { baseCmd: string; output: string | undefined } {
     const pipeIdx = input.indexOf('|')
     if (pipeIdx === -1) {
@@ -114,30 +94,6 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
     }
     return { baseCmd: base, output: raw }
   }
-
-  // Timer
-  useEffect(() => {
-    if (submitted || !timed || labPaused) return
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current!)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed, labPaused])
-
-  useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) doSubmit()
-  }, [timeLeft])
-
-  // Auto-scroll terminal
-  useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [lines])
 
   const handleCommand = useCallback((cmd: string) => {
     const trimmed = cmd.trim()
@@ -200,65 +156,36 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
   }
 
   const doSubmit = useCallback(async () => {
-    if (submitted || !lab) return
-    setSubmitted(true)
-    clearProgress()
-    if (timerRef.current) clearInterval(timerRef.current)
-
     const correctAnswer = lab.answers.find((a) => a.correct)
     const correct = selectedAnswer === correctAnswer?.id
     setIsCorrect(correct)
-    completeWithGamification(correct)
-
-    const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
-
-    if (user) {
-      try {
-        await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: selectedAnswer || '', correct, timeTaken }),
-        })
-      } catch {
-        // Non-critical
-      }
-    }
-  }, [submitted, lab, selectedAnswer, authFetch, user])
-
-  const handlePauseAndExit = useCallback(() => {
-    saveProgress({ lines, commandHistory, selectedAnswer, timeLeft })
-    setRoute('skill-labs')
-  }, [lines, commandHistory, selectedAnswer, timeLeft])
-
-  const handleCancelLab = useCallback(() => {
-    clearProgress()
-    setRoute('skill-labs')
-  }, [])
+    await session.finalize(correct, selectedAnswer || '')
+  }, [lab, selectedAnswer, session.finalize])
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {showConfirmModal && (
+      {session.showConfirmModal && (
         <LabCompleteModal
           title={lab.title}
-          timeTaken={lab.timeLimit - timeLeft}
+          timeTaken={lab.timeLimit - session.timeLeft}
           timed={timed}
-          onConfirm={() => { setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => setShowConfirmModal(false)}
+          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
+          onCancel={() => session.setShowConfirmModal(false)}
         />
       )}
 
       <LabHeader
         title={lab.title}
         timed={timed}
-        timeLeft={timeLeft}
+        timeLeft={session.timeLeft}
         subtitle={lab.scenario}
         labId={lab.id}
-        onPauseChange={setLabPaused}
-        onPauseAndExit={submitted ? undefined : handlePauseAndExit}
-        onCancelLab={submitted ? undefined : handleCancelLab}
+        onPauseChange={session.setLabPaused}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ lines, commandHistory, selectedAnswer, timeLeft: session.timeLeft })}
+        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
       />
 
-      {resumeNotice && (
+      {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
         </div>
@@ -278,7 +205,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
             {line.text}
           </div>
         ))}
-        {!submitted && (
+        {!session.submitted && (
           <div className="flex items-center">
             <span className="text-cyan-400 whitespace-pre">{PROMPT}</span>
             <input
@@ -302,7 +229,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
           {lab.answers.map((answer) => {
             let cls = 'border border-border rounded-md px-4 py-2.5 text-sm text-left transition '
-            if (submitted) {
+            if (session.submitted) {
               if (answer.correct) {
                 cls += 'border-green-500 bg-green-500/10 text-green-700 dark:text-green-400'
               } else if (answer.id === selectedAnswer && !answer.correct) {
@@ -319,8 +246,8 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
               <button
                 key={answer.id}
                 className={cls}
-                disabled={submitted}
-                onClick={() => !submitted && setSelectedAnswer(answer.id)}
+                disabled={session.submitted}
+                onClick={() => !session.submitted && setSelectedAnswer(answer.id)}
               >
                 {answer.text}
               </button>
@@ -328,11 +255,11 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
           })}
         </div>
 
-        {!submitted ? (
+        {!session.submitted ? (
           <button
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!selectedAnswer}
-            onClick={() => setShowConfirmModal(true)}
+            onClick={() => session.setShowConfirmModal(true)}
           >
             Submit Answer
           </button>

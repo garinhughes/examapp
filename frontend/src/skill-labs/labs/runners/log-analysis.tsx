@@ -1,11 +1,9 @@
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import { Search, Filter } from 'lucide-react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
+import { Search } from 'lucide-react'
 import { useExam } from '@/exam/ExamContext'
-import { apiUrl } from '@/apiBase'
-import type { LogAnalysisLabDefinition, LogEntry } from '../../types'
+import type { LogAnalysisLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { useLabComplete } from '../shared'
-import { useLabProgress } from '../useLabProgress'
+import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
 interface LogAnalysisProgress {
@@ -27,54 +25,28 @@ const LEVEL_COLORS: Record<string, string> = {
 }
 
 export function LogAnalysisRunner({ lab, timed = true }: Props) {
-  const { authFetch, user, setRoute } = useExam()
-  const completeWithGamification = useLabComplete(lab)
-  const { savedProgress, saveProgress, clearProgress } = useLabProgress<LogAnalysisProgress>(lab.id, timed)
+  const { setRoute } = useExam()
+  const session = useLabSession<LogAnalysisProgress>({ lab, timed })
 
   const [searchTerm, setSearchTerm] = useState('')
   const [levelFilter, setLevelFilter] = useState<string | null>(null)
   const [highlightedLines, setHighlightedLines] = useState<Set<number>>(
-    () => new Set(savedProgress?.highlightedLines ?? [])
+    () => new Set(session.savedProgress?.highlightedLines ?? [])
   )
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(savedProgress?.selectedAnswer ?? null)
-  const [submitted, setSubmitted] = useState(false)
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(session.savedProgress?.selectedAnswer ?? null)
   const [isCorrect, setIsCorrect] = useState(false)
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
-  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
-  const [labPaused, setLabPaused] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startTimeRef = useRef<number>(Date.now())
-  const logContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!resumeNotice) return
-    const t = setTimeout(() => setResumeNotice(false), 3000)
-    return () => clearTimeout(t)
-  }, [resumeNotice])
+    if (session.submitted) return
+    session.saveProgress({ highlightedLines: [...highlightedLines], selectedAnswer, timeLeft: session.timeLeft })
+  }, [highlightedLines, selectedAnswer, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (submitted) return
-    saveProgress({ highlightedLines: [...highlightedLines], selectedAnswer, timeLeft })
-  }, [highlightedLines, selectedAnswer, timeLeft, submitted])
-
-  useEffect(() => {
-    if (submitted || !timed || labPaused) return
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) { clearInterval(timerRef.current!); return 0 }
-        return prev - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed, labPaused])
-
-  useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) doSubmit()
-  }, [timeLeft])
+    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+  }, [session.timeLeft])
 
   const filteredLogs = useMemo(() => {
-    return lab.logs.filter((log, _idx) => {
+    return lab.logs.filter((log) => {
       if (levelFilter && log.level !== levelFilter) return false
       if (searchTerm) {
         const term = searchTerm.toLowerCase()
@@ -89,72 +61,36 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
   }, [lab.logs, searchTerm, levelFilter])
 
   const toggleHighlight = useCallback((idx: number) => {
-    if (submitted) return
+    if (session.submitted) return
     setHighlightedLines((prev) => {
       const next = new Set(prev)
       if (next.has(idx)) next.delete(idx)
       else next.add(idx)
       return next
     })
-  }, [submitted])
+  }, [session.submitted])
 
   const doSubmit = useCallback(async () => {
-    if (submitted) return
-    setSubmitted(true)
-    clearProgress()
-    if (timerRef.current) clearInterval(timerRef.current)
-
     const correctAnswer = lab.answers.find((a) => a.correct)
     const correct = selectedAnswer === correctAnswer?.id
     setIsCorrect(correct)
-    completeWithGamification(correct)
-
-    const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
-    if (user) {
-      try {
-        await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: selectedAnswer || '', correct, timeTaken }),
-        })
-      } catch { /* non-critical */ }
-    }
-  }, [submitted, lab, selectedAnswer, authFetch, user])
-
-  const handlePauseAndExit = useCallback(() => {
-    saveProgress({ highlightedLines: [...highlightedLines], selectedAnswer, timeLeft })
-    setRoute('skill-labs')
-  }, [highlightedLines, selectedAnswer, timeLeft])
-
-  const handleCancelLab = useCallback(() => {
-    clearProgress()
-    setRoute('skill-labs')
-  }, [])
+    await session.finalize(correct, selectedAnswer || '')
+  }, [lab, selectedAnswer, session.finalize])
 
   const levels = useMemo(() => [...new Set(lab.logs.map((l) => l.level))], [lab.logs])
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {showConfirmModal && (
-        <LabCompleteModal
-          title={lab.title}
-          timeTaken={lab.timeLimit - timeLeft}
-          timed={timed}
-          onConfirm={() => { setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => setShowConfirmModal(false)}
-        />
+      {session.showConfirmModal && (
+        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - session.timeLeft} timed={timed}
+          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
+          onCancel={() => session.setShowConfirmModal(false)} />
       )}
-      <LabHeader
-        title={lab.title}
-        timed={timed}
-        timeLeft={timeLeft}
-        subtitle={lab.scenario}
-        labId={lab.id}
-        onPauseChange={setLabPaused}
-        onPauseAndExit={submitted ? undefined : handlePauseAndExit}
-        onCancelLab={submitted ? undefined : handleCancelLab}
-      />
-      {resumeNotice && (
+      <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={lab.scenario} labId={lab.id}
+        onPauseChange={session.setLabPaused}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ highlightedLines: [...highlightedLines], selectedAnswer, timeLeft: session.timeLeft })}
+        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+      {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
         </div>
@@ -193,11 +129,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
       </div>
 
       {/* Log viewer */}
-      <div
-        ref={logContainerRef}
-        className="flex-1 rounded-lg border border-border overflow-y-auto font-mono text-xs"
-        style={{ background: '#1e1e1e' }}
-      >
+      <div className="flex-1 rounded-lg border border-border overflow-y-auto font-mono text-xs" style={{ background: '#1e1e1e' }}>
         <table className="w-full">
           <thead>
             <tr className="text-left text-gray-500 border-b border-gray-700 sticky top-0" style={{ background: '#1e1e1e' }}>
@@ -215,9 +147,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
                 <tr
                   key={i}
                   onClick={() => toggleHighlight(globalIdx)}
-                  className={`cursor-pointer transition-colors ${
-                    isHighlighted ? 'bg-amber-500/20' : 'hover:bg-white/5'
-                  }`}
+                  className={`cursor-pointer transition-colors ${isHighlighted ? 'bg-amber-500/20' : 'hover:bg-white/5'}`}
                 >
                   <td className="px-3 py-1 text-gray-400">{log.timestamp}</td>
                   <td className={`px-3 py-1 font-bold ${LEVEL_COLORS[log.level] || 'text-gray-400'}`}>{log.level}</td>
@@ -236,7 +166,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
           {lab.answers.map((answer) => {
             let cls = 'border border-border rounded-md px-4 py-2.5 text-sm text-left transition '
-            if (submitted) {
+            if (session.submitted) {
               if (answer.correct) cls += 'border-green-500 bg-green-500/10 text-green-700 dark:text-green-400'
               else if (answer.id === selectedAnswer && !answer.correct) cls += 'border-destructive bg-destructive/10 text-destructive'
               else cls += 'bg-muted/30 text-muted-foreground'
@@ -246,17 +176,17 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
               cls += 'hover:bg-muted/50 cursor-pointer'
             }
             return (
-              <button key={answer.id} className={cls} disabled={submitted} onClick={() => !submitted && setSelectedAnswer(answer.id)}>
+              <button key={answer.id} className={cls} disabled={session.submitted} onClick={() => !session.submitted && setSelectedAnswer(answer.id)}>
                 {answer.text}
               </button>
             )
           })}
         </div>
-        {!submitted ? (
+        {!session.submitted ? (
           <button
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!selectedAnswer}
-            onClick={() => setShowConfirmModal(true)}
+            onClick={() => session.setShowConfirmModal(true)}
           >
             Submit Answer
           </button>

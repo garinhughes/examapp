@@ -1,11 +1,9 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import MonacoEditor from '@monaco-editor/react'
 import { useExam } from '@/exam/ExamContext'
-import { apiUrl } from '@/apiBase'
 import type { PolicySimulationLabDefinition, PolicyTestCase } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { useLabComplete } from '../shared'
-import { useLabProgress } from '../useLabProgress'
+import { useLabSession } from '../useLabSession'
 
 interface PolicySimProgress { policy: string; timeLeft: number }
 
@@ -71,45 +69,21 @@ function evaluatePolicy(policyJson: string, testCases: PolicyTestCase[]): { resu
 }
 
 export function PolicySimulationRunner({ lab, timed = true }: Props) {
-  const { authFetch, user, setRoute } = useExam()
-  const completeWithGamification = useLabComplete(lab)
-  const { savedProgress, saveProgress, clearProgress } = useLabProgress<PolicySimProgress>(lab.id, timed)
+  const { setRoute } = useExam()
+  const session = useLabSession<PolicySimProgress>({ lab, timed })
 
-  const [policy, setPolicy] = useState(savedProgress?.policy ?? lab.initialPolicy)
+  const [policy, setPolicy] = useState(session.savedProgress?.policy ?? lab.initialPolicy)
   const [testResults, setTestResults] = useState<TestResult[] | null>(null)
   const [testError, setTestError] = useState<string | null>(null)
-  const [submitted, setSubmitted] = useState(false)
-  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
-  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
-  const [labPaused, setLabPaused] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
-    if (!resumeNotice) return
-    const t = setTimeout(() => setResumeNotice(false), 3000)
-    return () => clearTimeout(t)
-  }, [resumeNotice])
+    if (session.submitted) return
+    session.saveProgress({ policy, timeLeft: session.timeLeft })
+  }, [policy, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (submitted) return
-    saveProgress({ policy, timeLeft })
-  }, [policy, timeLeft, submitted])
-
-  useEffect(() => {
-    if (submitted || !timed || labPaused) return
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) { clearInterval(timerRef.current!); return 0 }
-        return prev - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed, labPaused])
-
-  useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) handleRunTests()
-  }, [timeLeft])
+    if (timed && session.timeLeft === 0 && !session.submitted) handleRunTests()
+  }, [session.timeLeft])
 
   const handleRunTests = useCallback(async () => {
     const { results, error } = evaluatePolicy(policy, lab.testCases)
@@ -122,59 +96,24 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
     setTestResults(results)
 
     const allPass = results.every((r) => r.pass)
-    if (allPass && !submitted) {
-      setSubmitted(true)
-      clearProgress()
-      if (timerRef.current) clearInterval(timerRef.current)
-      completeWithGamification(true)
-
-      const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
-      if (user) {
-        try {
-          await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-          })
-        } catch { /* non-critical */ }
-      }
+    if (allPass) {
+      await session.finalize(true)
     }
-  }, [policy, lab, submitted, authFetch, user])
+  }, [policy, lab, session.finalize])
 
   const handleGiveUp = useCallback(async () => {
-    setSubmitted(true)
-    clearProgress()
-    if (timerRef.current) clearInterval(timerRef.current)
-    completeWithGamification(false)
-
-    const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
-    if (user) {
-      try {
-        await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        })
-      } catch { /* non-critical */ }
-    }
-  }, [lab, authFetch, user])
-
-  const handlePauseAndExit = useCallback(() => {
-    saveProgress({ policy, timeLeft })
-    setRoute('skill-labs')
-  }, [policy, timeLeft])
-
-  const handleCancelLab = useCallback(() => {
-    clearProgress()
-    setRoute('skill-labs')
-  }, [])
+    await session.finalize(false)
+  }, [session.finalize])
 
   const allPass = testResults !== null && testResults.every((r) => r.pass)
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id}
-        onPauseChange={setLabPaused} onPauseAndExit={submitted ? undefined : handlePauseAndExit}
-        onCancelLab={submitted ? undefined : handleCancelLab} />
-      {resumeNotice && (
+      <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={lab.scenario} labId={lab.id}
+        onPauseChange={session.setLabPaused}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ policy, timeLeft: session.timeLeft })}
+        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+      {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
         </div>
@@ -217,8 +156,8 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
             language="json"
             theme="vs-dark"
             value={policy}
-            onChange={(v) => !submitted && setPolicy(v || '')}
-            options={{ readOnly: submitted, minimap: { enabled: false }, fontSize: 13, lineNumbers: 'on', scrollBeyondLastLine: false }}
+            onChange={(v) => !session.submitted && setPolicy(v || '')}
+            options={{ readOnly: session.submitted, minimap: { enabled: false }, fontSize: 13, lineNumbers: 'on', scrollBeyondLastLine: false }}
           />
         </div>
 
@@ -253,7 +192,7 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
             <p className="text-xs text-muted-foreground">Click "Run Tests" to validate your policy against the test cases.</p>
           )}
 
-          {submitted && (
+          {session.submitted && (
             <div className="text-sm text-muted-foreground mt-4 pt-3 border-t border-border">
               {lab.explanation}
             </div>
@@ -263,7 +202,7 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
 
       {/* Action bar */}
       <div className="rounded-lg border border-border bg-card p-4 shadow-sm flex items-center justify-between">
-        {!submitted ? (
+        {!session.submitted ? (
           <>
             <button
               className="text-sm text-muted-foreground hover:text-foreground transition"

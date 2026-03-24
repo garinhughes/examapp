@@ -20,7 +20,7 @@ import { fileURLToPath } from 'url'
 import { publishLab, getLabIndex } from '../src/services/skillLabStore.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const LABS_FILE = path.resolve(__dirname, '../data/skill-labs.json')
+const LABS_DIR = path.resolve(__dirname, '../data/skill-labs')
 
 interface LabDef {
   id: string
@@ -44,9 +44,14 @@ async function main() {
     process.exit(1)
   }
 
-  // Load the monolithic labs file and split into individual lab definitions
-  const raw = await fs.readFile(LABS_FILE, 'utf-8')
-  const allLabs: LabDef[] = JSON.parse(raw)
+  // Scan per-provider files and merge into one array
+  const files = await fs.readdir(LABS_DIR)
+  const allLabs: LabDef[] = (await Promise.all(
+    files.filter((f) => f.endsWith('.json')).map(async (f) => {
+      const raw = await fs.readFile(path.join(LABS_DIR, f), 'utf-8')
+      return JSON.parse(raw) as LabDef[]
+    })
+  )).flat()
 
   let labs: LabDef[]
   if (publishAll) {
@@ -54,7 +59,7 @@ async function main() {
   } else {
     const match = allLabs.find((l) => l.id === labId)
     if (!match) {
-      console.error(`Lab "${labId}" not found in ${LABS_FILE}`)
+      console.error(`Lab "${labId}" not found in ${LABS_DIR}`)
       process.exit(1)
     }
     labs = [match]

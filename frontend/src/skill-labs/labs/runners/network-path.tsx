@@ -1,10 +1,8 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useExam } from '@/exam/ExamContext'
-import { apiUrl } from '@/apiBase'
 import type { NetworkPathLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { useLabComplete } from '../shared'
-import { useLabProgress } from '../useLabProgress'
+import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
 interface NetworkPathProgress {
@@ -19,109 +17,58 @@ interface Props {
 }
 
 export function NetworkPathRunner({ lab, timed = true }: Props) {
-  const { authFetch, user, setRoute } = useExam()
-  const completeWithGamification = useLabComplete(lab)
-  const { savedProgress, saveProgress, clearProgress } = useLabProgress<NetworkPathProgress>(lab.id, timed)
+  const { setRoute } = useExam()
+  const session = useLabSession<NetworkPathProgress>({ lab, timed })
 
-  const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>(savedProgress?.checkedSteps ?? {})
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(savedProgress?.selectedAnswer ?? null)
-  const [submitted, setSubmitted] = useState(false)
+  const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>(session.savedProgress?.checkedSteps ?? {})
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(session.savedProgress?.selectedAnswer ?? null)
   const [isCorrect, setIsCorrect] = useState(false)
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
-  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
-  const [labPaused, setLabPaused] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
-    if (!resumeNotice) return
-    const t = setTimeout(() => setResumeNotice(false), 3000)
-    return () => clearTimeout(t)
-  }, [resumeNotice])
+    if (session.submitted) return
+    session.saveProgress({ checkedSteps, selectedAnswer, timeLeft: session.timeLeft })
+  }, [checkedSteps, selectedAnswer, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (submitted) return
-    saveProgress({ checkedSteps, selectedAnswer, timeLeft })
-  }, [checkedSteps, selectedAnswer, timeLeft, submitted])
-
-  useEffect(() => {
-    if (submitted || !timed || labPaused) return
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) { clearInterval(timerRef.current!); return 0 }
-        return prev - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed, labPaused])
-
-  useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) doSubmit()
-  }, [timeLeft])
+    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+  }, [session.timeLeft])
 
   const runCheck = useCallback((stepId: string) => {
-    if (submitted || checkedSteps[stepId] !== undefined) return
+    if (session.submitted || checkedSteps[stepId] !== undefined) return
     const step = lab.steps.find((s) => s.id === stepId)
     if (!step) return
     setCheckedSteps((prev) => ({ ...prev, [stepId]: step.status === 'pass' }))
-  }, [submitted, checkedSteps, lab.steps])
+  }, [session.submitted, checkedSteps, lab.steps])
 
   const doSubmit = useCallback(async () => {
-    if (submitted) return
-    setSubmitted(true)
-    clearProgress()
-    if (timerRef.current) clearInterval(timerRef.current)
-
     const correctAnswer = lab.answers.find((a) => a.correct)
     const correct = selectedAnswer === correctAnswer?.id
     setIsCorrect(correct)
-    completeWithGamification(correct)
-
-    const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
-    if (user) {
-      try {
-        await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: selectedAnswer || '', correct, timeTaken }),
-        })
-      } catch { /* non-critical */ }
-    }
-  }, [submitted, lab, selectedAnswer, authFetch, user])
-
-  const handlePauseAndExit = useCallback(() => {
-    saveProgress({ checkedSteps, selectedAnswer, timeLeft })
-    setRoute('skill-labs')
-  }, [checkedSteps, selectedAnswer, timeLeft])
-
-  const handleCancelLab = useCallback(() => {
-    clearProgress()
-    setRoute('skill-labs')
-  }, [])
+    await session.finalize(correct, selectedAnswer || '')
+  }, [lab, selectedAnswer, session.finalize])
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {showConfirmModal && (
+      {session.showConfirmModal && (
         <LabCompleteModal
           title={lab.title}
-          timeTaken={lab.timeLimit - timeLeft}
+          timeTaken={lab.timeLimit - session.timeLeft}
           timed={timed}
-          onConfirm={() => { setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => setShowConfirmModal(false)}
+          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
+          onCancel={() => session.setShowConfirmModal(false)}
         />
       )}
       <LabHeader
         title={lab.title}
         timed={timed}
-        timeLeft={timeLeft}
+        timeLeft={session.timeLeft}
         subtitle={lab.scenario}
         labId={lab.id}
-        onPauseChange={setLabPaused}
-        onPauseAndExit={submitted ? undefined : handlePauseAndExit}
-        onCancelLab={submitted ? undefined : handleCancelLab}
+        onPauseChange={session.setLabPaused}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ checkedSteps, selectedAnswer, timeLeft: session.timeLeft })}
+        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
       />
-      {resumeNotice && (
+      {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
         </div>
@@ -161,7 +108,7 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
                 <div key={step.id}>
                   <button
                     onClick={() => runCheck(step.id)}
-                    disabled={submitted || checked !== undefined}
+                    disabled={session.submitted || checked !== undefined}
                     className={`w-full text-left px-3 py-2.5 rounded-md border text-sm transition ${
                       checked === undefined
                         ? 'border-border hover:bg-muted/50 cursor-pointer'
@@ -197,7 +144,7 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
           {lab.answers.map((answer) => {
             let cls = 'border border-border rounded-md px-4 py-2.5 text-sm text-left transition '
-            if (submitted) {
+            if (session.submitted) {
               if (answer.correct) cls += 'border-green-500 bg-green-500/10 text-green-700 dark:text-green-400'
               else if (answer.id === selectedAnswer && !answer.correct) cls += 'border-destructive bg-destructive/10 text-destructive'
               else cls += 'bg-muted/30 text-muted-foreground'
@@ -207,17 +154,17 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
               cls += 'hover:bg-muted/50 cursor-pointer'
             }
             return (
-              <button key={answer.id} className={cls} disabled={submitted} onClick={() => !submitted && setSelectedAnswer(answer.id)}>
+              <button key={answer.id} className={cls} disabled={session.submitted} onClick={() => !session.submitted && setSelectedAnswer(answer.id)}>
                 {answer.text}
               </button>
             )
           })}
         </div>
-        {!submitted ? (
+        {!session.submitted ? (
           <button
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!selectedAnswer}
-            onClick={() => setShowConfirmModal(true)}
+            onClick={() => session.setShowConfirmModal(true)}
           >
             Submit Answer
           </button>

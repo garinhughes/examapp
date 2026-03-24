@@ -8,33 +8,31 @@ interface SkillLabRunnerPageProps {
   timed?: boolean
 }
 
-const runnerImports: Record<SkillLabType, () => Promise<{ default: ComponentType<any> }>> = {
-  'diagnose': () =>
-    import('./labs/aws/diagnose-cloudfront-403').then(m => ({ default: m.DiagnoseLabRunner })),
-  'cli': () =>
-    import('./labs/aws/cli-s3-access-denied').then(m => ({ default: m.CliLabRunner })),
-  'policy-fix': () =>
-    import('./labs/aws/policy-fix-s3-iam').then(m => ({ default: m.PolicyFixLabRunner })),
-  'architecture-builder': () =>
-    import('./labs/aws/architecture-builder-ha-web-app').then(m => ({ default: m.ArchitectureBuilderRunner })),
-  'log-analysis': () =>
-    import('./labs/aws/log-analysis-lambda-timeout').then(m => ({ default: m.LogAnalysisRunner })),
-  'network-path': () =>
-    import('./labs/aws/network-path-api-debug').then(m => ({ default: m.NetworkPathRunner })),
-  'ordering': () =>
-    import('./labs/aws/ordering-incident-response').then(m => ({ default: m.OrderingRunner })),
-  'config-toggle': () =>
-    import('./labs/aws/config-toggle-alb-health-check').then(m => ({ default: m.ConfigToggleRunner })),
-  'cost-optimization': () =>
-    import('./labs/aws/cost-optimization-monthly-spend').then(m => ({ default: m.CostOptimizationRunner })),
-  'security-hardening': () =>
-    import('./labs/aws/security-hardening-s3-app').then(m => ({ default: m.SecurityHardeningRunner })),
-  'performance-optimization': () =>
-    import('./labs/aws/performance-optimization-api-latency').then(m => ({ default: m.PerformanceOptRunner })),
-  'policy-simulation': () =>
-    import('./labs/aws/policy-simulation-s3-readonly').then(m => ({ default: m.PolicySimulationRunner })),
-  'service-limits': () =>
-    import('./labs/aws/service-limits-traffic-spike').then(m => ({ default: m.ServiceLimitsRunner })),
+// Provider-specific overrides — add entries here when a lab type needs genuinely different
+// UI behaviour per provider (e.g. 'azure:cli'). Most labs will never need this.
+const providerRunnerImports: Partial<Record<string, () => Promise<{ default: ComponentType<any> }>>> = {
+  // e.g. 'azure:cli': () => import('./labs/providers/azure/cli').then(m => ({ default: m.CliLabRunner })),
+}
+
+// Generic fallback runners — one file per type, shared across all providers
+const genericRunnerImports: Record<SkillLabType, () => Promise<{ default: ComponentType<any> }>> = {
+  'diagnose':              () => import('./labs/runners/diagnose').then(m => ({ default: m.DiagnoseLabRunner })),
+  'cli':                   () => import('./labs/runners/cli').then(m => ({ default: m.CliLabRunner })),
+  'policy-fix':            () => import('./labs/runners/policy-fix').then(m => ({ default: m.PolicyFixLabRunner })),
+  'architecture-builder':  () => import('./labs/runners/architecture-builder').then(m => ({ default: m.ArchitectureBuilderRunner })),
+  'log-analysis':          () => import('./labs/runners/log-analysis').then(m => ({ default: m.LogAnalysisRunner })),
+  'network-path':          () => import('./labs/runners/network-path').then(m => ({ default: m.NetworkPathRunner })),
+  'ordering':              () => import('./labs/runners/ordering').then(m => ({ default: m.OrderingRunner })),
+  'config-toggle':         () => import('./labs/runners/config-toggle').then(m => ({ default: m.ConfigToggleRunner })),
+  'cost-optimization':     () => import('./labs/runners/cost-optimization').then(m => ({ default: m.CostOptimizationRunner })),
+  'security-hardening':    () => import('./labs/runners/security-hardening').then(m => ({ default: m.SecurityHardeningRunner })),
+  'performance-optimization': () => import('./labs/runners/performance-optimization').then(m => ({ default: m.PerformanceOptRunner })),
+  'policy-simulation':     () => import('./labs/runners/policy-simulation').then(m => ({ default: m.PolicySimulationRunner })),
+  'service-limits':        () => import('./labs/runners/service-limits').then(m => ({ default: m.ServiceLimitsRunner })),
+  'code-fix':              () => import('./labs/runners/code-fix').then(m => ({ default: m.CodeFixLabRunner })),
+  'fill-command':          () => import('./labs/runners/fill-command').then(m => ({ default: m.FillCommandRunner })),
+  'drag-match':            () => import('./labs/runners/drag-match').then(m => ({ default: m.DragMatchRunner })),
+  'diagram-label':         () => import('./labs/runners/diagram-label').then(m => ({ default: m.DiagramLabelRunner })),
 }
 
 export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPageProps) {
@@ -74,7 +72,8 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
     </div>
   )
 
-  const importer = runnerImports[lab.type]
+  const platform = (lab.platform ?? '').toLowerCase()
+  const importer = providerRunnerImports[`${platform}:${lab.type}`] ?? genericRunnerImports[lab.type]
   if (!importer) {
     return <div className="text-destructive p-4">Unknown lab type: {(lab as any).type}</div>
   }

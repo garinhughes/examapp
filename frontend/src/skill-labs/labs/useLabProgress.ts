@@ -11,7 +11,7 @@ import { useRef } from 'react'
 const PREFIX = 'skillLabProgress:'
 const EXPIRY_MS = 24 * 60 * 60 * 1000
 
-export function useLabProgress<T>(labId: string, timed?: boolean): {
+export function useLabProgress<T>(labId: string, timed?: boolean, labVersion?: string): {
   savedProgress: T | null
   savedTimed: boolean | null
   saveProgress: (state: T) => void
@@ -29,8 +29,11 @@ export function useLabProgress<T>(labId: string, timed?: boolean): {
         if (!parsed.savedAt || Date.now() - parsed.savedAt > EXPIRY_MS) {
           localStorage.removeItem(PREFIX + labId)
           initialRef.current = { progress: null, timed: null }
+        } else if (labVersion && parsed._version && parsed._version !== labVersion) {
+          localStorage.removeItem(PREFIX + labId)
+          initialRef.current = { progress: null, timed: null }
         } else {
-          const { savedAt: _savedAt, _timed, ...rest } = parsed
+          const { savedAt: _savedAt, _timed, _version: _v, ...rest } = parsed
           initialRef.current = { progress: rest as T, timed: typeof parsed._timed === 'boolean' ? parsed._timed : null }
         }
       }
@@ -44,7 +47,7 @@ export function useLabProgress<T>(labId: string, timed?: boolean): {
 
   function saveProgress(state: T) {
     try {
-      localStorage.setItem(PREFIX + labId, JSON.stringify({ ...state, _timed: timed, savedAt: Date.now() }))
+      localStorage.setItem(PREFIX + labId, JSON.stringify({ ...state, _timed: timed, _version: labVersion, savedAt: Date.now() }))
     } catch {}
   }
 

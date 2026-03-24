@@ -1,10 +1,8 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useExam } from '@/exam/ExamContext'
-import { apiUrl } from '@/apiBase'
 import type { ConfigToggleLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { useLabComplete } from '../shared'
-import { useLabProgress } from '../useLabProgress'
+import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
 interface ConfigToggleProgress { values: Record<string, string>; timeLeft: number }
@@ -15,62 +13,32 @@ interface Props {
 }
 
 export function ConfigToggleRunner({ lab, timed = true }: Props) {
-  const { authFetch, user, setRoute } = useExam()
-  const completeWithGamification = useLabComplete(lab)
-  const { savedProgress, saveProgress, clearProgress } = useLabProgress<ConfigToggleProgress>(lab.id, timed)
+  const { setRoute } = useExam()
+  const session = useLabSession<ConfigToggleProgress>({ lab, timed })
 
   const [values, setValues] = useState<Record<string, string>>(() => {
-    if (savedProgress?.values) return savedProgress.values
+    if (session.savedProgress?.values) return session.savedProgress.values
     const init: Record<string, string> = {}
     for (const item of lab.configItems) init[item.id] = item.currentValue
     return init
   })
-  const [submitted, setSubmitted] = useState(false)
   const [results, setResults] = useState<Record<string, boolean>>({})
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
-  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
-  const [labPaused, setLabPaused] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
-    if (!resumeNotice) return
-    const t = setTimeout(() => setResumeNotice(false), 3000)
-    return () => clearTimeout(t)
-  }, [resumeNotice])
+    if (session.submitted) return
+    session.saveProgress({ values, timeLeft: session.timeLeft })
+  }, [values, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (submitted) return
-    saveProgress({ values, timeLeft })
-  }, [values, timeLeft, submitted])
-
-  useEffect(() => {
-    if (submitted || !timed || labPaused) return
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) { clearInterval(timerRef.current!); return 0 }
-        return prev - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed, labPaused])
-
-  useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) doSubmit()
-  }, [timeLeft])
+    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+  }, [session.timeLeft])
 
   const updateValue = useCallback((id: string, value: string) => {
-    if (submitted) return
+    if (session.submitted) return
     setValues((prev) => ({ ...prev, [id]: value }))
-  }, [submitted])
+  }, [session.submitted])
 
   const doSubmit = useCallback(async () => {
-    if (submitted) return
-    setSubmitted(true)
-    clearProgress()
-    if (timerRef.current) clearInterval(timerRef.current)
-
     const res: Record<string, boolean> = {}
     let allCorrect = true
     for (const item of lab.configItems) {
@@ -79,42 +47,22 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
       if (!pass) allCorrect = false
     }
     setResults(res)
-    completeWithGamification(allCorrect)
+    await session.finalize(allCorrect, JSON.stringify(values))
+  }, [lab, values, session.finalize])
 
-    const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
-    if (user) {
-      try {
-        await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: JSON.stringify(values), correct: allCorrect, timeTaken }),
-        })
-      } catch { /* non-critical */ }
-    }
-  }, [submitted, lab, values, authFetch, user])
-
-  const handlePauseAndExit = useCallback(() => {
-    saveProgress({ values, timeLeft })
-    setRoute('skill-labs')
-  }, [values, timeLeft])
-
-  const handleCancelLab = useCallback(() => {
-    clearProgress()
-    setRoute('skill-labs')
-  }, [])
-
-  const allCorrect = submitted && lab.configItems.every((item) => results[item.id])
+  const allCorrect = session.submitted && lab.configItems.every((item) => results[item.id])
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - timeLeft} timed={timed}
-          onConfirm={() => { setShowConfirmModal(false); doSubmit() }} onCancel={() => setShowConfirmModal(false)} />
+      {session.showConfirmModal && (
+        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - session.timeLeft} timed={timed}
+          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }} onCancel={() => session.setShowConfirmModal(false)} />
       )}
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id}
-        onPauseChange={setLabPaused} onPauseAndExit={submitted ? undefined : handlePauseAndExit}
-        onCancelLab={submitted ? undefined : handleCancelLab} />
-      {resumeNotice && (
+      <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={lab.scenario} labId={lab.id}
+        onPauseChange={session.setLabPaused}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ values, timeLeft: session.timeLeft })}
+        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+      {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
         </div>
@@ -127,7 +75,7 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
             <div key={item.id}>
               <label className="block text-sm font-medium mb-1">
                 {item.label}
-                {submitted && (
+                {session.submitted && (
                   <span className={`ml-2 text-xs font-bold ${results[item.id] ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
                     {results[item.id] ? '✓' : '✗'}
                   </span>
@@ -137,9 +85,9 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
                 <select
                   value={values[item.id] || ''}
                   onChange={(e) => updateValue(item.id, e.target.value)}
-                  disabled={submitted}
+                  disabled={session.submitted}
                   className={`w-full px-3 py-2 rounded-md border text-sm bg-card focus:outline-none focus:ring-1 focus:ring-primary ${
-                    submitted
+                    session.submitted
                       ? results[item.id] ? 'border-green-500' : 'border-destructive'
                       : 'border-border'
                   }`}
@@ -153,15 +101,15 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
                   type="text"
                   value={values[item.id] || ''}
                   onChange={(e) => updateValue(item.id, e.target.value)}
-                  disabled={submitted}
+                  disabled={session.submitted}
                   className={`w-full px-3 py-2 rounded-md border text-sm font-mono bg-card focus:outline-none focus:ring-1 focus:ring-primary ${
-                    submitted
+                    session.submitted
                       ? results[item.id] ? 'border-green-500' : 'border-destructive'
                       : 'border-border'
                   }`}
                 />
               )}
-              {submitted && !results[item.id] && (
+              {session.submitted && !results[item.id] && (
                 <div className="text-xs text-muted-foreground mt-1">
                   Expected: <span className="font-mono text-foreground">{item.correctValue}</span>
                 </div>
@@ -173,12 +121,12 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
 
       {/* Submit / Result */}
       <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!submitted ? (
+        {!session.submitted ? (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">Fix the configuration values, then test your changes.</p>
             <button
               className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
-              onClick={() => setShowConfirmModal(true)}
+              onClick={() => session.setShowConfirmModal(true)}
             >
               Test Configuration
             </button>

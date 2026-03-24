@@ -6,6 +6,7 @@ export type SkillLabType =
   | 'ordering' | 'config-toggle' | 'cost-optimization'
   | 'security-hardening' | 'performance-optimization'
   | 'policy-simulation' | 'service-limits'
+  | 'code-fix' | 'fill-command' | 'drag-match' | 'diagram-label'
 
 export type SkillLevel = 'beginner' | 'intermediate' | 'advanced'
 
@@ -26,6 +27,7 @@ export interface LabSummary {
   category: string
   technologies: string[]
   labCategory: string      // e.g. "Troubleshoot", "Design", "Implement"
+  s3VersionId?: string
 }
 
 // --- Diagnose lab types ---
@@ -273,6 +275,68 @@ export interface ServiceLimitsLabDefinition extends LabSummary {
   explanation: string
 }
 
+// --- Code Fix lab types ---
+
+export interface CodeFixLabDefinition extends LabSummary {
+  type: 'code-fix'
+  scenario: string
+  language: string        // Monaco language id: 'yaml' | 'bash' | 'dockerfile' | 'json' | etc.
+  brokenCode: string
+  correctCode: string
+  validations: Array<{ field: string; expected: string }>
+  explanation: string
+}
+
+// --- Fill Command lab types ---
+
+export interface FillCommandQuestion {
+  id: string
+  template: string        // e.g. "kubectl ___ --namespace prod"
+  blanks: Array<{ id: string; placeholder: string; answer: string }>
+  hint?: string
+}
+
+export interface FillCommandLabDefinition extends LabSummary {
+  type: 'fill-command'
+  scenario: string
+  questions: FillCommandQuestion[]
+  explanation: string
+}
+
+// --- Drag Match lab types ---
+
+export interface DragMatchPair {
+  id: string
+  term: string
+  definition: string
+}
+
+export interface DragMatchLabDefinition extends LabSummary {
+  type: 'drag-match'
+  scenario: string
+  pairs: DragMatchPair[]
+  explanation: string
+}
+
+// --- Diagram Label lab types ---
+
+export interface DiagramHotspot {
+  id: string
+  x: number               // % from left
+  y: number               // % from top
+  options: string[]
+  answer: string
+  label: string           // shown after submit
+}
+
+export interface DiagramLabelLabDefinition extends LabSummary {
+  type: 'diagram-label'
+  scenario: string
+  imageUrl: string
+  hotspots: DiagramHotspot[]
+  explanation: string
+}
+
 // Union of all lab definitions
 export type LabDefinition =
   | DiagnoseLabDefinition | CliLabDefinition | PolicyFixLabDefinition
@@ -280,3 +344,5 @@ export type LabDefinition =
   | OrderingLabDefinition | ConfigToggleLabDefinition | CostOptimizationLabDefinition
   | SecurityHardeningLabDefinition | PerformanceOptLabDefinition
   | PolicySimulationLabDefinition | ServiceLimitsLabDefinition
+  | CodeFixLabDefinition | FillCommandLabDefinition | DragMatchLabDefinition
+  | DiagramLabelLabDefinition

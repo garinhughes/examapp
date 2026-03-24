@@ -13,11 +13,9 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { useExam } from '@/exam/ExamContext'
-import { apiUrl } from '@/apiBase'
 import type { ArchitectureBuilderLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { useLabComplete } from '../shared'
-import { useLabProgress } from '../useLabProgress'
+import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
 interface ArchProgress {
@@ -41,54 +39,29 @@ export function ArchitectureBuilderRunner(props: Props) {
 }
 
 function ArchitectureBuilderInner({ lab, timed = true }: Props) {
-  const { authFetch, user, setRoute } = useExam()
+  const { setRoute } = useExam()
   const reactFlowInstance = useReactFlow()
-  const completeWithGamification = useLabComplete(lab)
-  const { savedProgress, saveProgress, clearProgress } = useLabProgress<ArchProgress>(lab.id, timed)
+  const session = useLabSession<ArchProgress>({ lab, timed })
 
   const [placedComponents, setPlacedComponents] = useState<Set<string>>(
-    () => new Set(savedProgress?.placedComponents ?? [])
+    () => new Set(session.savedProgress?.placedComponents ?? [])
   )
-  const [nodes, setNodes, onNodesChange] = useNodesState(savedProgress?.nodes ?? [])
-  const [edges, setEdges, onEdgesChange] = useEdgesState(savedProgress?.edges ?? [])
-  const nodeCountRef = useRef(savedProgress?.nodes?.length ?? 0)
-  const [submitted, setSubmitted] = useState(false)
+  const [nodes, setNodes, onNodesChange] = useNodesState(session.savedProgress?.nodes ?? [])
+  const [edges, setEdges, onEdgesChange] = useEdgesState(session.savedProgress?.edges ?? [])
+  const nodeCountRef = useRef(session.savedProgress?.nodes?.length ?? 0)
   const [validationResults, setValidationResults] = useState<{ check: string; pass: boolean }[]>([])
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
-  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
-  const [labPaused, setLabPaused] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
-    if (!resumeNotice) return
-    const t = setTimeout(() => setResumeNotice(false), 3000)
-    return () => clearTimeout(t)
-  }, [resumeNotice])
+    if (session.submitted) return
+    session.saveProgress({ placedComponents: [...placedComponents], nodes, edges, timeLeft: session.timeLeft })
+  }, [placedComponents, nodes, edges, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (submitted) return
-    saveProgress({ placedComponents: [...placedComponents], nodes, edges, timeLeft })
-  }, [placedComponents, nodes, edges, timeLeft, submitted])
-
-  useEffect(() => {
-    if (submitted || !timed || labPaused) return
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) { clearInterval(timerRef.current!); return 0 }
-        return prev - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed, labPaused])
-
-  useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) doValidate()
-  }, [timeLeft])
+    if (timed && session.timeLeft === 0 && !session.submitted) doValidate()
+  }, [session.timeLeft])
 
   const addComponent = useCallback((comp: typeof lab.availableComponents[0]) => {
-    if (placedComponents.has(comp.id) || submitted) return
+    if (placedComponents.has(comp.id) || session.submitted) return
     setPlacedComponents((prev) => new Set([...prev, comp.id]))
     const n = nodeCountRef.current++
     const col = n % 3
@@ -112,19 +85,14 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
       requestAnimationFrame(() => reactFlowInstance.fitView({ padding: 0.25, duration: 200 }))
       return next
     })
-  }, [placedComponents, submitted, reactFlowInstance])
+  }, [placedComponents, session.submitted, reactFlowInstance])
 
   const onConnect = useCallback((connection: Connection) => {
-    if (submitted) return
+    if (session.submitted) return
     setEdges((prev) => addEdge({ ...connection, animated: true }, prev))
-  }, [submitted, setEdges])
+  }, [session.submitted, setEdges])
 
   const doValidate = useCallback(async () => {
-    if (submitted) return
-    setSubmitted(true)
-    clearProgress()
-    if (timerRef.current) clearInterval(timerRef.current)
-
     const results: { check: string; pass: boolean }[] = []
 
     const missingComps = lab.requiredComponents.filter((id) => !placedComponents.has(id))
@@ -152,29 +120,8 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
 
     setValidationResults(results)
     const allPass = results.every((r) => r.pass)
-    completeWithGamification(allPass)
-
-    const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
-    if (user) {
-      try {
-        await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: '', correct: allPass, timeTaken }),
-        })
-      } catch { /* non-critical */ }
-    }
-  }, [submitted, lab, placedComponents, edges, authFetch, user])
-
-  const handlePauseAndExit = useCallback(() => {
-    saveProgress({ placedComponents: [...placedComponents], nodes, edges, timeLeft })
-    setRoute('skill-labs')
-  }, [placedComponents, nodes, edges, timeLeft])
-
-  const handleCancelLab = useCallback(() => {
-    clearProgress()
-    setRoute('skill-labs')
-  }, [])
+    await session.finalize(allPass)
+  }, [lab, placedComponents, edges, session.finalize])
 
   const allPass = validationResults.length > 0 && validationResults.every((r) => r.pass)
 
@@ -190,14 +137,15 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - timeLeft} timed={timed}
-          onConfirm={() => { setShowConfirmModal(false); doValidate() }} onCancel={() => setShowConfirmModal(false)} />
+      {session.showConfirmModal && (
+        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - session.timeLeft} timed={timed}
+          onConfirm={() => { session.setShowConfirmModal(false); doValidate() }} onCancel={() => session.setShowConfirmModal(false)} />
       )}
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={displayScenario} labId={lab.id}
-        onPauseChange={setLabPaused} onPauseAndExit={submitted ? undefined : handlePauseAndExit}
-        onCancelLab={submitted ? undefined : handleCancelLab} />
-      {resumeNotice && (
+      <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={displayScenario} labId={lab.id}
+        onPauseChange={session.setLabPaused}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ placedComponents: [...placedComponents], nodes, edges, timeLeft: session.timeLeft })}
+        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+      {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
         </div>
@@ -216,7 +164,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
                     <button
                       key={comp.id}
                       onClick={() => addComponent(comp)}
-                      disabled={placedComponents.has(comp.id) || submitted}
+                      disabled={placedComponents.has(comp.id) || session.submitted}
                       className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm transition ${
                         placedComponents.has(comp.id)
                           ? 'bg-primary/10 text-primary border border-primary/30'
@@ -246,8 +194,8 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
             onConnect={onConnect}
             fitView
             proOptions={{ hideAttribution: true }}
-            nodesConnectable={!submitted}
-            nodesDraggable={!submitted}
+            nodesConnectable={!session.submitted}
+            nodesDraggable={!session.submitted}
           >
             <Background />
             <Controls showInteractive={false} />
@@ -257,7 +205,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
 
       {/* Validation / Submit */}
       <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!submitted ? (
+        {!session.submitted ? (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               Place components and connect them, then validate your architecture.
@@ -265,7 +213,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
             <button
               className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
               disabled={nodes.length === 0}
-              onClick={() => setShowConfirmModal(true)}
+              onClick={() => session.setShowConfirmModal(true)}
             >
               Validate Architecture
             </button>

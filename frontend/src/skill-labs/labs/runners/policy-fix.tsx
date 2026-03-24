@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Editor from '@monaco-editor/react'
 import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { PolicyFixLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { useLabComplete } from '../shared'
-import { useLabProgress } from '../useLabProgress'
+import { useLabSession } from '../useLabSession'
 
 interface PolicyFixLabRunnerProps {
   lab: PolicyFixLabDefinition
@@ -23,52 +22,21 @@ interface PolicyFixProgress {
 }
 
 export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProps) {
-  const { authFetch, user, setRoute } = useExam()
-  const completeWithGamification = useLabComplete(lab)
-  const { savedProgress, saveProgress, clearProgress } = useLabProgress<PolicyFixProgress>(lab.id, timed)
+  const { setRoute } = useExam()
+  const session = useLabSession<PolicyFixProgress>({ lab, timed })
 
-  const [policy, setPolicy] = useState(savedProgress?.policy ?? lab.brokenPolicy)
+  const [policy, setPolicy] = useState(session.savedProgress?.policy ?? lab.brokenPolicy)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
   const [validating, setValidating] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
-
-  // Timer
-  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
-  const [labPaused, setLabPaused] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startTimeRef = useRef<number>(Date.now())
-
-  // Auto-dismiss resume notice
-  useEffect(() => {
-    if (!resumeNotice) return
-    const t = setTimeout(() => setResumeNotice(false), 3000)
-    return () => clearTimeout(t)
-  }, [resumeNotice])
-
-  // Auto-save progress
-  useEffect(() => {
-    if (submitted) return
-    saveProgress({ policy, timeLeft })
-  }, [policy, timeLeft, submitted])
 
   useEffect(() => {
-    if (submitted || !timed || labPaused) return
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current!)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed, labPaused])
+    if (session.submitted) return
+    session.saveProgress({ policy, timeLeft: session.timeLeft })
+  }, [policy, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) handleTestPolicy()
-  }, [timeLeft])
+    if (timed && session.timeLeft === 0 && !session.submitted) handleTestPolicy()
+  }, [session.timeLeft])
 
   const handleTestPolicy = useCallback(async () => {
     setValidating(true)
@@ -81,67 +49,35 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
       const result: ValidationResult = await res.json()
       setValidationResult(result)
 
-      if (result.success && !submitted) {
-        setSubmitted(true)
-        clearProgress()
-        if (timerRef.current) clearInterval(timerRef.current)
-        completeWithGamification(true)
-        await saveAttempt(true)
+      if (result.success) {
+        await session.finalize(true, 'solved')
       }
     } catch {
       setValidationResult({ success: false, errors: ['Failed to validate. Please try again.'] })
     } finally {
       setValidating(false)
     }
-  }, [policy, lab.id, submitted])
+  }, [policy, lab.id, session.finalize])
 
   const handleGiveUp = useCallback(async () => {
-    setSubmitted(true)
-    clearProgress()
-    if (timerRef.current) clearInterval(timerRef.current)
     setPolicy(lab.correctPolicy)
     setValidationResult({ success: false, errors: ['You gave up. The correct policy is now shown.'] })
-    completeWithGamification(false)
-    await saveAttempt(false)
-  }, [lab])
-
-  const saveAttempt = async (correct: boolean) => {
-    if (!user) return
-    const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
-    try {
-      await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ selectedAnswer: correct ? 'solved' : 'gave-up', correct, timeTaken }),
-      })
-    } catch {
-      // Non-critical
-    }
-  }
-
-  const handlePauseAndExit = useCallback(() => {
-    saveProgress({ policy, timeLeft })
-    setRoute('skill-labs')
-  }, [policy, timeLeft])
-
-  const handleCancelLab = useCallback(() => {
-    clearProgress()
-    setRoute('skill-labs')
-  }, [])
+    await session.finalize(false, 'gave-up')
+  }, [lab, session.finalize])
 
   return (
     <div className="flex flex-col h-full gap-4">
       <LabHeader
         title={lab.title}
         timed={timed}
-        timeLeft={timeLeft}
+        timeLeft={session.timeLeft}
         labId={lab.id}
-        onPauseChange={setLabPaused}
-        onPauseAndExit={submitted ? undefined : handlePauseAndExit}
-        onCancelLab={submitted ? undefined : handleCancelLab}
+        onPauseChange={session.setLabPaused}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ policy, timeLeft: session.timeLeft })}
+        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
       />
 
-      {resumeNotice && (
+      {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
         </div>
@@ -169,7 +105,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
             height="100%"
             defaultLanguage="json"
             value={policy}
-            onChange={(value) => !submitted && setPolicy(value || '')}
+            onChange={(value) => !session.submitted && setPolicy(value || '')}
             theme="vs-dark"
             options={{
               minimap: { enabled: false },
@@ -177,7 +113,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
               lineNumbers: 'on',
               scrollBeyondLastLine: false,
               wordWrap: 'on',
-              readOnly: submitted,
+              readOnly: session.submitted,
               formatOnPaste: true,
             }}
           />
@@ -187,7 +123,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
         <div className="w-72 shrink-0 rounded-lg border border-border bg-card p-4 overflow-y-auto">
           <h3 className="font-semibold text-base mb-3">Test Results</h3>
 
-          {!validationResult && !submitted && (
+          {!validationResult && !session.submitted && (
             <p className="text-sm text-muted-foreground">
               Edit the policy and click "Test Policy" to validate your changes.
             </p>
@@ -216,7 +152,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
           )}
 
           <div className="mt-6 space-y-2">
-            {!submitted ? (
+            {!session.submitted ? (
               <>
                 <button
                   className="w-full px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"

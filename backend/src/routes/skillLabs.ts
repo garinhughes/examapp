@@ -12,7 +12,7 @@ import { updateMetricsOnLabAttempt } from '../services/metricsStore.js'
 import { getUserBySub } from '../services/dynamo.js'
 import { TIERS } from '../catalog.js'
 
-const LABS_FILE = path.join(process.cwd(), 'data', 'skill-labs.json')
+const LABS_DIR = path.join(process.cwd(), 'data', 'skill-labs')
 
 /**
  * Skill lab source switch — mirrors EXAM_SOURCE pattern.
@@ -35,8 +35,14 @@ function labMetadataOnly(lab: any) {
 
 async function loadLabsLocal(): Promise<any[]> {
   try {
-    const raw = await fs.readFile(LABS_FILE, 'utf-8')
-    return JSON.parse(raw)
+    const files = await fs.readdir(LABS_DIR)
+    const arrays = await Promise.all(
+      files.filter((f) => f.endsWith('.json')).map(async (f) => {
+        const raw = await fs.readFile(path.join(LABS_DIR, f), 'utf-8')
+        return JSON.parse(raw) as any[]
+      })
+    )
+    return arrays.flat()
   } catch (err) {
     console.error('[skill-labs] Failed to load labs data from disk', err)
     return []
@@ -79,7 +85,7 @@ async function findLabS3(id: string): Promise<any | null> {
     const idx = await getLabIndex(id)
     if (!idx) return null
     const { body } = await getLabFromS3(idx.labId, idx.s3VersionId)
-    return JSON.parse(body)
+    return { ...JSON.parse(body), s3VersionId: idx.s3VersionId }
   } catch (err) {
     console.error('[skill-labs] S3 load failed for id:', id, err)
     return null

@@ -1,11 +1,9 @@
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { DollarSign, ArrowRight } from 'lucide-react'
 import { useExam } from '@/exam/ExamContext'
-import { apiUrl } from '@/apiBase'
 import type { CostOptimizationLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
-import { useLabComplete } from '../shared'
-import { useLabProgress } from '../useLabProgress'
+import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
 interface CostOptProgress { selections: Record<string, string>; timeLeft: number }
@@ -16,49 +14,24 @@ interface Props {
 }
 
 export function CostOptimizationRunner({ lab, timed = true }: Props) {
-  const { authFetch, user, setRoute } = useExam()
-  const completeWithGamification = useLabComplete(lab)
-  const { savedProgress, saveProgress, clearProgress } = useLabProgress<CostOptProgress>(lab.id, timed)
+  const { setRoute } = useExam()
+  const session = useLabSession<CostOptProgress>({ lab, timed })
 
   const [selections, setSelections] = useState<Record<string, string>>(() => {
-    if (savedProgress?.selections) return savedProgress.selections
+    if (session.savedProgress?.selections) return session.savedProgress.selections
     const init: Record<string, string> = {}
     for (const comp of lab.components) init[comp.id] = comp.currentService
     return init
   })
-  const [submitted, setSubmitted] = useState(false)
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
-  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
-  const [labPaused, setLabPaused] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
-    if (!resumeNotice) return
-    const t = setTimeout(() => setResumeNotice(false), 3000)
-    return () => clearTimeout(t)
-  }, [resumeNotice])
+    if (session.submitted) return
+    session.saveProgress({ selections, timeLeft: session.timeLeft })
+  }, [selections, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (submitted) return
-    saveProgress({ selections, timeLeft })
-  }, [selections, timeLeft, submitted])
-
-  useEffect(() => {
-    if (submitted || !timed || labPaused) return
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) { clearInterval(timerRef.current!); return 0 }
-        return prev - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [submitted, timed, labPaused])
-
-  useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) doSubmit()
-  }, [timeLeft])
+    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+  }, [session.timeLeft])
 
   const currentTotal = useMemo(() => {
     return lab.components.reduce((sum, comp) => {
@@ -74,53 +47,28 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
   }, [lab.components])
 
   const handleSelect = useCallback((compId: string, service: string) => {
-    if (submitted) return
+    if (session.submitted) return
     setSelections((prev) => ({ ...prev, [compId]: service }))
-  }, [submitted])
+  }, [session.submitted])
 
   const doSubmit = useCallback(async () => {
-    if (submitted) return
-    setSubmitted(true)
-    clearProgress()
-    if (timerRef.current) clearInterval(timerRef.current)
-
     const correct = currentTotal <= lab.targetCost
-    completeWithGamification(correct)
-
-    const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000)
-    if (user) {
-      try {
-        await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selectedAnswer: JSON.stringify(selections), correct, timeTaken }),
-        })
-      } catch { /* non-critical */ }
-    }
-  }, [submitted, lab, selections, currentTotal, authFetch, user])
-
-  const handlePauseAndExit = useCallback(() => {
-    saveProgress({ selections, timeLeft })
-    setRoute('skill-labs')
-  }, [selections, timeLeft])
-
-  const handleCancelLab = useCallback(() => {
-    clearProgress()
-    setRoute('skill-labs')
-  }, [])
+    await session.finalize(correct, JSON.stringify(selections))
+  }, [lab, selections, currentTotal, session.finalize])
 
   const meetsTarget = currentTotal <= lab.targetCost
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - timeLeft} timed={timed}
-          onConfirm={() => { setShowConfirmModal(false); doSubmit() }} onCancel={() => setShowConfirmModal(false)} />
+      {session.showConfirmModal && (
+        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - session.timeLeft} timed={timed}
+          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }} onCancel={() => session.setShowConfirmModal(false)} />
       )}
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id}
-        onPauseChange={setLabPaused} onPauseAndExit={submitted ? undefined : handlePauseAndExit}
-        onCancelLab={submitted ? undefined : handleCancelLab} />
-      {resumeNotice && (
+      <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={lab.scenario} labId={lab.id}
+        onPauseChange={session.setLabPaused}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ selections, timeLeft: session.timeLeft })}
+        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+      {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
         </div>
@@ -157,12 +105,12 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
               { service: comp.currentService, cost: comp.currentCost },
               ...comp.alternatives,
             ]
-            const isCorrectChoice = submitted && selections[comp.id] === comp.correctService
-            const isWrongChoice = submitted && selections[comp.id] !== comp.correctService
+            const isCorrectChoice = session.submitted && selections[comp.id] === comp.correctService
+            const isWrongChoice = session.submitted && selections[comp.id] !== comp.correctService
 
             return (
               <div key={comp.id} className={`rounded-lg border p-4 ${
-                submitted
+                session.submitted
                   ? isCorrectChoice ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'
                   : 'border-border bg-card'
               }`}>
@@ -175,7 +123,7 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
                     <button
                       key={opt.service}
                       onClick={() => handleSelect(comp.id, opt.service)}
-                      disabled={submitted}
+                      disabled={session.submitted}
                       className={`w-full flex items-center justify-between px-3 py-2 rounded-md border text-sm transition ${
                         selections[comp.id] === opt.service
                           ? 'border-primary bg-primary/10 text-primary'
@@ -187,7 +135,7 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
                     </button>
                   ))}
                 </div>
-                {submitted && isWrongChoice && (
+                {session.submitted && isWrongChoice && (
                   <div className="text-xs text-muted-foreground mt-2">
                     Recommended: <span className="font-mono text-foreground">{comp.correctService}</span>
                   </div>
@@ -200,14 +148,14 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
 
       {/* Submit / Result */}
       <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!submitted ? (
+        {!session.submitted ? (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               Swap services to reduce costs below ${lab.targetCost}/mo while keeping architecture functional.
             </p>
             <button
               className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
-              onClick={() => setShowConfirmModal(true)}
+              onClick={() => session.setShowConfirmModal(true)}
             >
               Submit Optimization
             </button>
