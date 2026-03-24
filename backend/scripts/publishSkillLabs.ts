@@ -4,9 +4,10 @@
  * to S3 and update the DynamoDB skill-labs index.
  *
  * Usage:
- *   npx ts-node --esm scripts/publishSkillLabs.ts --all              # publish all labs
- *   npx ts-node --esm scripts/publishSkillLabs.ts --all --dry-run    # preview, don't upload
- *   npx ts-node --esm scripts/publishSkillLabs.ts <labId>            # publish one lab
+ *   pnpm publish:lab -- <labId>           # publish one lab
+ *   pnpm publish:lab -- <labId> --dry-run # preview one lab, don't upload
+ *   pnpm publish:skill-labs               # publish all labs
+ *   pnpm publish:skill-labs:dry           # preview all, don't upload
  *
  * Environment:
  *   AWS_PROFILE / AWS_REGION (defaults to eu-west-1)

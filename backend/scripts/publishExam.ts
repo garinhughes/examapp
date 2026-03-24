@@ -4,9 +4,10 @@
  * update the DynamoDB exam index.
  *
  * Usage:
- *   npx ts-node --esm scripts/publishExam.ts <examCode>        # publish one exam
- *   npx ts-node --esm scripts/publishExam.ts --all              # publish all exams in data/exams/
- *   npx ts-node --esm scripts/publishExam.ts --all --dry-run    # preview, don't upload
+ *   pnpm publish:exam -- <examCode>           # publish one exam
+ *   pnpm publish:exam -- <examCode> --dry-run # preview one exam, don't upload
+ *   pnpm publish:exams                        # publish all exams in data/exams/
+ *   pnpm publish:exams:dry                    # preview all, don't upload
  *
  * Environment:
  *   AWS_PROFILE / AWS_REGION (defaults to eu-west-1)

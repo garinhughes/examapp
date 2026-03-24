@@ -8,8 +8,10 @@
     "dev:reload": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p .",
     "start": "node dist/index.js",
+    "publish:exam": "node --import ./register.mjs scripts/publishExam.ts",
     "publish:exams": "node --import ./register.mjs scripts/publishExam.ts --all",
     "publish:exams:dry": "node --import ./register.mjs scripts/publishExam.ts --all --dry-run",
+    "publish:lab": "node --import ./register.mjs scripts/publishSkillLabs.ts",
     "publish:skill-labs": "node --import ./register.mjs scripts/publishSkillLabs.ts --all",
     "publish:skill-labs:dry": "node --import ./register.mjs scripts/publishSkillLabs.ts --all --dry-run",
     "test:workflow": "node --import ./register.mjs scripts/testWorkflow.ts"

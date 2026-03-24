@@ -818,6 +818,229 @@
       "domain": "Detection",
       "difficulty": 5,
       "lastReviewed": "2026-03-24"
+    },
+    {
+      "id": "SCS-C03-0018",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets-strategies.html",
+      "format": "text",
+      "services": [
+        "Secrets Manager",
+        "RDS",
+        "Lambda"
+      ],
+      "skills": [
+        "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+      ],
+      "question": "A company runs a high-traffic e-commerce application using Amazon RDS PostgreSQL, with database credentials stored in AWS Secrets Manager. During a recent credential rotation, application connection errors surged because the Lambda rotation function updated the RDS user password before all active connections using the previous password had closed. The security team needs a rotation strategy that prevents these connection interruptions in future rotations.\n\nWhich rotation strategy should the security engineer configure?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Configure the single user rotation strategy with a drain period by setting a ROTATION_SLEEP_SECONDS Lambda environment variable on the rotation function to delay the password update until existing connections close",
+          "explanation": "There is no ROTATION_SLEEP_SECONDS environment variable in AWS-provided Secrets Manager rotation function templates - this parameter is fabricated. The single user strategy replaces the database user's password atomically, so any connection presenting the old password immediately after rotation fails. Artificial delays reduce but do not eliminate the interruption window and introduce operational fragility."
+        },
+        {
+          "id": "c2",
+          "text": "Configure the alternating users rotation strategy, which maintains two dedicated database users and rotates credentials between them, keeping the previous user's credentials valid while existing connections drain",
+          "sequence": 1,
+          "explanation": "The alternating users strategy provisions two dedicated database users. While one user's credentials are AWSCURRENT, the other user's new credentials are staged as AWSPENDING. After promotion, the previously active credentials are retained under the AWSPREVIOUS label, allowing in-flight application connections to drain without errors before the old user's password is eventually decommissioned."
+        },
+        {
+          "id": "c3",
+          "text": "Configure the single user rotation strategy and enable Amazon RDS Multi-AZ, which automatically promotes a standby database instance before each rotation cycle begins to shield active connection pools from the password update",
+          "explanation": "Amazon RDS Multi-AZ maintains a synchronous standby replica and promotes it during infrastructure failures. It does not coordinate with Secrets Manager rotation timing. A password change applied to the primary RDS instance is replicated to the standby simultaneously, so enabling Multi-AZ does not create a transition window that preserves old credentials or prevents connection errors during single user rotation."
+        },
+        {
+          "id": "c4",
+          "text": "Configure the single user rotation strategy and set a Lambda reserved concurrency of 1 on the rotation function to serialize invocations, preventing concurrent password updates from disrupting active database sessions across multiple simultaneous callers",
+          "explanation": "Lambda reserved concurrency limits the number of parallel executions of the rotation function. Secrets Manager invokes the rotation function for a given secret sequentially anyway, so a concurrency limit of 1 has no practical effect. Single user rotation still replaces the password atomically in a single operation, causing connections presenting the old password to fail immediately regardless of invocation concurrency."
+        }
+      ],
+      "tip": "Consider whether any rotation approach can preserve the previous credentials' validity for a period after the new credentials are activated, eliminating the gap that causes connection errors.",
+      "explanation": "The alternating users rotation strategy is designed specifically to eliminate rotation-induced downtime. Secrets Manager maintains two database users: one active (AWSCURRENT) and one being rotated (AWSPENDING). After the new credentials are validated and promoted, the previously active credentials are retained under the AWSPREVIOUS label, giving applications with cached connections time to close naturally before the old user is decommissioned. The single user strategy performs an in-place password replacement with no fallback, creating an immediate gap where old-credential connections fail. RDS Multi-AZ is a disaster recovery feature entirely independent of Secrets Manager rotation scheduling. Lambda concurrency controls parallel function execution and has no bearing on credential validity windows. To configure alternating users rotation, open Secrets Manager in the AWS Management Console, select the secret, choose Edit rotation, and select the Alternating users rotation strategy. A superuser secret with permission to modify database user passwords is also required.",
+      "domain": "Data Protection",
+      "difficulty": 4,
+      "lastReviewed": "2026-03-24"
+    },
+    {
+      "id": "SCS-C03-0019",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples_cross.html",
+      "format": "text",
+      "services": [
+        "Secrets Manager",
+        "KMS",
+        "IAM"
+      ],
+      "skills": [
+        "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+      ],
+      "question": "A company's central security account stores RDS database credentials in AWS Secrets Manager, encrypted with a customer managed KMS key (CMK). A workload IAM role in a separate application account must retrieve these credentials. The security team has already added the workload role ARN to the Secrets Manager resource-based policy with secretsmanager:GetSecretValue permission, but every GetSecretValue call from the workload account still returns AccessDeniedException.\n\nWhich configuration must the security engineer apply to resolve the access failure?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Update the CMK key policy in the central security account to add a kms:ViaService condition restricting decryption only to the secretsmanager.amazonaws.com service principal, and add a separate key policy statement granting kms:CreateGrant to the workload role ARN so it can delegate decrypt permissions",
+          "explanation": "A kms:ViaService condition restricts which service may use the key but does not grant the cross-account principal any authorization. kms:CreateGrant allows the holder to delegate specific key operations but does not itself confer Decrypt capability. Neither change authorizes the workload role to perform kms:Decrypt, so AccessDeniedException persists."
+        },
+        {
+          "id": "c2",
+          "text": "Update the CMK key policy in the central security account to grant the application account root IAM principal kms:Decrypt, enabling IAM identity policies in the application account to independently control CMK access without referencing the workload role ARN directly in the key policy",
+          "explanation": "Granting the application account root in the CMK key policy does enable IAM delegation for kms:Decrypt within that account. However, the workload role's IAM identity policy must still explicitly include kms:Decrypt - access is not inherited automatically from the account-root key policy grant. Without that IAM permission, the role remains unauthorized and AccessDeniedException continues."
+        },
+        {
+          "id": "c3",
+          "text": "Update the CMK key policy in the central security account to grant kms:Decrypt directly to the workload role ARN, and ensure the workload role's IAM identity policy in the application account includes both secretsmanager:GetSecretValue and kms:Decrypt",
+          "sequence": 1,
+          "explanation": "When Secrets Manager retrieves a CMK-encrypted secret for a cross-account caller, it performs kms:Decrypt using the calling principal's identity. KMS evaluates the key policy and the caller's IAM policy independently; both must permit the operation. The Secrets Manager resource policy was already configured, so authorization is failing at the KMS layer. Adding the workload role ARN directly to the CMK key policy with kms:Decrypt, combined with matching IAM permissions on the workload role, satisfies both checks and resolves the error."
+        },
+        {
+          "id": "c4",
+          "text": "Update the CMK key policy in the central security account to grant kms:Decrypt to the secretsmanager.amazonaws.com service principal for all accounts in the organization using an aws:PrincipalOrgID condition key, and use an SCP to restrict kms:Decrypt usage to the workload role ARN in the application account",
+          "explanation": "Granting kms:Decrypt to the Secrets Manager service principal org-wide allows any Secrets Manager call within the organization to decrypt secrets, which is excessively permissive and does not authenticate the specific calling IAM role. SCPs are guardrails that restrict what IAM can allow within an account - they cannot grant cross-account permissions to resources in another account. This approach is both insecure and architecturally incorrect."
+        }
+      ],
+      "tip": "When cross-account access fails despite the resource policy being configured, identify every independent authorization layer that the API call traverses and verify that each one explicitly grants access to the calling identity.",
+      "explanation": "Retrieving a CMK-encrypted secret involves two independent authorization layers: the Secrets Manager resource policy and the KMS key policy. Since AWS KMS does not automatically delegate key authorization to IAM unless the account root or the specific principal is added to the key policy, the cross-account workload role must be authorized directly in the CMK key policy. The Secrets Manager resource policy was already set, so the missing piece is the CMK key policy grant of kms:Decrypt to the workload role ARN. Additionally, the calling role's own IAM identity policy must explicitly permit both secretsmanager:GetSecretValue and kms:Decrypt. Adding only the account root enables IAM delegation but still requires an explicit IAM grant on the workload role, making it an incomplete fix on its own. Granting the Secrets Manager service principal broadly is overly permissive, and SCPs cannot grant cross-account permissions. To resolve this, navigate to KMS in the central account, edit the CMK key policy to add a statement granting kms:Decrypt to the workload role ARN, then update the workload role's IAM policy in the application account to include secretsmanager:GetSecretValue and kms:Decrypt scoped to the specific secret ARN and CMK ARN.",
+      "domain": "Data Protection",
+      "difficulty": 5,
+      "lastReviewed": "2026-03-24"
+    },
+    {
+      "id": "SCS-C03-0020",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/cli/latest/reference/secretsmanager/rotate-secret.html",
+      "format": "cli",
+      "services": [
+        "Secrets Manager",
+        "Lambda"
+      ],
+      "skills": [
+        "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+      ],
+      "question": "A security engineer has deployed a Lambda rotation function using the SecretsManagerRDSMySQLRotationSingleUser template for a secret named prod/db/master-credentials. The engineer runs the following command to associate the rotation function with the secret:\n\naws secretsmanager rotate-secret \\\n  --secret-id prod/db/master-credentials \\\n  --rotation-lambda-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn\n\nThe command completes successfully and an immediate rotation occurs, but the secret is never rotated automatically again.\n\nWhich command should the engineer run to configure a 30-day automatic rotation schedule without triggering another immediate rotation?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "aws secretsmanager update-secret \\\n  --secret-id prod/db/master-credentials \\\n  --rotation-lambda-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn \\\n  --rotation-rules AutomaticallyAfterDays=30 \\\n  --rotation-enabled true",
+          "explanation": "The update-secret subcommand modifies secret metadata such as description, KMS key, or secret value. It does not accept --rotation-lambda-arn, --rotation-rules, or --rotation-enabled parameters. Rotation configuration including the Lambda ARN and schedule is managed exclusively through the rotate-secret subcommand."
+        },
+        {
+          "id": "c2",
+          "text": "aws secretsmanager put-rotation-configuration \\\n  --secret-id prod/db/master-credentials \\\n  --rotation-function-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn \\\n  --automatically-after-days 30 \\\n  --enable-rotation",
+          "explanation": "There is no put-rotation-configuration subcommand in the AWS Secrets Manager CLI. This command would fail with an unknown command error. Rotation scheduling is configured exclusively using the rotate-secret subcommand with the --rotation-rules parameter."
+        },
+        {
+          "id": "c3",
+          "text": "aws secretsmanager rotate-secret \\\n  --secret-id prod/db/master-credentials \\\n  --rotation-lambda-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn \\\n  --rotation-rules AutomaticallyAfterDays=30 \\\n  --no-rotate-immediately",
+          "sequence": 1,
+          "explanation": "The rotate-secret subcommand manages both the rotation Lambda association and the rotation schedule. The --rotation-rules AutomaticallyAfterDays=30 parameter sets up the 30-day recurring schedule. By default, rotate-secret also invokes the Lambda immediately - adding --no-rotate-immediately suppresses that invocation so the schedule is updated without consuming another rotation cycle."
+        },
+        {
+          "id": "c4",
+          "text": "aws secretsmanager create-rotation-schedule \\\n  --secret-id prod/db/master-credentials \\\n  --lambda-function-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn \\\n  --schedule-expression 'rate(30 days)' \\\n  --rotation-enabled true",
+          "explanation": "There is no create-rotation-schedule subcommand in the AWS Secrets Manager CLI, and Secrets Manager rotation does not accept EventBridge-style rate expressions. Rotation frequency is specified as an integer number of days via the --rotation-rules AutomaticallyAfterDays=N parameter of the rotate-secret subcommand."
+        }
+      ],
+      "tip": "Both the rotation Lambda association and the rotation schedule are controlled by a single Secrets Manager CLI subcommand. Look for a parameter that sets the recurrence interval and a flag that decouples the configuration update from triggering an immediate rotation cycle.",
+      "explanation": "The rotate-secret subcommand is the correct tool for both associating a rotation Lambda and configuring a recurrence schedule. Without --rotation-rules AutomaticallyAfterDays=N, Secrets Manager performs a one-time rotation only and schedules no future automatic rotations. Adding --rotation-rules AutomaticallyAfterDays=30 sets the recurring 30-day schedule. By default, rotate-secret triggers an immediate Lambda invocation; the --no-rotate-immediately flag suppresses this, updating only the schedule without consuming a rotation cycle at that moment. The update-secret subcommand does not accept rotation parameters. The put-rotation-configuration and create-rotation-schedule subcommands do not exist. To verify the configuration after running the command, run aws secretsmanager describe-secret --secret-id prod/db/master-credentials and inspect the RotationEnabled, RotationRules, and NextRotationDate fields.",
+      "domain": "Data Protection",
+      "difficulty": 3,
+      "lastReviewed": "2026-03-24"
+    },
+    {
+      "id": "SCS-C03-0021",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/config/latest/developerguide/secretsmanager-rotation-enabled-check.html",
+      "format": "text",
+      "services": [
+        "Secrets Manager",
+        "Config",
+        "Systems Manager",
+        "Organizations"
+      ],
+      "skills": [
+        "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+      ],
+      "question": "A financial services company manages 15 AWS accounts through AWS Organizations. The company's security policy mandates that all Secrets Manager secrets must have rotation configured and must have been rotated successfully within the past 90 days. The security team discovers that some accounts contain secrets with rotation disabled, while others have rotation enabled but last rotated successfully more than 90 days ago. The team requires continuous automated compliance monitoring and automated remediation for both violation types without manual triage.\n\nWhich TWO actions should the security engineer implement to satisfy both requirements? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Create an Amazon EventBridge rule in the management account that captures RotateSecret CloudTrail API events, uses content-based filtering to identify secrets whose last rotation timestamp exceeds 90 days, and routes non-compliant events to an SNS topic for security team review",
+          "explanation": "EventBridge content filtering operates on the fields present in the event at the moment it fires. A RotateSecret event fires when rotation occurs - it cannot identify secrets that have not recently emitted a rotation event. Routing findings to SNS for security team review is a manual notification mechanism, not automated remediation. This approach cannot continuously detect either violation type."
+        },
+        {
+          "id": "c2",
+          "text": "Deploy the secretsmanager-rotation-enabled-check AWS Config managed rule as an Organization Config rule across all member accounts, and configure automatic Systems Manager Automation remediation to associate a rotation Lambda function for secrets where rotation is disabled",
+          "sequence": 1,
+          "explanation": "The secretsmanager-rotation-enabled-check managed rule flags secrets that do not have rotation enabled. Deploying it as an Organization Config rule from a delegated administrator account provides centralized continuous evaluation across all 15 accounts. Pairing it with automatic Systems Manager Automation remediation addresses the first violation type - rotation entirely disabled - without manual intervention."
+        },
+        {
+          "id": "c3",
+          "text": "Enable AWS Security Hub in all accounts with the AWS Foundational Security Best Practices standard, which includes SecretsManager.1 and SecretsManager.4 controls for rotation compliance, and configure Security Hub custom actions to invoke a Lambda function that triggers rotation for non-compliant secrets",
+          "explanation": "AWS Security Hub FSBP includes SecretsManager controls that detect rotation issues. However, Security Hub custom actions require a human to manually select findings and click the action - they are configured responses, not automatic remediation. This approach satisfies continuous detection but fails the automated remediation requirement. Config rules with auto-remediation provide this capability natively."
+        },
+        {
+          "id": "c4",
+          "text": "Deploy the secretsmanager-scheduled-rotation-success-idle-too-long AWS Config managed rule as an Organization Config rule with the maxDaysSinceRotation parameter set to 90 across all member accounts, and configure automatic Systems Manager Automation remediation to invoke rotation for secrets exceeding the threshold",
+          "sequence": 2,
+          "explanation": "The secretsmanager-scheduled-rotation-success-idle-too-long managed rule flags secrets where rotation is enabled but the last successful rotation occurred more than the configured number of days ago. Setting maxDaysSinceRotation=90 and deploying org-wide as an Organization Config rule addresses the second violation type. Automatic Systems Manager Automation remediation invokes rotation for overdue secrets without requiring manual review."
+        },
+        {
+          "id": "c5",
+          "text": "Deploy a centralized Lambda function triggered daily by Amazon EventBridge that assumes cross-account IAM roles in each member account, calls secretsmanager:ListSecrets to evaluate last rotation timestamps, and publishes overdue secret ARNs to AWS Security Hub as custom findings for the security team to remediate",
+          "explanation": "This polling-based approach requires manual action to remediate Security Hub custom findings. It also introduces significant operational overhead with cross-account role assumption and custom finding lifecycle management. AWS Config Organization rules provide native continuous evaluation, automatic evidence collection, and built-in automatic remediation without requiring a custom polling architecture."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Each violation type represents a distinct compliance condition. Look for AWS-native tools designed for continuous configuration compliance evaluation that also support automated remediation, and identify which individual rule addresses each specific condition.",
+      "explanation": "Two distinct AWS Config managed rules are required because the two violation types are different conditions. The secretsmanager-rotation-enabled-check rule detects secrets where rotation has never been configured. The secretsmanager-scheduled-rotation-success-idle-too-long rule detects secrets where rotation is configured but has not succeeded within the required period. Together, they provide complete coverage of both conditions. Deploying both as Organization Config rules from a delegated administrator account provides centralized continuous evaluation across all accounts. Automatic Systems Manager Automation remediation eliminates manual intervention. The EventBridge approach cannot continuously detect secrets that have not recently emitted rotation events. Security Hub custom actions require human selection and are not automated. A custom Lambda polling solution adds architectural complexity while providing weaker remediation capability than native Config auto-remediation. In the AWS Console, navigate to Config, select Rules, then Add rule. Search for each managed rule, and configure Organization-level deployment and auto-remediation actions in the rule scope settings.",
+      "domain": "Data Protection",
+      "difficulty": 4,
+      "lastReviewed": "2026-03-24"
+    },
+    {
+      "id": "SCS-C03-0022",
+      "type": "ordering",
+      "docs": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotate-secrets_lambda-functions.html",
+      "services": [
+        "Secrets Manager",
+        "Lambda"
+      ],
+      "skills": [
+        "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+      ],
+      "question": "A security engineer is implementing a custom AWS Secrets Manager Lambda rotation function for an Amazon RDS database. During each rotation cycle, Secrets Manager invokes the Lambda function four times, each time passing a different value for the Step parameter. Each invocation performs a distinct and non-interchangeable action in the rotation workflow.\n\nArrange the following steps in the correct order in which Secrets Manager invokes them during a single rotation cycle.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "createSecret - Generate a new credential value and store it as a new secret version with the AWSPENDING staging label attached",
+          "sequence": 1,
+          "explanation": "createSecret is always invoked first. The rotation Lambda generates a new password and calls PutSecretValue to store it as a new version with the AWSPENDING label. All subsequent steps depend on finding an AWSPENDING version to act on, so this step must complete successfully before any other step can proceed."
+        },
+        {
+          "id": "c2",
+          "text": "setSecret - Apply the AWSPENDING credential value to the protected resource by updating the RDS database user's password to match the new staged version",
+          "sequence": 2,
+          "explanation": "setSecret is invoked second. It reads the AWSPENDING credential from Secrets Manager and updates the actual protected resource - for RDS, this means connecting with the existing AWSCURRENT credentials and executing an ALTER USER command to set the new password. This step requires createSecret to have completed so the new credential value exists in AWSPENDING."
+        },
+        {
+          "id": "c3",
+          "text": "testSecret - Authenticate against the protected resource using the AWSPENDING credential to confirm the new password was applied successfully",
+          "sequence": 3,
+          "explanation": "testSecret is invoked third. It attempts to authenticate against the RDS database using the credential stored in AWSPENDING to verify that setSecret successfully updated the user's password. This validation step prevents finishSecret from promoting an untested or broken credential to AWSCURRENT."
+        },
+        {
+          "id": "c4",
+          "text": "finishSecret - Promote the AWSPENDING version to AWSCURRENT, relabel the previous AWSCURRENT version as AWSPREVIOUS, and complete the rotation cycle",
+          "sequence": 4,
+          "explanation": "finishSecret is the final step. It calls UpdateSecretVersionStage to move the AWSCURRENT label to the successfully validated AWSPENDING version, making the new credential active. The version that was previously AWSCURRENT is relabeled AWSPREVIOUS and retained briefly to support applications that may still hold cached connections using the old credential."
+        }
+      ],
+      "tip": "Each step produces a specific artifact or state change that the next step depends on. Consider which action must complete and produce a verifiable result before the following action can begin.",
+      "explanation": "Secrets Manager defines a strict four-step rotation lifecycle: createSecret, setSecret, testSecret, finishSecret. The createSecret step must run first because it generates the new credential and stores it with the AWSPENDING label - the artifact all other steps consume. setSecret reads AWSPENDING and applies the new password to the protected resource, requiring createSecret to have completed. testSecret verifies the AWSPENDING credential against the live resource before promotion, requiring setSecret to have applied the change successfully. finishSecret promotes AWSPENDING to AWSCURRENT only after successful testing, completing the atomic rotation. Inverting or skipping any step risks creating an inconsistency between the credential stored in Secrets Manager and the password configured on the resource. When implementing a custom rotation function, the handler should inspect the Step parameter value and dispatch to the appropriate sub-function using a switch or if-else chain. The AWSPREVIOUS label set by finishSecret provides a brief fallback window for applications holding connections that use the old credential.",
+      "domain": "Data Protection",
+      "difficulty": 3,
+      "lastReviewed": "2026-03-24"
     }
   ]
 }
