@@ -5,6 +5,14 @@ import { apiUrl } from '@/apiBase'
 import type { LogAnalysisLabDefinition, LogEntry } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabComplete } from '../shared'
+import { useLabProgress } from '../useLabProgress'
+import { LabCompleteModal } from '../LabCompleteModal'
+
+interface LogAnalysisProgress {
+  highlightedLines: number[]
+  selectedAnswer: string | null
+  timeLeft: number
+}
 
 interface Props {
   lab: LogAnalysisLabDefinition
@@ -19,20 +27,36 @@ const LEVEL_COLORS: Record<string, string> = {
 }
 
 export function LogAnalysisRunner({ lab, timed = true }: Props) {
-  const { authFetch, user } = useExam()
+  const { authFetch, user, setRoute } = useExam()
   const completeWithGamification = useLabComplete(lab)
+  const { savedProgress, saveProgress, clearProgress } = useLabProgress<LogAnalysisProgress>(lab.id, timed)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [levelFilter, setLevelFilter] = useState<string | null>(null)
-  const [highlightedLines, setHighlightedLines] = useState<Set<number>>(new Set())
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
+  const [highlightedLines, setHighlightedLines] = useState<Set<number>>(
+    () => new Set(savedProgress?.highlightedLines ?? [])
+  )
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(savedProgress?.selectedAnswer ?? null)
   const [submitted, setSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
+  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
   const [labPaused, setLabPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
   const logContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!resumeNotice) return
+    const t = setTimeout(() => setResumeNotice(false), 3000)
+    return () => clearTimeout(t)
+  }, [resumeNotice])
+
+  useEffect(() => {
+    if (submitted) return
+    saveProgress({ highlightedLines: [...highlightedLines], selectedAnswer, timeLeft })
+  }, [highlightedLines, selectedAnswer, timeLeft, submitted])
 
   useEffect(() => {
     if (submitted || !timed || labPaused) return
@@ -46,7 +70,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
   }, [submitted, timed, labPaused])
 
   useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) handleSubmit()
+    if (timed && timeLeft === 0 && !submitted) doSubmit()
   }, [timeLeft])
 
   const filteredLogs = useMemo(() => {
@@ -74,9 +98,10 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
     })
   }, [submitted])
 
-  const handleSubmit = useCallback(async () => {
+  const doSubmit = useCallback(async () => {
     if (submitted) return
     setSubmitted(true)
+    clearProgress()
     if (timerRef.current) clearInterval(timerRef.current)
 
     const correctAnswer = lab.answers.find((a) => a.correct)
@@ -96,11 +121,44 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
     }
   }, [submitted, lab, selectedAnswer, authFetch, user])
 
+  const handlePauseAndExit = useCallback(() => {
+    saveProgress({ highlightedLines: [...highlightedLines], selectedAnswer, timeLeft })
+    setRoute('skill-labs')
+  }, [highlightedLines, selectedAnswer, timeLeft])
+
+  const handleCancelLab = useCallback(() => {
+    clearProgress()
+    setRoute('skill-labs')
+  }, [])
+
   const levels = useMemo(() => [...new Set(lab.logs.map((l) => l.level))], [lab.logs])
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id} onPauseChange={setLabPaused} />
+      {showConfirmModal && (
+        <LabCompleteModal
+          title={lab.title}
+          timeTaken={lab.timeLimit - timeLeft}
+          timed={timed}
+          onConfirm={() => { setShowConfirmModal(false); doSubmit() }}
+          onCancel={() => setShowConfirmModal(false)}
+        />
+      )}
+      <LabHeader
+        title={lab.title}
+        timed={timed}
+        timeLeft={timeLeft}
+        subtitle={lab.scenario}
+        labId={lab.id}
+        onPauseChange={setLabPaused}
+        onPauseAndExit={submitted ? undefined : handlePauseAndExit}
+        onCancelLab={submitted ? undefined : handleCancelLab}
+      />
+      {resumeNotice && (
+        <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
+          Resuming from saved progress
+        </div>
+      )}
 
       {/* Search + filter bar */}
       <div className="flex items-center gap-3">
@@ -198,16 +256,19 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
           <button
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!selectedAnswer}
-            onClick={handleSubmit}
+            onClick={() => setShowConfirmModal(true)}
           >
             Submit Answer
           </button>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </div>
             <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
+              Back to Skill Labs
+            </button>
           </div>
         )}
       </div>

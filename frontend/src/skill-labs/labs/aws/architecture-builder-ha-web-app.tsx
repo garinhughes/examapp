@@ -8,6 +8,7 @@ import ReactFlow, {
   useReactFlow,
   ReactFlowProvider,
   type Node,
+  type Edge,
   type Connection,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
@@ -16,6 +17,15 @@ import { apiUrl } from '@/apiBase'
 import type { ArchitectureBuilderLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabComplete } from '../shared'
+import { useLabProgress } from '../useLabProgress'
+import { LabCompleteModal } from '../LabCompleteModal'
+
+interface ArchProgress {
+  placedComponents: string[]
+  nodes: Node[]
+  edges: Edge[]
+  timeLeft: number
+}
 
 interface Props {
   lab: ArchitectureBuilderLabDefinition
@@ -31,20 +41,36 @@ export function ArchitectureBuilderRunner(props: Props) {
 }
 
 function ArchitectureBuilderInner({ lab, timed = true }: Props) {
-  const { authFetch, user } = useExam()
+  const { authFetch, user, setRoute } = useExam()
   const reactFlowInstance = useReactFlow()
   const completeWithGamification = useLabComplete(lab)
+  const { savedProgress, saveProgress, clearProgress } = useLabProgress<ArchProgress>(lab.id, timed)
 
-  const [placedComponents, setPlacedComponents] = useState<Set<string>>(new Set())
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
-  const nodeCountRef = useRef(0)
+  const [placedComponents, setPlacedComponents] = useState<Set<string>>(
+    () => new Set(savedProgress?.placedComponents ?? [])
+  )
+  const [nodes, setNodes, onNodesChange] = useNodesState(savedProgress?.nodes ?? [])
+  const [edges, setEdges, onEdgesChange] = useEdgesState(savedProgress?.edges ?? [])
+  const nodeCountRef = useRef(savedProgress?.nodes?.length ?? 0)
   const [submitted, setSubmitted] = useState(false)
   const [validationResults, setValidationResults] = useState<{ check: string; pass: boolean }[]>([])
-  const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
+  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
   const [labPaused, setLabPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
+
+  useEffect(() => {
+    if (!resumeNotice) return
+    const t = setTimeout(() => setResumeNotice(false), 3000)
+    return () => clearTimeout(t)
+  }, [resumeNotice])
+
+  useEffect(() => {
+    if (submitted) return
+    saveProgress({ placedComponents: [...placedComponents], nodes, edges, timeLeft })
+  }, [placedComponents, nodes, edges, timeLeft, submitted])
 
   useEffect(() => {
     if (submitted || !timed || labPaused) return
@@ -58,7 +84,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
   }, [submitted, timed, labPaused])
 
   useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) handleValidate()
+    if (timed && timeLeft === 0 && !submitted) doValidate()
   }, [timeLeft])
 
   const addComponent = useCallback((comp: typeof lab.availableComponents[0]) => {
@@ -67,7 +93,6 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
     const n = nodeCountRef.current++
     const col = n % 3
     const row = Math.floor(n / 3)
-    // Place in a grid that maps to viewport flow coordinates
     const newNode: Node = {
       id: comp.id,
       position: { x: 50 + col * 220, y: 40 + row * 130 },
@@ -84,7 +109,6 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
     }
     setNodes((prev) => {
       const next = [...prev, newNode]
-      // Fit viewport to show all nodes after a tick
       requestAnimationFrame(() => reactFlowInstance.fitView({ padding: 0.25, duration: 200 }))
       return next
     })
@@ -95,21 +119,20 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
     setEdges((prev) => addEdge({ ...connection, animated: true }, prev))
   }, [submitted, setEdges])
 
-  const handleValidate = useCallback(async () => {
+  const doValidate = useCallback(async () => {
     if (submitted) return
     setSubmitted(true)
+    clearProgress()
     if (timerRef.current) clearInterval(timerRef.current)
 
     const results: { check: string; pass: boolean }[] = []
 
-    // Check required components
     const missingComps = lab.requiredComponents.filter((id) => !placedComponents.has(id))
     results.push({
       check: 'All required components placed',
       pass: missingComps.length === 0,
     })
 
-    // Check required connections (accept either direction since handles are on all sides)
     for (const req of lab.requiredConnections) {
       const found = edges.some(
         (e) => (e.source === req.from && e.target === req.to) ||
@@ -123,7 +146,6 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
       })
     }
 
-    // Additional validation checks
     for (const check of lab.validationChecks) {
       results.push({ check, pass: missingComps.length === 0 && edges.length >= lab.requiredConnections.length })
     }
@@ -144,9 +166,18 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
     }
   }, [submitted, lab, placedComponents, edges, authFetch, user])
 
+  const handlePauseAndExit = useCallback(() => {
+    saveProgress({ placedComponents: [...placedComponents], nodes, edges, timeLeft })
+    setRoute('skill-labs')
+  }, [placedComponents, nodes, edges, timeLeft])
+
+  const handleCancelLab = useCallback(() => {
+    clearProgress()
+    setRoute('skill-labs')
+  }, [])
+
   const allPass = validationResults.length > 0 && validationResults.every((r) => r.pass)
 
-  // Group components by category
   const grouped = useMemo(() => {
     const map: Record<string, typeof lab.availableComponents> = {}
     for (const c of lab.availableComponents) {
@@ -155,12 +186,22 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
     return map
   }, [lab.availableComponents])
 
-  // Expand scenario text with extra guidance so learners understand constraints
   const displayScenario = `${lab.scenario} Your design must remain available if a single Availability Zone fails. Prefer managed, multi-AZ services with automated failover (single-AZ read-replicas alone are not sufficient for AZ-failure resilience). Consider serving static assets via a CDN, using an autoscaling web tier spread across AZs behind a load balancer, caching for read-heavy workloads, and durable object storage for static content.`
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={displayScenario} labId={lab.id} onPauseChange={setLabPaused} />
+      {showConfirmModal && (
+        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - timeLeft} timed={timed}
+          onConfirm={() => { setShowConfirmModal(false); doValidate() }} onCancel={() => setShowConfirmModal(false)} />
+      )}
+      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={displayScenario} labId={lab.id}
+        onPauseChange={setLabPaused} onPauseAndExit={submitted ? undefined : handlePauseAndExit}
+        onCancelLab={submitted ? undefined : handleCancelLab} />
+      {resumeNotice && (
+        <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
+          Resuming from saved progress
+        </div>
+      )}
 
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Component palette */}
@@ -224,7 +265,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
             <button
               className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
               disabled={nodes.length === 0}
-              onClick={handleValidate}
+              onClick={() => setShowConfirmModal(true)}
             >
               Validate Architecture
             </button>
@@ -245,6 +286,9 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
               ))}
             </div>
             <div className="text-sm text-muted-foreground mt-2">{lab.explanation}</div>
+            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
+              Back to Skill Labs
+            </button>
           </div>
         )}
       </div>

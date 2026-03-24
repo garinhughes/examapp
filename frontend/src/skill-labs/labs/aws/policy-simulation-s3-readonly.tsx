@@ -5,6 +5,9 @@ import { apiUrl } from '@/apiBase'
 import type { PolicySimulationLabDefinition, PolicyTestCase } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabComplete } from '../shared'
+import { useLabProgress } from '../useLabProgress'
+
+interface PolicySimProgress { policy: string; timeLeft: number }
 
 interface Props {
   lab: PolicySimulationLabDefinition
@@ -42,7 +45,6 @@ function evaluatePolicy(policyJson: string, testCases: PolicyTestCase[]): { resu
       const actionMatch = actions.some((a: string) => a === '*' || a === tc.action)
       const resourceMatch = resources.some((r: string) => {
         if (r === '*') return true
-        // Simple ARN prefix match (ending with /*)
         if (r.endsWith('/*')) {
           const prefix = r.slice(0, -1)
           return tc.resource.startsWith(prefix) || tc.resource === r
@@ -69,17 +71,30 @@ function evaluatePolicy(policyJson: string, testCases: PolicyTestCase[]): { resu
 }
 
 export function PolicySimulationRunner({ lab, timed = true }: Props) {
-  const { authFetch, user } = useExam()
+  const { authFetch, user, setRoute } = useExam()
   const completeWithGamification = useLabComplete(lab)
+  const { savedProgress, saveProgress, clearProgress } = useLabProgress<PolicySimProgress>(lab.id, timed)
 
-  const [policy, setPolicy] = useState(lab.initialPolicy)
+  const [policy, setPolicy] = useState(savedProgress?.policy ?? lab.initialPolicy)
   const [testResults, setTestResults] = useState<TestResult[] | null>(null)
   const [testError, setTestError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
+  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
   const [labPaused, setLabPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
+
+  useEffect(() => {
+    if (!resumeNotice) return
+    const t = setTimeout(() => setResumeNotice(false), 3000)
+    return () => clearTimeout(t)
+  }, [resumeNotice])
+
+  useEffect(() => {
+    if (submitted) return
+    saveProgress({ policy, timeLeft })
+  }, [policy, timeLeft, submitted])
 
   useEffect(() => {
     if (submitted || !timed || labPaused) return
@@ -109,6 +124,7 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
     const allPass = results.every((r) => r.pass)
     if (allPass && !submitted) {
       setSubmitted(true)
+      clearProgress()
       if (timerRef.current) clearInterval(timerRef.current)
       completeWithGamification(true)
 
@@ -126,6 +142,7 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
 
   const handleGiveUp = useCallback(async () => {
     setSubmitted(true)
+    clearProgress()
     if (timerRef.current) clearInterval(timerRef.current)
     completeWithGamification(false)
 
@@ -140,11 +157,28 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
     }
   }, [lab, authFetch, user])
 
+  const handlePauseAndExit = useCallback(() => {
+    saveProgress({ policy, timeLeft })
+    setRoute('skill-labs')
+  }, [policy, timeLeft])
+
+  const handleCancelLab = useCallback(() => {
+    clearProgress()
+    setRoute('skill-labs')
+  }, [])
+
   const allPass = testResults !== null && testResults.every((r) => r.pass)
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id} onPauseChange={setLabPaused} />
+      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id}
+        onPauseChange={setLabPaused} onPauseAndExit={submitted ? undefined : handlePauseAndExit}
+        onCancelLab={submitted ? undefined : handleCancelLab} />
+      {resumeNotice && (
+        <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
+          Resuming from saved progress
+        </div>
+      )}
 
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Requirements panel */}
@@ -244,10 +278,15 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
               Run Tests
             </button>
           </>
-        ) : !allPass ? (
-          <div className="text-sm text-muted-foreground">Lab complete — review the explanation above.</div>
         ) : (
-          <div className="text-sm text-green-600 dark:text-green-400 font-semibold">Policy validates successfully!</div>
+          <div className="flex items-center justify-between w-full">
+            <div className={`text-sm font-semibold ${allPass ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+              {allPass ? 'Policy validates successfully!' : 'Lab complete — review the explanation above.'}
+            </div>
+            <button onClick={() => setRoute('skill-labs')} className="px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
+              Back to Skill Labs
+            </button>
+          </div>
         )}
       </div>
     </div>

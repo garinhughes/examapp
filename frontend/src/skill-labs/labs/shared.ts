@@ -38,3 +38,34 @@ export function toggleBookmark(labId: string): Set<string> {
   localStorage.setItem('skill-labs-bookmarked', JSON.stringify(stored))
   return new Set(stored)
 }
+
+const PROGRESS_PREFIX = 'skillLabProgress:'
+const PROGRESS_EXPIRY_MS = 24 * 60 * 60 * 1000
+
+/**
+ * Returns all in-progress lab IDs from localStorage (not yet submitted, not expired).
+ * Used by SkillLabsPage to show "In Progress" badges and resume banner.
+ */
+export function getInProgressLabs(): Array<{ labId: string; savedAt: number; timed: boolean | null }> {
+  const result: Array<{ labId: string; savedAt: number; timed: boolean | null }> = []
+  try {
+    const keys: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (k?.startsWith(PROGRESS_PREFIX)) keys.push(k)
+    }
+    for (const key of keys) {
+      const raw = localStorage.getItem(key)
+      if (!raw) continue
+      let parsed: any
+      try { parsed = JSON.parse(raw) } catch { continue }
+      if (!parsed.savedAt || Date.now() - parsed.savedAt > PROGRESS_EXPIRY_MS) {
+        localStorage.removeItem(key)
+        continue
+      }
+      const labId = key.slice(PROGRESS_PREFIX.length)
+      result.push({ labId, savedAt: parsed.savedAt, timed: typeof parsed._timed === 'boolean' ? parsed._timed : null })
+    }
+  } catch {}
+  return result
+}

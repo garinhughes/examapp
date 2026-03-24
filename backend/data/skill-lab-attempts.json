@@ -187,5 +187,45 @@
     "correct": true,
     "timeTaken": 2,
     "createdAt": "2026-03-18T16:19:49.788Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "f9401b94-a9d6-438a-af97-90dd0ff3b34f",
+    "labId": "cloudfront-403",
+    "labType": "diagnose",
+    "selectedAnswer": "policy",
+    "correct": true,
+    "timeTaken": 10,
+    "createdAt": "2026-03-24T08:01:02.157Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "c7f1b7e3-fd06-4ab8-a253-f85bac2107f7",
+    "labId": "api-request-network-debug",
+    "labType": "diagnose",
+    "selectedAnswer": "sg-port",
+    "correct": true,
+    "timeTaken": 5,
+    "createdAt": "2026-03-24T08:02:36.220Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "a2e7f7c1-f8fc-4de2-b96a-da4d50058623",
+    "labId": "cloudfront-403",
+    "labType": "diagnose",
+    "selectedAnswer": "policy",
+    "correct": true,
+    "timeTaken": 6,
+    "createdAt": "2026-03-24T08:06:37.815Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "5f80a34d-188a-447c-82ef-e1f44dc45509",
+    "labId": "cloudfront-403",
+    "labType": "diagnose",
+    "selectedAnswer": "cache",
+    "correct": false,
+    "timeTaken": 2,
+    "createdAt": "2026-03-24T08:08:08.449Z"
   }
 ]

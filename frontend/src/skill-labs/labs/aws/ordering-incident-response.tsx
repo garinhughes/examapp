@@ -8,6 +8,13 @@ import type { OrderingLabDefinition, OrderingStep } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabComplete } from '../shared'
 import { SortableOrderItem } from '@/exam/SortableOrderItem'
+import { useLabProgress } from '../useLabProgress'
+import { LabCompleteModal } from '../LabCompleteModal'
+
+interface OrderingProgress {
+  steps: OrderingStep[]
+  timeLeft: number
+}
 
 interface Props {
   lab: OrderingLabDefinition
@@ -24,16 +31,30 @@ function shuffleArray<T>(arr: T[]): T[] {
 }
 
 export function OrderingRunner({ lab, timed = true }: Props) {
-  const { authFetch, user } = useExam()
+  const { authFetch, user, setRoute } = useExam()
   const completeWithGamification = useLabComplete(lab)
+  const { savedProgress, saveProgress, clearProgress } = useLabProgress<OrderingProgress>(lab.id, timed)
 
-  const [steps, setSteps] = useState<OrderingStep[]>(() => shuffleArray(lab.steps))
+  const [steps, setSteps] = useState<OrderingStep[]>(() => savedProgress?.steps ?? shuffleArray(lab.steps))
   const [submitted, setSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
+  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
   const [labPaused, setLabPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
+
+  useEffect(() => {
+    if (!resumeNotice) return
+    const t = setTimeout(() => setResumeNotice(false), 3000)
+    return () => clearTimeout(t)
+  }, [resumeNotice])
+
+  useEffect(() => {
+    if (submitted) return
+    saveProgress({ steps, timeLeft })
+  }, [steps, timeLeft, submitted])
 
   useEffect(() => {
     if (submitted || !timed || labPaused) return
@@ -47,7 +68,7 @@ export function OrderingRunner({ lab, timed = true }: Props) {
   }, [submitted, timed, labPaused])
 
   useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) handleSubmit()
+    if (timed && timeLeft === 0 && !submitted) doSubmit()
   }, [timeLeft])
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -62,9 +83,10 @@ export function OrderingRunner({ lab, timed = true }: Props) {
     }
   }, [submitted])
 
-  const handleSubmit = useCallback(async () => {
+  const doSubmit = useCallback(async () => {
     if (submitted) return
     setSubmitted(true)
+    clearProgress()
     if (timerRef.current) clearInterval(timerRef.current)
 
     const correct = steps.every((step, idx) => step.correctPosition === idx + 1)
@@ -83,11 +105,44 @@ export function OrderingRunner({ lab, timed = true }: Props) {
     }
   }, [submitted, steps, lab, authFetch, user])
 
+  const handlePauseAndExit = useCallback(() => {
+    saveProgress({ steps, timeLeft })
+    setRoute('skill-labs')
+  }, [steps, timeLeft])
+
+  const handleCancelLab = useCallback(() => {
+    clearProgress()
+    setRoute('skill-labs')
+  }, [])
+
   const correctOrder = [...lab.steps].sort((a, b) => a.correctPosition - b.correctPosition)
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id} onPauseChange={setLabPaused} />
+      {showConfirmModal && (
+        <LabCompleteModal
+          title={lab.title}
+          timeTaken={lab.timeLimit - timeLeft}
+          timed={timed}
+          onConfirm={() => { setShowConfirmModal(false); doSubmit() }}
+          onCancel={() => setShowConfirmModal(false)}
+        />
+      )}
+      <LabHeader
+        title={lab.title}
+        timed={timed}
+        timeLeft={timeLeft}
+        subtitle={lab.scenario}
+        labId={lab.id}
+        onPauseChange={setLabPaused}
+        onPauseAndExit={submitted ? undefined : handlePauseAndExit}
+        onCancelLab={submitted ? undefined : handleCancelLab}
+      />
+      {resumeNotice && (
+        <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
+          Resuming from saved progress
+        </div>
+      )}
 
       <div className="flex-1 flex gap-6 min-h-0">
         {/* Ordering area */}
@@ -144,16 +199,19 @@ export function OrderingRunner({ lab, timed = true }: Props) {
         {!submitted ? (
           <button
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
-            onClick={handleSubmit}
+            onClick={() => setShowConfirmModal(true)}
           >
             Submit Order
           </button>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {isCorrect ? '✓ Correct order!' : '✗ Incorrect order'}
             </div>
             <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
+              Back to Skill Labs
+            </button>
           </div>
         )}
       </div>

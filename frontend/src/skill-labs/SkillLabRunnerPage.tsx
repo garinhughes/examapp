@@ -1,5 +1,6 @@
 import { useState, useEffect, Suspense, lazy, ComponentType } from 'react'
 import { apiUrl } from '@/apiBase'
+import { useExam } from '@/exam/ExamContext'
 import type { LabDefinition, SkillLabType } from './types'
 
 interface SkillLabRunnerPageProps {
@@ -7,11 +8,6 @@ interface SkillLabRunnerPageProps {
   timed?: boolean
 }
 
-/**
- * Map lab type → dynamic import of runner component.
- * Each entry returns a Promise<{ default: ComponentType }> shape for React.lazy.
- * Vite will code-split each runner (and its deps like Monaco) into separate chunks.
- */
 const runnerImports: Record<SkillLabType, () => Promise<{ default: ComponentType<any> }>> = {
   'diagnose': () =>
     import('./labs/aws/diagnose-cloudfront-403').then(m => ({ default: m.DiagnoseLabRunner })),
@@ -42,6 +38,7 @@ const runnerImports: Record<SkillLabType, () => Promise<{ default: ComponentType
 }
 
 export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPageProps) {
+  const { authFetch, setRoute } = useExam()
   const [lab, setLab] = useState<LabDefinition | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -50,7 +47,7 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
     let cancelled = false
     async function fetchLab() {
       try {
-        const res = await fetch(apiUrl(`/skill-labs/${encodeURIComponent(labId)}`))
+        const res = await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(labId)}`))
         if (!res.ok) throw new Error('Failed to load')
         const data = await res.json()
         if (!cancelled) setLab(data)
@@ -65,7 +62,17 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
   }, [labId])
 
   if (loading) return <div className="text-muted-foreground p-4">Loading lab…</div>
-  if (error || !lab) return <div className="text-destructive p-4">{error || 'Lab not found'}</div>
+  if (error || !lab) return (
+    <div className="flex flex-col items-start gap-3 p-4">
+      <p className="text-destructive">{error || 'Lab not found'}</p>
+      <button
+        onClick={() => setRoute('skill-labs')}
+        className="px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition"
+      >
+        Back to Skill Labs
+      </button>
+    </div>
+  )
 
   const importer = runnerImports[lab.type]
   if (!importer) {

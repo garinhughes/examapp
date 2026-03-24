@@ -11,24 +11,49 @@ import { apiUrl } from '@/apiBase'
 import type { DiagnoseLabDefinition, Inspection } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabComplete } from '../shared'
+import { useLabProgress } from '../useLabProgress'
+import { LabCompleteModal } from '../LabCompleteModal'
 
 interface DiagnoseLabRunnerProps {
   lab: DiagnoseLabDefinition
   timed?: boolean
 }
 
-export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps) {
-  const { authFetch, user } = useExam()
-  const completeWithGamification = useLabComplete(lab)
+interface DiagnoseProgress {
+  selectedNode: string | null
+  selectedAnswer: string | null
+  timeLeft: number
+}
 
-  const [selectedNode, setSelectedNode] = useState<string | null>(null)
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
+export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps) {
+  const { authFetch, user, setRoute } = useExam()
+  const completeWithGamification = useLabComplete(lab)
+  const { savedProgress, saveProgress, clearProgress } = useLabProgress<DiagnoseProgress>(lab.id, timed)
+
+  const [selectedNode, setSelectedNode] = useState<string | null>(savedProgress?.selectedNode ?? null)
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(savedProgress?.selectedAnswer ?? null)
   const [submitted, setSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
   const [labPaused, setLabPaused] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
+
+  // Auto-dismiss resume notice
+  useEffect(() => {
+    if (!resumeNotice) return
+    const t = setTimeout(() => setResumeNotice(false), 3000)
+    return () => clearTimeout(t)
+  }, [resumeNotice])
+
+  // Auto-save progress on state changes
+  useEffect(() => {
+    if (submitted) return
+    saveProgress({ selectedNode, selectedAnswer, timeLeft })
+  }, [selectedNode, selectedAnswer, timeLeft, submitted])
 
   // Timer
   useEffect(() => {
@@ -46,12 +71,13 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
   }, [submitted, timed, labPaused])
 
   useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) handleSubmit()
+    if (timed && timeLeft === 0 && !submitted) doSubmit()
   }, [timeLeft])
 
-  const handleSubmit = useCallback(async () => {
+  const doSubmit = useCallback(async () => {
     if (submitted) return
     setSubmitted(true)
+    clearProgress()
     if (timerRef.current) clearInterval(timerRef.current)
 
     const correctAnswer = lab.answers.find((a) => a.correct)
@@ -66,17 +92,23 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
         await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            selectedAnswer: selectedAnswer || '',
-            correct,
-            timeTaken,
-          }),
+          body: JSON.stringify({ selectedAnswer: selectedAnswer || '', correct, timeTaken }),
         })
       } catch {
         // Non-critical
       }
     }
   }, [submitted, lab, selectedAnswer, authFetch, user])
+
+  const handlePauseAndExit = useCallback(() => {
+    saveProgress({ selectedNode, selectedAnswer, timeLeft })
+    setRoute('skill-labs')
+  }, [selectedNode, selectedAnswer, timeLeft])
+
+  const handleCancelLab = useCallback(() => {
+    clearProgress()
+    setRoute('skill-labs')
+  }, [])
 
   // Build React Flow nodes and edges
   const rfNodes: Node[] = lab.nodes.map((n) => ({
@@ -109,7 +141,31 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
 
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} labId={lab.id} onPauseChange={setLabPaused} />
+      {showConfirmModal && (
+        <LabCompleteModal
+          title={lab.title}
+          timeTaken={lab.timeLimit - timeLeft}
+          timed={timed}
+          onConfirm={() => { setShowConfirmModal(false); doSubmit() }}
+          onCancel={() => setShowConfirmModal(false)}
+        />
+      )}
+
+      <LabHeader
+        title={lab.title}
+        timed={timed}
+        timeLeft={timeLeft}
+        labId={lab.id}
+        onPauseChange={setLabPaused}
+        onPauseAndExit={submitted ? undefined : handlePauseAndExit}
+        onCancelLab={submitted ? undefined : handleCancelLab}
+      />
+
+      {resumeNotice && (
+        <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
+          Resuming from saved progress
+        </div>
+      )}
 
       {/* Main layout: diagram + inspection panel */}
       <div className="flex-1 flex gap-4 min-h-0">
@@ -188,18 +244,22 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
           <button
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!selectedAnswer}
-            onClick={handleSubmit}
+            onClick={() => setShowConfirmModal(true)}
           >
             Submit Answer
           </button>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </div>
-            <div className="text-sm text-muted-foreground">
-              {lab.explanation}
-            </div>
+            <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <button
+              onClick={() => setRoute('skill-labs')}
+              className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition"
+            >
+              Back to Skill Labs
+            </button>
           </div>
         )}
       </div>

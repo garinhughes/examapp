@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useExam } from '@/exam/ExamContext'
-import { Play, Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search } from 'lucide-react'
+import { Play, Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight } from 'lucide-react'
 import type { LabSummary, SkillLevel } from './types'
 import { apiUrl } from '@/apiBase'
 import { SearchableFilter } from './SearchableFilter'
-import { getBookmarkedLabs, toggleBookmark } from './labs/shared'
+import { getBookmarkedLabs, toggleBookmark, getInProgressLabs } from './labs/shared'
 
 const DIFFICULTY_LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced']
 const DIFFICULTY_COLORS: Record<SkillLevel, string> = {
@@ -42,6 +42,11 @@ export function SkillLabsPage() {
       return 'all'
     }
   })
+
+  // In-progress labs (from localStorage, read once on mount)
+  const [inProgressLabs] = useState<Map<string, { timed: boolean | null }>>(() =>
+    new Map(getInProgressLabs().map((e) => [e.labId, { timed: e.timed }]))
+  )
 
   // Bookmarks
   const [bookmarkedLabIds, setBookmarkedLabIds] = useState<Set<string>>(() => getBookmarkedLabs())
@@ -293,6 +298,29 @@ export function SkillLabsPage() {
         </div>
       </div>
 
+      {/* Resume banner — shown when a visible lab has saved progress */}
+      {(() => {
+        const resumable = filtered.find((l) => inProgressLabs.has(l.id))
+        if (!resumable) return null
+        return (
+          <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-amber-400/40 bg-amber-50/60 dark:bg-amber-900/10 dark:border-amber-500/30">
+            <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
+              Lab in progress: <span className="font-semibold">{resumable.title}</span>
+            </p>
+            <button
+              onClick={() => {
+                const savedTimed = inProgressLabs.get(resumable.id)?.timed
+                const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
+                setRoute(`skill-lab:${resumable.id}:${mode}` as any)
+              }}
+              className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition"
+            >
+              Resume <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )
+      })()}
+
       {/* Lab cards grid: 3 across × 4 down */}
       {paginated.length === 0 ? (
         <div className="text-center text-muted-foreground py-12">
@@ -357,14 +385,31 @@ export function SkillLabsPage() {
               </div>
 
               <div className="mt-4 flex items-center gap-2">
-                <button
-                  className="flex-1 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm inline-flex items-center gap-2 hover:bg-primary/90 transition justify-center"
-                  onClick={() => setRoute(`skill-lab:${lab.id}:${timed ? 'timed' : 'casual'}` as any)}
-                >
-                  <Play className="w-4 h-4" />
-                  Start Lab
-                </button>
-                {completedLabIds.has(lab.id) && (
+                {(() => {
+                  const isInProgress = inProgressLabs.has(lab.id)
+                  const otherInProgress = !isInProgress && inProgressLabs.size > 0
+                  return (
+                    <button
+                      className="flex-1 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm inline-flex items-center gap-2 hover:bg-primary/90 transition justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+                      disabled={otherInProgress}
+                      title={otherInProgress ? 'Finish or cancel your in-progress lab first' : undefined}
+                      onClick={() => {
+                        const savedTimed = inProgressLabs.get(lab.id)?.timed
+                        const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
+                        setRoute(`skill-lab:${lab.id}:${mode}` as any)
+                      }}
+                    >
+                      <Play className="w-4 h-4" />
+                      {isInProgress ? 'Resume Lab' : 'Start Lab'}
+                    </button>
+                  )
+                })()}
+                {inProgressLabs.has(lab.id) && (
+                  <span title="In Progress" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-500 text-white text-sm shadow-md">
+                    <Clock className="w-5 h-5" />
+                  </span>
+                )}
+                {completedLabIds.has(lab.id) && !inProgressLabs.has(lab.id) && (
                   <span title="Completed" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-600 text-white text-sm shadow-md">
                     <CheckCircle2 className="w-5 h-5" />
                   </span>

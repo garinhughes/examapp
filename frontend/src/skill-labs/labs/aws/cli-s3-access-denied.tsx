@@ -4,6 +4,8 @@ import { apiUrl } from '@/apiBase'
 import type { CliLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabComplete } from '../shared'
+import { useLabProgress } from '../useLabProgress'
+import { LabCompleteModal } from '../LabCompleteModal'
 
 interface CliLabRunnerProps {
   lab: CliLabDefinition
@@ -17,29 +19,41 @@ interface TerminalLine {
 
 const PROMPT = 'aws-user@lab:~$ '
 
-export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
-  const { authFetch, user } = useExam()
-  const completeWithGamification = useLabComplete(lab)
+interface CliProgress {
+  lines: TerminalLine[]
+  commandHistory: string[]
+  selectedAnswer: string | null
+  timeLeft: number
+}
 
-  // Terminal state
-  const [lines, setLines] = useState<TerminalLine[]>([
+export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
+  const { authFetch, user, setRoute } = useExam()
+  const completeWithGamification = useLabComplete(lab)
+  const { savedProgress, saveProgress, clearProgress } = useLabProgress<CliProgress>(lab.id, timed)
+
+  const defaultLines: TerminalLine[] = [
     { type: 'output', text: `Lab: ${lab.title}` },
     { type: 'output', text: lab.scenario },
     { type: 'output', text: '' },
     { type: 'output', text: 'Type AWS CLI commands to investigate. Type "help" for available commands.' },
     { type: 'output', text: '' },
-  ])
+  ]
+
+  // Terminal state
+  const [lines, setLines] = useState<TerminalLine[]>(savedProgress?.lines ?? defaultLines)
   const [input, setInput] = useState('')
-  const [commandHistory, setCommandHistory] = useState<string[]>([])
+  const [commandHistory, setCommandHistory] = useState<string[]>(savedProgress?.commandHistory ?? [])
   const [historyIndex, setHistoryIndex] = useState(-1)
 
   // Answer state
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(savedProgress?.selectedAnswer ?? null)
   const [submitted, setSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
 
   // Timer
-  const [timeLeft, setTimeLeft] = useState(lab.timeLimit)
+  const [timeLeft, setTimeLeft] = useState(savedProgress?.timeLeft ?? lab.timeLimit)
   const [labPaused, setLabPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(Date.now())
@@ -52,6 +66,19 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
     new Map(lab.commands.map((c) => [c.command.trim().toLowerCase(), c.output]))
   ).current
 
+  // Auto-dismiss resume notice
+  useEffect(() => {
+    if (!resumeNotice) return
+    const t = setTimeout(() => setResumeNotice(false), 3000)
+    return () => clearTimeout(t)
+  }, [resumeNotice])
+
+  // Auto-save progress
+  useEffect(() => {
+    if (submitted) return
+    saveProgress({ lines, commandHistory, selectedAnswer, timeLeft })
+  }, [lines, commandHistory, selectedAnswer, timeLeft, submitted])
+
   /** Simulate `| jq` piping: pretty-print JSON, optionally extract a top-level key */
   function applyJq(raw: string, jqArg: string): string {
     try {
@@ -59,7 +86,6 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
       if (jqArg === '' || jqArg === '.') {
         return JSON.stringify(parsed, null, 4)
       }
-      // Support simple `.Key` extraction
       const key = jqArg.startsWith('.') ? jqArg.slice(1) : jqArg
       if (key in parsed) {
         const val = parsed[key]
@@ -86,7 +112,6 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
       const jqArg = pipeCmd.slice(2).trim()
       return { baseCmd: base, output: applyJq(raw, jqArg) }
     }
-    // Unsupported pipe — still return the base output
     return { baseCmd: base, output: raw }
   }
 
@@ -106,7 +131,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
   }, [submitted, timed, labPaused])
 
   useEffect(() => {
-    if (timed && timeLeft === 0 && !submitted) handleSubmit()
+    if (timed && timeLeft === 0 && !submitted) doSubmit()
   }, [timeLeft])
 
   // Auto-scroll terminal
@@ -135,7 +160,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
       setInput('')
       return
     } else {
-      const { baseCmd, output } = resolveCommand(trimmed)
+      const { output } = resolveCommand(trimmed)
       if (output !== undefined) {
         output.split('\n').forEach((line) => {
           newLines.push({ type: 'output', text: line })
@@ -174,9 +199,10 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
     }
   }
 
-  const handleSubmit = useCallback(async () => {
+  const doSubmit = useCallback(async () => {
     if (submitted || !lab) return
     setSubmitted(true)
+    clearProgress()
     if (timerRef.current) clearInterval(timerRef.current)
 
     const correctAnswer = lab.answers.find((a) => a.correct)
@@ -191,11 +217,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
         await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/attempt`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            selectedAnswer: selectedAnswer || '',
-            correct,
-            timeTaken,
-          }),
+          body: JSON.stringify({ selectedAnswer: selectedAnswer || '', correct, timeTaken }),
         })
       } catch {
         // Non-critical
@@ -203,9 +225,44 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
     }
   }, [submitted, lab, selectedAnswer, authFetch, user])
 
+  const handlePauseAndExit = useCallback(() => {
+    saveProgress({ lines, commandHistory, selectedAnswer, timeLeft })
+    setRoute('skill-labs')
+  }, [lines, commandHistory, selectedAnswer, timeLeft])
+
+  const handleCancelLab = useCallback(() => {
+    clearProgress()
+    setRoute('skill-labs')
+  }, [])
+
   return (
     <div className="flex flex-col h-full gap-4">
-      <LabHeader title={lab.title} timed={timed} timeLeft={timeLeft} subtitle={lab.scenario} labId={lab.id} onPauseChange={setLabPaused} />
+      {showConfirmModal && (
+        <LabCompleteModal
+          title={lab.title}
+          timeTaken={lab.timeLimit - timeLeft}
+          timed={timed}
+          onConfirm={() => { setShowConfirmModal(false); doSubmit() }}
+          onCancel={() => setShowConfirmModal(false)}
+        />
+      )}
+
+      <LabHeader
+        title={lab.title}
+        timed={timed}
+        timeLeft={timeLeft}
+        subtitle={lab.scenario}
+        labId={lab.id}
+        onPauseChange={setLabPaused}
+        onPauseAndExit={submitted ? undefined : handlePauseAndExit}
+        onCancelLab={submitted ? undefined : handleCancelLab}
+      />
+
+      {resumeNotice && (
+        <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
+          Resuming from saved progress
+        </div>
+      )}
 
       {/* Terminal */}
       <div
@@ -275,16 +332,22 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
           <button
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!selectedAnswer}
-            onClick={handleSubmit}
+            onClick={() => setShowConfirmModal(true)}
           >
             Submit Answer
           </button>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </div>
             <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <button
+              onClick={() => setRoute('skill-labs')}
+              className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition"
+            >
+              Back to Skill Labs
+            </button>
           </div>
         )}
       </div>

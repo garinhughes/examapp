@@ -12,14 +12,19 @@ interface LabHeaderProps {
   subtitle?: string
   labId?: string
   onPauseChange?: (paused: boolean) => void
+  /** Called instead of setRoute when leaving an in-progress lab — saves progress first. */
+  onPauseAndExit?: () => void
+  /** Called to discard saved progress and exit. When provided, a "Cancel Lab" option is shown. */
+  onCancelLab?: () => void
 }
 
-export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChange }: LabHeaderProps) {
+export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChange, onPauseAndExit, onCancelLab }: LabHeaderProps) {
   const { setRoute, userTier } = useExam()
   const canReport = userTier !== 'visitor'
   const [isBookmarked, setIsBookmarked] = useState(() => labId ? getBookmarkedLabs().has(labId) : false)
   const [reporting, setReporting] = useState(false)
   const [rating, setRating] = useState(false)
+  const [confirmCancel, setConfirmCancel] = useState(false)
 
   useEffect(() => {
     onPauseChange?.(reporting || rating)
@@ -39,14 +44,16 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
 
   return (
     <div className="space-y-2">
-      {/* Back link — sits above the card so it never competes with multi-line titles */}
-      <button
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
-        onClick={() => setRoute('skill-labs')}
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        Back to Skill Labs
-      </button>
+      {/* Back row */}
+      <div className="flex items-center gap-3">
+        <button
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
+          onClick={() => onPauseAndExit ? onPauseAndExit() : setRoute('skill-labs')}
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to Skill Labs
+        </button>
+      </div>
 
       {/* Header card */}
       <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-card px-4 py-3 shadow-sm">
@@ -72,6 +79,22 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
             >
               <Flag className="w-3 h-3" /> Report
             </button>
+          )}
+          {onCancelLab && !confirmCancel && (
+            <button
+              onClick={() => setConfirmCancel(true)}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 transition-colors"
+              title="Cancel lab and discard progress"
+            >
+              Cancel Lab
+            </button>
+          )}
+          {onCancelLab && confirmCancel && (
+            <span className="flex items-center gap-1.5 text-xs">
+              <span className="text-muted-foreground">Discard progress?</span>
+              <button className="px-2 py-0.5 rounded bg-destructive text-white font-medium hover:bg-destructive/90 transition" onClick={onCancelLab}>Yes, discard</button>
+              <button className="px-2 py-0.5 rounded border border-border text-muted-foreground hover:text-foreground transition" onClick={() => setConfirmCancel(false)}>Keep</button>
+            </span>
           )}
           {labId && (
             <button
