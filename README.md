@@ -97,7 +97,7 @@ gh workflow run backend-deploy.yml --ref main
 
 These workflows use OIDC to assume the configured AWS role; make sure the role and trust policy are in place before running.
 
-**AWS Auth**
+**AWS Authentication**
 
 When authentication to AWS is required (for terraform or CLI commands), a helper script is available to sign-in via SSO using the `certshack` profile:
 ```bash
