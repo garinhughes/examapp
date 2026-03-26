@@ -5,7 +5,7 @@ export default function RefundPolicy() {
     <>
       <Helmet>
         <title>certshack | Refund Policy</title>
-        <meta name="description" content="Read the CertShack refund policy for digital content purchases." />
+        <meta name="description" content="Read the certshack refund policy for digital content purchases." />
         <link rel="canonical" href="https://certshack.com/refund" />
       </Helmet>
       <div className="max-w-3xl mx-auto px-6 py-12">

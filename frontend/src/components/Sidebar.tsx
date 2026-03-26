@@ -97,7 +97,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
       >
         <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
           <span className="text-xl font-bold tracking-tight text-sidebar-foreground flex items-center gap-2">
-            <img src="/favicon.png" alt="CertShack" className="h-7 w-7 object-contain rounded-lg bg-white" />
+            <img src="/favicon.png" alt="certshack" className="h-7 w-7 object-contain rounded-lg bg-white" />
             certshack
           </span>
         </div>

@@ -107,7 +107,7 @@ const CertificatePreview = React.forwardRef<HTMLDivElement, CertificatePreviewPr
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <img
               src={certshackLogo}
-              alt="CertShack"
+              alt="certshack"
               style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 6, backgroundColor: '#FFFFFF', padding: 2 }}
             />
             <div style={{ color: '#FFFFFF', fontSize: 28, fontWeight: 'bold', letterSpacing: 1 }}>

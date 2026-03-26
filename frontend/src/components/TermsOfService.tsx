@@ -5,7 +5,7 @@ export default function TermsOfService() {
     <>
       <Helmet>
         <title>certshack | Terms of Service</title>
-        <meta name="description" content="Read the CertShack terms of service governing your use of the platform." />
+        <meta name="description" content="Read the certshack terms of service governing your use of the platform." />
         <link rel="canonical" href="https://certshack.com/terms" />
       </Helmet>
       <div className="max-w-3xl mx-auto px-6 py-12">
@@ -118,7 +118,7 @@ export default function TermsOfService() {
             <h2 className="text-lg font-bold mb-2">8. Intellectual property</h2>
             <p className="text-muted-foreground leading-relaxed">
               All content on certshack.com - including exam questions, explanations, lab definitions, diagrams, and
-              interface design - is the intellectual property of <strong>[Your Company Name]</strong> or its licensors.
+              interface design - is the intellectual property of <strong>certshack</strong> or its licensors.
               Your purchase grants you a personal, non-transferable licence to access and use the content for your own
               study. No content may be copied, reproduced, or distributed without our written permission.
             </p>

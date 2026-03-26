@@ -29,7 +29,7 @@ const META: Partial<Record<AppRoute, RouteMeta>> = {
   },
   pricing: {
     title: 'certshack | Pricing',
-    description: 'Simple, transparent pricing for CertShack practice exams and skill labs. Start free.',
+    description: 'Simple, transparent pricing for certshack practice exams and skill labs. Start free.',
     path: '/pricing',
   },
   analytics: {
@@ -40,7 +40,7 @@ const META: Partial<Record<AppRoute, RouteMeta>> = {
   },
   account: {
     title: 'certshack | Account',
-    description: 'Manage your CertShack account settings and achievements.',
+    description: 'Manage your certshack account settings and achievements.',
     path: '/account',
     noindex: true,
   },
