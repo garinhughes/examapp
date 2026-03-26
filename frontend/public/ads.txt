@@ -1,0 +1,4 @@
+# ads.txt — authorized digital sellers
+# https://iabtechlab.com/ads-txt/
+# Add entries here when setting up ad networks, e.g.:
+# google.com, pub-XXXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

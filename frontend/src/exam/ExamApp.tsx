@@ -1,6 +1,10 @@
 import { Save, X, Play, Pause, Download, FileText, Info, BarChart3, BookOpen, Terminal } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { Sidebar } from '@/components/Sidebar'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { PageMeta } from '@/components/PageMeta'
+import { CookieConsent } from '@/components/CookieConsent'
+import { useRouteSync } from '@/hooks/useRouteSync'
 import AccountPage from '../components/AccountPage'
 import Leaderboard from '../components/Leaderboard'
 import AdminPanel from '../components/AdminPanel'
@@ -23,8 +27,13 @@ import { QuestionNav } from './QuestionNav'
 import { QuestionCard } from './QuestionCard'
 import { Modals } from './Modals'
 import Footer from '@/components/Footer'
+import PrivacyPolicy from '@/components/PrivacyPolicy'
+import TermsOfService from '@/components/TermsOfService'
+import RefundPolicy from '@/components/RefundPolicy'
 
 export default function ExamApp() {
+  useRouteSync()
+  const navigate = useNavigate()
   const {
     route, setRoute, selected, setSelected, selectedMeta, exams, questions, setQuestions,
     examTier, examStarted, setExamStarted, isFinished, attemptId, attemptData, setAttemptData,
@@ -43,6 +52,8 @@ export default function ExamApp() {
   return (
     <FeedbackProvider authFetch={authFetch} isAdmin={userIsAdmin}>
     <div className="flex flex-col h-screen w-full overflow-hidden bg-background text-foreground">
+      <PageMeta route={route} />
+      <CookieConsent />
       {/* Work-in-progress banner */}
       <div className="shrink-0 bg-amber-500 text-amber-950 text-xs font-medium text-center py-1.5 px-4">
         This site is a work in progress and is not ready for use. Features may be incomplete or change without notice.
@@ -174,6 +185,10 @@ export default function ExamApp() {
               </div>
             )}
 
+            {route === 'privacy' && <PrivacyPolicy />}
+            {route === 'terms' && <TermsOfService />}
+            {route === 'refund' && <RefundPolicy />}
+
             {/* Resume banner on homepage when no exam selected */}
             {route === 'home' && !selected && anySavedExam && (
               <div className="mb-4 p-4 rounded-md bg-muted/40 border border-border shadow-sm flex items-center justify-between gap-4">
@@ -206,8 +221,8 @@ export default function ExamApp() {
                   <p className="text-muted-foreground mb-6">Timed or casual practice exams, focused by domain, with per-question explanations and analytics to help you improve.</p>
 
                   <div className="flex items-center justify-center gap-4 mb-6">
-                    <button onClick={() => setRoute('practice')} className="px-4 py-2 rounded bg-primary text-white text-sm font-medium inline-flex items-center gap-2"><BookOpen className="w-4 h-4" />Browse Practice Exams</button>
-                    <button onClick={() => setRoute('skill-labs')} className="px-4 py-2 rounded border border-primary text-primary text-sm font-medium bg-primary/5 inline-flex items-center gap-2"><Terminal className="w-4 h-4" />Browse Skill Labs</button>
+                    <button onClick={() => navigate('/exams')} className="px-4 py-2 rounded bg-primary text-white text-sm font-medium inline-flex items-center gap-2"><BookOpen className="w-4 h-4" />Browse Practice Exams</button>
+                    <button onClick={() => navigate('/skill-labs')} className="px-4 py-2 rounded border border-primary text-primary text-sm font-medium bg-primary/5 inline-flex items-center gap-2"><Terminal className="w-4 h-4" />Browse Skill Labs</button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 text-left">

@@ -1,5 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+import { HelmetProvider } from 'react-helmet-async'
 import { AuthProvider } from './auth/AuthContext'
 import { GamificationProvider } from './gamification/GamificationContext'
 import { ThemeProvider } from './components/theme-provider'
@@ -10,14 +11,16 @@ import './index.css'
 const el = document.getElementById('root')!
 createRoot(el).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-        <AuthProvider>
-          <GamificationProvider>
-            <App />
-          </GamificationProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <AuthProvider>
+            <GamificationProvider>
+              <App />
+            </GamificationProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   </React.StrictMode>
 )

@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /exams
+Allow: /skill-labs
+Allow: /pricing
+
+Disallow: /account
+Disallow: /analytics
+Disallow: /admin
+Disallow: /metrics
+Disallow: /diagrams
+Disallow: /feedback
+Disallow: /basket
+Disallow: /verify/
+
+Sitemap: https://certshack.com/sitemap.xml

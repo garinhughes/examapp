@@ -1,14 +1,14 @@
-import { Target } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <>
+      <Helmet>
+        <title>certshack | Terms of Service</title>
+        <meta name="description" content="Read the CertShack terms of service governing your use of the platform." />
+        <link rel="canonical" href="https://certshack.com/terms" />
+      </Helmet>
       <div className="max-w-3xl mx-auto px-6 py-12">
-        <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
-          <Target className="h-4 w-4 text-primary" />
-          certshack
-        </a>
-
         <h1 className="text-3xl font-extrabold mb-2">Terms of Service</h1>
         <p className="text-sm text-muted-foreground mb-8">Last updated: March 2025</p>
 
@@ -39,7 +39,7 @@ export default function TermsOfService() {
             <h2 className="text-lg font-bold mb-2">3. The Service</h2>
             <p className="text-muted-foreground leading-relaxed">
               certshack.com provides practice exam questions, skill labs, analytics, and related study tools to help
-              you prepare for cloud certification exams. The Service is a <strong>study aid only</strong>. We make no
+              you prepare for IT certification exams. The Service is a <strong>study aid only</strong>. We make no
               guarantee that using certshack.com will result in passing any certification exam. Exam questions on this
               platform are original practice material and are not leaked, stolen, or copied from official exam banks.
             </p>
@@ -67,10 +67,10 @@ export default function TermsOfService() {
                 We offer the following paid products, all priced in GBP:
               </p>
               <ul className="list-disc list-inside space-y-1">
-                <li><strong>Exam Passes</strong> (£9 each) - 12 months' access to a single exam's question bank</li>
-                <li><strong>Exam Packs</strong> (from £17) - bundled access to 2 or more exams for 12 months</li>
-                <li><strong>All-Access Monthly</strong> (£10/month) - access to all exams and skill labs, billed monthly</li>
-                <li><strong>All-Access Annual</strong> (£96/year) - access to all exams and skill labs, billed annually</li>
+                <li><strong>Exam Passes</strong> - 12 months' access to a single exam's question bank</li>
+                <li><strong>Exam Packs</strong> - bundled access to 2 or more exams for 12 months</li>
+                <li><strong>All-Access Monthly</strong> - access to all exams and skill labs, billed monthly</li>
+                <li><strong>All-Access Annual</strong> - access to all exams and skill labs, billed annually</li>
               </ul>
               <p className="leading-relaxed">
                 Prices are inclusive of any applicable VAT. Access is granted to your account immediately upon successful
@@ -157,12 +157,7 @@ export default function TermsOfService() {
 
         </div>
 
-        <div className="mt-12 pt-6 border-t border-border text-xs text-muted-foreground flex flex-wrap gap-4">
-          <a href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</a>
-          <a href="/refund" className="hover:text-foreground transition-colors">Refund Policy</a>
-          <a href="/" className="hover:text-foreground transition-colors">Back to app</a>
-        </div>
       </div>
-    </div>
+    </>
   )
 }

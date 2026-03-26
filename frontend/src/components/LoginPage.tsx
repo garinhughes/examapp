@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { useAuth } from '../auth/AuthContext'
 import { Button } from './ui/button'
 
@@ -146,6 +147,11 @@ export default function LoginPage() {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>certshack | Sign In</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-1">
@@ -380,5 +386,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </>
   )
 }

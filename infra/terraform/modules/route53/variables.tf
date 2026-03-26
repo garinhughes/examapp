@@ -49,3 +49,9 @@ variable "create_aliases" {
   default     = false
 }
 
+variable "apex_txt_records" {
+  description = "TXT record values to publish at the apex domain (SPF, GSC verification, etc.)"
+  type        = list(string)
+  default     = []
+}
+

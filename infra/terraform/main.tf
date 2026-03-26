@@ -250,6 +250,10 @@ module "route53" {
   zone_id                 = data.aws_route53_zone.main.zone_id
   domain                  = var.domain
   acm_dvos                = local.all_cert_dvos
+  apex_txt_records = [
+    "v=spf1 include:amazonses.com ~all",
+    "google-site-verification=0CAvqJgA__ZRdb5ba9fHnGEB_94h1DOj-OU-XXBEbvY",
+  ]
 }
 
 # ==========================================================================

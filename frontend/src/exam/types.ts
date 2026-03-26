@@ -49,4 +49,4 @@ export type Question = {
 
 export type ExamMode = 'casual' | 'timed' | 'weakest-link'
 export type RevealMode = 'immediately' | 'on-completion'
-export type AppRoute = 'home' | 'practice' | 'analytics' | 'account' | 'admin' | 'metrics' | 'pricing' | 'basket' | 'diagrams' | 'skill-labs' | `skill-lab:${string}`
+export type AppRoute = 'home' | 'practice' | 'analytics' | 'account' | 'admin' | 'metrics' | 'pricing' | 'basket' | 'diagrams' | 'skill-labs' | 'feedback' | 'privacy' | 'terms' | 'refund' | `skill-lab:${string}`

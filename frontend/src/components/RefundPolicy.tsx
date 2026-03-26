@@ -1,14 +1,14 @@
-import { Target } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 
 export default function RefundPolicy() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <>
+      <Helmet>
+        <title>certshack | Refund Policy</title>
+        <meta name="description" content="Read the CertShack refund policy for digital content purchases." />
+        <link rel="canonical" href="https://certshack.com/refund" />
+      </Helmet>
       <div className="max-w-3xl mx-auto px-6 py-12">
-        <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
-          <Target className="h-4 w-4 text-primary" />
-          certshack
-        </a>
-
         <h1 className="text-3xl font-extrabold mb-2">Refund Policy</h1>
         <p className="text-sm text-muted-foreground mb-8">Last updated: March 2025</p>
 
@@ -116,12 +116,7 @@ export default function RefundPolicy() {
 
         </div>
 
-        <div className="mt-12 pt-6 border-t border-border text-xs text-muted-foreground flex flex-wrap gap-4">
-          <a href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</a>
-          <a href="/terms" className="hover:text-foreground transition-colors">Terms of Service</a>
-          <a href="/" className="hover:text-foreground transition-colors">Back to app</a>
-        </div>
       </div>
-    </div>
+    </>
   )
 }

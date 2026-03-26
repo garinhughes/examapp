@@ -1,10 +1,25 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>certshack</title>
+    <!-- Fallback meta — react-helmet-async overrides per page -->
+    <meta name="description" content="CertShack — practice exams and skill labs for cloud certifications." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CertShack" />
+    <!-- Preconnect for GA4 -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V7NP7F67TN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-V7NP7F67TN', { send_page_view: false });
+    </script>
   </head>
   <body>
     <div id="root"></div>

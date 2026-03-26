@@ -24,10 +24,13 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import type { AuthUser } from "@/auth/AuthContext";
 
+// Routes with real browser URLs (navigate changes the URL)
+const URL_ROUTES = new Set(['home', 'practice', 'analytics', 'skill-labs', 'account', 'pricing'])
+
 // Map routes to internal App state keys
 const navItems = [
-  { icon: LayoutDashboard, label: "Overview", href: "/home", key: 'home' },
-  { icon: BookOpen, label: "Exams", href: "/practice", key: 'practice' },
+  { icon: LayoutDashboard, label: "Overview", href: "/", key: 'home' },
+  { icon: BookOpen, label: "Exams", href: "/exams", key: 'practice' },
   { icon: Activity, label: "Analytics", href: "/analytics", key: 'analytics' },
   { icon: BarChart2, label: "Metrics", href: "/metrics", key: 'metrics' },
   { icon: Network, label: "Diagrams", href: "/diagrams", key: 'diagrams' },
@@ -61,9 +64,13 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
 
   const toggle = () => setIsOpen(!isOpen);
 
-  const handleNav = (key: string) => {
+  const handleNav = (key: string, href: string) => {
     setIsOpen(false);
-    if (onNavigate) onNavigate(key);
+    if (URL_ROUTES.has(key)) {
+      navigate(href);
+    } else {
+      if (onNavigate) onNavigate(key);
+    }
   };
 
   return (
@@ -101,7 +108,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
             return (
             <button
               key={item.key}
-              onClick={() => handleNav(item.key)}
+              onClick={() => handleNav(item.key, item.href)}
               className={cn(
                 "w-full group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
                 isActive 

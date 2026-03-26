@@ -1,3 +1,13 @@
+# Apex TXT records — SPF, GSC verification, etc.
+resource "aws_route53_record" "apex_txt" {
+  count   = length(var.apex_txt_records) > 0 ? 1 : 0
+  zone_id = var.zone_id
+  name    = var.domain
+  type    = "TXT"
+  ttl     = 300
+  records = var.apex_txt_records
+}
+
 resource "aws_route53_record" "acm_validation" {
   for_each = var.acm_dvos
 

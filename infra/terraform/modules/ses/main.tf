@@ -47,14 +47,8 @@ resource "aws_route53_record" "workmail_mx" {
   records = ["10 inbound-smtp.eu-west-1.amazonaws.com"]
 }
 
-# SPF TXT record — authorise SES to send on behalf of the domain
-resource "aws_route53_record" "spf" {
-  zone_id = var.zone_id
-  name    = var.domain
-  type    = "TXT"
-  ttl     = 300
-  records = ["v=spf1 include:amazonses.com ~all"]
-}
+# Apex TXT records (SPF + any other apex TXT values) are managed in the
+# route53 module to keep all DNS records in one place.
 
 # ---------- outputs ----------
 output "ses_domain_identity_arn" {

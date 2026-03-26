@@ -4,25 +4,35 @@ import { BasketProvider } from './basket/BasketContext'
 import ExamApp from './exam/ExamApp'
 import VerifyPage from './components/VerifyPage'
 import LoginPage from './components/LoginPage'
-import PrivacyPolicy from './components/PrivacyPolicy'
-import TermsOfService from './components/TermsOfService'
-import RefundPolicy from './components/RefundPolicy'
+import { usePageTracking } from './hooks/usePageTracking'
+
+function ExamAppWrapped() {
+  return (
+    <ExamProvider>
+      <BasketProvider>
+        <ExamApp />
+      </BasketProvider>
+    </ExamProvider>
+  )
+}
 
 export default function App() {
+  usePageTracking()
+
   return (
     <Routes>
       <Route path="/verify/:token" element={<VerifyPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/terms" element={<TermsOfService />} />
-      <Route path="/refund" element={<RefundPolicy />} />
-      <Route path="*" element={
-        <ExamProvider>
-          <BasketProvider>
-            <ExamApp />
-          </BasketProvider>
-        </ExamProvider>
-      } />
+      <Route path="/" element={<ExamAppWrapped />} />
+      <Route path="/exams" element={<ExamAppWrapped />} />
+      <Route path="/skill-labs" element={<ExamAppWrapped />} />
+      <Route path="/analytics" element={<ExamAppWrapped />} />
+      <Route path="/pricing" element={<ExamAppWrapped />} />
+      <Route path="/account" element={<ExamAppWrapped />} />
+      <Route path="/privacy" element={<ExamAppWrapped />} />
+      <Route path="/terms" element={<ExamAppWrapped />} />
+      <Route path="/refund" element={<ExamAppWrapped />} />
+      <Route path="*" element={<ExamAppWrapped />} />
     </Routes>
   )
 }

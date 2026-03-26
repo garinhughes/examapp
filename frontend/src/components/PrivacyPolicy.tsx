@@ -1,14 +1,14 @@
-import { Target } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <>
+      <Helmet>
+        <title>certshack | Privacy Policy</title>
+        <meta name="description" content="Read the CertShack privacy policy — how we collect, use, and protect your data." />
+        <link rel="canonical" href="https://certshack.com/privacy" />
+      </Helmet>
       <div className="max-w-3xl mx-auto px-6 py-12">
-        <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
-          <Target className="h-4 w-4 text-primary" />
-          certshack
-        </a>
-
         <h1 className="text-3xl font-extrabold mb-2">Privacy Policy</h1>
         <p className="text-sm text-muted-foreground mb-8">Last updated: March 2026</p>
 
@@ -17,8 +17,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-lg font-bold mb-2">1. Who we are</h2>
             <p className="text-muted-foreground leading-relaxed">
-              certshack.com is operated by <strong>certshack</strong>, registered in England and Wales
-              (company number <strong>[XXXXXXXX]</strong>), with a registered address at <strong>[Your Address]</strong>.
+              certshack.com is operated by <strong>certshack</strong>, a sole trader registered in England and Wales.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-2">
               We are the data controller for the personal data collected through this website. If you have any questions
@@ -94,7 +93,7 @@ export default function PrivacyPolicy() {
               operate the platform:
             </p>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-              <li><strong>Amazon Web Services (AWS)</strong> - cloud infrastructure including Cognito (authentication),
+              <li><strong>Amazon Web Services (AWS)</strong> - infrastructure including Cognito (authentication),
                 DynamoDB (data storage), S3 (content), SES (email), ECS (compute), and CloudFront (CDN). Data is
                 processed in the EU (eu-west-1, Ireland) and may be replicated within AWS regions.</li>
               <li><strong>Google</strong> - sign-in provider. When you authenticate via "Sign in with Google", Google's
@@ -165,12 +164,7 @@ export default function PrivacyPolicy() {
 
         </div>
 
-        <div className="mt-12 pt-6 border-t border-border text-xs text-muted-foreground flex flex-wrap gap-4">
-          <a href="/terms" className="hover:text-foreground transition-colors">Terms of Service</a>
-          <a href="/refund" className="hover:text-foreground transition-colors">Refund Policy</a>
-          <a href="/" className="hover:text-foreground transition-colors">Back to app</a>
-        </div>
       </div>
-    </div>
+    </>
   )
 }

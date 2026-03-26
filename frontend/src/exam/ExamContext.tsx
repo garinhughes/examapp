@@ -220,7 +220,18 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const [rewardModal, setRewardModal] = useState<{ title: string; subtitle?: string; xpGained: number; badges: { icon: string; name: string }[] } | null>(null)
 
   // ── Route & exam selection ──
-  const [route, setRoute] = useState<AppRoute>('home')
+  const [route, setRoute] = useState<AppRoute>(() => {
+    const p = window.location.pathname
+    if (p === '/exams') return 'practice'
+    if (p === '/skill-labs') return 'skill-labs'
+    if (p === '/analytics') return 'analytics'
+    if (p === '/pricing') return 'pricing'
+    if (p === '/account') return 'account'
+    if (p === '/privacy') return 'privacy'
+    if (p === '/terms') return 'terms'
+    if (p === '/refund') return 'refund'
+    return 'home'
+  })
   const [exams, setExams] = useState<Exam[]>([])
   const [selected, setSelected] = useState<string | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
