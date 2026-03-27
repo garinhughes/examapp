@@ -5,7 +5,7 @@ import { clarityEvent } from '@/clarity'
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { useExam } from './ExamContext'
-import { renderChoiceContent, renderWithParagraphs } from './utils'
+import { renderChoiceContent, MarkdownText } from './utils'
 import { SortableOrderItem } from './SortableOrderItem'
 import type { QuestionType } from './types'
 
@@ -23,6 +23,12 @@ export function QuestionCard() {
   const clampedIdx = Math.min(currentQuestionIndex, displayQuestions.length - 1)
   const visible = displayQuestions.length > 0 ? [displayQuestions[Math.max(0, clampedIdx)]] : []
   const [ratingTarget, setRatingTarget] = useState<string | null>(null)
+  const [expandedExplanations, setExpandedExplanations] = useState<Set<string>>(new Set())
+  const toggleExplanation = (key: string) => setExpandedExplanations(prev => {
+    const next = new Set(prev)
+    if (next.has(key)) next.delete(key); else next.add(key)
+    return next
+  })
 
   return (
     <div className={`${displayQuestions.length > 0 ? '!mt-2' : ''} space-y-4`}>
@@ -41,8 +47,8 @@ export function QuestionCard() {
         return (
           <article key={q.id} className="p-4 rounded-lg border border-border bg-card/60">
             <div className="mb-2">
-              <div className="font-semibold text-foreground">
-                {renderWithParagraphs(q.question)}
+              <div className="font-medium text-foreground">
+                <MarkdownText text={q.question} />
                 {qType === 'multiple-choice' && <span className="ml-2 text-xs font-medium text-primary">(Select {q.selectCount})</span>}
                 {qType === 'matching' && <span className="ml-2 text-xs font-medium text-primary">(Match each item)</span>}
                 {qType === 'ordering' && <span className="ml-2 text-xs font-medium text-primary">(Drag or use arrows to order)</span>}
@@ -143,8 +149,20 @@ export function QuestionCard() {
                     </button>
                   )}
                   {showFeedback && answered && q.choices.map((c) => c.explanation && (
-                    <div key={c.id} className="text-xs text-muted-foreground p-2 rounded bg-muted/30">
-                      <strong>{c.text}:</strong> {c.explanation}
+                    <div key={c.id} className="text-xs mt-1">
+                      <button
+                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 py-0.5"
+                        onClick={() => toggleExplanation(`${q.id}:${c.id}`)}
+                      >
+                        <span className="text-[10px]">{expandedExplanations.has(`${q.id}:${c.id}`) ? '▾' : '▸'}</span>
+                        <span className="font-medium">{c.text}:</span>
+                        <span className="opacity-70">{expandedExplanations.has(`${q.id}:${c.id}`) ? 'hide' : 'show explanation'}</span>
+                      </button>
+                      {expandedExplanations.has(`${q.id}:${c.id}`) && (
+                        <div className="mt-1 text-muted-foreground p-2 rounded bg-muted/30">
+                          <MarkdownText text={c.explanation} />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -244,8 +262,20 @@ export function QuestionCard() {
                     </button>
                   )}
                   {showFeedback && answered && q.choices.map((c) => c.explanation && (
-                    <div key={c.id} className="text-xs text-muted-foreground p-2 rounded bg-muted/30">
-                      <strong>Step {c.sequence}:</strong> {c.explanation}
+                    <div key={c.id} className="text-xs mt-1">
+                      <button
+                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 py-0.5"
+                        onClick={() => toggleExplanation(`${q.id}:${c.id}`)}
+                      >
+                        <span className="text-[10px]">{expandedExplanations.has(`${q.id}:${c.id}`) ? '▾' : '▸'}</span>
+                        <span className="font-medium">Step {c.sequence}:</span>
+                        <span className="opacity-70">{expandedExplanations.has(`${q.id}:${c.id}`) ? 'hide' : 'show explanation'}</span>
+                      </button>
+                      {expandedExplanations.has(`${q.id}:${c.id}`) && (
+                        <div className="mt-1 text-muted-foreground p-2 rounded bg-muted/30">
+                          <MarkdownText text={c.explanation} />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -320,8 +350,19 @@ export function QuestionCard() {
                         </span>
                       </button>
                       {showFeedback && answered && c.explanation && (
-                        <div className="mt-1 text-base text-muted-foreground p-2 rounded">
-                          {c.explanation}
+                        <div className="mt-1">
+                          <button
+                            className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 py-0.5"
+                            onClick={(e) => { e.stopPropagation(); toggleExplanation(`${q.id}:${c.id}`) }}
+                          >
+                            <span className="text-[10px]">{expandedExplanations.has(`${q.id}:${c.id}`) ? '▾' : '▸'}</span>
+                            <span className="opacity-70">{expandedExplanations.has(`${q.id}:${c.id}`) ? 'Hide explanation' : 'Show explanation'}</span>
+                          </button>
+                          {expandedExplanations.has(`${q.id}:${c.id}`) && (
+                            <div className="mt-1 text-base text-muted-foreground p-2 rounded">
+                              <MarkdownText text={c.explanation} />
+                            </div>
+                          )}
                         </div>
                       )}
                     </li>
@@ -374,7 +415,7 @@ export function QuestionCard() {
                 {q.explanation && (
                   <div className="p-2 rounded bg-muted/50 dark:bg-card text-foreground">
                     <div className="flex items-start justify-between gap-4">
-                      <div className="pr-2"><strong>Explanation:</strong> {q.explanation}</div>
+                      <div className="pr-2"><strong>Explanation:</strong> <MarkdownText text={q.explanation} /></div>
                       {q.docs && (
                         <div className="flex-shrink-0">
                           <a href={q.docs} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 rounded bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">

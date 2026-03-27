@@ -1,4 +1,6 @@
 import React from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import CodeBlock from '../components/CodeBlock'
 import type { Question } from './types'
 
@@ -80,7 +82,23 @@ export function computeDerivedAttempt(attemptObj: any, fallbackQuestions: Questi
   }
 }
 
-/** Render choice content (plain text, JSON, YAML, or CLI snippets) */
+/** Inline markdown renderer — safe inside <button> (no block elements) */
+function MarkdownInline({ text }: { text: string }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => <span>{children}</span>,
+        strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
+        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700">{children}</code>,
+      }}
+    >
+      {text}
+    </ReactMarkdown>
+  )
+}
+
+/** Render choice content (plain text with markdown, JSON, YAML, or CLI snippets) */
 export function renderChoiceContent(val: any, q?: Question, inline = false) {
   const s = typeof val === 'string' ? val : (val?.text != null ? String(val.text) : (val == null ? '' : String(val)))
   const isLikelyJson = (q?.format === 'json') || s.trim().startsWith('{') || s.trim().startsWith('[')
@@ -103,18 +121,26 @@ export function renderChoiceContent(val: any, q?: Question, inline = false) {
     return <CodeBlock code={s} language="bash" inline={false} />
   }
 
-  return <span>{s}</span>
+  return <MarkdownInline text={s} />
 }
 
-/** Render question text with \n\n as paragraph breaks */
-export function renderWithParagraphs(text: string) {
-  const parts = text.split('\n\n')
-  if (parts.length <= 1) return <>{text}</>
+/** Render text as markdown — used for question text and explanation fields */
+export function MarkdownText({ text, className }: { text: string; className?: string }) {
   return (
-    <>
-      {parts.map((part, i) => (
-        <p key={i} className={i > 0 ? 'mt-3' : ''}>{part}</p>
-      ))}
-    </>
+    <div className={className}>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+        ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-2">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-2">{children}</ol>,
+        li: ({ children }) => <li className="ml-2">{children}</li>,
+        strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
+        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700">{children}</code>,
+      }}
+    >
+      {text}
+    </ReactMarkdown>
+    </div>
   )
 }

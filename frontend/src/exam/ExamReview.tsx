@@ -1,7 +1,7 @@
 import React from 'react'
 import { Play, X, Check, BarChart3, ExternalLink, ChevronDown } from 'lucide-react'
 import { useExam } from './ExamContext'
-import { isAnswerCorrect, renderChoiceContent, renderWithParagraphs } from './utils'
+import { isAnswerCorrect, renderChoiceContent, MarkdownText } from './utils'
 import type { Question, QuestionType } from './types'
 
 export function ExamReview() {
@@ -176,7 +176,7 @@ export function ExamReview() {
 
               <div className={`p-4 rounded-lg border-l-4 ${item.isCorrect ? 'border-l-green-500' : 'border-l-red-500'} border border-border bg-card`}>
                 <div className="flex items-start justify-between gap-3">
-                  <div className="font-medium text-base flex-1">{renderWithParagraphs(item.q.question)}</div>
+                  <div className="font-medium text-base flex-1"><MarkdownText text={item.q.question} /></div>
                   <span className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${item.isCorrect ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>
                     {item.isCorrect ? '✓ Correct' : '✗ Incorrect'}
                   </span>
