@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, UpdateCommand, PutCommand, GetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
+import { DynamoDBDocumentClient, UpdateCommand, PutCommand, GetCommand, ScanCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb'
 
 const REGION = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'eu-west-1'
 const client = new DynamoDBClient({ region: REGION })
@@ -201,6 +201,40 @@ export async function putIssueReport(report: {
   } catch (err) {
     console.warn('[dynamo] putIssueReport failed', err)
   }
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+  try {
+    await ddb.send(new DeleteCommand({ TableName: USERS_TABLE, Key: { userId } }))
+  } catch (err) {
+    console.warn('[dynamo] deleteUser failed', err)
+    throw err
+  }
+}
+
+export async function anonymiseIssueReports(userId: string): Promise<number> {
+  const reports: Array<{ reportId: string }> = []
+  let lastKey: any = undefined
+  do {
+    const res = await ddb.send(new ScanCommand({
+      TableName: ISSUE_REPORTS_TABLE,
+      FilterExpression: 'userId = :uid',
+      ExpressionAttributeValues: { ':uid': userId },
+      ...(lastKey ? { ExclusiveStartKey: lastKey } : {}),
+    } as any))
+    reports.push(...((res.Items ?? []) as any[]))
+    lastKey = res.LastEvaluatedKey
+  } while (lastKey)
+
+  for (const report of reports) {
+    await ddb.send(new UpdateCommand({
+      TableName: ISSUE_REPORTS_TABLE,
+      Key: { reportId: report.reportId },
+      UpdateExpression: 'REMOVE userId SET reporterEmail = :deleted, reporterName = :name',
+      ExpressionAttributeValues: { ':deleted': 'deleted', ':name': 'Deleted User' },
+    } as any))
+  }
+  return reports.length
 }
 
 export default { upsertUserFromCognito, getUserBySub, addEntitlement, listUsers, recordAdminAudit, updateUserFields, findUserByUsername, putIssueReport }

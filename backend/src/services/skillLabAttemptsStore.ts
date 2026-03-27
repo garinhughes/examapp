@@ -13,6 +13,7 @@ import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
+  DeleteCommand,
 } from '@aws-sdk/lib-dynamodb'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -36,6 +37,7 @@ export interface SkillLabAttempt {
 export interface SkillLabAttemptsStore {
   listByUser(userId: string): Promise<SkillLabAttempt[]>
   put(attempt: SkillLabAttempt): Promise<void>
+  deleteAllForUser(userId: string): Promise<number>
 }
 
 function createDynamoStore(): SkillLabAttemptsStore {
@@ -56,6 +58,14 @@ function createDynamoStore(): SkillLabAttemptsStore {
 
     async put(attempt: SkillLabAttempt) {
       await ddb.send(new PutCommand({ TableName: TABLE, Item: attempt }))
+    },
+
+    async deleteAllForUser(userId: string) {
+      const items = await this.listByUser(userId)
+      for (const item of items) {
+        await ddb.send(new DeleteCommand({ TableName: TABLE, Key: { userId, attemptId: item.attemptId } }))
+      }
+      return items.length
     },
   }
 }
@@ -84,6 +94,14 @@ function createLocalStore(): SkillLabAttemptsStore {
       const all = await loadAll()
       all.push(attempt)
       await saveAll(all)
+    },
+
+    async deleteAllForUser(userId: string) {
+      const all = await loadAll()
+      const remaining = all.filter((a) => a.userId !== userId)
+      const count = all.length - remaining.length
+      await saveAll(remaining)
+      return count
     },
   }
 }

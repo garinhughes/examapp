@@ -149,6 +149,15 @@ export async function adminGrantEntitlement(
   })
 }
 
+/** Hard-delete all entitlement records for a user (GDPR erasure) */
+export async function deleteAllEntitlementsForUser(userId: string): Promise<number> {
+  const all = await getUserEntitlements(userId, true)
+  for (const ent of all) {
+    await ddb.send(new DeleteCommand({ TableName: ENTITLEMENTS_TABLE, Key: { userId, productId: ent.productId } }))
+  }
+  return all.length
+}
+
 /** Count distinct users with an active promo grant (meta.promoGrant = true) */
 export async function countPromoGrants(): Promise<number> {
   const userIds = new Set<string>()

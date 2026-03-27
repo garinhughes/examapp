@@ -83,6 +83,24 @@ export default function PrivacyPolicy() {
                   not sent to our servers except as part of normal API requests.
                 </p>
               </div>
+              <div>
+                <h3 className="font-semibold mb-1">Analytics and session recording</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  We use Google Analytics 4 to understand aggregate traffic patterns, and <strong>Microsoft Clarity</strong> to
+                  capture how you use and interact with our website through behavioural metrics, heatmaps, and session
+                  replay. This helps us improve the platform and understand where users experience difficulty. Website
+                  usage data is captured using first and third-party cookies and other tracking technologies to determine
+                  the popularity of features and online activity. We also use this information for site optimisation and
+                  security purposes. These tools are only activated after you accept cookies via the consent banner.
+                  Legal basis: consent.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mt-2">
+                  For more information about how Microsoft collects and uses your data, visit the{' '}
+                  <a href="https://www.microsoft.com/privacy/privacystatement" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                    Microsoft Privacy Statement
+                  </a>.
+                </p>
+              </div>
             </div>
           </section>
 
@@ -102,6 +120,14 @@ export default function PrivacyPolicy() {
                 Their privacy policy is available at gocardless.com.</li>
               <li><strong>PayPal</strong> - payment processing for one-time purchases and subscriptions. PayPal's
                 privacy policy applies to data you submit to PayPal.</li>
+              <li><strong>Microsoft</strong> - we use Microsoft Clarity for session recording and heatmaps (consent-based).
+                Microsoft may collect usage data in accordance with the{' '}
+                <a href="https://www.microsoft.com/privacy/privacystatement" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                  Microsoft Privacy Statement
+                </a>.
+              </li>
+              <li><strong>Google</strong> (Analytics) - we use Google Analytics 4 (consent-based) for aggregate traffic
+                analysis. Google's privacy policy applies to data collected via GA4.</li>
             </ul>
           </section>
 

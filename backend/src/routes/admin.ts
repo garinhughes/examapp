@@ -1,5 +1,7 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { getUserBySub, listUsers, recordAdminAudit, updateUserFields, listIssueReports, resolveIssueReport, countNewIssueReports } from '../services/dynamo.js'
+import { previewErasure, dryRunErasure, executeErasure } from '../services/erasureService.js'
+import { sendErasureReceiptEmail } from '../services/ses.js'
 import {
   listAllRatings, countNewRatings,
   createPoll, getPollDef, listPollDefs, listPollVotes, updatePollDef, deletePollDef, deactivateAllPolls, countNewPollVotes,
@@ -382,6 +384,54 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
     await resolveIssueReport(reportId)
     return { ok: true }
+  })
+
+  // ── GDPR Erasure ──
+
+  // GET /admin/users/:sub/erasure-preview — count data per category, no writes
+  server.get('/users/:sub/erasure-preview', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { sub } = request.params as any
+    const preview = await previewErasure(sub)
+    if (!preview) return reply.code(404).send({ message: 'User not found' })
+    return preview
+  })
+
+  // POST /admin/users/:sub/gdpr-erase-dryrun — read-only preflight checks, no data deleted
+  server.post('/users/:sub/gdpr-erase-dryrun', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { sub } = request.params as any
+    if (!request.user) return reply.code(401).send({ message: 'Unauthorized' })
+    const result = await dryRunErasure(sub)
+    if (!result) return reply.code(404).send({ message: 'User not found' })
+    return result
+  })
+
+  // POST /admin/users/:sub/gdpr-erase — execute full erasure; requires dry run to have passed
+  server.post('/users/:sub/gdpr-erase', { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { sub } = request.params as any
+    if (!request.user) return reply.code(401).send({ message: 'Unauthorized' })
+    // Safety: re-run dry run before executing to ensure all services are reachable
+    const preflight = await dryRunErasure(sub)
+    if (!preflight) return reply.code(404).send({ message: 'User not found' })
+    if (!preflight.allOk) {
+      return reply.code(409).send({
+        message: 'Dry run failed — erasure aborted. No data has been deleted.',
+        steps: preflight.steps,
+      })
+    }
+    try {
+      const receipt = await executeErasure(sub, (request.user as any).sub)
+      if (receipt.allOk) {
+        sendErasureReceiptEmail(receipt).catch((e) =>
+          request.log?.warn?.({ err: e.message }, 'gdpr-erase: receipt email failed (non-fatal)')
+        )
+      } else {
+        request.log?.warn?.({ receiptId: receipt.receiptId }, 'gdpr-erase: one or more steps failed — receipt email suppressed')
+      }
+      return receipt
+    } catch (err: any) {
+      request.log?.error?.({ err: err.message }, 'gdpr-erase failed')
+      return reply.code(500).send({ message: 'Erasure failed', detail: err.message })
+    }
   })
 
   // ── Cognito user management ──

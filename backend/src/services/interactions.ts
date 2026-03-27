@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, PutCommand, GetCommand, ScanCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb'
+import { DynamoDBDocumentClient, PutCommand, GetCommand, ScanCommand, UpdateCommand, DeleteCommand, QueryCommand } from '@aws-sdk/lib-dynamodb'
 import { randomUUID } from 'crypto'
 
 const REGION = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'eu-west-1'
@@ -289,6 +289,26 @@ export async function listPollVotes(
     console.warn('[interactions] listPollVotes failed', err)
     throw err
   }
+}
+
+export async function deleteAllInteractionsForUser(userId: string): Promise<number> {
+  const items: Array<{ userId: string; SK: string }> = []
+  let lastKey: any = undefined
+  do {
+    const res = await ddb.send(new QueryCommand({
+      TableName: INTERACTIONS_TABLE,
+      KeyConditionExpression: 'userId = :uid',
+      ExpressionAttributeValues: { ':uid': userId },
+      ...(lastKey ? { ExclusiveStartKey: lastKey } : {}),
+    }))
+    items.push(...((res.Items ?? []) as any[]))
+    lastKey = res.LastEvaluatedKey
+  } while (lastKey)
+
+  for (const item of items) {
+    await ddb.send(new DeleteCommand({ TableName: INTERACTIONS_TABLE, Key: { userId: item.userId, SK: item.SK } }))
+  }
+  return items.length
 }
 
 export async function countNewPollVotes(since: string): Promise<number> {

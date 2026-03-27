@@ -76,6 +76,41 @@ function fmtDateTime(iso?: string | null) {
   }
 }
 
+interface ErasurePreviewData {
+  targetUserId: string
+  targetEmail: string | null
+  targetName: string | null
+  registeredAt: string | null
+  counts: {
+    attempts: number
+    skillLabAttempts: number
+    interactions: number
+    entitlements: number
+    gamification: number
+    issueReports: number
+  }
+}
+
+interface ErasureReceiptData {
+  receiptId: string
+  deletedAt: string
+  adminId: string
+  targetUserId: string
+  targetEmail: string
+  targetName: string
+  steps: { name: string; status: 'ok' | 'error'; count: number; detail?: string }[]
+  allOk: boolean
+}
+
+interface DryRunResult {
+  dryRun: true
+  targetUserId: string
+  targetEmail: string
+  targetName: string
+  steps: { name: string; status: 'ok' | 'error'; count: number; detail?: string }[]
+  allOk: boolean
+}
+
 /* ------------------------------------------------------------------ */
 /*  Sub-component: User Row (expandable)                               */
 /* ------------------------------------------------------------------ */
@@ -1056,6 +1091,317 @@ function CognitoUsersPanel({
 /*  Main AdminPanel                                                    */
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/*  Sub-component: Checklist Row                                       */
+/* ------------------------------------------------------------------ */
+
+function ChecklistRow({ label, count, action, note }: { label: string; count: number; action: 'delete' | 'anonymise'; note?: string }) {
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <span className={action === 'delete' ? 'text-destructive' : 'text-amber-600 dark:text-amber-400'}>
+        {action === 'delete' ? '✕' : '~'}
+      </span>
+      <span className="flex-1">{label}</span>
+      <span className="text-muted-foreground">{count} record{count !== 1 ? 's' : ''}</span>
+      {note && <span className="text-muted-foreground italic hidden sm:inline">· {note}</span>}
+      <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${action === 'delete' ? 'bg-destructive/10 text-destructive' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'}`}>
+        {action}
+      </span>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Sub-component: GDPR Erasure Panel                                  */
+/* ------------------------------------------------------------------ */
+
+function ErasurePanel({
+  authFetch,
+  users,
+}: {
+  authFetch: ReturnType<typeof useAuthFetch>
+  users: UserRecord[]
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [selected, setSelected] = useState<UserRecord | null>(null)
+  const [preview, setPreview] = useState<ErasurePreviewData | null>(null)
+  const [loadingPreview, setLoadingPreview] = useState(false)
+  const [confirmInput, setConfirmInput] = useState('')
+  const [dryRun, setDryRun] = useState<DryRunResult | null>(null)
+  const [loadingDryRun, setLoadingDryRun] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [receipt, setReceipt] = useState<ErasureReceiptData | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+
+  const matches = search.length >= 2
+    ? users.filter((u) =>
+        u.email?.toLowerCase().includes(search.toLowerCase()) ||
+        u.name?.toLowerCase().includes(search.toLowerCase())
+      ).slice(0, 5)
+    : []
+
+  async function selectUser(u: UserRecord) {
+    setSelected(u)
+    setPreview(null)
+    setConfirmInput('')
+    setDryRun(null)
+    setReceipt(null)
+    setErr(null)
+    setLoadingPreview(true)
+    try {
+      const res = await authFetch(`/admin/users/${u.userId}/erasure-preview`)
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Preview failed')
+      setPreview(data)
+    } catch (e: any) {
+      setErr(e?.message ?? 'Preview failed')
+    } finally {
+      setLoadingPreview(false)
+    }
+  }
+
+  async function runDryRun() {
+    if (!selected) return
+    setLoadingDryRun(true)
+    setDryRun(null)
+    setErr(null)
+    try {
+      const res = await authFetch(`/admin/users/${selected.userId}/gdpr-erase-dryrun`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Dry run failed')
+      setDryRun(data)
+    } catch (e: any) {
+      setErr(e?.message ?? 'Dry run failed')
+    } finally {
+      setLoadingDryRun(false)
+    }
+  }
+
+  async function executeErasure() {
+    if (!selected) return
+    setBusy(true)
+    setErr(null)
+    try {
+      const res = await authFetch(`/admin/users/${selected.userId}/gdpr-erase`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Erasure failed')
+      setReceipt(data)
+    } catch (e: any) {
+      setErr(e?.message ?? 'Erasure failed')
+      setDryRun(null) // force re-run dry run before retrying
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  function reset() {
+    setSearch('')
+    setSelected(null)
+    setPreview(null)
+    setConfirmInput('')
+    setDryRun(null)
+    setReceipt(null)
+    setErr(null)
+    setBusy(false)
+  }
+
+  const emailConfirmed = confirmInput === selected?.email && !!preview
+  const canDryRun = emailConfirmed && !busy && !loadingDryRun
+  const canExecute = emailConfirmed && dryRun?.allOk === true && !busy
+
+  return (
+    <div className="rounded-lg border border-border overflow-hidden">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-muted text-sm font-semibold hover:bg-muted/80 transition-colors"
+      >
+        <span className="flex items-center gap-2">
+          Account Data Erasure (GDPR Compliant)
+          <span className="text-amber-500">⚠</span>
+        </span>
+        <span className={`text-xs transition-transform inline-block ${open ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {open && (
+        <div className="p-4 space-y-4 bg-card">
+          {receipt ? (
+            // Step 4 — Receipt
+            <div className="space-y-3 pt-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-sm">Erasure complete</h3>
+                <button onClick={reset} className="text-xs text-muted-foreground hover:text-foreground underline">New erasure</button>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-3 text-xs space-y-1">
+                <p><span className="text-muted-foreground">Receipt ID: </span><span className="font-mono">{receipt.receiptId}</span></p>
+                <p><span className="text-muted-foreground">Deleted at: </span>{fmtDateTime(receipt.deletedAt)}</p>
+                <p><span className="text-muted-foreground">User: </span>{receipt.targetName} ({receipt.targetEmail})</p>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-3 space-y-1.5">
+                {receipt.steps.map((s) => (
+                  <div key={s.name} className="flex items-center gap-2 text-xs">
+                    <span className={s.status === 'ok' ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}>
+                      {s.status === 'ok' ? '✓' : '✗'}
+                    </span>
+                    <span className="flex-1">{s.name}</span>
+                    <span className="text-muted-foreground">{s.count} record{s.count !== 1 ? 's' : ''}</span>
+                    {s.detail && <span className="text-destructive text-[10px] truncate max-w-[200px]">{s.detail}</span>}
+                  </div>
+                ))}
+                <div className="flex items-center gap-2 text-xs text-muted-foreground border-t border-border pt-1.5 mt-1">
+                  <span>–</span>
+                  <span className="flex-1">Aggregate metrics</span>
+                  <span className="italic">kept — not personal data</span>
+                </div>
+              </div>
+              {!receipt.allOk && (
+                <p className="text-xs text-destructive">Some steps failed. Check the audit log and re-run if needed.</p>
+              )}
+              <p className="text-xs text-muted-foreground">Receipt emailed to support@certshack.com — forward to the data subject as evidence of erasure.</p>
+            </div>
+          ) : selected && (preview || loadingPreview) ? (
+            // Step 2 + 3 — Preview checklist + Confirm
+            <div className="space-y-3 pt-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-sm">{selected.name ?? '(no name)'}</p>
+                  <p className="text-xs text-muted-foreground">{selected.email}{preview?.registeredAt ? ` · Registered ${fmtDate(preview.registeredAt)}` : ''}</p>
+                </div>
+                <button onClick={reset} className="text-xs text-muted-foreground hover:text-foreground underline">Change user</button>
+              </div>
+
+              {loadingPreview ? (
+                <div className="h-24 rounded-lg bg-muted animate-pulse" />
+              ) : preview && (
+                <div className="rounded-lg border border-border bg-card p-3 space-y-1.5">
+                  <ChecklistRow label="Exam attempts" count={preview.counts.attempts} action="delete" />
+                  <ChecklistRow label="Skill lab attempts" count={preview.counts.skillLabAttempts} action="delete" />
+                  <ChecklistRow label="Ratings & poll votes" count={preview.counts.interactions} action="delete" />
+                  <ChecklistRow label="Entitlements" count={preview.counts.entitlements} action="delete" />
+                  <ChecklistRow label="Gamification / XP" count={preview.counts.gamification} action="delete" note="removed from leaderboard" />
+                  <ChecklistRow label="Issue reports" count={preview.counts.issueReports} action="anonymise" note="content kept, PII stripped" />
+                  <ChecklistRow label="User profile" count={1} action="delete" />
+                  <ChecklistRow label="Cognito account" count={1} action="delete" />
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground border-t border-border pt-1.5 mt-1">
+                    <span>–</span>
+                    <span className="flex-1">Aggregate metrics</span>
+                    <span className="italic">kept — not personal data (UK GDPR compliant)</span>
+                  </div>
+                </div>
+              )}
+
+              {preview && (
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground block">
+                    Type <strong>{selected.email}</strong> to confirm
+                  </label>
+                  <input
+                    type="text"
+                    value={confirmInput}
+                    onChange={(e) => { setConfirmInput(e.target.value); setDryRun(null) }}
+                    placeholder="Type email address to confirm…"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-destructive/40"
+                  />
+                </div>
+              )}
+
+              {/* Dry run results */}
+              {dryRun && (
+                <div className="rounded-lg border border-border bg-card p-3 space-y-1.5">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                    Dry run — no data deleted
+                  </p>
+                  {dryRun.steps.map((s) => (
+                    <div key={s.name} className="flex items-center gap-2 text-xs">
+                      <span className={s.status === 'ok' ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}>
+                        {s.status === 'ok' ? '✓' : '✗'}
+                      </span>
+                      <span className="flex-1">{s.name}</span>
+                      <span className="text-muted-foreground">{s.count} record{s.count !== 1 ? 's' : ''}</span>
+                      {s.detail && <span className="text-destructive text-[10px] truncate max-w-[200px]">{s.detail}</span>}
+                    </div>
+                  ))}
+                  {dryRun.allOk
+                    ? <p className="text-xs text-emerald-600 dark:text-emerald-400 pt-1">All checks passed — ready to execute.</p>
+                    : <p className="text-xs text-destructive pt-1">One or more checks failed. Fix the issues above and retry the dry run.</p>
+                  }
+                </div>
+              )}
+
+              {err && <p className="text-xs text-destructive">{err}</p>}
+
+              {preview && (
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={runDryRun}
+                    disabled={!canDryRun}
+                    className="px-4 py-2 rounded-lg border border-border bg-muted text-sm font-semibold hover:bg-muted/80 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {loadingDryRun ? 'Running dry run…' : dryRun ? 'Retry Dry Run' : 'Dry Run'}
+                  </button>
+                  {dryRun?.allOk && (
+                    <button
+                      onClick={executeErasure}
+                      disabled={!canExecute}
+                      className="px-4 py-2 rounded-lg bg-destructive text-white text-sm font-semibold hover:bg-destructive/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {busy ? 'Executing…' : 'Execute Erasure'}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            // Step 1 — Search
+            <div className="space-y-3 pt-3">
+              <p className="text-xs text-muted-foreground">
+                Search by the email address from the user's deletion request.
+              </p>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by email or name…"
+                  className="w-full pl-8 pr-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">🔍</span>
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs hover:text-foreground"
+                  >✕</button>
+                )}
+              </div>
+              {err && <p className="text-xs text-destructive">{err}</p>}
+              {matches.length > 0 && (
+                <div className="space-y-1">
+                  {matches.map((u) => (
+                    <button
+                      key={u.userId}
+                      onClick={() => selectUser(u)}
+                      className="w-full text-left flex items-center justify-between px-3 py-2 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors text-sm"
+                    >
+                      <div>
+                        <span className="font-medium">{u.name ?? '(no name)'}</span>
+                        <span className="text-muted-foreground ml-2 text-xs">{u.email}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{fmtDate(u.lastLogin)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {search.length >= 2 && matches.length === 0 && (
+                <p className="text-xs text-muted-foreground">No users found.</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AdminPanel() {
   const authFetch = useAuthFetch()
   const [users, setUsers] = useState<UserRecord[]>([])
@@ -1188,6 +1534,7 @@ export default function AdminPanel() {
 
       <BulkMigratePanel authFetch={authFetch} />
       <CognitoUsersPanel authFetch={authFetch} />
+      <ErasurePanel authFetch={authFetch} users={users} />
 
       {/* Toolbar: search + filters */}
       <div className="flex flex-wrap items-center gap-2">
