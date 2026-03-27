@@ -3,9 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useExam } from '@/exam/ExamContext'
 import type { AppRoute } from '@/exam/types'
 
-const INTERNAL_ONLY_ROUTES = new Set<AppRoute>([
-  'admin', 'metrics', 'diagrams', 'basket', 'feedback',
-])
+const INTERNAL_ONLY_ROUTES = new Set<AppRoute>([])
 
 function pathnameToRoute(pathname: string): AppRoute | null {
   switch (pathname) {
@@ -28,6 +26,16 @@ function pathnameToRoute(pathname: string): AppRoute | null {
       return 'pricing'
     case '/account':
       return 'account'
+    case '/diagrams':
+      return 'diagrams'
+    case '/basket':
+      return 'basket'
+    case '/admin':
+      return 'admin'
+    case '/metrics':
+      return 'metrics'
+    case '/feedback':
+      return 'feedback'
     default:
       return null
   }
@@ -40,6 +48,11 @@ const ROUTE_TO_PATHNAME: Partial<Record<AppRoute, string>> = {
   analytics: '/analytics',
   pricing: '/pricing',
   account: '/account',
+  diagrams: '/diagrams',
+  basket: '/basket',
+  admin: '/admin',
+  metrics: '/metrics',
+  feedback: '/feedback',
   privacy: '/privacy',
   terms: '/terms',
   refund: '/refund',

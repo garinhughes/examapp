@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -24,8 +24,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import type { AuthUser } from "@/auth/AuthContext";
 
-// Routes with real browser URLs (navigate changes the URL)
-const URL_ROUTES = new Set(['home', 'practice', 'analytics', 'skill-labs', 'account', 'pricing'])
+
 
 // Map routes to internal App state keys
 const navItems = [
@@ -57,7 +56,6 @@ interface SidebarProps {
 
 export function Sidebar({ className, currentRoute, onNavigate, logout, login, user, xp, level, streak, showAdmin }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
   const { itemCount: basketCount } = useBasket();
   const { badgeCount: feedbackCount } = useFeedback();
@@ -66,10 +64,10 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
 
   const handleNav = (key: string, href: string) => {
     setIsOpen(false);
-    if (URL_ROUTES.has(key)) {
-      navigate(href);
+    if (onNavigate) {
+      onNavigate(key);
     } else {
-      if (onNavigate) onNavigate(key);
+      navigate(href);
     }
   };
 

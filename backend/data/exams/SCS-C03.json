@@ -697,23 +697,23 @@
       "choices": [
         {
           "id": "c1",
-          "text": "aws cloudtrail create-trail --name org-trail --s3-bucket-name org-audit-logs --is-multi-region-trail --is-organization-trail --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:* --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
+          "text": "aws cloudtrail create-trail \\\n  --name org-trail \\\n  --s3-bucket-name org-audit-logs \\\n  --is-multi-region-trail \\\n  --is-organization-trail \\\n  --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:* \\\n  --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
           "sequence": 1,
           "explanation": "This command includes all required parameters: --is-multi-region-trail for cross-region coverage, --is-organization-trail to propagate the trail to all member accounts, --cloud-watch-logs-log-group-arn with the required :* suffix referencing the log group and its streams, and --cloud-watch-logs-role-arn specifying the IAM role CloudTrail uses to deliver to CloudWatch Logs. Both CloudWatch Logs parameters must be present together."
         },
         {
           "id": "c2",
-          "text": "aws cloudtrail create-trail --name org-trail --s3-bucket-name org-audit-logs --is-multi-region-trail --is-organization-trail --enable-log-file-validation --kms-key-id arn:aws:kms:us-east-1:123456789012:alias/cloudtrail-key --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:*",
+          "text": "aws cloudtrail create-trail \\\n  --name org-trail \\\n  --s3-bucket-name org-audit-logs \\\n  --is-multi-region-trail \\\n  --is-organization-trail \\\n  --enable-log-file-validation \\\n  --kms-key-id arn:aws:kms:us-east-1:123456789012:alias/cloudtrail-key \\\n  --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:*",
           "explanation": "--enable-log-file-validation and --kms-key-id are valid but optional parameters. However, this command is missing the required --cloud-watch-logs-role-arn parameter. When specifying --cloud-watch-logs-log-group-arn, the role ARN is mandatory - CloudTrail needs it to assume the delivery role and write to CloudWatch Logs. The command will fail with a validation error."
         },
         {
           "id": "c3",
-          "text": "aws cloudtrail create-trail --name org-trail --s3-bucket-name org-audit-logs --include-global-service-events --is-organization-trail --enable-log-file-validation --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:* --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
+          "text": "aws cloudtrail create-trail \\\n  --name org-trail \\\n  --s3-bucket-name org-audit-logs \\\n  --include-global-service-events \\\n  --is-organization-trail \\\n  --enable-log-file-validation \\\n  --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:* \\\n  --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
           "explanation": "--include-global-service-events enables logging of global services like IAM and STS but does not make the trail multi-region. Without --is-multi-region-trail, CloudTrail only captures API calls in the single region where the trail was created. The requirement specifies a multi-region trail, so this command leaves all other regions unmonitored."
         },
         {
           "id": "c4",
-          "text": "aws cloudtrail create-trail --name org-trail --s3-bucket-name org-audit-logs --s3-key-prefix AWSLogs --is-multi-region-trail --is-organization-trail --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
+          "text": "aws cloudtrail create-trail \\\n  --name org-trail \\\n  --s3-bucket-name org-audit-logs \\\n  --s3-key-prefix AWSLogs \\\n  --is-multi-region-trail \\\n  --is-organization-trail \\\n  --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail \\\n  --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
           "explanation": "This command is missing the :* suffix on the log group ARN. CloudTrail requires the log group ARN to end with :* when specified via the CLI, because the ARN must reference the log group and all its associated log streams. Without the suffix, the command returns a validation error indicating the log group ARN format is invalid."
         }
       ],

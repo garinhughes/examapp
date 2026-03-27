@@ -241,7 +241,7 @@ function ExamAppInner() {
                   <h2 className="text-3xl sm:text-3xl font-extrabold mb-3">Train with intent. Certify with confidence.</h2>
                   <p className="text-muted-foreground mb-6">Timed or casual practice exams, focused by domain, with per-question explanations and analytics to help you improve.</p>
 
-                  <div className="flex items-center justify-center gap-4 mb-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
                     <button onClick={() => navigate('/exams')} className="px-4 py-2 rounded bg-primary text-white text-sm font-medium inline-flex items-center gap-2"><BookOpen className="w-4 h-4" />Browse Practice Exams</button>
                     <button onClick={() => navigate('/skill-labs')} className="px-4 py-2 rounded border border-primary text-primary text-sm font-medium bg-primary/5 inline-flex items-center gap-2"><Terminal className="w-4 h-4" />Browse Skill Labs</button>
                   </div>

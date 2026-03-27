@@ -26,9 +26,15 @@ export default function App() {
       <Route path="/" element={<ExamAppWrapped />} />
       <Route path="/exams" element={<ExamAppWrapped />} />
       <Route path="/skill-labs" element={<ExamAppWrapped />} />
+      <Route path="/skill-labs/:labId" element={<ExamAppWrapped />} />
       <Route path="/analytics" element={<ExamAppWrapped />} />
       <Route path="/pricing" element={<ExamAppWrapped />} />
       <Route path="/account" element={<ExamAppWrapped />} />
+      <Route path="/diagrams" element={<ExamAppWrapped />} />
+      <Route path="/basket" element={<ExamAppWrapped />} />
+      <Route path="/admin" element={<ExamAppWrapped />} />
+      <Route path="/metrics" element={<ExamAppWrapped />} />
+      <Route path="/feedback" element={<ExamAppWrapped />} />
       <Route path="/privacy" element={<ExamAppWrapped />} />
       <Route path="/terms" element={<ExamAppWrapped />} />
       <Route path="/refund" element={<ExamAppWrapped />} />

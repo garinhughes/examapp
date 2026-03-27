@@ -12,7 +12,7 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   if (language === 'bash' || language === 'sh' || language === 'shell') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded text-sm overflow-auto font-mono" style={{ backgroundColor: '#282a36', color: '#f8f8f2' }}>
+      <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full" style={{ backgroundColor: '#282a36', color: '#f8f8f2' }}>
         {lines.map((ln, i) => (
           <div key={i} className="leading-6">
             {ln.split(/(\s+)/).map((tok, j) => {
@@ -33,7 +33,7 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   if (language === 'yaml' || language === 'yml') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded text-sm overflow-auto font-mono" style={{ backgroundColor: '#282a36', color: '#f8f8f2' }}>
+      <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full" style={{ backgroundColor: '#282a36', color: '#f8f8f2' }}>
         {lines.map((ln, i) => {
           // Comment lines
           if (/^\s*#/.test(ln)) {
@@ -81,7 +81,7 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   return (
     <Highlight {...defaultProps} code={code} language={language as Language} theme={theme}>
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`${className} p-3 rounded text-sm overflow-auto font-mono`} style={{ ...style }}>
+        <pre className={`${className} p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full`} style={{ ...style }}>
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line, key: i })}>
               {line.map((token, k) => (

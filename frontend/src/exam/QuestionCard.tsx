@@ -310,12 +310,10 @@ export function QuestionCard() {
                             {String.fromCharCode(65 + i)}
                           </span>
                         )}
-                        <span className="flex-1 min-w-0">
-                          <span className="flex items-center gap-2 flex-wrap">
-                            <span className={`${isSelected ? 'font-semibold' : ''}`}>{renderChoiceContent(c, q, true)}</span>
-                            {showFeedback && answered && isSelected && !isCorrectChoice && <span className="ml-1 text-[10px] text-red-600 dark:text-red-400 font-medium">your answer</span>}
-                            {showFeedback && answered && !isSelected && isCorrectChoice && <span className="ml-1 text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
-                          </span>
+                        <span className="flex-1 min-w-0 overflow-hidden">
+                          <span className={`block min-w-0 ${isSelected ? 'font-semibold' : ''}`}>{renderChoiceContent(c, q, true)}</span>
+                          {showFeedback && answered && isSelected && !isCorrectChoice && <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">your answer</span>}
+                          {showFeedback && answered && !isSelected && isCorrectChoice && <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
                         </span>
                       </button>
                       {showFeedback && answered && c.explanation && (

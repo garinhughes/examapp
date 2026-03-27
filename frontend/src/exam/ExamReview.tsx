@@ -273,10 +273,10 @@ export function ExamReview() {
                         return (
                           <div key={cid} className={`flex items-start gap-2.5 px-3 py-2 rounded-lg border text-sm ${bg}`}>
                             <span className="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">{icon}</span>
-                            <div className="flex-1">
-                              <span className={`${isChosen ? 'font-semibold' : ''}`}>{renderChoiceContent(c, item.q, true)}</span>
-                              {isChosen && !isCorrectChoice && <span className="ml-2 text-[10px] text-red-500 font-medium">your answer</span>}
-                              {!isChosen && isCorrectChoice && <span className="ml-2 text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
+                            <div className="flex-1 min-w-0 overflow-hidden">
+                              <span className={`block min-w-0 ${isChosen ? 'font-semibold' : ''}`}>{renderChoiceContent(c, item.q, true)}</span>
+                              {isChosen && !isCorrectChoice && <span className="text-[10px] text-red-500 font-medium">your answer</span>}
+                              {!isChosen && isCorrectChoice && <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
                               {typeof c === 'object' && c?.explanation && (
                                 <div className="mt-1 text-xs text-muted-foreground">{c.explanation}</div>
                               )}
