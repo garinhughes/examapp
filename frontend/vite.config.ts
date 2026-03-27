@@ -16,7 +16,10 @@ export default defineConfig({
       '/payments': 'http://localhost:3000',
       '/attempts': 'http://localhost:3000',
       '/auth': 'http://localhost:3000',
-      '/admin': 'http://localhost:3000',
+      '/admin': {
+        target: 'http://localhost:3000',
+        bypass: (req) => (req.headers['sec-fetch-mode'] === 'navigate' || req.headers.accept?.includes('text/html')) ? '/index.html' : undefined,
+      },
       '/stripe': 'http://localhost:3000',
       '/gamification': 'http://localhost:3000',
       '/username': 'http://localhost:3000',
