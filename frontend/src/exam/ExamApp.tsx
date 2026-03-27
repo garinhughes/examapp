@@ -1,6 +1,9 @@
 import { Save, X, Play, Pause, Download, FileText, Info, BarChart3, BookOpen, Terminal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useRef, useEffect } from 'react'
 import { Sidebar } from '@/components/Sidebar'
+import { TourProvider, useTourContext } from '@/components/TourProvider'
+import { TourBubble } from '@/components/TourBubble'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PageMeta } from '@/components/PageMeta'
 import { CookieConsent } from '@/components/CookieConsent'
@@ -32,8 +35,17 @@ import TermsOfService from '@/components/TermsOfService'
 import RefundPolicy from '@/components/RefundPolicy'
 
 export default function ExamApp() {
+  return (
+    <TourProvider>
+      <ExamAppInner />
+    </TourProvider>
+  )
+}
+
+function ExamAppInner() {
   useRouteSync()
   const navigate = useNavigate()
+  const tour = useTourContext()
   const {
     route, setRoute, selected, setSelected, selectedMeta, exams, questions, setQuestions,
     examTier, examStarted, setExamStarted, isFinished, attemptId, attemptData, setAttemptData,
@@ -48,6 +60,15 @@ export default function ExamApp() {
   } = useExam()
 
   const userIsAdmin = isAdmin()
+
+  // Auto-advance tour from "click Setup Exam" step when visitor navigates to exam setup
+  const prevRouteRef = useRef(route)
+  useEffect(() => {
+    if (tour.active && tour.step === 2 && prevRouteRef.current === 'practice' && route === 'home') {
+      tour.goToStep(3)
+    }
+    prevRouteRef.current = route
+  }, [route, tour.active, tour.step])
 
   return (
     <FeedbackProvider authFetch={authFetch} isAdmin={userIsAdmin}>
@@ -512,6 +533,7 @@ export default function ExamApp() {
       </main>
       </div>
     </div>
+    <TourBubble />
     </FeedbackProvider>
   )
 }

@@ -1,5 +1,6 @@
 import { X, Coffee, Timer, Brain, Eye, Lock, ChevronDown } from 'lucide-react'
 import { useExam } from './ExamContext'
+import { useTourContext } from '@/components/TourProvider'
 
 export function ExamSetup() {
   const {
@@ -22,6 +23,7 @@ export function ExamSetup() {
     setShowAttempts, setAttemptsList,
   } = useExam()
 
+  const tour = useTourContext()
   const locked = !!attemptId && !isFinished
 
   const domainsList: string[] = attemptData?.perDomain ? Object.keys(attemptData.perDomain) : Array.from(new Set(questions.map((q) => (q as any).domain)))
@@ -79,7 +81,7 @@ export function ExamSetup() {
 
         {/* Domain dropdown */}
         <div className="mb-4">
-          <div className="w-full md:w-96">
+          <div ref={(el) => tour.registerTarget('domain-dropdown', el)} className="w-full md:w-96">
             <label className="block text-xs text-muted-foreground mb-1">Domains</label>
             <div className="relative">
               <button
@@ -151,7 +153,7 @@ export function ExamSetup() {
         {/* Mode selection + settings */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-3 flex-wrap">
+            <div ref={(el) => tour.registerTarget('mode-buttons', el)} className="flex items-center gap-3 flex-wrap">
               <button
                 type="button"
                 onClick={() => { setExamMode('casual'); setTimed(false); setRevealAnswers('immediately') }}
@@ -256,7 +258,7 @@ export function ExamSetup() {
             {/* Show Answers toggle */}
             <div className="mt-3">
               <label className="block text-xs text-muted-foreground mb-1.5">Show answers</label>
-              <div className="flex items-center gap-2">
+              <div ref={(el) => tour.registerTarget('answer-reveal', el)} className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setRevealAnswers('immediately')}
@@ -438,6 +440,7 @@ export function ExamSetup() {
             </button>
           )}
           <button
+            ref={(el) => tour.registerTarget('start-exam-btn', el)}
             className={`px-4 py-2 rounded-md text-white font-semibold transition-all ${
               examMode === 'weakest-link' ? 'bg-gradient-to-r bg-primary ' : 'bg-primary'
             } ${loadingWeakestLink ? 'opacity-70 cursor-wait' : ''}`}

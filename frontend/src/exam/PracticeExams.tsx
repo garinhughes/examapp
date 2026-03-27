@@ -3,12 +3,15 @@ import { Play, Info, Activity, ShoppingCart } from 'lucide-react'
 import { useBasket } from '@/basket/BasketContext'
 import { useEntitlements } from '@/hooks/useEntitlements'
 import { useState, useEffect } from 'react'
+import { useTourContext } from '@/components/TourProvider'
 
 export function PracticeExams() {
   const {
     providers, examStarted, anySavedExam, selected, savedProgress,
-    setupExamFromMeta, resumeExam, setSelected, setRoute
+    setupExamFromMeta, resumeExam, setSelected, setRoute,
+    user, authLoading,
   } = useExam()
+  const tour = useTourContext()
   const basket = useBasket()
   const { products } = useEntitlements()
   const [actionError, setActionError] = useState<string | null>(null)
@@ -16,6 +19,12 @@ export function PracticeExams() {
   useEffect(() => {
     if (basket.lastError) setActionError(basket.lastError)
   }, [basket.lastError])
+
+  useEffect(() => {
+    if (!authLoading && !user && !tour.active && !tour.completed && providers.length > 0) {
+      tour.start()
+    }
+  }, [authLoading, user, providers.length])
 
   function formatPrice(pence: number): string {
     const pounds = pence / 100
@@ -50,11 +59,11 @@ export function PracticeExams() {
       </div>
 
       <div className="space-y-6">
-        {providers.map((p) => (
+        {providers.map((p, pIndex) => (
           <div key={p.provider}>
             <h3 className="font-semibold mb-2">{p.provider}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {p.exams.map((ex: any) => (
+              {p.exams.map((ex: any, exIndex) => (
                 <div key={ex.code} className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm relative flex flex-col">
                   <div className="flex-1">
                     <div className="font-medium">{ex.title ?? ex.code}</div>
@@ -64,6 +73,7 @@ export function PracticeExams() {
                   </div>
                   <div className="mt-3 flex items-center gap-2">
                     <button
+                      ref={pIndex === 0 && exIndex === 0 ? (el) => tour.registerTarget('setup-exam-btn', el) : undefined}
                       className={`h-7 px-2 rounded font-medium text-sm inline-flex items-center gap-2 transition-colors ${examStarted || anySavedExam || (selected && savedProgress) ? 'bg-muted/60 text-muted-foreground/60 border border-border cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'}`}
                       disabled={!!(examStarted || anySavedExam || (selected && savedProgress))}
                       title={examStarted || anySavedExam || (selected && savedProgress) ? 'Complete or cancel your current exam first' : 'Setup this exam'}
@@ -72,6 +82,7 @@ export function PracticeExams() {
                       Setup Exam
                     </button>
                     <button
+                      ref={pIndex === 0 && exIndex === 0 ? (el) => tour.registerTarget('analytics-btn', el) : undefined}
                       onClick={(e) => { e.stopPropagation(); setSelected(ex.code); setRoute('analytics') }}
                       title={`View analytics for ${ex.title ?? ex.code}`}
                       className="h-7 w-7 rounded bg-secondary text-secondary-foreground hover:bg-secondary/80 text-sm inline-flex items-center justify-center"
