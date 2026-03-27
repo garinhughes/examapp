@@ -1,56 +1,26 @@
 # CLAUDE.md — examapp
 
-This file gives Claude Code project context to avoid unnecessary file scanning and reduce token usage.
-
----
-
-## Project Overview
-
-Full-stack exam/quiz web app deployed on AWS. Monorepo with three top-level concerns:
+Full-stack exam/quiz web app on AWS. Monorepo:
 
 | Folder | Purpose |
 |---|---|
 | `frontend/` | React 18 + Vite + Tailwind SPA |
 | `backend/` | Fastify 4 + TypeScript API (Node ESM) |
-| `infra/terraform/` | Terraform managing AWS infra (ECS, DynamoDB, S3, CloudWatch, WAF) |
+| `infra/terraform/` | AWS infra (ECS, DynamoDB, S3, CloudWatch, WAF) |
 
----
-
-## Do Not Read Unless Relevant
-
-Avoid loading these unless explicitly working on them — they are large and low-signal:
-
-- `**/node_modules/`
-- `**/dist/`
-- `**/pnpm-lock.yaml`
+## Avoid Reading (large/low-signal)
+- `**/node_modules/`, `**/dist/`, `**/pnpm-lock.yaml`
 - `infra/terraform/.terraform/`
-- `backend/data/exams/*.json` (large exam data files)
-- `backend/data/exam-guides/*.txt`
-
----
+- `backend/data/exams/*.json`, `backend/data/exam-guides/*.txt`
+- `backend/data/skill-labs/*.json`
 
 ## Tech Stack
 
-**Backend**
-- Runtime: Node.js (ESM), TypeScript 5
-- Framework: Fastify 4 with `@fastify/jwt`, `@fastify/cors`
-- AWS SDKs: `@aws-sdk/client-dynamodb`, `@aws-sdk/client-s3`, `@aws-sdk/lib-dynamodb`
-- Auth: Cognito JWT via `jwks-rsa` + `jose`
-- Entry: `backend/src/index.ts`
+**Backend** — Node.js ESM, TypeScript 5, Fastify 4, `@fastify/jwt`, `@fastify/cors`, AWS SDKs (`dynamodb`, `s3`, `lib-dynamodb`), Cognito JWT via `jwks-rsa` + `jose`. Entry: `backend/src/index.ts`
 
-**Frontend**
-- React 18, React Router 7, Vite 5
-- Styling: Tailwind CSS 3 + `tailwindcss-animate`
-- UI primitives: Radix UI, `class-variance-authority`, `lucide-react`
-- Theme: `next-themes`
-- Entry: `frontend/src/main.tsx` / `frontend/src/App.tsx`
+**Frontend** — React 18, React Router 7, Vite 5, Tailwind CSS 3, Radix UI, `class-variance-authority`, `lucide-react`, `next-themes`. Entry: `frontend/src/main.tsx` / `App.tsx`
 
-**Infra**
-- Terraform: `infra/terraform/main.tf` (primary), `variables.tf`, `outputs.tf`
-- CI/CD: GitHub Actions in `.github/workflows/`
-- ECS task definition: `backend/infra/ecs-task-def.json`
-
----
+**Infra** — Terraform: `infra/terraform/main.tf`, CI/CD: `.github/workflows/`, ECS task def: `backend/infra/ecs-task-def.json`
 
 ## Key Source Files
 
@@ -65,215 +35,129 @@ backend/src/
     auth.ts             # Cognito token exchange
     admin.ts            # Admin-only routes
     certificates.ts     # Certificate token signing + public verify endpoint
-    analytics.ts        # Usage stats
-    gamification.ts     # Badges/streaks
-    pricing.ts          # Pricing tiers
-    gocardless.ts       # GoCardless Direct Debit checkout + webhook (prefix /payments)
-    paypal.ts           # PayPal Orders + Subscriptions + webhook (prefix /payments/paypal)
-    username.ts         # Username management
-    skillLabs.ts        # GET/POST /skill-labs — lab definitions + attempt storage
-    reports.ts          # POST /reports — issue reporting (paid-only, SES + DynamoDB)
+    analytics.ts, gamification.ts, pricing.ts, username.ts
+    gocardless.ts       # Direct Debit (prefix /payments)
+    paypal.ts           # PayPal Orders + Subscriptions (prefix /payments/paypal)
+    skillLabs.ts        # GET/POST /skill-labs
+    reports.ts          # POST /reports — issue reporting (paid-only)
   plugins/
-    auth.ts             # JWT verification plugin
+    auth.ts             # JWT verification
     entitlements.ts     # Access control (free vs paid)
   services/
-    ses.ts              # SES client + sendIssueReportEmail
-    dynamo.ts           # DynamoDB client + helpers (exports ddb, SESSIONS_TABLE, etc.)
-    paypalSessions.ts   # PayPal checkout session store (examapp-sessions table, TTL 24h)
-    examStore.ts        # Exam CRUD via DynamoDB/S3
-    attemptsStore.ts    # Attempt persistence
-    entitlements.ts     # Entitlement checks
-    weakestLink.ts      # Adaptive question selection
-    profanityFilter.ts  # Username filter
-    skillLabAttemptsStore.ts # Skill lab attempt persistence (local JSON / DynamoDB)
-    skillLabStore.ts    # Skill lab S3 + DynamoDB store (mirrors examStore.ts)
+    dynamo.ts           # DynamoDB client + helpers
+    ses.ts              # SES email
+    paypalSessions.ts   # PayPal session store (examapp-sessions, TTL 24h)
+    examStore.ts, attemptsStore.ts, entitlements.ts
+    weakestLink.ts, profanityFilter.ts
+    skillLabStore.ts, skillLabAttemptsStore.ts
 
 frontend/src/
-  App.tsx               # Thin shell: ExamProvider + BasketProvider wrapping ExamApp
-  apiBase.ts            # Base URL config
+  App.tsx               # ExamProvider + BasketProvider wrapping ExamApp
+  apiBase.ts
   auth/
-    AuthContext.tsx     # Cognito auth state
-    useAuthFetch.ts     # Authenticated fetch hook
-    useIsAdmin.ts       # Admin role check
+    AuthContext.tsx, useAuthFetch.ts, useIsAdmin.ts
   components/
-    AdminPanel.tsx      # Admin UI
-    AccountPage.tsx     # User account/settings
-    CertificateOptions.tsx # Certificate generation options UI
-    CertificatePreview.tsx # Inline-styled certificate visual + QR code
-    CertificatesTab.tsx     # Orchestrator: options → generate → preview
-    VerifyPage.tsx          # Public verification page (/verify/:token)
-    CodeBlock.tsx       # Syntax-highlighted code display
-    Leaderboard.tsx     # Gamification leaderboard
-    PricingPage.tsx     # Pricing/paywall UI
-    Sidebar.tsx         # Navigation
-    DiagramsView.tsx    # Mermaid architecture diagrams
+    AdminPanel.tsx, AccountPage.tsx
+    CertificateOptions.tsx, CertificatePreview.tsx, CertificatesTab.tsx, VerifyPage.tsx
+    CodeBlock.tsx, Leaderboard.tsx, PricingPage.tsx, Sidebar.tsx, DiagramsView.tsx
   exam/
     types.ts            # Shared types (Exam, Question, Choice, Slot, etc.)
     ExamContext.tsx      # Central state: ~160 context props, all useState/useEffect/handlers
-    ExamApp.tsx          # Layout shell: Sidebar, header, route switch, ExamHeader, results
-    ExamSetup.tsx        # Pre-start form: mode, domains, filters, sliders, start/resume
-    ExamReview.tsx       # Post-exam review: domain filter, question-by-question review
-    QuestionNav.tsx      # Question grid, progress bar, Prev/Next, Complete Early
-    QuestionCard.tsx     # Single question: matching/ordering/single-multi choice rendering
-    Modals.tsx           # Pause overlay, cancel/submit/complete-early modals, toasts, confetti
-    PracticeExams.tsx    # Practice exams page: resume banner + provider cards
-    AnalyticsView.tsx    # Analytics: score history chart, stats, domain bars, attempts list
-    ScoreHistoryChart.tsx # SVG score history chart component
-    SortableOrderItem.tsx # DnD sortable wrapper for ordering questions
-    utils.tsx            # Pure helpers: isAnswerCorrect, computeDerivedAttempt, renderChoiceContent
-    downloads.ts         # CSV/PDF download functions (parameterized)
+    ExamApp.tsx          # Layout shell: Sidebar, header, route switch
+    ExamSetup.tsx, ExamReview.tsx, QuestionNav.tsx, QuestionCard.tsx
+    Modals.tsx, PracticeExams.tsx, AnalyticsView.tsx, ScoreHistoryChart.tsx
+    SortableOrderItem.tsx, utils.tsx, downloads.ts
   gamification/
-    GamificationContext.tsx
-    badges.ts
-    types.ts
+    GamificationContext.tsx, badges.ts, types.ts
   skill-labs/
     types.ts            # LabDefinition, LabSummary, Inspection types
-    SkillLabsPage.tsx   # Lab list page (/skill-labs) with filters, pagination, timed/casual toggle
-    SearchableFilter.tsx # Reusable multi-select dropdown with search
-    SkillLabRunnerPage.tsx # Lab runner dispatcher — routes to correct component by lab.type
+    SkillLabsPage.tsx, SearchableFilter.tsx, SkillLabRunnerPage.tsx
     labs/
-      LabHeader.tsx       # Shared header: back link + title card + timer/casual badge
-      DiagnoseLabRunner.tsx  # Diagnose lab: React Flow diagram with node inspection
-      CliLabRunner.tsx       # CLI lab: simulated AWS CLI terminal (no real commands)
-      PolicyFixLabRunner.tsx # Policy fix lab: Monaco Editor for IAM policy repair
-  hooks/
-    useEntitlements.ts  # Checks user access tier
+      LabHeader.tsx
+      DiagnoseLabRunner.tsx  # React Flow diagram
+      CliLabRunner.tsx       # Simulated AWS CLI terminal
+      PolicyFixLabRunner.tsx # Monaco Editor IAM policy repair
+  hooks/useEntitlements.ts
   basket/
-    BasketContext.tsx   # Shopping basket state (localStorage persistence, smart suggestions)
-    BasketPage.tsx      # Basket view: item list, suggestion banners, GoCardless + PayPal checkout
-    PayPalCheckout.tsx  # Lazy-loaded PayPal buttons (one-time orders + subscriptions)
+    BasketContext.tsx, BasketPage.tsx
+    PayPalCheckout.tsx  # Lazy-loaded into BasketPage
 ```
 
----
+## Question Schema
 
-## Question Schema (exam JSON)
+Shared fields (all types): `id`, `type`, `services[]`, `skills[]`, `domain`, `question`, `tip`, `explanation`, `difficulty (1-5)`, `docs`, `lastReviewed`
 
-Exam files live in `backend/data/exams/` (local) and S3 (production). Each file is a JSON array of question objects. All questions share a base set of fields; type-specific fields are noted per type.
-
-**Shared fields (all types)**
-```ts
-{
-  id: string,           // e.g. "SCS-C03-0001"
-  type: QuestionType,
-  services: string[],
-  skills: string[],
-  domain: string,
-  question: string,
-  tip: string,
-  explanation: string,
-  difficulty: 1 | 2 | 3 | 4 | 5,
-  docs: string,         // URL
-  lastReviewed: string  // YYYY-MM-DD
-}
-```
-
-**`single-choice`** — `format: "text"|"json"|"cli"`, `choices[]` (4 total, correct has `sequence: 1`)
-
-**`multiple-choice`** — `format`, `selectCount: 2|3`, `choices[]` (correct choices have `sequence` field)
-
-**`matching`** — `slots[]` (each has `label` + `correctChoiceId`), `choices[]` (shared pool). No `format` field. Order does not matter.
-
-**`ordering`** — `choices[]` only, every choice has `sequence`. No distractors. No `format`. User drags to correct order.
-
----
+- **`single-choice`** — `format: "text"|"json"|"cli"`, `choices[]` (4 total, correct has `sequence: 1`)
+- **`multiple-choice`** — `format`, `selectCount: 2|3`, `choices[]` (correct choices have `sequence`)
+- **`matching`** — `slots[]` (label + correctChoiceId), `choices[]` (shared pool). No `format`.
+- **`ordering`** — `choices[]` only, every choice has `sequence`. No distractors. No `format`.
 
 ## Dev Commands
 
 ```bash
-# Backend
-cd backend
-pnpm dev              # ts-node dev server (hot)
-pnpm build            # compile to dist/
-pnpm start            # run compiled dist/
-
-# Frontend
-cd frontend
-pnpm dev              # Vite dev server
-pnpm build            # production build to dist/
-
-# Publish exam data to DynamoDB/S3
-cd backend
-pnpm publish:exams
-pnpm publish:exams:dry   # dry run - no writes
-
-# Publish skill-lab definitions to S3/DynamoDB
-pnpm publish:skill-labs
-pnpm publish:skill-labs:dry   # dry run - no writes
+cd backend && pnpm dev|build|start
+cd frontend && pnpm dev|build
+cd backend && pnpm publish:exams[:dry] | pnpm publish:skill-labs[:dry]
 ```
-
----
 
 ## Infrastructure
 
-- **ECS Fargate** — backend container; task def at `backend/infra/ecs-task-def.json`
-- **S3** — exam JSON storage (`examapp-exams-*`), skill-lab definitions (`examapp-skill-labs-*`), frontend static hosting
-- **DynamoDB** — attempts, users, entitlements, exam index (`examapp-exams-index`), skill-lab index (`examapp-skill-labs-index`), skill-lab attempts (`examapp-skill-lab-attempts`)
-- **Cognito** — auth (JWT issued by Cognito user pool)
+- **ECS Fargate** — `backend/infra/ecs-task-def.json`
+- **S3** — exam JSON (`examapp-exams-*`), skill-labs (`examapp-skill-labs-*`), frontend static
+- **DynamoDB** — attempts, users, entitlements, exam index (`examapp-exams-index`), skill-lab index, skill-lab attempts (`examapp-skill-lab-attempts`)
+- **Cognito** — JWT auth; user pool in mgmt account (`eu-west-1_c6WQUP1RX`, ExamAppPool)
 - **CloudFront** — frontend CDN
-- **WAF** — IP allowlist managed via `backend/infra/waf-allowlist.sh`
-- **GoCardless** — Direct Debit payments via webhook in `backend/src/routes/gocardless.ts` (route prefix `/payments`)
-- **PayPal** — one-time (Orders API v2) and subscription (Billing Plans API) payments. Backend route: `backend/src/routes/paypal.ts` (prefix `/payments/paypal`). Session store: `backend/src/services/paypalSessions.ts` (uses `examapp-sessions` DynamoDB table, TTL 24h). Frontend component: `frontend/src/basket/PayPalCheckout.tsx` (lazy-loaded into BasketPage). Env vars: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `PAYPAL_API_BASE`, `PAYPAL_PLAN_ID_MONTHLY`, `PAYPAL_PLAN_ID_ANNUAL`, `SESSIONS_TABLE`. Frontend: `VITE_PAYPAL_CLIENT_ID`. Sandbox billing plans created: monthly `P-7S2032886L4467328NG5KSUI` (£10), annual `P-466167562P531510YNG5KSWI` (£96). Apple Pay wired but disabled (remove `applepay` from `components` string); enable when domain is registered with PayPal.
-- **SES** — production-approved (out of sandbox). Domain: `certshack.com`. Terraform module at `infra/terraform/modules/ses/main.tf` manages domain identity, DKIM CNAMEs, SES verification TXT, SPF TXT, and WorkMail MX record. Service: `backend/src/services/ses.ts`. Env vars: `SES_FROM_ADDRESS` (default `noreply@certshack.com`), `SES_SUPPORT_ADDRESS` (default `support@certshack.com`).
-- **WorkMail** — `support@certshack.com` receives issue reports. MX record points to `inbound-smtp.eu-west-1.amazonaws.com` (eu-west-1), managed in the SES Terraform module. WorkMail itself is configured manually in the AWS console (not Terraform).
-- **Report Issue** — paid-only feature (`tier === 'paying'`). Frontend modal: `frontend/src/components/ReportIssueModal.tsx`. Backend route: `POST /reports` in `backend/src/routes/reports.ts`. On submit: sends email via SES (`sendIssueReportEmail`) AND persists to DynamoDB (`putIssueReport`). Content types: `question`, `answer`, `explanation`, `lab`.
+- **WAF** — IP allowlist via `backend/infra/waf-allowlist.sh`
+- **GoCardless** — Direct Debit, `backend/src/routes/gocardless.ts`
+- **PayPal** — Orders + Subscriptions, `backend/src/routes/paypal.ts`. Session store: `examapp-sessions` (TTL 24h). Env: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `PAYPAL_API_BASE`, `PAYPAL_PLAN_ID_MONTHLY`, `PAYPAL_PLAN_ID_ANNUAL`, `SESSIONS_TABLE`, `VITE_PAYPAL_CLIENT_ID`
+- **SES** — production-approved, domain `certshack.com`. Env: `SES_FROM_ADDRESS`, `SES_SUPPORT_ADDRESS`. Terraform: `infra/terraform/modules/ses/`
+- **WorkMail** — `support@certshack.com`, MX → `inbound-smtp.eu-west-1.amazonaws.com` (eu-west-1). Manual setup in AWS console.
+- **Report Issue** — paid-only (`tier === 'paying'`). Frontend: `ReportIssueModal.tsx`. Backend: `POST /reports`. Saves to DynamoDB + sends SES email.
 
-Terraform state is remote (S3 backend defined in `infra/terraform/backend.tf`). Never run `terraform destroy` without explicit confirmation.
+Terraform state: S3 remote (`infra/terraform/backend.tf`). Never run `terraform destroy` without confirmation.
 
----
-
-### AWS Accounts and SSO Profiles
-
-Two AWS accounts are in use:
+### AWS Accounts / SSO Profiles
 
 | Profile | Account | Services |
 |---|---|---|
-| `certshack` | `809472479011` | ECS, DynamoDB, S3, CloudFront, WAF, ACM, SES (production identity + WorkMail), Route53 hosted zone (`certshack.com`) |
-| `mgmt` | `030461496359` | Cognito user pool (`ExamAppPool`, `eu-west-1_c6WQUP1RX`), SES domain identity (certshack.com — separate from prod) |
+| `certshack` | `809472479011` | ECS, DynamoDB, S3, CloudFront, WAF, ACM, SES, Route53 (`certshack.com`) |
+| `mgmt` | `030461496359` | Cognito (`ExamAppPool`, `eu-west-1_c6WQUP1RX`), SES domain identity |
 
-Switch between profiles using `aws-sso-login`:
 ```bash
-aws-sso-login certshack   # prod account
-aws-sso-login mgmt        # management account
+aws-sso-login certshack   # prod
+aws-sso-login mgmt        # management
 ```
-Always pass `--profile certshack` or `--profile mgmt` to AWS CLI commands accordingly.
 
-### Cognito is in the mgmt account
+Always pass `--profile certshack` or `--profile mgmt` to AWS CLI commands.
 
-The Cognito user pool (`eu-west-1_c6WQUP1RX`, ExamAppPool) lives in **account 030461496359 (mgmt)**, not the prod account. The prod account has no Cognito user pools.
+### Cognito is in mgmt account
 
-Any Cognito admin operations (e.g. `ListUsers`, `AdminGetUser`) must be performed by first assuming the cross-account role `arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role`. The ECS task role (`examapp-ecs-task-role` in prod) has `sts:AssumeRole` permission on that role, and the backend uses the `COGNITO_ADMIN_ROLE_ARN` env var to determine which role to assume before calling Cognito. If that env var is empty or missing, the backend calls Cognito directly with prod credentials and gets an access denied error.
-
-The cross-account role (`examapp-mgmt-cross-account-role` in mgmt account) must have Cognito permissions in its inline policy (`examapp-cognito-admin-policy`). Its trust policy must allow `sts:AssumeRole` from the prod account's ECS task role. Route53 is in the certshack (prod) account — not mgmt — so the cross-account role is Cognito-only.
+Cognito (`eu-west-1_c6WQUP1RX`) lives in mgmt (`030461496359`). Backend assumes cross-account role `arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role` via `COGNITO_ADMIN_ROLE_ARN` env var. Missing/empty var → access denied. The cross-account role's trust policy must allow `sts:AssumeRole` from the prod ECS task role.
 
 ### ECS Task Definition: GitHub Actions owns the deployed version
 
-Terraform creates the **initial** ECS task definition but the lifecycle is set to `ignore_changes = [task_definition]`. After the first deploy, the authoritative task definition is **`backend/infra/ecs-task-def.json`**, which GitHub Actions uses in the backend deploy workflow.
+Terraform creates the initial task def but `ignore_changes = [task_definition]` applies after first deploy. Authoritative source: `backend/infra/ecs-task-def.json` (deployed by GitHub Actions).
 
-- Terraform changes to the ECS task definition (env vars, image, secrets) will **not** take effect in production unless they are also reflected in `backend/infra/ecs-task-def.json` and a deployment is triggered.
-- When adding new env vars or secrets to the backend, update **both** `infra/terraform/modules/ecs/main.tf` (for infra consistency) **and** `backend/infra/ecs-task-def.json` (for actual deployed task).
-
----
+When adding env vars/secrets: update **both** `infra/terraform/modules/ecs/main.tf` and `backend/infra/ecs-task-def.json`.
 
 ## Conventions
 
-- Backend uses **ESM** (`"type": "module"`). Use `import`/`export`, not `require`.
-- No test framework is currently set up. Validate changes locally with `pnpm dev`.
-- Exam question IDs follow the pattern `{EXAM-CODE}-{NNNN}` (e.g. `SCS-C03-0042`). IDs are assigned at merge time by the exam-generator tooling in `../exam-generator/`.
-- New question content is generated in `../exam-generator/reviews/` and merged into `backend/data/exams/` before publishing.
-- The `sequence` field on a choice marks it as correct (single/multiple-choice) OR defines its position (ordering questions). Distractors never carry `sequence`.
+- Backend uses ESM (`"type": "module"`). Use `import`/`export`, not `require`.
+- No test framework. Validate with `pnpm dev`.
+- Question IDs: `{EXAM-CODE}-{NNNN}` (e.g. `SCS-C03-0042`). Assigned at merge time by `../exam-generator/`.
+- New questions generated in `../exam-generator/reviews/`, merged into `backend/data/exams/` before publishing.
+- `sequence` on a choice = correct answer (single/multiple-choice) OR position (ordering). Distractors never carry `sequence`.
 
----
+## Scope Guidance
 
-## Scope Guidance for Claude
-
-- **Frontend only**: work exclusively under `frontend/src/`
-- **Backend route change**: check `backend/src/routes/` + relevant `backend/src/services/`
-- **Auth/entitlements change**: `backend/src/plugins/` + `frontend/src/auth/` + `frontend/src/hooks/useEntitlements.ts`
+- **Frontend only**: `frontend/src/`
+- **Backend route**: `backend/src/routes/` + relevant `backend/src/services/`
+- **Auth/entitlements**: `backend/src/plugins/` + `frontend/src/auth/` + `frontend/src/hooks/useEntitlements.ts`
 - **Exam data/schema**: `backend/src/examLoader.ts` + `backend/src/services/examStore.ts`
-- **Infra change**: `infra/terraform/` — confirm before applying
-- **Question rendering** (new types like `matching`/`ordering`): `frontend/src/exam/QuestionCard.tsx` for in-exam rendering, `frontend/src/exam/ExamReview.tsx` for post-exam review
-- **Exam state/logic**: `frontend/src/exam/ExamContext.tsx` — central React Context with all state, effects, and handlers
-- **Exam UI components**: `frontend/src/exam/` — ExamApp (layout shell), ExamSetup, QuestionNav, QuestionCard, ExamReview, Modals, PracticeExams, AnalyticsView
-- **Skill Labs**: `frontend/src/skill-labs/` (pages + types) + `backend/src/routes/skillLabs.ts` + `backend/src/services/skillLabStore.ts` + `backend/src/services/skillLabAttemptsStore.ts` + `backend/data/skill-labs.json` (lab definitions). Supports three lab types: `diagnose` (React Flow diagram), `cli` (simulated AWS CLI terminal), `policy-fix` (Monaco Editor IAM policy repair). The runner page (`SkillLabRunnerPage`) dispatches to the correct component by `lab.type` using `React.lazy` + dynamic imports for code-splitting. Lab runner components live in `frontend/src/skill-labs/labs/` and share a common `LabHeader` component. Publishing mirrors the exam pipeline: `pnpm publish:skill-labs` uploads each lab to S3 and writes a summary index to DynamoDB. `SKILL_LAB_SOURCE=local|s3` toggles data source (same pattern as `EXAM_SOURCE`).
-- **Report Issue**: `frontend/src/components/ReportIssueModal.tsx` + `backend/src/routes/reports.ts` + `backend/src/services/ses.ts`. Paid-only (`tier === 'paying'`). SES env vars: `SES_FROM_ADDRESS`, `SES_SUPPORT_ADDRESS`. Terraform: `infra/terraform/modules/ses/`.
-- **Basket / Payments**: `frontend/src/basket/` (BasketContext + BasketPage + PayPalCheckout) + `backend/src/routes/gocardless.ts` + `backend/src/routes/paypal.ts` + `backend/src/catalog.ts`. The basket uses localStorage persistence (`certshack:basket`), smart upsell suggestions, and two checkout paths: GoCardless (Direct Debit) and PayPal (one-time + subscriptions). Pricing: single exams £9, bundles £17/£25, monthly sub £10, annual sub £96. The `PricingPage` "Add to Basket" buttons and `PracticeExams` cart icons both feed into the basket context.
+- **Infra**: `infra/terraform/` — confirm before applying
+- **Question rendering**: `frontend/src/exam/QuestionCard.tsx` (in-exam), `ExamReview.tsx` (post-exam)
+- **Exam state/logic**: `frontend/src/exam/ExamContext.tsx`
+- **Exam UI**: `frontend/src/exam/` — ExamApp, ExamSetup, QuestionNav, QuestionCard, ExamReview, Modals, PracticeExams, AnalyticsView
+- **Skill Labs**: `frontend/src/skill-labs/` + `backend/src/routes/skillLabs.ts` + `backend/src/services/skillLabStore.ts` + `skillLabAttemptsStore.ts` + `backend/data/skill-labs.json`. Types: `diagnose` (React Flow), `cli` (simulated terminal), `policy-fix` (Monaco Editor). Toggle source: `SKILL_LAB_SOURCE=local|s3`.
+- **Report Issue**: `ReportIssueModal.tsx` + `backend/src/routes/reports.ts` + `backend/src/services/ses.ts`. Paid-only.
+- **Basket/Payments**: `frontend/src/basket/` + `backend/src/routes/gocardless.ts` + `backend/src/routes/paypal.ts` + `backend/src/catalog.ts`. Pricing: exams £9, bundles £17/£25, monthly £10, annual £96.
