@@ -3,8 +3,9 @@
  * and checkout options: GoCardless (Direct Debit) and PayPal (+ Apple Pay).
  */
 
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Trash2, ShoppingCart, ArrowRight, Sparkles, X } from 'lucide-react'
+import { clarityEvent, clarityTag } from '../clarity'
 
 const PayPalCheckout = lazy(() => import('./PayPalCheckout'))
 import { useBasket } from './BasketContext'
@@ -22,6 +23,12 @@ export default function BasketPage() {
   const { products } = useEntitlements()
   const { user, login } = useAuth()
 
+  useEffect(() => {
+    clarityTag('funnel_stage', 'checkout')
+    clarityTag('basket_item_count', String(itemCount))
+    clarityEvent('checkout_page_viewed')
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleCheckout = () => {
     if (!user) {
       login()
@@ -36,6 +43,8 @@ export default function BasketPage() {
       return
     }
 
+    clarityEvent('checkout_initiated')
+    clarityTag('payment_method', 'gocardless')
     const productIds = items.map((i) => i.product.productId)
     if (productIds.length === 0) return
 
@@ -163,6 +172,8 @@ function SuggestionBanner({ suggestion, products }: { suggestion: { message: str
 
   const handleUpgrade = () => {
     if (!suggested) return
+    clarityEvent('basket_upgrade_accepted')
+    clarityTag('upgrade_to', suggested.productId)
     switchTo(suggested)
   }
 

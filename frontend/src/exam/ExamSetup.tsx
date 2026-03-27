@@ -1,6 +1,7 @@
 import { X, Coffee, Timer, Brain, Eye, Lock, ChevronDown } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { useTourContext } from '@/components/TourProvider'
+import { clarityEvent, clarityTag } from '@/clarity'
 
 export function ExamSetup() {
   const {
@@ -156,7 +157,7 @@ export function ExamSetup() {
             <div ref={(el) => tour.registerTarget('mode-buttons', el)} className="flex items-center gap-3 flex-wrap">
               <button
                 type="button"
-                onClick={() => { setExamMode('casual'); setTimed(false); setRevealAnswers('immediately') }}
+                onClick={() => { setExamMode('casual'); setTimed(false); setRevealAnswers('immediately'); clarityTag('exam_mode_selected', 'casual') }}
                 disabled={locked}
                 className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${examMode === 'casual' ? 'border-primary bg-primary/10' : 'border-transparent bg-transparent hover:bg-muted/20'} text-sm`}
                 aria-pressed={examMode === 'casual'}
@@ -169,7 +170,7 @@ export function ExamSetup() {
               <button
                 type="button"
                 onClick={() => {
-                  setExamMode('timed'); setTimed(true); setRevealAnswers('on-completion')
+                  setExamMode('timed'); setTimed(true); setRevealAnswers('on-completion'); clarityTag('exam_mode_selected', 'timed')
                   if (!selected) return
                   try { const meta = exams.find((e: any) => e.code === selected); if (typeof meta?.defaultDuration === 'number') setDurationMinutes(meta.defaultDuration) } catch {}
                 }}
@@ -184,7 +185,7 @@ export function ExamSetup() {
 
               <button
                 type="button"
-                onClick={() => { setExamMode('weakest-link'); setTimed(false); setRevealAnswers('immediately') }}
+                onClick={() => { setExamMode('weakest-link'); setTimed(false); setRevealAnswers('immediately'); clarityTag('exam_mode_selected', 'weakest-link') }}
                 disabled={locked || !user}
                 className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${examMode === 'weakest-link' ? 'border-primary bg-primary/10' : 'border-transparent bg-transparent hover:bg-muted/20'} text-sm ${!user ? 'opacity-40 cursor-not-allowed' : ''}`}
                 aria-pressed={examMode === 'weakest-link'}
@@ -444,7 +445,7 @@ export function ExamSetup() {
             className={`px-4 py-2 rounded-md text-white font-semibold transition-all ${
               examMode === 'weakest-link' ? 'bg-gradient-to-r bg-primary ' : 'bg-primary'
             } ${loadingWeakestLink ? 'opacity-70 cursor-wait' : ''}`}
-            onClick={() => createAttempt()}
+            onClick={() => { createAttempt(); clarityEvent('exam_start_clicked'); clarityTag('exam_code', selected ?? '') }}
             disabled={loadingWeakestLink}
           >
             {loadingWeakestLink ? 'Preparing…' : savedProgress ? 'Start new' : 'Start exam'}

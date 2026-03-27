@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react'
 import { apiUrl } from '../apiBase'
+import { clarityIdentify, clarityTag } from '../clarity'
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -471,6 +472,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateUserName = useCallback((name: string) => {
     setUser((prev) => prev ? { ...prev, name } : prev)
   }, [])
+
+  /* ---- Clarity: tag auth state whenever user changes ---- */
+  useEffect(() => {
+    if (user) {
+      clarityIdentify(user.sub)
+      clarityTag('auth_state', 'logged_in')
+    } else if (!loading) {
+      clarityTag('auth_state', 'anonymous')
+    }
+  }, [user, loading])
 
   return (
     <AuthContext.Provider value={{

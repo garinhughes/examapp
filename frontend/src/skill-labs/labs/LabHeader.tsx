@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useExam } from '@/exam/ExamContext'
 import { ArrowLeft, Heart, Flag, Star } from 'lucide-react'
+import { clarityEvent, clarityTag } from '@/clarity'
 import { getBookmarkedLabs, toggleBookmark } from './shared'
 import { ReportIssueModal } from '@/components/ReportIssueModal'
 import { RatingModal } from '@/feedback/RatingModal'
@@ -34,6 +35,8 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
     if (!labId) return
     const updated = toggleBookmark(labId)
     setIsBookmarked(updated.has(labId))
+    clarityEvent('lab_bookmarked')
+    clarityTag('lab_id', labId)
   }, [labId])
 
   const formatTime = (seconds: number) => {
@@ -64,7 +67,7 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
         <div className="shrink-0 flex items-center gap-2">
           {labId && canReport && (
             <button
-              onClick={() => setRating(true)}
+              onClick={() => { setRating(true); clarityEvent('lab_rated'); if (labId) clarityTag('lab_id', labId) }}
               className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground border border-border hover:border-primary/50 transition-colors"
               title="Rate this lab"
             >
@@ -82,7 +85,7 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
           )}
           {onCancelLab && !confirmCancel && (
             <button
-              onClick={() => setConfirmCancel(true)}
+              onClick={() => { setConfirmCancel(true); clarityEvent('lab_cancel_initiated'); if (labId) clarityTag('lab_id', labId) }}
               className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 transition-colors"
               title="Cancel lab and discard progress"
             >

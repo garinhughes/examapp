@@ -4,6 +4,7 @@
  */
 
 import { X, Clock, Coffee } from 'lucide-react'
+import { clarityEvent } from '@/clarity'
 
 interface LabCompleteModalProps {
   title: string
@@ -56,7 +57,7 @@ export function LabCompleteModal({ title, timeTaken, timed, onConfirm, onCancel 
 
         <div className="flex gap-3 pt-1">
           <button
-            onClick={onConfirm}
+            onClick={() => { clarityEvent('lab_completed'); onConfirm() }}
             className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition"
           >
             Submit

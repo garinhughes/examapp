@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useExam } from '@/exam/ExamContext'
 import { Play, Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight } from 'lucide-react'
+import { clarityEvent, clarityTag } from '@/clarity'
 import type { LabSummary, SkillLevel } from './types'
 import { apiUrl } from '@/apiBase'
 import { SearchableFilter } from './SearchableFilter'
@@ -55,6 +56,8 @@ export function SkillLabsPage() {
   const handleToggleBookmark = useCallback((labId: string) => {
     const updated = toggleBookmark(labId)
     setBookmarkedLabIds(updated)
+    clarityEvent('lab_bookmarked')
+    clarityTag('lab_id', labId)
   }, [])
 
   // Pagination
@@ -311,6 +314,9 @@ export function SkillLabsPage() {
               onClick={() => {
                 const savedTimed = inProgressLabs.get(resumable.id)?.timed
                 const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
+                clarityEvent('lab_resumed')
+                clarityTag('lab_id', resumable.id)
+                clarityTag('lab_mode', mode)
                 setRoute(`skill-lab:${resumable.id}:${mode}` as any)
               }}
               className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition"
@@ -396,6 +402,9 @@ export function SkillLabsPage() {
                       onClick={() => {
                         const savedTimed = inProgressLabs.get(lab.id)?.timed
                         const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
+                        clarityEvent(isInProgress ? 'lab_resumed' : 'lab_started')
+                        clarityTag('lab_id', lab.id)
+                        clarityTag('lab_mode', mode)
                         setRoute(`skill-lab:${lab.id}:${mode}` as any)
                       }}
                     >

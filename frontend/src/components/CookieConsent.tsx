@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { initClarity } from '@/clarity'
 
 type ConsentState = 'accepted' | 'declined' | null
 
@@ -17,6 +18,7 @@ export function CookieConsent() {
     localStorage.setItem('cookie_consent', 'accepted')
     setConsent('accepted')
     window.dispatchEvent(new Event('cookieConsent'))
+    initClarity()
   }
 
   function handleDecline() {

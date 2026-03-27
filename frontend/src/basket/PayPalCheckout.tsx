@@ -13,6 +13,7 @@ import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { useBasket } from './BasketContext'
 import { useAuth } from '../auth/AuthContext'
 import { apiUrl } from '../apiBase'
+import { clarityEvent, clarityTag } from '../clarity'
 
 const PAYPAL_CLIENT_ID = (import.meta as any).env?.VITE_PAYPAL_CLIENT_ID ?? ''
 
@@ -58,6 +59,8 @@ export default function PayPalCheckout() {
               login()
               throw new Error('Not authenticated')
             }
+            clarityEvent('checkout_initiated')
+            clarityTag('payment_method', 'paypal_subscription')
             const res = await fetch(apiUrl('/payments/paypal/create-subscription'), {
               method: 'POST',
               headers: authHeaders(),
@@ -75,11 +78,15 @@ export default function PayPalCheckout() {
             return data.subscriptionId
           }}
           onApprove={async () => {
+            clarityEvent('payment_success')
+            clarityTag('payment_method', 'paypal_subscription')
             // Subscription activation is confirmed via webhook; navigate immediately
             clear()
             window.location.href = window.location.origin + '/?payment=success'
           }}
           onError={(err) => {
+            clarityEvent('payment_error')
+            clarityTag('payment_method', 'paypal_subscription')
             console.error('[PayPal] subscription error', err)
             alert('PayPal error: ' + String(err))
           }}
@@ -92,6 +99,8 @@ export default function PayPalCheckout() {
               login()
               throw new Error('Not authenticated')
             }
+            clarityEvent('checkout_initiated')
+            clarityTag('payment_method', 'paypal_order')
             const res = await fetch(apiUrl('/payments/paypal/create-order'), {
               method: 'POST',
               headers: authHeaders(),
@@ -116,13 +125,19 @@ export default function PayPalCheckout() {
             })
             if (!res.ok) {
               const text = await res.text()
+              clarityEvent('payment_error')
+              clarityTag('payment_method', 'paypal_order')
               alert('Payment capture failed: ' + text)
               return
             }
+            clarityEvent('payment_success')
+            clarityTag('payment_method', 'paypal_order')
             clear()
             window.location.href = window.location.origin + '/?payment=success'
           }}
           onError={(err) => {
+            clarityEvent('payment_error')
+            clarityTag('payment_method', 'paypal_order')
             console.error('[PayPal] order error', err)
             alert('PayPal error: ' + String(err))
           }}

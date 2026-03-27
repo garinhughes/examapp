@@ -1,6 +1,7 @@
 import { Save, X, Play, Pause, Download, FileText, Info, BarChart3, BookOpen, Terminal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useRef, useEffect } from 'react'
+import { clarityEvent, clarityTag } from '@/clarity'
 import { Sidebar } from '@/components/Sidebar'
 import { TourProvider, useTourContext } from '@/components/TourProvider'
 import { TourBubble } from '@/components/TourBubble'
@@ -69,6 +70,28 @@ function ExamAppInner() {
     }
     prevRouteRef.current = route
   }, [route, tour.active, tour.step])
+
+  // Clarity: track exam lifecycle
+  useEffect(() => {
+    if (examStarted && selected) {
+      clarityEvent('exam_started')
+      clarityTag('exam_code', selected)
+      clarityTag('exam_mode', timed ? 'timed' : 'casual')
+    }
+  }, [examStarted]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (isFinished && selected) {
+      clarityEvent('exam_completed')
+      clarityTag('exam_code', selected)
+    }
+  }, [isFinished]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (paused) {
+      clarityEvent('exam_timer_paused')
+    }
+  }, [paused])
 
   return (
     <FeedbackProvider authFetch={authFetch} isAdmin={userIsAdmin}>
@@ -317,6 +340,7 @@ function ExamAppInner() {
                           onClick={() => {
                             setExamStarted(false)
                             showToast('Progress saved — resume any time', 'info')
+                            clarityEvent('exam_saved_for_later')
                           }}
                           title="Save progress and exit — resume later"
                         >
@@ -325,7 +349,7 @@ function ExamAppInner() {
                         </button>
                         <button
                           className="px-3 py-1 rounded-md bg-red-600 text-white text-sm inline-flex items-center gap-2 shadow-sm hover:bg-red-700 transition-colors whitespace-nowrap"
-                          onClick={() => setShowCancelConfirm(true)}
+                          onClick={() => { setShowCancelConfirm(true); clarityEvent('exam_cancel_initiated') }}
                         >
                           <X className="w-4 h-4" />
                           Cancel

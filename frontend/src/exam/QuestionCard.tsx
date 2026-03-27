@@ -1,6 +1,7 @@
 import { X, Check, ExternalLink, Lightbulb, Star } from 'lucide-react'
 import { useState } from 'react'
 import { RatingModal } from '@/feedback/RatingModal'
+import { clarityEvent } from '@/clarity'
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { useExam } from './ExamContext'
@@ -50,7 +51,7 @@ export function QuestionCard() {
                 <div className="mt-2 flex items-center justify-end gap-2">
                   {q.tip && (
                     <button
-                      onClick={() => setShowTipMap((s) => ({ ...s, [q.id]: !s[q.id] }))}
+                      onClick={() => { setShowTipMap((s) => ({ ...s, [q.id]: !s[q.id] })); if (!showTipMap[q.id]) clarityEvent('hint_revealed') }}
                       className="text-sm px-2 py-1 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center gap-1"
                       aria-label={showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
                     >
@@ -59,13 +60,15 @@ export function QuestionCard() {
                   )}
                   <button
                     onClick={() => {
+                      const wasFlagged = flaggedQuestions.has(q.id)
                       setFlaggedQuestions((prev) => {
                         const next = new Set(prev)
                         if (next.has(q.id)) next.delete(q.id)
                         else next.add(q.id)
                         return next
                       })
-                      if (!flaggedQuestions.has(q.id)) {
+                      if (!wasFlagged) {
+                        clarityEvent('question_flagged')
                         setCurrentQuestionIndex((idx) => Math.min(displayQuestions.length - 1, idx + 1))
                       }
                     }}
@@ -74,7 +77,7 @@ export function QuestionCard() {
                     🚩 {flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}
                   </button>
                   <button
-                    onClick={() => setRatingTarget(q.id)}
+                    onClick={() => { setRatingTarget(q.id); clarityEvent('question_rated') }}
                     className="text-sm px-2 py-1 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center gap-1"
                     aria-label="Rate this question"
                   >
@@ -333,6 +336,7 @@ export function QuestionCard() {
                 <button
                   className="px-4 py-2 rounded-md font-semibold text-sm bg-primary text-white hover:bg-primary/80 transition-colors"
                   onClick={async () => {
+                    clarityEvent('answer_submitted')
                     await submitAnswer(q, staged!)
                     setRevealedQuestions((prev) => new Set(prev).add(q.id))
                     setStagedAnswer((prev) => { const next = { ...prev }; delete next[q.id]; return next })

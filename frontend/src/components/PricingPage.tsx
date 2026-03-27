@@ -10,6 +10,7 @@ import { useEntitlements, type CatalogProduct } from '../hooks/useEntitlements'
 import { useAuthFetch } from '../auth/useAuthFetch'
 import { useBasket } from '../basket/BasketContext'
 import { Check, Sparkles, ChevronRight, RotateCcw, Zap, Award, ChevronDown, ShoppingCart } from 'lucide-react'
+import { clarityEvent, clarityTag } from '../clarity'
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -204,6 +205,10 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
     }
   }, [step, pickedExams, examCount, wantLabs, products, examProducts])
 
+  useEffect(() => {
+    if (step !== 'start') clarityEvent(`wizard_step_${step}`)
+  }, [step])
+
   function reset() {
     setStep('start')
     setWantLabs(false)
@@ -384,6 +389,12 @@ export default function PricingPage() {
   const basket = useBasket()
   const [actionError, setActionError] = useState<string | null>(null)
 
+  // Tag this session as having visited pricing
+  useEffect(() => {
+    clarityTag('funnel_stage', 'pricing')
+    clarityEvent('pricing_page_viewed')
+  }, [])
+
   // Load available exam codes from the server and use them to defensively
   // filter any exam products that don't have a backing JSON file.
   const [availableExamCodes, setAvailableExamCodes] = useState<Set<string> | null>(null)
@@ -404,6 +415,9 @@ export default function PricingPage() {
   }, [authFetch])
 
   const handleBuy = (product: CatalogProduct) => {
+    clarityEvent('add_to_basket')
+    clarityTag('product_added', `${product.kind}:${product.productId}`)
+    clarityTag('funnel_stage', 'add_to_basket')
     const ok = basket.add(product)
     if (!ok) setActionError(basket.lastError)
   }
