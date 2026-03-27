@@ -86,12 +86,16 @@ function UserRow({
   authFetch,
   onReload,
   onError,
+  selected,
+  onToggleSelect,
 }: {
   user: UserRecord
   products: Product[]
   authFetch: ReturnType<typeof useAuthFetch>
   onReload: () => void
   onError: (msg: string) => void
+  selected: boolean
+  onToggleSelect: (userId: string) => void
 }) {
   const [expanded, setExpanded] = useState(false)
   const [entitlements, setEntitlements] = useState<Entitlement[]>([])
@@ -184,6 +188,14 @@ function UserRow({
         className={`border-t border-border/60 dark:border-border/60 cursor-pointer hover:bg-muted/50 dark:hover:bg-card/40 transition-colors ${expanded ? 'bg-muted/50/80 dark:bg-card/30' : ''}`}
         onClick={() => setExpanded(!expanded)}
       >
+        <td className="p-2.5 w-8" onClick={(e) => e.stopPropagation()}>
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => onToggleSelect(user.userId)}
+            className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
+          />
+        </td>
         <td className="p-2.5">
           <div className="flex items-center gap-2">
             <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${user.isActive !== false ? 'bg-emerald-500' : 'bg-red-500'}`} title={user.isActive !== false ? 'Active' : 'Deactivated'} />
@@ -215,7 +227,7 @@ function UserRow({
       {/* Expanded detail */}
       {expanded && (
         <tr>
-          <td colSpan={5} className="p-0">
+          <td colSpan={6} className="p-0">
             <div className="px-4 py-3 bg-muted/50/50 dark:bg-card/20 border-b border-border/60 dark:border-border/60 space-y-4">
               {/* User info & quick actions */}
               <div className="flex flex-wrap items-center gap-2">
@@ -371,6 +383,255 @@ function UserRow({
         </tr>
       )}
     </>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Sub-component: Bulk Grant Modal                                    */
+/* ------------------------------------------------------------------ */
+
+function BulkGrantModal({
+  userIds,
+  products,
+  authFetch,
+  onClose,
+  onDone,
+}: {
+  userIds: string[]
+  products: Product[]
+  authFetch: ReturnType<typeof useAuthFetch>
+  onClose: () => void
+  onDone: () => void
+}) {
+  const [productId, setProductId] = useState('')
+  const defaultExpiry = new Date(Date.now() + 30 * 86400 * 1000).toISOString().slice(0, 10)
+  const [expiryDate, setExpiryDate] = useState(defaultExpiry)
+  const [busy, setBusy] = useState(false)
+  const [result, setResult] = useState<{ granted: number; skipped: number; errors: string[] } | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+
+  async function submit() {
+    if (!productId || !expiryDate) return
+    setBusy(true)
+    setErr(null)
+    try {
+      const res = await authFetch('/admin/bulk-entitlements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'grant',
+          userIds,
+          productId,
+          expiresAt: new Date(expiryDate).toISOString(),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Grant failed')
+      setResult(data)
+    } catch (e: any) {
+      setErr(e.message || 'Grant failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="bg-card rounded-xl border border-border shadow-xl max-w-md w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+        <h3 className="font-semibold text-base">Grant Promo Access</h3>
+        <p className="text-xs text-muted-foreground">
+          Grant a time-limited entitlement to {userIds.length} selected user{userIds.length !== 1 ? 's' : ''}.
+          Users who already have the product will be skipped.
+        </p>
+
+        {!result ? (
+          <>
+            <div className="space-y-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-muted-foreground">Product</label>
+                <select
+                  value={productId}
+                  onChange={(e) => setProductId(e.target.value)}
+                  className="px-2 py-1.5 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                >
+                  <option value="">Select product…</option>
+                  {products.filter((p) => p.available !== false).map((p) => (
+                    <option key={p.productId} value={p.productId}>
+                      {p.label} ({p.kind})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-muted-foreground">Access expires on</label>
+                <input
+                  type="date"
+                  value={expiryDate}
+                  onChange={(e) => setExpiryDate(e.target.value)}
+                  min={new Date().toISOString().slice(0, 10)}
+                  className="px-2 py-1.5 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+              </div>
+            </div>
+
+            {err && (
+              <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
+                {err}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <button onClick={onClose} className="px-3 py-1.5 rounded-lg bg-accent text-sm text-muted-foreground">
+                Cancel
+              </button>
+              <button
+                onClick={submit}
+                disabled={!productId || !expiryDate || busy}
+                className="px-4 py-1.5 rounded-lg bg-emerald-500 text-white text-sm font-semibold disabled:opacity-40 hover:bg-emerald-400 transition-colors"
+              >
+                {busy ? 'Granting…' : `Grant to ${userIds.length} user${userIds.length !== 1 ? 's' : ''}`}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-800 dark:text-emerald-300">
+              Done — {result.granted} granted, {result.skipped} skipped (already had access).
+              {result.errors.length > 0 && (
+                <div className="mt-1 text-red-600 dark:text-red-400">
+                  {result.errors.length} error{result.errors.length !== 1 ? 's' : ''}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end">
+              <button onClick={onDone} className="px-4 py-1.5 rounded-lg bg-primary text-white text-sm font-semibold">
+                Done
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Sub-component: Bulk Revoke Modal                                   */
+/* ------------------------------------------------------------------ */
+
+function BulkRevokeModal({
+  userIds,
+  products,
+  authFetch,
+  onClose,
+  onDone,
+}: {
+  userIds: string[]
+  products: Product[]
+  authFetch: ReturnType<typeof useAuthFetch>
+  onClose: () => void
+  onDone: () => void
+}) {
+  const [productId, setProductId] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [result, setResult] = useState<{ granted: number; skipped: number; errors: string[] } | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+  const [confirm, setConfirm] = useState(false)
+
+  async function submit() {
+    if (!productId) return
+    setBusy(true)
+    setErr(null)
+    try {
+      const res = await authFetch('/admin/bulk-entitlements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'revoke', userIds, productId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Revoke failed')
+      setResult(data)
+    } catch (e: any) {
+      setErr(e.message || 'Revoke failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="bg-card rounded-xl border border-border shadow-xl max-w-md w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+        <h3 className="font-semibold text-base">Revoke Access</h3>
+        <p className="text-xs text-muted-foreground">
+          Revoke a product entitlement from {userIds.length} selected user{userIds.length !== 1 ? 's' : ''}.
+        </p>
+
+        {!result ? (
+          <>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-muted-foreground">Product to revoke</label>
+              <select
+                value={productId}
+                onChange={(e) => { setProductId(e.target.value); setConfirm(false) }}
+                className="px-2 py-1.5 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              >
+                <option value="">Select product…</option>
+                {products.map((p) => (
+                  <option key={p.productId} value={p.productId}>
+                    {p.label} ({p.kind})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {err && (
+              <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
+                {err}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <button onClick={onClose} className="px-3 py-1.5 rounded-lg bg-accent text-sm text-muted-foreground">
+                Cancel
+              </button>
+              {!confirm ? (
+                <button
+                  onClick={() => setConfirm(true)}
+                  disabled={!productId}
+                  className="px-4 py-1.5 rounded-lg bg-red-500 text-white text-sm font-semibold disabled:opacity-40 hover:bg-red-400 transition-colors"
+                >
+                  Revoke…
+                </button>
+              ) : (
+                <button
+                  onClick={submit}
+                  disabled={busy}
+                  className="px-4 py-1.5 rounded-lg bg-red-500 text-white text-sm font-semibold disabled:opacity-40 hover:bg-red-400 transition-colors"
+                >
+                  {busy ? 'Revoking…' : `Confirm revoke from ${userIds.length} user${userIds.length !== 1 ? 's' : ''}`}
+                </button>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-800 dark:text-emerald-300">
+              Done — {result.granted} revoked.
+              {result.errors.length > 0 && (
+                <div className="mt-1 text-red-600 dark:text-red-400">
+                  {result.errors.length} error{result.errors.length !== 1 ? 's' : ''}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end">
+              <button onClick={onDone} className="px-4 py-1.5 rounded-lg bg-primary text-white text-sm font-semibold">
+                Done
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -805,6 +1066,28 @@ export default function AdminPanel() {
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'inactive'>('all')
   const [sortBy, setSortBy] = useState<'name' | 'email' | 'lastLogin'>('lastLogin')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set())
+  const [promoStats, setPromoStats] = useState<{ count: number; limit: number } | null>(null)
+  const [showGrantModal, setShowGrantModal] = useState(false)
+  const [showRevokeModal, setShowRevokeModal] = useState(false)
+
+  const loadPromoStats = useCallback(async () => {
+    try {
+      const res = await authFetch('/admin/promo-stats')
+      if (res.ok) setPromoStats(await res.json())
+    } catch { /* non-critical */ }
+  }, [authFetch])
+
+  useEffect(() => { loadPromoStats() }, [loadPromoStats])
+
+  function toggleSelect(userId: string) {
+    setSelectedUserIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(userId)) next.delete(userId)
+      else next.add(userId)
+      return next
+    })
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -856,6 +1139,14 @@ export default function AdminPanel() {
       return sortDir === 'asc' ? cmp : -cmp
     })
 
+  function toggleSelectAll() {
+    if (selectedUserIds.size === filtered.length && filtered.length > 0) {
+      setSelectedUserIds(new Set())
+    } else {
+      setSelectedUserIds(new Set(filtered.map((u) => u.userId)))
+    }
+  }
+
   function toggleSort(col: typeof sortBy) {
     if (sortBy === col) setSortDir((d) => d === 'asc' ? 'desc' : 'asc')
     else { setSortBy(col); setSortDir('asc') }
@@ -868,11 +1159,16 @@ export default function AdminPanel() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="flex items-center gap-3 flex-wrap">
           <p className="text-xs text-muted-foreground mt-0.5">
             {users.length} user{users.length !== 1 ? 's' : ''} registered
             {filtered.length !== users.length && ` · ${filtered.length} shown`}
           </p>
+          {promoStats && (
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${promoStats.count >= promoStats.limit ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'bg-primary/10 text-primary'}`}>
+              Promo slots: {promoStats.count} / {promoStats.limit} used
+            </span>
+          )}
         </div>
         <button
           onClick={load}
@@ -924,12 +1220,48 @@ export default function AdminPanel() {
         </div>
       </div>
 
+      {/* Bulk action bar */}
+      {selectedUserIds.size > 0 && (
+        <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-sm">
+          <span className="font-medium text-primary">
+            {selectedUserIds.size} user{selectedUserIds.size !== 1 ? 's' : ''} selected
+          </span>
+          <div className="flex-1" />
+          <button
+            onClick={() => setShowGrantModal(true)}
+            className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-400 transition-colors"
+          >
+            Grant access
+          </button>
+          <button
+            onClick={() => setShowRevokeModal(true)}
+            className="px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-semibold hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+          >
+            Revoke access
+          </button>
+          <button
+            onClick={() => setSelectedUserIds(new Set())}
+            className="px-2 py-1.5 rounded-lg bg-accent text-xs text-muted-foreground hover:bg-accent/80 transition-colors"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       <div className="rounded-lg border border-border overflow-hidden">
         <div className="overflow-auto max-h-[65vh]">
           <table className="w-full table-auto text-sm">
             <thead className="bg-muted sticky top-0 z-10">
               <tr className="text-left text-xs text-muted-foreground uppercase tracking-wider">
+                <th className="p-2.5 w-8">
+                  <input
+                    type="checkbox"
+                    checked={filtered.length > 0 && selectedUserIds.size === filtered.length}
+                    onChange={toggleSelectAll}
+                    className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
+                  />
+                </th>
                 <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('name')}>
                   User{sortIcon('name')}
                 </th>
@@ -946,7 +1278,7 @@ export default function AdminPanel() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-6 text-center text-muted-foreground">
+                  <td colSpan={6} className="p-6 text-center text-muted-foreground">
                     {loading ? 'Loading…' : search ? 'No users match your search.' : 'No users found.'}
                   </td>
                 </tr>
@@ -959,6 +1291,8 @@ export default function AdminPanel() {
                     authFetch={authFetch}
                     onReload={load}
                     onError={(msg) => setError(msg)}
+                    selected={selectedUserIds.has(u.userId)}
+                    onToggleSelect={toggleSelect}
                   />
                 ))
               )}
@@ -966,6 +1300,25 @@ export default function AdminPanel() {
           </table>
         </div>
       </div>
+
+      {showGrantModal && (
+        <BulkGrantModal
+          userIds={[...selectedUserIds]}
+          products={products}
+          authFetch={authFetch}
+          onClose={() => setShowGrantModal(false)}
+          onDone={() => { setShowGrantModal(false); setSelectedUserIds(new Set()); loadPromoStats() }}
+        />
+      )}
+      {showRevokeModal && (
+        <BulkRevokeModal
+          userIds={[...selectedUserIds]}
+          products={products}
+          authFetch={authFetch}
+          onClose={() => setShowRevokeModal(false)}
+          onDone={() => { setShowRevokeModal(false); setSelectedUserIds(new Set()); loadPromoStats() }}
+        />
+      )}
     </div>
   )
 }

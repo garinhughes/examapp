@@ -4,7 +4,7 @@ import {
   listAllRatings, countNewRatings,
   createPoll, getPollDef, listPollDefs, listPollVotes, updatePollDef, deletePollDef, deactivateAllPolls, countNewPollVotes,
 } from '../services/interactions.js'
-import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement, findUsersWithActiveEntitlement } from '../services/entitlements.js'
+import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement, findUsersWithActiveEntitlement, countPromoGrants } from '../services/entitlements.js'
 import { PRODUCTS } from '../catalog.js'
 import { loadAllExams } from '../examLoader.js'
 import { listCognitoUsers, getCognitoUser, deleteCognitoUser, resendUserConfirmation } from '../services/cognitoAdmin.js'
@@ -126,6 +126,70 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       request.log?.error?.('admin grant entitlement failed', err)
       return reply.code(500).send({ message: 'grant failed' })
     }
+  })
+
+  /** Bulk grant or revoke an entitlement for multiple users (promo tool) */
+  server.post('/bulk-entitlements', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const body = request.body as any
+    const { action, userIds, productId, expiresAt } = body ?? {}
+
+    if (action !== 'grant' && action !== 'revoke') {
+      return reply.code(400).send({ message: 'action must be "grant" or "revoke"' })
+    }
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      return reply.code(400).send({ message: 'userIds must be a non-empty array' })
+    }
+    if (!productId || typeof productId !== 'string') {
+      return reply.code(400).send({ message: 'productId is required' })
+    }
+    if (action === 'grant' && (!expiresAt || typeof expiresAt !== 'string')) {
+      return reply.code(400).send({ message: 'expiresAt is required for grant' })
+    }
+
+    const product = PRODUCTS.find((p) => p.productId === productId)
+    if (!product) {
+      return reply.code(400).send({ message: `Unknown product: ${productId}` })
+    }
+
+    let granted = 0
+    let skipped = 0
+    const errors: string[] = []
+
+    for (const userId of userIds) {
+      try {
+        if (action === 'grant') {
+          const existing = await getUserEntitlements(userId)
+          const alreadyHas = existing.some((e) => e.productId === productId)
+          if (alreadyHas) {
+            skipped++
+            continue
+          }
+          await adminGrantEntitlement(userId, productId, product.kind, expiresAt, { promoGrant: true })
+          granted++
+        } else {
+          await revokeEntitlement(userId, productId)
+          granted++ // reuse "granted" as "affected" count for revoke
+        }
+      } catch (err: any) {
+        errors.push(`${userId}: ${err.message ?? 'unknown error'}`)
+      }
+    }
+
+    await recordAdminAudit((request.user as any).sub, null, `bulk_${action}_entitlements`, {
+      productId,
+      expiresAt: expiresAt ?? null,
+      granted,
+      skipped,
+      userCount: userIds.length,
+    })
+
+    return { granted, skipped, errors }
+  })
+
+  /** Get count of active promo grant slots used */
+  server.get('/promo-stats', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (_request, _reply) => {
+    const count = await countPromoGrants()
+    return { count, limit: 30 }
   })
 
   /** Bulk migrate entitlements from one exam product to another */

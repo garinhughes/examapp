@@ -136,7 +136,40 @@ export async function findUsersWithActiveEntitlement(productId: string): Promise
 export async function adminGrantEntitlement(
   userId: string,
   productId: string,
-  kind: string
+  kind: string,
+  expiresAt?: string | null,
+  extraMeta?: Record<string, any>
 ): Promise<Entitlement> {
-  return grantEntitlement({ userId, productId, kind, meta: { grantedByAdmin: true } })
+  return grantEntitlement({
+    userId,
+    productId,
+    kind,
+    expiresAt,
+    meta: { grantedByAdmin: true, ...extraMeta },
+  })
+}
+
+/** Count distinct users with an active promo grant (meta.promoGrant = true) */
+export async function countPromoGrants(): Promise<number> {
+  const userIds = new Set<string>()
+  let lastKey: Record<string, any> | undefined = undefined
+
+  do {
+    const res = await ddb.send(
+      new ScanCommand({
+        TableName: ENTITLEMENTS_TABLE,
+        FilterExpression: '#st = :active AND meta.promoGrant = :t',
+        ExpressionAttributeNames: { '#st': 'status' },
+        ExpressionAttributeValues: { ':active': 'active', ':t': true },
+        ProjectionExpression: 'userId',
+        ExclusiveStartKey: lastKey,
+      })
+    )
+    for (const item of res.Items ?? []) {
+      if (item.userId) userIds.add(item.userId as string)
+    }
+    lastKey = res.LastEvaluatedKey as Record<string, any> | undefined
+  } while (lastKey)
+
+  return userIds.size
 }
