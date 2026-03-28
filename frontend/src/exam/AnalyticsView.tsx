@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Download, Trash2 } from 'lucide-react'
+import { Download, Trash2, ChevronDown, ChevronRight, Search } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
 import { ScoreHistoryChart } from './ScoreHistoryChart'
@@ -11,9 +11,26 @@ export function AnalyticsView() {
     gamState, fetchScoreHistory, downloadAnalyticsCSV, setupExamFromMeta,
     setRoute, authFetch, setAttemptData, setSelected, questions, setQuestions,
     attemptId, setAttemptId, showToast, setExamStarted, userTier,
+    examStarted, anySavedExam, savedProgress,
   } = useExam()
 
   const passMark = typeof selectedMeta?.passMark === 'number' ? selectedMeta.passMark : 70
+
+  const [collapsedProviders, setCollapsedProviders] = useState<Set<string>>(new Set())
+  const [searchQuery, setSearchQuery] = useState('')
+
+  function toggleProvider(name: string) {
+    setCollapsedProviders(prev => {
+      const next = new Set(prev)
+      if (next.has(name)) next.delete(name)
+      else next.add(name)
+      return next
+    })
+  }
+
+  function allCollapsed() {
+    return providers.length > 0 && providers.every((p: any) => collapsedProviders.has(p.provider))
+  }
 
   // Previous version analytics state
   const [showPrev, setShowPrev] = useState(false)
@@ -89,16 +106,24 @@ export function AnalyticsView() {
                 CSV
               </button>
               )}
-              <button
-                className="px-3 py-1 rounded bg-primary text-white text-sm"
-                onClick={() => {
-                  const meta = selectedMeta || exams.find((e) => String(e.code).toLowerCase() === String(selected).toLowerCase())
-                  if (meta) setupExamFromMeta(meta)
-                  else setRoute('home')
-                }}
-              >
-                Setup Exam
-              </button>
+              {(() => {
+                const blocked = !!(examStarted || anySavedExam || (selected && savedProgress))
+                return (
+                  <button
+                    className="px-3 py-1 rounded bg-primary text-white text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                    disabled={blocked}
+                    title={blocked ? 'Complete or cancel your current exam first' : undefined}
+                    onClick={() => {
+                      if (blocked) return
+                      const meta = selectedMeta || exams.find((e) => String(e.code).toLowerCase() === String(selected).toLowerCase())
+                      if (meta) setupExamFromMeta(meta)
+                      else setRoute('home')
+                    }}
+                  >
+                    Setup Exam
+                  </button>
+                )
+              })()}
             </>
           )}
         </div>
@@ -106,31 +131,79 @@ export function AnalyticsView() {
 
       {!selected && providers.length > 0 && (
         <div className="mt-4 space-y-4">
-          {providers.map((p) => (
-            <div key={p.provider}>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">{p.provider}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {p.exams.map((ex: any) => (
-                  <button
-                    key={ex.code}
-                    className="p-4 pb-10 rounded-lg border border-border bg-card text-card-foreground shadow-sm text-left hover:border-primary transition-colors relative h-full flex flex-col items-start"
-                    onClick={() => {
-                      setSelected(ex.code)
-                      void fetchScoreHistory(ex.code)
-                    }}
-                  >
-                    <div className="font-medium text-sm">{ex.title ?? ex.code}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{ex.code}</div>
-                    {ex.logo && (
-                      <div className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-background rounded-full p-1 shadow-sm" aria-hidden>
-                        <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search by title or code…"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+          <div className="flex items-center justify-end -mt-2">
+            <button
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => {
+                if (allCollapsed()) setCollapsedProviders(new Set())
+                else setCollapsedProviders(new Set(providers.map((p: any) => p.provider)))
+              }}
+            >
+              {allCollapsed() ? 'Show all' : 'Hide all'}
+            </button>
+          </div>
+          {providers.map((p: any) => {
+            const q = searchQuery.toLowerCase()
+            const filteredExams = q
+              ? p.exams.filter((ex: any) => (ex.title ?? '').toLowerCase().includes(q) || ex.code.toLowerCase().includes(q))
+              : p.exams
+            if (filteredExams.length === 0) return null
+            const collapsed = !q && collapsedProviders.has(p.provider)
+            return (
+              <div key={p.provider}>
+                <button
+                  className="flex items-center gap-1 font-semibold mb-2 hover:text-primary transition-colors w-full text-left"
+                  onClick={() => toggleProvider(p.provider)}
+                  aria-expanded={!collapsed}
+                >
+                  {collapsed ? <ChevronRight className="w-4 h-4 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 flex-shrink-0" />}
+                  {p.provider}
+                </button>
+                {!collapsed && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {filteredExams.map((ex: any) => (
+                      <div
+                        key={ex.code}
+                        className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm relative flex flex-col cursor-pointer hover:border-primary transition-colors"
+                        onClick={() => {
+                          setSelected(ex.code)
+                          void fetchScoreHistory(ex.code)
+                        }}
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium">{ex.title ?? ex.code}</div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-muted-foreground">{ex.code}</span>
+                          </div>
+                        </div>
+                        {ex.logo && (
+                          ex.logoHref ? (
+                            <a href={ex.logoHref} title="Amazon.com Inc., Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>, via Wikimedia Commons" target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-background rounded-full p-1 shadow-sm" aria-label={`${ex.provider ?? 'Provider'} logo link`} onClick={e => e.stopPropagation()}>
+                              <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
+                            </a>
+                          ) : (
+                            <div className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-background rounded-full p-1 shadow-sm" aria-hidden>
+                              <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
+                            </div>
+                          )
+                        )}
                       </div>
-                    )}
-                  </button>
-                ))}
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

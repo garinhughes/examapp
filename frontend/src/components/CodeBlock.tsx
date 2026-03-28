@@ -1,10 +1,23 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
 import Highlight, { defaultProps, Language } from 'prism-react-renderer'
-import theme from 'prism-react-renderer/themes/dracula'
+import darkTheme from 'prism-react-renderer/themes/dracula'
+import lightTheme from 'prism-react-renderer/themes/vsLight'
+
+function useDark() {
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const obs = new MutationObserver(() => setDark(document.documentElement.classList.contains('dark')))
+    obs.observe(document.documentElement, { attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+  return dark
+}
 
 type Props = { code: string; language?: string; inline?: boolean }
 
 export default function CodeBlock({ code, language = 'bash', inline = false }: Props) {
+  const dark = useDark()
+
   if (inline) {
     return <code className="font-mono text-sm bg-card px-1 py-0.5 rounded">{code}</code>
   }
@@ -12,15 +25,15 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   if (language === 'bash' || language === 'sh' || language === 'shell') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full" style={{ backgroundColor: '#282a36', color: '#f8f8f2' }}>
+      <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full" style={{ backgroundColor: 'var(--code-block-bg)', color: 'var(--code-block-fg)' }}>
         {lines.map((ln, i) => (
           <div key={i} className="leading-6">
             {ln.split(/(\s+)/).map((tok, j) => {
               if (/^\s+$/.test(tok)) return <span key={j}>{tok}</span>
-              if (/^--[A-Za-z0-9\-_=]+/.test(tok)) return <span key={j} style={{ color: '#8be9fd' }}>{tok}</span>
-              if (/^-[A-Za-z0-9]+/.test(tok)) return <span key={j} style={{ color: '#ffb86c' }}>{tok}</span>
-              if (/^aws$/.test(tok)) return <span key={j} style={{ color: '#50fa7b' }}>{tok}</span>
-              if (/^[a-z0-9_\-]+\/[a-z0-9_\-]+/.test(tok)) return <span key={j} style={{ color: '#8be9fd' }}>{tok}</span>
+              if (/^--[A-Za-z0-9\-_=]+/.test(tok)) return <span key={j} style={{ color: 'var(--code-token-flag-long)' }}>{tok}</span>
+              if (/^-[A-Za-z0-9]+/.test(tok)) return <span key={j} style={{ color: 'var(--code-token-flag-short)' }}>{tok}</span>
+              if (/^aws$/.test(tok)) return <span key={j} style={{ color: 'var(--code-token-keyword)' }}>{tok}</span>
+              if (/^[a-z0-9_\-]+\/[a-z0-9_\-]+/.test(tok)) return <span key={j} style={{ color: 'var(--code-token-path)' }}>{tok}</span>
               return <span key={j} style={{ color: 'inherit' }}>{tok}</span>
             })}
           </div>
@@ -33,29 +46,29 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   if (language === 'yaml' || language === 'yml') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full" style={{ backgroundColor: '#282a36', color: '#f8f8f2' }}>
+      <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full" style={{ backgroundColor: 'var(--code-block-bg)', color: 'var(--code-block-fg)' }}>
         {lines.map((ln, i) => {
           // Comment lines
           if (/^\s*#/.test(ln)) {
-            return <div key={i} className="leading-6" style={{ color: '#6272a4' }}>{ln}</div>
+            return <div key={i} className="leading-6" style={{ color: 'var(--code-yaml-comment)' }}>{ln}</div>
           }
           // Key: value lines
           const m = ln.match(/^(\s*)([\w.\-/]+)(:)(.*)$/)
           if (m) {
             const [, indent, key, colon, rest] = m
             // Colour booleans, numbers, and special keywords in the value
-            let valStyle: React.CSSProperties = { color: '#f1fa8c' }
+            let valColor = 'var(--code-yaml-value)'
             const trimmed = rest.trim()
-            if (/^(true|false|yes|no|on|off|null|~)$/i.test(trimmed)) valStyle = { color: '#bd93f9' }
-            else if (/^-?\d+(\.\d+)?$/.test(trimmed)) valStyle = { color: '#bd93f9' }
-            else if (/^['"]/.test(trimmed)) valStyle = { color: '#f1fa8c' }
-            else if (trimmed.startsWith('!')) valStyle = { color: '#ff79c6' }
+            if (/^(true|false|yes|no|on|off|null|~)$/i.test(trimmed)) valColor = 'var(--code-yaml-bool)'
+            else if (/^-?\d+(\.\d+)?$/.test(trimmed)) valColor = 'var(--code-yaml-bool)'
+            else if (/^['"]/.test(trimmed)) valColor = 'var(--code-yaml-value)'
+            else if (trimmed.startsWith('!')) valColor = 'var(--code-yaml-list)'
             return (
               <div key={i} className="leading-6">
                 <span style={{ color: 'inherit' }}>{indent}</span>
-                <span style={{ color: '#8be9fd' }}>{key}</span>
+                <span style={{ color: 'var(--code-yaml-key)' }}>{key}</span>
                 <span style={{ color: 'inherit' }}>{colon}</span>
-                <span style={valStyle}>{rest}</span>
+                <span style={{ color: valColor }}>{rest}</span>
               </div>
             )
           }
@@ -66,9 +79,9 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
             return (
               <div key={i} className="leading-6">
                 <span style={{ color: 'inherit' }}>{indent}</span>
-                <span style={{ color: '#ff79c6' }}>{dash}</span>
+                <span style={{ color: 'var(--code-yaml-list)' }}>{dash}</span>
                 <span style={{ color: 'inherit' }}>{space}</span>
-                <span style={{ color: '#f1fa8c' }}>{val}</span>
+                <span style={{ color: 'var(--code-yaml-value)' }}>{val}</span>
               </div>
             )
           }
@@ -79,7 +92,7 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   }
 
   return (
-    <Highlight {...defaultProps} code={code} language={language as Language} theme={theme}>
+    <Highlight {...defaultProps} code={code} language={language as Language} theme={dark ? darkTheme : lightTheme}>
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
         <pre className={`${className} p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full`} style={{ ...style }}>
           {tokens.map((line, i) => (

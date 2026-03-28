@@ -55,7 +55,7 @@ function ExamAppInner() {
     anySavedExam, savedProgress, lastError, setLastError,
     selectedAnswers, flaggedQuestions,
     user, login, logout, gamState, gamLevel,
-    authFetch, showToast, resumeExam, setupExamFromMeta,
+    authFetch, showToast, resumeExam, setupExamFromMeta, saveExamProgress,
     downloadAttemptCSV, downloadAttemptPDF, userTier,
     setShowCancelConfirm, isAdmin,
   } = useExam()
@@ -106,6 +106,10 @@ function ExamAppInner() {
       <Sidebar
         currentRoute={route}
         onNavigate={(key) => {
+          if (examStarted && !isFinished && selected && key !== 'home') {
+            saveExamProgress()
+            setExamStarted(false)
+          }
           setRoute(key as any)
           if (key === 'home') { setSelected(null); setExamStarted(false); setAttemptData(null); setShowAttempts(false); setAttemptsList(null) }
         }}
@@ -338,8 +342,9 @@ function ExamAppInner() {
                         <button
                           className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition-colors whitespace-nowrap"
                           onClick={() => {
+                            saveExamProgress()
                             setExamStarted(false)
-                            showToast('Progress saved — resume any time', 'info')
+                            setRoute('practice')
                             clarityEvent('exam_saved_for_later')
                           }}
                           title="Save progress and exit — resume later"

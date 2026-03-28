@@ -80,6 +80,7 @@ export interface ExamContextType {
   setShowCompleteEarlyConfirm: React.Dispatch<React.SetStateAction<boolean>>
   showCancelConfirm: boolean
   setShowCancelConfirm: React.Dispatch<React.SetStateAction<boolean>>
+  setSavedExamVersion: React.Dispatch<React.SetStateAction<number>>
   showTipMap: Record<string, boolean>
   setShowTipMap: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   paused: boolean
@@ -95,6 +96,8 @@ export interface ExamContextType {
   setRewardModal: React.Dispatch<React.SetStateAction<any>>
   mobileOpen: boolean
   setMobileOpen: React.Dispatch<React.SetStateAction<boolean>>
+  ratingTarget: string | null
+  setRatingTarget: React.Dispatch<React.SetStateAction<string | null>>
 
   // Attempt
   attemptId: string | null
@@ -188,6 +191,7 @@ export interface ExamContextType {
   finishAttempt: (aid: string) => Promise<void>
   handleSubmitExam: (earlyComplete?: boolean) => Promise<void>
   resumeExam: (examCode?: string) => void
+  saveExamProgress: () => void
   downloadAttemptCSV: () => void
   downloadAttemptPDF: () => void
   downloadAnalyticsCSV: () => void
@@ -304,6 +308,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const [showAttempts, setShowAttempts] = useState(false)
   const [attemptsList, setAttemptsList] = useState<any[] | null>(null)
   const [mobileOpen, setMobileOpen] = useState<boolean>(false)
+  const [ratingTarget, setRatingTarget] = useState<string | null>(null)
 
   // ── Review ──
   const [reviewDomains, setReviewDomains] = useState<string[]>(['All'])
@@ -362,6 +367,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [numQuestions, setNumQuestions] = useState<number>(0)
   const [showCancelConfirm, setShowCancelConfirm] = useState<boolean>(false)
+  const [savedExamVersion, setSavedExamVersion] = useState<number>(0)
 
   // ── Filters ──
   const [serviceFilterText, setServiceFilterText] = useState<string>('')
@@ -449,7 +455,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       if (age > 24 * 60 * 60 * 1000) { localStorage.removeItem(`examProgress:${selected}`); return null }
       return { answeredCount, timestamp: saved.timestamp, total: saved.numQuestions || 0 }
     } catch { return null }
-  }, [selected, examStarted])
+  }, [selected, examStarted, savedExamVersion])
 
   const anySavedExam = useMemo(() => {
     try {
@@ -460,16 +466,18 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         const raw = localStorage.getItem(key)
         if (!raw) continue
         const saved = JSON.parse(raw)
-        const answeredCount = Object.keys(saved.answers || {}).length
+        const total = saved.numQuestions || 0
+        const rawAnswered = Object.keys(saved.answers || {}).length
+        const answeredCount = total > 0 ? Math.min(rawAnswered, total) : rawAnswered
         if (answeredCount === 0) continue
         const age = Date.now() - (saved.timestamp || 0)
         if (age > 24 * 60 * 60 * 1000) { localStorage.removeItem(key); continue }
         const meta = exams.find((e: any) => e.code === code)
-        return { code, title: meta?.title ?? code, answeredCount, total: saved.numQuestions || 0 }
+        return { code, title: meta?.title ?? code, answeredCount, total }
       }
     } catch {}
     return null
-  }, [selected, examStarted, savedProgress, exams])
+  }, [selected, examStarted, savedProgress, exams, savedExamVersion])
 
   const providers = useMemo(() => {
     const byProvider: Record<string, any[]> = {}
@@ -892,6 +900,17 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     setShowSubmitConfirm(false); setShowCompleteEarlyConfirm(false)
   }
 
+  function saveExamProgress() {
+    if (!selected) return
+    try {
+      localStorage.setItem(`examProgress:${selected}`, JSON.stringify({
+        answers: selectedAnswers, flagged: Array.from(flaggedQuestions), currentIndex: currentQuestionIndex,
+        numQuestions: displayQuestions.length > 0 ? displayQuestions.length : numQuestions, timed, timeLeft, durationMinutes, attemptId: attemptId ?? null,
+        examMode: examMode ?? 'casual', revealAnswers: revealAnswers ?? 'immediately', timestamp: Date.now(),
+      }))
+    } catch {}
+  }
+
   function resumeExam(examCode?: string) {
     const code = examCode ?? selected
     if (!code) return
@@ -1040,7 +1059,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(key, JSON.stringify({
         answers: selectedAnswers, flagged: Array.from(flaggedQuestions), currentIndex: currentQuestionIndex,
-        numQuestions, timed, timeLeft, durationMinutes, attemptId: attemptId ?? null,
+        numQuestions: displayQuestions.length > 0 ? displayQuestions.length : numQuestions, timed, timeLeft, durationMinutes, attemptId: attemptId ?? null,
         examMode: examMode ?? 'casual', revealAnswers: revealAnswers ?? 'immediately', timestamp: Date.now(),
       }))
     } catch {}
@@ -1101,14 +1120,14 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     exams, selected, setSelected, selectedMeta, providers, questions, setQuestions, examTier, userTier, examTotalAvailable, examLimited, examShowcase, trialDaysRemaining,
     dark, setDark, themePreset, setThemePreset, customCorrect, setCustomCorrect, customCorrect2, setCustomCorrect2, customIncorrect, setCustomIncorrect, customIncorrect2, setCustomIncorrect2,
     selectedAnswers, setSelectedAnswers, multiSelectPending, setMultiSelectPending, matchingAnswers, setMatchingAnswers, orderingAnswers, setOrderingAnswers, flaggedQuestions, setFlaggedQuestions, currentQuestionIndex, setCurrentQuestionIndex,
-    showSubmitConfirm, setShowSubmitConfirm, showCompleteEarlyConfirm, setShowCompleteEarlyConfirm, showCancelConfirm, setShowCancelConfirm, showTipMap, setShowTipMap, paused, setPaused, lastError, setLastError, toasts, setToasts, showToast, showConfetti, setShowConfetti, rewardModal, setRewardModal, mobileOpen, setMobileOpen,
+    showSubmitConfirm, setShowSubmitConfirm, showCompleteEarlyConfirm, setShowCompleteEarlyConfirm, showCancelConfirm, setShowCancelConfirm, setSavedExamVersion, showTipMap, setShowTipMap, paused, setPaused, lastError, setLastError, toasts, setToasts, showToast, showConfetti, setShowConfetti, rewardModal, setRewardModal, mobileOpen, setMobileOpen, ratingTarget, setRatingTarget,
     attemptId, setAttemptId, attemptData, setAttemptData, showAttempts, setShowAttempts, attemptsList, setAttemptsList, isFinished,
     reviewDomains, setReviewDomains, reviewDomainOpen, setReviewDomainOpen, reviewIndex, setReviewIndex, incorrectOnly, setIncorrectOnly, reviewDomainRef, reviewDomainToggleRef,
     takeDomains, setTakeDomains, domainOpen, setDomainOpen, domainRef, domainToggleRef, examStarted, setExamStarted, timed, setTimed, durationMinutes, setDurationMinutes, examMode, setExamMode, revealAnswers, setRevealAnswers, revealedQuestions, setRevealedQuestions, stagedAnswer, setStagedAnswer, weakestLinkInfo, setWeakestLinkInfo, loadingWeakestLink, timeLeft, setTimeLeft, numQuestions, setNumQuestions,
     serviceFilterText, setServiceFilterText, homeExamFilter, setHomeExamFilter, selectedServices, setSelectedServices, availableServices, serviceDropOpen, setServiceDropOpen, serviceSearchText, setServiceSearchText, serviceDropRef, serviceDropToggleRef,
     scoreHistory, loadingScoreHistory, analyticsAttempts, analyticsDomains, deletingAttemptId, setDeletingAttemptId,
     filteredByDomain, availableFilteredCount, displayQuestions, savedProgress, anySavedExam,
-    setupExamFromMeta, fetchScoreHistory, createAttempt, submitAnswer, submitMatchingAnswer, submitOrderingAnswer, finishAttempt, handleSubmitExam, resumeExam,
+    setupExamFromMeta, fetchScoreHistory, createAttempt, submitAnswer, submitMatchingAnswer, submitOrderingAnswer, finishAttempt, handleSubmitExam, resumeExam, saveExamProgress,
     downloadAttemptCSV, downloadAttemptPDF, downloadAnalyticsCSV,
   }
 

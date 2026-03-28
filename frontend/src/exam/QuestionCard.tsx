@@ -1,6 +1,5 @@
-import { X, Check, ExternalLink, Lightbulb, Star } from 'lucide-react'
-import { useState } from 'react'
-import { RatingModal } from '@/feedback/RatingModal'
+import { X, Check, ExternalLink, Lightbulb, Volume2, VolumeX } from 'lucide-react'
+import { useState, useRef } from 'react'
 import { clarityEvent } from '@/clarity'
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
@@ -22,8 +21,42 @@ export function QuestionCard() {
 
   const clampedIdx = Math.min(currentQuestionIndex, displayQuestions.length - 1)
   const visible = displayQuestions.length > 0 ? [displayQuestions[Math.max(0, clampedIdx)]] : []
-  const [ratingTarget, setRatingTarget] = useState<string | null>(null)
   const [expandedExplanations, setExpandedExplanations] = useState<Set<string>>(new Set())
+  const [speakingId, setSpeakingId] = useState<string | null>(null)
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
+
+  function stripMarkdown(text: string) {
+    return text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
+      .replace(/`{1,3}[^`]*`{1,3}/g, (m) => m.replace(/`/g, ''))
+      .replace(/[*_]{1,3}([^*_]+)[*_]{1,3}/g, '$1')
+      .replace(/^#{1,6}\s+/gm, '')
+      .trim()
+  }
+
+  function isTextChoice(text: string, format?: string) {
+    if (format === 'json' || format === 'yaml' || format === 'cli') return false
+    const s = text.trim()
+    if (s.startsWith('{') || s.startsWith('[')) return false
+    if (text.includes('\n') || /^\s*(?:\$|sudo\b)/.test(text) || /^\s*aws\s+[a-z0-9-]/.test(text)) return false
+    return true
+  }
+
+  function toggleTTS(id: string, text: string) {
+    if (speakingId === id) {
+      window.speechSynthesis.cancel()
+      setSpeakingId(null)
+      return
+    }
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(stripMarkdown(text))
+    utterance.onend = () => setSpeakingId(null)
+    utterance.onerror = () => setSpeakingId(null)
+    utteranceRef.current = utterance
+    window.speechSynthesis.speak(utterance)
+    setSpeakingId(id)
+  }
   const toggleExplanation = (key: string) => setExpandedExplanations(prev => {
     const next = new Set(prev)
     if (next.has(key)) next.delete(key); else next.add(key)
@@ -53,44 +86,46 @@ export function QuestionCard() {
                 {qType === 'matching' && <span className="ml-2 text-xs font-medium text-primary">(Match each item)</span>}
                 {qType === 'ordering' && <span className="ml-2 text-xs font-medium text-primary">(Drag or use arrows to order)</span>}
               </div>
-              {!isFinished && (
-                <div className="mt-2 flex items-center justify-end gap-2">
-                  {q.tip && (
+              <div className="mt-2 flex items-center justify-end gap-2 flex-wrap">
+                <button
+                  onClick={() => toggleTTS(q.id, q.question)}
+                  className="h-8 min-w-[2rem] px-2 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center justify-center"
+                  aria-label={speakingId === q.id ? 'Stop reading' : 'Read question aloud'}
+                >
+                  {speakingId === q.id ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                </button>
+                {!isFinished && q.tip && (
+                  <button
+                    onClick={() => { setShowTipMap((s) => ({ ...s, [q.id]: !s[q.id] })); if (!showTipMap[q.id]) clarityEvent('hint_revealed') }}
+                    className="h-8 text-sm px-2 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center gap-1"
+                    aria-label={showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
+                  >
+                    <Lightbulb className="w-3.5 h-3.5" /> {showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
+                  </button>
+                )}
+                {!isFinished && (
+                  <>
                     <button
-                      onClick={() => { setShowTipMap((s) => ({ ...s, [q.id]: !s[q.id] })); if (!showTipMap[q.id]) clarityEvent('hint_revealed') }}
-                      className="text-sm px-2 py-1 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center gap-1"
-                      aria-label={showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
+                      onClick={() => {
+                        const wasFlagged = flaggedQuestions.has(q.id)
+                        setFlaggedQuestions((prev) => {
+                          const next = new Set(prev)
+                          if (next.has(q.id)) next.delete(q.id)
+                          else next.add(q.id)
+                          return next
+                        })
+                        if (!wasFlagged) {
+                          clarityEvent('question_flagged')
+                          setCurrentQuestionIndex((idx) => Math.min(displayQuestions.length - 1, idx + 1))
+                        }
+                      }}
+                      className={`h-8 text-sm px-2 rounded font-medium transition-colors ${flaggedQuestions.has(q.id) ? 'bg-primary text-white' : 'bg-accent text-primary border border-border'}`}
                     >
-                      <Lightbulb className="w-3.5 h-3.5" /> {showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
+                      🚩 {flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}
                     </button>
-                  )}
-                  <button
-                    onClick={() => {
-                      const wasFlagged = flaggedQuestions.has(q.id)
-                      setFlaggedQuestions((prev) => {
-                        const next = new Set(prev)
-                        if (next.has(q.id)) next.delete(q.id)
-                        else next.add(q.id)
-                        return next
-                      })
-                      if (!wasFlagged) {
-                        clarityEvent('question_flagged')
-                        setCurrentQuestionIndex((idx) => Math.min(displayQuestions.length - 1, idx + 1))
-                      }
-                    }}
-                    className={`text-sm px-2 py-1 rounded font-medium transition-colors ${flaggedQuestions.has(q.id) ? 'bg-primary text-white' : 'bg-accent text-primary border border-border'}`}
-                  >
-                    🚩 {flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}
-                  </button>
-                  <button
-                    onClick={() => { setRatingTarget(q.id); clarityEvent('question_rated') }}
-                    className="text-sm px-2 py-1 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center gap-1"
-                    aria-label="Rate this question"
-                  >
-                    <Star className="w-3.5 h-3.5" /> Rate
-                  </button>
-                </div>
-              )}
+                  </>
+                )}
+              </div>
               {q.tip && !isFinished && showTipMap[q.id] && (
                 <div className="mt-2 p-2.5 rounded-lg bg-muted/50 border border-border text-sm text-foreground">
                   <strong>💡 Tip:</strong> {q.tip}
@@ -109,29 +144,53 @@ export function QuestionCard() {
                     const selectedChoice = curMappings[slot.id]
                     const isCorrectMapping = showFeedback && answered && selectedChoice === slot.correctChoiceId
                     const isIncorrectMapping = showFeedback && answered && selectedChoice && selectedChoice !== slot.correctChoiceId
+                    const correctChoice = q.choices.find((c) => c.id === slot.correctChoiceId)
+                    const explanationKey = `${q.id}:${correctChoice?.id}`
                     return (
-                      <div key={slot.id} className={`p-3 rounded-lg border ${isCorrectMapping ? 'border-green-400/40 bg-green-50 dark:bg-green-900/25' : isIncorrectMapping ? 'border-red-400/40 bg-red-50 dark:bg-red-900/25' : 'border-border'}`}>
-                        <div className="font-medium text-sm mb-2">{si + 1}. {slot.label}</div>
-                        <select
-                          value={selectedChoice ?? ''}
-                          disabled={questionLocked}
-                          onChange={(e) => {
-                            const val = e.target.value
-                            setMatchingAnswers((p) => ({
-                              ...p,
-                              [q.id]: { ...(p[q.id] ?? {}), [slot.id]: val }
-                            }))
-                          }}
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
-                        >
-                          <option value="">— Select —</option>
-                          {q.choices.map((c) => (
-                            <option key={c.id} value={c.id}>{c.text}</option>
-                          ))}
-                        </select>
-                        {showFeedback && answered && isIncorrectMapping && (
-                          <div className="mt-1 text-xs text-green-600 dark:text-green-400">
-                            Correct: {q.choices.find((c) => c.id === slot.correctChoiceId)?.text}
+                      <div key={slot.id}>
+                        <div className={`p-3 rounded-lg border ${isCorrectMapping ? 'border-green-400/40 bg-green-50 dark:bg-green-900/25' : isIncorrectMapping ? 'border-red-400/40 bg-red-50 dark:bg-red-900/25' : 'border-border'}`}>
+                          <div className="font-medium text-sm mb-2 flex items-center gap-1.5">
+                            {isCorrectMapping && <Check className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0" />}
+                            {isIncorrectMapping && <X className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />}
+                            {si + 1}. {slot.label}
+                          </div>
+                          <select
+                            value={selectedChoice ?? ''}
+                            disabled={questionLocked}
+                            onChange={(e) => {
+                              const val = e.target.value
+                              setMatchingAnswers((p) => ({
+                                ...p,
+                                [q.id]: { ...(p[q.id] ?? {}), [slot.id]: val }
+                              }))
+                            }}
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
+                          >
+                            <option value="">— Select —</option>
+                            {q.choices.map((c) => (
+                              <option key={c.id} value={c.id}>{c.text}</option>
+                            ))}
+                          </select>
+                          {showFeedback && answered && isIncorrectMapping && (
+                            <div className="mt-1 text-xs text-green-600 dark:text-green-400">
+                              Correct: {correctChoice?.text}
+                            </div>
+                          )}
+                        </div>
+                        {showFeedback && answered && correctChoice?.explanation && (
+                          <div className="mt-1">
+                            <button
+                              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 py-0.5"
+                              onClick={() => toggleExplanation(explanationKey)}
+                            >
+                              <span className="text-[10px]">{expandedExplanations.has(explanationKey) ? '▾' : '▸'}</span>
+                              <span className="opacity-70">{expandedExplanations.has(explanationKey) ? 'Hide explanation' : 'Show explanation'}</span>
+                            </button>
+                            {expandedExplanations.has(explanationKey) && (
+                              <div className="mt-1 text-base text-muted-foreground p-2 rounded bg-muted/30">
+                                <MarkdownText text={correctChoice.explanation} />
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -148,23 +207,6 @@ export function QuestionCard() {
                       Confirm Matching
                     </button>
                   )}
-                  {showFeedback && answered && q.choices.map((c) => c.explanation && (
-                    <div key={c.id} className="text-xs mt-1">
-                      <button
-                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 py-0.5"
-                        onClick={() => toggleExplanation(`${q.id}:${c.id}`)}
-                      >
-                        <span className="text-[10px]">{expandedExplanations.has(`${q.id}:${c.id}`) ? '▾' : '▸'}</span>
-                        <span className="font-medium">{c.text}:</span>
-                        <span className="opacity-70">{expandedExplanations.has(`${q.id}:${c.id}`) ? 'hide' : 'show explanation'}</span>
-                      </button>
-                      {expandedExplanations.has(`${q.id}:${c.id}`) && (
-                        <div className="mt-1 text-muted-foreground p-2 rounded bg-muted/30">
-                          <MarkdownText text={c.explanation} />
-                        </div>
-                      )}
-                    </div>
-                  ))}
                 </div>
               )
             })()}
@@ -216,7 +258,7 @@ export function QuestionCard() {
                                 <span className="text-[10px] leading-none opacity-70">Step</span>
                                 <span className="text-sm leading-tight">{idx + 1}</span>
                               </span>
-                              <span className="flex-1 text-sm">{c.text}</span>
+                              <span className="flex-1 text-sm"><MarkdownText text={c.text} /></span>
                               {!questionLocked && (
                                 <div className="flex flex-col gap-0.5 shrink-0">
                                   <button className="text-xs px-1 rounded hover:bg-muted disabled:opacity-30" disabled={idx === 0} onClick={(e) => { e.stopPropagation(); setOrderingAnswers((p) => { const arr = [...(p[q.id] ?? curOrder)]; [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]]; return { ...p, [q.id]: arr } }) }}>▲</button>
@@ -243,7 +285,7 @@ export function QuestionCard() {
                                 <span className="text-[10px] leading-none opacity-70">Step</span>
                                 <span className="text-xs font-bold leading-tight">{idx + 1}</span>
                               </span>
-                              <span>{c?.text ?? cid}</span>
+                              <span>{c ? <MarkdownText text={c.text} /> : cid}</span>
                             </div>
                           )
                         })}
@@ -272,7 +314,7 @@ export function QuestionCard() {
                         <span className="opacity-70">{expandedExplanations.has(`${q.id}:${c.id}`) ? 'hide' : 'show explanation'}</span>
                       </button>
                       {expandedExplanations.has(`${q.id}:${c.id}`) && (
-                        <div className="mt-1 text-muted-foreground p-2 rounded bg-muted/30">
+                        <div className="mt-1 text-base text-muted-foreground p-2 rounded bg-muted/30">
                           <MarkdownText text={c.explanation} />
                         </div>
                       )}
@@ -304,6 +346,7 @@ export function QuestionCard() {
                   }
                   return (
                     <li key={c.id}>
+                      <div className="flex items-stretch gap-1">
                       <button
                         onClick={() => {
                           if (isFinished || questionLocked) return
@@ -327,7 +370,7 @@ export function QuestionCard() {
                           }
                           submitAnswer(q, c.id)
                         }}
-                        className={`w-full text-left px-3 py-2.5 rounded-lg border ${showFeedback && answered ? (isCorrectChoice ? 'border-green-500/50 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-500/50 dark:border-red-500/30' : 'border-border/60 dark:border-border/60') : isStagedChoice ? 'border-primary dark:border-primary' : isSelected ? 'border-primary dark:border-primary' : 'border-border/60 dark:border-border/60'} ${bg} ${(isStagedChoice || isSelected) && !showFeedback ? 'hover:bg-primary/90' : 'hover:bg-muted'} flex items-start gap-2.5 transition-colors`}
+                        className={`flex-1 text-left px-3 py-2.5 rounded-lg border ${showFeedback && answered ? (isCorrectChoice ? 'border-green-500/50 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-500/50 dark:border-red-500/30' : 'border-border/60 dark:border-border/60') : isStagedChoice ? 'border-primary dark:border-primary' : isSelected ? 'border-primary dark:border-primary' : 'border-border/60 dark:border-border/60'} ${bg} ${(isStagedChoice || isSelected) && !showFeedback ? 'hover:bg-primary/90' : 'hover:bg-muted'} flex items-start gap-2.5 transition-colors`}
                       >
                         {showFeedback && answered ? (
                           <span className="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">
@@ -349,6 +392,16 @@ export function QuestionCard() {
                           {showFeedback && answered && !isSelected && isCorrectChoice && <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
                         </span>
                       </button>
+                      {isTextChoice(c.text, q.format) && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleTTS(`${q.id}:choice:${c.id}`, c.text) }}
+                          className="shrink-0 p-2 rounded-lg border border-border/60 bg-muted/50 text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center"
+                          aria-label={speakingId === `${q.id}:choice:${c.id}` ? 'Stop' : 'Read aloud'}
+                        >
+                          {speakingId === `${q.id}:choice:${c.id}` ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                        </button>
+                      )}
+                      </div>
                       {showFeedback && answered && c.explanation && (
                         <div className="mt-1">
                           <button
@@ -416,15 +469,28 @@ export function QuestionCard() {
                   <div className="p-2 rounded bg-muted/50 dark:bg-card text-foreground">
                     <div className="flex items-start justify-between gap-4">
                       <div className="pr-2"><strong>Explanation:</strong> <MarkdownText text={q.explanation} /></div>
-                      {q.docs && (
-                        <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 flex items-center gap-1.5">
+                        <button
+                          onClick={() => toggleTTS(`${q.id}:explanation`, q.explanation!)}
+                          className="h-7 min-w-[1.75rem] px-1.5 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center justify-center"
+                          aria-label={speakingId === `${q.id}:explanation` ? 'Stop' : 'Read explanation aloud'}
+                        >
+                          {speakingId === `${q.id}:explanation` ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                        </button>
+                        {q.docs && (
                           <a href={q.docs} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 rounded bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
                             <ExternalLink className="w-4 h-4" />
                             <span>Docs</span>
                           </a>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
+                    {(q.domain || (q.skills && q.skills.length > 0)) && (
+                      <div className="mt-3 pt-2 border-t border-border/50 flex flex-col gap-0.5 text-xs">
+                        {q.domain && <span><span className="font-medium text-orange-500">Domain:</span> <span className="text-gray-600 dark:text-gray-400">{q.domain}</span></span>}
+                        {q.skills && q.skills.length > 0 && <span><span className="font-medium text-orange-500">Skill:</span> <span className="text-gray-600 dark:text-gray-400">{q.skills.join(', ')}</span></span>}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -432,13 +498,6 @@ export function QuestionCard() {
           </article>
         )
       })}
-      {ratingTarget && (
-        <RatingModal
-          contentType="question"
-          contentId={ratingTarget}
-          onClose={() => setRatingTarget(null)}
-        />
-      )}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Play, X, Check, BarChart3, ExternalLink, ChevronDown } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { isAnswerCorrect, renderChoiceContent, MarkdownText } from './utils'
@@ -46,6 +46,13 @@ export function ExamReview() {
 
   const visibleAll = domainFiltered.map((q) => ({ q, ...deriveRecord(q) }))
   const visible = incorrectOnly ? visibleAll.filter((v) => !v.isCorrect) : visibleAll
+
+  const [expandedExplanations, setExpandedExplanations] = useState<Set<string>>(new Set())
+  const toggleExplanation = (key: string) => setExpandedExplanations(prev => {
+    const next = new Set(prev)
+    if (next.has(key)) next.delete(key); else next.add(key)
+    return next
+  })
 
   return (
     <div className="mb-4">
@@ -182,12 +189,6 @@ export function ExamReview() {
                   </span>
                 </div>
 
-                {item.q.domain && <div className="mt-1.5 text-xs text-muted-foreground">Domain: {item.q.domain}</div>}
-                {Array.isArray(item.q.skills) && item.q.skills.length > 0 && (
-                  <div className="mt-0.5 text-xs text-muted-foreground">
-                    <span className="font-medium">Skills tested: </span>{item.q.skills.join(' · ')}
-                  </div>
-                )}
 
                 {/* Type-specific rendering */}
                 {(() => {
@@ -212,8 +213,19 @@ export function ExamReview() {
                           )
                         })}
                         {(item.q.choices ?? []).map((c: any) => c.explanation && (
-                          <div key={c.id} className="text-xs text-muted-foreground p-2 rounded bg-muted/30">
-                            <strong>{c.text}:</strong> {c.explanation}
+                          <div key={c.id} className="mt-1">
+                            <button
+                              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 py-0.5"
+                              onClick={() => toggleExplanation(`${item.q.id}:${c.id}`)}
+                            >
+                              <span className="text-[10px]">{expandedExplanations.has(`${item.q.id}:${c.id}`) ? '▾' : '▸'}</span>
+                              <span className="opacity-70">{expandedExplanations.has(`${item.q.id}:${c.id}`) ? 'Hide explanation' : 'Show explanation'} ({c.text})</span>
+                            </button>
+                            {expandedExplanations.has(`${item.q.id}:${c.id}`) && (
+                              <div className="mt-1 text-base text-muted-foreground p-2 rounded bg-muted/30">
+                                <MarkdownText text={c.explanation} />
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -236,14 +248,26 @@ export function ExamReview() {
                           return (
                             <div key={cid} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border text-sm ${bg}`}>
                               <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${isCorrectPos ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{idx + 1}</span>
-                              <span className="flex-1">{c?.text ?? cid}</span>
+                              <span className="flex-1">{c ? <MarkdownText text={c.text} /> : cid}</span>
                               {!isCorrectPos && <span className="text-xs text-green-600 dark:text-green-400">Should be #{correctOrder.indexOf(cid) + 1}</span>}
                             </div>
                           )
                         })}
                         {(item.q.choices ?? []).map((c: any) => c.explanation && (
-                          <div key={c.id} className="text-xs text-muted-foreground p-2 rounded bg-muted/30">
-                            <strong>Step {c.sequence}:</strong> {c.explanation}
+                          <div key={c.id} className="text-xs mt-1">
+                            <button
+                              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 py-0.5"
+                              onClick={() => toggleExplanation(`${item.q.id}:${c.id}`)}
+                            >
+                              <span className="text-[10px]">{expandedExplanations.has(`${item.q.id}:${c.id}`) ? '▾' : '▸'}</span>
+                              <span className="font-medium">Step {c.sequence}:</span>
+                              <span className="opacity-70">{expandedExplanations.has(`${item.q.id}:${c.id}`) ? 'hide' : 'show explanation'}</span>
+                            </button>
+                            {expandedExplanations.has(`${item.q.id}:${c.id}`) && (
+                              <div className="mt-1 text-base text-muted-foreground p-2 rounded bg-muted/30">
+                                <MarkdownText text={c.explanation} />
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -271,14 +295,27 @@ export function ExamReview() {
                           icon = <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
                         }
                         return (
-                          <div key={cid} className={`flex items-start gap-2.5 px-3 py-2 rounded-lg border text-sm ${bg}`}>
+                          <div key={cid} className={`flex items-start gap-2.5 px-3 py-2.5 rounded-lg border text-sm ${bg}`}>
                             <span className="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">{icon}</span>
                             <div className="flex-1 min-w-0 overflow-hidden">
                               <span className={`block min-w-0 ${isChosen ? 'font-semibold' : ''}`}>{renderChoiceContent(c, item.q, true)}</span>
                               {isChosen && !isCorrectChoice && <span className="text-[10px] text-red-500 font-medium">your answer</span>}
                               {!isChosen && isCorrectChoice && <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
                               {typeof c === 'object' && c?.explanation && (
-                                <div className="mt-1 text-xs text-muted-foreground">{c.explanation}</div>
+                                <div className="mt-1">
+                                  <button
+                                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 py-0.5"
+                                    onClick={(e) => { e.stopPropagation(); toggleExplanation(`${item.q.id}:${cid}`) }}
+                                  >
+                                    <span className="text-[10px]">{expandedExplanations.has(`${item.q.id}:${cid}`) ? '▾' : '▸'}</span>
+                                    <span className="opacity-70">{expandedExplanations.has(`${item.q.id}:${cid}`) ? 'Hide explanation' : 'Show explanation'}</span>
+                                  </button>
+                                  {expandedExplanations.has(`${item.q.id}:${cid}`) && (
+                                    <div className="mt-1 text-base text-muted-foreground p-2 rounded bg-muted/30">
+                                      <MarkdownText text={c.explanation} />
+                                    </div>
+                                  )}
+                                </div>
                               )}
                             </div>
                           </div>
@@ -290,14 +327,22 @@ export function ExamReview() {
 
                 {/* Explanation */}
                 {item.q.explanation && (
-                  <div className="mt-3 text-base p-3 rounded-lg bg-primary/5 border border-primary/20 dark:border-border/30">
-                    <div className="flex items-start justify-between gap-4">
-                      <div><span className="font-semibold">Explanation:</span> {item.q.explanation}</div>
-                      {item.q.docs && (
-                        <a href={item.q.docs} target="_blank" rel="noopener noreferrer" className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-accent text-foreground dark:text-white text-xs hover:bg-accent transition">
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          Docs
-                        </a>
+                  <div className="mt-3 text-base">
+                    <div className="p-2 rounded bg-muted/50 dark:bg-card text-foreground">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="pr-2"><strong>Explanation:</strong> <MarkdownText text={item.q.explanation} /></div>
+                        {item.q.docs && (
+                          <a href={item.q.docs} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 inline-flex items-center gap-2 px-3 py-1 rounded bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
+                            <ExternalLink className="w-4 h-4" />
+                            <span>Docs</span>
+                          </a>
+                        )}
+                      </div>
+                      {(item.q.domain || (Array.isArray(item.q.skills) && item.q.skills.length > 0)) && (
+                        <div className="mt-3 pt-2 border-t border-border/50 flex flex-col gap-0.5 text-xs">
+                          {item.q.domain && <span><span className="font-medium text-orange-500">Domain:</span> <span className="text-gray-600 dark:text-gray-400">{item.q.domain}</span></span>}
+                          {Array.isArray(item.q.skills) && item.q.skills.length > 0 && <span><span className="font-medium text-orange-500">Skill:</span> <span className="text-gray-600 dark:text-gray-400">{item.q.skills.join(', ')}</span></span>}
+                        </div>
                       )}
                     </div>
                   </div>

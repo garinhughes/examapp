@@ -1,5 +1,5 @@
 import { useExam } from './ExamContext'
-import { Play, Info, Activity, ShoppingCart } from 'lucide-react'
+import { Play, Info, Activity, ShoppingCart, ChevronDown, ChevronRight, X, Search } from 'lucide-react'
 import { useBasket } from '@/basket/BasketContext'
 import { useEntitlements } from '@/hooks/useEntitlements'
 import { useState, useEffect } from 'react'
@@ -9,12 +9,27 @@ export function PracticeExams() {
   const {
     providers, examStarted, anySavedExam, selected, savedProgress,
     setupExamFromMeta, resumeExam, setSelected, setRoute,
-    user, authLoading,
+    user, authLoading, setShowCancelConfirm,
   } = useExam()
   const tour = useTourContext()
   const basket = useBasket()
   const { products } = useEntitlements()
   const [actionError, setActionError] = useState<string | null>(null)
+  const [collapsedProviders, setCollapsedProviders] = useState<Set<string>>(new Set())
+  const [searchQuery, setSearchQuery] = useState('')
+
+  function toggleProvider(name: string) {
+    setCollapsedProviders(prev => {
+      const next = new Set(prev)
+      if (next.has(name)) next.delete(name)
+      else next.add(name)
+      return next
+    })
+  }
+
+  function allCollapsed() {
+    return providers.length > 0 && providers.every(p => collapsedProviders.has(p.provider))
+  }
 
   useEffect(() => {
     if (basket.lastError) setActionError(basket.lastError)
@@ -42,28 +57,61 @@ export function PracticeExams() {
             </div>
             <div>
               <div className="font-semibold text-foreground">Exam in progress</div>
-              <div className="text-sm text-muted-foreground">{anySavedExam.title} — {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
+              <div className="text-sm text-muted-foreground">{anySavedExam.title} - {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition" onClick={() => resumeExam(anySavedExam.code)}>
               <Play className="w-4 h-4" /> Resume
             </button>
+            <button className="px-3 py-1 rounded-md bg-muted text-muted-foreground border border-border text-sm inline-flex items-center gap-1.5 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition" onClick={() => setShowCancelConfirm(true)}>
+              <X className="w-4 h-4" /> Cancel
+            </button>
           </div>
         </div>
       )}
 
-      <div role="note" className="mb-4 p-3 rounded-lg border border-border bg-muted/30 text-sm text-muted-foreground flex items-start gap-3">
-        <Info className="w-5 h-5 flex-shrink-0 mt-0.5 text-primary" aria-hidden />
-        <div className="leading-snug">These products are not affiliated with or endorsed by any certification provider. All questions are original and created for practice purposes only.</div>
-      </div>
-
       <div className="space-y-6">
-        {providers.map((p, pIndex) => (
+        <div className="relative mb-1">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search by title or code…"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-3 py-1.5 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </div>
+        <div className="flex items-center justify-end -mt-1 mb-1">
+          <button
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => {
+              if (allCollapsed()) setCollapsedProviders(new Set())
+              else setCollapsedProviders(new Set(providers.map(p => p.provider)))
+            }}
+          >
+            {allCollapsed() ? 'Show all' : 'Hide all'}
+          </button>
+        </div>
+        {providers.map((p, pIndex) => {
+          const q = searchQuery.toLowerCase()
+          const filteredExams = q
+            ? p.exams.filter((ex: any) => (ex.title ?? '').toLowerCase().includes(q) || ex.code.toLowerCase().includes(q))
+            : p.exams
+          if (filteredExams.length === 0) return null
+          const collapsed = !q && collapsedProviders.has(p.provider)
+          return (
           <div key={p.provider}>
-            <h3 className="font-semibold mb-2">{p.provider}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {p.exams.map((ex: any, exIndex) => (
+            <button
+              className="flex items-center gap-1 font-semibold mb-2 hover:text-primary transition-colors w-full text-left"
+              onClick={() => toggleProvider(p.provider)}
+              aria-expanded={!collapsed}
+            >
+              {collapsed ? <ChevronRight className="w-4 h-4 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 flex-shrink-0" />}
+              {p.provider}
+            </button>
+            {!collapsed && <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {filteredExams.map((ex: any, exIndex) => (
                 <div key={ex.code} className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm relative flex flex-col">
                   <div className="flex-1">
                     <div className="font-medium">{ex.title ?? ex.code}</div>
@@ -129,9 +177,15 @@ export function PracticeExams() {
                   )}
                 </div>
               ))}
-            </div>
+            </div>}
           </div>
-        ))}
+          )
+        })}
+      </div>
+
+      <div role="note" className="mt-6 p-3 rounded-lg border border-border bg-muted/30 text-sm text-muted-foreground flex items-start gap-3">
+        <Info className="w-5 h-5 flex-shrink-0 mt-0.5 text-primary" aria-hidden />
+        <div className="leading-snug">These products are not affiliated with or endorsed by any certification provider. All questions are original and created for practice purposes only.</div>
       </div>
     </div>
   )

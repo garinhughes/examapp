@@ -46,6 +46,12 @@ const PROGRESS_EXPIRY_MS = 24 * 60 * 60 * 1000
  * Returns all in-progress lab IDs from localStorage (not yet submitted, not expired).
  * Used by SkillLabsPage to show "In Progress" badges and resume banner.
  */
+export function clearLabProgress(labId: string): void {
+  try {
+    localStorage.removeItem(`${PROGRESS_PREFIX}${labId}`)
+  } catch {}
+}
+
 export function getInProgressLabs(): Array<{ labId: string; savedAt: number; timed: boolean | null }> {
   const result: Array<{ labId: string; savedAt: number; timed: boolean | null }> = []
   try {

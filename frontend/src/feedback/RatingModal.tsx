@@ -28,6 +28,12 @@ export function RatingModal({ contentType, contentId, onClose }: Props) {
   const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [onClose])
+
+  useEffect(() => {
     authFetch(`/ratings/mine?contentType=${encodeURIComponent(contentType)}&contentId=${encodeURIComponent(contentId)}`)
       .then((res) => res.json())
       .then((data) => {

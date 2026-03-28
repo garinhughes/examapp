@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useExam } from '@/exam/ExamContext'
 import { ArrowLeft, Heart, Flag, Star } from 'lucide-react'
 import { clarityEvent, clarityTag } from '@/clarity'
@@ -30,6 +31,13 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
   useEffect(() => {
     onPauseChange?.(reporting || rating)
   }, [reporting, rating])
+
+  useEffect(() => {
+    if (!confirmCancel) return
+    function onKeyDown(e: KeyboardEvent) { if (e.key === 'Escape') setConfirmCancel(false) }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [confirmCancel])
 
   const handleBookmark = useCallback(() => {
     if (!labId) return
@@ -83,7 +91,7 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
               <Flag className="w-3 h-3" /> Report
             </button>
           )}
-          {onCancelLab && !confirmCancel && (
+          {onCancelLab && (
             <button
               onClick={() => { setConfirmCancel(true); clarityEvent('lab_cancel_initiated'); if (labId) clarityTag('lab_id', labId) }}
               className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 transition-colors"
@@ -91,13 +99,6 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
             >
               Cancel Lab
             </button>
-          )}
-          {onCancelLab && confirmCancel && (
-            <span className="flex items-center gap-1.5 text-xs">
-              <span className="text-muted-foreground">Discard progress?</span>
-              <button className="px-2 py-0.5 rounded bg-destructive text-white font-medium hover:bg-destructive/90 transition" onClick={onCancelLab}>Yes, discard</button>
-              <button className="px-2 py-0.5 rounded border border-border text-muted-foreground hover:text-foreground transition" onClick={() => setConfirmCancel(false)}>Keep</button>
-            </span>
           )}
           {labId && (
             <button
@@ -122,6 +123,20 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
               contentId={labId}
               onClose={() => setRating(false)}
             />
+          )}
+          {confirmCancel && onCancelLab && createPortal(
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/50" onClick={() => setConfirmCancel(false)} />
+              <div className="relative bg-card p-6 rounded max-w-lg w-full mx-4">
+                <h3 className="text-lg font-semibold mb-2">Cancel lab?</h3>
+                <div className="text-sm text-muted-foreground mb-4">Your progress will be discarded and cannot be recovered.</div>
+                <div className="flex items-center justify-end gap-3">
+                  <button className="px-3 py-1 rounded-md bg-accent text-muted-foreground hover:bg-accent transition" onClick={() => setConfirmCancel(false)}>Keep going</button>
+                  <button className="px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition" onClick={onCancelLab}>Yes, cancel</button>
+                </div>
+              </div>
+            </div>,
+            document.body
           )}
           {timed ? (
             <div className={`font-mono text-sm font-semibold px-3 py-1 rounded-md ${timeLeft <= 30 ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>

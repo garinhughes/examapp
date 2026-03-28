@@ -790,7 +790,7 @@
       "choices": [
         {
           "id": "c1",
-          "text": "Enable CloudTrail as a trusted service in AWS Organizations from the management account console or by running 'aws organizations enable-aws-service-access --service-principal cloudtrail.amazonaws.com'.",
+          "text": "Enable CloudTrail as a trusted service in AWS Organizations from the management account console or by running `aws organizations enable-aws-service-access --service-principal cloudtrail.amazonaws.com`.",
           "sequence": 1,
           "explanation": "Enabling CloudTrail as a trusted service in Organizations is the first prerequisite. This creates the `AWSServiceRoleForCloudTrail` service-linked role and grants CloudTrail the permissions it needs to create and manage trails in member accounts. Without this step, the `IsOrganizationTrail` flag cannot be used successfully."
         },
@@ -802,13 +802,13 @@
         },
         {
           "id": "c3",
-          "text": "Create the organization trail in the management account with IsOrganizationTrail enabled, specifying the S3 bucket as the primary destination and providing the CloudWatch Logs log group ARN and IAM role ARN for log streaming.",
+          "text": "Create the organization trail in the management account with `IsOrganizationTrail` enabled, specifying the S3 bucket as the primary destination and providing the CloudWatch Logs log group ARN and IAM role ARN for log streaming.",
           "sequence": 3,
           "explanation": "With Organizations integration active and the S3 bucket policy in place, the trail can be created. Setting `IsOrganizationTrail` automatically deploys the trail configuration to all current and future member accounts. Providing both CloudWatch Logs parameters at creation time enables dual delivery - to S3 for durable storage and to CloudWatch Logs for real-time alerting."
         },
         {
           "id": "c4",
-          "text": "Enable logging on the trail using 'aws cloudtrail start-logging --name org-trail', then verify delivery by checking for log files in the S3 bucket prefix and confirming that log streams appear in the CloudWatch Logs log group.",
+          "text": "Enable logging on the trail using `aws cloudtrail start-logging --name org-trail`, then verify delivery by checking for log files in the S3 bucket prefix and confirming that log streams appear in the CloudWatch Logs log group.",
           "sequence": 4,
           "explanation": "Creating a trail does not automatically start log delivery - the trail must be explicitly started with `start-logging`. Verifying that both delivery paths are working (S3 and CloudWatch Logs) confirms that the end-to-end configuration is correct and that management events from all member accounts are being captured and routed to both destinations."
         }

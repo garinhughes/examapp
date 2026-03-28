@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Confetti, RewardModal } from '../components/Confetti'
 import { useExam } from './ExamContext'
 
@@ -10,13 +11,24 @@ export function Modals() {
     handleSubmitExam, toasts, setToasts,
     showConfetti, setShowConfetti, rewardModal, setRewardModal,
     displayQuestions, flaggedQuestions, selectedAnswers,
-    selected, attemptId, authFetch, showAttempts,
-    setAttemptsList, showToast,
-    setAttemptId, setAttemptData, setExamStarted,
+    selected, anySavedExam, attemptId, authFetch, showAttempts,
+    setAttemptsList,
+    setAttemptId, setAttemptData, setExamStarted, setSavedExamVersion,
     setSelectedAnswers, setMultiSelectPending,
     setFlaggedQuestions, setCurrentQuestionIndex,
     setTimeLeft, setServiceFilterText, setSelectedServices,
   } = useExam()
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return
+      if (showCompleteEarlyConfirm) { setShowCompleteEarlyConfirm(false); return }
+      if (showSubmitConfirm) { setShowSubmitConfirm(false); return }
+      if (showCancelConfirm) { setShowCancelConfirm(false); return }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [showCompleteEarlyConfirm, showSubmitConfirm, showCancelConfirm])
 
   return (
     <>
@@ -52,8 +64,10 @@ export function Modals() {
                     await authFetch(`/attempts/${attemptId}`, { method: 'DELETE' })
                   }
                 } catch {}
-                try { if (selected) localStorage.removeItem(`attempt:${selected}`) } catch {}
-                try { if (selected) localStorage.removeItem(`examProgress:${selected}`) } catch {}
+                const codeToRemove = anySavedExam?.code ?? selected
+                try { if (codeToRemove) localStorage.removeItem(`attempt:${codeToRemove}`) } catch {}
+                try { if (codeToRemove) localStorage.removeItem(`examProgress:${codeToRemove}`) } catch {}
+                setSavedExamVersion(v => v + 1)
                 setAttemptId(null)
                 setAttemptData(null)
                 setExamStarted(false)
@@ -75,7 +89,6 @@ export function Modals() {
                     setAttemptsList(dd.attempts ?? [])
                   } catch {}
                 }
-                showToast('Attempt cancelled')
               }}>Yes, cancel</button>
             </div>
           </div>
@@ -115,12 +128,18 @@ export function Modals() {
               const answered = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === id)).length
               const total = displayQuestions.length
               const unanswered = total - answered
+              const flaggedCount = displayQuestions.filter(q => flaggedQuestions.has(q.id)).length
               return (
                 <>
                   <div className="text-sm text-muted-foreground mb-2">
                     You have answered <strong>{answered}</strong> of <strong>{total}</strong> questions.
                     {unanswered > 0 && <span className="text-primary"> {unanswered} question{unanswered > 1 ? 's' : ''} will not be scored.</span>}
                   </div>
+                  {flaggedCount > 0 && (
+                    <div className="text-sm text-primary mb-2">
+                      🚩 You have {flaggedCount} flagged question{flaggedCount > 1 ? 's' : ''}. Review them before completing?
+                    </div>
+                  )}
                   <div className="text-sm text-muted-foreground mb-4">
                     Your score will be calculated from the <strong>{answered}</strong> answered questions only — unanswered questions won't count against you.
                   </div>

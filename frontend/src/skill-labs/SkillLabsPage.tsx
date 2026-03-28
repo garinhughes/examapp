@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useExam } from '@/exam/ExamContext'
-import { Play, Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight } from 'lucide-react'
+import { Play, Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight, X } from 'lucide-react'
 import { clarityEvent, clarityTag } from '@/clarity'
 import type { LabSummary, SkillLevel } from './types'
 import { apiUrl } from '@/apiBase'
 import { SearchableFilter } from './SearchableFilter'
-import { getBookmarkedLabs, toggleBookmark, getInProgressLabs } from './labs/shared'
+import { getBookmarkedLabs, toggleBookmark, getInProgressLabs, clearLabProgress } from './labs/shared'
 
 const DIFFICULTY_LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced']
 const DIFFICULTY_COLORS: Record<SkillLevel, string> = {
@@ -45,9 +45,23 @@ export function SkillLabsPage() {
   })
 
   // In-progress labs (from localStorage, read once on mount)
-  const [inProgressLabs] = useState<Map<string, { timed: boolean | null }>>(() =>
+  const [inProgressLabs, setInProgressLabs] = useState<Map<string, { timed: boolean | null }>>(() =>
     new Map(getInProgressLabs().map((e) => [e.labId, { timed: e.timed }]))
   )
+  const [confirmCancelLabId, setConfirmCancelLabId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!confirmCancelLabId) return
+    function onKeyDown(e: KeyboardEvent) { if (e.key === 'Escape') setConfirmCancelLabId(null) }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [confirmCancelLabId])
+
+  function cancelLabProgress(labId: string) {
+    clearLabProgress(labId)
+    setInProgressLabs((prev) => { const next = new Map(prev); next.delete(labId); return next })
+    setConfirmCancelLabId(null)
+  }
 
   // Bookmarks
   const [bookmarkedLabIds, setBookmarkedLabIds] = useState<Set<string>>(() => getBookmarkedLabs())
@@ -310,19 +324,28 @@ export function SkillLabsPage() {
             <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
               Lab in progress: <span className="font-semibold">{resumable.title}</span>
             </p>
-            <button
-              onClick={() => {
-                const savedTimed = inProgressLabs.get(resumable.id)?.timed
-                const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
-                clarityEvent('lab_resumed')
-                clarityTag('lab_id', resumable.id)
-                clarityTag('lab_mode', mode)
-                setRoute(`skill-lab:${resumable.id}:${mode}` as any)
-              }}
-              className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition"
-            >
-              Resume <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => {
+                  const savedTimed = inProgressLabs.get(resumable.id)?.timed
+                  const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
+                  clarityEvent('lab_resumed')
+                  clarityTag('lab_id', resumable.id)
+                  clarityTag('lab_mode', mode)
+                  setRoute(`skill-lab:${resumable.id}:${mode}` as any)
+                }}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition"
+              >
+                Resume <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                  onClick={() => setConfirmCancelLabId(resumable.id)}
+                  className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-xs text-amber-700 dark:text-amber-400 hover:bg-destructive/10 hover:text-destructive transition"
+                  title="Cancel lab progress"
+                >
+                  <X className="w-3.5 h-3.5" /> Cancel
+                </button>
+            </div>
           </div>
         )
       })()}
@@ -395,29 +418,35 @@ export function SkillLabsPage() {
                   const isInProgress = inProgressLabs.has(lab.id)
                   const otherInProgress = !isInProgress && inProgressLabs.size > 0
                   return (
-                    <button
-                      className="flex-1 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm inline-flex items-center gap-2 hover:bg-primary/90 transition justify-center disabled:opacity-40 disabled:cursor-not-allowed"
-                      disabled={otherInProgress}
-                      title={otherInProgress ? 'Finish or cancel your in-progress lab first' : undefined}
-                      onClick={() => {
-                        const savedTimed = inProgressLabs.get(lab.id)?.timed
-                        const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
-                        clarityEvent(isInProgress ? 'lab_resumed' : 'lab_started')
-                        clarityTag('lab_id', lab.id)
-                        clarityTag('lab_mode', mode)
-                        setRoute(`skill-lab:${lab.id}:${mode}` as any)
-                      }}
-                    >
-                      <Play className="w-4 h-4" />
-                      {isInProgress ? 'Resume Lab' : 'Start Lab'}
-                    </button>
+                    <>
+                      <button
+                        className="flex-1 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm inline-flex items-center gap-2 hover:bg-primary/90 transition justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+                        disabled={otherInProgress}
+                        title={otherInProgress ? 'Finish or cancel your in-progress lab first' : undefined}
+                        onClick={() => {
+                          const savedTimed = inProgressLabs.get(lab.id)?.timed
+                          const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
+                          clarityEvent(isInProgress ? 'lab_resumed' : 'lab_started')
+                          clarityTag('lab_id', lab.id)
+                          clarityTag('lab_mode', mode)
+                          setRoute(`skill-lab:${lab.id}:${mode}` as any)
+                        }}
+                      >
+                        <Play className="w-4 h-4" />
+                        {isInProgress ? 'Resume Lab' : 'Start Lab'}
+                      </button>
+                      {isInProgress && (
+                        <button
+                          onClick={() => setConfirmCancelLabId(lab.id)}
+                          title="Cancel lab progress"
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-border text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </>
                   )
                 })()}
-                {inProgressLabs.has(lab.id) && (
-                  <span title="In Progress" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-500 text-white text-sm shadow-md">
-                    <Clock className="w-5 h-5" />
-                  </span>
-                )}
                 {completedLabIds.has(lab.id) && !inProgressLabs.has(lab.id) && (
                   <span title="Completed" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-600 text-white text-sm shadow-md">
                     <CheckCircle2 className="w-5 h-5" />
@@ -426,6 +455,21 @@ export function SkillLabsPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Cancel lab confirmation modal */}
+      {confirmCancelLabId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setConfirmCancelLabId(null)} />
+          <div className="relative bg-card p-6 rounded max-w-lg w-full mx-4">
+            <h3 className="text-lg font-semibold mb-2">Cancel lab?</h3>
+            <div className="text-sm text-muted-foreground mb-4">Your progress will be discarded and cannot be recovered.</div>
+            <div className="flex items-center justify-end gap-3">
+              <button className="px-3 py-1 rounded-md bg-accent text-muted-foreground hover:bg-accent transition" onClick={() => setConfirmCancelLabId(null)}>Keep going</button>
+              <button className="px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition" onClick={() => cancelLabProgress(confirmCancelLabId)}>Yes, cancel</button>
+            </div>
+          </div>
         </div>
       )}
 
