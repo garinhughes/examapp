@@ -25,6 +25,8 @@ export interface TierConfig {
   exportEnabled: boolean
   leaderboardEnabled: boolean
   domainMasteryEnabled: boolean
+  trialDays: number | null
+  labShowcaseCount: number | null
 }
 
 export interface CatalogProduct {
@@ -58,6 +60,8 @@ const DEFAULT_TIER_CONFIG: TierConfig = {
   exportEnabled: false,
   leaderboardEnabled: false,
   domainMasteryEnabled: false,
+  trialDays: null,
+  labShowcaseCount: 3,
 }
 
 export function useEntitlements(): EntitlementState {

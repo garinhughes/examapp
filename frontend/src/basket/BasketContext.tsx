@@ -151,12 +151,11 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     // Single exam: gently suggest All-Access as an upgrade (non-intrusive)
     if (!hasSubscription && examItems.length === 1) {
       const singlePrice = examItems[0].product.priceGBP
-      const monthlyPrice = 1000
       const diff = monthlyPrice - singlePrice
       result.push({
         message: `Have you considered All-Access? You'll get every exam and all skill labs for just ${formatPence(monthlyPrice)}/mo - that's ${diff > 0 ? `only ${formatPence(diff)} more` : 'a great value'} and you can cancel anytime.`,
         suggestedProductId: 'sub:all-access',
-        saving: Math.max(0, singlePrice - monthlyPrice),
+        saving: 0,
       })
     }
 
@@ -179,16 +178,6 @@ export function BasketProvider({ children }: { children: ReactNode }) {
         message: `Save even more with the annual plan at ${formatPence(annualPrice)}/year (${formatPence(800)}/mo).`,
         suggestedProductId: 'sub:all-access-annual',
         saving: examTotal - annualPrice,
-      })
-    }
-
-    // If they have a bundle pick-2 but also individual exams, suggest upgrading
-    const hasBundlePick2 = items.some((i) => i.product.productId === 'bundle:pick-2')
-    if (hasBundlePick2 && examItems.length > 0) {
-      result.push({
-        message: 'You already have a 2-exam pack. Consider the monthly plan instead for unlimited access.',
-        suggestedProductId: 'sub:all-access',
-        saving: 0,
       })
     }
 

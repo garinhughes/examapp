@@ -9,6 +9,7 @@ import { useAuth } from '../auth/AuthContext'
 import { useEntitlements, type CatalogProduct } from '../hooks/useEntitlements'
 import { useAuthFetch } from '../auth/useAuthFetch'
 import { useBasket } from '../basket/BasketContext'
+import { useExam } from '../exam/ExamContext'
 import { Check, Sparkles, ChevronRight, RotateCcw, Zap, Award, ChevronDown, ShoppingCart } from 'lucide-react'
 import { clarityEvent, clarityTag } from '../clarity'
 
@@ -171,8 +172,16 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
 
     const numExams = pickedExams.length || (examCount === 'one' ? 1 : examCount === 'two' ? 2 : 3)
 
-    // 3+ exams or wants labs with multiple -> subscription
-    if (numExams >= 3 || (numExams >= 2 && wantLabs)) {
+    // Compute actual total for picked exams (falls back to catalog price * count)
+    const pickedTotal = pickedExams.length > 0
+      ? pickedExams.reduce((sum, code) => {
+          const p = products.find((p) => p.productId === `exam:${code}`)
+          return sum + (p?.priceGBP ?? 900)
+        }, 0)
+      : numExams * (examProducts[0]?.priceGBP ?? 900)
+
+    // 4+ exams, or wants labs with multiple exams -> subscription
+    if (numExams > 3 || (numExams >= 2 && wantLabs)) {
       const annual = products.find((p) => p.productId === 'sub:all-access-annual')
       const monthly = products.find((p) => p.productId === 'sub:all-access')
       return {
@@ -182,15 +191,29 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
       }
     }
 
-    // 2 exams -> bundle
-    if (numExams === 2) {
-      const bundle = products.find((p) => p.productId === 'bundle:pick-2')
-      const singleTotal = numExams * 900
-      const saving = singleTotal - (bundle?.priceGBP ?? 1700)
+    // Exactly 3 exams -> bundle:pick-3
+    if (numExams === 3) {
+      const bundle = products.find((p) => p.productId === 'bundle:pick-3')
+      const saving = pickedTotal - (bundle?.priceGBP ?? 2500)
       return {
         primary: bundle,
         alternative: products.find((p) => p.productId === 'sub:all-access'),
-        reason: `The 2-exam pack saves you ${formatPrice(saving)} compared to buying individually.`,
+        reason: saving > 0
+          ? `The 3-exam pack saves you ${formatPrice(saving)} compared to buying individually.`
+          : 'The 3-exam pack gives you a year of access to 3 exams and their skill labs.',
+      }
+    }
+
+    // 2 exams -> bundle:pick-2
+    if (numExams === 2) {
+      const bundle = products.find((p) => p.productId === 'bundle:pick-2')
+      const saving = pickedTotal - (bundle?.priceGBP ?? 1700)
+      return {
+        primary: bundle,
+        alternative: products.find((p) => p.productId === 'sub:all-access'),
+        reason: saving > 0
+          ? `The 2-exam pack saves you ${formatPrice(saving)} compared to buying individually.`
+          : 'The 2-exam pack gives you a year of access to 2 exams and their skill labs.',
       }
     }
 
@@ -387,6 +410,7 @@ export default function PricingPage() {
   const { tier, products, loading } = useEntitlements()
   const authFetch = useAuthFetch()
   const basket = useBasket()
+  const { showToast } = useExam()
   const [actionError, setActionError] = useState<string | null>(null)
 
   // Tag this session as having visited pricing
@@ -419,7 +443,8 @@ export default function PricingPage() {
     clarityTag('product_added', `${product.kind}:${product.productId}`)
     clarityTag('funnel_stage', 'add_to_basket')
     const ok = basket.add(product)
-    if (!ok) setActionError(basket.lastError)
+    if (ok) showToast(`${product.label} added to basket`, 'info')
+    else setActionError(basket.lastError)
   }
 
   let exams = products.filter((p) => p.kind === 'exam')
