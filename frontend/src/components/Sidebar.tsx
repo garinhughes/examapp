@@ -88,7 +88,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
 
       <aside 
         className={cn(
-          "fixed top-7 bottom-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 md:translate-x-0 md:static flex flex-col h-full text-sidebar-foreground",
+          "fixed top-7 bottom-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 md:translate-x-0 md:static flex flex-col md:h-full text-sidebar-foreground",
           isOpen ? "translate-x-0" : "-translate-x-full",
           className
         )}

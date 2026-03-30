@@ -45,6 +45,7 @@ export function QuestionNav() {
   return (
     <>
     <div className="mb-2 space-y-2">
+      <p className="block sm:hidden text-[10px] text-muted-foreground text-center select-none">📐 Landscape mode recommended</p>
       {/* Bank carousel controls — only shown when > PAGE_SIZE questions */}
       {usePaging && (
         <div className="flex items-center gap-2 text-xs text-muted-foreground">

@@ -90,7 +90,7 @@ function MarkdownInline({ text }: { text: string }) {
       components={{
         p: ({ children }) => <span>{children}</span>,
         strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
-        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700">{children}</code>,
+        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700 break-all">{children}</code>,
       }}
     >
       {text}
@@ -136,7 +136,7 @@ export function MarkdownText({ text, className }: { text: string; className?: st
         ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-2">{children}</ol>,
         li: ({ children }) => <li className="ml-2">{children}</li>,
         strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
-        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700">{children}</code>,
+        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700 break-all">{children}</code>,
       }}
     >
       {text}

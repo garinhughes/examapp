@@ -66,13 +66,27 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
         </button>
       </div>
 
+      <p className="block sm:hidden text-[10px] text-muted-foreground text-right select-none">📐 Landscape mode recommended</p>
       {/* Header card */}
-      <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-card px-4 py-3 shadow-sm">
-        <div className="min-w-0">
-          <h2 className="font-semibold text-lg leading-snug">{title}</h2>
-          {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+      <div className="rounded-lg border border-border bg-card px-4 py-3 shadow-sm space-y-2">
+        {/* Title row: title on left, timer/casual badge on right */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="font-semibold text-lg leading-snug">{title}</h2>
+            {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+          </div>
+          <div className="shrink-0">
+          {timed ? (
+            <div className={`font-mono text-sm font-semibold px-3 py-1 rounded-md ${timeLeft <= 30 ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
+              {formatTime(timeLeft)}
+            </div>
+          ) : (
+            <span className="px-3 py-1 rounded-md bg-muted text-muted-foreground text-sm font-medium">Casual</span>
+          )}
+          </div>
         </div>
-        <div className="shrink-0 flex items-center gap-2">
+        {/* Action buttons row */}
+        <div className="flex items-center gap-2 flex-wrap">
           {labId && canReport && (
             <button
               onClick={() => { setRating(true); clarityEvent('lab_rated'); if (labId) clarityTag('lab_id', labId) }}
@@ -137,13 +151,6 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
               </div>
             </div>,
             document.body
-          )}
-          {timed ? (
-            <div className={`font-mono text-sm font-semibold px-3 py-1 rounded-md ${timeLeft <= 30 ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
-              {formatTime(timeLeft)}
-            </div>
-          ) : (
-            <span className="px-3 py-1 rounded-md bg-muted text-muted-foreground text-sm font-medium">Casual</span>
           )}
         </div>
       </div>

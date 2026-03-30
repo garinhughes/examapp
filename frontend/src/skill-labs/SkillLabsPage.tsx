@@ -190,9 +190,9 @@ export function SkillLabsPage() {
       {/* Controls bar: timed toggle + filters */}
       <div className="flex flex-col gap-3">
         {/* Top row: mode toggle + clear */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             {/* Timed / Casual toggle + Search */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50 border border-border">
                 <button
                   onClick={() => setTimed(false)}
@@ -214,7 +214,7 @@ export function SkillLabsPage() {
                 </button>
               </div>
 
-              <div className="relative">
+              <div className="relative flex-1 sm:flex-none">
                 <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                   <Search className="w-4 h-4 text-muted-foreground" />
                 </div>
@@ -223,7 +223,7 @@ export function SkillLabsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search labs..."
-                  className="ml-1 pl-8 w-64 sm:w-80 px-3 py-1.5 rounded-md border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="ml-1 pl-8 w-full sm:w-64 md:w-80 px-3 py-1.5 rounded-md border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>

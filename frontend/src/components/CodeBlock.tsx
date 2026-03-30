@@ -25,7 +25,8 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   if (language === 'bash' || language === 'sh' || language === 'shell') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full" style={{ backgroundColor: 'var(--code-block-bg)', color: 'var(--code-block-fg)' }}>
+      <div>
+        <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-all max-w-full" style={{ backgroundColor: 'var(--code-block-bg)', color: 'var(--code-block-fg)' }}>
         {lines.map((ln, i) => (
           <div key={i} className="leading-6">
             {ln.split(/(\s+)/).map((tok, j) => {
@@ -38,7 +39,8 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
             })}
           </div>
         ))}
-      </pre>
+        </pre>
+      </div>
     )
   }
 
@@ -46,7 +48,8 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
   if (language === 'yaml' || language === 'yml') {
     const lines = code.split('\n')
     return (
-      <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full" style={{ backgroundColor: 'var(--code-block-bg)', color: 'var(--code-block-fg)' }}>
+      <div>
+        <pre className="p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-all max-w-full" style={{ backgroundColor: 'var(--code-block-bg)', color: 'var(--code-block-fg)' }}>
         {lines.map((ln, i) => {
           // Comment lines
           if (/^\s*#/.test(ln)) {
@@ -87,23 +90,28 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
           }
           return <div key={i} className="leading-6" style={{ color: 'inherit' }}>{ln}</div>
         })}
-      </pre>
+        </pre>
+      </div>
     )
   }
 
   return (
     <Highlight {...defaultProps} code={code} language={language as Language} theme={dark ? darkTheme : lightTheme}>
-      {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`${className} p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-words max-w-full`} style={{ ...style }}>
-          {tokens.map((line, i) => (
-            <div key={i} {...getLineProps({ line, key: i })}>
-              {line.map((token, k) => (
-                <span key={k} {...getTokenProps({ token, key: k })} />
+      {({ className, style, tokens, getLineProps, getTokenProps }) => {
+        return (
+          <div>
+            <pre className={`${className} p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-all max-w-full`} style={{ ...style }}>
+              {tokens.map((line, i) => (
+                <div key={i} {...getLineProps({ line, key: i })}>
+                  {line.map((token, k) => (
+                    <span key={k} {...getTokenProps({ token, key: k })} />
+                  ))}
+                </div>
               ))}
-            </div>
-          ))}
-        </pre>
-      )}
+            </pre>
+          </div>
+        )
+      }}
     </Highlight>
   )
 }

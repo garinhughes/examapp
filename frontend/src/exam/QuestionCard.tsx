@@ -258,7 +258,7 @@ export function QuestionCard() {
                                 <span className="text-[10px] leading-none opacity-70">Step</span>
                                 <span className="text-sm leading-tight">{idx + 1}</span>
                               </span>
-                              <span className="flex-1 text-sm"><MarkdownText text={c.text} /></span>
+                              <span className="flex-1 min-w-0 text-sm break-words"><MarkdownText text={c.text} /></span>
                               {!questionLocked && (
                                 <div className="flex flex-col gap-0.5 shrink-0">
                                   <button className="text-xs px-1 rounded hover:bg-muted disabled:opacity-30" disabled={idx === 0} onClick={(e) => { e.stopPropagation(); setOrderingAnswers((p) => { const arr = [...(p[q.id] ?? curOrder)]; [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]]; return { ...p, [q.id]: arr } }) }}>▲</button>
@@ -387,7 +387,7 @@ export function QuestionCard() {
                           </span>
                         )}
                         <span className="flex-1 min-w-0 overflow-hidden">
-                          <span className={`block min-w-0 ${isSelected ? 'font-semibold' : ''}`}>{renderChoiceContent(c, q, true)}</span>
+                          <span className={`block min-w-0 break-words ${isSelected ? 'font-semibold' : ''}`}>{renderChoiceContent(c, q, true)}</span>
                           {showFeedback && answered && isSelected && !isCorrectChoice && <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">your answer</span>}
                           {showFeedback && answered && !isSelected && isCorrectChoice && <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
                         </span>

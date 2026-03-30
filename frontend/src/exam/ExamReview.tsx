@@ -56,9 +56,9 @@ export function ExamReview() {
 
   return (
     <div className="mb-4">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
         <h3 className="font-semibold">Review</h3>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             className="px-3 py-1 rounded-md bg-primary text-primary-foreground text-sm inline-flex items-center gap-2 shadow-sm hover:bg-primary/90 transition-colors"
             onClick={async () => { try { await createAttempt() } catch {} }}
@@ -247,9 +247,9 @@ export function ExamReview() {
                           const bg = isCorrectPos ? 'bg-green-50 dark:bg-green-900/25 border-green-400/50' : 'bg-red-50 dark:bg-red-900/25 border-red-400/50'
                           return (
                             <div key={cid} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border text-sm ${bg}`}>
-                              <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${isCorrectPos ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{idx + 1}</span>
-                              <span className="flex-1">{c ? <MarkdownText text={c.text} /> : cid}</span>
-                              {!isCorrectPos && <span className="text-xs text-green-600 dark:text-green-400">Should be #{correctOrder.indexOf(cid) + 1}</span>}
+                              <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0 ${isCorrectPos ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{idx + 1}</span>
+                              <span className="flex-1 min-w-0 break-words">{c ? <MarkdownText text={c.text} /> : cid}</span>
+                              {!isCorrectPos && <span className="text-xs text-green-600 dark:text-green-400 shrink-0">Should be #{correctOrder.indexOf(cid) + 1}</span>}
                             </div>
                           )
                         })}
@@ -329,8 +329,8 @@ export function ExamReview() {
                 {item.q.explanation && (
                   <div className="mt-3 text-base">
                     <div className="p-2 rounded bg-muted/50 dark:bg-card text-foreground">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="pr-2"><strong>Explanation:</strong> <MarkdownText text={item.q.explanation} /></div>
+                      <div className="flex items-start justify-between gap-2 sm:gap-4 flex-wrap">
+                        <div className="flex-1 min-w-0 pr-0 sm:pr-2"><strong>Explanation:</strong> <MarkdownText text={item.q.explanation} /></div>
                         {item.q.docs && (
                           <a href={item.q.docs} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 inline-flex items-center gap-2 px-3 py-1 rounded bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
                             <ExternalLink className="w-4 h-4" />

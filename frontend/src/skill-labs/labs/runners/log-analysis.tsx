@@ -97,8 +97,8 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
       )}
 
       {/* Search + filter bar */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col gap-2">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
@@ -108,24 +108,26 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
             className="w-full pl-9 pr-3 py-2 rounded-md border border-border bg-card text-sm focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
-        <div className="flex items-center gap-1 p-0.5 rounded-md border border-border bg-card">
-          <button
-            onClick={() => setLevelFilter(null)}
-            className={`px-2.5 py-1 rounded text-xs font-medium transition ${!levelFilter ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            All
-          </button>
-          {levels.map((level) => (
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 p-0.5 rounded-md border border-border bg-card">
             <button
-              key={level}
-              onClick={() => setLevelFilter(levelFilter === level ? null : level)}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition ${levelFilter === level ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              onClick={() => setLevelFilter(null)}
+              className={`px-2.5 py-1 rounded text-xs font-medium transition ${!levelFilter ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              {level}
+              All
             </button>
-          ))}
+            {levels.map((level) => (
+              <button
+                key={level}
+                onClick={() => setLevelFilter(levelFilter === level ? null : level)}
+                className={`px-2.5 py-1 rounded text-xs font-medium transition ${levelFilter === level ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground">{filteredLogs.length}/{lab.logs.length} entries</span>
         </div>
-        <span className="text-xs text-muted-foreground">{filteredLogs.length}/{lab.logs.length} entries</span>
       </div>
 
       {/* Log viewer */}

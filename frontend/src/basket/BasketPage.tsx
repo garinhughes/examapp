@@ -185,15 +185,15 @@ function SuggestionBanner({ suggestion, products }: { suggestion: { message: str
         {suggestion.saving > 0 && (
           <p className="text-xs text-primary font-medium mt-1">Save {formatPrice(suggestion.saving)}</p>
         )}
+        {suggested && (
+          <button
+            onClick={handleUpgrade}
+            className="mt-2 text-xs px-3 py-1.5 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition"
+          >
+            Switch to {suggested.productId === 'sub:all-access' ? 'All-Access Monthly' : suggested.productId === 'sub:all-access-annual' ? 'All-Access Annual' : suggested.label}
+          </button>
+        )}
       </div>
-      {suggested && (
-        <button
-          onClick={handleUpgrade}
-          className="text-xs px-3 py-1.5 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition flex-shrink-0"
-        >
-          Switch to {suggested.productId === 'sub:all-access' ? 'All-Access Monthly' : suggested.productId === 'sub:all-access-annual' ? 'All-Access Annual' : suggested.label}
-        </button>
-      )}
     </div>
   )
 }
