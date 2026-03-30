@@ -14,7 +14,7 @@ export function QuestionCard() {
     matchingAnswers, setMatchingAnswers, orderingAnswers, setOrderingAnswers,
     flaggedQuestions, setFlaggedQuestions, revealedQuestions, setRevealedQuestions,
     stagedAnswer, setStagedAnswer, showTipMap, setShowTipMap,
-    isFinished, revealAnswers, dndSensors,
+    isFinished, revealAnswers, dndSensors, ttsEnabled,
     submitAnswer, submitMatchingAnswer, submitOrderingAnswer, setCurrentQuestionIndex,
     setSelectedAnswers,
   } = useExam()
@@ -87,13 +87,15 @@ export function QuestionCard() {
                 {qType === 'ordering' && <span className="ml-2 text-xs font-medium text-primary">(Drag or use arrows to order)</span>}
               </div>
               <div className="mt-2 flex items-center justify-end gap-2 flex-wrap">
-                <button
-                  onClick={() => toggleTTS(q.id, q.question)}
-                  className="h-8 min-w-[2rem] px-2 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center justify-center"
-                  aria-label={speakingId === q.id ? 'Stop reading' : 'Read question aloud'}
-                >
-                  {speakingId === q.id ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                </button>
+                {ttsEnabled && (
+                  <button
+                    onClick={() => toggleTTS(q.id, q.question)}
+                    className="h-8 min-w-[2rem] px-2 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center justify-center"
+                    aria-label={speakingId === q.id ? 'Stop reading' : 'Read question aloud'}
+                  >
+                    {speakingId === q.id ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                  </button>
+                )}
                 {!isFinished && q.tip && (
                   <button
                     onClick={() => { setShowTipMap((s) => ({ ...s, [q.id]: !s[q.id] })); if (!showTipMap[q.id]) clarityEvent('hint_revealed') }}
@@ -392,7 +394,7 @@ export function QuestionCard() {
                           {showFeedback && answered && !isSelected && isCorrectChoice && <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
                         </span>
                       </button>
-                      {isTextChoice(c.text, q.format) && (
+                      {ttsEnabled && isTextChoice(c.text, q.format) && (
                         <button
                           onClick={(e) => { e.stopPropagation(); toggleTTS(`${q.id}:choice:${c.id}`, c.text) }}
                           className="shrink-0 p-2 rounded-lg border border-border/60 bg-muted/50 text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center"
@@ -470,13 +472,15 @@ export function QuestionCard() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="pr-2"><strong>Explanation:</strong> <MarkdownText text={q.explanation} /></div>
                       <div className="flex-shrink-0 flex items-center gap-1.5">
-                        <button
-                          onClick={() => toggleTTS(`${q.id}:explanation`, q.explanation!)}
-                          className="h-7 min-w-[1.75rem] px-1.5 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center justify-center"
-                          aria-label={speakingId === `${q.id}:explanation` ? 'Stop' : 'Read explanation aloud'}
-                        >
-                          {speakingId === `${q.id}:explanation` ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                        </button>
+                        {ttsEnabled && (
+                          <button
+                            onClick={() => toggleTTS(`${q.id}:explanation`, q.explanation!)}
+                            className="h-7 min-w-[1.75rem] px-1.5 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center justify-center"
+                            aria-label={speakingId === `${q.id}:explanation` ? 'Stop' : 'Read explanation aloud'}
+                          >
+                            {speakingId === `${q.id}:explanation` ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                          </button>
+                        )}
                         {q.docs && (
                           <a href={q.docs} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 rounded bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
                             <ExternalLink className="w-4 h-4" />

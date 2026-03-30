@@ -1,4 +1,4 @@
-import { X, Coffee, Timer, Brain, Eye, Lock, ChevronDown } from 'lucide-react'
+import { X, Coffee, Timer, Brain, Eye, Lock, ChevronDown, Volume2 } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { useTourContext } from '@/components/TourProvider'
 import { clarityEvent, clarityTag } from '@/clarity'
@@ -6,7 +6,7 @@ import { clarityEvent, clarityTag } from '@/clarity'
 export function ExamSetup() {
   const {
     selected, selectedMeta, exams, questions, examTier, examTotalAvailable, examLimited, examShowcase, trialDaysRemaining,
-    examMode, setExamMode, revealAnswers, setRevealAnswers, timed, setTimed,
+    examMode, setExamMode, revealAnswers, setRevealAnswers, ttsEnabled, setTtsEnabled, timed, setTimed,
     durationMinutes, setDurationMinutes, numQuestions, setNumQuestions,
     availableFilteredCount, attemptId, isFinished, user, login,
     takeDomains, setTakeDomains, domainOpen, setDomainOpen, domainRef, domainToggleRef,
@@ -291,6 +291,28 @@ export function ExamSetup() {
                 {revealAnswers === 'immediately'
                   ? 'You\'ll see the correct answer and explanation after submitting each question.'
                   : 'Answers and explanations are only revealed after you finish the exam.'}
+              </p>
+            </div>
+
+            {/* Text-to-speech toggle */}
+            <div className="mt-3">
+              <label className="block text-xs text-muted-foreground mb-1.5">Text-to-speech</label>
+              <button
+                type="button"
+                onClick={() => setTtsEnabled(!ttsEnabled)}
+                disabled={locked}
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition ${
+                  ttsEnabled
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-transparent bg-transparent hover:bg-muted/20 text-muted-foreground dark:text-muted-foreground'
+                }`}
+                aria-pressed={ttsEnabled}
+              >
+                <Volume2 className="w-4 h-4" />
+                <span>{ttsEnabled ? 'Enabled' : 'Disabled'}</span>
+              </button>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {ttsEnabled ? 'Audio buttons will appear on questions and answers.' : 'Enable to read questions and answers aloud on-demand.'}
               </p>
             </div>
 

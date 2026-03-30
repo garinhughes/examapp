@@ -139,6 +139,8 @@ export interface ExamContextType {
   setExamMode: React.Dispatch<React.SetStateAction<ExamMode>>
   revealAnswers: RevealMode
   setRevealAnswers: React.Dispatch<React.SetStateAction<RevealMode>>
+  ttsEnabled: boolean
+  setTtsEnabled: React.Dispatch<React.SetStateAction<boolean>>
   revealedQuestions: Set<string>
   setRevealedQuestions: React.Dispatch<React.SetStateAction<Set<string>>>
   stagedAnswer: Record<string, string>
@@ -356,6 +358,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const [durationMinutes, setDurationMinutes] = useState<number>(15)
   const [examMode, setExamMode] = useState<ExamMode>('casual')
   const [revealAnswers, setRevealAnswers] = useState<RevealMode>('immediately')
+  const [ttsEnabled, setTtsEnabled] = useState<boolean>(false)
   const [revealedQuestions, setRevealedQuestions] = useState<Set<string>>(new Set())
   const [stagedAnswer, setStagedAnswer] = useState<Record<string, string>>({})
   const [weakestLinkInfo, setWeakestLinkInfo] = useState<{
@@ -1123,7 +1126,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     showSubmitConfirm, setShowSubmitConfirm, showCompleteEarlyConfirm, setShowCompleteEarlyConfirm, showCancelConfirm, setShowCancelConfirm, setSavedExamVersion, showTipMap, setShowTipMap, paused, setPaused, lastError, setLastError, toasts, setToasts, showToast, showConfetti, setShowConfetti, rewardModal, setRewardModal, mobileOpen, setMobileOpen, ratingTarget, setRatingTarget,
     attemptId, setAttemptId, attemptData, setAttemptData, showAttempts, setShowAttempts, attemptsList, setAttemptsList, isFinished,
     reviewDomains, setReviewDomains, reviewDomainOpen, setReviewDomainOpen, reviewIndex, setReviewIndex, incorrectOnly, setIncorrectOnly, reviewDomainRef, reviewDomainToggleRef,
-    takeDomains, setTakeDomains, domainOpen, setDomainOpen, domainRef, domainToggleRef, examStarted, setExamStarted, timed, setTimed, durationMinutes, setDurationMinutes, examMode, setExamMode, revealAnswers, setRevealAnswers, revealedQuestions, setRevealedQuestions, stagedAnswer, setStagedAnswer, weakestLinkInfo, setWeakestLinkInfo, loadingWeakestLink, timeLeft, setTimeLeft, numQuestions, setNumQuestions,
+    takeDomains, setTakeDomains, domainOpen, setDomainOpen, domainRef, domainToggleRef, examStarted, setExamStarted, timed, setTimed, durationMinutes, setDurationMinutes, examMode, setExamMode, revealAnswers, setRevealAnswers, ttsEnabled, setTtsEnabled, revealedQuestions, setRevealedQuestions, stagedAnswer, setStagedAnswer, weakestLinkInfo, setWeakestLinkInfo, loadingWeakestLink, timeLeft, setTimeLeft, numQuestions, setNumQuestions,
     serviceFilterText, setServiceFilterText, homeExamFilter, setHomeExamFilter, selectedServices, setSelectedServices, availableServices, serviceDropOpen, setServiceDropOpen, serviceSearchText, setServiceSearchText, serviceDropRef, serviceDropToggleRef,
     scoreHistory, loadingScoreHistory, analyticsAttempts, analyticsDomains, deletingAttemptId, setDeletingAttemptId,
     filteredByDomain, availableFilteredCount, displayQuestions, savedProgress, anySavedExam,
