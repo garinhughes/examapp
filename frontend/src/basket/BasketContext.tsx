@@ -154,7 +154,7 @@ export function BasketProvider({ children }: { children: ReactNode }) {
       const monthlyPrice = 1000
       const diff = monthlyPrice - singlePrice
       result.push({
-        message: `Have you considered All-Access? You'll get every exam and all skill labs for just ${formatPence(monthlyPrice)}/mo — that's ${diff > 0 ? `only ${formatPence(diff)} more` : 'a great value'} and you can cancel anytime.`,
+        message: `Have you considered All-Access? You'll get every exam and all skill labs for just ${formatPence(monthlyPrice)}/mo - that's ${diff > 0 ? `only ${formatPence(diff)} more` : 'a great value'} and you can cancel anytime.`,
         suggestedProductId: 'sub:all-access',
         saving: Math.max(0, singlePrice - monthlyPrice),
       })

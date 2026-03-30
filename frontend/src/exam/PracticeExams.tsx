@@ -9,7 +9,7 @@ export function PracticeExams() {
   const {
     providers, examStarted, anySavedExam, selected, savedProgress,
     setupExamFromMeta, resumeExam, setSelected, setRoute,
-    user, authLoading, setShowCancelConfirm,
+    user, authLoading, setShowCancelConfirm, showToast,
   } = useExam()
   const tour = useTourContext()
   const basket = useBasket()
@@ -148,7 +148,8 @@ export function PracticeExams() {
                         <button
                           onClick={(e) => { e.stopPropagation(); if (!inBasket) {
                             const ok = basket.add(product)
-                            if (!ok) setActionError(basket.lastError)
+                            if (ok) showToast(`${product.label} added to basket`, 'info')
+                            else setActionError(basket.lastError)
                           } }}
                           title={inBasket ? 'Already in basket' : `Add ${ex.code} to basket`}
                           className={`h-7 px-2 rounded text-sm inline-flex items-center gap-2 ${
