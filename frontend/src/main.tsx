@@ -13,7 +13,7 @@ createRoot(el).render(
   <React.StrictMode>
     <HelmetProvider>
       <BrowserRouter>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light">
           <AuthProvider>
             <GamificationProvider>
               <App />

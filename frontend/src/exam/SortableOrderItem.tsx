@@ -9,7 +9,7 @@ export function SortableOrderItem({ id, disabled, className, children }: {
   children: React.ReactNode
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled })
-  const style = { transform: CSS.Transform.toString(transform), transition }
+  const style = { transform: CSS.Transform.toString(transform), transition, touchAction: disabled ? undefined : 'none' as const }
   return (
     <div
       ref={setNodeRef}

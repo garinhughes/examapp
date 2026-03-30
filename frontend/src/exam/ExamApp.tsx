@@ -279,8 +279,8 @@ function ExamAppInner() {
                       <div className="text-sm text-muted-foreground">Practice under exam-like conditions or take a relaxed walkthrough.</div>
                     </div>
                     <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Exam Checklists</div>
-                      <div className="text-sm text-muted-foreground">Organise your study with focused checklists and topic goals.</div>
+                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Skill Labs</div>
+                      <div className="text-sm text-muted-foreground">Hands-on simulations: interactive labs to practice real-world tasks.</div>
                     </div>
                     <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
                       <div className="font-semibold mb-1"><span className="text-primary">//</span> Review & Insights</div>
@@ -300,12 +300,12 @@ function ExamAppInner() {
                     <div className="text-sm text-muted-foreground">Choose specific domains to drill into weaker areas.</div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Advanced Question Filtering</div>
-                    <div className="text-sm text-muted-foreground">Filter question sets by services or keywords.</div>
+                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Question Filtering</div>
+                    <div className="text-sm text-muted-foreground">Filter question sets by keywords.</div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Skill Labs</div>
-                    <div className="text-sm text-muted-foreground">Hands-on simulations: interactive labs to practice real-world tasks.</div>
+                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Question Types</div>
+                    <div className="text-sm text-muted-foreground">Single, multiple choice, ordering (drag-and-drop) & matching questions.</div>
                   </div>
                 </div>
                 <PollWidget />

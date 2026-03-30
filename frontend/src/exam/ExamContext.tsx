@@ -216,7 +216,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const isAdmin = useIsAdmin()
   const dndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
+    useSensor(TouchSensor, { activationConstraint: { delay: 100, tolerance: 5 } })
   )
 
   // ── Confetti / reward ──
@@ -260,11 +260,11 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   // ── Theme ──
   const [dark, setDark] = useState<boolean>(() => {
     try { const stored = localStorage.getItem('theme'); if (stored) return stored === 'dark' } catch {}
-    return true
+    return false
   })
   const [themePreset, setThemePreset] = useState<string>(() => {
-    try { const raw = localStorage.getItem('themePrefs'); if (raw) return JSON.parse(raw).preset || 'dark' } catch {}
-    return 'dark'
+    try { const raw = localStorage.getItem('themePrefs'); if (raw) return JSON.parse(raw).preset || 'light' } catch {}
+    return 'light'
   })
   const [customCorrect, setCustomCorrect] = useState<string>(() => {
     try { const raw = localStorage.getItem('themePrefs'); if (raw) return JSON.parse(raw).customCorrect || '#10b981' } catch {}
