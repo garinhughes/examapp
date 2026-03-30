@@ -1,6 +1,6 @@
-import { Save, X, Play, Pause, Download, FileText, Info, BarChart3, BookOpen, Terminal } from 'lucide-react'
+import { Save, X, Play, Pause, Download, FileText, Info, BarChart3, BookOpen, Terminal, Minimize2, Maximize2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { clarityEvent, clarityTag } from '@/clarity'
 import { Sidebar } from '@/components/Sidebar'
 import { TourProvider, useTourContext } from '@/components/TourProvider'
@@ -62,6 +62,13 @@ function ExamAppInner() {
 
   const userIsAdmin = isAdmin()
 
+  const [focusMode, setFocusMode] = useState(false)
+
+  // Exit focus mode when the exam ends
+  useEffect(() => {
+    if (!examStarted || isFinished) setFocusMode(false)
+  }, [examStarted, isFinished])
+
   // Auto-advance tour from "click Setup Exam" step when visitor navigates to exam setup
   const prevRouteRef = useRef(route)
   useEffect(() => {
@@ -99,10 +106,11 @@ function ExamAppInner() {
       <PageMeta route={route} />
       <CookieConsent />
       {/* Work-in-progress banner */}
-      <div className="shrink-0 bg-amber-500 text-amber-950 text-xs font-medium text-center py-1.5 px-4">
+      <div className={`shrink-0 bg-amber-500 text-amber-950 text-xs font-medium text-center py-1.5 px-4${focusMode ? ' hidden' : ''}`}>
         This site is a work in progress and is not ready for use. Features may be incomplete or change without notice.
       </div>
       <div className="flex flex-1 overflow-hidden">
+      <div className={focusMode ? 'hidden' : ''}>
       <Sidebar
         currentRoute={route}
         onNavigate={(key) => {
@@ -121,6 +129,7 @@ function ExamAppInner() {
         streak={gamState.streak}
         showAdmin={userIsAdmin}
       />
+      </div>
 
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         <div className="absolute top-4 right-4 z-10 hidden md:flex gap-2">
@@ -130,7 +139,7 @@ function ExamAppInner() {
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="container mx-auto max-w-6xl space-y-8">
             {/* Header */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <header className={`flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6${focusMode ? ' hidden' : ''}`}>
               <div className="flex flex-col">
                 {selected && (
                   <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
@@ -318,49 +327,65 @@ function ExamAppInner() {
                 <h2 className="text-lg font-semibold">Questions</h2>
                 <div className="flex min-w-0 flex-1 flex-col gap-2 lg:items-end">
                   <div className="text-sm text-muted-foreground break-words lg:text-right">{selected}{selectedMeta?.title ? ` — ${selectedMeta.title}` : ''}</div>
-                  <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-                    <button
-                      className="px-3 py-1 rounded-md bg-muted-foreground text-white text-sm whitespace-nowrap"
-                      onClick={async () => {
-                        setShowAttempts((s) => !s)
-                        if (!attemptsList) {
-                          try {
-                            const res = await authFetch('/attempts')
-                            const d = await res.json()
-                            setAttemptsList(d.attempts ?? [])
-                          } catch (err) {
-                            console.error(err)
-                            setLastError(String(err))
-                          }
-                        }
-                      }}
-                    >
-                      Attempts
-                    </button>
-                    {attemptId && !isFinished && examStarted && (
-                      <>
+                  <div className="flex flex-col items-stretch gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
+                    {/* Focus Mode: own centered row on mobile, inline on desktop */}
+                    {examStarted && !isFinished && (
+                      <div className="flex justify-center lg:contents">
                         <button
-                          className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition-colors whitespace-nowrap"
-                          onClick={() => {
-                            saveExamProgress()
-                            setExamStarted(false)
-                            setRoute('practice')
-                            clarityEvent('exam_saved_for_later')
-                          }}
-                          title="Save progress and exit — resume later"
+                          className="px-3 py-1 rounded-md bg-accent text-foreground text-sm inline-flex items-center gap-1.5 whitespace-nowrap"
+                          onClick={() => setFocusMode((f) => !f)}
+                          title={focusMode ? 'Exit Focus Mode' : 'Enter Focus Mode'}
                         >
-                          <Save className="w-4 h-4" />
-                          Save for Later
+                          {focusMode ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
+                          {focusMode ? 'Exit Focus' : 'Focus Mode'}
                         </button>
-                        <button
-                          className="px-3 py-1 rounded-md bg-red-600 text-white text-sm inline-flex items-center gap-2 shadow-sm hover:bg-red-700 transition-colors whitespace-nowrap"
-                          onClick={() => { setShowCancelConfirm(true); clarityEvent('exam_cancel_initiated') }}
-                        >
-                          <X className="w-4 h-4" />
-                          Cancel
-                        </button>
-                      </>
+                      </div>
                     )}
+                    {/* Attempts / Save / Cancel: always one row */}
+                    <div className="flex flex-nowrap justify-center items-center gap-2 lg:justify-end">
+                      <button
+                        className="px-3 py-1 rounded-md bg-muted-foreground text-white text-sm whitespace-nowrap"
+                        onClick={async () => {
+                          setShowAttempts((s) => !s)
+                          if (!attemptsList) {
+                            try {
+                              const res = await authFetch('/attempts')
+                              const d = await res.json()
+                              setAttemptsList(d.attempts ?? [])
+                            } catch (err) {
+                              console.error(err)
+                              setLastError(String(err))
+                            }
+                          }
+                        }}
+                      >
+                        Attempts
+                      </button>
+                      {attemptId && !isFinished && examStarted && (
+                        <>
+                          <button
+                            className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition-colors whitespace-nowrap"
+                            onClick={() => {
+                              saveExamProgress()
+                              setExamStarted(false)
+                              setRoute('practice')
+                              clarityEvent('exam_saved_for_later')
+                            }}
+                            title="Save progress and exit — resume later"
+                          >
+                            <Save className="w-4 h-4" />
+                            Save for Later
+                          </button>
+                          <button
+                            className="px-3 py-1 rounded-md bg-red-600 text-white text-sm inline-flex items-center gap-2 shadow-sm hover:bg-red-700 transition-colors whitespace-nowrap"
+                            onClick={() => { setShowCancelConfirm(true); clarityEvent('exam_cancel_initiated') }}
+                          >
+                            <X className="w-4 h-4" />
+                            Cancel
+                          </button>
+                        </>
+                      )}
+                    </div>
                     {examStarted && timed && timeLeft !== null && (
                       <div className="flex items-center gap-2 rounded-md bg-muted/40 px-2 py-1">
                         <button
@@ -554,7 +579,7 @@ function ExamAppInner() {
             {/* Return to Practice Exams button removed here (kept inside ExamSetup) */}
 
           </div>
-          <Footer />
+          {!focusMode && <Footer />}
         </div>
 
         {/* Modals, toasts, confetti, etc. */}
