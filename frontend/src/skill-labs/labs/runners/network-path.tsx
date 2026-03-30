@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useExam } from '@/exam/ExamContext'
 import type { NetworkPathLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
@@ -21,6 +22,7 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
   const session = useLabSession<NetworkPathProgress>({ lab, timed })
 
   const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>(session.savedProgress?.checkedSteps ?? {})
+  const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({})
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(session.savedProgress?.selectedAnswer ?? null)
   const [isCorrect, setIsCorrect] = useState(false)
 
@@ -127,8 +129,18 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
                     </div>
                   </button>
                   {checked !== undefined && (
-                    <div className="mt-1 ml-3 text-xs text-muted-foreground font-mono bg-muted/40 rounded px-2 py-1">
-                      {step.detail}
+                    <div>
+                      <button
+                        onClick={() => setExpandedSteps(prev => ({ ...prev, [step.id]: !prev[step.id] }))}
+                        className="mt-1 ml-3 text-xs text-muted-foreground hover:text-foreground transition"
+                      >
+                        {expandedSteps[step.id] ? '▾ hide detail' : '▸ show detail'}
+                      </button>
+                      {expandedSteps[step.id] && (
+                        <div className="mt-1 ml-3 text-xs text-muted-foreground font-mono bg-muted/40 rounded px-2 py-1">
+                          {step.detail}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -173,7 +185,7 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
             <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </div>
-            <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <ExplanationBlock text={lab.explanation} />
             <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
               Back to Skill Labs
             </button>

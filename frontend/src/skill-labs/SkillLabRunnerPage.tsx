@@ -33,6 +33,8 @@ const genericRunnerImports: Record<SkillLabType, () => Promise<{ default: Compon
   'fill-command':          () => import('./labs/runners/fill-command').then(m => ({ default: m.FillCommandRunner })),
   'drag-match':            () => import('./labs/runners/drag-match').then(m => ({ default: m.DragMatchRunner })),
   'diagram-label':         () => import('./labs/runners/diagram-label').then(m => ({ default: m.DiagramLabelRunner })),
+  'incident-response':    () => import('./labs/runners/incident-response').then(m => ({ default: m.IncidentResponseRunner })),
+  'drift-detection':      () => import('./labs/runners/drift-detection').then(m => ({ default: m.DriftDetectionRunner })),
 }
 
 export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPageProps) {

@@ -1,9 +1,55 @@
 import { useState, useCallback, useEffect } from 'react'
+import type React from 'react'
 import { useExam } from '@/exam/ExamContext'
 import type { FillCommandLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
+
+// Matches, in priority order:
+// 1. Comment lines   2. --flags   3. single-quoted strings   4. double-quoted strings
+// 5. line-continuation \   6. ARNs   7. s3:// URIs
+// 8. "aws <service>" pair   9. standalone "aws"
+const SYNTAX_RE =
+  /(#[^\n]*)|(--[\w-]+)|('(?:[^'\\]|\\.)*')|("(?:[^"\\]|\\.)*")|(\\(?=[ \t]*(?:\n|$)))|(arn:[\w:.\/-]+)|(s3:\/\/\S+)|(aws)[ \t]+(rds|ecs|route53|s3|cloudfront|sns|ec2|iam|lambda|cloudwatch|sesv2|cognito-idp|secretsmanager|ssm|logs)\b|\b(aws)\b/gm
+
+function highlightCode(text: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = []
+  let lastIndex = 0
+  const re = new RegExp(SYNTAX_RE.source, SYNTAX_RE.flags)
+  let m: RegExpExecArray | null
+  let k = 0
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > lastIndex) nodes.push(text.slice(lastIndex, m.index))
+    const [full, comment, flag, sq, dq, bslash, arn, s3uri, awsSvc, svc, awsAlone] = m
+    if (comment !== undefined) {
+      nodes.push(<span key={k++} className="text-slate-400 dark:text-slate-500 italic">{comment}</span>)
+    } else if (flag !== undefined) {
+      nodes.push(<span key={k++} className="text-yellow-500 dark:text-yellow-300">{flag}</span>)
+    } else if (sq !== undefined || dq !== undefined) {
+      nodes.push(<span key={k++} className="text-orange-500 dark:text-orange-300">{full}</span>)
+    } else if (bslash !== undefined) {
+      nodes.push(<span key={k++} className="text-slate-400 dark:text-slate-500">{full}</span>)
+    } else if (arn !== undefined || s3uri !== undefined) {
+      nodes.push(<span key={k++} className="text-emerald-600 dark:text-emerald-400">{full}</span>)
+    } else if (awsSvc !== undefined) {
+      const gap = full.slice(awsSvc.length, -svc!.length)
+      nodes.push(
+        <span key={k++}>
+          <span className="text-sky-600 dark:text-sky-400 font-bold">{awsSvc}</span>
+          {gap}
+          <span className="text-cyan-600 dark:text-cyan-400">{svc}</span>
+        </span>
+      )
+    } else if (awsAlone !== undefined) {
+      nodes.push(<span key={k++} className="text-sky-600 dark:text-sky-400 font-bold">{awsAlone}</span>)
+    }
+    lastIndex = m.index + full.length
+  }
+  if (lastIndex < text.length) nodes.push(text.slice(lastIndex))
+  return nodes
+}
 
 interface FillCommandProgress {
   answers: Record<string, string>   // key: `${questionId}:${blankId}`
@@ -89,12 +135,12 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
           let blankIdx = 0
           return (
             <div key={q.id} className="rounded-lg border border-border bg-card p-4">
-              <div className="font-mono text-sm flex flex-wrap items-center gap-1">
+              <div className="font-mono text-sm whitespace-pre-wrap bg-muted/40 dark:bg-muted/20 rounded p-3 overflow-x-auto leading-relaxed">
                 {parts.map((part, i) => {
                   const blank = q.blanks[blankIdx]
                   const node = (
                     <span key={i}>
-                      <span>{part}</span>
+                      {highlightCode(part)}
                       {i < parts.length - 1 && blank && (() => {
                         const b = blank
                         const key = `${q.id}:${b.id}`
@@ -110,7 +156,7 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
                             disabled={session.submitted}
                             spellCheck={false}
                             autoComplete="off"
-                            className={`inline-block font-mono text-sm px-2 py-0.5 rounded border mx-1 w-36 focus:outline-none focus:ring-1 focus:ring-primary ${
+                            className={`inline font-mono text-sm px-2 py-0.5 rounded border w-36 align-middle focus:outline-none focus:ring-1 focus:ring-primary ${
                               isCorrect === true
                                 ? 'border-green-500 bg-green-500/10 text-green-700 dark:text-green-400'
                                 : isCorrect === false
@@ -165,7 +211,7 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
                 ? '✓ All commands correct!'
                 : `✗ ${Object.values(results).filter(Boolean).length}/${totalBlanks} correct`}
             </div>
-            <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <ExplanationBlock text={lab.explanation} />
             <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
               Back to Skill Labs
             </button>

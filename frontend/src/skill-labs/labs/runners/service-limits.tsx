@@ -3,6 +3,7 @@ import { Activity } from 'lucide-react'
 import { useExam } from '@/exam/ExamContext'
 import type { ServiceLimitsLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
@@ -160,7 +161,7 @@ export function ServiceLimitsRunner({ lab, timed = true }: Props) {
                 ? '✓ All scaling actions correct — system stabilized!'
                 : `✗ ${Object.values(results).filter(Boolean).length}/${lab.metrics.length} correct`}
             </div>
-            <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <ExplanationBlock text={lab.explanation} />
             <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
               Back to Skill Labs
             </button>

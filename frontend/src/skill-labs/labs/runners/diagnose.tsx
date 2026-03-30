@@ -11,6 +11,7 @@ import type { DiagnoseLabDefinition, Inspection } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
+import { ExplanationBlock } from '../ExplanationBlock'
 
 interface DiagnoseLabRunnerProps {
   lab: DiagnoseLabDefinition
@@ -107,7 +108,7 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
       )}
 
       {/* Main layout: diagram + inspection panel */}
-      <div className="flex-1 flex gap-4 min-h-0">
+      <div className="flex gap-4 min-h-[500px]">
         {/* Diagram */}
         <div className="flex-1 rounded-lg border border-border bg-card overflow-hidden">
           <ReactFlow
@@ -192,7 +193,7 @@ export function DiagnoseLabRunner({ lab, timed = true }: DiagnoseLabRunnerProps)
             <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </div>
-            <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <ExplanationBlock text={lab.explanation} />
             <button
               onClick={() => setRoute('skill-labs')}
               className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition"

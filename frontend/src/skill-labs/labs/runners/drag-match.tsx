@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react'
+import { ExplanationBlock } from '../ExplanationBlock'
 import {
   DndContext,
   DragOverlay,
@@ -248,7 +249,7 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
                 ? '✓ All matches correct!'
                 : `✗ ${Object.values(results).filter(Boolean).length}/${lab.pairs.length} correct`}
             </div>
-            <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <ExplanationBlock text={lab.explanation} />
             <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
               Back to Skill Labs
             </button>

@@ -4,7 +4,7 @@
     "title": "Diagnose CloudFront 403 Error",
     "description": "A user reports receiving a 403 Access Denied error when accessing static assets through CloudFront. Inspect the architecture to find the root cause.",
     "type": "diagnose",
-    "timeLimit": 180,
+    "timeLimit": 300,
     "difficulty": "beginner",
     "platform": "AWS",
     "category": "Security",
@@ -28,6 +28,12 @@
         "y": 150
       },
       {
+        "id": "oac-config",
+        "label": "Origin Access Control",
+        "x": 500,
+        "y": 0
+      },
+      {
         "id": "s3",
         "label": "S3 Bucket",
         "x": 500,
@@ -39,6 +45,11 @@
         "source": "client",
         "target": "cloudfront",
         "label": "HTTPS"
+      },
+      {
+        "source": "cloudfront",
+        "target": "oac-config",
+        "label": "Config"
       },
       {
         "source": "cloudfront",
@@ -89,6 +100,31 @@
           }
         ]
       },
+      "oac-config": {
+        "title": "Origin Access Control (OAC)",
+        "details": [
+          {
+            "label": "OAC ID",
+            "value": "E1ABCDEFGH1234"
+          },
+          {
+            "label": "Signing Protocol",
+            "value": "SigV4"
+          },
+          {
+            "label": "Signing Behaviour",
+            "value": "Always"
+          },
+          {
+            "label": "Origin Type",
+            "value": "S3"
+          },
+          {
+            "label": "Status",
+            "value": "Active"
+          }
+        ]
+      },
       "s3": {
         "title": "S3 Bucket",
         "details": [
@@ -105,8 +141,8 @@
             "value": "No bucket policy attached"
           },
           {
-            "label": "Note",
-            "value": "OAC requires a bucket policy granting s3:GetObject to the CloudFront service principal"
+            "label": "Versioning",
+            "value": "Suspended"
           }
         ]
       }
@@ -139,7 +175,7 @@
     "title": "Diagnose S3 Access Issue",
     "description": "A user cannot download an object from an S3 bucket. Use the AWS CLI simulator to investigate and identify the root cause.",
     "type": "cli",
-    "timeLimit": 300,
+    "timeLimit": 600,
     "difficulty": "intermediate",
     "platform": "AWS",
     "category": "Security",
@@ -148,7 +184,7 @@
       "IAM"
     ],
     "labCategory": "Troubleshoot",
-    "scenario": "A developer reports they cannot download objects from the `my-app-bucket` S3 bucket. They receive an AccessDenied error. Use the simulated AWS CLI to run diagnostic commands and determine the root cause.",
+    "scenario": "A developer at a partner company (AWS account 987654321098) reports they cannot download objects from the `my-app-bucket` S3 bucket in your account (111122223333). They receive an AccessDenied error despite having AmazonS3ReadOnlyAccess attached to their user. Use the simulated AWS CLI to investigate and determine the root cause.",
     "commands": [
       {
         "command": "aws s3 ls",
@@ -160,15 +196,15 @@
       },
       {
         "command": "aws s3api get-bucket-policy --bucket my-app-bucket",
-        "output": "{\n    \"Policy\": {\n        \"Version\": \"2012-10-17\",\n        \"Statement\": [\n            {\n                \"Effect\": \"Deny\",\n                \"Action\": \"s3:GetObject\",\n                \"Resource\": \"arn:aws:s3:::my-app-bucket/*\",\n                \"Principal\": \"*\"\n            }\n        ]\n    }\n}"
+        "output": "{\n    \"Policy\": {\n        \"Version\": \"2012-10-17\",\n        \"Statement\": [\n            {\n                \"Effect\": \"Deny\",\n                \"Action\": \"s3:*\",\n                \"Resource\": [\n                    \"arn:aws:s3:::my-app-bucket\",\n                    \"arn:aws:s3:::my-app-bucket/*\"\n                ],\n                \"Principal\": \"*\",\n                \"Condition\": {\n                    \"StringNotEquals\": {\n                        \"aws:PrincipalOrgID\": \"o-abc123def4\"\n                    }\n                }\n            }\n        ]\n    }\n}"
       },
       {
         "command": "aws iam get-user",
-        "output": "{\n    \"User\": {\n        \"UserName\": \"dev-user\",\n        \"UserId\": \"AIDAEXAMPLE123456\",\n        \"Arn\": \"arn:aws:iam::123456789012:user/dev-user\",\n        \"CreateDate\": \"2024-01-15T10:30:00Z\"\n    }\n}"
+        "output": "{\n    \"User\": {\n        \"UserName\": \"dev-user\",\n        \"UserId\": \"AIDAEXAMPLE123456\",\n        \"Arn\": \"arn:aws:iam::987654321098:user/dev-user\",\n        \"CreateDate\": \"2024-01-15T10:30:00Z\"\n    }\n}"
       },
       {
         "command": "aws sts get-caller-identity",
-        "output": "{\n    \"UserId\": \"AIDAEXAMPLE123456\",\n    \"Account\": \"123456789012\",\n    \"Arn\": \"arn:aws:iam::123456789012:user/dev-user\"\n}"
+        "output": "{\n    \"UserId\": \"AIDAEXAMPLE123456\",\n    \"Account\": \"987654321098\",\n    \"Arn\": \"arn:aws:iam::987654321098:user/dev-user\"\n}"
       },
       {
         "command": "aws iam list-attached-user-policies --user-name dev-user",
@@ -176,40 +212,60 @@
       },
       {
         "command": "aws s3api get-bucket-acl --bucket my-app-bucket",
-        "output": "{\n    \"Owner\": {\n        \"ID\": \"abc123\"\n    },\n    \"Grants\": [\n        {\n            \"Grantee\": {\n                \"Type\": \"CanonicalUser\",\n                \"ID\": \"abc123\"\n            },\n            \"Permission\": \"FULL_CONTROL\"\n        }\n    ]\n}"
+        "output": "{\n    \"Owner\": { \"ID\": \"abc123\" },\n    \"Grants\": [ { \"Grantee\": { \"Type\": \"CanonicalUser\", \"ID\": \"abc123\" }, \"Permission\": \"FULL_CONTROL\" } ]\n}"
+      },
+      {
+        "command": "aws s3api get-public-access-block --bucket my-app-bucket",
+        "output": "{\n    \"PublicAccessBlockConfiguration\": {\n        \"BlockPublicAcls\": true,\n        \"IgnorePublicAcls\": true,\n        \"BlockPublicPolicy\": true,\n        \"RestrictPublicBuckets\": true\n    }\n}"
+      },
+      {
+        "command": "aws s3api get-bucket-versioning --bucket my-app-bucket",
+        "output": "{\n    \"Status\": \"Enabled\"\n}"
+      },
+      {
+        "command": "aws s3api get-bucket-encryption --bucket my-app-bucket",
+        "output": "{\n    \"ServerSideEncryptionConfiguration\": {\n        \"Rules\": [\n            {\n                \"ApplyServerSideEncryptionByDefault\": {\n                    \"SSEAlgorithm\": \"aws:kms\",\n                    \"KMSMasterKeyID\": \"arn:aws:kms:us-east-1:111122223333:key/mrk-abc123\"\n                },\n                \"BucketKeyEnabled\": true\n            }\n        ]\n    }\n}"
+      },
+      {
+        "command": "aws organizations describe-organization",
+        "output": "An error occurred (AWSOrganizationsNotInUseException) when calling the DescribeOrganization operation: Your account is not a member of an organization."
+      },
+      {
+        "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::987654321098:user/dev-user --action-names s3:GetObject --resource-arns arn:aws:s3:::my-app-bucket/report.csv",
+        "output": "{\n    \"EvaluationResults\": [\n        {\n            \"EvalActionName\": \"s3:GetObject\",\n            \"EvalResourceName\": \"arn:aws:s3:::my-app-bucket/report.csv\",\n            \"EvalDecision\": \"implicitDeny\",\n            \"MatchedStatements\": []\n        }\n    ]\n}"
       }
     ],
     "expectedCommands": [
-      "aws s3 ls",
+      "aws sts get-caller-identity",
       "aws s3api get-bucket-policy --bucket my-app-bucket"
     ],
     "answers": [
       {
         "id": "no-iam",
-        "text": "The IAM user has no S3 permissions"
+        "text": "The IAM user does not have an S3 policy attached"
       },
       {
-        "id": "deny-policy",
-        "text": "The bucket policy has an explicit Deny on s3:GetObject",
+        "id": "org-deny",
+        "text": "The bucket policy denies access to principals outside the AWS Organisation",
         "correct": true
       },
       {
-        "id": "wrong-region",
-        "text": "The S3 bucket is in a different region"
+        "id": "kms-deny",
+        "text": "The bucket's KMS encryption key denies access to external accounts"
       },
       {
-        "id": "encryption",
-        "text": "Server-side encryption is blocking access"
+        "id": "block-public",
+        "text": "Block Public Access is preventing the partner account from reading objects"
       }
     ],
-    "explanation": "The bucket policy contains an explicit Deny statement for s3:GetObject on all principals. In AWS IAM, an explicit Deny always overrides any Allow — even if the user has AmazonS3ReadOnlyAccess attached. The fix is to remove or modify the Deny statement in the bucket policy."
+    "explanation": "The bucket policy contains an explicit Deny with a StringNotEquals condition on aws:PrincipalOrgID. Any principal whose account is NOT in organisation o-abc123def4 is denied all s3:* actions.\n\nThe developer's account (987654321098) is not a member of that organisation - confirmed by the DescribeOrganization error.\n\nIn AWS IAM, an explicit Deny always overrides any Allow, so AmazonS3ReadOnlyAccess is irrelevant. The fix is to add the partner account or role as an exception in the bucket policy."
   },
   {
     "id": "aws-s3-iam-policy-fix",
     "title": "Fix S3 IAM Policy",
-    "description": "An EC2 instance role cannot read objects from a specific S3 bucket. Fix the IAM policy to grant least-privilege access.",
+    "description": "An EC2 instance role cannot correctly access an S3 bucket. Fix the IAM policy to grant the correct least-privilege access.",
     "type": "policy-fix",
-    "timeLimit": 300,
+    "timeLimit": 600,
     "difficulty": "intermediate",
     "platform": "AWS",
     "category": "Security",
@@ -219,20 +275,28 @@
       "EC2"
     ],
     "labCategory": "Implement",
-    "scenario": "An EC2 instance needs to read objects from the `my-app-bucket` S3 bucket, but the current IAM policy grants overly broad access using a wildcard Resource. Your task is to fix the policy so it follows least-privilege principles by restricting access to only the `my-app-bucket` bucket.",
-    "brokenPolicy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
-    "correctPolicy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::my-app-bucket/*\"\n    }\n  ]\n}",
+    "scenario": "An EC2 instance needs to list objects in `my-app-bucket`, read objects, and upload new objects. The current policy is broken: it grants overly broad access on the wrong resource and is missing required permissions. Fix the policy to follow least-privilege principles.",
+    "brokenPolicy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::*\"\n    }\n  ]\n}",
+    "correctPolicy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\"s3:GetObject\", \"s3:PutObject\"],\n      \"Resource\": \"arn:aws:s3:::my-app-bucket/*\"\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::my-app-bucket\"\n    }\n  ]\n}",
     "validations": [
-      {
-        "field": "Action",
-        "expected": "s3:GetObject"
-      },
       {
         "field": "Resource",
         "expected": "arn:aws:s3:::my-app-bucket/*"
+      },
+      {
+        "field": "Action",
+        "expected": "s3:PutObject"
+      },
+      {
+        "field": "Action",
+        "expected": "s3:ListBucket"
+      },
+      {
+        "field": "Resource",
+        "expected": "arn:aws:s3:::my-app-bucket"
       }
     ],
-    "explanation": "The original policy used \"Resource\": \"*\" which grants s3:GetObject access to every S3 bucket in the account. Following the principle of least privilege, the Resource should be scoped to only the specific bucket needed: \"arn:aws:s3:::my-app-bucket/*\". This ensures the EC2 instance can only read objects from my-app-bucket.",
+    "explanation": "Three issues needed fixing:\n\n1. Resource was arn:aws:s3:::* - far too broad. Object operations require the objects ARN arn:aws:s3:::my-app-bucket/*.\n2. s3:PutObject was missing - the role needs to upload, not just read.\n3. s3:ListBucket was missing and requires the bucket ARN (no /*) as the Resource - a common mistake is using the objects ARN for ListBucket, which silently fails.\n\nThe correct policy has two statements: one for object operations on the /* ARN, and one for ListBucket on the bare bucket ARN.",
     "showcase": true,
     "showcaseOrder": 4
   },
@@ -241,7 +305,7 @@
     "title": "Build a Highly Available Web Application",
     "description": "Design a fault-tolerant web application architecture using AWS services. Place the correct components and connect them properly.",
     "type": "architecture-builder",
-    "timeLimit": 600,
+    "timeLimit": 900,
     "difficulty": "advanced",
     "platform": "AWS",
     "category": "Architecture",
@@ -253,7 +317,7 @@
       "Auto Scaling"
     ],
     "labCategory": "Design",
-    "scenario": "Design a multi-AZ highly available web application that survives a single AZ failure. Use CDN for edge caching, an autoscaling web tier across AZs behind an ALB, durable object storage for static assets, and a multi-AZ managed database with automated failover.",
+    "scenario": "Your company is launching a customer-facing web application that must remain available 24/7 and tolerate any single component or AZ failure. The platform team mandates an RTO under 5 minutes. Design the architecture from the available components.",
     "availableComponents": [
       {
         "id": "cloudfront",
@@ -287,7 +351,7 @@
       },
       {
         "id": "rds-replica",
-        "label": "RDS Read Replica",
+        "label": "RDS Standby (Multi-AZ)",
         "icon": "🗄️",
         "category": "Database"
       },
@@ -308,6 +372,36 @@
         "label": "ElastiCache",
         "icon": "⚡",
         "category": "Cache"
+      },
+      {
+        "id": "waf",
+        "label": "AWS WAF",
+        "icon": "🛡️",
+        "category": "Security"
+      },
+      {
+        "id": "route53",
+        "label": "Route 53",
+        "icon": "🌍",
+        "category": "DNS"
+      },
+      {
+        "id": "secrets-manager",
+        "label": "Secrets Manager",
+        "icon": "🔑",
+        "category": "Security"
+      },
+      {
+        "id": "ecs",
+        "label": "ECS Fargate",
+        "icon": "🚀",
+        "category": "Compute"
+      },
+      {
+        "id": "sqs",
+        "label": "SQS Queue",
+        "icon": "📬",
+        "category": "Messaging"
       }
     ],
     "requiredComponents": [
@@ -315,7 +409,10 @@
       "alb",
       "ec2-a",
       "ec2-b",
-      "rds-primary"
+      "rds-primary",
+      "rds-replica",
+      "s3",
+      "nat-gw"
     ],
     "requiredConnections": [
       {
@@ -337,21 +434,39 @@
       {
         "from": "ec2-b",
         "to": "rds-primary"
+      },
+      {
+        "from": "ec2-a",
+        "to": "s3"
+      },
+      {
+        "from": "ec2-b",
+        "to": "s3"
+      },
+      {
+        "from": "rds-primary",
+        "to": "rds-replica"
+      },
+      {
+        "from": "ec2-a",
+        "to": "nat-gw"
       }
     ],
     "validationChecks": [
       "CloudFront distributes traffic to ALB",
       "ALB routes to EC2 instances in multiple AZs",
-      "EC2 instances connect to RDS database"
+      "EC2 instances connect to RDS Primary",
+      "RDS Primary has a Multi-AZ standby for automatic failover",
+      "EC2 instances connect to S3 and route outbound traffic via NAT Gateway"
     ],
-    "explanation": "A highly available web application requires CloudFront for edge caching and DDoS protection, an ALB to distribute traffic across multiple AZs, EC2 instances in at least two AZs for compute redundancy, and RDS for reliable data storage. This architecture survives single AZ failures."
+    "explanation": "A fault-tolerant architecture needs:\n\n- CloudFront for edge caching and latency reduction\n- ALB distributing traffic across two AZs so the app survives any single AZ failure\n- EC2 in both AZs\n- S3 for durable static-asset storage\n- NAT Gateway for private-subnet outbound access\n- RDS Primary for transactional data\n- RDS Standby (Multi-AZ) for synchronous replication and automatic failover in under 60 seconds\n\nThe five decoys - ElastiCache, WAF, Route 53, Secrets Manager, ECS Fargate, SQS - serve legitimate production purposes but are not required by the stated HA constraints."
   },
   {
     "id": "aws-lambda-timeout-logs",
     "title": "Find the Lambda Timeout Root Cause",
     "description": "Analyze CloudWatch logs to diagnose why a Lambda function is timing out intermittently.",
     "type": "log-analysis",
-    "timeLimit": 300,
+    "timeLimit": 600,
     "difficulty": "intermediate",
     "platform": "AWS",
     "category": "Troubleshooting",
@@ -361,121 +476,205 @@
       "DynamoDB"
     ],
     "labCategory": "Troubleshoot",
-    "scenario": "A Lambda function processing API requests is intermittently timing out after 30 seconds. Analyze the CloudWatch logs to find the root cause.",
+    "scenario": "Two Lambda functions share the same DynamoDB tables. The OrderProcessor function is intermittently timing out after 30 seconds. Analyze the interleaved CloudWatch logs from both functions to find the root cause of the timeouts.",
     "logs": [
       {
         "timestamp": "2024-03-15T10:00:01Z",
         "level": "INFO",
-        "source": "handler",
-        "message": "Received API request: GET /users/123"
+        "source": "OrderProcessor/handler",
+        "message": "Received API request: GET /orders/501"
       },
       {
         "timestamp": "2024-03-15T10:00:01Z",
         "level": "INFO",
-        "source": "auth",
-        "message": "Token validated successfully for user-123"
+        "source": "OrderProcessor/auth",
+        "message": "Token validated successfully for user-501"
       },
       {
         "timestamp": "2024-03-15T10:00:02Z",
         "level": "DEBUG",
-        "source": "dynamo",
-        "message": "Querying DynamoDB table 'users' with key: {id: '123'}"
+        "source": "OrderProcessor/dynamo",
+        "message": "Querying table 'orders' with key {id: '501'}"
       },
       {
         "timestamp": "2024-03-15T10:00:02Z",
         "level": "INFO",
-        "source": "dynamo",
-        "message": "DynamoDB response: 200 OK (45ms)"
+        "source": "OrderProcessor/dynamo",
+        "message": "DynamoDB response: 200 OK (38ms)"
       },
       {
         "timestamp": "2024-03-15T10:00:02Z",
         "level": "INFO",
-        "source": "handler",
-        "message": "Request completed in 1.2s"
+        "source": "OrderProcessor/handler",
+        "message": "Request completed in 1.1s"
+      },
+      {
+        "timestamp": "2024-03-15T10:02:15Z",
+        "level": "INFO",
+        "source": "UserRecommendation/init",
+        "message": "Initialising function — cold start"
+      },
+      {
+        "timestamp": "2024-03-15T10:02:15Z",
+        "level": "INFO",
+        "source": "UserRecommendation/init",
+        "message": "Attaching network interface — waiting for VPC ENI"
+      },
+      {
+        "timestamp": "2024-03-15T10:02:19Z",
+        "level": "WARN",
+        "source": "UserRecommendation/init",
+        "message": "VPC ENI attachment took 4218ms"
+      },
+      {
+        "timestamp": "2024-03-15T10:02:19Z",
+        "level": "INFO",
+        "source": "UserRecommendation/handler",
+        "message": "Received request for user-701"
+      },
+      {
+        "timestamp": "2024-03-15T10:02:21Z",
+        "level": "INFO",
+        "source": "UserRecommendation/dynamo",
+        "message": "Querying recommendations table (23ms)"
+      },
+      {
+        "timestamp": "2024-03-15T10:02:21Z",
+        "level": "INFO",
+        "source": "UserRecommendation/handler",
+        "message": "Request completed in 6.3s"
       },
       {
         "timestamp": "2024-03-15T10:05:12Z",
         "level": "INFO",
-        "source": "handler",
-        "message": "Received API request: GET /users/456"
+        "source": "OrderProcessor/handler",
+        "message": "Received API request: GET /orders/456"
       },
       {
         "timestamp": "2024-03-15T10:05:12Z",
         "level": "INFO",
-        "source": "auth",
+        "source": "OrderProcessor/auth",
         "message": "Token validated successfully for user-456"
       },
       {
         "timestamp": "2024-03-15T10:05:13Z",
         "level": "DEBUG",
-        "source": "dynamo",
-        "message": "Querying DynamoDB table 'users' with key: {id: '456'}"
+        "source": "OrderProcessor/dynamo",
+        "message": "Querying table 'orders' with key {id: '456'}"
       },
       {
         "timestamp": "2024-03-15T10:05:13Z",
         "level": "WARN",
-        "source": "dynamo",
-        "message": "DynamoDB ProvisionedThroughputExceededException — retrying with exponential backoff"
+        "source": "OrderProcessor/dynamo",
+        "message": "DDB:PROV_THROUGHPUT_EXCEEDED — retry 1 (backoff: 1024ms)"
       },
       {
         "timestamp": "2024-03-15T10:05:15Z",
         "level": "WARN",
-        "source": "dynamo",
-        "message": "DynamoDB retry attempt 2 — ProvisionedThroughputExceededException"
+        "source": "OrderProcessor/dynamo",
+        "message": "DDB:PROV_THROUGHPUT_EXCEEDED — retry 2 (backoff: 2048ms)"
       },
       {
         "timestamp": "2024-03-15T10:05:19Z",
         "level": "WARN",
-        "source": "dynamo",
-        "message": "DynamoDB retry attempt 3 — ProvisionedThroughputExceededException"
+        "source": "OrderProcessor/dynamo",
+        "message": "DDB:PROV_THROUGHPUT_EXCEEDED — retry 3 (backoff: 4096ms)"
       },
       {
         "timestamp": "2024-03-15T10:05:27Z",
         "level": "ERROR",
-        "source": "dynamo",
-        "message": "DynamoDB retry attempt 4 — ProvisionedThroughputExceededException"
+        "source": "OrderProcessor/dynamo",
+        "message": "DDB:PROV_THROUGHPUT_EXCEEDED — retry 4 (backoff: 8192ms)"
       },
       {
         "timestamp": "2024-03-15T10:05:42Z",
         "level": "ERROR",
-        "source": "handler",
+        "source": "OrderProcessor/handler",
         "message": "Task timed out after 30.00 seconds"
       },
       {
-        "timestamp": "2024-03-15T10:10:00Z",
+        "timestamp": "2024-03-15T10:07:00Z",
         "level": "INFO",
-        "source": "handler",
-        "message": "Received API request: GET /users/789"
+        "source": "OrderProcessor/handler",
+        "message": "Received API request: GET /orders/789"
+      },
+      {
+        "timestamp": "2024-03-15T10:07:00Z",
+        "level": "INFO",
+        "source": "OrderProcessor/auth",
+        "message": "Token validated successfully for user-789"
+      },
+      {
+        "timestamp": "2024-03-15T10:07:01Z",
+        "level": "DEBUG",
+        "source": "OrderProcessor/dynamo",
+        "message": "Querying table 'orders' with key {id: '789'}"
+      },
+      {
+        "timestamp": "2024-03-15T10:07:01Z",
+        "level": "INFO",
+        "source": "OrderProcessor/dynamo",
+        "message": "DynamoDB response: 200 OK (1847ms)"
+      },
+      {
+        "timestamp": "2024-03-15T10:07:03Z",
+        "level": "INFO",
+        "source": "OrderProcessor/handler",
+        "message": "Request completed in 3.2s"
+      },
+      {
+        "timestamp": "2024-03-15T10:07:05Z",
+        "level": "INFO",
+        "source": "UserRecommendation/handler",
+        "message": "Received request for user-801"
+      },
+      {
+        "timestamp": "2024-03-15T10:07:06Z",
+        "level": "INFO",
+        "source": "UserRecommendation/dynamo",
+        "message": "Querying recommendations table (31ms)"
+      },
+      {
+        "timestamp": "2024-03-15T10:07:06Z",
+        "level": "INFO",
+        "source": "UserRecommendation/handler",
+        "message": "Request completed in 1.1s"
       },
       {
         "timestamp": "2024-03-15T10:10:00Z",
         "level": "INFO",
-        "source": "auth",
-        "message": "Token validated successfully for user-789"
+        "source": "OrderProcessor/handler",
+        "message": "Received API request: GET /orders/999"
+      },
+      {
+        "timestamp": "2024-03-15T10:10:00Z",
+        "level": "INFO",
+        "source": "OrderProcessor/auth",
+        "message": "Token validated successfully for user-999"
       },
       {
         "timestamp": "2024-03-15T10:10:01Z",
         "level": "DEBUG",
-        "source": "dynamo",
-        "message": "Querying DynamoDB table 'users' with key: {id: '789'}"
+        "source": "OrderProcessor/dynamo",
+        "message": "Querying table 'orders' with key {id: '999'}"
       },
       {
         "timestamp": "2024-03-15T10:10:01Z",
         "level": "INFO",
-        "source": "dynamo",
-        "message": "DynamoDB response: 200 OK (52ms)"
+        "source": "OrderProcessor/dynamo",
+        "message": "DynamoDB response: 200 OK (44ms)"
       },
       {
         "timestamp": "2024-03-15T10:10:01Z",
         "level": "INFO",
-        "source": "handler",
+        "source": "OrderProcessor/handler",
         "message": "Request completed in 1.4s"
       }
     ],
     "answers": [
       {
         "id": "cold-start",
-        "text": "Lambda cold start causes the timeout"
+        "text": "VPC cold start latency is causing OrderProcessor to time out"
       },
       {
         "id": "auth-delay",
@@ -483,15 +682,15 @@
       },
       {
         "id": "dynamo-throttle",
-        "text": "DynamoDB table is throttling reads due to exceeded provisioned throughput",
+        "text": "DynamoDB table is throttling reads, exhausting Lambda retry budget",
         "correct": true
       },
       {
-        "id": "memory",
-        "text": "Lambda runs out of memory"
+        "id": "slow-query",
+        "text": "A slow DynamoDB query (1847ms) is accumulating to cause the timeout"
       }
     ],
-    "explanation": "The logs show repeated ProvisionedThroughputExceededException errors from DynamoDB with exponential backoff retries. The SDK retries consume the entire 30-second Lambda timeout. The fix is to switch the DynamoDB table to on-demand capacity mode or increase provisioned read capacity units.",
+    "explanation": "The logs show DDB:PROV_THROUGHPUT_EXCEEDED errors from the OrderProcessor function with exponential backoff retries. The SDK retries consume the entire 30-second Lambda timeout.\n\nTwo red herrings to discard:\n- VPC ENI cold start (4.2s) belongs to UserRecommendationFunction - it completes successfully\n- Slow 1847ms query at 10:07 - the request still completes in 3.2s, well within the timeout\n\nThe fix is to switch the DynamoDB table to on-demand capacity mode or increase provisioned read capacity units.",
     "showcase": true,
     "showcaseOrder": 5
   },
@@ -500,7 +699,7 @@
     "title": "Debug a Failed API Request",
     "description": "Trace a failing HTTPS request through the network path from client to API server to find the broken hop.",
     "type": "network-path",
-    "timeLimit": 180,
+    "timeLimit": 300,
     "difficulty": "beginner",
     "platform": "AWS",
     "category": "Networking",
@@ -582,7 +781,14 @@
         "label": "EC2 Security Group",
         "checkLabel": "Check EC2 SG",
         "status": "fail",
-        "detail": "EC2 security group only allows inbound on port 80. ALB target group is configured for port 8080. Port mismatch — traffic is blocked."
+        "detail": "Inbound rule check failed."
+      },
+      {
+        "id": "nacl",
+        "label": "Network ACL",
+        "checkLabel": "Check Subnet NACL",
+        "status": "pass",
+        "detail": "Subnet NACL allows all required inbound and outbound traffic."
       },
       {
         "id": "app",
@@ -611,7 +817,7 @@
         "text": "Application process has crashed"
       }
     ],
-    "explanation": "The EC2 security group allows inbound traffic on port 80, but the ALB target group forwards to port 8080. Since the security group doesn't allow port 8080, the ALB health checks fail and requests time out with 504 errors. The fix is to update the EC2 security group to allow inbound traffic on port 8080 from the ALB security group.",
+    "explanation": "The EC2 security group allows inbound traffic on port 80, but the ALB target group forwards to port 8080. Since the security group doesn't allow port 8080, the ALB health checks fail and requests time out with 504 errors.\n\nThe fix is to update the EC2 security group to allow inbound traffic on port 8080 from the ALB security group.",
     "showcase": true,
     "showcaseOrder": 2
   },
@@ -620,7 +826,7 @@
     "title": "Order the Incident Response Steps",
     "description": "A security incident has been detected. Put the AWS incident response steps in the correct order.",
     "type": "ordering",
-    "timeLimit": 120,
+    "timeLimit": 300,
     "difficulty": "beginner",
     "platform": "AWS",
     "category": "Security",
@@ -644,33 +850,48 @@
       },
       {
         "id": "step-3",
-        "text": "Review CloudTrail logs for scope of unauthorized activity",
+        "text": "Notify the security team and relevant stakeholders",
         "correctPosition": 3
       },
       {
         "id": "step-4",
-        "text": "Identify and revert any unauthorized changes to resources",
+        "text": "Review GuardDuty findings for signs of lateral movement",
         "correctPosition": 4
       },
       {
         "id": "step-5",
-        "text": "Rotate all credentials and create new access keys",
+        "text": "Review CloudTrail logs for the scope of unauthorized activity",
         "correctPosition": 5
       },
       {
         "id": "step-6",
-        "text": "Document findings and update security policies",
+        "text": "Isolate affected EC2 instances and revoke active console sessions",
         "correctPosition": 6
+      },
+      {
+        "id": "step-7",
+        "text": "Identify and revert any unauthorized changes to resources",
+        "correctPosition": 7
+      },
+      {
+        "id": "step-8",
+        "text": "Rotate all credentials and issue new access keys",
+        "correctPosition": 8
+      },
+      {
+        "id": "step-9",
+        "text": "Document findings and update security policies",
+        "correctPosition": 9
       }
     ],
-    "explanation": "The correct incident response order is: (1) Immediately disable compromised keys to stop the threat, (2) apply deny-all to prevent any remaining sessions from acting, (3) investigate the scope via CloudTrail, (4) remediate unauthorized changes, (5) issue fresh credentials once containment is confirmed, and (6) document lessons learned. Containment must come before investigation to limit blast radius."
+    "explanation": "The correct order:\n\n1. Disable the compromised keys immediately - this is the fastest containment.\n2. Apply deny-all to catch any active sessions still using the principal.\n3. Notify stakeholders before deep investigation so they are aware.\n4. Check GuardDuty for lateral movement signals first - it provides a broader threat picture.\n5. Deep dive into CloudTrail for the full action scope.\n6. Isolate affected EC2 instances once you understand what was accessed.\n7. Revert unauthorized changes.\n8. Issue fresh credentials once containment is confirmed.\n9. Document and improve policies last."
   },
   {
     "id": "aws-fix-alb-health-check",
     "title": "Fix ALB Health Check Configuration",
     "description": "An ALB is marking all targets as unhealthy. Fix the health check configuration to restore traffic flow.",
     "type": "config-toggle",
-    "timeLimit": 180,
+    "timeLimit": 300,
     "difficulty": "beginner",
     "platform": "AWS",
     "category": "Networking",
@@ -680,7 +901,7 @@
       "Target Groups"
     ],
     "labCategory": "Implement",
-    "scenario": "Your ALB target group shows all EC2 targets as unhealthy. The application listens on port 8080 at path /api/health and responds with 200. Fix the target group health check configuration.",
+    "scenario": "Your ALB target group shows all EC2 targets as unhealthy. The backend service runs without TLS and exposes a dedicated health endpoint. Review the target group health check configuration and correct it to restore target registration.",
     "configItems": [
       {
         "id": "protocol",
@@ -747,9 +968,29 @@
           "10",
           "30"
         ]
+      },
+      {
+        "id": "matcher",
+        "label": "Success Response Codes",
+        "currentValue": "200",
+        "correctValue": "200-299",
+        "inputType": "text"
+      },
+      {
+        "id": "dereg-delay",
+        "label": "Deregistration Delay (seconds)",
+        "currentValue": "300",
+        "correctValue": "60",
+        "inputType": "select",
+        "options": [
+          "30",
+          "60",
+          "120",
+          "300"
+        ]
       }
     ],
-    "explanation": "Three settings are wrong: (1) Protocol should be HTTP, not HTTPS — the app does not serve TLS on the backend. (2) Port must match the application port 8080, not the default 80. (3) Path must match the actual health endpoint /api/health. The healthy threshold of 5 is excessive — 2 is standard. Interval and timeout were already correct.",
+    "explanation": "Four settings need fixing:\n\n1. Protocol must be HTTP - the backend does not terminate TLS.\n2. Port must match the application's listening port, not the default 80.\n3. Path must match the actual health endpoint, not a generic /health.\n4. Healthy Threshold of 5 means a target needs 5 consecutive passes before it's considered healthy - 2 is the AWS recommended minimum for faster recovery.\n\nResponse codes should be 200-299 to accept any success code, not just 200. Deregistration delay of 300s is too long for rapid failover; 60s is appropriate for most APIs.",
     "showcase": true,
     "showcaseOrder": 3
   },
@@ -758,7 +999,7 @@
     "title": "Reduce Monthly AWS Spending",
     "description": "Optimize an over-provisioned architecture to bring monthly costs under the target budget while maintaining functionality.",
     "type": "cost-optimization",
-    "timeLimit": 420,
+    "timeLimit": 600,
     "difficulty": "intermediate",
     "platform": "AWS",
     "category": "Cost",
@@ -770,8 +1011,8 @@
       "Aurora"
     ],
     "labCategory": "Design",
-    "scenario": "Your team's monthly AWS bill is $2,150. The target budget is $900. Replace over-provisioned services with cost-effective alternatives while maintaining equivalent functionality.",
-    "targetCost": 900,
+    "scenario": "Your team's monthly AWS bill is $2,850. The target budget is $600. Replace over-provisioned services with cost-effective alternatives while maintaining equivalent functionality.",
+    "targetCost": 600,
     "components": [
       {
         "id": "compute",
@@ -872,9 +1113,59 @@
           }
         ],
         "correctService": "S3 Lifecycle: 30d Standard → IA → Glacier ($65/mo)"
+      },
+      {
+        "id": "logging",
+        "name": "CloudWatch Logs",
+        "currentService": "CloudWatch Logs: 200GB/day ingestion ($320/mo)",
+        "currentCost": 320,
+        "alternatives": [
+          {
+            "service": "Export to S3 + query with Athena ($40/mo)",
+            "cost": 40
+          },
+          {
+            "service": "Reduce log retention to 7 days ($200/mo)",
+            "cost": 200
+          },
+          {
+            "service": "CloudWatch Logs Insights subscription only ($85/mo)",
+            "cost": 85
+          },
+          {
+            "service": "Disable application logging ($0/mo)",
+            "cost": 0
+          }
+        ],
+        "correctService": "Export to S3 + query with Athena ($40/mo)"
+      },
+      {
+        "id": "batch-workers",
+        "name": "Batch Processing Workers",
+        "currentService": "ECS Fargate On-Demand (8 tasks, always-on) ($380/mo)",
+        "currentCost": 380,
+        "alternatives": [
+          {
+            "service": "70% Fargate Spot + 30% On-Demand tasks ($95/mo)",
+            "cost": 95
+          },
+          {
+            "service": "EC2 Spot Instances (c5.large fleet) ($55/mo)",
+            "cost": 55
+          },
+          {
+            "service": "AWS Step Functions + Lambda ($120/mo)",
+            "cost": 120
+          },
+          {
+            "service": "Keep Fargate On-Demand ($380/mo)",
+            "cost": 380
+          }
+        ],
+        "correctService": "70% Fargate Spot + 30% On-Demand tasks ($95/mo)"
       }
     ],
-    "explanation": "The optimal strategy brings costs to ~$480/mo: (1) Lambda replaces always-on EC2 instances for an API with variable traffic ($45 vs $520). (2) Aurora Serverless v2 scales to demand instead of a fixed oversized RDS ($350 vs $1200). (3) VPC Endpoints eliminate NAT Gateway data processing fees for AWS service traffic ($20 vs $210). (4) S3 Lifecycle policies automatically move aging data to cheaper tiers ($65 vs $220). Avoid Spot for production APIs (unreliable) and don't sacrifice Multi-AZ for databases (availability risk).",
+    "explanation": "The optimal strategy brings costs to ~$615/mo:\n\n1. Lambda replaces always-on EC2 for variable API traffic ($45 vs $520).\n2. Aurora Serverless v2 scales to demand instead of a fixed oversized RDS ($350 vs $1200).\n3. VPC Endpoints eliminate NAT data fees for AWS service traffic ($20 vs $210).\n4. S3 Lifecycle moves aging objects to cheaper tiers automatically ($65 vs $220).\n5. Exporting CloudWatch logs to S3 and querying with Athena is far cheaper than high-volume log ingestion ($40 vs $320).\n6. Fargate Spot is suitable for interruptible batch workers - EC2 Spot is cheaper still but requires managing instances ($95 vs $380).\n\nAvoid disabling logging (breaks audit trail) and avoid pure Spot for latency-sensitive APIs.",
     "showcase": true,
     "showcaseOrder": 6
   },
@@ -883,7 +1174,7 @@
     "title": "Secure an S3-Backed Application",
     "description": "Identify and fix security vulnerabilities in an application that stores user data in S3.",
     "type": "security-hardening",
-    "timeLimit": 480,
+    "timeLimit": 600,
     "difficulty": "intermediate",
     "platform": "AWS",
     "category": "Security",
@@ -955,16 +1246,40 @@
           "Enable MFA Delete on the bucket"
         ],
         "correctOption": "Enable versioning with lifecycle rules for non-current versions"
+      },
+      {
+        "id": "mfa-delete",
+        "resource": "S3 Bucket: user-data-prod",
+        "issue": "Versioning is enabled but MFA Delete is not configured. Any authenticated user with s3:DeleteObjectVersion can permanently remove object versions.",
+        "options": [
+          "Enable MFA Delete; require MFA for s3:DeleteObjectVersion and s3:PutBucketVersioning",
+          "Apply a bucket policy denying delete operations from all principals",
+          "Enable Object Lock in GOVERNANCE mode",
+          "Restrict DeleteObject permissions via IAM permission boundary"
+        ],
+        "correctOption": "Enable MFA Delete; require MFA for s3:DeleteObjectVersion and s3:PutBucketVersioning"
+      },
+      {
+        "id": "retention",
+        "resource": "S3 Bucket: user-data-prod (Object Lock)",
+        "issue": "Compliance policy requires immutable retention of user records for 7 years. Bucket has Object Lock enabled but retention period is set to 365 days in GOVERNANCE mode.",
+        "options": [
+          "Change Object Lock mode to COMPLIANCE and set retention period to 2,555 days (7 years)",
+          "Enable cross-region replication to a second region as a backup",
+          "Use S3 Glacier Vault Lock with a 7-year policy instead",
+          "Apply a lifecycle rule moving objects to S3 Glacier after 1 year"
+        ],
+        "correctOption": "Change Object Lock mode to COMPLIANCE and set retention period to 2,555 days (7 years)"
       }
     ],
-    "explanation": "The five critical fixes are: (1) Block Public Access prevents accidental exposure — it overrides ACLs and bucket policies. (2) SSE-KMS with a CMK provides encryption plus audit trail via CloudTrail, and the deny policy prevents unencrypted uploads. (3) Least-privilege IAM scopes the role to only needed actions on the specific bucket. (4) CloudTrail S3 data events provide detailed per-object audit logging. (5) Versioning protects against accidental deletes and enables recovery of previous versions."
+    "explanation": "The seven critical fixes are:\n\n1. Block Public Access prevents accidental exposure.\n2. SSE-KMS with a CMK provides encryption plus audit trail, with a deny policy blocking unencrypted uploads.\n3. Least-privilege IAM restricts the role to needed actions on the specific bucket.\n4. CloudTrail S3 data events provide per-object audit logging.\n5. Versioning with lifecycle rules protects against accidental deletes.\n6. MFA Delete adds a second authentication factor to prevent permanent version deletion by compromised credentials.\n7. Switching Object Lock to COMPLIANCE mode for 7 years makes retention tamper-proof - even the root account cannot shorten it, satisfying regulatory requirements."
   },
   {
     "id": "aws-improve-api-latency",
     "title": "Improve API Response Times",
     "description": "Optimize a slow serverless API by selecting the correct performance improvement for each bottleneck.",
     "type": "performance-optimization",
-    "timeLimit": 360,
+    "timeLimit": 600,
     "difficulty": "intermediate",
     "platform": "AWS",
     "category": "Performance",
@@ -1026,16 +1341,40 @@
           "Paginate all responses to 10 items"
         ],
         "correctOption": "Use DynamoDB projection expressions and return only needed fields"
+      },
+      {
+        "id": "secrets-fetching",
+        "area": "Secrets Manager Latency",
+        "problem": "The Lambda function calls Secrets Manager GetSecretValue on every invocation to retrieve database credentials. Each call adds ~80ms of latency and contributes significant cost at scale.",
+        "options": [
+          "Use the AWS Parameters and Secrets Lambda extension with a local cache (TTL 5 min)",
+          "Hard-code the database credentials in the Lambda environment variables",
+          "Store secrets in S3 and read them at cold start only",
+          "Switch to IAM database authentication to eliminate secrets entirely for this use case"
+        ],
+        "correctOption": "Use the AWS Parameters and Secrets Lambda extension with a local cache (TTL 5 min)"
+      },
+      {
+        "id": "gateway-logging",
+        "area": "API Gateway Execution Logging",
+        "problem": "API Gateway execution logging is set to INFO level on all stages and routes, writing a log entry for every request, response, and Lambda integration event. Under load this adds measurable per-request overhead and inflates CloudWatch costs.",
+        "options": [
+          "Set execution logging level to ERROR only in production; use access logging for request tracing",
+          "Disable CloudWatch logging entirely to eliminate overhead",
+          "Switch to HTTP API which does not support execution logging",
+          "Move all APIs to a private VPC endpoint to reduce logging volume"
+        ],
+        "correctOption": "Set execution logging level to ERROR only in production; use access logging for request tracing"
       }
     ],
-    "explanation": "Four optimizations bring latency under 500ms: (1) Provisioned Concurrency eliminates cold starts — the #1 latency contributor for infrequently invoked functions with large packages. (2) DAX provides microsecond read caching for hot items, reducing DynamoDB round trips. (3) API Gateway caching eliminates Lambda invocations entirely for repeated requests. (4) Projection expressions reduce data transfer and processing by fetching only needed attributes. Together these address cold starts, database access, API layer, and payload size."
+    "explanation": "Six optimizations bring latency under 500ms:\n\n1. Provisioned Concurrency eliminates cold starts - the #1 contributor for functions with large packages.\n2. DAX provides microsecond caching for hot DynamoDB items.\n3. API Gateway caching eliminates Lambda invocations for repeated requests.\n4. Projection expressions reduce payload size and data transfer.\n5. The Parameters and Secrets Lambda extension caches secrets in the Lambda execution environment, removing the per-invocation Secrets Manager call (~80ms savings).\n6. Reducing execution logging to ERROR only removes per-request log overhead; access logs are sufficient for tracing in production."
   },
   {
     "id": "aws-write-s3-readonly-policy",
-    "title": "Write a Cross-Account S3 Read Policy",
+    "title": "Write a Cross-Account S3 Versioned Access Policy",
     "description": "Write an IAM policy that grants read-only access to a specific S3 bucket from a cross-account role.",
     "type": "policy-simulation",
-    "timeLimit": 600,
+    "timeLimit": 900,
     "difficulty": "advanced",
     "platform": "AWS",
     "category": "Security",
@@ -1045,10 +1384,12 @@
       "STS"
     ],
     "labCategory": "Implement",
-    "scenario": "Account B (444455556666) needs to read objects from the 'shared-data-bucket' in Account A (111122223333). Write an IAM policy for the role in Account B that follows least-privilege.",
+    "scenario": "Account B (444455556666) needs to read current and historical (versioned) objects from the 'shared-data-bucket' in Account A (111122223333), but must not be able to enumerate other buckets or perform write/delete operations. Write an IAM policy for the Account B role that follows strict least-privilege.",
     "requirements": [
       "Allow s3:GetObject on objects in shared-data-bucket only",
       "Allow s3:ListBucket on the shared-data-bucket only",
+      "Allow s3:GetObjectVersion on versioned objects in shared-data-bucket only",
+      "Deny s3:ListAllMyBuckets — cross-account bucket enumeration must not be permitted",
       "Deny all other S3 actions",
       "Deny access to any other bucket"
     ],
@@ -1063,6 +1404,12 @@
         "description": "List shared bucket",
         "action": "s3:ListBucket",
         "resource": "arn:aws:s3:::shared-data-bucket",
+        "expectedResult": "Allow"
+      },
+      {
+        "description": "Get versioned object from shared bucket",
+        "action": "s3:GetObjectVersion",
+        "resource": "arn:aws:s3:::shared-data-bucket/reports/q1.csv",
         "expectedResult": "Allow"
       },
       {
@@ -1088,17 +1435,35 @@
         "action": "s3:ListBucket",
         "resource": "arn:aws:s3:::other-private-bucket",
         "expectedResult": "Deny"
+      },
+      {
+        "description": "Get versioned object from a different bucket (should be denied)",
+        "action": "s3:GetObjectVersion",
+        "resource": "arn:aws:s3:::other-private-bucket/secret.txt",
+        "expectedResult": "Deny"
+      },
+      {
+        "description": "List all buckets in account (should be denied)",
+        "action": "s3:ListAllMyBuckets",
+        "resource": "*",
+        "expectedResult": "Deny"
+      },
+      {
+        "description": "Get object tags from shared bucket — not in allowed actions (should be denied)",
+        "action": "s3:GetObjectTagging",
+        "resource": "arn:aws:s3:::shared-data-bucket/reports/q1.csv",
+        "expectedResult": "Deny"
       }
     ],
     "initialPolicy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
-    "explanation": "The correct policy has two statements: (1) Allow s3:GetObject on 'arn:aws:s3:::shared-data-bucket/*' for object-level access. (2) Allow s3:ListBucket on 'arn:aws:s3:::shared-data-bucket' (bucket-level ARN without /*). No wildcard actions or resources — only the specific actions and bucket needed. The initial policy with s3:* and Resource:* violates least-privilege and would fail the Deny test cases."
+    "explanation": "The correct policy has three statements:\n\n1. Allow s3:GetObject and s3:GetObjectVersion on arn:aws:s3:::shared-data-bucket/* for object-level access.\n2. Allow s3:ListBucket on arn:aws:s3:::shared-data-bucket (bucket ARN without /*).\n3. Explicit Deny for s3:ListAllMyBuckets on * prevents account enumeration.\n\nAll other actions are denied implicitly.\n\nCommon mistakes:\n- Using wildcard Resource or Action for the Allow statements\n- Forgetting the separate bucket-level ARN for ListBucket\n- Omitting the explicit Deny for ListAllMyBuckets\n- Conflating GetObjectVersion with GetObject (they are distinct IAM actions)"
   },
   {
     "id": "aws-handle-traffic-spike",
     "title": "Handle a Traffic Spike",
     "description": "A 10x traffic spike is overwhelming your infrastructure. Select the correct scaling action for each metric.",
     "type": "service-limits",
-    "timeLimit": 600,
+    "timeLimit": 900,
     "difficulty": "advanced",
     "platform": "AWS",
     "category": "Reliability",
@@ -1176,8 +1541,1846 @@
           "Add CloudFront in front of API Gateway"
         ],
         "correctOption": "Request API Gateway account-level throttle increase via AWS Support"
+      },
+      {
+        "id": "elasticache-evictions",
+        "metric": "ElastiCache Cluster Evictions",
+        "currentValue": "Eviction rate 45% (threshold: 30%)",
+        "targetValue": "Reduce evictions below 30% without increasing cache misses",
+        "options": [
+          "Scale up node type and enable cluster mode with auto-sharding",
+          "Flush all cache keys to start fresh",
+          "Increase TTL on all cached items to reduce churn",
+          "Switch from Redis to Memcached"
+        ],
+        "correctOption": "Scale up node type and enable cluster mode with auto-sharding"
+      },
+      {
+        "id": "rds-connections",
+        "metric": "RDS max_connections",
+        "currentValue": "480/500 connections (approaching hard limit)",
+        "targetValue": "Support 5x more concurrent application connections without changing RDS instance size",
+        "options": [
+          "Enable RDS Proxy to pool and multiplex database connections",
+          "Restart RDS to clear stale connections",
+          "Set max_connections to 2000 in the parameter group",
+          "Switch to Aurora which has a higher default connection limit"
+        ],
+        "correctOption": "Enable RDS Proxy to pool and multiplex database connections"
+      },
+      {
+        "id": "cloudfront-origin-errors",
+        "metric": "CloudFront Origin Error Rate",
+        "currentValue": "12% origin errors (normal baseline: <1%)",
+        "targetValue": "Reduce origin error rate below 1%",
+        "options": [
+          "Enable CloudFront Origin Shield and increase origin response timeout",
+          "Increase CloudFront default TTL to reduce origin requests",
+          "Add a second ALB in a different region as failover origin",
+          "Disable CloudFront and route traffic directly to the ALB"
+        ],
+        "correctOption": "Enable CloudFront Origin Shield and increase origin response timeout"
       }
     ],
-    "explanation": "The correct actions: (1) Increase ASG max capacity — the current limit prevents scaling out. Target tracking at 60% CPU provides headroom. (2) Request Lambda concurrency increase — the account-level limit must be raised via AWS Support, and reserved concurrency protects critical functions from noisy neighbors. (3) DynamoDB on-demand mode auto-scales to traffic without pre-provisioning. (4) Increasing Lambda batch size and concurrency for SQS consumers processes more messages per invocation. (5) API Gateway account-level throttle must be raised via Support — caching helps but doesn't solve a hard limit issue."
+    "explanation": "The correct actions:\n\n1. Increase ASG max capacity - the current limit prevents scaling out; target tracking at 60% CPU provides headroom.\n2. Request Lambda concurrency increase via AWS Support, and set reserved concurrency to protect critical functions.\n3. DynamoDB on-demand mode auto-scales without pre-provisioning.\n4. Increasing Lambda batch size and concurrency for SQS consumers drains the queue faster.\n5. API Gateway account-level throttle must be raised via Support - caching helps but doesn't solve a hard limit.\n6. Scaling up ElastiCache nodes and enabling cluster mode distributes keyspace and reduces eviction pressure.\n7. RDS Proxy pools persistent application connections and multiplexes them to RDS, allowing far more concurrent connections without resizing the instance.\n8. CloudFront Origin Shield adds an extra caching layer between edge nodes and the origin; increasing origin timeout handles slow responses under spike load."
+  },
+  {
+    "id": "aws-investigate-api-outage",
+    "title": "Investigate Production API Outage",
+    "description": "Your production REST API is returning intermittent 500 errors during peak traffic. Investigate alerts, metrics, logs, and the incident timeline to identify the root cause and select the correct remediation actions.",
+    "type": "incident-response",
+    "timeLimit": 900,
+    "difficulty": "advanced",
+    "platform": "AWS",
+    "category": "Operations",
+    "technologies": [
+      "API Gateway",
+      "Lambda",
+      "DynamoDB",
+      "CloudWatch"
+    ],
+    "labCategory": "Troubleshoot",
+    "scenario": "At 14:00 UTC, your operations team received multiple alerts about API errors. The API is backed by API Gateway → Lambda → DynamoDB with provisioned capacity. Users are reporting timeouts and errors. Investigate the incident across all available signals and determine the root cause and correct response.",
+    "alerts": [
+      {
+        "id": "a1",
+        "severity": "critical",
+        "time": "14:25",
+        "service": "DynamoDB",
+        "message": "ThrottledRequests alarm: 112 throttled requests in the last 5 minutes on table 'orders'. Threshold: 0"
+      },
+      {
+        "id": "a2",
+        "severity": "critical",
+        "time": "14:28",
+        "service": "API Gateway",
+        "message": "5xx error rate alarm: 23% of requests returning 500 errors. Threshold: 2%"
+      },
+      {
+        "id": "a3",
+        "severity": "warning",
+        "time": "14:22",
+        "service": "Lambda",
+        "message": "Duration alarm: Average execution time 12,400ms on function 'api-handler'. Threshold: 10,000ms"
+      },
+      {
+        "id": "a4",
+        "severity": "warning",
+        "time": "14:30",
+        "service": "Lambda",
+        "message": "Error rate alarm: 8.2% invocation error rate on function 'api-handler'. Threshold: 5%"
+      },
+      {
+        "id": "a5",
+        "severity": "info",
+        "time": "14:15",
+        "service": "CloudWatch",
+        "message": "DynamoDB ConsumedReadCapacityUnits approaching provisioned limit on table 'orders'"
+      }
+    ],
+    "metrics": [
+      {
+        "id": "m1",
+        "name": "API Gateway 5xx Count",
+        "unit": "count",
+        "values": [
+          {
+            "time": "13:30",
+            "value": 0
+          },
+          {
+            "time": "13:45",
+            "value": 0
+          },
+          {
+            "time": "14:00",
+            "value": 2
+          },
+          {
+            "time": "14:05",
+            "value": 8
+          },
+          {
+            "time": "14:10",
+            "value": 45
+          },
+          {
+            "time": "14:15",
+            "value": 120
+          },
+          {
+            "time": "14:20",
+            "value": 89
+          },
+          {
+            "time": "14:25",
+            "value": 156
+          }
+        ]
+      },
+      {
+        "id": "m2",
+        "name": "Lambda Invocations",
+        "unit": "count",
+        "values": [
+          {
+            "time": "13:30",
+            "value": 1200
+          },
+          {
+            "time": "13:45",
+            "value": 1300
+          },
+          {
+            "time": "14:00",
+            "value": 1250
+          },
+          {
+            "time": "14:05",
+            "value": 1800
+          },
+          {
+            "time": "14:10",
+            "value": 2200
+          },
+          {
+            "time": "14:15",
+            "value": 2500
+          },
+          {
+            "time": "14:20",
+            "value": 2800
+          },
+          {
+            "time": "14:25",
+            "value": 3100
+          }
+        ]
+      },
+      {
+        "id": "m3",
+        "name": "Lambda Avg Duration",
+        "unit": "ms",
+        "values": [
+          {
+            "time": "13:30",
+            "value": 120
+          },
+          {
+            "time": "13:45",
+            "value": 125
+          },
+          {
+            "time": "14:00",
+            "value": 340
+          },
+          {
+            "time": "14:05",
+            "value": 890
+          },
+          {
+            "time": "14:10",
+            "value": 4200
+          },
+          {
+            "time": "14:15",
+            "value": 12000
+          },
+          {
+            "time": "14:20",
+            "value": 8900
+          },
+          {
+            "time": "14:25",
+            "value": 15200
+          }
+        ]
+      },
+      {
+        "id": "m4",
+        "name": "DynamoDB Consumed Read Capacity",
+        "unit": "RCU",
+        "values": [
+          {
+            "time": "13:30",
+            "value": 50
+          },
+          {
+            "time": "13:45",
+            "value": 55
+          },
+          {
+            "time": "14:00",
+            "value": 72
+          },
+          {
+            "time": "14:05",
+            "value": 95
+          },
+          {
+            "time": "14:10",
+            "value": 100
+          },
+          {
+            "time": "14:15",
+            "value": 100
+          },
+          {
+            "time": "14:20",
+            "value": 100
+          },
+          {
+            "time": "14:25",
+            "value": 100
+          }
+        ]
+      },
+      {
+        "id": "m5",
+        "name": "DynamoDB Provisioned Read Capacity",
+        "unit": "RCU",
+        "values": [
+          {
+            "time": "13:30",
+            "value": 100
+          },
+          {
+            "time": "13:45",
+            "value": 100
+          },
+          {
+            "time": "14:00",
+            "value": 100
+          },
+          {
+            "time": "14:05",
+            "value": 100
+          },
+          {
+            "time": "14:10",
+            "value": 100
+          },
+          {
+            "time": "14:15",
+            "value": 100
+          },
+          {
+            "time": "14:20",
+            "value": 100
+          },
+          {
+            "time": "14:25",
+            "value": 100
+          }
+        ]
+      },
+      {
+        "id": "m6",
+        "name": "DynamoDB Throttled Requests",
+        "unit": "count",
+        "values": [
+          {
+            "time": "13:30",
+            "value": 0
+          },
+          {
+            "time": "13:45",
+            "value": 0
+          },
+          {
+            "time": "14:00",
+            "value": 0
+          },
+          {
+            "time": "14:05",
+            "value": 12
+          },
+          {
+            "time": "14:10",
+            "value": 45
+          },
+          {
+            "time": "14:15",
+            "value": 89
+          },
+          {
+            "time": "14:20",
+            "value": 67
+          },
+          {
+            "time": "14:25",
+            "value": 112
+          }
+        ]
+      }
+    ],
+    "logs": [
+      {
+        "timestamp": "13:58:12",
+        "level": "INFO",
+        "source": "api-handler",
+        "message": "GET /orders/12345 — 200 OK (85ms)"
+      },
+      {
+        "timestamp": "13:59:45",
+        "level": "INFO",
+        "source": "api-handler",
+        "message": "POST /orders — 201 Created (102ms)"
+      },
+      {
+        "timestamp": "14:01:03",
+        "level": "INFO",
+        "source": "api-handler",
+        "message": "INIT cold start — runtime initialisation complete (540ms)"
+      },
+      {
+        "timestamp": "14:02:18",
+        "level": "INFO",
+        "source": "api-handler",
+        "message": "GET /orders — 200 OK (95ms)"
+      },
+      {
+        "timestamp": "14:05:31",
+        "level": "WARN",
+        "source": "api-handler",
+        "message": "DynamoDB query latency elevated: 450ms (normal: <50ms)"
+      },
+      {
+        "timestamp": "14:07:44",
+        "level": "WARN",
+        "source": "api-handler",
+        "message": "DynamoDB query retry attempt 1/3 — ProvisionedThroughputExceededException"
+      },
+      {
+        "timestamp": "14:08:12",
+        "level": "ERROR",
+        "source": "api-handler",
+        "message": "DynamoDB query failed after 3 retries — ProvisionedThroughputExceededException. Table: orders"
+      },
+      {
+        "timestamp": "14:09:01",
+        "level": "INFO",
+        "source": "api-handler",
+        "message": "GET /health — 200 OK (12ms)"
+      },
+      {
+        "timestamp": "14:10:33",
+        "level": "ERROR",
+        "source": "api-handler",
+        "message": "Task timed out after 29.00 seconds — pending DynamoDB GetItem on table 'orders'"
+      },
+      {
+        "timestamp": "14:11:05",
+        "level": "ERROR",
+        "source": "api-handler",
+        "message": "DynamoDB query failed — ProvisionedThroughputExceededException. Table: orders"
+      },
+      {
+        "timestamp": "14:12:22",
+        "level": "WARN",
+        "source": "api-handler",
+        "message": "DynamoDB query retry attempt 2/3 — ProvisionedThroughputExceededException"
+      },
+      {
+        "timestamp": "14:13:47",
+        "level": "ERROR",
+        "source": "api-handler",
+        "message": "Task timed out after 29.00 seconds — pending DynamoDB Query on table 'orders'"
+      },
+      {
+        "timestamp": "14:14:55",
+        "level": "INFO",
+        "source": "api-handler",
+        "message": "INIT cold start — runtime initialisation complete (620ms)"
+      },
+      {
+        "timestamp": "14:15:30",
+        "level": "ERROR",
+        "source": "api-handler",
+        "message": "DynamoDB BatchGetItem throttled — ProvisionedThroughputExceededException. 23 unprocessed keys"
+      },
+      {
+        "timestamp": "14:17:08",
+        "level": "ERROR",
+        "source": "api-gateway",
+        "message": "502 Bad Gateway — upstream Lambda invocation failed (timeout)"
+      },
+      {
+        "timestamp": "14:18:44",
+        "level": "WARN",
+        "source": "api-handler",
+        "message": "Memory usage: 245MB / 256MB — approaching limit"
+      },
+      {
+        "timestamp": "14:20:11",
+        "level": "ERROR",
+        "source": "api-handler",
+        "message": "Task timed out after 29.00 seconds — pending DynamoDB Scan on table 'orders'"
+      },
+      {
+        "timestamp": "14:22:33",
+        "level": "DEBUG",
+        "source": "api-gateway",
+        "message": "Execution log — x-amzn-RequestId: a3b4c5d6-7890, latency: 29012ms"
+      }
+    ],
+    "timeline": [
+      {
+        "time": "14:00",
+        "event": "Marketing campaign email sent to 50,000 subscribers with promotional code"
+      },
+      {
+        "time": "14:03",
+        "event": "API request rate begins increasing — up 40% from baseline"
+      },
+      {
+        "time": "14:05",
+        "event": "DynamoDB consumed read capacity reaches 95% of provisioned limit (95/100 RCU)"
+      },
+      {
+        "time": "14:07",
+        "event": "First DynamoDB ProvisionedThroughputExceededException errors appear in Lambda logs"
+      },
+      {
+        "time": "14:10",
+        "event": "Lambda functions begin timing out waiting for throttled DynamoDB responses"
+      },
+      {
+        "time": "14:15",
+        "event": "CloudWatch info alert: DynamoDB capacity approaching limit"
+      },
+      {
+        "time": "14:22",
+        "event": "Lambda duration alarm triggers (avg >10s)"
+      },
+      {
+        "time": "14:25",
+        "event": "DynamoDB throttled requests alarm triggers"
+      },
+      {
+        "time": "14:28",
+        "event": "API Gateway 5xx rate alarm triggers — 23% error rate"
+      },
+      {
+        "time": "14:30",
+        "event": "Lambda error rate alarm triggers — SNS notification sent to ops team"
+      }
+    ],
+    "actions": [
+      {
+        "id": "act1",
+        "description": "Switch DynamoDB 'orders' table to on-demand (PAY_PER_REQUEST) capacity mode",
+        "correct": true
+      },
+      {
+        "id": "act2",
+        "description": "Enable DynamoDB auto-scaling with target utilisation of 70%",
+        "correct": true
+      },
+      {
+        "id": "act3",
+        "description": "Add exponential backoff with jitter to Lambda DynamoDB calls",
+        "correct": true
+      },
+      {
+        "id": "act4",
+        "description": "Increase Lambda memory from 256MB to 512MB",
+        "correct": false
+      },
+      {
+        "id": "act5",
+        "description": "Enable API Gateway response caching for GET endpoints",
+        "correct": false
+      },
+      {
+        "id": "act6",
+        "description": "Restart all Lambda function instances by updating the function configuration",
+        "correct": false
+      },
+      {
+        "id": "act7",
+        "description": "Switch API Gateway to Regional endpoint type",
+        "correct": false
+      }
+    ],
+    "answers": [
+      {
+        "id": "ans1",
+        "text": "DynamoDB provisioned read capacity exceeded due to traffic spike from marketing campaign",
+        "correct": true
+      },
+      {
+        "id": "ans2",
+        "text": "Lambda cold starts causing cascading timeouts across the API"
+      },
+      {
+        "id": "ans3",
+        "text": "API Gateway throttling due to account-level usage plan limits"
+      },
+      {
+        "id": "ans4",
+        "text": "Lambda memory exhaustion causing out-of-memory crashes"
+      }
+    ],
+    "explanation": "The root cause is DynamoDB throttling. The 'orders' table has fixed provisioned capacity of 100 RCU. When the marketing campaign drove a traffic spike at 14:00, read demand exceeded provisioned capacity within minutes. DynamoDB began returning ProvisionedThroughputExceededException errors, causing Lambda functions to retry and eventually time out (29s). These timeouts cascaded to API Gateway, which returned 502/500 errors to clients.\n\nCorrect remediation actions:\n1. Switch to on-demand capacity - immediately removes the throughput ceiling\n2. If staying on provisioned, enable auto-scaling - prevents future capacity ceilings\n3. Add exponential backoff with jitter - prevents retry storms that amplify throttling\n\nIncorrect actions:\n- Increasing Lambda memory won't help - the bottleneck is DynamoDB throttling, not Lambda compute\n- API Gateway caching might reduce read load but doesn't fix the underlying capacity problem\n- Restarting Lambda has no effect\n- Changing endpoint type is irrelevant"
+  },
+  {
+    "id": "aws-detect-terraform-drift",
+    "title": "Detect Infrastructure Drift",
+    "description": "Your team uses Terraform to manage AWS infrastructure. After a colleague made emergency manual changes via the AWS Console, you need to identify which resources have drifted from the Terraform state.",
+    "type": "drift-detection",
+    "timeLimit": 480,
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "DevOps",
+    "technologies": [
+      "Terraform",
+      "IAM",
+      "EC2",
+      "RDS",
+      "S3",
+      "Lambda"
+    ],
+    "labCategory": "Troubleshoot",
+    "scenario": "During last week’s incident, a colleague made emergency changes via the AWS Console to restore service. Now you need to run a drift assessment before your next Terraform apply. Compare the expected Terraform state with the actual AWS configuration and identify which resources have drifted.",
+    "resources": [
+      {
+        "id": "sg-web",
+        "resourceType": "aws_security_group",
+        "resourceName": "sg-web-app",
+        "expected": {
+          "ingress_ports": "80, 443",
+          "egress": "0.0.0.0/0 (all traffic)",
+          "description": "Web application security group"
+        },
+        "actual": {
+          "ingress_ports": "80, 443, 22",
+          "egress": "0.0.0.0/0 (all traffic)",
+          "description": "Web application security group"
+        },
+        "drifted": true
+      },
+      {
+        "id": "s3-data",
+        "resourceType": "aws_s3_bucket",
+        "resourceName": "app-data-prod",
+        "expected": {
+          "versioning": "Enabled",
+          "encryption": "AES256",
+          "public_access_block": "all blocked",
+          "lifecycle_rule": "transition to GLACIER after 90 days"
+        },
+        "actual": {
+          "versioning": "Enabled",
+          "encryption": "AES256",
+          "public_access_block": "all blocked",
+          "lifecycle_rule": "transition to GLACIER after 90 days"
+        },
+        "drifted": false
+      },
+      {
+        "id": "rds-prod",
+        "resourceType": "aws_db_instance",
+        "resourceName": "prod-db",
+        "expected": {
+          "instance_class": "db.t3.medium",
+          "multi_az": "true",
+          "backup_retention": "7 days",
+          "storage_encrypted": "true"
+        },
+        "actual": {
+          "instance_class": "db.t3.large",
+          "multi_az": "true",
+          "backup_retention": "7 days",
+          "storage_encrypted": "true"
+        },
+        "drifted": true
+      },
+      {
+        "id": "iam-lambda",
+        "resourceType": "aws_iam_role",
+        "resourceName": "lambda-execution-role",
+        "expected": {
+          "managed_policies": "AmazonDynamoDBReadOnlyAccess, AWSLambdaBasicExecutionRole",
+          "inline_policies": "none",
+          "trust_policy": "lambda.amazonaws.com"
+        },
+        "actual": {
+          "managed_policies": "AmazonDynamoDBReadOnlyAccess, AWSLambdaBasicExecutionRole, AmazonS3FullAccess",
+          "inline_policies": "none",
+          "trust_policy": "lambda.amazonaws.com"
+        },
+        "drifted": true
+      },
+      {
+        "id": "cw-alarm",
+        "resourceType": "aws_cloudwatch_metric_alarm",
+        "resourceName": "high-cpu-alarm",
+        "expected": {
+          "threshold": "80",
+          "period": "300",
+          "evaluation_periods": "2",
+          "comparison_operator": "GreaterThanThreshold"
+        },
+        "actual": {
+          "threshold": "80",
+          "period": "300",
+          "evaluation_periods": "2",
+          "comparison_operator": "GreaterThanThreshold"
+        },
+        "drifted": false
+      },
+      {
+        "id": "lambda-api",
+        "resourceType": "aws_lambda_function",
+        "resourceName": "api-handler",
+        "expected": {
+          "runtime": "nodejs18.x",
+          "memory_size": "256",
+          "timeout": "30",
+          "environment": "STAGE=prod, LOG_LEVEL=warn"
+        },
+        "actual": {
+          "runtime": "nodejs18.x",
+          "memory_size": "512",
+          "timeout": "60",
+          "environment": "STAGE=prod, LOG_LEVEL=debug"
+        },
+        "drifted": true
+      },
+      {
+        "id": "dynamodb-users",
+        "resourceType": "aws_dynamodb_table",
+        "resourceName": "users",
+        "expected": {
+          "billing_mode": "PAY_PER_REQUEST",
+          "encryption": "AWS_OWNED_KEY",
+          "point_in_time_recovery": "enabled",
+          "ttl_attribute": "expiresAt"
+        },
+        "actual": {
+          "billing_mode": "PAY_PER_REQUEST",
+          "encryption": "AWS_OWNED_KEY",
+          "point_in_time_recovery": "enabled",
+          "ttl_attribute": "expiresAt"
+        },
+        "drifted": false
+      },
+      {
+        "id": "alb-rule",
+        "resourceType": "aws_lb_listener_rule",
+        "resourceName": "app-api-rule",
+        "expected": {
+          "priority": "100",
+          "path_pattern": "/api/*",
+          "target_group": "api-tg",
+          "health_check_path": "/health"
+        },
+        "actual": {
+          "priority": "100",
+          "path_pattern": "/api/*",
+          "target_group": "api-tg",
+          "health_check_path": "/health"
+        },
+        "drifted": false
+      }
+    ],
+    "explanation": "Four resources have drifted from the Terraform state:\n\n1. Security Group (sg-web-app) - Port 22 (SSH) was added manually for debugging during the incident. This is a security risk and should be removed, then the Terraform state updated if SSH access is needed.\n\n2. RDS Instance (prod-db) - Instance class was upgraded from db.t3.medium to db.t3.large during the incident for more capacity. The Terraform configuration should be updated to reflect the new size if the upgrade is desired, or the instance should be downgraded.\n\n3. IAM Role (lambda-execution-role) - AmazonS3FullAccess was attached manually. This violates least-privilege and should be replaced with a scoped policy granting only the specific S3 permissions needed.\n\n4. Lambda Function (api-handler) - Memory was doubled (256→512MB), timeout increased (30→60s), and LOG_LEVEL changed from 'warn' to 'debug'. These were emergency changes to handle elevated load and improve debugging. The Terraform config should be updated to keep the memory increase if helpful, but LOG_LEVEL should revert to 'warn' for production."
+  },
+  {
+    "id": "aws-migration-service-mapping",
+    "title": "Map On-Prem Services to AWS",
+    "description": "Your organisation is migrating from on-premises infrastructure to AWS. Match each on-premises technology to the most appropriate AWS service equivalent for a lift-and-shift migration.",
+    "type": "drag-match",
+    "timeLimit": 300,
+    "difficulty": "beginner",
+    "platform": "AWS",
+    "category": "Migration",
+    "technologies": [
+      "EC2",
+      "EBS",
+      "RDS",
+      "EFS",
+      "ELB",
+      "CloudWatch",
+      "SQS",
+      "Directory Service"
+    ],
+    "labCategory": "Design",
+    "scenario": "Your organisation is planning a lift-and-shift migration from on-premises data centres to AWS. For each on-premises technology currently in use, identify the most appropriate AWS managed service equivalent. Drag each on-prem technology to its matching AWS service.",
+    "pairs": [
+      {
+        "id": "compute",
+        "term": "VMware vSphere VMs",
+        "definition": "Amazon EC2 — Virtual servers with configurable instance types, auto-scaling groups, and placement groups for HA"
+      },
+      {
+        "id": "block-storage",
+        "term": "NetApp SAN (iSCSI)",
+        "definition": "Amazon EBS — Block-level storage volumes attached to EC2 instances with snapshots and encryption"
+      },
+      {
+        "id": "database",
+        "term": "Self-managed PostgreSQL",
+        "definition": "Amazon RDS — Managed relational database with automated backups, Multi-AZ deployment, and read replicas"
+      },
+      {
+        "id": "file-storage",
+        "term": "NFS File Server",
+        "definition": "Amazon EFS — Fully managed elastic NFS file system for shared access across multiple EC2 instances"
+      },
+      {
+        "id": "load-balancer",
+        "term": "F5 BIG-IP Load Balancer",
+        "definition": "Elastic Load Balancing (ALB/NLB) — Distributes traffic across targets with health checks and SSL/TLS termination"
+      },
+      {
+        "id": "monitoring",
+        "term": "Nagios + Grafana",
+        "definition": "Amazon CloudWatch — Metrics, alarms, logs, and dashboards for monitoring AWS resources and applications"
+      },
+      {
+        "id": "message-queue",
+        "term": "RabbitMQ Broker",
+        "definition": "Amazon SQS — Fully managed message queuing service with at-least-once delivery and dead-letter queues"
+      },
+      {
+        "id": "directory",
+        "term": "Microsoft Active Directory",
+        "definition": "AWS Directory Service — Managed Microsoft AD or Simple AD for user authentication and group policy management"
+      },
+      {
+        "id": "backup",
+        "term": "Veeam Backup & Tape Library",
+        "definition": "AWS Backup — Centralised backup service with lifecycle policies, cross-region copy, and compliance reporting"
+      },
+      {
+        "id": "dns",
+        "term": "BIND DNS Server",
+        "definition": "Amazon Route 53 — Scalable DNS with health checks, failover routing, latency-based routing, and domain registration"
+      }
+    ],
+    "explanation": "The key AWS service mappings for lift-and-shift migration:\n\n• VMware VMs → EC2: Direct VM-to-instance migration using AWS Application Migration Service (MGN)\n• SAN storage → EBS: Block storage attached to instances; choose gp3 for general purpose, io2 for high IOPS\n• PostgreSQL → RDS: Managed DB eliminates patching/backup overhead; use DMS for data migration\n• NFS → EFS: Elastic shared file system with NFS v4 protocol compatibility\n• F5 → ALB/NLB: ALB for HTTP/HTTPS (Layer 7), NLB for TCP/UDP (Layer 4)\n• Nagios → CloudWatch: Native monitoring with custom metrics, alarms, and integration with SNS for alerting\n• RabbitMQ → SQS: Managed queuing; consider Amazon MQ if AMQP protocol compatibility is required\n• Active Directory → Directory Service: AWS Managed Microsoft AD provides full AD compatibility\n• Veeam → AWS Backup: Centralised backup with retention policies and cross-account/cross-region support\n• BIND DNS → Route 53: Managed DNS with 100% SLA and advanced routing policies"
+  },
+  {
+    "id": "aws-disaster-recovery-runbook",
+    "title": "Execute DR Recovery Runbook",
+    "description": "A catastrophic failure has occurred in your primary region (eu-west-1). Execute the disaster recovery runbook by filling in the missing parameters in each AWS CLI command to failover to the DR region (eu-west-2).",
+    "type": "fill-command",
+    "timeLimit": 600,
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Operations",
+    "technologies": [
+      "Route 53",
+      "RDS",
+      "ECS",
+      "S3",
+      "CloudFront",
+      "SNS"
+    ],
+    "labCategory": "Implement",
+    "scenario": "INCIDENT: eu-west-1 region is experiencing a major outage affecting multiple AZs. Your application stack includes Route 53 → CloudFront → ALB → ECS Fargate → RDS Aurora (with cross-region read replica in eu-west-2). Follow the DR runbook to failover all services to eu-west-2. Fill in the missing parameters for each command.",
+    "questions": [
+      {
+        "id": "q1",
+        "template": "# Step 1: Promote the Aurora read replica to a standalone cluster\naws rds promote-read-replica-db-cluster \\\n  --db-cluster-identifier ___ \\\n  --region ___",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "DR cluster ID",
+            "answer": "prod-db-replica-eu-west-2"
+          },
+          {
+            "id": "b2",
+            "placeholder": "DR region",
+            "answer": "eu-west-2"
+          }
+        ],
+        "hint": "The read replica cluster in the DR region needs to become a primary cluster"
+      },
+      {
+        "id": "q2",
+        "template": "# Step 2: Update ECS service to scale up in DR region\naws ecs update-service \\\n  --cluster dr-cluster \\\n  --service api-service \\\n  --desired-count ___ \\\n  --region ___",
+        "blanks": [
+          {
+            "id": "b3",
+            "placeholder": "instance count",
+            "answer": "4"
+          },
+          {
+            "id": "b4",
+            "placeholder": "DR region",
+            "answer": "eu-west-2"
+          }
+        ],
+        "hint": "Match the primary region's task count (4 tasks) in the DR cluster"
+      },
+      {
+        "id": "q3",
+        "template": "# Step 3: Update Route 53 to point to DR region's ALB\naws route53 change-resource-record-sets \\\n  --hosted-zone-id Z1A2B3C4D5E6F \\\n  --change-batch '{\"Changes\":[{\"Action\":\"___\",\"ResourceRecordSet\":{\"Name\":\"api.example.com\",\"Type\":\"A\",\"AliasTarget\":{\"HostedZoneId\":\"Z2FDTNDATAQYW2\",\"DNSName\":\"dr-alb.eu-west-2.elb.amazonaws.com\",\"EvaluateTargetHealth\":true}}}]}'",
+        "blanks": [
+          {
+            "id": "b5",
+            "placeholder": "DNS action",
+            "answer": "UPSERT"
+          }
+        ],
+        "hint": "This action creates the record if it doesn't exist, or updates it if it does"
+      },
+      {
+        "id": "q4",
+        "template": "# Step 4: Sync any assets uploaded since last replication\naws s3 ___ \\\n  s3://app-assets-eu-west-1 \\\n  s3://app-assets-eu-west-2 \\\n  --source-region eu-west-1 \\\n  --region eu-west-2",
+        "blanks": [
+          {
+            "id": "b6",
+            "placeholder": "S3 command",
+            "answer": "sync"
+          }
+        ],
+        "hint": "This command copies only new or modified objects between buckets"
+      },
+      {
+        "id": "q5",
+        "template": "# Step 5: Invalidate CloudFront cache to serve fresh content from DR origin\naws cloudfront create-___ \\\n  --distribution-id E1A2B3C4D5E6F \\\n  --paths '/*'",
+        "blanks": [
+          {
+            "id": "b7",
+            "placeholder": "CloudFront action",
+            "answer": "invalidation"
+          }
+        ],
+        "hint": "Force CloudFront to fetch fresh content from the new DR origin"
+      },
+      {
+        "id": "q6",
+        "template": "# Step 6: Notify the operations team\naws sns ___ \\\n  --topic-arn arn:aws:sns:eu-west-2:123456789012:ops-notifications \\\n  --subject 'DR Failover Complete' \\\n  --message 'Failover to eu-west-2 completed. All services operational.'",
+        "blanks": [
+          {
+            "id": "b8",
+            "placeholder": "SNS action",
+            "answer": "publish"
+          }
+        ],
+        "hint": "Send a message to an SNS topic"
+      }
+    ],
+    "explanation": "Disaster recovery failover procedure:\n\n1. Promote Aurora read replica - The cross-region read replica becomes a standalone primary cluster in eu-west-2. For Aurora, use promote-read-replica-db-cluster (not promote-read-replica which is for non-Aurora RDS).\n\n2. Scale ECS in DR - The DR cluster keeps a minimal task count (0 or 1) during normal operation. Scale to match primary (4 tasks) during failover.\n\n3. Route 53 UPSERT - Updates the DNS alias record to point to the DR region's ALB. UPSERT is preferred over CREATE because it handles both new and existing records.\n\n4. S3 sync - Copies only objects that are new or modified since the last cross-region replication. This catches any objects uploaded between the last replication and the outage.\n\n5. CloudFront invalidation - Forces edge caches to fetch from the new origin (DR region). The path '/*' invalidates all cached content.\n\n6. SNS publish - Sends a notification to the ops team confirming failover is complete. Critical for incident communication."
+  },
+  {
+    "id": "aws-fix-terraform-s3",
+    "title": "Fix Terraform S3 Security Config",
+    "description": "Your security scanner has flagged several issues in a Terraform configuration for an S3 bucket storing application logs. Fix the configuration to meet compliance requirements: KMS encryption, versioning, no public access, and lifecycle rules.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Security",
+    "technologies": [
+      "Terraform",
+      "S3",
+      "KMS"
+    ],
+    "labCategory": "Implement",
+    "scenario": "Your compliance team requires all S3 buckets storing application logs to meet these security standards:\n\n1. Server-side encryption using AWS KMS (not AES256)\n2. Versioning enabled for audit trail\n3. All public access blocked\n4. Lifecycle rule to transition objects to Glacier after 90 days\n\nFix the Terraform configuration to pass all checks.",
+    "language": "hcl",
+    "brokenCode": "resource \"aws_s3_bucket\" \"logs\" {\n  bucket = \"company-app-logs\"\n}\n\nresource \"aws_s3_bucket_versioning\" \"logs\" {\n  bucket = aws_s3_bucket.logs.id\n  versioning_configuration {\n    status = \"Disabled\"\n  }\n}\n\nresource \"aws_s3_bucket_server_side_encryption_configuration\" \"logs\" {\n  bucket = aws_s3_bucket.logs.id\n  rule {\n    apply_server_side_encryption_by_default {\n      sse_algorithm = \"AES256\"\n    }\n  }\n}\n\nresource \"aws_s3_bucket_public_access_block\" \"logs\" {\n  bucket                  = aws_s3_bucket.logs.id\n  block_public_acls       = true\n  block_public_policy     = true\n  ignore_public_acls      = true\n  restrict_public_buckets = false\n}",
+    "correctCode": "resource \"aws_s3_bucket\" \"logs\" {\n  bucket = \"company-app-logs\"\n}\n\nresource \"aws_s3_bucket_versioning\" \"logs\" {\n  bucket = aws_s3_bucket.logs.id\n  versioning_configuration {\n    status = \"Enabled\"\n  }\n}\n\nresource \"aws_s3_bucket_server_side_encryption_configuration\" \"logs\" {\n  bucket = aws_s3_bucket.logs.id\n  rule {\n    apply_server_side_encryption_by_default {\n      sse_algorithm = \"aws:kms\"\n    }\n  }\n}\n\nresource \"aws_s3_bucket_public_access_block\" \"logs\" {\n  bucket                  = aws_s3_bucket.logs.id\n  block_public_acls       = true\n  block_public_policy     = true\n  ignore_public_acls      = true\n  restrict_public_buckets = true\n}\n\nresource \"aws_s3_bucket_lifecycle_configuration\" \"logs\" {\n  bucket = aws_s3_bucket.logs.id\n  rule {\n    id     = \"archive-logs\"\n    status = \"Enabled\"\n    transition {\n      days          = 90\n      storage_class = \"GLACIER\"\n    }\n  }\n}",
+    "validations": [
+      {
+        "field": "versioning",
+        "expected": "Enabled"
+      },
+      {
+        "field": "encryption",
+        "expected": "aws:kms"
+      },
+      {
+        "field": "public_access",
+        "expected": "restrict_public_buckets = true"
+      },
+      {
+        "field": "lifecycle_transition",
+        "expected": "GLACIER"
+      },
+      {
+        "field": "lifecycle_days",
+        "expected": "days          = 90"
+      }
+    ],
+    "explanation": "The Terraform configuration had four security issues:\n\n1. Versioning Disabled → Enabled: Required for audit trail and accidental deletion protection. Without versioning, deleted or overwritten log files are unrecoverable.\n\n2. AES256 → aws:kms: AES256 uses Amazon-managed keys with no audit trail. KMS provides key rotation, access policies, and CloudTrail logging of key usage - required for compliance.\n\n3. restrict_public_buckets = false → true: This was the only public access block setting not enabled. Even if bucket policies don't grant public access today, this setting prevents any future policy from making the bucket public.\n\n4. Missing lifecycle rule: Without a lifecycle configuration, logs accumulate indefinitely in Standard storage. Transitioning to Glacier after 90 days reduces storage costs by ~80% while maintaining compliance retention."
+  },
+  {
+    "id": "aws-detect-iam-escalation",
+    "title": "Detect IAM Privilege Escalation",
+    "description": "Your security team detected suspicious IAM activity via GuardDuty. Analyse the CloudTrail logs to identify the attack chain and determine what type of attack was attempted.",
+    "type": "log-analysis",
+    "timeLimit": 600,
+    "difficulty": "advanced",
+    "platform": "AWS",
+    "category": "Security",
+    "technologies": [
+      "IAM",
+      "CloudTrail",
+      "Lambda",
+      "S3",
+      "GuardDuty"
+    ],
+    "labCategory": "Troubleshoot",
+    "scenario": "GuardDuty has flagged high-severity findings related to IAM activity in your production account. The alerts triggered at 03:47 UTC from an unusual source IP. Examine the CloudTrail logs below to identify the attack chain, determine what the attacker accomplished, and select the correct classification of this attack.",
+    "logs": [
+      {
+        "timestamp": "03:12:05",
+        "level": "INFO",
+        "source": "iam",
+        "message": "AssumeRole by arn:aws:iam::123456789012:role/ci-deploy-role from IP 10.0.1.55 — role session: github-actions-deploy-742"
+      },
+      {
+        "timestamp": "03:14:22",
+        "level": "INFO",
+        "source": "s3",
+        "message": "GetObject s3://app-config-prod/settings.json by role/ci-deploy-role — 200 OK"
+      },
+      {
+        "timestamp": "03:18:41",
+        "level": "INFO",
+        "source": "lambda",
+        "message": "UpdateFunctionCode on function 'payment-processor' by role/ci-deploy-role — success"
+      },
+      {
+        "timestamp": "03:22:08",
+        "level": "INFO",
+        "source": "dynamodb",
+        "message": "Query on table 'orders' by role/app-api-handler — 200 OK, 25 items returned"
+      },
+      {
+        "timestamp": "03:25:33",
+        "level": "INFO",
+        "source": "s3",
+        "message": "PutObject s3://app-deploy-artifacts/v2.3.1.zip by role/ci-deploy-role — 200 OK"
+      },
+      {
+        "timestamp": "03:41:17",
+        "level": "WARN",
+        "source": "iam",
+        "message": "ListRoles by user/dev-intern from IP 198.51.100.44 — 200 OK, 34 roles returned"
+      },
+      {
+        "timestamp": "03:41:52",
+        "level": "WARN",
+        "source": "iam",
+        "message": "ListAttachedRolePolicies for role/lambda-admin-role by user/dev-intern from IP 198.51.100.44 — 200 OK"
+      },
+      {
+        "timestamp": "03:42:18",
+        "level": "WARN",
+        "source": "iam",
+        "message": "ListPolicies by user/dev-intern from IP 198.51.100.44 — 200 OK, 67 policies returned"
+      },
+      {
+        "timestamp": "03:43:05",
+        "level": "WARN",
+        "source": "iam",
+        "message": "CreatePolicy 'temp-escalation-policy' by user/dev-intern from IP 198.51.100.44 — policy grants iam:*, s3:*, lambda:*"
+      },
+      {
+        "timestamp": "03:43:29",
+        "level": "ERROR",
+        "source": "iam",
+        "message": "AttachRolePolicy 'temp-escalation-policy' to role/lambda-admin-role by user/dev-intern from IP 198.51.100.44 — 200 OK"
+      },
+      {
+        "timestamp": "03:44:11",
+        "level": "ERROR",
+        "source": "lambda",
+        "message": "UpdateFunctionCode on function 'data-export' by user/dev-intern from IP 198.51.100.44 — function code replaced"
+      },
+      {
+        "timestamp": "03:44:33",
+        "level": "ERROR",
+        "source": "lambda",
+        "message": "Invoke function 'data-export' by user/dev-intern from IP 198.51.100.44 — 200 OK"
+      },
+      {
+        "timestamp": "03:44:58",
+        "level": "ERROR",
+        "source": "s3",
+        "message": "GetObject s3://customer-data-prod/exports/full-dump.csv by role/lambda-admin-role — 200 OK (47MB)"
+      },
+      {
+        "timestamp": "03:45:12",
+        "level": "ERROR",
+        "source": "s3",
+        "message": "PutObject s3://customer-data-prod/exports/full-dump.csv.bak by role/lambda-admin-role — 200 OK"
+      },
+      {
+        "timestamp": "03:45:30",
+        "level": "INFO",
+        "source": "dynamodb",
+        "message": "Scan on table 'users' by role/app-api-handler — 200 OK, 150 items returned"
+      },
+      {
+        "timestamp": "03:46:01",
+        "level": "ERROR",
+        "source": "s3",
+        "message": "GetObject s3://customer-data-prod/pii/customer-emails.csv by role/lambda-admin-role — 200 OK (12MB)"
+      },
+      {
+        "timestamp": "03:47:15",
+        "level": "INFO",
+        "source": "guardduty",
+        "message": "HIGH severity finding: UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration — unusual API calls from IP 198.51.100.44"
+      },
+      {
+        "timestamp": "03:49:22",
+        "level": "INFO",
+        "source": "iam",
+        "message": "ListBuckets by role/app-api-handler — 200 OK (routine health check)"
+      },
+      {
+        "timestamp": "03:52:07",
+        "level": "INFO",
+        "source": "s3",
+        "message": "GetObject s3://app-config-prod/feature-flags.json by role/app-api-handler — 200 OK"
+      }
+    ],
+    "answers": [
+      {
+        "id": "ans1",
+        "text": "IAM privilege escalation via policy attachment to Lambda execution role, followed by data exfiltration through modified Lambda function",
+        "correct": true
+      },
+      {
+        "id": "ans2",
+        "text": "S3 bucket data exfiltration via publicly exposed bucket policy"
+      },
+      {
+        "id": "ans3",
+        "text": "Compromised CI/CD pipeline credentials used to deploy malicious code"
+      },
+      {
+        "id": "ans4",
+        "text": "DDoS attack via excessive API calls causing Lambda throttling"
+      }
+    ],
+    "explanation": "Attack chain analysis:\n\n1. RECONNAISSANCE (03:41): The attacker (user/dev-intern from external IP 198.51.100.44) enumerated IAM roles and policies using ListRoles, ListAttachedRolePolicies, and ListPolicies. This revealed the existence of 'lambda-admin-role' with elevated privileges.\n\n2. PRIVILEGE ESCALATION (03:43): The attacker created a custom policy ('temp-escalation-policy') granting iam:*, s3:*, and lambda:* permissions, then attached it to the 'lambda-admin-role'. The dev-intern user had iam:CreatePolicy and iam:AttachRolePolicy permissions - a dangerous combination that enables privilege escalation.\n\n3. EXECUTION (03:44): The attacker modified the 'data-export' Lambda function's code (UpdateFunctionCode) and invoked it. The function now runs with the elevated 'lambda-admin-role' permissions.\n\n4. DATA EXFILTRATION (03:44-03:46): The modified Lambda function, running with escalated privileges, accessed sensitive S3 objects: full-dump.csv (47MB) and customer-emails.csv (12MB) from the customer-data-prod bucket.\n\nThe CI/CD activity (03:12-03:25) from IP 10.0.1.55 is legitimate - different source IP, expected role, and normal deployment operations. The DynamoDB/S3 activity from app-api-handler (03:22, 03:49, 03:52) is routine application traffic.\n\nRemediation: Revoke dev-intern's access, detach the malicious policy, restore the Lambda function code, rotate all credentials, and implement SCP guardrails preventing iam:CreatePolicy/AttachRolePolicy for developer users."
+  },
+  {
+    "id": "aws-review-architecture-flaws",
+    "title": "Review Architecture Security Flaws",
+    "description": "You've been asked to review a colleague's architecture for a new serverless microservices application. Identify the security anti-patterns and select the correct fix for each issue.",
+    "type": "security-hardening",
+    "timeLimit": 480,
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Security",
+    "technologies": [
+      "API Gateway",
+      "Lambda",
+      "DynamoDB",
+      "S3",
+      "VPC",
+      "IAM",
+      "Secrets Manager",
+      "CloudWatch"
+    ],
+    "labCategory": "Design",
+    "scenario": "A colleague has designed a serverless microservices architecture: API Gateway → 5 Lambda functions → DynamoDB + S3 + external payment API. You're conducting a security architecture review before the team begins implementation. Identify the anti-patterns and select the correct remediation for each.",
+    "issues": [
+      {
+        "id": "i1",
+        "resource": "API Gateway",
+        "issue": "All API endpoints are open with no authentication. The only access control is checking for an 'x-api-key' header in Lambda code.",
+        "options": [
+          "Add CORS headers to all responses",
+          "Implement Cognito User Pool authorizer on API Gateway",
+          "Add WAF rules to block suspicious IPs",
+          "Rate-limit to 100 requests per minute"
+        ],
+        "correctOption": "Implement Cognito User Pool authorizer on API Gateway"
+      },
+      {
+        "id": "i2",
+        "resource": "Lambda IAM Roles",
+        "issue": "All 5 Lambda functions share one execution role with AdministratorAccess managed policy attached.",
+        "options": [
+          "Add MFA requirement to the Lambda execution role",
+          "Create per-function roles with least-privilege permissions",
+          "Set Lambda concurrency limit to 10",
+          "Enable Lambda code signing"
+        ],
+        "correctOption": "Create per-function roles with least-privilege permissions"
+      },
+      {
+        "id": "i3",
+        "resource": "DynamoDB",
+        "issue": "Tables use default AWS-owned CMK for encryption. Data includes customer PII subject to GDPR.",
+        "options": [
+          "Disable encryption for better write throughput",
+          "Enable DynamoDB Streams for change tracking",
+          "Switch to customer-managed KMS keys with automatic rotation",
+          "Add a GSI for faster PII lookups"
+        ],
+        "correctOption": "Switch to customer-managed KMS keys with automatic rotation"
+      },
+      {
+        "id": "i4",
+        "resource": "Secrets Management",
+        "issue": "Database credentials and API keys for the external payment service are stored as Lambda environment variables in plaintext.",
+        "options": [
+          "Encrypt environment variables with Lambda's default KMS key",
+          "Store secrets in a private S3 bucket with bucket policy",
+          "Migrate to AWS Secrets Manager with automatic rotation and VPC endpoint access",
+          "Hardcode secrets in application code and use code signing"
+        ],
+        "correctOption": "Migrate to AWS Secrets Manager with automatic rotation and VPC endpoint access"
+      },
+      {
+        "id": "i5",
+        "resource": "Network Architecture",
+        "issue": "Payment processing Lambda calls an external payment API directly over the internet. No VPC configuration is used for any function.",
+        "options": [
+          "Enable Lambda SnapStart for faster cold starts",
+          "Deploy payment Lambda in VPC with NAT Gateway for controlled outbound access",
+          "Add a security group to the Lambda function",
+          "Use API Gateway VPC Link"
+        ],
+        "correctOption": "Deploy payment Lambda in VPC with NAT Gateway for controlled outbound access"
+      },
+      {
+        "id": "i6",
+        "resource": "CloudWatch Logs",
+        "issue": "Application logs contain unmasked customer email addresses, phone numbers, and partial credit card numbers for debugging.",
+        "options": [
+          "Delete CloudWatch log groups after 24 hours",
+          "Restrict log access to administrators only",
+          "Implement log sanitisation in application code to mask PII before logging",
+          "Disable CloudWatch Logs and use print statements"
+        ],
+        "correctOption": "Implement log sanitisation in application code to mask PII before logging"
+      },
+      {
+        "id": "i7",
+        "resource": "S3 Bucket (user uploads)",
+        "issue": "User-uploaded files are stored in S3 with a bucket policy allowing s3:GetObject from principal '*' for easy sharing.",
+        "options": [
+          "Enable S3 versioning",
+          "Generate pre-signed URLs with expiration for authorised access",
+          "Add CloudFront in front of the bucket",
+          "Enable S3 Object Lock"
+        ],
+        "correctOption": "Generate pre-signed URLs with expiration for authorised access"
+      }
+    ],
+    "explanation": "Architecture security review findings:\n\n1. Authentication at the edge: API keys in Lambda code provide no real security - they're shared secrets with no user identity. Cognito authorizers validate JWT tokens at the API Gateway level before code executes, providing user identity and token expiration.\n\n2. Least-privilege IAM: AdministratorAccess on shared roles is the most dangerous anti-pattern. If one function is compromised, the attacker has full account access. Each function should have a dedicated role granting only the specific API actions and resources it needs.\n\n3. Customer-managed KMS: While AWS-owned keys provide encryption, they offer no audit trail via CloudTrail, no key policy control, and no ability to disable/rotate keys independently. GDPR compliance typically requires demonstrable control over encryption keys.\n\n4. Secrets Manager: Environment variables are visible in the Lambda console and API to anyone with lambda:GetFunctionConfiguration. Secrets Manager provides encryption, automatic rotation, fine-grained IAM access control, and audit logging.\n\n5. VPC + NAT: Running the payment Lambda in a VPC with NAT Gateway ensures outbound traffic goes through a controlled, monitored path. Security groups and NACLs provide additional network-level controls. VPC Flow Logs enable network traffic audit.\n\n6. PII in logs: Compliance regulations (GDPR, PCI-DSS) prohibit storing unmasked PII in logs. Log sanitisation at the application layer masks sensitive data before it reaches CloudWatch, regardless of who has log access.\n\n7. Public S3 access: principal '*' makes all objects publicly readable. Pre-signed URLs provide time-limited, per-object access that expires automatically, maintaining security while enabling sharing."
+  },
+  {
+    "id": "aws-recover-from-az-failure",
+    "title": "Recover From AZ Failure",
+    "description": "Availability Zone eu-west-1a has experienced a complete failure. Your application is deployed across two AZs with Multi-AZ services. Order the correct recovery and validation steps to restore full service.",
+    "type": "ordering",
+    "timeLimit": 420,
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Reliability",
+    "technologies": [
+      "EC2",
+      "ALB",
+      "RDS",
+      "ElastiCache",
+      "Auto Scaling",
+      "Route 53",
+      "CloudWatch"
+    ],
+    "labCategory": "Implement",
+    "scenario": "ALERT: AWS has confirmed an infrastructure failure in eu-west-1a. Your application is deployed in eu-west-1a and eu-west-1b behind an ALB with Auto Scaling, RDS Multi-AZ, and ElastiCache with replicas. Some services will auto-recover, but you need to follow the correct order to verify recovery, validate service health, and plan for resilience.",
+    "steps": [
+      {
+        "id": "s1",
+        "text": "Verify ALB health checks have automatically marked eu-west-1a targets as unhealthy and stopped routing traffic to them",
+        "correctPosition": 1
+      },
+      {
+        "id": "s2",
+        "text": "Confirm Auto Scaling Group has detected unhealthy instances and is launching replacements in eu-west-1b",
+        "correctPosition": 2
+      },
+      {
+        "id": "s3",
+        "text": "Verify RDS Multi-AZ automatic failover has promoted the standby instance in eu-west-1b to primary",
+        "correctPosition": 3
+      },
+      {
+        "id": "s4",
+        "text": "Check ElastiCache replica in eu-west-1b has been promoted and application cache connections are restored",
+        "correctPosition": 4
+      },
+      {
+        "id": "s5",
+        "text": "Run API smoke tests against production endpoints to validate end-to-end application health",
+        "correctPosition": 5
+      },
+      {
+        "id": "s6",
+        "text": "Check CloudWatch dashboards for error rate, latency, and throughput metrics to confirm steady state",
+        "correctPosition": 6
+      },
+      {
+        "id": "s7",
+        "text": "Update Route 53 health check thresholds if using DNS failover to accommodate single-AZ operation",
+        "correctPosition": 7
+      },
+      {
+        "id": "s8",
+        "text": "Notify stakeholders with incident status, current capacity, and estimated time to full resilience",
+        "correctPosition": 8
+      },
+      {
+        "id": "s9",
+        "text": "Plan and schedule capacity expansion into eu-west-1c to restore multi-AZ redundancy",
+        "correctPosition": 9
+      }
+    ],
+    "explanation": "AZ failure recovery follows a verify → validate → communicate → plan sequence:\n\n1-2. ALB + ASG verification: These are the fastest auto-recovery mechanisms. ALB health checks detect failures within seconds, and ASG launches replacements within minutes. Verify these are working before checking database layer.\n\n3-4. Data tier failover: RDS Multi-AZ failover typically completes in 60-120 seconds. ElastiCache automatic failover depends on configuration but should complete within minutes. Verify these before running end-to-end tests.\n\n5-6. Validation: Smoke tests verify the full request path works. CloudWatch metrics confirm stable operation - look for error rates returning to baseline, latency normalising, and throughput recovering. Don't skip this - auto-recovery succeeding doesn't mean the application is fully healthy.\n\n7. Route 53 adjustment: If using health-check-based failover, the thresholds may need temporary adjustment since you're running at reduced capacity in a single AZ.\n\n8. Communication: Only notify stakeholders after you have confirmed facts - current health, remaining capacity, and whether manual intervention is needed.\n\n9. Resilience planning: Don't wait for eu-west-1a to recover - plan capacity in eu-west-1c so you're not single-AZ for an extended period. This is non-urgent but should be scheduled."
+  },
+  {
+    "id": "aws-tune-rds-performance",
+    "title": "Tune RDS Database Performance",
+    "description": "Your Aurora MySQL database is experiencing slow query performance under load. The DBA has identified parameter group settings that need tuning. Configure the correct values for each setting.",
+    "type": "config-toggle",
+    "timeLimit": 300,
+    "difficulty": "beginner",
+    "platform": "AWS",
+    "category": "Performance",
+    "technologies": [
+      "RDS",
+      "Aurora",
+      "MySQL"
+    ],
+    "labCategory": "Implement",
+    "scenario": "Your Aurora MySQL database (db.r6g.xlarge, 32GB RAM) is experiencing slow query performance during peak hours. After running Performance Insights, the DBA identified several parameter group settings that need adjustment. Configure each parameter to its optimal value.",
+    "configItems": [
+      {
+        "id": "buffer-pool",
+        "label": "innodb_buffer_pool_size",
+        "currentValue": "134217728",
+        "correctValue": "21474836480",
+        "inputType": "select",
+        "options": [
+          "134217728",
+          "4294967296",
+          "10737418240",
+          "21474836480"
+        ]
+      },
+      {
+        "id": "max-conn",
+        "label": "max_connections",
+        "currentValue": "50",
+        "correctValue": "200",
+        "inputType": "select",
+        "options": [
+          "50",
+          "100",
+          "200",
+          "1000"
+        ]
+      },
+      {
+        "id": "slow-log",
+        "label": "slow_query_log",
+        "currentValue": "0",
+        "correctValue": "1",
+        "inputType": "select",
+        "options": [
+          "0",
+          "1"
+        ]
+      },
+      {
+        "id": "long-query",
+        "label": "long_query_time",
+        "currentValue": "10",
+        "correctValue": "2",
+        "inputType": "select",
+        "options": [
+          "1",
+          "2",
+          "5",
+          "10"
+        ]
+      },
+      {
+        "id": "query-cache",
+        "label": "query_cache_type",
+        "currentValue": "1",
+        "correctValue": "0",
+        "inputType": "select",
+        "options": [
+          "0",
+          "1",
+          "2"
+        ]
+      },
+      {
+        "id": "io-capacity",
+        "label": "innodb_io_capacity",
+        "currentValue": "200",
+        "correctValue": "2000",
+        "inputType": "select",
+        "options": [
+          "200",
+          "500",
+          "1000",
+          "2000"
+        ]
+      }
+    ],
+    "explanation": "Optimal parameter tuning for Aurora MySQL db.r6g.xlarge (32GB RAM):\n\n1. innodb_buffer_pool_size → 20GB (21474836480): The buffer pool should be approximately 60-75% of total instance memory. At 128MB (default), the database constantly reads from disk. 20GB allows most active data to reside in memory, dramatically reducing I/O.\n\n2. max_connections → 200: 50 connections is far too low for production workloads. With connection pooling, 200 provides adequate headroom. Setting to 1000 wastes memory (each connection consumes ~10MB) and risks resource exhaustion.\n\n3. slow_query_log → 1 (enabled): Essential for identifying performance bottlenecks. Without this, you're blind to which queries are slow. Combine with Performance Insights for query-level analysis.\n\n4. long_query_time → 2 seconds: Captures queries taking more than 2 seconds. The default of 10 seconds misses many problematic queries. 1 second may log too many routine queries in high-throughput systems.\n\n5. query_cache_type → 0 (disabled): The MySQL query cache is deprecated and removed in MySQL 8.0. Even in 5.7, it causes mutex contention under concurrent writes. Disable it - use application-level caching (ElastiCache) instead.\n\n6. innodb_io_capacity → 2000: This tells InnoDB how many IOPS the storage can handle. Aurora's storage can deliver thousands of IOPS; the default of 200 (designed for spinning disks) artificially throttles background I/O operations like flushing dirty pages and merge operations."
+  },
+  {
+    "id": "aws-build-serverless-pipeline",
+    "title": "Build Serverless Data Pipeline",
+    "description": "Design a serverless event-driven data pipeline on AWS. Users upload CSV files which must be processed, transformed, stored in a database, and trigger a notification on completion.",
+    "type": "architecture-builder",
+    "timeLimit": 600,
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Architecture",
+    "technologies": [
+      "S3",
+      "Lambda",
+      "SQS",
+      "DynamoDB",
+      "SNS"
+    ],
+    "labCategory": "Design",
+    "scenario": "Your team needs to build an event-driven data processing pipeline. The flow:\n\n1. Users upload CSV files to S3\n2. The upload triggers a Lambda function\n3. The function sends a message to SQS for reliable processing\n4. A consumer Lambda reads from SQS and transforms the data\n5. Transformed data is stored in DynamoDB\n6. An SNS notification is sent when processing completes\n\nDesign this pipeline by placing components and connecting them in the correct order.",
+    "availableComponents": [
+      {
+        "id": "s3-upload",
+        "label": "S3 Bucket (Uploads)",
+        "icon": "bucket",
+        "category": "Storage"
+      },
+      {
+        "id": "lambda-trigger",
+        "label": "Lambda (File Trigger)",
+        "icon": "function",
+        "category": "Compute"
+      },
+      {
+        "id": "sqs-queue",
+        "label": "SQS Queue",
+        "icon": "queue",
+        "category": "Messaging"
+      },
+      {
+        "id": "lambda-transform",
+        "label": "Lambda (Transform)",
+        "icon": "function",
+        "category": "Compute"
+      },
+      {
+        "id": "dynamodb",
+        "label": "DynamoDB Table",
+        "icon": "database",
+        "category": "Database"
+      },
+      {
+        "id": "sns-topic",
+        "label": "SNS Topic",
+        "icon": "notification",
+        "category": "Messaging"
+      },
+      {
+        "id": "api-gateway",
+        "label": "API Gateway",
+        "icon": "api",
+        "category": "Networking"
+      },
+      {
+        "id": "cloudfront",
+        "label": "CloudFront CDN",
+        "icon": "cdn",
+        "category": "Networking"
+      },
+      {
+        "id": "ec2-worker",
+        "label": "EC2 Instance",
+        "icon": "server",
+        "category": "Compute"
+      },
+      {
+        "id": "kinesis",
+        "label": "Kinesis Data Stream",
+        "icon": "stream",
+        "category": "Messaging"
+      },
+      {
+        "id": "step-functions",
+        "label": "Step Functions",
+        "icon": "workflow",
+        "category": "Compute"
+      },
+      {
+        "id": "rds",
+        "label": "RDS Database",
+        "icon": "database",
+        "category": "Database"
+      }
+    ],
+    "requiredComponents": [
+      "s3-upload",
+      "lambda-trigger",
+      "sqs-queue",
+      "lambda-transform",
+      "dynamodb",
+      "sns-topic"
+    ],
+    "requiredConnections": [
+      {
+        "from": "s3-upload",
+        "to": "lambda-trigger"
+      },
+      {
+        "from": "lambda-trigger",
+        "to": "sqs-queue"
+      },
+      {
+        "from": "sqs-queue",
+        "to": "lambda-transform"
+      },
+      {
+        "from": "lambda-transform",
+        "to": "dynamodb"
+      },
+      {
+        "from": "lambda-transform",
+        "to": "sns-topic"
+      }
+    ],
+    "validationChecks": [
+      "S3 upload bucket is connected to a Lambda trigger function",
+      "File trigger Lambda sends messages to SQS for decoupled processing",
+      "SQS queue feeds the transform Lambda for reliable message consumption",
+      "Transform Lambda writes processed data to DynamoDB",
+      "Transform Lambda publishes completion notification to SNS",
+      "No unnecessary components are placed (e.g. EC2, CloudFront, API Gateway)"
+    ],
+    "explanation": "This serverless pipeline uses event-driven architecture with loose coupling:\n\n1. S3 → Lambda (Event Notification): S3 event notifications trigger the file trigger Lambda on every ObjectCreated event. This is an async push model - no polling needed.\n\n2. Lambda → SQS: Rather than processing the file directly, the trigger Lambda sends a message to SQS. This decouples file detection from processing, provides retry capability, and handles bursts via SQS's built-in buffering.\n\n3. SQS → Lambda (Event Source Mapping): The transform Lambda uses SQS as an event source. Lambda automatically polls SQS, manages batch size, and handles failures with configurable retry and dead-letter queue.\n\n4. Lambda → DynamoDB: The transform Lambda parses CSV data and writes structured records to DynamoDB. NoSQL is ideal here - schema flexibility handles varying CSV formats, and DynamoDB scales automatically.\n\n5. Lambda → SNS: After successful processing, the Lambda publishes to SNS. Subscribers (email, webhook, other Lambdas) receive the notification. This enables the pipeline to trigger downstream processes without tight coupling.\n\nWhy not the other components?\n- API Gateway: No direct user API needed - uploads go straight to S3 (via presigned URLs)\n- CloudFront: Not needed for a data processing pipeline\n- EC2: Unnecessary - Lambda handles the compute without server management\n- Kinesis: Overkill for file processing - better suited for continuous real-time streaming\n- Step Functions: Useful for complex multi-step workflows but overkill here - the SQS decoupling achieves the same reliability\n- RDS: Not needed - DynamoDB provides the right data model for processed records"
+  },
+  {
+    "id": "aws-label-vpc-architecture",
+    "title": "Label a VPC Architecture",
+    "description": "A VPC architecture diagram has been prepared for a 3-tier application. Identify each component by selecting the correct label from the dropdown menus placed on the diagram.",
+    "type": "diagram-label",
+    "timeLimit": 300,
+    "difficulty": "beginner",
+    "platform": "AWS",
+    "category": "Networking",
+    "technologies": [
+      "VPC",
+      "EC2",
+      "RDS",
+      "NAT Gateway",
+      "Internet Gateway"
+    ],
+    "labCategory": "Design",
+    "scenario": "You're onboarding onto a team that manages a 3-tier application on AWS. The lead engineer has drawn the VPC architecture but left the labels blank as a knowledge check. Identify every component on the diagram: the gateway connecting the VPC to the internet, the subnet types, the role of each EC2 instance, the networking device enabling private subnet internet access, the database service, and the default route for each route table.",
+    "imageUrl": "/labs/vpc-architecture.svg",
+    "hotspots": [
+      {
+        "id": "h1",
+        "x": 50.0,
+        "y": 14.4,
+        "options": [
+          "Internet Gateway",
+          "NAT Gateway",
+          "Virtual Private Gateway",
+          "Transit Gateway"
+        ],
+        "answer": "Internet Gateway",
+        "label": "Connects VPC to the internet"
+      },
+      {
+        "id": "h2",
+        "x": 27.8,
+        "y": 34.9,
+        "options": [
+          "Public Subnet",
+          "Private Subnet",
+          "Isolated Subnet",
+          "VPN-only Subnet"
+        ],
+        "answer": "Public Subnet",
+        "label": "Has route to IGW"
+      },
+      {
+        "id": "h3",
+        "x": 72.2,
+        "y": 34.9,
+        "options": [
+          "Public Subnet",
+          "Private Subnet",
+          "Isolated Subnet",
+          "VPN-only Subnet"
+        ],
+        "answer": "Private Subnet",
+        "label": "No direct internet route"
+      },
+      {
+        "id": "h4",
+        "x": 22.2,
+        "y": 45.1,
+        "options": [
+          "Bastion Host",
+          "Web Server",
+          "NAT Instance",
+          "Load Balancer"
+        ],
+        "answer": "Bastion Host",
+        "label": "SSH jump box in public subnet"
+      },
+      {
+        "id": "h5",
+        "x": 22.2,
+        "y": 54.1,
+        "options": [
+          "NAT Gateway",
+          "Internet Gateway",
+          "VPN Gateway",
+          "Elastic Load Balancer"
+        ],
+        "answer": "NAT Gateway",
+        "label": "Enables private subnet outbound internet"
+      },
+      {
+        "id": "h6",
+        "x": 66.7,
+        "y": 45.1,
+        "options": [
+          "Application Server",
+          "Bastion Host",
+          "NAT Instance",
+          "Web Server"
+        ],
+        "answer": "Application Server",
+        "label": "Runs application code in private subnet"
+      },
+      {
+        "id": "h7",
+        "x": 66.7,
+        "y": 54.1,
+        "options": [
+          "Amazon RDS (MySQL)",
+          "Amazon DynamoDB",
+          "Amazon ElastiCache",
+          "Amazon Redshift"
+        ],
+        "answer": "Amazon RDS (MySQL)",
+        "label": "Managed relational database, Multi-AZ"
+      },
+      {
+        "id": "h8",
+        "x": 23.3,
+        "y": 84.4,
+        "options": [
+          "0.0.0.0/0 → igw-xxxx",
+          "0.0.0.0/0 → nat-xxxx",
+          "10.0.0.0/16 → local",
+          "0.0.0.0/0 → vgw-xxxx"
+        ],
+        "answer": "0.0.0.0/0 → igw-xxxx",
+        "label": "Public subnet routes internet traffic via IGW"
+      },
+      {
+        "id": "h9",
+        "x": 72.2,
+        "y": 84.4,
+        "options": [
+          "0.0.0.0/0 → nat-xxxx",
+          "0.0.0.0/0 → igw-xxxx",
+          "10.0.0.0/16 → local",
+          "0.0.0.0/0 → eni-xxxx"
+        ],
+        "answer": "0.0.0.0/0 → nat-xxxx",
+        "label": "Private subnet routes internet traffic via NAT"
+      }
+    ],
+    "explanation": "VPC architecture components:\n\n• Internet Gateway (IGW): The only component that connects a VPC directly to the internet. It’s horizontally scaled, redundant, and HA by default. Not to be confused with NAT Gateway (outbound-only) or Virtual Private Gateway (VPN/Direct Connect).\n\n• Public vs Private Subnets: A subnet is \"public\" if its route table has a route to an IGW (0.0.0.0/0 → igw-xxxx). A \"private\" subnet has no such route - it can only access the internet outbound via a NAT Gateway.\n\n• Bastion Host: An EC2 instance in the public subnet used as an SSH jump box to reach instances in private subnets. It has an Elastic IP and strict security group rules (SSH from known IPs only).\n\n• NAT Gateway: Sits in the public subnet and allows instances in private subnets to initiate outbound connections (e.g. software updates, API calls) without being directly reachable from the internet. Requires an Elastic IP.\n\n• Application Server: Runs in the private subnet with no public IP. Accessible only from the bastion host via SSH or from the load balancer. This isolation is a security best practice.\n\n• Amazon RDS (MySQL): Managed relational database in the private subnet with Multi-AZ for high availability. Never placed in a public subnet in production.\n\n• Route Tables: The public route table needs 0.0.0.0/0 → igw-xxxx so instances can reach the internet directly. The private route table needs 0.0.0.0/0 → nat-xxxx so outbound traffic goes through the NAT Gateway. Both route tables automatically include 10.0.0.0/16 → local for intra-VPC traffic."
+  },
+  {
+    "id": "aws-wire-up-ec2-access",
+    "title": "Wire Up EC2 Network Access",
+    "description": "You’ve been handed a VPC with EC2 instances, an RDS database, and networking components already provisioned — but none of the security groups or route tables are configured. Set up the correct rules to enable secure access.",
+    "type": "config-toggle",
+    "timeLimit": 420,
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Networking",
+    "technologies": [
+      "VPC",
+      "EC2",
+      "RDS",
+      "Security Groups",
+      "Route Tables",
+      "NAT Gateway"
+    ],
+    "labCategory": "Implement",
+    "scenario": "Configure the security groups and route tables for this VPC. Your office IP range is 203.0.113.0/24. Wrong choices represent common misconfigurations that would either break access or create security vulnerabilities.",
+    "configItems": [
+      {
+        "id": "bastion-ssh-source",
+        "label": "Bastion SG — Inbound SSH (22) Source",
+        "currentValue": "0.0.0.0/0",
+        "correctValue": "203.0.113.0/24",
+        "inputType": "select",
+        "options": [
+          "0.0.0.0/0",
+          "10.0.0.0/16",
+          "203.0.113.0/24",
+          "10.0.1.0/24"
+        ],
+        "shortLabel": "SSH (22) Source"
+      },
+      {
+        "id": "bastion-ssh-port",
+        "label": "Bastion SG — Inbound Rule Port",
+        "currentValue": "3389",
+        "correctValue": "22",
+        "inputType": "select",
+        "options": [
+          "22",
+          "3389",
+          "443",
+          "80"
+        ],
+        "shortLabel": "SSH Inbound Port"
+      },
+      {
+        "id": "app-ssh-source",
+        "label": "App Server SG — Inbound SSH (22) Source",
+        "currentValue": "0.0.0.0/0",
+        "correctValue": "sg-bastion",
+        "inputType": "select",
+        "options": [
+          "0.0.0.0/0",
+          "10.0.1.10/32",
+          "sg-bastion",
+          "203.0.113.0/24"
+        ],
+        "shortLabel": "SSH (22) Source"
+      },
+      {
+        "id": "app-traffic-port",
+        "label": "App Server SG — Inbound Application Port",
+        "currentValue": "80",
+        "correctValue": "8080",
+        "inputType": "select",
+        "options": [
+          "80",
+          "443",
+          "8080",
+          "3000"
+        ],
+        "shortLabel": "App Traffic Port"
+      },
+      {
+        "id": "db-mysql-source",
+        "label": "Database SG — Inbound MySQL (3306) Source",
+        "currentValue": "0.0.0.0/0",
+        "correctValue": "sg-app-server",
+        "inputType": "select",
+        "options": [
+          "0.0.0.0/0",
+          "10.0.0.0/16",
+          "sg-app-server",
+          "sg-bastion"
+        ],
+        "shortLabel": "MySQL (3306) Source"
+      },
+      {
+        "id": "db-mysql-port",
+        "label": "Database SG — Inbound Rule Port",
+        "currentValue": "5432",
+        "correctValue": "3306",
+        "inputType": "select",
+        "options": [
+          "3306",
+          "5432",
+          "1433",
+          "27017"
+        ],
+        "shortLabel": "MySQL Inbound Port"
+      },
+      {
+        "id": "public-rt-target",
+        "label": "Public Route Table — 0.0.0.0/0 Target",
+        "currentValue": "nat-xxxx",
+        "correctValue": "igw-xxxx",
+        "inputType": "select",
+        "options": [
+          "igw-xxxx",
+          "nat-xxxx",
+          "vgw-xxxx",
+          "local"
+        ],
+        "shortLabel": "0.0.0.0/0 Target"
+      },
+      {
+        "id": "private-rt-target",
+        "label": "Private Route Table — 0.0.0.0/0 Target",
+        "currentValue": "igw-xxxx",
+        "correctValue": "nat-xxxx",
+        "inputType": "select",
+        "options": [
+          "igw-xxxx",
+          "nat-xxxx",
+          "vgw-xxxx",
+          "pcx-xxxx"
+        ],
+        "shortLabel": "0.0.0.0/0 Target"
+      }
+    ],
+    "explanation": "Security group and route table configuration explained:\n\n1. Bastion SSH Source → 203.0.113.0/24: Never open SSH to 0.0.0.0/0 (the entire internet). Restrict to your office IP range. Using 10.0.0.0/16 would allow any VPC instance to SSH in, which is too broad. 10.0.1.0/24 would only allow the subnet itself.\n\n2. Bastion Inbound Port → 22: Port 22 is SSH (Linux). Port 3389 is RDP (Windows). Port 443 is HTTPS and port 80 is HTTP - neither is for remote shell access.\n\n3. App Server SSH Source → sg-bastion: Referencing a security group (not an IP) is the AWS best practice. It allows any instance in the bastion SG to connect, even if IPs change. Using 10.0.1.10/32 would work but is fragile - if the bastion IP changes, access breaks. Never use 0.0.0.0/0 for private subnet SSH.\n\n4. App Server Port → 8080: The application runs on port 8080. Port 80/443 would only work if a reverse proxy is configured. Port 3000 is for Node.js development servers, not production.\n\n5. Database Source → sg-app-server: Only the application server should access the database. Using 0.0.0.0/0 exposes the database to the internet (critical vulnerability). Using sg-bastion would allow the bastion to connect directly, bypassing the application layer. 10.0.0.0/16 is too broad.\n\n6. Database Port → 3306: MySQL uses port 3306. Port 5432 is PostgreSQL, 1433 is SQL Server, and 27017 is MongoDB. Using the wrong port means the app server can’t reach the database.\n\n7. Public RT Target → igw-xxxx: Public subnets need a route to the Internet Gateway for direct internet access. Routing to NAT is for private subnets. Routing to VPN Gateway (vgw) is for hybrid connectivity. \"local\" only allows VPC-internal traffic.\n\n8. Private RT Target → nat-xxxx: Private subnets route outbound internet traffic through the NAT Gateway. Routing to IGW would make the subnet effectively public (security risk). VPN Gateway is for on-premises connectivity.",
+    "visualContainerLabel": "VPC — 10.0.0.0/16",
+    "visualZones": [
+      {
+        "id": "public",
+        "label": "Public Subnet — 10.0.1.0/24",
+        "color": "blue",
+        "row": 1
+      },
+      {
+        "id": "private",
+        "label": "Private Subnet — 10.0.2.0/24",
+        "color": "orange",
+        "row": 1
+      },
+      {
+        "id": "routing",
+        "label": "Route Tables",
+        "color": "neutral",
+        "row": 2
+      }
+    ],
+    "visualGroups": [
+      {
+        "id": "bastion-sg",
+        "label": "Bastion Host",
+        "sublabel": "10.0.1.10 — Security Group",
+        "zone": "public",
+        "itemIds": [
+          "bastion-ssh-source",
+          "bastion-ssh-port"
+        ]
+      },
+      {
+        "id": "nat-gw",
+        "label": "NAT Gateway",
+        "sublabel": "nat-xxxx — outbound internet for private subnet",
+        "zone": "public",
+        "itemIds": []
+      },
+      {
+        "id": "app-sg",
+        "label": "App Server",
+        "sublabel": "10.0.2.20 — Security Group",
+        "zone": "private",
+        "itemIds": [
+          "app-ssh-source",
+          "app-traffic-port"
+        ]
+      },
+      {
+        "id": "db-sg",
+        "label": "RDS MySQL",
+        "sublabel": "10.0.2.30 — Security Group",
+        "zone": "private",
+        "itemIds": [
+          "db-mysql-source",
+          "db-mysql-port"
+        ]
+      },
+      {
+        "id": "public-rt",
+        "label": "Public Route Table",
+        "sublabel": "Default route — 0.0.0.0/0",
+        "zone": "routing",
+        "itemIds": [
+          "public-rt-target"
+        ]
+      },
+      {
+        "id": "private-rt",
+        "label": "Private Route Table",
+        "sublabel": "Default route — 0.0.0.0/0",
+        "zone": "routing",
+        "itemIds": [
+          "private-rt-target"
+        ]
+      }
+    ]
   }
 ]

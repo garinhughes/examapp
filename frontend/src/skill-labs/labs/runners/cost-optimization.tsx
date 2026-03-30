@@ -3,6 +3,7 @@ import { DollarSign, ArrowRight } from 'lucide-react'
 import { useExam } from '@/exam/ExamContext'
 import type { CostOptimizationLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
@@ -167,7 +168,7 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
                 ? `✓ Cost reduced to $${currentTotal}/mo — under target!`
                 : `✗ Cost is $${currentTotal}/mo — still above $${lab.targetCost}/mo target`}
             </div>
-            <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <ExplanationBlock text={lab.explanation} />
             <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
               Back to Skill Labs
             </button>

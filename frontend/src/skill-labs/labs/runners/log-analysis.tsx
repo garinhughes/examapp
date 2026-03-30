@@ -3,6 +3,7 @@ import { Search } from 'lucide-react'
 import { useExam } from '@/exam/ExamContext'
 import type { LogAnalysisLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
@@ -197,7 +198,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
             <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </div>
-            <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <ExplanationBlock text={lab.explanation} />
             <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
               Back to Skill Labs
             </button>

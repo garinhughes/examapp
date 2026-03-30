@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 610" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="610" rx="8" fill="#f8fafc"/>
+
+  <!-- Internet cloud -->
+  <ellipse cx="450" cy="30" rx="65" ry="22" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="450" y="35" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">Internet</text>
+
+  <!-- Arrow: Internet → IGW -->
+  <line x1="450" y1="52" x2="450" y2="68" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Internet Gateway box (H1 hotspot @50%, 14%) — blank, dropdown fills the label role -->
+  <rect x="370" y="68" width="160" height="40" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <!-- no text — dropdown is centered here -->
+
+  <!-- Arrow: IGW → VPC -->
+  <line x1="450" y1="108" x2="450" y2="132" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+  <!-- VPC boundary -->
+  <rect x="50" y="132" width="800" height="418" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="10,5"/>
+  <text x="450" y="154" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">VPC — 10.0.0.0/16</text>
+
+  <!-- ======= PUBLIC SUBNET (left) ======= -->
+  <rect x="80" y="170" width="340" height="295" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+  <!-- CIDR/AZ above hotspot centre (hotspot at y≈35%=213) -->
+  <text x="250" y="185" text-anchor="middle" font-size="10" font-weight="600" fill="#4ade80">10.0.1.0/24 · eu-west-1a</text>
+  <!-- blank slot for H2 dropdown (centred at 213px) -->
+  <rect x="176" y="200" width="148" height="26" rx="4" fill="#dcfce7" stroke="#86efac" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Bastion Host EC2 (H4 — hotspot at y≈45.6%=278) -->
+  <rect x="120" y="242" width="160" height="68" rx="6" fill="#faf5ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="148" y="259" font-size="10" font-weight="600" fill="#6b21a8">EC2 Instance</text>
+  <!-- blank slot for H4 dropdown (centred at 278) -->
+  <rect x="130" y="262" width="140" height="26" rx="4" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="200" y="303" text-anchor="middle" font-size="9" fill="#9ca3af">10.0.1.10 · Elastic IP</text>
+
+  <!-- NAT Gateway (H5 — hotspot at y≈54.1%=330) -->
+  <rect x="120" y="322" width="160" height="58" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <!-- blank slot for H5 dropdown (centred at 330) - slightly below top -->
+  <rect x="130" y="317" width="140" height="26" rx="4" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="200" y="371" text-anchor="middle" font-size="9" fill="#9ca3af">10.0.1.50 · Elastic IP</text>
+
+  <!-- ======= PRIVATE SUBNET (right) ======= -->
+  <rect x="480" y="170" width="340" height="295" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="650" y="185" text-anchor="middle" font-size="10" font-weight="600" fill="#fbbf24">10.0.2.0/24 · eu-west-1b</text>
+  <!-- blank slot for H3 dropdown -->
+  <rect x="576" y="200" width="148" height="26" rx="4" fill="#fef9c3" stroke="#fde047" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- App Server EC2 (H6 — hotspot at y≈45.6%=278) -->
+  <rect x="520" y="242" width="160" height="68" rx="6" fill="#faf5ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="548" y="259" font-size="10" font-weight="600" fill="#6b21a8">EC2 Instance</text>
+  <rect x="530" y="262" width="140" height="26" rx="4" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="600" y="303" text-anchor="middle" font-size="9" fill="#9ca3af">10.0.2.20 · No public IP</text>
+
+  <!-- RDS Database (H7 — hotspot at y≈54.1%=330) -->
+  <rect x="520" y="322" width="160" height="58" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <rect x="530" y="317" width="140" height="26" rx="4" fill="#e0e7ff" stroke="#a5b4fc" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="600" y="371" text-anchor="middle" font-size="9" fill="#9ca3af">10.0.2.30 · Multi-AZ</text>
+
+  <!-- ======= CONNECTION ARROWS ======= -->
+  <!-- Bastion → App Server (SSH) -->
+  <line x1="280" y1="276" x2="520" y2="276" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <rect x="368" y="263" width="64" height="16" rx="3" fill="white" stroke="#d4d4d8" stroke-width="0.5"/>
+  <text x="400" y="275" text-anchor="middle" font-size="9" font-weight="600" fill="#7c3aed">SSH :22</text>
+
+  <!-- App Server → RDS -->
+  <line x1="600" y1="310" x2="600" y2="322" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <text x="626" y="319" font-size="9" font-weight="600" fill="#6366f1">:3306</text>
+
+  <!-- NAT → IGW (outbound) -->
+  <path d="M 280 341 Q 360 341 360 200 Q 360 120 370 88" stroke="#10b981" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#arrow)"/>
+  <text x="364" y="232" font-size="8" fill="#10b981" transform="rotate(-90 364 232)">outbound</text>
+
+  <!-- ======= ROUTE TABLES ======= -->
+  <!-- Public Route Table (H8 — hotspot at y≈84.3%=514) -->
+  <rect x="100" y="482" width="220" height="58" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="210" y="498" text-anchor="middle" font-size="10" font-weight="700" fill="#334155">Public Route Table</text>
+  <!-- blank slot for H8 dropdown (centred at 514) -->
+  <rect x="112" y="502" width="196" height="26" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Arrow: Public RT ↑ -->
+  <line x1="210" y1="482" x2="210" y2="468" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Private Route Table (H9 — hotspot at y≈84.3%=514) -->
+  <rect x="540" y="482" width="220" height="58" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="650" y="498" text-anchor="middle" font-size="10" font-weight="700" fill="#334155">Private Route Table</text>
+  <rect x="552" y="502" width="196" height="26" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Arrow: Private RT ↑ -->
+  <line x1="650" y1="482" x2="650" y2="468" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Implicit local route notes -->
+  <text x="210" y="552" text-anchor="middle" font-size="8" fill="#94a3b8">10.0.0.0/16 → local (implicit)</text>
+  <text x="650" y="552" text-anchor="middle" font-size="8" fill="#94a3b8">10.0.0.0/16 → local (implicit)</text>
+
+  <!-- Security group boundary outlines -->
+  <rect x="114" y="234" width="172" height="152" rx="4" fill="none" stroke="#a855f7" stroke-width="1" stroke-dasharray="3,3" opacity="0.35"/>
+  <text x="286" y="245" font-size="8" fill="#a855f7" text-anchor="end" opacity="0.6">SG: bastion-sg</text>
+
+  <rect x="514" y="234" width="172" height="152" rx="4" fill="none" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,3" opacity="0.35"/>
+  <text x="686" y="245" font-size="8" fill="#6366f1" text-anchor="end" opacity="0.6">SG: app-sg / db-sg</text>
+
+  <!-- Legend -->
+  <rect x="50" y="568" width="800" height="32" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="588" font-size="9" fill="#64748b">Legend:</text>
+  <rect x="120" y="576" width="12" height="12" rx="2" fill="#f0fdf4" stroke="#22c55e" stroke-width="1"/>
+  <text x="140" y="588" font-size="9" fill="#64748b">Public Subnet</text>
+  <rect x="235" y="576" width="12" height="12" rx="2" fill="#fffbeb" stroke="#f59e0b" stroke-width="1"/>
+  <text x="255" y="588" font-size="9" fill="#64748b">Private Subnet</text>
+  <rect x="355" y="576" width="12" height="12" rx="2" fill="#faf5ff" stroke="#a855f7" stroke-width="1"/>
+  <text x="375" y="588" font-size="9" fill="#64748b">EC2 Instance</text>
+  <rect x="465" y="576" width="12" height="12" rx="2" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+  <text x="485" y="588" font-size="9" fill="#64748b">Gateway / NAT</text>
+  <rect x="580" y="576" width="12" height="12" rx="2" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="600" y="588" font-size="9" fill="#64748b">Database</text>
+  <line x1="658" y1="582" x2="688" y2="582" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="698" y="588" font-size="9" fill="#64748b">Connection</text>
+  <line x1="762" y1="582" x2="792" y2="582" stroke="#a855f7" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+  <text x="802" y="588" font-size="9" fill="#64748b">Security Group</text>
+</svg>

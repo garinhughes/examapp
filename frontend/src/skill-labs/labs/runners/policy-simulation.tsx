@@ -3,6 +3,7 @@ import MonacoEditor from '@monaco-editor/react'
 import { useExam } from '@/exam/ExamContext'
 import type { PolicySimulationLabDefinition, PolicyTestCase } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
 
 interface PolicySimProgress { policy: string; timeLeft: number }
@@ -193,8 +194,8 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
           )}
 
           {session.submitted && (
-            <div className="text-sm text-muted-foreground mt-4 pt-3 border-t border-border">
-              {lab.explanation}
+            <div className="mt-4 pt-3 border-t border-border">
+              <ExplanationBlock text={lab.explanation} />
             </div>
           )}
         </div>

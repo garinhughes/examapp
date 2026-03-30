@@ -17,6 +17,7 @@ import type { ArchitectureBuilderLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
+import { ExplanationBlock } from '../ExplanationBlock'
 
 interface ArchProgress {
   placedComponents: string[]
@@ -51,6 +52,15 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
   const nodeCountRef = useRef(session.savedProgress?.nodes?.length ?? 0)
   const [validationResults, setValidationResults] = useState<{ check: string; pass: boolean }[]>([])
 
+  // Fit view when nodes are added
+  const prevNodeCount = useRef(nodes.length)
+  useEffect(() => {
+    if (nodes.length > prevNodeCount.current) {
+      setTimeout(() => reactFlowInstance.fitView({ padding: 0.25, duration: 200 }), 50)
+    }
+    prevNodeCount.current = nodes.length
+  }, [nodes.length])
+
   useEffect(() => {
     if (session.submitted) return
     session.saveProgress({ placedComponents: [...placedComponents], nodes, edges, timeLeft: session.timeLeft })
@@ -80,16 +90,17 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
         fontSize: '13px',
       },
     }
-    setNodes((prev) => {
-      const next = [...prev, newNode]
-      requestAnimationFrame(() => reactFlowInstance.fitView({ padding: 0.25, duration: 200 }))
-      return next
-    })
+    setNodes((prev) => [...prev, newNode])
   }, [placedComponents, session.submitted, reactFlowInstance])
 
   const onConnect = useCallback((connection: Connection) => {
     if (session.submitted) return
     setEdges((prev) => addEdge({ ...connection, animated: true }, prev))
+  }, [session.submitted, setEdges])
+
+  const onEdgeClick = useCallback((_event: React.MouseEvent, edge: Edge) => {
+    if (session.submitted) return
+    setEdges((prev) => prev.filter((e) => e.id !== edge.id))
   }, [session.submitted, setEdges])
 
   const doValidate = useCallback(async () => {
@@ -151,7 +162,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
         </div>
       )}
 
-      <div className="flex-1 flex gap-4 min-h-0">
+      <div className="flex gap-4 min-h-[500px]">
         {/* Component palette */}
         <div className="w-56 shrink-0 rounded-lg border border-border bg-card p-3 overflow-y-auto flex flex-col gap-4">
           <div>
@@ -180,7 +191,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
           </div>
 
           <div className="border-t border-border pt-3">
-            <p className="text-xs text-muted-foreground mt-2 leading-relaxed">Tip: Drag from a node's edge handle to connect it to another node. Click "Validate Architecture" when ready to evaluate your design.</p>
+            <p className="text-xs text-muted-foreground mt-2 leading-relaxed">Tip: Drag from a node's edge handle to connect it to another node. Click a connection line to remove it. Click "Validate Architecture" when ready.</p>
           </div>
         </div>
 
@@ -192,6 +203,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onEdgeClick={onEdgeClick}
             fitView
             proOptions={{ hideAttribution: true }}
             nodesConnectable={!session.submitted}
@@ -233,7 +245,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
                 </div>
               ))}
             </div>
-            <div className="text-sm text-muted-foreground mt-2">{lab.explanation}</div>
+            <ExplanationBlock text={lab.explanation} className="mt-2" />
             <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
               Back to Skill Labs
             </button>

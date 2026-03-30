@@ -261,6 +261,32 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     return reply.send({ success: errors.length === 0, errors })
   })
 
+  // POST /skill-labs/:id/validate-code — validate code-fix lab submission
+  server.post('/:id/validate-code', async (request, reply) => {
+    const { id: labId } = request.params as { id: string }
+    const lab = USE_S3 ? await findLabS3(labId) : await findLabLocal(labId)
+    if (!lab) return reply.status(404).send({ message: 'Lab not found' })
+    if (lab.type !== 'code-fix') return reply.status(400).send({ message: 'Not a code-fix lab' })
+
+    const body = request.body as any
+    const { code } = body || {}
+    if (typeof code !== 'string') {
+      return reply.status(400).send({ message: 'code (string) is required' })
+    }
+
+    const errors: string[] = []
+    const normalised = code.replace(/\r\n/g, '\n').trim()
+
+    for (const v of (lab as any).validations) {
+      // Check if the expected value appears in the submitted code
+      if (!normalised.includes(v.expected)) {
+        errors.push(`Expected ${v.field} to be "${v.expected}"`)
+      }
+    }
+
+    return reply.send({ success: errors.length === 0, errors })
+  })
+
   // POST /skill-labs/:id/attempt — store result
   server.post('/:id/attempt', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const { id: labId } = request.params as { id: string }

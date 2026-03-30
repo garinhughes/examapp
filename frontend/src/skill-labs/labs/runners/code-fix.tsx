@@ -5,6 +5,7 @@ import { apiUrl } from '@/apiBase'
 import type { CodeFixLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabSession } from '../useLabSession'
+import { ExplanationBlock } from '../ExplanationBlock'
 
 interface CodeFixProgress {
   code: string
@@ -142,8 +143,8 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
                 </ul>
               )}
               {validationResult.success && (
-                <div className="text-sm text-muted-foreground mt-4">
-                  {lab.explanation}
+                <div className="mt-4">
+                  <ExplanationBlock text={lab.explanation} />
                 </div>
               )}
             </div>

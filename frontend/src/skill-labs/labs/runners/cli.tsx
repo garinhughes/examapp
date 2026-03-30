@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useExam } from '@/exam/ExamContext'
 import type { CliLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 
@@ -32,7 +33,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
     { type: 'output', text: `Lab: ${lab.title}` },
     { type: 'output', text: lab.scenario },
     { type: 'output', text: '' },
-    { type: 'output', text: 'Type AWS CLI commands to investigate. Type "help" for available commands.' },
+    { type: 'output', text: 'Type AWS CLI commands to investigate the environment.' },
     { type: 'output', text: '' },
   ]
 
@@ -105,12 +106,29 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
     const newLines: TerminalLine[] = [{ type: 'prompt', text: `${PROMPT}${trimmed}` }]
 
     if (trimmed.toLowerCase() === 'help') {
-      newLines.push({ type: 'output', text: 'Available commands:' })
-      for (const c of lab.commands) {
-        newLines.push({ type: 'output', text: `  ${c.command}` })
-      }
+      newLines.push({ type: 'output', text: 'Available command categories:' })
       newLines.push({ type: 'output', text: '' })
-      newLines.push({ type: 'output', text: 'Other commands: help, clear' })
+      newLines.push({ type: 'output', text: '  Identity & Caller' })
+      newLines.push({ type: 'output', text: '    aws sts get-caller-identity' })
+      newLines.push({ type: 'output', text: '' })
+      newLines.push({ type: 'output', text: '  IAM' })
+      newLines.push({ type: 'output', text: '    aws iam get-user' })
+      newLines.push({ type: 'output', text: '    aws iam list-attached-user-policies --user-name <username>' })
+      newLines.push({ type: 'output', text: '    aws iam simulate-principal-policy --policy-source-arn <arn> --action-names <action> --resource-arns <arn>' })
+      newLines.push({ type: 'output', text: '' })
+      newLines.push({ type: 'output', text: '  S3 Bucket Inspection' })
+      newLines.push({ type: 'output', text: '    aws s3 ls' })
+      newLines.push({ type: 'output', text: '    aws s3 ls s3://<bucket>' })
+      newLines.push({ type: 'output', text: '    aws s3api get-bucket-acl --bucket <bucket>' })
+      newLines.push({ type: 'output', text: '    aws s3api get-bucket-policy --bucket <bucket>' })
+      newLines.push({ type: 'output', text: '    aws s3api get-bucket-encryption --bucket <bucket>' })
+      newLines.push({ type: 'output', text: '    aws s3api get-public-access-block --bucket <bucket>' })
+      newLines.push({ type: 'output', text: '    aws s3api get-bucket-versioning --bucket <bucket>' })
+      newLines.push({ type: 'output', text: '' })
+      newLines.push({ type: 'output', text: '  Organizations' })
+      newLines.push({ type: 'output', text: '    aws organizations describe-organization' })
+      newLines.push({ type: 'output', text: '' })
+      newLines.push({ type: 'output', text: 'Builtins: help, clear' })
     } else if (trimmed.toLowerCase() === 'clear') {
       setLines([])
       setInput('')
@@ -122,8 +140,8 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
           newLines.push({ type: 'output', text: line })
         })
       } else {
-        newLines.push({ type: 'error', text: `bash: ${trimmed.split(' ')[0]}: command not found or not available in this lab` })
-        newLines.push({ type: 'output', text: 'Type "help" to see available commands.' })
+        newLines.push({ type: 'error', text: `bash: ${trimmed.split(' ')[0]}: command not found or not available in this environment` })
+        newLines.push({ type: 'output', text: '' })
       }
     }
 
@@ -268,7 +286,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
             <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </div>
-            <div className="text-sm text-muted-foreground">{lab.explanation}</div>
+            <ExplanationBlock text={lab.explanation} />
             <button
               onClick={() => setRoute('skill-labs')}
               className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition"

@@ -3,6 +3,7 @@ import Editor from '@monaco-editor/react'
 import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { PolicyFixLabDefinition } from '../../types'
+import { ExplanationBlock } from '../ExplanationBlock'
 import { LabHeader } from '../LabHeader'
 import { useLabSession } from '../useLabSession'
 
@@ -93,7 +94,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
             <h4 className="font-semibold text-sm">Requirements</h4>
             {lab.validations.map((v, i) => (
               <div key={i} className="text-xs bg-muted/50 rounded px-2 py-1">
-                <span className="font-medium">{v.field}</span>: should be <code className="text-primary">{v.expected}</code>
+                <span className="font-medium">{v.field}</span>
               </div>
             ))}
           </div>
@@ -144,8 +145,8 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
                 </ul>
               )}
               {validationResult.success && (
-                <div className="text-sm text-muted-foreground mt-4">
-                  {lab.explanation}
+                <div className="mt-4">
+                  <ExplanationBlock text={lab.explanation} />
                 </div>
               )}
             </div>

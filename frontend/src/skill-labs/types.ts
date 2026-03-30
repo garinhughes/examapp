@@ -7,6 +7,7 @@ export type SkillLabType =
   | 'security-hardening' | 'performance-optimization'
   | 'policy-simulation' | 'service-limits'
   | 'code-fix' | 'fill-command' | 'drag-match' | 'diagram-label'
+  | 'incident-response' | 'drift-detection'
 
 export type SkillLevel = 'beginner' | 'intermediate' | 'advanced'
 
@@ -172,10 +173,26 @@ export interface OrderingLabDefinition extends LabSummary {
 export interface ConfigItem {
   id: string
   label: string
+  shortLabel?: string
   currentValue: string
   correctValue: string
   inputType: 'text' | 'select'
   options?: string[]
+}
+
+export interface ConfigVisualGroup {
+  id: string
+  label: string
+  sublabel?: string
+  zone: string
+  itemIds: string[]
+}
+
+export interface ConfigVisualZone {
+  id: string
+  label: string
+  color?: 'blue' | 'orange' | 'green' | 'neutral'
+  row?: number
 }
 
 export interface ConfigToggleLabDefinition extends LabSummary {
@@ -183,6 +200,9 @@ export interface ConfigToggleLabDefinition extends LabSummary {
   scenario: string
   configItems: ConfigItem[]
   explanation: string
+  visualGroups?: ConfigVisualGroup[]
+  visualZones?: ConfigVisualZone[]
+  visualContainerLabel?: string
 }
 
 // --- Cost Optimization lab types ---
@@ -337,6 +357,64 @@ export interface DiagramLabelLabDefinition extends LabSummary {
   explanation: string
 }
 
+// --- Incident Response lab types ---
+
+export interface IncidentAlert {
+  id: string
+  severity: 'critical' | 'warning' | 'info'
+  time: string
+  service: string
+  message: string
+}
+
+export interface IncidentMetric {
+  id: string
+  name: string
+  unit: string
+  values: { time: string; value: number }[]
+}
+
+export interface IncidentTimelineEvent {
+  time: string
+  event: string
+}
+
+export interface IncidentAction {
+  id: string
+  description: string
+  correct: boolean
+}
+
+export interface IncidentResponseLabDefinition extends LabSummary {
+  type: 'incident-response'
+  scenario: string
+  alerts: IncidentAlert[]
+  metrics: IncidentMetric[]
+  logs: LogEntry[]
+  timeline: IncidentTimelineEvent[]
+  actions: IncidentAction[]
+  answers: LabAnswer[]
+  explanation: string
+}
+
+// --- Drift Detection lab types ---
+
+export interface DriftResource {
+  id: string
+  resourceType: string
+  resourceName: string
+  expected: Record<string, string>
+  actual: Record<string, string>
+  drifted: boolean
+}
+
+export interface DriftDetectionLabDefinition extends LabSummary {
+  type: 'drift-detection'
+  scenario: string
+  resources: DriftResource[]
+  explanation: string
+}
+
 // Union of all lab definitions
 export type LabDefinition =
   | DiagnoseLabDefinition | CliLabDefinition | PolicyFixLabDefinition
@@ -345,4 +423,4 @@ export type LabDefinition =
   | SecurityHardeningLabDefinition | PerformanceOptLabDefinition
   | PolicySimulationLabDefinition | ServiceLimitsLabDefinition
   | CodeFixLabDefinition | FillCommandLabDefinition | DragMatchLabDefinition
-  | DiagramLabelLabDefinition
+  | DiagramLabelLabDefinition | IncidentResponseLabDefinition | DriftDetectionLabDefinition

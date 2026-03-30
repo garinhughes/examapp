@@ -247,5 +247,65 @@
     "correct": true,
     "timeTaken": 11,
     "createdAt": "2026-03-24T10:15:22.390Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "6afbeaf9-a42a-4348-be59-fc34d9f77868",
+    "labId": "aws-label-vpc-architecture",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"h1\":\"Internet Gateway\",\"h2\":\"Public Subnet\",\"h3\":\"Private Subnet\",\"h4\":\"Bastion Host\",\"h6\":\"Web Server\",\"h7\":\"Amazon RDS (MySQL)\",\"h5\":\"NAT Gateway\",\"h8\":\"0.0.0.0/0 → igw-xxxx\",\"h9\":\"0.0.0.0/0 → nat-xxxx\"}",
+    "correct": false,
+    "timeTaken": 149,
+    "createdAt": "2026-03-30T18:23:09.499Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "16a10f97-207f-4a99-9bc5-7810f21ad8bc",
+    "labId": "aws-wire-up-ec2-access",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"bastion-ssh-source\":\"0.0.0.0/0\",\"bastion-ssh-port\":\"3389\",\"app-ssh-source\":\"0.0.0.0/0\",\"app-traffic-port\":\"80\",\"db-mysql-source\":\"0.0.0.0/0\",\"db-mysql-port\":\"5432\",\"public-rt-target\":\"nat-xxxx\",\"private-rt-target\":\"igw-xxxx\"}",
+    "correct": false,
+    "timeTaken": 73,
+    "createdAt": "2026-03-30T18:28:21.574Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "84281bd7-428b-4ef7-be1e-023c8c730d8b",
+    "labId": "aws-wire-up-ec2-access",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"bastion-ssh-source\":\"0.0.0.0/0\",\"bastion-ssh-port\":\"3389\",\"app-ssh-source\":\"0.0.0.0/0\",\"app-traffic-port\":\"80\",\"db-mysql-source\":\"0.0.0.0/0\",\"db-mysql-port\":\"5432\",\"public-rt-target\":\"nat-xxxx\",\"private-rt-target\":\"igw-xxxx\"}",
+    "correct": false,
+    "timeTaken": 26,
+    "createdAt": "2026-03-30T18:38:59.488Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "36a6f198-aca5-40c5-9217-5e92901e26e7",
+    "labId": "aws-secure-s3-app",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"public-access\":\"Move bucket to a private VPC endpoint\",\"encryption\":\"Enable SSE-KMS with a customer-managed key and deny unencrypted uploads via bucket policy\",\"iam-wildcard\":\"Create a service control policy (SCP) to restrict S3 access\",\"logging\":\"Enable S3 server access logging to a separate log bucket\",\"versioning\":\"Enable cross-region replication\",\"mfa-delete\":\"Apply a bucket policy denying delete operations from all principals\",\"retention\":\"Use S3 Glacier Vault Lock with a 7-year policy instead\"}",
+    "correct": false,
+    "timeTaken": 14,
+    "createdAt": "2026-03-30T18:51:06.993Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "ce7e7bc1-729a-4cde-920e-5baa5eaba299",
+    "labId": "aws-secure-s3-app",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"public-access\":\"Add a bucket policy denying anonymous access\",\"encryption\":\"Enable SSE-KMS with a customer-managed key and deny unencrypted uploads via bucket policy\",\"iam-wildcard\":\"Restrict actions to s3:GetObject, s3:PutObject on the specific bucket ARN only\",\"logging\":\"Enable CloudTrail S3 data events for the bucket\",\"versioning\":\"Enable versioning with lifecycle rules for non-current versions\",\"mfa-delete\":\"Apply a bucket policy denying delete operations from all principals\",\"retention\":\"Change Object Lock mode to COMPLIANCE and set retention period to 2,555 days (7 years)\"}",
+    "correct": false,
+    "timeTaken": 14,
+    "createdAt": "2026-03-30T18:57:21.995Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "7b2aa93b-11ba-4828-aa76-bba60b3ff5ee",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "diagnose",
+    "selectedAnswer": "cold-start",
+    "correct": false,
+    "timeTaken": 5,
+    "createdAt": "2026-03-30T18:57:59.628Z"
   }
 ]
