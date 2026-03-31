@@ -1,0 +1,2329 @@
+{
+  "code": "AIF-C01",
+  "provider": "AWS",
+  "passMark": 70,
+  "logo": "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
+  "defaultQuestions": 65,
+  "defaultDuration": 90,
+  "title": "AWS Certified AI Practitioner",
+  "level": 0,
+  "questions": [
+    {
+      "id": "AIF-C01-0001",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+      ],
+      "question": "A machine learning engineer is developing a system to recognize defective products on a manufacturing assembly line. The engineer trains a model on thousands of images of both defective and normal products.\n\nWhich term best describes the process of using the trained model to identify new defective products in real-time?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Inferencing",
+          "sequence": 1,
+          "explanation": "This is the correct term for using a trained model to make predictions on new data."
+        },
+        {
+          "id": "c2",
+          "text": "Training",
+          "explanation": "Training is the initial process of teaching the model using historical data, not the process of making predictions on new data."
+        },
+        {
+          "id": "c3",
+          "text": "Tokenization",
+          "explanation": "Tokenization is a technique used in NLP to break text into smaller units, not relevant to image classification tasks."
+        },
+        {
+          "id": "c4",
+          "text": "Fine-tuning",
+          "explanation": "Fine-tuning is a technique to adapt a pre-trained model to a new task, not the process of making real-time predictions."
+        }
+      ],
+      "tip": "Consider what happens when a trained model is used to make predictions on new data, not during the initial learning phase.",
+      "explanation": "Inferencing is the process of using a trained machine learning model to make predictions on new, unseen data. In this scenario, the engineer's model was trained on images during the training phase, and now it uses that learned knowledge to infer whether new products are defective.\n\n**Why it works:** Inferencing is the standard term for prediction or decision-making by a trained model in production environments.\n\n**Why the others don't work:**\n- Training: This refers to the initial phase of teaching the model, not making predictions\n- Tokenization: This is an NLP preprocessing technique, not applicable to image analysis\n- Fine-tuning: This is an optimization technique for transfer learning, not the prediction phase",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0002",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+      ],
+      "question": "A financial institution is building a loan approval system. During testing, the data team discovers that the model approves loans at significantly higher rates for applicants from certain demographic groups compared to others, even though all other factors are equal.\n\nWhich concept is this situation demonstrating?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Bias",
+          "sequence": 1,
+          "explanation": "Bias refers to systematic prejudice or unfairness in how a model makes decisions across different groups."
+        },
+        {
+          "id": "c2",
+          "text": "Overfitting",
+          "explanation": "Overfitting occurs when a model learns the training data too well, including noise, but this doesn't explain disparate approval rates across demographic groups."
+        },
+        {
+          "id": "c3",
+          "text": "Underfitting",
+          "explanation": "Underfitting means a model is too simple to capture the underlying patterns, not related to differential treatment of demographic groups."
+        },
+        {
+          "id": "c4",
+          "text": "Regularization",
+          "explanation": "Regularization is a technique to prevent overfitting by adding constraints to the model, not a fairness concern."
+        }
+      ],
+      "tip": "Focus on what term describes systematic unfair treatment of different groups by a model.",
+      "explanation": "Bias in machine learning refers to systematic prejudice or unfairness in the model's predictions across different groups or populations. The scenario describes disparate treatment based on demographic characteristics, which is a clear example of algorithmic bias.\n\n**Why it works:** Bias manifests when a model consistently treats certain groups differently, leading to unfair outcomes regardless of other factors.\n\n**Why the others don't work:**\n- Overfitting: Relates to model generalization on unseen data, not systematic unfairness across demographic groups\n- Underfitting: Refers to insufficient model complexity, not differential treatment of groups\n- Regularization: A technique to improve model performance, not a fairness issue",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0003",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon SageMaker"
+      ],
+      "skills": [
+        "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+      ],
+      "question": "A data scientist is evaluating different machine learning algorithms for predicting customer churn. After testing multiple algorithms on a validation dataset, the team selects the one that achieves the best accuracy without being overly complex.\n\nWhat concept is the team demonstrating in selecting this algorithm?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Good fit",
+          "sequence": 1,
+          "explanation": "Good fit represents the balance between model accuracy and complexity, avoiding both underfitting and overfitting."
+        },
+        {
+          "id": "c2",
+          "text": "Deep learning",
+          "explanation": "Deep learning is a specific technique using neural networks with multiple layers, not a concept about model selection balance."
+        },
+        {
+          "id": "c3",
+          "text": "Natural language processing",
+          "explanation": "NLP is a specialized AI field for processing text, not relevant to selecting algorithms for churn prediction."
+        },
+        {
+          "id": "c4",
+          "text": "Supervised learning",
+          "explanation": "Supervised learning is a category of ML tasks with labeled data, but doesn't describe the balance between performance and complexity."
+        }
+      ],
+      "tip": "Consider the balance between model performance and simplicity when evaluating algorithms.",
+      "explanation": "Good fit refers to finding the right balance in a machine learning model where it captures important patterns in the data without being overly complex or too simple. The team selected an algorithm with strong accuracy while maintaining reasonable complexity, demonstrating the concept of good fit.\n\n**Why it works:** Good fit is achieved when a model generalizes well to new data with appropriate complexity.\n\n**Why the others don't work:**\n- Deep learning: A specific type of neural network architecture, not about algorithm selection balance\n- Natural language processing: A specialized field for text analysis, irrelevant to churn prediction\n- Supervised learning: A learning paradigm category, not about the fit quality of a specific algorithm",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0004",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Rekognition",
+        "AWS"
+      ],
+      "skills": [
+        "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+      ],
+      "question": "A retail company is implementing a system to automatically tag products in their image database. The system needs to identify objects, recognize text on packaging, and understand scene composition. The team is evaluating which combination of AI capabilities to use.\n\nWhich TWO capabilities best address the company's requirements? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Computer vision to identify objects and understand visual scene composition",
+          "sequence": 1,
+          "explanation": "Computer vision enables the system to recognize and classify objects in images, addressing the identification and scene understanding needs."
+        },
+        {
+          "id": "c2",
+          "text": "Natural language processing to extract and understand text from packaging",
+          "sequence": 2,
+          "explanation": "NLP can process the recognized text from product packaging, enabling text understanding and metadata extraction."
+        },
+        {
+          "id": "c3",
+          "text": "Deep learning neural networks to compress image file sizes",
+          "explanation": "While deep learning is useful for image tasks, compressing file sizes is not relevant to the tagging and recognition requirements."
+        },
+        {
+          "id": "c4",
+          "text": "Large language models to generate product descriptions from images",
+          "explanation": "LLMs are powerful for text generation, but they are not the primary tool for the visual recognition tasks required here."
+        },
+        {
+          "id": "c5",
+          "text": "Machine learning algorithms to predict product prices based on image features",
+          "explanation": "Price prediction is outside the scope of the company's stated requirements for tagging and identification."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Consider which AI capabilities directly address visual recognition and text understanding in images.",
+      "explanation": "Computer vision and natural language processing are the two AI capabilities that directly address the company's needs. Computer vision handles object identification and visual scene understanding, while NLP processes and understands the text found on product packaging.\n\n**Why they work:** Computer vision specializes in image analysis and object recognition, while NLP processes extracted text from images.\n\n**Why the others don't work:**\n- Deep learning for compression: Relevant to deep learning but not to the tagging requirements\n- LLMs for descriptions: Text generation is secondary to the primary need for visual and text recognition\n- ML for price prediction: Price prediction is not part of the tagging and recognition scope",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0005",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+      ],
+      "question": "Match each AI concept to its correct definition.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "Algorithm",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "Model",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "Training",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "Fairness",
+          "correctChoiceId": "c4"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "A step-by-step procedure or set of rules used to solve a problem or make decisions",
+          "explanation": "An algorithm is a sequence of computational steps or rules for processing data."
+        },
+        {
+          "id": "c2",
+          "text": "A mathematical representation learned from data that can make predictions or decisions",
+          "explanation": "A model is the trained artifact that applies learned patterns to new inputs."
+        },
+        {
+          "id": "c3",
+          "text": "The process of teaching a machine learning system using historical data and examples",
+          "explanation": "Training is the phase where the model learns from labeled or unlabeled data."
+        },
+        {
+          "id": "c4",
+          "text": "The principle that an AI system should treat all groups equitably without discrimination",
+          "explanation": "Fairness in AI ensures that decisions are unbiased and equitable across different populations."
+        }
+      ],
+      "tip": "Consider the distinction between the procedure (algorithm), the result (model), the process (training), and the principle (fairness).",
+      "explanation": "Each concept has a distinct role in machine learning. An algorithm is the procedure, a model is the trained artifact, training is the learning process, and fairness is an ethical principle ensuring equitable outcomes across groups.",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0006",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+      ],
+      "question": "An e-commerce company is analyzing customer behavior to suggest products that buyers might be interested in based on their browsing history and purchase patterns.\n\nWhich AI application type is this company implementing?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Recommendation systems",
+          "sequence": 1,
+          "explanation": "Recommendation systems analyze user preferences and behavior to suggest relevant products or content."
+        },
+        {
+          "id": "c2",
+          "text": "Speech recognition",
+          "explanation": "Speech recognition converts spoken audio into text, which is not relevant to analyzing customer behavior."
+        },
+        {
+          "id": "c3",
+          "text": "Computer vision",
+          "explanation": "Computer vision processes images and videos to extract visual information, not analyzing purchasing patterns."
+        },
+        {
+          "id": "c4",
+          "text": "Forecasting",
+          "explanation": "Forecasting predicts future trends or values based on historical data, not analyzing individual customer behavior for suggestions."
+        }
+      ],
+      "tip": "Consider which AI application is specifically designed to suggest items based on user preferences and behavior.",
+      "explanation": "Recommendation systems are AI applications that analyze user behavior, preferences, and patterns to suggest products or content that users might find valuable. This company's product suggestion feature is a classic recommendation system use case.\n\n**Why it works:** Recommendation systems excel at analyzing browsing and purchase history to predict user interests and preferences.\n\n**Why the others don't work:**\n- Speech recognition: Converts spoken words to text, not applicable to behavior analysis\n- Computer vision: Analyzes visual content, not customer behavior patterns\n- Forecasting: Predicts aggregate future values, not individual product recommendations",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0007",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Transcribe"
+      ],
+      "skills": [
+        "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+      ],
+      "question": "A customer service company wants to automatically convert phone call recordings into searchable text transcripts. The system needs to understand spoken language from callers with various accents and speaking styles.\n\nWhich AI capability should the company use?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Speech recognition",
+          "sequence": 1,
+          "explanation": "Speech recognition technology converts spoken audio into text and can handle various accents and speaking patterns."
+        },
+        {
+          "id": "c2",
+          "text": "Computer vision",
+          "explanation": "Computer vision processes visual images, not audio or speech content."
+        },
+        {
+          "id": "c3",
+          "text": "Fraud detection",
+          "explanation": "Fraud detection identifies suspicious patterns and anomalies, not relevant to transcribing audio."
+        },
+        {
+          "id": "c4",
+          "text": "Forecasting",
+          "explanation": "Forecasting predicts future trends, not applicable to converting current speech to text."
+        }
+      ],
+      "tip": "Focus on which AI application specifically converts spoken words into text format.",
+      "explanation": "Speech recognition is the AI application that converts spoken language into written text. This technology can handle various accents, speech patterns, and noise levels, making it ideal for transcribing customer service calls.\n\n**Why it works:** Speech recognition specializes in converting audio input to text, understanding natural speech variations.\n\n**Why the others don't work:**\n- Computer vision: Designed for image and video analysis, not audio processing\n- Fraud detection: Identifies suspicious patterns, not related to speech-to-text conversion\n- Forecasting: Predicts future values, not applicable to transcription tasks",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0008",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Lookout for Fraud"
+      ],
+      "skills": [
+        "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+      ],
+      "question": "A banking institution monitors credit card transactions in real-time to identify unusual patterns that might indicate unauthorized use or criminal activity. The system learns from historical transaction patterns to detect anomalies quickly.\n\nWhich real-world AI application is the bank implementing?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Fraud detection",
+          "sequence": 1,
+          "explanation": "Fraud detection identifies suspicious transactions and unauthorized activities by analyzing patterns."
+        },
+        {
+          "id": "c2",
+          "text": "Recommendation systems",
+          "explanation": "Recommendation systems suggest products or content, not detect fraudulent transactions."
+        },
+        {
+          "id": "c3",
+          "text": "Natural language processing",
+          "explanation": "NLP processes text and language, not financial transaction patterns."
+        },
+        {
+          "id": "c4",
+          "text": "Forecasting",
+          "explanation": "Forecasting predicts future values or trends, not identifies suspicious current transactions."
+        }
+      ],
+      "tip": "Consider which AI application identifies suspicious or anomalous patterns in real-time activities.",
+      "explanation": "Fraud detection is an AI application that analyzes transaction patterns to identify suspicious activities and unauthorized use. By learning from historical legitimate transactions, the system can quickly detect anomalies that likely represent fraud.\n\n**Why it works:** Fraud detection systems excel at analyzing patterns and identifying deviations that suggest criminal activity.\n\n**Why the others don't work:**\n- Recommendation systems: Designed to suggest items, not detect fraudulent activity\n- Natural language processing: Processes text content, not transaction patterns\n- Forecasting: Predicts future values, not identifies current suspicious transactions",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0009",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Lookout for Equipment",
+        "AWS"
+      ],
+      "skills": [
+        "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+      ],
+      "question": "A manufacturing facility wants to improve operations by using AI in two ways. First, they want to predict when equipment is likely to fail so they can perform preventive maintenance. Second, they want to analyze images from quality control cameras to identify defects before products leave the factory.\n\nWhich TWO AI applications should the facility implement? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Forecasting to predict equipment failures and maintenance needs",
+          "sequence": 1,
+          "explanation": "Forecasting predicts future events like equipment failures based on historical patterns, enabling proactive maintenance."
+        },
+        {
+          "id": "c2",
+          "text": "Computer vision to analyze visual content and identify manufacturing defects",
+          "sequence": 2,
+          "explanation": "Computer vision processes images to detect visual defects in products, enabling quality control automation."
+        },
+        {
+          "id": "c3",
+          "text": "Speech recognition to communicate alerts to facility workers",
+          "explanation": "While useful for alerts, speech recognition is not a primary AI capability for the stated requirements."
+        },
+        {
+          "id": "c4",
+          "text": "Recommendation systems to suggest maintenance schedules",
+          "explanation": "Recommendation systems suggest items or content, not ideal for predictive failure analysis."
+        },
+        {
+          "id": "c5",
+          "text": "Natural language processing to generate maintenance reports",
+          "explanation": "NLP helps process text, but is not necessary for the core equipment failure prediction and defect detection needs."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Identify which AI applications directly address predictive maintenance and visual quality control.",
+      "explanation": "Forecasting and computer vision are the two AI applications that address the facility's stated needs. Forecasting can predict when equipment will fail, enabling preventive maintenance, while computer vision can analyze quality control camera images to detect manufacturing defects.\n\n**Why they work:** Forecasting excels at predicting future events based on historical patterns, while computer vision specializes in analyzing visual information.\n\n**Why the others don't work:**\n- Speech recognition: Enables communication but doesn't address prediction or visual analysis needs\n- Recommendation systems: Suggests items, not ideal for failure prediction\n- Natural language processing: Processes text, not essential for the core manufacturing requirements",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0010",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+      ],
+      "question": "Match each real-world scenario to the appropriate AI application that solves it.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "A streaming service suggests movies based on viewing history",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "A hospital system detects tumors in medical imaging scans",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "A retailer predicts customer demand for next season's inventory",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "A voice assistant understands and responds to spoken commands",
+          "correctChoiceId": "c4"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Recommendation systems",
+          "explanation": "Recommendation systems analyze user preferences and behavior to suggest relevant content."
+        },
+        {
+          "id": "c2",
+          "text": "Computer vision",
+          "explanation": "Computer vision analyzes medical images to identify abnormalities and detect tumors."
+        },
+        {
+          "id": "c3",
+          "text": "Forecasting",
+          "explanation": "Forecasting predicts future values and demand based on historical patterns."
+        },
+        {
+          "id": "c4",
+          "text": "Speech recognition",
+          "explanation": "Speech recognition converts spoken commands into actionable instructions."
+        }
+      ],
+      "tip": "Consider what each AI application does best: suggesting content, analyzing images, predicting futures, or processing speech.",
+      "explanation": "Each AI application addresses specific real-world needs. Recommendation systems personalize content suggestions, computer vision analyzes visual medical data, forecasting predicts demand, and speech recognition processes spoken language.",
+      "domain": "Fundamentals of AI and ML",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0011",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+      ],
+      "question": "A marketing team wants to automatically create multiple variations of product descriptions for A/B testing. They need to generate different versions quickly without manual rewriting.\n\nWhich generative AI capability would be most suitable for this use case?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Text generation to create product description variations",
+          "sequence": 1,
+          "explanation": "Text generation can produce multiple natural language variations of descriptions efficiently."
+        },
+        {
+          "id": "c2",
+          "text": "Image generation to create product photography",
+          "explanation": "Image generation creates visual content, not written descriptions."
+        },
+        {
+          "id": "c3",
+          "text": "Video generation to create marketing demonstrations",
+          "explanation": "Video generation produces video content, not written product descriptions."
+        },
+        {
+          "id": "c4",
+          "text": "Speech synthesis to create audio narration",
+          "explanation": "Speech synthesis creates audio content, not written descriptions."
+        }
+      ],
+      "tip": "Consider which generative capability creates written content variations.",
+      "explanation": "Text generation through large language models is the most suitable capability for creating multiple product description variations quickly. Generative AI models can produce natural, diverse text variations that maintain the core message while changing phrasing and emphasis.\n\n**Why it works:** Text generation excels at creating natural language variations efficiently at scale.\n\n**Why the others don't work:**\n- Image generation: Creates visual content, not written descriptions\n- Video generation: Produces video content, not text descriptions\n- Speech synthesis: Generates audio, not written product descriptions",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0012",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Translate"
+      ],
+      "skills": [
+        "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+      ],
+      "question": "A software development company has technical documentation in English and needs to provide it to customers in multiple languages including Spanish, French, and Mandarin. The company needs to automate this process to keep translations current as documentation updates.\n\nWhich generative AI use case applies here?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Translation to convert documentation between languages",
+          "sequence": 1,
+          "explanation": "Translation models can convert text between languages while maintaining meaning and context."
+        },
+        {
+          "id": "c2",
+          "text": "Summarization to condense technical documentation",
+          "explanation": "Summarization creates brief versions of content, not translations into other languages."
+        },
+        {
+          "id": "c3",
+          "text": "Code generation to write software programs",
+          "explanation": "Code generation creates executable code, not language translations."
+        },
+        {
+          "id": "c4",
+          "text": "Image generation to create visual documentation",
+          "explanation": "Image generation creates visual content, not language translations."
+        }
+      ],
+      "tip": "Focus on which generative AI capability converts text from one language to another.",
+      "explanation": "Translation is the generative AI use case that automatically converts text from one language to another. This allows companies to maintain multilingual documentation efficiently as their products and documentation evolve.\n\n**Why it works:** Generative translation models understand semantic meaning and cultural context to produce accurate translations.\n\n**Why the others don't work:**\n- Summarization: Creates shorter versions of text, not language translations\n- Code generation: Produces executable code, not language translations\n- Image generation: Creates visual content, not translated text",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0013",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS CodeWhisperer"
+      ],
+      "skills": [
+        "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+      ],
+      "question": "A software development team wants to improve productivity by automating routine coding tasks. They want AI to suggest code completions and generate boilerplate code based on comments and function signatures.\n\nWhich generative AI capability would best serve this use case?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Code generation to produce software code from descriptions",
+          "sequence": 1,
+          "explanation": "Code generation models can suggest completions and generate code based on context and comments."
+        },
+        {
+          "id": "c2",
+          "text": "Image generation to create UI mockups",
+          "explanation": "Image generation creates visual designs, not executable code."
+        },
+        {
+          "id": "c3",
+          "text": "Summarization to create code documentation",
+          "explanation": "Summarization creates brief text summaries, not generates functional code."
+        },
+        {
+          "id": "c4",
+          "text": "Chatbots for code review assistance",
+          "explanation": "While chatbots can discuss code, they don't directly generate executable code."
+        }
+      ],
+      "tip": "Consider which generative AI capability produces actual executable code from specifications.",
+      "explanation": "Code generation is the generative AI capability that produces executable code based on comments, function signatures, and natural language descriptions. This dramatically speeds up development by automating routine coding tasks.\n\n**Why it works:** Code generation models trained on large codebases can understand context and produce syntactically correct, functional code.\n\n**Why the others don't work:**\n- Image generation: Creates visual mockups, not executable code\n- Summarization: Produces text summaries, not functional code\n- Chatbots: Assist with discussion and questions, not code production",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0014",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock",
+        "AWS"
+      ],
+      "skills": [
+        "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+      ],
+      "question": "A customer service department is implementing a comprehensive AI solution with multiple capabilities. They want to deploy a conversational system to handle customer inquiries, condense long customer emails into brief summaries for agents, and generate responses in the customer's preferred language.\n\nWhich TWO generative AI use cases are essential for this solution? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Chatbots to provide conversational customer service interactions",
+          "sequence": 1,
+          "explanation": "Chatbots enable natural conversation with customers to answer questions and resolve issues."
+        },
+        {
+          "id": "c2",
+          "text": "Translation to respond to customers in their preferred language",
+          "sequence": 2,
+          "explanation": "Translation models convert responses to match customer language preferences, enabling global support."
+        },
+        {
+          "id": "c3",
+          "text": "Summarization to condense long emails into brief agent summaries",
+          "explanation": "While helpful, summarization is secondary to the core chatbot and translation capabilities for this scenario."
+        },
+        {
+          "id": "c4",
+          "text": "Image generation to create visual customer support materials",
+          "explanation": "Image generation creates visual content, not essential for text-based customer service."
+        },
+        {
+          "id": "c5",
+          "text": "Code generation to automate backend development",
+          "explanation": "Code generation supports application development but is not part of the customer service interaction layer."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Focus on the generative AI capabilities that directly address conversational support and language preferences.",
+      "explanation": "Chatbots and translation are the two essential generative AI capabilities for this customer service solution. Chatbots handle the conversational interactions, while translation enables responses in the customer's preferred language for global support.\n\n**Why they work:** Chatbots provide interactive customer engagement, while translation ensures multilingual accessibility.\n\n**Why the others don't work:**\n- Summarization: Helpful for agent efficiency but not essential to the core requirement\n- Image generation: Supports content creation but not critical for text-based service\n- Code generation: Supports development, not customer-facing service delivery",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0015",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+      ],
+      "question": "Match each use case to the appropriate generative AI capability that solves it.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "An organization needs to summarize lengthy research papers into key findings",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "A company needs an AI assistant to answer employee HR questions",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "A designer needs AI to generate product images for e-commerce catalog",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "A game developer needs AI to generate dialogue for non-player characters",
+          "correctChoiceId": "c4"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Summarization",
+          "explanation": "Summarization extracts key points and condenses lengthy documents into brief summaries."
+        },
+        {
+          "id": "c2",
+          "text": "Chatbots",
+          "explanation": "Chatbots provide conversational AI to answer questions and assist users interactively."
+        },
+        {
+          "id": "c3",
+          "text": "Image generation",
+          "explanation": "Image generation creates visual content from descriptions or prompts."
+        },
+        {
+          "id": "c4",
+          "text": "Text generation",
+          "explanation": "Text generation produces natural language content including dialogue and narratives."
+        }
+      ],
+      "tip": "Consider the specific output type each generative AI capability produces.",
+      "explanation": "Each generative AI capability serves distinct purposes: summarization condenses text, chatbots provide interaction, image generation creates visuals, and text generation produces written content.",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0016",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+      ],
+      "question": "A financial services company needs a generative AI model for highly accurate and secure document summarization. The company must ensure compliance with financial regulations like SOX and data never leaves their infrastructure.\n\nWhich critical factors should the company prioritize when selecting a model?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Compliance requirements and data residency constraints",
+          "sequence": 1,
+          "explanation": "Compliance and data residency are critical factors for regulated industries like finance."
+        },
+        {
+          "id": "c2",
+          "text": "Model speed and cost per token regardless of compliance",
+          "explanation": "While speed and cost matter, compliance and security are non-negotiable for financial services."
+        },
+        {
+          "id": "c3",
+          "text": "Maximum model size to ensure best accuracy",
+          "explanation": "Larger models don't always meet specific compliance or performance requirements for use cases."
+        },
+        {
+          "id": "c4",
+          "text": "Popularity of the model among data scientists",
+          "explanation": "Model popularity is not a primary factor for regulatory compliance and data security."
+        }
+      ],
+      "tip": "Consider which factors are non-negotiable for regulated financial institutions.",
+      "explanation": "For financial services, compliance requirements and data residency constraints are critical selection factors. The company must ensure the model meets regulatory standards like SOX and maintains data within secure, compliant infrastructure.\n\n**Why it works:** Regulated industries must prioritize compliance and data governance above other factors.\n\n**Why the others don't work:**\n- Speed and cost over compliance: Regulatory compliance cannot be sacrificed for cost savings\n- Maximum model size: Larger models don't guarantee regulatory compliance\n- Model popularity: Popularity is irrelevant to meeting compliance requirements",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0017",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+      ],
+      "question": "A startup is building a real-time translation mobile app that needs fast response times to provide a smooth user experience. The app must work with limited bandwidth and run on user devices with modest computational resources.\n\nWhich factors are most important in selecting a generative AI model for this use case?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Low latency, small model size, and efficient resource usage",
+          "sequence": 1,
+          "explanation": "Real-time mobile applications require fast response times, compact models, and efficient resource consumption."
+        },
+        {
+          "id": "c2",
+          "text": "Maximum accuracy regardless of model size or response time",
+          "explanation": "While accuracy matters, practical constraints of mobile devices and user experience must be balanced."
+        },
+        {
+          "id": "c3",
+          "text": "Highest cost to ensure premium model performance",
+          "explanation": "Cost is a factor for startups, and high cost doesn't guarantee the best fit for mobile constraints."
+        },
+        {
+          "id": "c4",
+          "text": "Model complexity and number of parameters for better results",
+          "explanation": "Larger, more complex models consume more resources and increase latency, unsuitable for mobile apps."
+        }
+      ],
+      "tip": "Consider the constraints of real-time mobile applications with limited computational resources.",
+      "explanation": "For real-time mobile applications, low latency, small model size, and efficient resource usage are critical factors. The model must respond quickly with minimal computational and memory overhead to provide a smooth user experience on resource-constrained devices.\n\n**Why it works:** Mobile and real-time applications require models optimized for speed and efficiency.\n\n**Why the others don't work:**\n- Maximum accuracy over performance: Mobile constraints require balancing accuracy with speed\n- Highest cost: Startups need cost-effective solutions, and high cost doesn't solve resource constraints\n- Model complexity: Larger models increase latency and resource usage on mobile devices",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0018",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+      ],
+      "question": "A healthcare organization is evaluating generative AI models for creating patient education materials. The organization requires models that can explain medical concepts accurately and safely without fabricating medical information.\n\nWhich capability is most critical when selecting a model for this healthcare use case?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "High accuracy and factual reliability without hallucinations",
+          "sequence": 1,
+          "explanation": "Healthcare applications require models that provide accurate, factual information without generating false medical claims."
+        },
+        {
+          "id": "c2",
+          "text": "Model speed to generate content in seconds",
+          "explanation": "While speed is useful, accuracy and safety are paramount in healthcare applications."
+        },
+        {
+          "id": "c3",
+          "text": "Ability to generate creative content regardless of factuality",
+          "explanation": "Creative generation without factual constraints is inappropriate and dangerous for healthcare."
+        },
+        {
+          "id": "c4",
+          "text": "Maximum model size for better general performance",
+          "explanation": "Larger models don't guarantee reduced hallucinations or medical accuracy."
+        }
+      ],
+      "tip": "Focus on what matters most when providing medical information to patients.",
+      "explanation": "High accuracy and factual reliability without hallucinations are critical for healthcare. Generative models can sometimes produce plausible-sounding but false information, which is particularly dangerous in medical contexts where incorrect information could harm patients.\n\n**Why it works:** Healthcare requires models with proven factual accuracy and minimal hallucination risk.\n\n**Why the others don't work:**\n- Model speed: Important but secondary to medical accuracy and safety\n- Creative generation: Inappropriate for healthcare where factuality is essential\n- Maximum model size: Doesn't guarantee accuracy or reduce hallucinations",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0019",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock",
+        "AWS"
+      ],
+      "skills": [
+        "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+      ],
+      "question": "An enterprise is deploying a generative AI solution for document analysis and must make critical decisions about model selection. The organization needs to balance high accuracy requirements with the need for data privacy compliance, reasonable inference costs, and acceptable response times for batch processing.\n\nWhich TWO selection factors are most important to address the organization's primary constraints? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Performance requirements and inference cost per request",
+          "sequence": 1,
+          "explanation": "Balancing performance with cost efficiency is critical for scalable enterprise solutions."
+        },
+        {
+          "id": "c2",
+          "text": "Data privacy compliance and on-premises deployment capabilities",
+          "sequence": 2,
+          "explanation": "Enterprise data governance requires models that meet compliance standards and can run within controlled environments."
+        },
+        {
+          "id": "c3",
+          "text": "Model popularity among academic researchers",
+          "explanation": "Research popularity is not relevant to business requirements or compliance."
+        },
+        {
+          "id": "c4",
+          "text": "Maximum latency requirements for real-time processing",
+          "explanation": "While the scenario mentions acceptable response times, real-time latency is less critical than stated batch processing needs."
+        },
+        {
+          "id": "c5",
+          "text": "Creative output capabilities for marketing content",
+          "explanation": "Creative generation is not relevant to document analysis and enterprise data processing."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Identify the factors that directly address the stated enterprise constraints of accuracy, privacy, cost, and processing speed.",
+      "explanation": "Performance requirements and inference cost, along with data privacy compliance and deployment options, are the two most important factors. Enterprises must balance analytical capability with operational costs and ensure their data handling meets regulatory requirements.\n\n**Why they work:** Performance with cost efficiency ensures scalability, while compliance and deployment options ensure data governance.\n\n**Why the others don't work:**\n- Research popularity: Irrelevant to business and compliance requirements\n- Real-time latency: Less critical for batch processing workflows\n- Creative output: Not applicable to document analysis tasks",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0020",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+      ],
+      "question": "Match each selection factor to the organizational requirement it best addresses.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "A regulated bank must meet GDPR and data residency requirements",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "A startup needs to minimize operating costs while maintaining quality",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "A real-time chatbot requires immediate user responses",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "A specialized domain needs expert-level knowledge and accuracy",
+          "correctChoiceId": "c4"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Compliance requirements and deployment constraints",
+          "explanation": "These factors ensure regulatory adherence and data governance."
+        },
+        {
+          "id": "c2",
+          "text": "Model efficiency and inference cost",
+          "explanation": "Cost-effective models maximize value for resource-constrained organizations."
+        },
+        {
+          "id": "c3",
+          "text": "Low latency and fast inference performance",
+          "explanation": "Speed is critical for real-time interactive applications."
+        },
+        {
+          "id": "c4",
+          "text": "Domain expertise and model capabilities",
+          "explanation": "Specialized models provide the accuracy needed for expert-level knowledge domains."
+        }
+      ],
+      "tip": "Consider how each selection factor aligns with the specific organizational need.",
+      "explanation": "Different factors matter for different contexts: compliance for regulated industries, cost for budget-conscious organizations, latency for real-time applications, and specialized capabilities for domain-specific needs.",
+      "domain": "Fundamentals of Generative AI",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0021",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "3.1.3: Defining Retrieval Augmented Generation (RAG) and describing its business applications (for example, Amazon Bedrock, knowledge base)."
+      ],
+      "question": "A company implements a customer support chatbot that answers questions about their products. Rather than training the model on product information, they store all product documentation in a database and retrieve relevant sections when customers ask questions. The chatbot then uses these retrieved documents to generate accurate answers.\n\nWhich approach is this company using?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Retrieval Augmented Generation (RAG)",
+          "sequence": 1,
+          "explanation": "RAG retrieves relevant information from a knowledge base and uses it to augment the model's response."
+        },
+        {
+          "id": "c2",
+          "text": "Fine-tuning on product data",
+          "explanation": "Fine-tuning modifies the model weights with training data, rather than retrieving external documents."
+        },
+        {
+          "id": "c3",
+          "text": "Pre-training on company-specific data",
+          "explanation": "Pre-training creates the base model from scratch, not the approach of retrieving and augmenting responses."
+        },
+        {
+          "id": "c4",
+          "text": "Prompt engineering without retrieval",
+          "explanation": "Prompt engineering refines instructions without retrieving external documents or knowledge bases."
+        }
+      ],
+      "tip": "Focus on what distinguishes retrieving external information to augment responses.",
+      "explanation": "Retrieval Augmented Generation (RAG) is the approach of retrieving relevant information from external knowledge bases or documents and using that information to augment the model's response. This allows the model to provide accurate, current information without being retrained.\n\n**Why it works:** RAG separates the knowledge storage (database) from the generation model, allowing dynamic updates and accurate information retrieval.\n\n**Why the others don't work:**\n- Fine-tuning: Modifies model weights, doesn't retrieve external documents\n- Pre-training: Trains the base model, not applicable to product documentation retrieval\n- Prompt engineering: Refines instructions, doesn't retrieve external information",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0022",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "3.1.3: Defining Retrieval Augmented Generation (RAG) and describing its business applications (for example, Amazon Bedrock, knowledge base)."
+      ],
+      "question": "A legal firm wants to implement an AI system that can answer client questions about their cases by referencing specific case files and documents stored in the firm's document management system. The firm wants accurate responses grounded in their actual files without modifying the foundation model.\n\nWhich business problem does RAG solve for this legal firm?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Providing accurate, sourced answers from proprietary case files without retraining models",
+          "sequence": 1,
+          "explanation": "RAG allows grounding responses in specific documents without model retraining."
+        },
+        {
+          "id": "c2",
+          "text": "Replacing lawyers with AI for legal case management",
+          "explanation": "RAG augments but doesn't replace human expertise in legal work."
+        },
+        {
+          "id": "c3",
+          "text": "Automatically generating new legal cases from templates",
+          "explanation": "RAG retrieves and augments responses, not generates new legal cases."
+        },
+        {
+          "id": "c4",
+          "text": "Reducing the need for document storage and management",
+          "explanation": "RAG actually requires effective document storage and management to function."
+        }
+      ],
+      "tip": "Consider how RAG helps tie AI responses to specific, authoritative sources.",
+      "explanation": "RAG solves the business problem of providing accurate, sourced answers from proprietary documents without needing to retrain models. The legal firm can ground responses in actual case files, ensuring clients receive information directly from their specific legal documents.\n\n**Why it works:** RAG retrieves specific documents and uses them to augment responses, maintaining accuracy and source attribution.\n\n**Why the others don't work:**\n- Replacing lawyers: RAG augments human decision-making, not replaces it\n- Generating new cases: RAG retrieves existing documents, doesn't create new cases\n- Reducing document storage: RAG requires well-organized document systems",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0023",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "3.1.3: Defining Retrieval Augmented Generation (RAG) and describing its business applications (for example, Amazon Bedrock, knowledge base)."
+      ],
+      "question": "A research institution maintains a large knowledge base of scientific papers and wants to create a system that can answer researcher questions by citing and referencing the most relevant papers. The system should surface where information comes from and update automatically when new papers are added.\n\nWhich architecture would best serve this use case?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "RAG with a knowledge base of research papers",
+          "sequence": 1,
+          "explanation": "RAG enables retrieval of relevant papers and citation of sources while automatically incorporating new additions."
+        },
+        {
+          "id": "c2",
+          "text": "Fine-tuning a model on all historical papers",
+          "explanation": "Fine-tuning requires retraining with each new paper and doesn't enable citation of sources."
+        },
+        {
+          "id": "c3",
+          "text": "Prompt engineering with static instructions",
+          "explanation": "Prompt engineering alone doesn't retrieve documents or automatically update with new papers."
+        },
+        {
+          "id": "c4",
+          "text": "Creating separate models for each research area",
+          "explanation": "Multiple models don't solve the problem of retrieving and citing relevant papers."
+        }
+      ],
+      "tip": "Consider which approach allows dynamic updates and source attribution.",
+      "explanation": "RAG with a knowledge base is the ideal architecture because it allows retrieving relevant papers, citing sources, and automatically incorporating new papers without retraining. This maintains a current, sourced response system.\n\n**Why it works:** RAG separates the knowledge base (which updates dynamically) from the generation model.\n\n**Why the others don't work:**\n- Fine-tuning: Requires retraining for new papers, doesn't naturally attribute sources\n- Prompt engineering: Static instructions can't retrieve and cite specific papers\n- Multiple models: Doesn't solve retrieval and citation problems",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0024",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock",
+        "AWS"
+      ],
+      "skills": [
+        "3.1.3: Defining Retrieval Augmented Generation (RAG) and describing its business applications (for example, Amazon Bedrock, knowledge base)."
+      ],
+      "question": "A healthcare provider is building an AI system to help clinicians access evidence-based medical guidelines and research. The system needs to stay current with the latest clinical guidelines, ensure information is traceable to authoritative medical sources, and reduce hallucinations where the AI might generate incorrect medical information. The organization also needs to avoid the substantial time and expense of retraining models.\n\nWhich TWO characteristics of RAG directly address this healthcare organization's requirements? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Retrieval from authoritative sources enables traceability and reduces AI hallucinations",
+          "sequence": 1,
+          "explanation": "RAG grounds responses in actual medical sources, making information verifiable and reducing fabrication."
+        },
+        {
+          "id": "c2",
+          "text": "Dynamic knowledge base updates ensure current clinical guidelines without model retraining",
+          "sequence": 2,
+          "explanation": "RAG separates knowledge from the model, enabling updates to guidelines without expensive retraining."
+        },
+        {
+          "id": "c3",
+          "text": "Automatic cost reduction through elimination of model storage",
+          "explanation": "RAG doesn't eliminate model storage costs, though it does reduce retraining expenses."
+        },
+        {
+          "id": "c4",
+          "text": "Elimination of the need for healthcare professionals' expertise",
+          "explanation": "RAG augments clinicians' expertise but doesn't replace the need for professional judgment."
+        },
+        {
+          "id": "c5",
+          "text": "Ability to generate new medical research without sourcing from existing studies",
+          "explanation": "RAG retrieves existing knowledge; it doesn't generate new medical research."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Identify which RAG characteristics solve the healthcare provider's specific concerns about accuracy, currency, and cost.",
+      "explanation": "RAG's retrieval from authoritative sources ensures traceability and reduces hallucinations by grounding responses in actual medical evidence. Its dynamic knowledge base enables updating clinical guidelines without expensive model retraining, directly addressing the organization's requirements.\n\n**Why they work:** Sourced retrieval prevents fabrication, and dynamic updates eliminate retraining costs.\n\n**Why the others don't work:**\n- Cost reduction through storage elimination: RAG doesn't eliminate model storage\n- Eliminating professional expertise: RAG augments, doesn't replace clinical judgment\n- Generating new research: RAG retrieves existing knowledge, doesn't create new research",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0025",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "3.1.3: Defining Retrieval Augmented Generation (RAG) and describing its business applications (for example, Amazon Bedrock, knowledge base)."
+      ],
+      "question": "Match each business requirement to the RAG component or benefit that addresses it.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "Updating information without retraining the foundation model",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "Ensuring AI responses cite authoritative sources",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "Reducing AI-generated false information in specialized domains",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "Scaling knowledge across the organization without creating new models",
+          "correctChoiceId": "c4"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Dynamic knowledge base updates",
+          "explanation": "The knowledge base can be updated independently from the model."
+        },
+        {
+          "id": "c2",
+          "text": "Retrieval from sourced documents",
+          "explanation": "Retrieved documents provide attribution and source verification."
+        },
+        {
+          "id": "c3",
+          "text": "Grounding responses in domain-specific knowledge",
+          "explanation": "Specialized knowledge bases prevent hallucinations in expert domains."
+        },
+        {
+          "id": "c4",
+          "text": "Reusable foundation model with expandable knowledge",
+          "explanation": "A single model can support multiple knowledge bases for organizational scaling."
+        }
+      ],
+      "tip": "Consider how each RAG component solves specific business and technical challenges.",
+      "explanation": "RAG addresses multiple business needs: dynamic updates without retraining, sourced and traceable responses, reduced hallucinations through grounding, and scalable knowledge without model multiplication.",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0026",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "3.2.2: Understanding techniques for prompt engineering (for example, chain-of-thought, zero-shot, single-shot, few-shot, prompt templates)."
+      ],
+      "question": "A data analyst wants to extract insights from customer feedback data using an AI model. The analyst provides the model with one sample of well-formatted feedback analysis as an example and then asks the model to analyze new feedback in the same format.\n\nWhich prompt engineering technique is the analyst using?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Single-shot prompting with one example",
+          "sequence": 1,
+          "explanation": "Single-shot provides one example to demonstrate the desired format and approach."
+        },
+        {
+          "id": "c2",
+          "text": "Zero-shot prompting without examples",
+          "explanation": "Zero-shot involves no examples, just direct instructions."
+        },
+        {
+          "id": "c3",
+          "text": "Few-shot prompting with multiple examples",
+          "explanation": "Few-shot uses multiple examples, not just one."
+        },
+        {
+          "id": "c4",
+          "text": "Chain-of-thought reasoning step-by-step",
+          "explanation": "Chain-of-thought focuses on breaking problems into reasoning steps, not using examples."
+        }
+      ],
+      "tip": "Consider how many examples are being provided to guide the model's behavior.",
+      "explanation": "Single-shot prompting provides one example to demonstrate the desired format and approach. The analyst shows the model one well-formatted example and then asks it to apply that format to new feedback.\n\n**Why it works:** Single-shot gives the model one concrete example to follow.\n\n**Why the others don't work:**\n- Zero-shot: Involves no examples at all\n- Few-shot: Uses multiple examples, not just one\n- Chain-of-thought: Focuses on reasoning steps, not using examples",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0027",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "3.2.2: Understanding techniques for prompt engineering (for example, chain-of-thought, zero-shot, single-shot, few-shot, prompt templates)."
+      ],
+      "question": "A developer is building a question-answering system and provides the AI model with three different examples of how to answer complex questions: one example showing step-by-step reasoning, another showing research summary, and a third showing detailed explanation. The developer then asks the model to answer new questions in a similar style.\n\nWhich prompt engineering technique is the developer using?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Few-shot prompting with multiple examples",
+          "sequence": 1,
+          "explanation": "Few-shot uses multiple examples (typically 3-10) to guide the model's behavior."
+        },
+        {
+          "id": "c2",
+          "text": "Single-shot prompting with one example",
+          "explanation": "Single-shot uses only one example, not three examples."
+        },
+        {
+          "id": "c3",
+          "text": "Zero-shot prompting without examples",
+          "explanation": "Zero-shot doesn't use any examples."
+        },
+        {
+          "id": "c4",
+          "text": "Prompt template with fixed structure",
+          "explanation": "Prompt templates define structure but don't rely on showing multiple example outputs."
+        }
+      ],
+      "tip": "Count the number of examples being provided to the model.",
+      "explanation": "Few-shot prompting uses multiple examples (in this case, three) to demonstrate different ways to approach a task. This helps the model understand variations in style and approach.\n\n**Why it works:** Few-shot leverages multiple examples to demonstrate diverse approaches.\n\n**Why the others don't work:**\n- Single-shot: Only one example, not multiple\n- Zero-shot: No examples provided\n- Prompt template: Defines structure, doesn't demonstrate multiple output examples",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0028",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "3.2.2: Understanding techniques for prompt engineering (for example, chain-of-thought, zero-shot, single-shot, few-shot, prompt templates)."
+      ],
+      "question": "An AI system needs to solve complex math problems. Instead of asking for direct answers, a data scientist instructs the model to first identify the problem type, then list the steps needed, calculate intermediate results, and finally provide the answer. This approach helps the model show its reasoning.\n\nWhich prompt engineering technique is the data scientist using?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Chain-of-thought prompting",
+          "sequence": 1,
+          "explanation": "Chain-of-thought breaks problems into step-by-step reasoning that the model must articulate."
+        },
+        {
+          "id": "c2",
+          "text": "Zero-shot prompting",
+          "explanation": "Zero-shot is direct instruction without examples or reasoning breakdowns."
+        },
+        {
+          "id": "c3",
+          "text": "Few-shot prompting",
+          "explanation": "Few-shot uses examples, not structured reasoning breakdowns."
+        },
+        {
+          "id": "c4",
+          "text": "Prompt templates",
+          "explanation": "Prompt templates define output format, not step-by-step reasoning processes."
+        }
+      ],
+      "tip": "Focus on which technique emphasizes showing reasoning steps to solve problems.",
+      "explanation": "Chain-of-thought prompting breaks complex problems into step-by-step reasoning that the model must articulate. By forcing the model to show intermediate steps and reasoning, this technique often improves accuracy on complex problems.\n\n**Why it works:** Chain-of-thought improves reasoning by requiring intermediate step articulation.\n\n**Why the others don't work:**\n- Zero-shot: Direct instruction without reasoning structure\n- Few-shot: Uses examples, doesn't structure reasoning steps\n- Prompt templates: Defines output format, not reasoning breakdown",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0029",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock",
+        "AWS"
+      ],
+      "skills": [
+        "3.2.2: Understanding techniques for prompt engineering (for example, chain-of-thought, zero-shot, single-shot, few-shot, prompt templates)."
+      ],
+      "question": "A machine learning team is deploying an AI system to handle customer service inquiries. They need a scalable approach that can be reused across different customer service scenarios without requiring many examples or complex reasoning breakdowns. The system should follow a consistent output format.\n\nWhich TWO prompt engineering techniques would best support the team's requirements for scalability and consistency? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Prompt templates to define consistent output structure across scenarios",
+          "sequence": 1,
+          "explanation": "Templates provide reusable structures that ensure consistent formatting across different inquiries."
+        },
+        {
+          "id": "c2",
+          "text": "Zero-shot prompting to handle new scenarios without examples",
+          "sequence": 2,
+          "explanation": "Zero-shot enables the system to handle new customer inquiries without requiring domain-specific examples."
+        },
+        {
+          "id": "c3",
+          "text": "Few-shot prompting with many customer examples",
+          "explanation": "While useful, few-shot requires collecting and maintaining many examples per scenario."
+        },
+        {
+          "id": "c4",
+          "text": "Chain-of-thought for reasoning-heavy customer questions",
+          "explanation": "Chain-of-thought adds complexity; most customer service is simpler and doesn't require detailed reasoning steps."
+        },
+        {
+          "id": "c5",
+          "text": "Single-shot with one example per customer type",
+          "explanation": "Single-shot still requires collecting examples, reducing scalability."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Consider which techniques enable consistency and scalability without extensive example collection.",
+      "explanation": "Prompt templates provide consistent output structure across different scenarios, and zero-shot prompting enables handling new customer service inquiries without requiring domain-specific examples. Together, these create a scalable, consistent system.\n\n**Why they work:** Templates ensure consistency, zero-shot enables scalability without example collection.\n\n**Why the others don't work:**\n- Few-shot: Requires collecting many examples per scenario, reducing scalability\n- Chain-of-thought: Adds unnecessary complexity to straightforward customer service\n- Single-shot: Still requires example collection, less scalable than zero-shot",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0030",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "3.2.2: Understanding techniques for prompt engineering (for example, chain-of-thought, zero-shot, single-shot, few-shot, prompt templates)."
+      ],
+      "question": "Match each prompt engineering technique to the scenario where it is most effective.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "A system needs to handle new task types with only high-level instructions",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "A system should show logical steps when solving complex problems",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "A system must follow consistent formatting rules across all outputs",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "A system learns best from seeing multiple variations of correct output",
+          "correctChoiceId": "c4"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Zero-shot prompting",
+          "explanation": "Zero-shot works well with just instructions when the model has general knowledge."
+        },
+        {
+          "id": "c2",
+          "text": "Chain-of-thought prompting",
+          "explanation": "Chain-of-thought breaks complex problems into articulated reasoning steps."
+        },
+        {
+          "id": "c3",
+          "text": "Prompt templates",
+          "explanation": "Templates define and enforce consistent output formatting."
+        },
+        {
+          "id": "c4",
+          "text": "Few-shot prompting",
+          "explanation": "Few-shot uses multiple examples to guide behavior across variations."
+        }
+      ],
+      "tip": "Consider the unique strength of each technique and when it provides the most value.",
+      "explanation": "Each technique serves distinct purposes: zero-shot handles new tasks with just instructions, chain-of-thought articulates reasoning, templates enforce consistency, and few-shot learns from multiple examples.",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0031",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "3.3.1: Describing the key elements of training a foundation model (for example, pre-training, fine-tuning, continuous pre-training)."
+      ],
+      "question": "A technology company is creating a large language model from scratch by training it on billions of text documents from the internet. The model learns general language patterns, grammar, and world knowledge across diverse topics.\n\nWhich key training element is the company performing?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Pre-training to build a foundational understanding of language",
+          "sequence": 1,
+          "explanation": "Pre-training trains the base model on vast amounts of data to learn general patterns."
+        },
+        {
+          "id": "c2",
+          "text": "Fine-tuning for a specific domain or task",
+          "explanation": "Fine-tuning adapts an existing model to specific tasks, not the initial creation phase."
+        },
+        {
+          "id": "c3",
+          "text": "Continuous pre-training on recent data",
+          "explanation": "Continuous pre-training updates existing models, not the initial model creation."
+        },
+        {
+          "id": "c4",
+          "text": "Transfer learning from existing models",
+          "explanation": "Transfer learning adapts existing models; this is initial model development."
+        }
+      ],
+      "tip": "Consider what happens when training a new model from scratch on vast amounts of general data.",
+      "explanation": "Pre-training is the initial phase where foundation models are trained on enormous amounts of general text data to learn fundamental language patterns, grammar, factual knowledge, and reasoning abilities. This creates the base model that can later be adapted for specific tasks.\n\n**Why it works:** Pre-training builds the foundational knowledge from diverse, large-scale data.\n\n**Why the others don't work:**\n- Fine-tuning: Adapts existing models, not for initial creation\n- Continuous pre-training: Updates existing models, not initial development\n- Transfer learning: Adapts models, not the fundamental training phase",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0032",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "3.3.1: Describing the key elements of training a foundation model (for example, pre-training, fine-tuning, continuous pre-training)."
+      ],
+      "question": "An organization has a pre-trained foundation model and wants to specialize it for their specific use case: medical diagnosis from patient descriptions. They provide the model with labeled examples of patient cases and desired diagnoses, then train the model to specialize in medical applications.\n\nWhich training approach is the organization using?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Fine-tuning the pre-trained model on medical examples",
+          "sequence": 1,
+          "explanation": "Fine-tuning adapts a pre-trained model to a specific domain using labeled task examples."
+        },
+        {
+          "id": "c2",
+          "text": "Pre-training from scratch on medical data",
+          "explanation": "Pre-training trains from scratch; this organization is adapting an existing model."
+        },
+        {
+          "id": "c3",
+          "text": "Continuous pre-training on recent medical research",
+          "explanation": "Continuous pre-training updates models with recent data, not task-specific specialization."
+        },
+        {
+          "id": "c4",
+          "text": "Validation of the pre-trained model without modification",
+          "explanation": "Validation tests the model without training it; the organization is training."
+        }
+      ],
+      "tip": "Consider how to specialize an existing model for a specific task or domain.",
+      "explanation": "Fine-tuning is the process of taking a pre-trained foundation model and further training it on task-specific or domain-specific labeled data. This adapts the model's capabilities to excel in specialized applications like medical diagnosis.\n\n**Why it works:** Fine-tuning leverages the foundation model's general knowledge while teaching specific domain patterns.\n\n**Why the others don't work:**\n- Pre-training: Creates models from scratch, not adapting existing ones\n- Continuous pre-training: Updates with recent general data, not specialized training\n- Validation: Tests without training; this involves active training",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0033",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock"
+      ],
+      "skills": [
+        "3.3.1: Describing the key elements of training a foundation model (for example, pre-training, fine-tuning, continuous pre-training)."
+      ],
+      "question": "A company maintains a large language model that was pre-trained years ago. Recent events and new developments in various fields have occurred since the model's last training. The company wants to update the model with recent information without losing its existing knowledge or completely retraining from scratch.\n\nWhich training approach would best address the company's needs?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Continuous pre-training on recent data",
+          "sequence": 1,
+          "explanation": "Continuous pre-training updates models with recent information while preserving learned knowledge."
+        },
+        {
+          "id": "c2",
+          "text": "Fine-tuning on a specific recent-data task",
+          "explanation": "Fine-tuning is for specific tasks, not updating general knowledge across domains."
+        },
+        {
+          "id": "c3",
+          "text": "Complete pre-training from scratch",
+          "explanation": "Pre-training from scratch would lose all existing knowledge and require immense resources."
+        },
+        {
+          "id": "c4",
+          "text": "Validation against new test data",
+          "explanation": "Validation tests the model but doesn't update it with new information."
+        }
+      ],
+      "tip": "Consider how to add recent information while preserving existing knowledge.",
+      "explanation": "Continuous pre-training is the approach of further pre-training an existing model on recent data to update its knowledge while preserving the understanding it already learned. This keeps the model current without the expense or knowledge loss of complete retraining.\n\n**Why it works:** Continuous pre-training adds recent knowledge incrementally without losing established understanding.\n\n**Why the others don't work:**\n- Fine-tuning: For specific tasks, not general knowledge updates\n- Complete pre-training: Wastes resources and loses existing knowledge\n- Validation: Tests without updating the model",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0034",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "Amazon Bedrock",
+        "AWS"
+      ],
+      "skills": [
+        "3.3.1: Describing the key elements of training a foundation model (for example, pre-training, fine-tuning, continuous pre-training)."
+      ],
+      "question": "An AI research team is planning the complete training lifecycle for a new specialized AI system for financial analysis. The team needs to build a robust foundation with general knowledge, adapt it for financial terminology and analysis, and keep it current as new financial instruments and regulations emerge. They must do all this while managing computational resources efficiently.\n\nWhich TWO training elements are essential for the team's comprehensive training strategy? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Pre-training on large general datasets to establish foundational knowledge",
+          "sequence": 1,
+          "explanation": "Pre-training creates the base model with general language and reasoning capabilities."
+        },
+        {
+          "id": "c2",
+          "text": "Fine-tuning on financial domain data to specialize the model",
+          "sequence": 2,
+          "explanation": "Fine-tuning adapts the pre-trained model specifically to financial analysis tasks."
+        },
+        {
+          "id": "c3",
+          "text": "Continuous pre-training to keep the model current with new financial developments",
+          "explanation": "While valuable, continuous pre-training happens after the initial specialization phase."
+        },
+        {
+          "id": "c4",
+          "text": "Complete retraining from scratch whenever new data becomes available",
+          "explanation": "Retraining from scratch is computationally expensive and unnecessary when other approaches suffice."
+        },
+        {
+          "id": "c5",
+          "text": "Manual annotation of all training data by financial experts",
+          "explanation": "While helpful, extensive manual annotation isn't essential with pre-trained and fine-tuned approaches."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Identify the two foundational training elements that establish general capability and then specialize it.",
+      "explanation": "Pre-training and fine-tuning are the essential first two elements. Pre-training establishes foundational knowledge from general data, and fine-tuning specializes the model for financial analysis. Continuous pre-training can be added later for updates, but these two form the core of the initial strategy.\n\n**Why they work:** Pre-training provides foundation, fine-tuning specializes - together they create an effective specialized model efficiently.\n\n**Why the others don't work:**\n- Continuous pre-training: Important but comes after initial training\n- Complete retraining: Inefficient when incremental approaches work\n- Manual annotation: Not essential with transfer learning approaches",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0035",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "3.3.1: Describing the key elements of training a foundation model (for example, pre-training, fine-tuning, continuous pre-training)."
+      ],
+      "question": "Match each training element to the description that best defines it.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "Training a model on billions of tokens from diverse internet sources",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "Adapting an existing model to perform well on a specific task or domain",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "Updating an existing model with new recent data without losing prior knowledge",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "The phase where a model learns general language patterns and world knowledge",
+          "correctChoiceId": "c1"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Pre-training",
+          "explanation": "Pre-training builds foundational knowledge from massive diverse datasets."
+        },
+        {
+          "id": "c2",
+          "text": "Fine-tuning",
+          "explanation": "Fine-tuning specializes a pre-trained model for specific tasks or domains."
+        },
+        {
+          "id": "c3",
+          "text": "Continuous pre-training",
+          "explanation": "Continuous pre-training updates models with new data while preserving knowledge."
+        }
+      ],
+      "tip": "Consider the purpose and scale of each training element in the model development lifecycle.",
+      "explanation": "Pre-training establishes foundation from massive datasets, fine-tuning specializes for specific applications, and continuous pre-training keeps models current with new information.",
+      "domain": "Applications of Foundation Models",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0036",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.1.1: Identifying features of responsible AI (for example, bias, fairness, inclusivity, robustness, safety, veracity)."
+      ],
+      "question": "A loan approval AI system performs well on average but historically denies loan applications at different rates for different ethnic groups despite similar credit profiles. When the issue is discovered, the company works to ensure equal approval rates across all demographic groups.\n\nWhich responsible AI feature is the company prioritizing in this correction?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Fairness to treat all demographic groups equitably",
+          "sequence": 1,
+          "explanation": "Fairness ensures that AI systems don't discriminate and treat different groups equitably."
+        },
+        {
+          "id": "c2",
+          "text": "Robustness to handle various input conditions",
+          "explanation": "Robustness handles diverse and unexpected inputs, not demographic equity."
+        },
+        {
+          "id": "c3",
+          "text": "Veracity to ensure accurate predictions",
+          "explanation": "Veracity relates to truthfulness and accuracy, not demographic fairness."
+        },
+        {
+          "id": "c4",
+          "text": "Inclusivity in training data collection",
+          "explanation": "While related, inclusivity in data is a precursor to fairness in outcomes."
+        }
+      ],
+      "tip": "Focus on which feature addresses equitable treatment across demographic groups.",
+      "explanation": "Fairness in responsible AI ensures that systems treat all groups equitably without discrimination. By working to equalize approval rates across demographic groups, the company is directly addressing fairness.\n\n**Why it works:** Fairness specifically addresses equitable outcomes across different populations.\n\n**Why the others don't work:**\n- Robustness: Handles edge cases and varied inputs, not demographic equity\n- Veracity: Addresses accuracy of information, not fairness across groups\n- Inclusivity: A strategy to achieve fairness, but fairness is the direct objective",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0037",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.1.1: Identifying features of responsible AI (for example, bias, fairness, inclusivity, robustness, safety, veracity)."
+      ],
+      "question": "A medical diagnosis AI system is designed to work reliably even when presented with incomplete patient information, unusual symptom combinations, or data from different hospital systems with varying formats. The system maintains accuracy despite these challenging conditions.\n\nWhich responsible AI feature does this system demonstrate?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Robustness to perform reliably under diverse conditions",
+          "sequence": 1,
+          "explanation": "Robustness means the system functions well despite variations, incomplete data, or edge cases."
+        },
+        {
+          "id": "c2",
+          "text": "Safety to prevent harm in medical contexts",
+          "explanation": "Safety prevents negative outcomes; robustness refers to handling varied conditions."
+        },
+        {
+          "id": "c3",
+          "text": "Veracity to provide truthful medical information",
+          "explanation": "Veracity relates to truthfulness; robustness refers to handling variations in data."
+        },
+        {
+          "id": "c4",
+          "text": "Fairness in treatment across patient demographics",
+          "explanation": "Fairness addresses equity; robustness addresses performance under varied conditions."
+        }
+      ],
+      "tip": "Consider which feature relates to reliable performance despite variations and challenges.",
+      "explanation": "Robustness refers to an AI system's ability to maintain performance and reliability under diverse, challenging, or unusual conditions. This system demonstrates robustness by handling incomplete data, unusual combinations, and varied formats without degradation.\n\n**Why it works:** Robustness specifically addresses reliable performance despite variations.\n\n**Why the others don't work:**\n- Safety: Prevents harm, not about handling data variations\n- Veracity: Truthfulness of information, not handling varied data formats\n- Fairness: Equitable treatment, not resilience to data variations",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0038",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.1.1: Identifying features of responsible AI (for example, bias, fairness, inclusivity, robustness, safety, veracity)."
+      ],
+      "question": "A content moderation AI system incorrectly flags certain cultural references and minority-language content at higher rates than mainstream content, leading to suppression of legitimate diverse voices. The company recognizes this is a systematic prejudice that favors majority perspectives.\n\nWhich problematic AI characteristic does this situation demonstrate?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Bias - a systematic prejudice toward certain groups",
+          "sequence": 1,
+          "explanation": "Bias refers to systematic prejudice where the system favors some groups over others."
+        },
+        {
+          "id": "c2",
+          "text": "Lack of inclusivity in training data",
+          "explanation": "Inclusivity is about representing diverse perspectives in training, but bias is the manifestation."
+        },
+        {
+          "id": "c3",
+          "text": "Poor robustness on edge cases",
+          "explanation": "Robustness addresses varied conditions, not systematic prejudice toward groups."
+        },
+        {
+          "id": "c4",
+          "text": "Low veracity in content classification",
+          "explanation": "Veracity relates to truthfulness, not systematic prejudice based on cultural identity."
+        }
+      ],
+      "tip": "Focus on which characteristic describes systematic prejudice favoring certain groups.",
+      "explanation": "Bias is systematic prejudice where an AI system systematically favors or disadvantages certain groups. This content moderation system demonstrates bias by treating minority-language and cultural content unfairly compared to mainstream content.\n\n**Why it works:** Bias specifically describes systematic prejudice against certain populations.\n\n**Why the others don't work:**\n- Inclusivity: A solution to bias, not the bias itself\n- Robustness: Addresses edge cases, not systematic discrimination\n- Veracity: Truthfulness, not preferential treatment of groups",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0039",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.1.1: Identifying features of responsible AI (for example, bias, fairness, inclusivity, robustness, safety, veracity)."
+      ],
+      "question": "An autonomous vehicle AI system is being developed with multiple responsible AI considerations. The system must accurately perceive objects regardless of lighting conditions or weather, treat all pedestrians equitably regardless of age or appearance, ensure information about vehicle status is truthful and verifiable, and actively prevent harm to all occupants and pedestrians.\n\nWhich TWO responsible AI features are essential for this autonomous vehicle system? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Robustness to maintain perception accuracy in varied weather and lighting conditions",
+          "sequence": 1,
+          "explanation": "Robustness ensures reliable performance despite environmental variations."
+        },
+        {
+          "id": "c2",
+          "text": "Safety to prevent harm to passengers and pedestrians",
+          "sequence": 2,
+          "explanation": "Safety is paramount in autonomous vehicles to prevent accidents and injuries."
+        },
+        {
+          "id": "c3",
+          "text": "Fairness to treat all pedestrians equitably regardless of demographics",
+          "explanation": "While important for fairness, safety and robustness are more immediately critical."
+        },
+        {
+          "id": "c4",
+          "text": "Veracity to communicate vehicle status truthfully",
+          "explanation": "While important, veracity in communication is secondary to physical safety and robustness."
+        },
+        {
+          "id": "c5",
+          "text": "Inclusivity in representing diverse road scenarios in training data",
+          "explanation": "Inclusivity in training is important but is a means to achieve robustness and fairness."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Identify the two most critical responsible AI features for autonomous vehicle safety and performance.",
+      "explanation": "Robustness and safety are the two most critical responsible AI features for autonomous vehicles. Robustness ensures reliable perception in varied conditions, and safety actively prevents harm - both are essential for vehicle operation.\n\n**Why they work:** Robustness ensures perception works in all conditions, safety prevents harm.\n\n**Why the others don't work:**\n- Fairness: Important but secondary to physical safety\n- Veracity: Important for communication but not the primary safety concern\n- Inclusivity: A training strategy, not a core runtime feature",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0040",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.1.1: Identifying features of responsible AI (for example, bias, fairness, inclusivity, robustness, safety, veracity)."
+      ],
+      "question": "Match each responsible AI feature to the situation it addresses.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "An AI system recommending job candidates at different rates for applicants with equivalent qualifications",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "An AI system maintaining accuracy even with corrupted or unusual input data",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "An AI system reporting incorrect medical test results as confident diagnoses",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "An AI system actively preventing collisions in autonomous vehicles",
+          "correctChoiceId": "c4"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Fairness",
+          "explanation": "Fairness ensures equitable treatment of similar cases regardless of protected characteristics."
+        },
+        {
+          "id": "c2",
+          "text": "Robustness",
+          "explanation": "Robustness maintains performance despite varied or challenging input conditions."
+        },
+        {
+          "id": "c3",
+          "text": "Veracity",
+          "explanation": "Veracity ensures AI systems provide truthful, accurate, and honest information."
+        },
+        {
+          "id": "c4",
+          "text": "Safety",
+          "explanation": "Safety prevents harm and negative outcomes in AI system decisions and actions."
+        }
+      ],
+      "tip": "Consider what each responsible AI feature protects or ensures.",
+      "explanation": "Each feature addresses distinct concerns: fairness for equitable treatment, robustness for handling variations, veracity for truthful information, and safety for harm prevention.",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0041",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.2.3: Identifying tradeoffs between model safety and transparency (for example, measure interpretability and performance)."
+      ],
+      "question": "A financial institution implements a credit scoring model that makes accurate predictions but provides minimal explanation for credit decisions. The regulator requires the institution to explain every credit denial to applicants.\n\nWhich tradeoff is the institution facing?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Accuracy versus interpretability and transparency",
+          "sequence": 1,
+          "explanation": "Model accuracy (performance) often conflicts with interpretability (transparency about decisions)."
+        },
+        {
+          "id": "c2",
+          "text": "Data quantity versus data quality",
+          "explanation": "Data quantity and quality are different concerns, not about model transparency tradeoffs."
+        },
+        {
+          "id": "c3",
+          "text": "Training speed versus inference speed",
+          "explanation": "These relate to computational efficiency, not model transparency and explainability."
+        },
+        {
+          "id": "c4",
+          "text": "Model size versus model stability",
+          "explanation": "Model size affects memory and speed, not interpretability or transparency tradeoffs."
+        }
+      ],
+      "tip": "Focus on what the institution must balance: achieving accurate predictions versus explaining decisions clearly.",
+      "explanation": "The institution faces a tradeoff between model accuracy (high performance) and interpretability/transparency (ability to explain decisions). Highly accurate models like deep neural networks are often \"black boxes\" that don't easily explain their reasoning, while more interpretable models like decision trees may be less accurate.\n\n**Why it works:** High performance and interpretability often conflict; improving one can degrade the other.\n\n**Why the others don't work:**\n- Data quantity vs. quality: Not related to transparency or interpretability tradeoffs\n- Training vs. inference speed: Computational efficiency, not model explanation concerns\n- Model size vs. stability: About computational resources, not decision transparency",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0042",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.2.3: Identifying tradeoffs between model safety and transparency (for example, measure interpretability and performance)."
+      ],
+      "question": "A healthcare provider wants to implement a diagnostic AI system. The organization discovers that a highly transparent, rule-based model (if-then logic) achieves 85% accuracy, while an opaque deep learning model achieves 95% accuracy. The regulatory requirement mandates that physicians must understand how the system reached its diagnostic recommendation.\n\nHow should the provider balance the competing requirements?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Use the interpretable model and accept lower performance to meet transparency requirements",
+          "sequence": 1,
+          "explanation": "In healthcare, regulatory compliance and physician understanding may outweigh maximum performance."
+        },
+        {
+          "id": "c2",
+          "text": "Use the high-performance model and provide generic explanations",
+          "explanation": "Generic explanations for a 'black box' don't genuinely satisfy transparency requirements."
+        },
+        {
+          "id": "c3",
+          "text": "Use the high-performance model and ignore regulatory requirements",
+          "explanation": "Ignoring regulatory requirements is not a viable tradeoff decision."
+        },
+        {
+          "id": "c4",
+          "text": "Create two separate models for different needs",
+          "explanation": "Using two models is operationally complex and still doesn't resolve the fundamental tradeoff."
+        }
+      ],
+      "tip": "Consider the context where regulatory compliance and physician understanding are critical.",
+      "explanation": "In healthcare, the tradeoff decision should favor the interpretable model that meets regulatory requirements and physician understanding, even if it has lower performance. Trust in medical AI systems requires that practitioners can understand recommendations, and regulatory compliance is mandatory.\n\n**Why it works:** In regulated industries, transparency and safety compliance outweigh maximum performance.\n\n**Why the others don't work:**\n- Generic explanations: Don't resolve the fundamental lack of true interpretability\n- Ignoring regulations: Not a valid option in regulated industries\n- Two models: Operationally complex and doesn't resolve the core tradeoff",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0043",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.2.3: Identifying tradeoffs between model safety and transparency (for example, measure interpretability and performance)."
+      ],
+      "question": "An organization implementing a high-stakes AI system for hiring decisions must measure both the model's accuracy rate and its interpretability. The measurement shows the model achieves 92% accuracy in identifying qualified candidates but only partially explains its reasoning for rejecting applicants.\n\nWhich metrics are most important to track for responsible AI in this scenario?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Performance metrics and interpretability measures for both accuracy and explanation quality",
+          "sequence": 1,
+          "explanation": "Both metrics are needed: performance ensures capability, interpretability ensures accountability."
+        },
+        {
+          "id": "c2",
+          "text": "Only performance metrics since accuracy is the primary concern",
+          "explanation": "Ignoring interpretability metrics creates accountability gaps in hiring decisions."
+        },
+        {
+          "id": "c3",
+          "text": "Only interpretability metrics since transparency is mandated",
+          "explanation": "Ignoring performance metrics allows selection of poor-quality candidates."
+        },
+        {
+          "id": "c4",
+          "text": "Neither metrics nor monitoring since the system is deployed",
+          "explanation": "Ongoing measurement and monitoring are essential for responsible AI."
+        }
+      ],
+      "tip": "Consider what metrics are necessary to balance performance and transparency in hiring.",
+      "explanation": "Both performance metrics (accuracy of candidate evaluation) and interpretability measures (ability to explain decisions) must be tracked. This allows the organization to understand the tradeoff: whether the 92% accuracy and partial interpretability meet responsible AI standards for hiring decisions.\n\n**Why it works:** Both metrics are essential to understand and manage the performance-transparency tradeoff.\n\n**Why the others don't work:**\n- Only performance: Ignores accountability and transparency requirements\n- Only interpretability: Ignores the capability to make quality hiring decisions\n- Neither: Abandons responsible AI monitoring after deployment",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0044",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.2.3: Identifying tradeoffs between model safety and transparency (for example, measure interpretability and performance)."
+      ],
+      "question": "A social media company is deploying an AI system to moderate harmful content at scale. The system must handle millions of decisions daily with very high accuracy to prevent harmful content while minimizing false positives. However, the company also faces pressure to explain moderation decisions to users. The organization must understand the fundamental tradeoff it faces.\n\nWhich TWO aspects best describe the responsible AI tradeoff the company must navigate? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Performance metrics measuring accuracy and false positive rates must be optimized",
+          "sequence": 1,
+          "explanation": "Accurate content moderation at scale requires measuring and optimizing performance."
+        },
+        {
+          "id": "c2",
+          "text": "Interpretability measures must be tracked to explain moderation decisions to users",
+          "sequence": 2,
+          "explanation": "Users deserve understanding of why content was moderated, requiring interpretability metrics."
+        },
+        {
+          "id": "c3",
+          "text": "The company should focus only on accuracy since user explanation is secondary",
+          "explanation": "Transparency and fairness require measuring interpretability, not ignoring it."
+        },
+        {
+          "id": "c4",
+          "text": "Complex deep learning models will provide both accuracy and automatic interpretability",
+          "explanation": "Deep learning often sacrifices interpretability for accuracy - the core tradeoff."
+        },
+        {
+          "id": "c5",
+          "text": "Continuous monitoring of both performance and interpretability metrics is required",
+          "explanation": "While monitoring is important, it's not one of the two primary tradeoff aspects."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Identify the two primary measurements the company must track to manage the safety-transparency tradeoff.",
+      "explanation": "The company must measure both performance metrics (accuracy and false positives) and interpretability measures (ability to explain decisions). This allows them to track and optimize the fundamental tradeoff between achieving high moderation accuracy and providing explanations to users.\n\n**Why they work:** Performance ensures safety, interpretability ensures accountability.\n\n**Why the others don't work:**\n- Focus only on accuracy: Ignores transparency requirements\n- Deep learning provides both: This assumes the tradeoff doesn't exist\n- Continuous monitoring: Important but not one of the core tradeoff measurements",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0045",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "4.2.3: Identifying tradeoffs between model safety and transparency (for example, measure interpretability and performance)."
+      ],
+      "question": "Match each consideration to the responsible AI tradeoff dimension it represents.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "Accuracy rate and false positive rate of predictions",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "Ability to explain why a specific decision was made",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "How well users understand the model's reasoning",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s4",
+          "label": "Error rate and model performance on test cases",
+          "correctChoiceId": "c1"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Performance and safety metrics",
+          "explanation": "These measure how accurately and safely the model makes decisions."
+        },
+        {
+          "id": "c2",
+          "text": "Interpretability and transparency metrics",
+          "explanation": "These measure how well decisions can be explained and understood."
+        }
+      ],
+      "tip": "Consider whether each factor relates to what the model can do (performance) or whether it can explain its reasoning (transparency).",
+      "explanation": "Performance metrics measure accuracy and safety, while interpretability metrics measure explanation quality and user understanding. Both dimensions are important for responsible AI.",
+      "domain": "Guidelines for Responsible AI",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0046",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "5.2.1: Identifying regulatory compliance standards for AI systems (for example, International Organization for Standardization [ISO], System and Organization Controls [SOC], algorithm accountability laws)."
+      ],
+      "question": "A software company developing AI solutions is preparing for a third-party security and data protection audit. The company needs to demonstrate that controls are in place for how AI systems process and protect customer data, manage access, and handle financial transactions.\n\nWhich compliance standard framework would be most relevant for this audit?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "System and Organization Controls (SOC) 2 compliance",
+          "sequence": 1,
+          "explanation": "SOC 2 addresses controls over data security, availability, processing integrity, and privacy."
+        },
+        {
+          "id": "c2",
+          "text": "ISO certification for manufacturing quality",
+          "explanation": "Manufacturing ISO standards don't address data security or software system controls."
+        },
+        {
+          "id": "c3",
+          "text": "Algorithm accountability laws for bias detection",
+          "explanation": "Algorithm accountability is important but doesn't cover the full scope of data protection controls."
+        },
+        {
+          "id": "c4",
+          "text": "Software version control standards",
+          "explanation": "Version control is a development practice, not a compliance framework for data protection."
+        }
+      ],
+      "tip": "Consider which framework specifically addresses controls over organizational systems and data handling.",
+      "explanation": "System and Organization Controls (SOC) 2 is the compliance framework that demonstrates controls over data security, availability, processing integrity, and privacy. It's designed for third-party audits to verify an organization has appropriate controls in place.\n\n**Why it works:** SOC 2 specifically addresses organizational controls over customer data and system security.\n\n**Why the others don't work:**\n- Manufacturing ISO: Focuses on quality, not data security and system controls\n- Algorithm accountability: Addresses fairness, not comprehensive data protection controls\n- Version control: A development practice, not a compliance standard",
+      "domain": "Security, Compliance, and Governance for AI Solutions",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0047",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "5.2.1: Identifying regulatory compliance standards for AI systems (for example, International Organization for Standardization [ISO], System and Organization Controls [SOC], algorithm accountability laws)."
+      ],
+      "question": "A healthcare organization is developing an AI system for patient treatment recommendations. A new regulation requires the organization to maintain records demonstrating how algorithmic decisions were made and ensure there's accountability for those decisions. The organization needs to implement systems that document the AI decision-making process.\n\nWhich type of regulatory requirement does this organization need to address?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Algorithm accountability laws requiring transparency and auditability",
+          "sequence": 1,
+          "explanation": "Algorithm accountability laws require documentation and accountability for automated decisions."
+        },
+        {
+          "id": "c2",
+          "text": "ISO standards for medical device manufacturing",
+          "explanation": "ISO medical device standards focus on physical product quality, not AI decision accountability."
+        },
+        {
+          "id": "c3",
+          "text": "SOC 2 compliance for data center operations",
+          "explanation": "SOC 2 addresses data security and processing, not algorithm decision accountability."
+        },
+        {
+          "id": "c4",
+          "text": "General business process documentation requirements",
+          "explanation": "Algorithm accountability laws are more specific than general documentation requirements."
+        }
+      ],
+      "tip": "Focus on regulations that specifically require accountability and transparency for automated AI decisions.",
+      "explanation": "Algorithm accountability laws require organizations to maintain transparent records of how AI systems make decisions, especially in high-stakes domains like healthcare. These laws ensure decisions can be audited and explained, holding organizations accountable for algorithmic outcomes.\n\n**Why it works:** Algorithm accountability laws directly address decision transparency and auditability.\n\n**Why the others don't work:**\n- ISO medical device standards: Focus on physical product quality and safety\n- SOC 2: Addresses data security and processing controls, not decision transparency\n- General documentation: Algorithm accountability is more specific and legally mandated",
+      "domain": "Security, Compliance, and Governance for AI Solutions",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0048",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "5.2.1: Identifying regulatory compliance standards for AI systems (for example, International Organization for Standardization [ISO], System and Organization Controls [SOC], algorithm accountability laws)."
+      ],
+      "question": "A fintech company is designing an AI system for automated financial trading and wants to ensure it meets international best practices for quality and safety. The company seeks a globally recognized framework that would provide standardized guidelines for developing reliable AI systems across multiple countries.\n\nWhich standard would best support the company's goals for global consistency?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "International Organization for Standardization (ISO) standards",
+          "sequence": 1,
+          "explanation": "ISO develops internationally agreed-upon standards recognized across countries."
+        },
+        {
+          "id": "c2",
+          "text": "Algorithm accountability laws specific to each country",
+          "explanation": "Accountability laws vary by jurisdiction, don't provide consistent global standards."
+        },
+        {
+          "id": "c3",
+          "text": "Company-specific internal compliance procedures",
+          "explanation": "Internal procedures don't provide internationally recognized standards or consistency."
+        },
+        {
+          "id": "c4",
+          "text": "Financial trading exchange rules only",
+          "explanation": "Exchange rules address trading mechanics, not AI system quality or safety standards."
+        }
+      ],
+      "tip": "Consider which framework provides internationally recognized and consistent standards.",
+      "explanation": "International Organization for Standardization (ISO) develops and publishes internationally agreed-upon standards that are recognized across countries. ISO standards for AI would provide consistent quality and safety guidelines that the fintech company could apply globally.\n\n**Why it works:** ISO is specifically designed to create internationally consistent standards.\n\n**Why the others don't work:**\n- Accountability laws: Vary by jurisdiction, not globally consistent\n- Internal procedures: Company-specific, don't provide international standards\n- Trading rules: Address specific trading mechanics, not AI quality standards",
+      "domain": "Security, Compliance, and Governance for AI Solutions",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0049",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "5.2.1: Identifying regulatory compliance standards for AI systems (for example, International Organization for Standardization [ISO], System and Organization Controls [SOC], algorithm accountability laws)."
+      ],
+      "question": "A large financial services company is building an AI-powered lending platform that operates across multiple countries. The company must address multiple regulatory requirements: establishing control frameworks for data security and processing integrity, demonstrating accountability for lending decisions, and ensuring compliance with internationally recognized AI quality standards.\n\nWhich TWO compliance frameworks should the company prioritize implementing? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "ISO standards to establish internationally recognized AI quality and safety practices",
+          "sequence": 1,
+          "explanation": "ISO provides globally recognized standards for AI system quality and reliability."
+        },
+        {
+          "id": "c2",
+          "text": "SOC 2 compliance to demonstrate controls over customer data and system security",
+          "sequence": 2,
+          "explanation": "SOC 2 addresses controls over data security, processing integrity, and customer privacy."
+        },
+        {
+          "id": "c3",
+          "text": "Algorithm accountability laws to ensure transparent and auditable lending decisions",
+          "explanation": "While important for lending decisions, algorithm accountability is managed through specific laws."
+        },
+        {
+          "id": "c4",
+          "text": "Manufacturing quality standards for hardware components",
+          "explanation": "Manufacturing standards are irrelevant to a software AI lending platform."
+        },
+        {
+          "id": "c5",
+          "text": "Open source software licensing compliance",
+          "explanation": "Software licensing is important but not a primary regulatory compliance framework."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Identify the two primary compliance frameworks for an AI lending platform's regulatory needs.",
+      "explanation": "ISO standards provide internationally recognized quality and safety practices for AI systems, while SOC 2 compliance demonstrates organizational controls over data security and processing integrity - both critical for a global financial services AI platform.\n\n**Why they work:** ISO ensures quality standards, SOC 2 ensures organizational controls.\n\n**Why the others don't work:**\n- Algorithm accountability: Important but specific to decision transparency, not primary frameworks\n- Manufacturing standards: Irrelevant to software platforms\n- Software licensing: Important but not regulatory compliance",
+      "domain": "Security, Compliance, and Governance for AI Solutions",
+      "difficulty": 2,
+      "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "AIF-C01-0050",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/",
+      "format": "text",
+      "services": [
+        "AWS"
+      ],
+      "skills": [
+        "5.2.1: Identifying regulatory compliance standards for AI systems (for example, International Organization for Standardization [ISO], System and Organization Controls [SOC], algorithm accountability laws)."
+      ],
+      "question": "Match each compliance requirement to the appropriate regulatory framework or standard.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "Ensure organizational controls over data security and processing integrity",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "Provide internationally recognized standards for AI system quality",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "Maintain transparent records of how automated decisions were made",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "Document controls for customer data protection and access",
+          "correctChoiceId": "c1"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "System and Organization Controls (SOC) 2",
+          "explanation": "SOC 2 demonstrates controls over data security, privacy, and processing integrity."
+        },
+        {
+          "id": "c2",
+          "text": "International Organization for Standardization (ISO)",
+          "explanation": "ISO develops internationally agreed standards for quality, safety, and reliability."
+        },
+        {
+          "id": "c3",
+          "text": "Algorithm accountability laws",
+          "explanation": "These require transparency and documentation of automated decision-making processes."
+        }
+      ],
+      "tip": "Consider what each compliance framework specifically addresses and ensures.",
+      "explanation": "SOC 2 addresses organizational controls, ISO addresses international standards, and algorithm accountability laws address decision transparency.",
+      "domain": "Security, Compliance, and Governance for AI Solutions",
+      "difficulty": 1,
+      "lastReviewed": "2026-03-31"
+    }
+  ]
+}
