@@ -291,14 +291,10 @@ module "ses" {
 }
 
 module "waf" {
-  source               = "./modules/waf"
-  project              = var.project
-  enable_waf           = var.enable_waf
-  enable_rate_limiting = var.enable_rate_limiting
-  addresses  = [
-    "185.77.56.49/32",
-    "86.8.179.69/32",
-    "185.124.2.141/32",
-    "131.251.24.249/32",
-  ]
+  source  = "./modules/waf"
+  project = var.project
+
+  providers = {
+    aws.useast1 = aws.useast1
+  }
 }
