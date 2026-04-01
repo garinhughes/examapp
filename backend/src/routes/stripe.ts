@@ -138,7 +138,6 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
           session = await stripePost('/checkout/sessions', {
             mode: 'subscription',
-            payment_method_types: ['card', 'paypal'],
             line_items: [{ price: priceId, quantity: 1 }],
             success_url: successRedirect,
             cancel_url: cancelRedirect,
@@ -166,7 +165,6 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
           session = await stripePost('/checkout/sessions', {
             mode: 'payment',
-            payment_method_types: ['card', 'paypal'],
             line_items: lineItems,
             success_url: successRedirect,
             cancel_url: cancelRedirect,
