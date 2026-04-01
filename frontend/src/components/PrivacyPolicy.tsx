@@ -70,8 +70,8 @@ export default function PrivacyPolicy() {
               <div>
                 <h3 className="font-semibold mb-1">Payment information</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  We do not store your payment card or bank details. Payments are processed entirely by GoCardless
-                  (Direct Debit) or PayPal. We receive a confirmation of successful payment and store your entitlement
+                  We do not store your payment card details. Payments are processed entirely by Stripe
+                  (card / Apple Pay / Google Pay) or PayPal. We receive a confirmation of successful payment and store your entitlement
                   (what products you have purchased) in our database. Legal basis: performance of a contract.
                 </p>
               </div>
@@ -116,8 +116,8 @@ export default function PrivacyPolicy() {
                 processed in the EU (eu-west-1, Ireland) and may be replicated within AWS regions.</li>
               <li><strong>Google</strong> - sign-in provider. When you authenticate via "Sign in with Google", Google's
                 privacy policy applies to that interaction.</li>
-              <li><strong>GoCardless</strong> - Direct Debit payment processing. GoCardless is authorised by the FCA.
-                Their privacy policy is available at gocardless.com.</li>
+              <li><strong>Stripe</strong> - card payment processing (including Apple Pay and Google Pay). Stripe is a PCI DSS Level 1 certified payment provider.
+                Their privacy policy is available at stripe.com/privacy.</li>
               <li><strong>PayPal</strong> - payment processing for one-time purchases and subscriptions. PayPal's
                 privacy policy applies to data you submit to PayPal.</li>
               <li><strong>Microsoft</strong> - we use Microsoft Clarity for session recording and heatmaps (consent-based).

@@ -20,14 +20,14 @@ resource "aws_secretsmanager_secret_policy" "cognito_client_secret_policy" {
   })
 }
 
-# Reference existing GoCardless secrets (managed out-of-band)
-data "aws_secretsmanager_secret" "gocardless_access_token" {
-  name = var.gocardless_access_token_secret_name
+# Reference existing Stripe secrets (managed out-of-band)
+data "aws_secretsmanager_secret" "stripe_secret_key" {
+  name = var.stripe_secret_key_secret_name
 }
 
-# Grant the ECS task execution role permission to read the GoCardless secrets
-resource "aws_secretsmanager_secret_policy" "gocardless_access_token_policy" {
-  secret_arn = data.aws_secretsmanager_secret.gocardless_access_token.arn
+# Grant the ECS task execution role permission to read the Stripe secrets
+resource "aws_secretsmanager_secret_policy" "stripe_secret_key_policy" {
+  secret_arn = data.aws_secretsmanager_secret.stripe_secret_key.arn
   policy     = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -36,18 +36,18 @@ resource "aws_secretsmanager_secret_policy" "gocardless_access_token_policy" {
         Effect = "Allow",
         Principal = { AWS = var.ecs_task_execution_role_arn },
         Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
-        Resource = data.aws_secretsmanager_secret.gocardless_access_token.arn
+        Resource = data.aws_secretsmanager_secret.stripe_secret_key.arn
       }
     ]
   })
 }
 
-data "aws_secretsmanager_secret" "gocardless_webhook_secret" {
-  name = var.gocardless_webhook_secret_name
+data "aws_secretsmanager_secret" "stripe_webhook_secret" {
+  name = var.stripe_webhook_secret_name
 }
 
-resource "aws_secretsmanager_secret_policy" "gocardless_webhook_secret_policy" {
-  secret_arn = data.aws_secretsmanager_secret.gocardless_webhook_secret.arn
+resource "aws_secretsmanager_secret_policy" "stripe_webhook_secret_policy" {
+  secret_arn = data.aws_secretsmanager_secret.stripe_webhook_secret.arn
   policy     = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -56,7 +56,7 @@ resource "aws_secretsmanager_secret_policy" "gocardless_webhook_secret_policy" {
         Effect = "Allow",
         Principal = { AWS = var.ecs_task_execution_role_arn },
         Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
-        Resource = data.aws_secretsmanager_secret.gocardless_webhook_secret.arn
+        Resource = data.aws_secretsmanager_secret.stripe_webhook_secret.arn
       }
     ]
   })

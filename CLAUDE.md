@@ -36,7 +36,7 @@ backend/src/
     admin.ts            # Admin-only routes
     certificates.ts     # Certificate token signing + public verify endpoint
     analytics.ts, gamification.ts, pricing.ts, username.ts
-    gocardless.ts       # Direct Debit (prefix /payments)
+    stripe.ts           # Stripe Checkout Sessions — one-time + subscriptions (prefix /payments)
     paypal.ts           # PayPal Orders + Subscriptions (prefix /payments/paypal)
     skillLabs.ts        # GET/POST /skill-labs
     reports.ts          # POST /reports — issue reporting (paid-only)
@@ -108,7 +108,7 @@ cd backend && pnpm publish:exams[:dry] | pnpm publish:skill-labs[:dry]
 - **Cognito** — JWT auth; user pool in mgmt account (`eu-west-1_c6WQUP1RX`, ExamAppPool)
 - **CloudFront** — frontend CDN
 - **WAF** — IP allowlist via `backend/infra/waf-allowlist.sh`
-- **GoCardless** — Direct Debit, `backend/src/routes/gocardless.ts`
+- **Stripe** — Card / Apple Pay / Google Pay (one-time + subscriptions), `backend/src/routes/stripe.ts`. Env: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_ANNUAL`.
 - **PayPal** — Orders + Subscriptions, `backend/src/routes/paypal.ts`. Session store: `examapp-sessions` (TTL 24h). Env: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `PAYPAL_API_BASE`, `PAYPAL_PLAN_ID_MONTHLY`, `PAYPAL_PLAN_ID_ANNUAL`, `SESSIONS_TABLE`, `VITE_PAYPAL_CLIENT_ID`
 - **SES** — production-approved, domain `certshack.com`. Env: `SES_FROM_ADDRESS`, `SES_SUPPORT_ADDRESS`. Terraform: `infra/terraform/modules/ses/`
 - **WorkMail** — `support@certshack.com`, MX → `inbound-smtp.eu-west-1.amazonaws.com` (eu-west-1). Manual setup in AWS console.
@@ -160,4 +160,4 @@ When adding env vars/secrets: update **both** `infra/terraform/modules/ecs/main.
 - **Exam UI**: `frontend/src/exam/` — ExamApp, ExamSetup, QuestionNav, QuestionCard, ExamReview, Modals, PracticeExams, AnalyticsView
 - **Skill Labs**: `frontend/src/skill-labs/` + `backend/src/routes/skillLabs.ts` + `backend/src/services/skillLabStore.ts` + `skillLabAttemptsStore.ts` + `backend/data/skill-labs.json`. Types: `diagnose` (React Flow), `cli` (simulated terminal), `policy-fix` (Monaco Editor). Toggle source: `SKILL_LAB_SOURCE=local|s3`.
 - **Report Issue**: `ReportIssueModal.tsx` + `backend/src/routes/reports.ts` + `backend/src/services/ses.ts`. Paid-only.
-- **Basket/Payments**: `frontend/src/basket/` + `backend/src/routes/gocardless.ts` + `backend/src/routes/paypal.ts` + `backend/src/catalog.ts`. Pricing: exams £9, bundles £17/£25, monthly £10, annual £96.
+- **Basket/Payments**: `frontend/src/basket/` + `backend/src/routes/stripe.ts` + `backend/src/routes/paypal.ts` + `backend/src/catalog.ts`. Pricing: exams £9, bundles £17/£25, monthly £10, annual £96.

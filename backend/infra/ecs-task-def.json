@@ -34,9 +34,6 @@
         { "name": "COGNITO_USER_POOL_ID", "value": "eu-west-1_c6WQUP1RX" },
         { "name": "COGNITO_REDIRECT_URI", "value": "https://api.certshack.com/auth/token" },
         { "name": "FRONTEND_ORIGIN", "value": "https://certshack.com" },
-        { "name": "GOCARDLESS_ENVIRONMENT", "value": "sandbox" },
-        { "name": "GOCARDLESS_API_BASE", "value": "https://api-sandbox.gocardless.com" },
-        { "name": "GOCARDLESS_ENABLE_REAL", "value": "1" },
         { "name": "METRICS_TABLE", "value": "examapp-metrics" },
         { "name": "INTERACTIONS_TABLE", "value": "examapp-interactions" },
         { "name": "SESSIONS_TABLE", "value": "examapp-sessions" },
@@ -48,12 +45,12 @@
           "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-cognito-app-client-secret-Yw5Yg5"
         },
         {
-          "name": "GOCARDLESS_ACCESS_TOKEN",
-          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-gocardless-access-token-uGZIMp"
+          "name": "STRIPE_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-stripe-secret-key"
         },
         {
-          "name": "GOCARDLESS_WEBHOOK_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-gocardless-webhook-secret-aAU0EY"
+          "name": "STRIPE_WEBHOOK_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-stripe-webhook-secret"
         }
       ],
       "logConfiguration": {

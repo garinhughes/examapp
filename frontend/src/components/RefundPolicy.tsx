@@ -87,7 +87,7 @@ export default function RefundPolicy() {
               Approved refunds are returned to your original payment method:
             </p>
             <ul className="list-disc list-inside space-y-1 text-muted-foreground mt-2">
-              <li><strong>GoCardless (Direct Debit):</strong> refunds typically appear within 3–5 business days</li>
+              <li><strong>Stripe (card):</strong> refunds typically appear within 5–10 business days depending on your card issuer</li>
               <li><strong>PayPal:</strong> refunds typically appear within 3–5 business days, depending on your
                 funding source</li>
             </ul>

@@ -37,8 +37,8 @@ set -euo pipefail
 #
 # Current secrets:
 #   examapp-cognito-app-client-secret  → COGNITO_APP_CLIENT_SECRET
-#   examapp-gocardless-access-token    → GOCARDLESS_ACCESS_TOKEN
-#   examapp-gocardless-webhook-secret  → GOCARDLESS_WEBHOOK_SECRET
+#   examapp-stripe-secret-key          → STRIPE_SECRET_KEY
+#   examapp-stripe-webhook-secret      → STRIPE_WEBHOOK_SECRET
 # ─────────────────────────────────────────────────────────────────────
 
 REGION=${AWS_REGION:-eu-west-1}

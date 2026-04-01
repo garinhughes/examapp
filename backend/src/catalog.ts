@@ -1,8 +1,6 @@
 /**
  * Product & tier catalog - single source of truth for pricing,
  * feature gating, and what each tier unlocks.
- *
- * GoCardless integration is scaffolded but will be wired later.
  */
 
 /* ------------------------------------------------------------------ */
@@ -72,7 +70,7 @@ export const TIERS: Record<Tier, TierConfig> = {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Products (GoCardless SKUs)                                         */
+/*  Products                                                           */
 /* ------------------------------------------------------------------ */
 
 export type ProductKind = 'exam' | 'bundle' | 'subscription' | 'extra'
@@ -91,13 +89,10 @@ export interface Product {
   examCodes?: string[]
   /** Cloud provider — used to group exam passes in the UI */
   provider?: string
-  /** GoCardless Price ID - filled in when GoCardless products are created */
-  goCardlessPriceId?: string
 }
 
 /**
  * Master product list.
- * New exams/bundles are added here; GoCardless Price IDs are populated later.
  */
 export const PRODUCTS: Product[] = [
   // -- Single exams (Exam Pass - £9 each, 1 year access) --

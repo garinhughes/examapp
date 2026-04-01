@@ -20,7 +20,7 @@ import gamificationRoutes from './routes/gamification.js'
 import adminRoutes from './routes/admin.js'
 import metricsRoutes from './routes/metrics.js'
 import pricingRoutes from './routes/pricing.js'
-import goCardlessRoutes from './routes/gocardless.js'
+import stripeRoutes from './routes/stripe.js'
 import paypalRoutes from './routes/paypal.js'
 import usernameRoutes from './routes/username.js'
 import skillLabsRoutes from './routes/skillLabs.js'
@@ -31,8 +31,8 @@ import pollsRoutes from './routes/polls.js'
 
 const server = Fastify({ logger: true, trustProxy: true })
 
-// Capture raw body string so the GoCardless webhook handler can verify the
-// HMAC-SHA256 signature over the exact bytes GoCardless signed.
+// Capture raw body string so webhook handlers (Stripe, PayPal) can verify
+// HMAC-SHA256 signatures over the exact bytes the provider signed.
 server.addContentTypeParser('application/json', { parseAs: 'string' }, function (_req, body, done) {
   ;(_req as any).rawBody = body
   try {
@@ -67,9 +67,9 @@ await server.register(entitlementPlugin)
 // Auth routes (public: /auth/config, protected: /auth/me)
 await server.register(authRoutes, { prefix: '/auth' })
 
-// Pricing & GoCardless (scaffolded)
+// Pricing & payments
 await server.register(pricingRoutes, { prefix: '/pricing' })
-await server.register(goCardlessRoutes, { prefix: '/payments' })
+await server.register(stripeRoutes, { prefix: '/payments' })
 await server.register(paypalRoutes, { prefix: '/payments/paypal' })
 
 // App routes

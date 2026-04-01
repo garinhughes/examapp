@@ -14,14 +14,14 @@ variable "cognito_client_secret_name" {
   default     = "examapp-cognito-app-client-secret"
 }
 
-variable "gocardless_access_token_secret_name" {
-  description = "Name of the pre-existing Secrets Manager secret holding GoCardless access token"
+variable "stripe_secret_key_secret_name" {
+  description = "Name of the pre-existing Secrets Manager secret holding the Stripe secret key"
   type        = string
-  default     = "examapp-gocardless-access-token"
+  default     = "examapp-stripe-secret-key"
 }
 
-variable "gocardless_webhook_secret_name" {
-  description = "Name of the pre-existing Secrets Manager secret holding GoCardless webhook secret"
+variable "stripe_webhook_secret_name" {
+  description = "Name of the pre-existing Secrets Manager secret holding the Stripe webhook signing secret"
   type        = string
-  default     = "examapp-gocardless-webhook-secret"
+  default     = "examapp-stripe-webhook-secret"
 }

@@ -77,7 +77,7 @@ export default function TermsOfService() {
                 payment confirmation.
               </p>
               <p className="leading-relaxed">
-                Payments are processed by GoCardless (Direct Debit) or PayPal. By completing a purchase, you agree to
+                Payments are processed by Stripe (card / Apple Pay / Google Pay) or PayPal. By completing a purchase, you agree to
                 the respective payment provider's terms.
               </p>
             </div>

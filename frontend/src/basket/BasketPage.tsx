@@ -1,6 +1,6 @@
 /**
  * BasketPage -- shows basket contents, smart upgrade suggestions,
- * and checkout options: GoCardless (Direct Debit) and PayPal (+ Apple Pay).
+ * and checkout options: Stripe (card / Apple Pay / Google Pay) and PayPal.
  */
 
 import { lazy, Suspense, useEffect } from 'react'
@@ -44,7 +44,7 @@ export default function BasketPage() {
     }
 
     clarityEvent('checkout_initiated')
-    clarityTag('payment_method', 'gocardless')
+    clarityTag('payment_method', 'stripe')
     const productIds = items.map((i) => i.product.productId)
     if (productIds.length === 0) return
 
@@ -70,7 +70,7 @@ export default function BasketPage() {
 
       const data = await res.json()
       if (data.url) {
-        // Redirect to GoCardless / simulator
+        // Redirect to Stripe hosted checkout
         window.location.href = data.url
         return
       }
@@ -145,7 +145,7 @@ export default function BasketPage() {
           onClick={handleCheckout}
           className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition inline-flex items-center justify-center gap-2"
         >
-          Pay by Direct Debit (GoCardless) <ArrowRight className="w-4 h-4" />
+          Pay by card / Apple Pay / Google Pay <ArrowRight className="w-4 h-4" />
         </button>
 
         <div className="relative flex items-center py-1">
@@ -159,7 +159,7 @@ export default function BasketPage() {
         </Suspense>
 
         <p className="text-[11px] text-muted-foreground text-center">
-          Payments processed securely via GoCardless or PayPal.
+          Payments processed securely via Stripe or PayPal.
         </p>
       </div>
     </div>
