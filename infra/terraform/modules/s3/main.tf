@@ -81,6 +81,34 @@ resource "aws_s3_bucket_versioning" "skill_labs_versioning" {
   }
 }
 
+# ---------- Images S3 bucket ----------
+resource "aws_s3_bucket" "images" {
+  bucket = "examapp-images-${var.account_id}"
+  tags   = { Project = var.project }
+}
+
+resource "aws_s3_bucket_public_access_block" "images_block" {
+  bucket                  = aws_s3_bucket.images.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "images_versioning" {
+  bucket = aws_s3_bucket.images.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "images" {
+  bucket = aws_s3_bucket.images.id
+  rule {
+    apply_server_side_encryption_by_default { sse_algorithm = "AES256" }
+  }
+}
+
 # ---------- outputs ----------
 output "bucket_name" {
   value = aws_s3_bucket.site.id
@@ -100,4 +128,8 @@ output "exam_questions_bucket_name" {
 
 output "skill_labs_bucket_name" {
   value = aws_s3_bucket.skill_labs.id
+}
+
+output "images_bucket_name" {
+  value = aws_s3_bucket.images.id
 }

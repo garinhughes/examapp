@@ -496,6 +496,7 @@
       ],
       "tip": "Focus on which storage type provides dedicated, consistent IOPS as a block device that outlives the compute instance.",
       "explanation": "`io2` Block Express is the correct choice for workloads requiring both consistent high IOPS and durable block storage independent of instance state.\n\n**Why it works:** `io2` Block Express supports up to 256,000 IOPS and 4,000 MB/s per volume with sub-millisecond latency. EBS volumes persist independently of the EC2 instance and are retained after instance termination when `DeleteOnTermination` is set to `false`.\n\n**Why the others fail:**\n- `gp3` provisioned at 64,000 IOPS: `gp3` has a hard maximum of 16,000 IOPS per volume; the API rejects this request.\n- EC2 instance store with DLM snapshots: instance store is ephemeral - data is lost on instance stop or termination. Snapshots require a separate EBS volume to restore, violating the direct persistence requirement.\n- FSx for Lustre Persistent-1: a shared distributed file system, not dedicated block storage; it cannot provide per-instance provisioned IOPS equivalent to `io2`.\n\n**Implementation:** Console > EC2 > Volumes > Create Volume, select `io2`, set size and IOPS. CLI: `aws ec2 create-volume --volume-type io2 --size <GiB> --iops <IOPS> --availability-zone <AZ>`.",
+      "image": "aws/ebs-io2-64000iops.png",
       "domain": "Design High-Performing Architectures",
       "difficulty": 4,
       "lastReviewed": "2026-03-30"

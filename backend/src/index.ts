@@ -28,6 +28,7 @@ import reportsRoutes from './routes/reports.js'
 import ratingsRoutes from './routes/ratings.js'
 import certificatesRoutes from './routes/certificates.js'
 import pollsRoutes from './routes/polls.js'
+import imagesRoutes from './routes/images.js'
 
 const server = Fastify({ logger: true, trustProxy: true })
 
@@ -93,6 +94,8 @@ await server.register(ratingsRoutes, { prefix: '/ratings' })
 await server.register(certificatesRoutes, { prefix: '/certificates' })
 // Polls
 await server.register(pollsRoutes, { prefix: '/polls' })
+// Images — presigned S3 URLs for question diagrams
+await server.register(imagesRoutes, { prefix: '/images' })
 
 // Health check for ALB
 server.get('/health', async () => ({ status: 'ok' }))

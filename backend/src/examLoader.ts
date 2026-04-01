@@ -66,6 +66,7 @@ export interface Question {
   docs?: string
   tip?: string
   explanation?: string
+  image?: string
   difficulty?: number
   lastReviewed?: string
 }
@@ -144,6 +145,7 @@ export function normaliseQuestion(raw: any): Question {
     docs: raw.docs,
     tip: raw.tip,
     explanation: raw.explanation,
+    image: raw.image,
     difficulty: raw.difficulty,
     lastReviewed: raw.lastReviewed,
   }

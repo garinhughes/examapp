@@ -42,6 +42,7 @@ export type Question = {
   skills?: string[]
   tip?: string
   explanation?: string
+  image?: string
   docs?: string
   difficulty?: number
   services?: string[]

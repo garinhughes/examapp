@@ -23,6 +23,7 @@
         { "name": "ENTITLEMENTS_TABLE", "value": "examapp-entitlements" },
         { "name": "AUDIT_TABLE", "value": "examapp-audit" },
         { "name": "ISSUE_REPORTS_TABLE", "value": "examapp-issue-reports" },
+        { "name": "IMAGES_S3_BUCKET", "value": "examapp-images-809472479011" },
         { "name": "SKILL_LAB_SOURCE", "value": "s3" },
         { "name": "SKILL_LAB_S3_BUCKET", "value": "examapp-skill-labs-809472479011" },
         { "name": "SKILL_LAB_INDEX_TABLE", "value": "examapp-skill-labs-index" },

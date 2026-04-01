@@ -13,6 +13,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       // Proxy payments endpoints to backend
+      '/images': 'http://localhost:3000',
       '/payments': 'http://localhost:3000',
       '/attempts': 'http://localhost:3000',
       '/auth': 'http://localhost:3000',

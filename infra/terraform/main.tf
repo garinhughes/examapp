@@ -154,6 +154,7 @@ module "ecs" {
   users_table              = module.dynamodb.table_names["users"]
   entitlements_table       = module.dynamodb.table_names["entitlements"]
   audit_table              = module.dynamodb.table_names["audit"]
+  images_s3_bucket         = module.s3.images_bucket_name
   skill_lab_source         = "s3"
   skill_lab_s3_bucket      = module.s3.skill_labs_bucket_name
   skill_lab_index_table    = module.dynamodb.table_names["skill_labs_index"]

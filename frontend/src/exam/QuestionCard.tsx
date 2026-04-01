@@ -6,6 +6,7 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import { useExam } from './ExamContext'
 import { renderChoiceContent, MarkdownText } from './utils'
 import { SortableOrderItem } from './SortableOrderItem'
+import { QuestionImage } from './QuestionImage'
 import type { QuestionType } from './types'
 
 export function QuestionCard() {
@@ -469,10 +470,27 @@ export function QuestionCard() {
               <div className="mt-3 text-base space-y-2">
                 {q.explanation && (
                   <div className="p-2 rounded bg-muted/50 dark:bg-card text-foreground">
+                    {(q.domain || (q.skills && q.skills.length > 0)) && (
+                      <div className="mb-2 flex flex-col gap-0.5 text-xs">
+                        {q.domain && <span><span className="font-medium text-orange-500">Domain:</span> <span className="text-gray-600 dark:text-gray-400">{q.domain}</span></span>}
+                        {q.skills && q.skills.length > 0 && <span><span className="font-medium text-orange-500">Skill:</span> <span className="text-gray-600 dark:text-gray-400">{q.skills.join(', ')}</span></span>}
+                      </div>
+                    )}
+                    {q.docs && (
+                      <div className="mb-2">
+                        <a href={q.docs} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 rounded bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
+                          <ExternalLink className="w-4 h-4" />
+                          <span>Docs</span>
+                        </a>
+                      </div>
+                    )}
+                    {(q.domain || (q.skills && q.skills.length > 0) || q.docs) && (
+                      <hr className="border-border/50 mb-2" />
+                    )}
                     <div className="flex items-start justify-between gap-4">
                       <div className="pr-2"><strong>Explanation:</strong> <MarkdownText text={q.explanation} /></div>
-                      <div className="flex-shrink-0 flex items-center gap-1.5">
-                        {ttsEnabled && (
+                      {ttsEnabled && (
+                        <div className="flex-shrink-0">
                           <button
                             onClick={() => toggleTTS(`${q.id}:explanation`, q.explanation!)}
                             className="h-7 min-w-[1.75rem] px-1.5 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center justify-center"
@@ -480,21 +498,10 @@ export function QuestionCard() {
                           >
                             {speakingId === `${q.id}:explanation` ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
                           </button>
-                        )}
-                        {q.docs && (
-                          <a href={q.docs} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 rounded bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
-                            <ExternalLink className="w-4 h-4" />
-                            <span>Docs</span>
-                          </a>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
-                    {(q.domain || (q.skills && q.skills.length > 0)) && (
-                      <div className="mt-3 pt-2 border-t border-border/50 flex flex-col gap-0.5 text-xs">
-                        {q.domain && <span><span className="font-medium text-orange-500">Domain:</span> <span className="text-gray-600 dark:text-gray-400">{q.domain}</span></span>}
-                        {q.skills && q.skills.length > 0 && <span><span className="font-medium text-orange-500">Skill:</span> <span className="text-gray-600 dark:text-gray-400">{q.skills.join(', ')}</span></span>}
-                      </div>
-                    )}
+                    {q.image && <QuestionImage imageKey={q.image} />}
                   </div>
                 )}
               </div>

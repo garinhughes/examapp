@@ -3,6 +3,7 @@ import { Play, X, Check, BarChart3, ExternalLink, ChevronDown } from 'lucide-rea
 import { useExam } from './ExamContext'
 import { isAnswerCorrect, renderChoiceContent, MarkdownText } from './utils'
 import type { Question, QuestionType } from './types'
+import { QuestionImage } from './QuestionImage'
 
 export function ExamReview() {
   const {
@@ -344,6 +345,7 @@ export function ExamReview() {
                           {Array.isArray(item.q.skills) && item.q.skills.length > 0 && <span><span className="font-medium text-orange-500">Skill:</span> <span className="text-gray-600 dark:text-gray-400">{item.q.skills.join(', ')}</span></span>}
                         </div>
                       )}
+                      {(item.q as any).image && <QuestionImage imageKey={(item.q as any).image} />}
                     </div>
                   </div>
                 )}

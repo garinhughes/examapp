@@ -112,6 +112,11 @@ variable "audit_table" {
   default = ""
 }
 
+variable "images_s3_bucket" {
+  type    = string
+  default = ""
+}
+
 variable "skill_lab_source" {
   type    = string
   default = "s3"
@@ -405,6 +410,7 @@ locals {
     { name = "USERS_TABLE", value = var.users_table },
     { name = "ENTITLEMENTS_TABLE", value = var.entitlements_table },
     { name = "AUDIT_TABLE", value = var.audit_table },
+    { name = "IMAGES_S3_BUCKET", value = var.images_s3_bucket },
     { name = "SKILL_LAB_SOURCE", value = var.skill_lab_source },
     { name = "SKILL_LAB_S3_BUCKET", value = var.skill_lab_s3_bucket },
     { name = "SKILL_LAB_INDEX_TABLE", value = var.skill_lab_index_table },
