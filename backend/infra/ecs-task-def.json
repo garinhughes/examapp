@@ -48,11 +48,11 @@
         },
         {
           "name": "STRIPE_SECRET_KEY",
-          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-stripe-secret-key"
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-stripe-secret-key-QCYE1I"
         },
         {
           "name": "STRIPE_WEBHOOK_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-stripe-webhook-secret"
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-stripe-webhook-secret-vN7GyR"
         }
       ],
       "logConfiguration": {
