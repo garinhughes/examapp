@@ -37,7 +37,9 @@
         { "name": "METRICS_TABLE", "value": "examapp-metrics" },
         { "name": "INTERACTIONS_TABLE", "value": "examapp-interactions" },
         { "name": "SESSIONS_TABLE", "value": "examapp-sessions" },
-        { "name": "COGNITO_ADMIN_ROLE_ARN", "value": "arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role" }
+        { "name": "COGNITO_ADMIN_ROLE_ARN", "value": "arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role" },
+        { "name": "STRIPE_PRICE_ID_MONTHLY", "value": "price_1THKKkRXOMjZneV7ptKVgxPT" },
+        { "name": "STRIPE_PRICE_ID_ANNUAL",  "value": "price_1THKLCRXOMjZneV7bUdaFcDz" }
       ],
       "secrets": [
         {
