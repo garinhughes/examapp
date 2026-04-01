@@ -943,6 +943,7 @@
       ],
       "tip": "Both the rotation Lambda association and the rotation schedule are controlled by a single Secrets Manager CLI subcommand. Look for a parameter that sets the recurrence interval and a flag that decouples the configuration update from triggering an immediate rotation cycle.",
       "explanation": "The `rotate-secret` subcommand is the correct tool for both associating a rotation Lambda and configuring a recurrence schedule.\n\n**Why it works:** Without `--rotation-rules AutomaticallyAfterDays=N`, Secrets Manager performs a one-time rotation only. Adding `--rotation-rules AutomaticallyAfterDays=30` sets the recurring 30-day schedule. The `--no-rotate-immediately` flag suppresses the default immediate Lambda invocation, updating only the schedule without consuming a rotation cycle.\n\n**Why the others fail:**\n- `update-secret`: does not accept rotation parameters - rotation configuration is managed exclusively through `rotate-secret`.\n- `put-rotation-configuration`: does not exist in the Secrets Manager CLI.\n- `create-rotation-schedule`: does not exist; Secrets Manager does not accept EventBridge-style rate expressions.\n\n**Implementation:** After running the command, verify with `aws secretsmanager describe-secret --secret-id prod/db/master-credentials` and inspect the `RotationEnabled`, `RotationRules`, and `NextRotationDate` fields.",
+      "image": "aws/rotate-secret-lambda.png",
       "domain": "Data Protection",
       "difficulty": 3,
       "lastReviewed": "2026-03-24"
