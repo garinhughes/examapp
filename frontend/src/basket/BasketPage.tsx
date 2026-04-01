@@ -4,6 +4,7 @@
  */
 
 import { lazy, Suspense, useEffect } from 'react'
+import { Icon } from '@iconify/react'
 import { Trash2, ShoppingCart, ArrowRight, Sparkles, X } from 'lucide-react'
 import { clarityEvent, clarityTag } from '../clarity'
 
@@ -141,6 +142,17 @@ export default function BasketPage() {
           <span>Total</span>
           <span>{formatPrice(total)}</span>
         </div>
+
+        {/* Payment method logos */}
+        <div className="flex items-center justify-center gap-3 py-2">
+          <Icon icon="logos:visa" className="h-6 w-auto" />
+          <Icon icon="logos:mastercard" className="h-6 w-auto" />
+          <Icon icon="logos:amex" className="h-6 w-auto" />
+          <div className="w-px h-6 bg-border" />
+          <Icon icon="logos:apple-pay" className="h-6 w-auto" />
+          <Icon icon="logos:google-pay" className="h-6 w-auto" />
+        </div>
+
         <button
           onClick={handleCheckout}
           className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition inline-flex items-center justify-center gap-2"
