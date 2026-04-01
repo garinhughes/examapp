@@ -305,7 +305,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           const productIds: string[] = JSON.parse(metadata.productIds ?? '[]')
           if (userId && productIds.length > 0) {
             for (const pid of productIds) {
-              await revokeEntitlement({ userId, productId: pid })
+              await revokeEntitlement(userId, pid)
             }
             server.log.info({ userId, productIds, subscriptionId: subscription.id }, '[stripe] subscription entitlements revoked')
           } else {
