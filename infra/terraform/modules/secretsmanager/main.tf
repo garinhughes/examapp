@@ -61,3 +61,24 @@ resource "aws_secretsmanager_secret_policy" "stripe_webhook_secret_policy" {
     ]
   })
 }
+
+# PayPal client secret (managed out-of-band)
+data "aws_secretsmanager_secret" "paypal_client_secret" {
+  name = var.paypal_client_secret_name
+}
+
+resource "aws_secretsmanager_secret_policy" "paypal_client_secret_policy" {
+  secret_arn = data.aws_secretsmanager_secret.paypal_client_secret.arn
+  policy     = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowEcsTaskGetSecret",
+        Effect = "Allow",
+        Principal = { AWS = var.ecs_task_execution_role_arn },
+        Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        Resource = data.aws_secretsmanager_secret.paypal_client_secret.arn
+      }
+    ]
+  })
+}

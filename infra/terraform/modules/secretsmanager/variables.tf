@@ -25,3 +25,9 @@ variable "stripe_webhook_secret_name" {
   type        = string
   default     = "examapp-stripe-webhook-secret"
 }
+
+variable "paypal_client_secret_name" {
+  description = "Name of the pre-existing Secrets Manager secret holding the PayPal client secret"
+  type        = string
+  default     = "examapp-paypal-client-secret"
+}

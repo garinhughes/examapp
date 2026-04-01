@@ -204,6 +204,56 @@ variable "cognito_admin_role_arn" {
   default     = "arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role"
 }
 
+variable "paypal_client_id" {
+  type    = string
+  default = ""
+}
+
+variable "paypal_api_base" {
+  type    = string
+  default = "https://api-m.paypal.com"
+}
+
+variable "paypal_plan_id_monthly" {
+  type    = string
+  default = ""
+}
+
+variable "paypal_plan_id_annual" {
+  type    = string
+  default = ""
+}
+
+variable "paypal_webhook_id" {
+  type    = string
+  default = ""
+}
+
+variable "paypal_client_secret_arn" {
+  type    = string
+  default = ""
+}
+
+variable "stripe_secret_key_arn" {
+  type    = string
+  default = ""
+}
+
+variable "stripe_webhook_secret_arn" {
+  type    = string
+  default = ""
+}
+
+variable "stripe_price_id_monthly" {
+  type    = string
+  default = ""
+}
+
+variable "stripe_price_id_annual" {
+  type    = string
+  default = ""
+}
+
 # ---------- security groups ----------
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project}-alb-"
@@ -346,11 +396,10 @@ resource "aws_cloudwatch_log_group" "backend" {
 locals {
   container_environment = [
     { name = "EXAM_SOURCE", value = var.exam_source },
-    { name = "DYNAMODB_TABLE", value = var.dynamodb_table_name },
+    { name = "SESSIONS_TABLE", value = var.dynamodb_table_name },
     { name = "AWS_REGION", value = var.region },
-    { name = "AWS_DEFAULT_REGION", value = var.region },
-    { name = "EXAM_BUCKET", value = var.s3_bucket },
-    { name = "EXAM_INDEX_TABLE", value = var.exams_index_table },
+    { name = "S3_BUCKET", value = var.s3_bucket },
+    { name = "EXAMS_INDEX_TABLE", value = var.exams_index_table },
     { name = "ATTEMPTS_TABLE", value = var.attempts_table },
     { name = "GAM_TABLE", value = var.gam_table },
     { name = "USERS_TABLE", value = var.users_table },
@@ -373,6 +422,13 @@ locals {
     { name = "METRICS_TABLE", value = var.metrics_table },
     { name = "INTERACTIONS_TABLE", value = var.interactions_table },
     { name = "COGNITO_ADMIN_ROLE_ARN", value = var.cognito_admin_role_arn },
+    { name = "PAYPAL_CLIENT_ID", value = var.paypal_client_id },
+    { name = "PAYPAL_API_BASE", value = var.paypal_api_base },
+    { name = "PAYPAL_PLAN_ID_MONTHLY", value = var.paypal_plan_id_monthly },
+    { name = "PAYPAL_PLAN_ID_ANNUAL", value = var.paypal_plan_id_annual },
+    { name = "PAYPAL_WEBHOOK_ID", value = var.paypal_webhook_id },
+    { name = "STRIPE_PRICE_ID_MONTHLY", value = var.stripe_price_id_monthly },
+    { name = "STRIPE_PRICE_ID_ANNUAL", value = var.stripe_price_id_annual },
   ]
 
   container_secrets = concat(
@@ -381,6 +437,15 @@ locals {
     ] : [],
     var.origin_verify_secret_arn != "" ? [
       { name = "ORIGIN_VERIFY_SECRET", valueFrom = var.origin_verify_secret_arn }
+    ] : [],
+    var.stripe_secret_key_arn != "" ? [
+      { name = "STRIPE_SECRET_KEY", valueFrom = var.stripe_secret_key_arn }
+    ] : [],
+    var.stripe_webhook_secret_arn != "" ? [
+      { name = "STRIPE_WEBHOOK_SECRET", valueFrom = var.stripe_webhook_secret_arn }
+    ] : [],
+    var.paypal_client_secret_arn != "" ? [
+      { name = "PAYPAL_CLIENT_SECRET", valueFrom = var.paypal_client_secret_arn }
     ] : [],
   )
 }

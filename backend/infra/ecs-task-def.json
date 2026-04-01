@@ -38,6 +38,8 @@
         { "name": "INTERACTIONS_TABLE", "value": "examapp-interactions" },
         { "name": "SESSIONS_TABLE", "value": "examapp-sessions" },
         { "name": "COGNITO_ADMIN_ROLE_ARN", "value": "arn:aws:iam::030461496359:role/examapp-mgmt-cross-account-role" },
+        { "name": "SES_FROM_ADDRESS", "value": "noreply@certshack.com" },
+        { "name": "SES_SUPPORT_ADDRESS", "value": "support@certshack.com" },
         { "name": "STRIPE_PRICE_ID_MONTHLY", "value": "price_1THKKkRXOMjZneV7ptKVgxPT" },
         { "name": "STRIPE_PRICE_ID_ANNUAL",  "value": "price_1THKLCRXOMjZneV7bUdaFcDz" },
         { "name": "PAYPAL_CLIENT_ID", "value": "AbyHVazM-r_fPb1CgQa0j5nwTtdMawkxoHGa2Dxd9PavViGd1G4Z0qTiHONgx1hUMC7ONUYKLBbrU4wa" },
