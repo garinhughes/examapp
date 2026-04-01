@@ -108,7 +108,7 @@
       "skills": [
         "1.1.1: Understanding the economies of scale (for example, cost savings)."
       ],
-      "question": "An enterprise is evaluating AWS adoption and wants to understand how the cloud provider reduces costs for all customers.\n\nWhich TWO factors directly enable AWS to offer lower costs through economies of scale? (Select TWO)",
+      "question": "An enterprise is evaluating AWS adoption and wants to understand how the cloud provider reduces costs for all customers.\n\nWhich TWO factors directly enable AWS to offer lower costs through economies of scale?",
       "choices": [
         {
           "id": "c1",
@@ -243,7 +243,7 @@
       "skills": [
         "2.1.1: Recognizing the components of the AWS shared responsibility model."
       ],
-      "question": "A solutions architect is designing a security strategy for an enterprise deploying multiple AWS services. She needs to identify which responsibilities fall under the shared responsibility model.\n\nWhich TWO of the following are customer responsibilities in the AWS Shared Responsibility Model? (Select TWO)",
+      "question": "A solutions architect is designing a security strategy for an enterprise deploying multiple AWS services. She needs to identify which responsibilities fall under the shared responsibility model.\n\nWhich TWO of the following are customer responsibilities in the AWS Shared Responsibility Model?",
       "choices": [
         {
           "id": "c1",
@@ -377,7 +377,7 @@
       "skills": [
         "2.2.3: Describing how customers secure resources on AWS (for example, Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield)."
       ],
-      "question": "A company needs a centralized security view that aggregates findings from multiple AWS security services. The solution must consolidate compliance checks and security alerts in a single dashboard.\n\nWhich TWO options address this? (Select TWO)",
+      "question": "A company needs a centralized security view that aggregates findings from multiple AWS security services. The solution must consolidate compliance checks and security alerts in a single dashboard.\n\nWhich TWO options address this?",
       "choices": [
         {
           "id": "c1",
@@ -510,7 +510,7 @@
       "skills": [
         "1.4.2: Understanding costs that are associated with on-premises environments."
       ],
-      "question": "When evaluating the cost advantages of migrating from on-premises to AWS, which TWO cost areas demonstrate significant savings? (Select TWO)",
+      "question": "When evaluating the cost advantages of migrating from on-premises to AWS, which TWO cost areas demonstrate significant savings?",
       "choices": [
         {
           "id": "c1",
@@ -644,7 +644,7 @@
       "skills": [
         "3.6.6: Understanding use cases for lifecycle policies."
       ],
-      "question": "An enterprise stores data with varying access patterns: frequently accessed databases (first 3 months), occasionally accessed archives (3-12 months), and rarely accessed long-term compliance records (beyond 1 year). The company wants to optimize both cost and performance.\n\nWhich TWO lifecycle policy strategies address this? (Select TWO)",
+      "question": "An enterprise stores data with varying access patterns: frequently accessed databases (first 3 months), occasionally accessed archives (3-12 months), and rarely accessed long-term compliance records (beyond 1 year). The company wants to optimize both cost and performance.\n\nWhich TWO lifecycle policy strategies address this?",
       "choices": [
         {
           "id": "c1",
@@ -778,7 +778,7 @@
       "skills": [
         "4.1.5: Understanding different pricing options for various storage options and tiers."
       ],
-      "question": "A company wants to optimize storage costs while maintaining flexibility for unpredictable access patterns across different data sets. Some objects are accessed frequently, while others have varying usage patterns over time.\n\nWhich TWO pricing strategies help reduce total storage costs? (Select TWO)",
+      "question": "A company wants to optimize storage costs while maintaining flexibility for unpredictable access patterns across different data sets. Some objects are accessed frequently, while others have varying usage patterns over time.\n\nWhich TWO pricing strategies help reduce total storage costs?",
       "choices": [
         {
           "id": "c1",
@@ -911,7 +911,7 @@
       "skills": [
         "3.8.4: Choosing the appropriate option for business support assistance."
       ],
-      "question": "An organization is deciding which AWS Support plan to adopt based on its operational maturity and business needs. The company wants guidance on choosing appropriate support tiers across different scenarios.\n\nWhich TWO support plan decisions are correct for their respective scenarios? (Select TWO)",
+      "question": "An organization is deciding which AWS Support plan to adopt based on its operational maturity and business needs. The company wants guidance on choosing appropriate support tiers across different scenarios.\n\nWhich TWO support plan decisions are correct for their respective scenarios?",
       "choices": [
         {
           "id": "c1",
@@ -1044,7 +1044,7 @@
       "skills": [
         "3.5.4: Identifying edge services (for example, CloudFront, Global Accelerator)."
       ],
-      "question": "An enterprise needs to improve global performance for two distinct use cases: (1) delivering static website content and media to end users worldwide, and (2) optimizing API responses from backend services across regions. The company wants to leverage AWS edge infrastructure for both.\n\nWhich TWO edge services should be used for these scenarios? (Select TWO)",
+      "question": "An enterprise needs to improve global performance for two distinct use cases: (1) delivering static website content and media to end users worldwide, and (2) optimizing API responses from backend services across regions. The company wants to leverage AWS edge infrastructure for both.\n\nWhich TWO edge services should be used for these scenarios?",
       "choices": [
         {
           "id": "c1",
@@ -1168,7 +1168,7 @@
     {
       "id": "CLF-C02-0027",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://repost.aws/knowledge-center",
       "format": "text",
       "services": [
         "AWS Resources",
@@ -1177,7 +1177,7 @@
       "skills": [
         "4.3.2: Identifying and locating AWS technical resources (for example, AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post)."
       ],
-      "question": "An organization is building expertise in AWS services and needs access to different types of resources. The team needs official documentation, best-practice patterns, and quick answers to common questions from a variety of sources.\n\nWhich TWO resources should the team use to cover all these needs? (Select TWO)",
+      "question": "An organization is building expertise in AWS services and needs access to different types of resources. The team needs official documentation, best-practice patterns, and quick answers to common questions from a variety of sources.\n\nWhich TWO resources should the team use to cover all these needs?",
       "choices": [
         {
           "id": "c1",
@@ -1310,7 +1310,7 @@
       "skills": [
         "2.2.4: Identifying different encryption options (for example, encryption in transit, encryption at rest)."
       ],
-      "question": "A financial services company needs comprehensive data protection for sensitive customer information stored in AWS and transmitted across networks. The organization requires encryption in both scenarios: when data is stored and when it is transmitted.\n\nWhich TWO encryption strategies provide complete coverage? (Select TWO)",
+      "question": "A financial services company needs comprehensive data protection for sensitive customer information stored in AWS and transmitted across networks. The organization requires encryption in both scenarios: when data is stored and when it is transmitted.\n\nWhich TWO encryption strategies provide complete coverage?",
       "choices": [
         {
           "id": "c1",

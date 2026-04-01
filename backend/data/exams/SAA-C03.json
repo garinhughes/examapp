@@ -146,7 +146,7 @@
       "skills": [
         "1.1.1: Applying AWS security best practices to IAM users and root users (for example, multi-factor authentication [MFA])."
       ],
-      "question": "A security team is hardening a standalone AWS account that is not part of an organization. The team must implement two independent preventive controls to minimize the risk of unauthorized root user access. The root user currently has a valid password, no MFA device registered, and two active access keys.\n\nWhich TWO actions should the team take to reduce the risk of unauthorized root user access? (Select TWO)",
+      "question": "A security team is hardening a standalone AWS account that is not part of an organization. The team must implement two independent preventive controls to minimize the risk of unauthorized root user access. The root user currently has a valid password, no MFA device registered, and two active access keys.\n\nWhich TWO actions should the team take to reduce the risk of unauthorized root user access?",
       "choices": [
         {
           "id": "c1",
@@ -370,7 +370,7 @@
       "skills": [
         "2.1.1: Designing event-driven, microservice, and/or multi-tier architectures based on requirements."
       ],
-      "question": "An e-commerce startup is decomposing a monolithic application into independent microservices on AWS. After a purchase is saved to the database, an inventory service, a shipping coordinator, and a loyalty program service must each receive and independently process every purchase event. The checkout service must return a response to the customer immediately without waiting for downstream processing. Any downstream service may be unavailable for up to 15 minutes during rolling deployments.\n\nWhich TWO AWS services should the solutions architect combine to deliver purchase events durably to all three downstream services? (Select TWO)",
+      "question": "An e-commerce startup is decomposing a monolithic application into independent microservices on AWS. After a purchase is saved to the database, an inventory service, a shipping coordinator, and a loyalty program service must each receive and independently process every purchase event. The checkout service must return a response to the customer immediately without waiting for downstream processing. Any downstream service may be unavailable for up to 15 minutes during rolling deployments.\n\nWhich TWO AWS services should the solutions architect combine to deliver purchase events durably to all three downstream services?",
       "choices": [
         {
           "id": "c1",
@@ -595,7 +595,7 @@
       "skills": [
         "3.1.1: Determining storage services and configurations that meet performance demands."
       ],
-      "question": "A financial analytics company runs a data warehouse on Amazon Redshift and queries a 200 TB dataset stored in Amazon S3 using Amazon Redshift Spectrum. Over the past month query execution times have increased by 60% as the dataset has grown, and all files are currently stored in CSV format under a flat key prefix. The team must improve S3 data access performance without reloading data into Redshift managed storage.\n\nWhich TWO configurations improve Redshift Spectrum query performance? (Select TWO)",
+      "question": "A financial analytics company runs a data warehouse on Amazon Redshift and queries a 200 TB dataset stored in Amazon S3 using Amazon Redshift Spectrum. Over the past month query execution times have increased by 60% as the dataset has grown, and all files are currently stored in CSV format under a flat key prefix. The team must improve S3 data access performance without reloading data into Redshift managed storage.\n\nWhich TWO configurations improve Redshift Spectrum query performance?",
       "choices": [
         {
           "id": "c1",
@@ -831,7 +831,7 @@
       "skills": [
         "4.1.1: Designing appropriate storage strategies (for example, batch uploads to Amazon S3 compared with individual uploads)."
       ],
-      "question": "A company's batch pipeline initiates multipart uploads to Amazon S3 for large compressed archives but frequently fails mid-upload without cleanup. Over six months the bucket has accumulated hundreds of thousands of incomplete multipart uploads occupying tens of terabytes and generating ongoing storage charges. The team must eliminate the existing charges and prevent future accumulation.\n\nWhich TWO actions together resolve both the existing and future incomplete multipart upload costs? (Select TWO)",
+      "question": "A company's batch pipeline initiates multipart uploads to Amazon S3 for large compressed archives but frequently fails mid-upload without cleanup. Over six months the bucket has accumulated hundreds of thousands of incomplete multipart uploads occupying tens of terabytes and generating ongoing storage charges. The team must eliminate the existing charges and prevent future accumulation.\n\nWhich TWO actions together resolve both the existing and future incomplete multipart upload costs?",
       "choices": [
         {
           "id": "c1",

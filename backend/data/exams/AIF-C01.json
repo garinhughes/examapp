@@ -11,7 +11,7 @@
     {
       "id": "AIF-C01-0001",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model.html",
       "format": "text",
       "services": [
         "AWS"
@@ -52,7 +52,7 @@
     {
       "id": "AIF-C01-0002",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-fairness-and-explainability.html",
       "format": "text",
       "services": [
         "AWS"
@@ -93,7 +93,7 @@
     {
       "id": "AIF-C01-0003",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/machine-learning/latest/dg/model-fit-underfitting-vs-overfitting.html",
       "format": "text",
       "services": [
         "Amazon SageMaker"
@@ -134,7 +134,7 @@
     {
       "id": "AIF-C01-0004",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html",
       "format": "text",
       "services": [
         "Amazon Rekognition",
@@ -143,7 +143,7 @@
       "skills": [
         "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
       ],
-      "question": "A retail company is implementing a system to automatically tag products in their image database. The system needs to identify objects, recognize text on packaging, and understand scene composition. The team is evaluating which combination of AI capabilities to use.\n\nWhich TWO capabilities best address the company's requirements? (Select TWO)",
+      "question": "A retail company is implementing a system to automatically tag products in their image database. The system needs to identify objects, recognize text on packaging, and understand scene composition. The team is evaluating which combination of AI capabilities to use.\n\nWhich TWO capabilities best address the company's requirements?",
       "choices": [
         {
           "id": "c1",
@@ -183,7 +183,7 @@
     {
       "id": "AIF-C01-0005",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/machine-learning/latest/dg/amazon-machine-learning-key-concepts.html",
       "format": "text",
       "services": [
         "AWS"
@@ -245,7 +245,7 @@
     {
       "id": "AIF-C01-0006",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/personalize/latest/dg/what-is-personalize.html",
       "format": "text",
       "services": [
         "AWS"
@@ -286,7 +286,7 @@
     {
       "id": "AIF-C01-0007",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/transcribe/latest/dg/what-is.html",
       "format": "text",
       "services": [
         "Amazon Transcribe"
@@ -327,7 +327,7 @@
     {
       "id": "AIF-C01-0008",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/frauddetector/latest/ug/what-is-frauddetector.html",
       "format": "text",
       "services": [
         "Amazon Lookout for Fraud"
@@ -368,7 +368,7 @@
     {
       "id": "AIF-C01-0009",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/lookout-for-equipment/latest/ug/what-is-lookoutequipment.html",
       "format": "text",
       "services": [
         "Amazon Lookout for Equipment",
@@ -377,7 +377,7 @@
       "skills": [
         "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
       ],
-      "question": "A manufacturing facility wants to improve operations by using AI in two ways. First, they want to predict when equipment is likely to fail so they can perform preventive maintenance. Second, they want to analyze images from quality control cameras to identify defects before products leave the factory.\n\nWhich TWO AI applications should the facility implement? (Select TWO)",
+      "question": "A manufacturing facility wants to improve operations by using AI in two ways. First, they want to predict when equipment is likely to fail so they can perform preventive maintenance. Second, they want to analyze images from quality control cameras to identify defects before products leave the factory.\n\nWhich TWO AI applications should the facility implement?",
       "choices": [
         {
           "id": "c1",
@@ -417,7 +417,7 @@
     {
       "id": "AIF-C01-0010",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html",
       "format": "text",
       "services": [
         "AWS"
@@ -479,7 +479,7 @@
     {
       "id": "AIF-C01-0011",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -520,7 +520,7 @@
     {
       "id": "AIF-C01-0012",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/translate/latest/dg/what-is.html",
       "format": "text",
       "services": [
         "Amazon Translate"
@@ -561,7 +561,7 @@
     {
       "id": "AIF-C01-0013",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html",
       "format": "text",
       "services": [
         "AWS CodeWhisperer"
@@ -602,7 +602,7 @@
     {
       "id": "AIF-C01-0014",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html",
       "format": "text",
       "services": [
         "Amazon Bedrock",
@@ -611,7 +611,7 @@
       "skills": [
         "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
       ],
-      "question": "A customer service department is implementing a comprehensive AI solution with multiple capabilities. They want to deploy a conversational system to handle customer inquiries, condense long customer emails into brief summaries for agents, and generate responses in the customer's preferred language.\n\nWhich TWO generative AI use cases are essential for this solution? (Select TWO)",
+      "question": "A customer service department is implementing a comprehensive AI solution with multiple capabilities. They want to deploy a conversational system to handle customer inquiries, condense long customer emails into brief summaries for agents, and generate responses in the customer's preferred language.\n\nWhich TWO generative AI use cases are essential for this solution?",
       "choices": [
         {
           "id": "c1",
@@ -651,7 +651,7 @@
     {
       "id": "AIF-C01-0015",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html",
       "format": "text",
       "services": [
         "AWS"
@@ -713,7 +713,7 @@
     {
       "id": "AIF-C01-0016",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -754,7 +754,7 @@
     {
       "id": "AIF-C01-0017",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/neo.html",
       "format": "text",
       "services": [
         "AWS"
@@ -795,7 +795,7 @@
     {
       "id": "AIF-C01-0018",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -836,7 +836,7 @@
     {
       "id": "AIF-C01-0019",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html",
       "format": "text",
       "services": [
         "Amazon Bedrock",
@@ -845,7 +845,7 @@
       "skills": [
         "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
       ],
-      "question": "An enterprise is deploying a generative AI solution for document analysis and must make critical decisions about model selection. The organization needs to balance high accuracy requirements with the need for data privacy compliance, reasonable inference costs, and acceptable response times for batch processing.\n\nWhich TWO selection factors are most important to address the organization's primary constraints? (Select TWO)",
+      "question": "An enterprise is deploying a generative AI solution for document analysis and must make critical decisions about model selection. The organization needs to balance high accuracy requirements with the need for data privacy compliance, reasonable inference costs, and acceptable response times for batch processing.\n\nWhich TWO selection factors are most important to address the organization's primary constraints?",
       "choices": [
         {
           "id": "c1",
@@ -885,7 +885,7 @@
     {
       "id": "AIF-C01-0020",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html",
       "format": "text",
       "services": [
         "AWS"
@@ -947,7 +947,7 @@
     {
       "id": "AIF-C01-0021",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -988,7 +988,7 @@
     {
       "id": "AIF-C01-0022",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -1029,7 +1029,7 @@
     {
       "id": "AIF-C01-0023",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -1070,7 +1070,7 @@
     {
       "id": "AIF-C01-0024",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html",
       "format": "text",
       "services": [
         "Amazon Bedrock",
@@ -1079,7 +1079,7 @@
       "skills": [
         "3.1.3: Defining Retrieval Augmented Generation (RAG) and describing its business applications (for example, Amazon Bedrock, knowledge base)."
       ],
-      "question": "A healthcare provider is building an AI system to help clinicians access evidence-based medical guidelines and research. The system needs to stay current with the latest clinical guidelines, ensure information is traceable to authoritative medical sources, and reduce hallucinations where the AI might generate incorrect medical information. The organization also needs to avoid the substantial time and expense of retraining models.\n\nWhich TWO characteristics of RAG directly address this healthcare organization's requirements? (Select TWO)",
+      "question": "A healthcare provider is building an AI system to help clinicians access evidence-based medical guidelines and research. The system needs to stay current with the latest clinical guidelines, ensure information is traceable to authoritative medical sources, and reduce hallucinations where the AI might generate incorrect medical information. The organization also needs to avoid the substantial time and expense of retraining models.\n\nWhich TWO characteristics of RAG directly address this healthcare organization's requirements?",
       "choices": [
         {
           "id": "c1",
@@ -1119,7 +1119,7 @@
     {
       "id": "AIF-C01-0025",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1181,7 +1181,7 @@
     {
       "id": "AIF-C01-0026",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -1222,7 +1222,7 @@
     {
       "id": "AIF-C01-0027",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -1263,7 +1263,7 @@
     {
       "id": "AIF-C01-0028",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -1304,7 +1304,7 @@
     {
       "id": "AIF-C01-0029",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management.html",
       "format": "text",
       "services": [
         "Amazon Bedrock",
@@ -1313,7 +1313,7 @@
       "skills": [
         "3.2.2: Understanding techniques for prompt engineering (for example, chain-of-thought, zero-shot, single-shot, few-shot, prompt templates)."
       ],
-      "question": "A machine learning team is deploying an AI system to handle customer service inquiries. They need a scalable approach that can be reused across different customer service scenarios without requiring many examples or complex reasoning breakdowns. The system should follow a consistent output format.\n\nWhich TWO prompt engineering techniques would best support the team's requirements for scalability and consistency? (Select TWO)",
+      "question": "A machine learning team is deploying an AI system to handle customer service inquiries. They need a scalable approach that can be reused across different customer service scenarios without requiring many examples or complex reasoning breakdowns. The system should follow a consistent output format.\n\nWhich TWO prompt engineering techniques would best support the team's requirements for scalability and consistency?",
       "choices": [
         {
           "id": "c1",
@@ -1353,7 +1353,7 @@
     {
       "id": "AIF-C01-0030",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1415,7 +1415,7 @@
     {
       "id": "AIF-C01-0031",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -1456,7 +1456,7 @@
     {
       "id": "AIF-C01-0032",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -1497,7 +1497,7 @@
     {
       "id": "AIF-C01-0033",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html",
       "format": "text",
       "services": [
         "Amazon Bedrock"
@@ -1538,7 +1538,7 @@
     {
       "id": "AIF-C01-0034",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html",
       "format": "text",
       "services": [
         "Amazon Bedrock",
@@ -1547,7 +1547,7 @@
       "skills": [
         "3.3.1: Describing the key elements of training a foundation model (for example, pre-training, fine-tuning, continuous pre-training)."
       ],
-      "question": "An AI research team is planning the complete training lifecycle for a new specialized AI system for financial analysis. The team needs to build a robust foundation with general knowledge, adapt it for financial terminology and analysis, and keep it current as new financial instruments and regulations emerge. They must do all this while managing computational resources efficiently.\n\nWhich TWO training elements are essential for the team's comprehensive training strategy? (Select TWO)",
+      "question": "An AI research team is planning the complete training lifecycle for a new specialized AI system for financial analysis. The team needs to build a robust foundation with general knowledge, adapt it for financial terminology and analysis, and keep it current as new financial instruments and regulations emerge. They must do all this while managing computational resources efficiently.\n\nWhich TWO training elements are essential for the team's comprehensive training strategy?",
       "choices": [
         {
           "id": "c1",
@@ -1587,7 +1587,7 @@
     {
       "id": "AIF-C01-0035",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/bedrock/",
+      "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1644,7 +1644,7 @@
     {
       "id": "AIF-C01-0036",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-fairness-and-explainability.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1685,7 +1685,7 @@
     {
       "id": "AIF-C01-0037",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1726,7 +1726,7 @@
     {
       "id": "AIF-C01-0038",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-detect-post-training-bias.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1767,7 +1767,7 @@
     {
       "id": "AIF-C01-0039",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1775,7 +1775,7 @@
       "skills": [
         "4.1.1: Identifying features of responsible AI (for example, bias, fairness, inclusivity, robustness, safety, veracity)."
       ],
-      "question": "An autonomous vehicle AI system is being developed with multiple responsible AI considerations. The system must accurately perceive objects regardless of lighting conditions or weather, treat all pedestrians equitably regardless of age or appearance, ensure information about vehicle status is truthful and verifiable, and actively prevent harm to all occupants and pedestrians.\n\nWhich TWO responsible AI features are essential for this autonomous vehicle system? (Select TWO)",
+      "question": "An autonomous vehicle AI system is being developed with multiple responsible AI considerations. The system must accurately perceive objects regardless of lighting conditions or weather, treat all pedestrians equitably regardless of age or appearance, ensure information about vehicle status is truthful and verifiable, and actively prevent harm to all occupants and pedestrians.\n\nWhich TWO responsible AI features are essential for this autonomous vehicle system?",
       "choices": [
         {
           "id": "c1",
@@ -1815,7 +1815,7 @@
     {
       "id": "AIF-C01-0040",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-fairness-and-explainability.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1877,7 +1877,7 @@
     {
       "id": "AIF-C01-0041",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-explainability.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1918,7 +1918,7 @@
     {
       "id": "AIF-C01-0042",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-explainability.html",
       "format": "text",
       "services": [
         "AWS"
@@ -1959,7 +1959,7 @@
     {
       "id": "AIF-C01-0043",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-explainability.html",
       "format": "text",
       "services": [
         "AWS"
@@ -2000,7 +2000,7 @@
     {
       "id": "AIF-C01-0044",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
       "format": "text",
       "services": [
         "AWS"
@@ -2008,7 +2008,7 @@
       "skills": [
         "4.2.3: Identifying tradeoffs between model safety and transparency (for example, measure interpretability and performance)."
       ],
-      "question": "A social media company is deploying an AI system to moderate harmful content at scale. The system must handle millions of decisions daily with very high accuracy to prevent harmful content while minimizing false positives. However, the company also faces pressure to explain moderation decisions to users. The organization must understand the fundamental tradeoff it faces.\n\nWhich TWO aspects best describe the responsible AI tradeoff the company must navigate? (Select TWO)",
+      "question": "A social media company is deploying an AI system to moderate harmful content at scale. The system must handle millions of decisions daily with very high accuracy to prevent harmful content while minimizing false positives. However, the company also faces pressure to explain moderation decisions to users. The organization must understand the fundamental tradeoff it faces.\n\nWhich TWO aspects best describe the responsible AI tradeoff the company must navigate?",
       "choices": [
         {
           "id": "c1",
@@ -2048,7 +2048,7 @@
     {
       "id": "AIF-C01-0045",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-explainability.html",
       "format": "text",
       "services": [
         "AWS"
@@ -2100,7 +2100,7 @@
     {
       "id": "AIF-C01-0046",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/audit-manager/latest/userguide/soc2.html",
       "format": "text",
       "services": [
         "AWS"
@@ -2141,7 +2141,7 @@
     {
       "id": "AIF-C01-0047",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/audit-manager/latest/userguide/what-is.html",
       "format": "text",
       "services": [
         "AWS"
@@ -2182,7 +2182,7 @@
     {
       "id": "AIF-C01-0048",
       "type": "single-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/audit-manager/latest/userguide/ISO-27001.html",
       "format": "text",
       "services": [
         "AWS"
@@ -2223,7 +2223,7 @@
     {
       "id": "AIF-C01-0049",
       "type": "multiple-choice",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/audit-manager/latest/userguide/ISO-27001.html",
       "format": "text",
       "services": [
         "AWS"
@@ -2231,7 +2231,7 @@
       "skills": [
         "5.2.1: Identifying regulatory compliance standards for AI systems (for example, International Organization for Standardization [ISO], System and Organization Controls [SOC], algorithm accountability laws)."
       ],
-      "question": "A large financial services company is building an AI-powered lending platform that operates across multiple countries. The company must address multiple regulatory requirements: establishing control frameworks for data security and processing integrity, demonstrating accountability for lending decisions, and ensuring compliance with internationally recognized AI quality standards.\n\nWhich TWO compliance frameworks should the company prioritize implementing? (Select TWO)",
+      "question": "A large financial services company is building an AI-powered lending platform that operates across multiple countries. The company must address multiple regulatory requirements: establishing control frameworks for data security and processing integrity, demonstrating accountability for lending decisions, and ensuring compliance with internationally recognized AI quality standards.\n\nWhich TWO compliance frameworks should the company prioritize implementing?",
       "choices": [
         {
           "id": "c1",
@@ -2271,7 +2271,7 @@
     {
       "id": "AIF-C01-0050",
       "type": "matching",
-      "docs": "https://docs.aws.amazon.com/",
+      "docs": "https://docs.aws.amazon.com/audit-manager/latest/userguide/what-is.html",
       "format": "text",
       "services": [
         "AWS"
