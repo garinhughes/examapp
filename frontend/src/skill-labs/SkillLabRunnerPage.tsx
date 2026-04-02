@@ -1,4 +1,5 @@
 import { useState, useEffect, Suspense, lazy, ComponentType } from 'react'
+import Loader from '@/components/Loader'
 import { apiUrl } from '@/apiBase'
 import { useExam } from '@/exam/ExamContext'
 import type { LabDefinition, SkillLabType } from './types'
@@ -61,7 +62,7 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
     return () => { cancelled = true }
   }, [labId])
 
-  if (loading) return <div className="text-muted-foreground p-4">Loading lab…</div>
+  if (loading) return <Loader text="Loading lab…" />
   if (error || !lab) return (
     <div className="flex flex-col items-start gap-3 p-4">
       <p className="text-destructive">{error || 'Lab not found'}</p>
@@ -83,7 +84,7 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
   const LazyRunner = lazy(importer)
 
   return (
-    <Suspense fallback={<div className="text-muted-foreground p-4">Loading runner…</div>}>
+    <Suspense fallback={<Loader text="Loading runner…" />}>
       <LazyRunner lab={lab} timed={timed} />
     </Suspense>
   )

@@ -8,6 +8,7 @@ import { TourBubble } from '@/components/TourBubble'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PageMeta } from '@/components/PageMeta'
 import { CookieConsent } from '@/components/CookieConsent'
+import Loader from '@/components/Loader'
 import { useRouteSync } from '@/hooks/useRouteSync'
 import AccountPage from '../components/AccountPage'
 import Leaderboard from '../components/Leaderboard'
@@ -469,7 +470,7 @@ function ExamAppInner() {
                     ))}
                   </ul>
                 ) : (
-                  <div className="text-sm text-muted-foreground">Loading…</div>
+                  <Loader />
                 )}
               </div>
             )}

@@ -514,6 +514,107 @@ resource "aws_ecs_service" "backend" {
   tags = { Project = var.project }
 }
 
+# ---------- SNS topic for scaling notifications ----------
+resource "aws_sns_topic" "scaling_alerts" {
+  name = "${var.project}-ecs-scaling-alerts"
+  tags = { Project = var.project }
+}
+
+resource "aws_sns_topic_subscription" "scaling_email" {
+  topic_arn = aws_sns_topic.scaling_alerts.arn
+  protocol  = "email"
+  endpoint  = "certshack@gmail.com"
+}
+
+# ---------- Application Auto Scaling ----------
+resource "aws_appautoscaling_target" "ecs_backend" {
+  max_capacity       = 5
+  min_capacity       = 1
+  resource_id        = "service/${aws_ecs_cluster.this.name}/${aws_ecs_service.backend.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "scale_out" {
+  name               = "${var.project}-ecs-scale-out"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.ecs_backend.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_backend.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_backend.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Average"
+
+    step_adjustment {
+      metric_interval_lower_bound = 0
+      scaling_adjustment          = 1
+    }
+  }
+}
+
+resource "aws_appautoscaling_policy" "scale_in" {
+  name               = "${var.project}-ecs-scale-in"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.ecs_backend.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_backend.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_backend.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 300
+    metric_aggregation_type = "Average"
+
+    step_adjustment {
+      metric_interval_upper_bound = 0
+      scaling_adjustment          = -1
+    }
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu_high" {
+  alarm_name          = "${var.project}-ecs-cpu-high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 70
+  alarm_description   = "ECS CPU >= 70% for 1 minute — scale out"
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    ClusterName = aws_ecs_cluster.this.name
+    ServiceName = aws_ecs_service.backend.name
+  }
+
+  alarm_actions = [aws_appautoscaling_policy.scale_out.arn, aws_sns_topic.scaling_alerts.arn]
+  tags          = { Project = var.project }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu_low" {
+  alarm_name          = "${var.project}-ecs-cpu-low"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = 5
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 30
+  alarm_description   = "ECS CPU <= 30% sustained — scale in"
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    ClusterName = aws_ecs_cluster.this.name
+    ServiceName = aws_ecs_service.backend.name
+  }
+
+  alarm_actions = [aws_appautoscaling_policy.scale_in.arn, aws_sns_topic.scaling_alerts.arn]
+  tags          = { Project = var.project }
+}
+
 # ---------- outputs ----------
 output "cluster_arn" {
   value = aws_ecs_cluster.this.arn

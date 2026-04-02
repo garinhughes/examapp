@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import Loader from '@/components/Loader'
 import { useExam } from '@/exam/ExamContext'
 import { Play, Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight, X } from 'lucide-react'
 import { clarityEvent, clarityTag } from '@/clarity'
@@ -182,7 +183,7 @@ export function SkillLabsPage() {
     setSearchQuery('')
   }
 
-  if (loading) return <div className="text-muted-foreground">Loading skill labs…</div>
+  if (loading) return <Loader text="Loading skill labs…" />
   if (error) return <div className="text-destructive">{error}</div>
 
   return (
