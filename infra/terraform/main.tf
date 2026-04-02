@@ -168,6 +168,7 @@ module "ecs" {
   cognito_user_pool_id  = "eu-west-1_c6WQUP1RX"
   cognito_redirect_uri  = "https://api.certshack.com/auth/token"
   frontend_origin       = "https://certshack.com"
+  backend_origin        = "https://api.certshack.com"
   # Wire in the certshack-managed secrets (created in secretsmanager module)
   cognito_client_secret_arn = module.secretsmanager.cognito_client_secret_arn
 

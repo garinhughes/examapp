@@ -8,6 +8,7 @@ const FROM = wrapName(process.env.SES_FROM_ADDRESS || 'noreply@certshack.com')
 const OUTREACH = wrapName(process.env.SES_OUTREACH_ADDRESS || 'outreach@certshack.com')
 const TO = process.env.SES_SUPPORT_ADDRESS || 'support@certshack.com'
 const FRONTEND = process.env.FRONTEND_ORIGIN || 'https://certshack.com'
+const BACKEND = process.env.BACKEND_ORIGIN || 'https://api.certshack.com'
 
 // ── Shared HTML helpers ────────────────────────────────────────────────────
 
@@ -39,7 +40,7 @@ async function renderEmail(opts: {
   const unsubLine = opts.userId && opts.isMarketing
     ? `<p style="margin:0 0 8px;font-size:12px;color:#999;">
         Don't want these emails?
-        <a href="${FRONTEND}/api/unsubscribe?token={{unsubToken}}" style="color:#999;">Unsubscribe</a>
+        <a href="${BACKEND}/unsubscribe?token={{unsubToken}}" style="color:#999;">Unsubscribe</a>
       </p>`
     : ''
 
@@ -61,10 +62,10 @@ async function renderEmail(opts: {
             <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
               <tr>
                 <td style="padding:0 12px 0 0;vertical-align:middle;">
-                  <img src="${LOGO_URL}" alt="CertShack" height="36" style="display:block;">
+                  <img src="${LOGO_URL}" alt="certshack" height="36" style="display:block;">
                 </td>
                 <td style="vertical-align:middle;">
-                  <span style="font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:0.5px;">CertShack</span>
+                  <span style="font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:0.5px;">certshack</span>
                 </td>
               </tr>
             </table>
@@ -147,7 +148,7 @@ async function sendHtml(opts: {
  */
 export async function sendWelcomeEmail(params: { to: string; name: string; userId: string }): Promise<void> {
   const stored = await getTemplate('welcome')
-  let subject = stored?.subject || 'Welcome to CertShack!'
+  let subject = stored?.subject || 'Welcome aboard!'
   let bodyHtml: string
   const vars = { name: params.name || 'there', frontendUrl: FRONTEND }
 
@@ -157,8 +158,8 @@ export async function sendWelcomeEmail(params: { to: string; name: string; userI
   } else {
     bodyHtml = `
       <p style="font-size:16px;color:#333;">Hi ${vars.name},</p>
-      <p style="color:#555;">Welcome to CertShack — where cloud pros sharpen their certification skills.</p>
-      <p style="color:#555;">Start your first practice exam and see where you stand.</p>
+      <p style="color:#555;">Welcome to certshack - where professionals sharpen their skills.</p>
+      <p style="color:#555;">Start your first practice exam or skill lab and see where you stand.</p>
       <p style="margin:32px 0;">
         <a href="${FRONTEND}" style="background:${BRAND};color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:bold;">
           Start learning
@@ -167,7 +168,7 @@ export async function sendWelcomeEmail(params: { to: string; name: string; userI
       <p style="color:#999;font-size:13px;">If you didn't create this account, you can safely ignore this email.</p>`
   }
 
-  const { html, text } = await renderEmail({ title: 'Welcome to CertShack!', body: bodyHtml })
+  const { html, text } = await renderEmail({ title: 'Welcome to certshack!', body: bodyHtml })
   await sendHtml({ from: FROM, to: params.to, subject, html, text })
 }
 
@@ -183,7 +184,7 @@ export async function sendPaymentConfirmedEmail(params: {
   source: 'stripe' | 'paypal'
 }): Promise<void> {
   const stored = await getTemplate('payment-confirmed')
-  let subject = stored?.subject || 'Your CertShack order is confirmed'
+  let subject = stored?.subject || 'Your certshack order is confirmed'
   const vars = { name: params.name || 'there', frontendUrl: FRONTEND }
   let bodyHtml: string
 
@@ -205,7 +206,7 @@ export async function sendPaymentConfirmedEmail(params: {
 
     bodyHtml = `
       <p style="font-size:16px;color:#333;">Hi ${vars.name},</p>
-      <p style="color:#555;">Thanks for your purchase — your access is now active.</p>
+      <p style="color:#555;">Thanks for your purchase - your access is now active.</p>
       <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
         <tr>
           <th style="text-align:left;padding:8px 0;border-bottom:2px solid #FF6B35;color:#333;">Item</th>
@@ -242,7 +243,7 @@ export async function sendExpiryReminderEmail(params: {
   daysLeft: number
 }): Promise<void> {
   const stored = await getTemplate('expiry-reminder')
-  let subject = stored?.subject || `Your CertShack access expires in ${params.daysLeft} day${params.daysLeft === 1 ? '' : 's'}`
+  let subject = stored?.subject || `Your certshack access expires in ${params.daysLeft} day${params.daysLeft === 1 ? '' : 's'}`
   const vars = { name: params.name || 'there', frontendUrl: FRONTEND, daysLeft: String(params.daysLeft), productLabel: params.productLabel }
   let bodyHtml: string
 

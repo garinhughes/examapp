@@ -277,7 +277,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
                 })
                 const totalPence = products.reduce((s, p) => s + p.priceGBP, 0)
                 sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId, products, totalPence, source: 'stripe' })
-                  .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'stripe-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your CertShack order is confirmed', filters: { productIds } }))
+                  .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'stripe-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your certshack order is confirmed', filters: { productIds } }))
                   .catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] payment confirmed email failed'))
               }
             } catch (e: any) {

@@ -32,7 +32,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
         await setEmailOptIn(payload.sub, false)
         server.log.info({ userId: payload.sub }, '[unsubscribe] user opted out')
-        return reply.send(unsubPage('Unsubscribed', "You've been removed from CertShack marketing emails. You'll still receive important account notifications."))
+        return reply.send(unsubPage('Unsubscribed', "You've been removed from certshack marketing emails. You'll still receive important account notifications."))
       } catch (err: any) {
         server.log.warn({ err: err.message }, '[unsubscribe] token verification failed')
         return reply.status(400).send(unsubPage('Link expired', 'This unsubscribe link has expired. Log in to manage your email preferences.'))
@@ -47,7 +47,7 @@ function unsubPage(heading: string, message: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>${heading} — CertShack</title>
+  <title>${heading} — certshack</title>
   <style>
     body { margin:0; padding:0; background:#f4f4f4; font-family:Arial,sans-serif; }
     .wrap { max-width:560px; margin:80px auto; background:#fff; border-radius:8px; overflow:hidden; }
@@ -60,11 +60,11 @@ function unsubPage(heading: string, message: string): string {
 </head>
 <body>
   <div class="wrap">
-    <div class="bar"><h1>CertShack</h1></div>
+    <div class="bar"><h1>certshack</h1></div>
     <div class="body">
       <h2 style="color:#222;margin-top:0;">${heading}</h2>
       <p>${message}</p>
-      <p><a href="${process.env.FRONTEND_ORIGIN || 'https://certshack.com'}">Return to CertShack</a></p>
+      <p><a href="${process.env.FRONTEND_ORIGIN || 'https://certshack.com'}">Return to certshack</a></p>
     </div>
   </div>
 </body>

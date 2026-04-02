@@ -99,7 +99,7 @@ async function _grantFromSession(
       })
       const totalPence = products.reduce((s: number, p: { priceGBP: number }) => s + p.priceGBP, 0)
       sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId: sess.userId, products, totalPence, source: 'paypal' })
-        .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'paypal-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your CertShack order is confirmed', filters: { productIds: sess.productIds } }))
+        .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'paypal-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your certshack order is confirmed', filters: { productIds: sess.productIds } }))
         .catch((e: any) => server.log.warn({ err: e?.message }, '[paypal] payment confirmed email failed'))
     }
   } catch (e: any) {
@@ -148,7 +148,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           payment_source: {
             paypal: {
               experience_context: {
-                brand_name: 'CertShack',
+                brand_name: 'certshack',
                 landing_page: 'NO_PREFERENCE',
                 shipping_preference: 'NO_SHIPPING',
                 user_action: 'PAY_NOW',
@@ -219,7 +219,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         body: JSON.stringify({
           plan_id: planId,
           application_context: {
-            brand_name: 'CertShack',
+            brand_name: 'certshack',
             shipping_preference: 'NO_SHIPPING',
             user_action: 'SUBSCRIBE_NOW',
             return_url: 'https://certshack.com/?payment=success',

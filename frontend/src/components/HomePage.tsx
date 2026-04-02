@@ -119,10 +119,10 @@ export function HomePage() {
       {/* ── Hero ──────────────────────────────────────────────── */}
       <section className="text-center py-3 md:py-6">
         <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 text-primary">
-          Train with Intent. Certify with Confidence.
+          Train with intent. Certify with confidence.
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-          Practice exams and hands-on skill labs for AWS, Azure, GCP and more.
+          Practice exams and hands-on skill labs for AWS, Azure, GCP and more.<br />
           Build real-world skills, not just exam knowledge.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -165,9 +165,9 @@ export function HomePage() {
                 'Various modes: Timed, Casual and Weakest Link',
                 'Analytics suite with history, explanations and images',
                 'Single, multiple-choice, ordering & matching question types',
-                'Filter by domain or keyword to target specific areas',
+                'Optional toggles like text-to-speech audio and focus mode',
                 'Save & Resume exams - pick up exactly where you left off',
-                'Optional toggles like text-to-speech audio and focus mode'
+                'Filter by domain or keyword to target specific areas',
               ].map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
@@ -197,13 +197,13 @@ export function HomePage() {
             </p>
             <ul className="space-y-3 mb-6">
                 {[
-                'Simulated CLI terminals for hands-on command practice',
-                'Policy troubleshooting labs with a live code editor',
-                'Architecture diagnosis with interactive system diagrams',
-                'Timed challenges to sharpen troubleshooting speed',
                 'Scenario-based tasks aligned to real job responsibilities',
+                'Various modes: Timed & Casual',
+                'Simulated CLI terminals for hands-on command practice',
+                'JSON & YAML code editor',
+                'Design or fix architectures using interactive diagrams',
                 'Save & Resume labs - grab a coffee without losing progress',
-                'Filter by difficulty, platform, category and technology'
+                'Filter by difficulty, platform, category and technology',
                 ].map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
