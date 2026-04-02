@@ -51,7 +51,7 @@ await server.register(cors, {
 
 await server.register(rateLimit, {
   global: true,
-  max: 100,
+  max: parseInt(process.env.RATE_LIMIT_MAX ?? '100'),
   timeWindow: '1 minute',
   keyGenerator: (req) => req.ip,
 })
