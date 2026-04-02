@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
+import { randomUUID } from 'crypto'
 import { getUserBySub, listUsers, recordAdminAudit, updateUserFields, listIssueReports, resolveIssueReport, countNewIssueReports } from '../services/dynamo.js'
 import { previewErasure, dryRunErasure, executeErasure } from '../services/erasureService.js'
 import { sendErasureReceiptEmail } from '../services/ses.js'
@@ -10,6 +11,7 @@ import { getUserEntitlements, adminGrantEntitlement, revokeEntitlement, findUser
 import { PRODUCTS } from '../catalog.js'
 import { loadAllExams } from '../examLoader.js'
 import { listCognitoUsers, getCognitoUser, deleteCognitoUser, resendUserConfirmation } from '../services/cognitoAdmin.js'
+import { getCarouselSlides, saveCarouselSlides, getUploadPresignedUrl } from '../services/carouselStore.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Require auth and admin flag
@@ -490,6 +492,65 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err: any) {
       request.log?.error?.({ err: err.message }, 'resendUserConfirmation failed')
       return reply.code(502).send({ message: 'Failed to resend confirmation', detail: err.message })
+    }
+  })
+
+  /* ------------------------------------------------------------------ */
+  /*  Carousel management                                                */
+  /* ------------------------------------------------------------------ */
+
+  // GET /admin/carousel — list slides
+  server.get('/carousel', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (_request, reply) => {
+    try {
+      const slides = await getCarouselSlides()
+      return { slides }
+    } catch (err: any) {
+      return reply.code(502).send({ message: 'Failed to load carousel config', detail: err.message })
+    }
+  })
+
+  // PUT /admin/carousel — save full slides config
+  server.put('/carousel', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const body = request.body as any
+    if (!Array.isArray(body?.slides)) return reply.code(400).send({ message: 'slides array required' })
+    for (const s of body.slides) {
+      if (!s.id || typeof s.key !== 'string' || typeof s.alt !== 'string' || typeof s.order !== 'number') {
+        return reply.code(400).send({ message: 'each slide requires id, key (string), alt (string), order (number)' })
+      }
+      if (!s.key.startsWith('carousel/') || s.key.includes('..') || /[\x00-\x1f]/.test(s.key)) {
+        return reply.code(400).send({ message: `invalid key: ${s.key}` })
+      }
+    }
+    try {
+      await saveCarouselSlides(body.slides)
+      await recordAdminAudit((request.user as any).sub, 'carousel', 'update_carousel', { count: body.slides.length })
+      return { ok: true }
+    } catch (err: any) {
+      return reply.code(502).send({ message: 'Failed to save carousel config', detail: err.message })
+    }
+  })
+
+  // POST /admin/carousel/upload-url — presigned PUT URL for direct S3 upload
+  server.post('/carousel/upload-url', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const body = request.body as any
+    const filename = body?.filename
+    if (!filename || typeof filename !== 'string') {
+      return reply.code(400).send({ message: 'filename required' })
+    }
+    const ext = filename.split('.').pop()?.toLowerCase()
+    if (!ext || !['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
+      return reply.code(400).send({ message: 'image files only (jpg, jpeg, png, webp, gif)' })
+    }
+    if (!/^[\w\-. ]+$/.test(filename)) {
+      return reply.code(400).send({ message: 'invalid filename' })
+    }
+    const id = randomUUID()
+    const key = `carousel/${id}.${ext}`
+    try {
+      const uploadUrl = await getUploadPresignedUrl(key)
+      return { uploadUrl, key, id }
+    } catch (err: any) {
+      return reply.code(502).send({ message: 'Failed to generate upload URL', detail: err.message })
     }
   })
 }

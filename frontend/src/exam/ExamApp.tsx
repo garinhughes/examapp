@@ -32,6 +32,7 @@ import { QuestionNav } from './QuestionNav'
 import { QuestionCard } from './QuestionCard'
 import { Modals } from './Modals'
 import Footer from '@/components/Footer'
+import { HomePage } from '@/components/HomePage'
 import PrivacyPolicy from '@/components/PrivacyPolicy'
 import TermsOfService from '@/components/TermsOfService'
 import RefundPolicy from '@/components/RefundPolicy'
@@ -256,7 +257,7 @@ function ExamAppInner() {
                   </div>
                   <div>
                     <div className="font-semibold text-foreground">Exam in progress</div>
-                    <div className="text-sm text-muted-foreground">{anySavedExam.title} — {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
+                    <div className="text-sm text-muted-foreground">{anySavedExam.title} - {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
                   </div>
                 </div>
                 <div>
@@ -271,63 +272,15 @@ function ExamAppInner() {
               </div>
             )}
 
-            {/* Homepage hero when no exam selected */}
-            {route === 'home' && !selected && (
-              <div className="mb-8 p-8 rounded-lg bg-card border border-border shadow-sm">
-                <div className="max-w-4xl mx-auto text-center">
-                  <h2 className="text-3xl sm:text-3xl font-extrabold mb-3">Train with intent. Certify with confidence.</h2>
-                  <p className="text-muted-foreground mb-6">Timed or casual practice exams, focused by domain, with per-question explanations and analytics to help you improve.</p>
-
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-                    <button onClick={() => navigate('/exams')} className="px-4 py-2 rounded bg-primary text-white text-sm font-medium inline-flex items-center gap-2"><BookOpen className="w-4 h-4" />Browse Practice Exams</button>
-                    <button onClick={() => navigate('/skill-labs')} className="px-4 py-2 rounded border border-primary text-primary text-sm font-medium bg-primary/5 inline-flex items-center gap-2"><Terminal className="w-4 h-4" />Browse Skill Labs</button>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 text-left">
-                    <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Timed & Casual</div>
-                      <div className="text-sm text-muted-foreground">Practice under exam-like conditions or take a relaxed walkthrough.</div>
-                    </div>
-                    <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Skill Labs</div>
-                      <div className="text-sm text-muted-foreground">Hands-on simulations: interactive labs to practice real-world tasks.</div>
-                    </div>
-                    <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Review & Insights</div>
-                      <div className="text-sm text-muted-foreground">View per-domain scores and detailed explanations after each attempt.</div>
-                    </div>
-                    <button onClick={() => setRoute('account')} className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent hover:border-primary transition-colors text-left">
-                      <div className="font-semibold mb-1"><span className="text-primary">//</span> Leaderboard</div>
-                      <div className="text-sm text-muted-foreground">Compete with fellow learners and climb the ranks.</div>
-                    </button>
-                  </div>
-
-                  
-                </div>
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Domain Focus</div>
-                    <div className="text-sm text-muted-foreground">Choose specific domains to drill into weaker areas.</div>
-                  </div>
-                  <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Question Filtering</div>
-                    <div className="text-sm text-muted-foreground">Filter question sets by keywords.</div>
-                  </div>
-                  <div className="p-4 rounded-lg bg-muted/50 dark:bg-card/5 border border-border/60 dark:border-transparent">
-                    <div className="font-semibold mb-1"><span className="text-primary">//</span> Question Types</div>
-                    <div className="text-sm text-muted-foreground">Single, multiple choice, ordering (drag-and-drop) & matching questions.</div>
-                  </div>
-                </div>
-                <PollWidget />
-              </div>
-            )}
+            {/* Homepage when no exam selected */}
+            {route === 'home' && !selected && <HomePage />}
 
             {/* ExamHeader bar */}
             {route === 'home' && selected ? (
               <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <h2 className="text-lg font-semibold">Questions</h2>
                 <div className="flex min-w-0 flex-1 flex-col gap-2 lg:items-end">
-                  <div className="text-sm text-muted-foreground break-words lg:text-right">{selected}{selectedMeta?.title ? ` — ${selectedMeta.title}` : ''}</div>
+                  <div className="text-sm text-muted-foreground break-words lg:text-right">{selected}{selectedMeta?.title ? ` - ${selectedMeta.title}` : ''}</div>
                   <div className="flex flex-col items-stretch gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
                     {/* Focus Mode: own centered row on mobile, inline on desktop */}
                     {examStarted && !isFinished && (

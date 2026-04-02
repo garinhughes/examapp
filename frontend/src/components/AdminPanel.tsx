@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { useAuthFetch } from '../auth/useAuthFetch'
+import { apiUrl } from '@/apiBase'
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -1402,6 +1403,257 @@ function ErasurePanel({
   )
 }
 
+/* ------------------------------------------------------------------ */
+/*  Sub-component: Carousel Management Panel                          */
+/* ------------------------------------------------------------------ */
+
+interface CarouselSlide {
+  id: string
+  key: string
+  alt: string
+  order: number
+}
+
+function SlideThumb({ imageKey }: { imageKey: string }) {
+  const [src, setSrc] = useState<string | null>(null)
+  useEffect(() => {
+    fetch(apiUrl(`/images/presigned?key=${encodeURIComponent(imageKey)}`))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.url && setSrc(d.url))
+      .catch(() => {})
+  }, [imageKey])
+  if (!src) return <div className="w-20 h-14 rounded bg-muted animate-pulse shrink-0" />
+  return <img src={src} alt="" className="w-20 h-14 object-cover rounded shrink-0" />
+}
+
+function CarouselPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> }) {
+  const [open, setOpen] = useState(false)
+  const [slides, setSlides] = useState<CarouselSlide[]>([])
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+
+  // New slide form state
+  const [newAlt, setNewAlt] = useState('')
+  const [newOrder, setNewOrder] = useState(0)
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setErr(null)
+    try {
+      const res = await authFetch('/admin/carousel')
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Load failed')
+      setSlides(Array.isArray(data.slides) ? data.slides : [])
+      setNewOrder((data.slides?.length ?? 0) + 1)
+    } catch (e: any) {
+      setErr(e?.message ?? 'Failed to load carousel')
+    } finally {
+      setLoading(false)
+    }
+  }, [authFetch])
+
+  useEffect(() => {
+    if (open) load()
+  }, [open, load])
+
+  async function save(updated: CarouselSlide[]) {
+    setSaving(true)
+    setErr(null)
+    setSuccess(false)
+    try {
+      const res = await authFetch('/admin/carousel', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slides: updated }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Save failed')
+      setSlides(updated)
+      setSuccess(true)
+      setTimeout(() => setSuccess(false), 3000)
+    } catch (e: any) {
+      setErr(e?.message ?? 'Save failed')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function updateSlide(id: string, field: 'alt' | 'order', value: string | number) {
+    setSlides((prev) => prev.map((s) => s.id === id ? { ...s, [field]: value } : s))
+  }
+
+  function deleteSlide(id: string) {
+    setSlides((prev) => prev.filter((s) => s.id !== id))
+  }
+
+  async function addSlide() {
+    const file = fileRef.current?.files?.[0]
+    if (!file) { setErr('Pick an image file first'); return }
+    if (!newAlt.trim()) { setErr('Alt text is required'); return }
+    setUploading(true)
+    setErr(null)
+    try {
+      // Get presigned PUT URL
+      const urlRes = await authFetch('/admin/carousel/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name }),
+      })
+      const urlData = await urlRes.json()
+      if (!urlRes.ok) throw new Error(urlData.message || 'Failed to get upload URL')
+
+      // Upload directly to S3
+      const uploadRes = await fetch(urlData.uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+      })
+      if (!uploadRes.ok) throw new Error(`S3 upload failed (${uploadRes.status}) - check bucket CORS`)
+
+      const newSlide: CarouselSlide = {
+        id: urlData.id,
+        key: urlData.key,
+        alt: newAlt.trim(),
+        order: newOrder,
+      }
+      const updated = [...slides, newSlide].sort((a, b) => a.order - b.order)
+      setNewAlt('')
+      setNewOrder(updated.length + 1)
+      if (fileRef.current) fileRef.current.value = ''
+      await save(updated)
+    } catch (e: any) {
+      setErr(e?.message ?? 'Upload failed')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div className="rounded-lg border border-border overflow-hidden">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-muted text-sm font-semibold hover:bg-muted/80 transition-colors"
+      >
+        <span>Carousel Management</span>
+        <span className="text-muted-foreground text-xs">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {open && (
+        <div className="p-4 space-y-4">
+          {err && (
+            <div className="p-3 rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
+              {err}
+              <button onClick={() => setErr(null)} className="ml-2 underline text-xs">dismiss</button>
+            </div>
+          )}
+          {success && (
+            <div className="p-3 rounded bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-600 dark:text-emerald-400">
+              Carousel saved.
+            </div>
+          )}
+
+          {loading ? (
+            <p className="text-sm text-muted-foreground">Loading...</p>
+          ) : (
+            <>
+              {/* Slide list */}
+              {slides.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No slides yet. Add one below.</p>
+              ) : (
+                <div className="space-y-2">
+                  {slides.map((slide) => (
+                    <div key={slide.id} className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card">
+                      <SlideThumb imageKey={slide.key} />
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs text-muted-foreground w-10 shrink-0">Alt</label>
+                          <input
+                            type="text"
+                            value={slide.alt}
+                            onChange={(e) => updateSlide(slide.id, 'alt', e.target.value)}
+                            className="flex-1 px-2 py-1 rounded border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs text-muted-foreground w-10 shrink-0">Order</label>
+                          <input
+                            type="number"
+                            value={slide.order}
+                            onChange={(e) => updateSlide(slide.id, 'order', Number(e.target.value))}
+                            className="w-20 px-2 py-1 rounded border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                          />
+                          <span className="text-xs text-muted-foreground truncate hidden sm:block">{slide.key}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => deleteSlide(slide.id)}
+                        className="px-2 py-1 rounded text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors shrink-0"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add new slide */}
+              <div className="p-3 rounded-lg border border-dashed border-border space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Add slide</p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    className="text-sm file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Alt / caption text"
+                    value={newAlt}
+                    onChange={(e) => setNewAlt(e.target.value)}
+                    className="flex-1 px-2 py-1.5 rounded border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Order"
+                    value={newOrder}
+                    onChange={(e) => setNewOrder(Number(e.target.value))}
+                    className="w-20 px-2 py-1.5 rounded border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                </div>
+                <button
+                  onClick={addSlide}
+                  disabled={uploading}
+                  className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                >
+                  {uploading ? 'Uploading...' : 'Upload & Add'}
+                </button>
+              </div>
+
+              {/* Save */}
+              <div className="flex justify-end">
+                <button
+                  onClick={() => save(slides)}
+                  disabled={saving}
+                  className="px-4 py-2 rounded-lg bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-400 disabled:opacity-50 transition-colors"
+                >
+                  {saving ? 'Saving...' : 'Save changes'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AdminPanel() {
   const authFetch = useAuthFetch()
   const [users, setUsers] = useState<UserRecord[]>([])
@@ -1535,6 +1787,7 @@ export default function AdminPanel() {
       <BulkMigratePanel authFetch={authFetch} />
       <CognitoUsersPanel authFetch={authFetch} />
       <ErasurePanel authFetch={authFetch} users={users} />
+      <CarouselPanel authFetch={authFetch} />
 
       {/* Toolbar: search + filters */}
       <div className="flex flex-wrap items-center gap-2">
