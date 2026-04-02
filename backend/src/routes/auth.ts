@@ -9,7 +9,8 @@
 import { createHmac } from 'crypto'
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { jwtVerify, createRemoteJWKSet, decodeProtectedHeader } from 'jose'
-import { upsertUserFromCognito, getUserBySub, setRegisteredAtIfNew, updateUserFields } from '../services/dynamo.js'
+import { upsertUserFromCognito, getUserBySub, setRegisteredAtIfNew, updateUserFields, setEmailOptIn, setWelcomeEmailSent } from '../services/dynamo.js'
+import { sendWelcomeEmail } from '../services/ses.js'
 import { TIERS } from '../catalog.js'
 import {
   CognitoIdentityProviderClient,
@@ -43,6 +44,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       tier: request.tier,
       registeredAt,
       trialDaysRemaining,
+      emailOptIn: profile?.emailOptIn ?? true,
     }
   })
 
@@ -139,6 +141,17 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             // upsert user in DynamoDB and stamp registeredAt on first login
             try { await upsertUserFromCognito(verified.payload) } catch (e) { /* ignore */ }
             try { await setRegisteredAtIfNew(String(verified.payload.sub)) } catch (e) { /* ignore */ }
+            // On first login: auto opt-in + send welcome email (fire-and-forget)
+            try {
+              const userId = String(verified.payload.sub)
+              const isNew = await setWelcomeEmailSent(userId)
+              if (isNew) {
+                await setEmailOptIn(userId, true)
+                const email = (verified.payload.email ?? verified.payload.preferred_username) as string | undefined
+                const name = ((verified.payload.name ?? verified.payload.given_name) as string | undefined) ?? email ?? 'there'
+                if (email) sendWelcomeEmail({ to: email, name, userId }).catch((e: any) => request.log?.warn?.({ err: e?.message }, 'welcome email failed'))
+              }
+            } catch { /* non-critical */ }
             // attach user info
             return { ...tokens, user: verified.payload }
           }
@@ -205,6 +218,17 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             // upsert user in DynamoDB and stamp registeredAt on first login
             try { await upsertUserFromCognito(verified.payload) } catch (e) { /* ignore */ }
             try { await setRegisteredAtIfNew(String(verified.payload.sub)) } catch (e) { /* ignore */ }
+            // On first login: auto opt-in + send welcome email (fire-and-forget)
+            try {
+              const userId = String(verified.payload.sub)
+              const isNew = await setWelcomeEmailSent(userId)
+              if (isNew) {
+                await setEmailOptIn(userId, true)
+                const email = (verified.payload.email ?? verified.payload.preferred_username) as string | undefined
+                const name = ((verified.payload.name ?? verified.payload.given_name) as string | undefined) ?? email ?? 'there'
+                if (email) sendWelcomeEmail({ to: email, name, userId }).catch((e: any) => request.log?.warn?.({ err: e?.message }, 'welcome email failed'))
+              }
+            } catch { /* non-critical */ }
             // redirect back to frontend with id_token (dev-friendly; consider HttpOnly cookie for prod)
             const frontend = process.env.FRONTEND_ORIGIN || 'http://localhost:5173'
             const sep = frontend.includes('#') ? '&' : '#'
@@ -415,6 +439,16 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         const verified = await jwtVerify(tokens.IdToken, JWKS, { issuer, audience: clientId })
         try { await upsertUserFromCognito(verified.payload) } catch { /* ignore */ }
         try { await setRegisteredAtIfNew(String(verified.payload.sub)) } catch { /* ignore */ }
+        // On first login: auto opt-in + send welcome email (fire-and-forget)
+        try {
+          const userId = String(verified.payload.sub)
+          const isNew = await setWelcomeEmailSent(userId)
+          if (isNew) {
+            await setEmailOptIn(userId, true)
+            const name = ((verified.payload.name ?? verified.payload.given_name) as string | undefined) ?? email ?? 'there'
+            sendWelcomeEmail({ to: email, name, userId }).catch((e: any) => request.log?.warn?.({ err: e?.message }, 'welcome email failed'))
+          }
+        } catch { /* non-critical */ }
       }
 
       return {
@@ -533,5 +567,18 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err: any) {
       return reply.status(401).send({ message: 'token verification failed', detail: err?.message ?? String(err) })
     }
+  })
+
+  /**
+   * PATCH /auth/preferences — update email opt-in preference for the authenticated user.
+   * Body: { emailOptIn: boolean }
+   */
+  server.patch('/preferences', { preHandler: [server.authenticate] }, async (request, reply) => {
+    const { emailOptIn } = request.body as any
+    if (typeof emailOptIn !== 'boolean') {
+      return reply.status(400).send({ message: 'emailOptIn (boolean) is required' })
+    }
+    await setEmailOptIn(request.user!.sub, emailOptIn)
+    return { ok: true, emailOptIn }
   })
 }

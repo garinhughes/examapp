@@ -13,3 +13,11 @@ output "stripe_webhook_secret_arn" {
 output "paypal_client_secret_arn" {
   value = data.aws_secretsmanager_secret.paypal_client_secret.arn
 }
+
+output "cron_secret_arn" {
+  value = data.aws_secretsmanager_secret.cron_secret.arn
+}
+
+output "unsubscribe_secret_arn" {
+  value = data.aws_secretsmanager_secret.unsubscribe_secret.arn
+}

@@ -29,6 +29,8 @@ import ratingsRoutes from './routes/ratings.js'
 import certificatesRoutes from './routes/certificates.js'
 import pollsRoutes from './routes/polls.js'
 import imagesRoutes from './routes/images.js'
+import cronRoutes from './routes/cron.js'
+import unsubscribeRoutes from './routes/unsubscribe.js'
 
 const server = Fastify({ logger: true, trustProxy: true })
 
@@ -96,6 +98,10 @@ await server.register(certificatesRoutes, { prefix: '/certificates' })
 await server.register(pollsRoutes, { prefix: '/polls' })
 // Images — presigned S3 URLs for question diagrams
 await server.register(imagesRoutes, { prefix: '/images' })
+// Internal cron — expiry reminders (EventBridge calls daily)
+await server.register(cronRoutes, { prefix: '/internal/cron' })
+// Public one-click unsubscribe
+await server.register(unsubscribeRoutes, { prefix: '/unsubscribe' })
 
 // Health check for ALB
 server.get('/health', async () => ({ status: 'ok' }))

@@ -21,7 +21,9 @@ import { ScanCommand } from '@aws-sdk/lib-dynamodb'
 import { getProduct } from '../catalog.js'
 import { grantEntitlement, revokeEntitlement } from '../services/entitlements.js'
 import { putPaypalSession, getPaypalSession, deletePaypalSession } from '../services/paypalSessions.js'
-import { ddb, ENTITLEMENTS_TABLE } from '../services/dynamo.js'
+import { ddb, ENTITLEMENTS_TABLE, getUserBySub } from '../services/dynamo.js'
+import { sendPaymentConfirmedEmail } from '../services/ses.js'
+import { logEmailSend } from '../services/emailLogs.js'
 
 const PP_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.paypal.com'
 
@@ -87,6 +89,22 @@ async function _grantFromSession(
     { pk, sk, userId: sess.userId, productIds: sess.productIds },
     '[paypal] entitlements granted'
   )
+  // Send payment confirmation email (fire-and-forget)
+  try {
+    const user = await getUserBySub(sess.userId)
+    if (user?.email) {
+      const products = sess.productIds.map((pid: string) => {
+        const p = getProduct(pid)
+        return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
+      })
+      const totalPence = products.reduce((s: number, p: { priceGBP: number }) => s + p.priceGBP, 0)
+      sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId: sess.userId, products, totalPence, source: 'paypal' })
+        .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'paypal-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your CertShack order is confirmed', filters: { productIds: sess.productIds } }))
+        .catch((e: any) => server.log.warn({ err: e?.message }, '[paypal] payment confirmed email failed'))
+    }
+  } catch (e: any) {
+    server.log.warn({ err: e?.message }, '[paypal] payment confirmed email lookup failed')
+  }
   await deletePaypalSession(pk, sk)
 }
 

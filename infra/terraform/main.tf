@@ -78,6 +78,8 @@ module "dynamodb" {
     issue_reports      = { table_name = "${var.project}-issue-reports", hash_key = "reportId" }
     metrics            = { table_name = "${var.project}-metrics", hash_key = "pk", range_key = "sk" }
     interactions       = { table_name = "${var.project}-interactions", hash_key = "userId", range_key = "SK" }
+    email_templates    = { table_name = "${var.project}-email-templates", hash_key = "templateId" }
+    email_logs         = { table_name = "${var.project}-email-logs", hash_key = "logId" }
   }
 }
 
@@ -172,9 +174,12 @@ module "ecs" {
   cognito_admin_role_arn = var.cognito_admin_role_arn
   ses_from_address       = "noreply@certshack.com"
   ses_support_address    = "support@certshack.com"
+  ses_outreach_address   = "outreach@certshack.com"
   issue_reports_table    = module.dynamodb.table_names["issue_reports"]
   metrics_table          = module.dynamodb.table_names["metrics"]
   interactions_table     = module.dynamodb.table_names["interactions"]
+  email_templates_table  = module.dynamodb.table_names["email_templates"]
+  email_logs_table       = module.dynamodb.table_names["email_logs"]
 
   paypal_client_id          = "AbyHVazM-r_fPb1CgQa0j5nwTtdMawkxoHGa2Dxd9PavViGd1G4Z0qTiHONgx1hUMC7ONUYKLBbrU4wa"
   paypal_api_base           = "https://api-m.paypal.com"
@@ -184,6 +189,8 @@ module "ecs" {
   paypal_client_secret_arn  = module.secretsmanager.paypal_client_secret_arn
   stripe_secret_key_arn     = module.secretsmanager.stripe_secret_key_arn
   stripe_webhook_secret_arn = module.secretsmanager.stripe_webhook_secret_arn
+  cron_secret               = module.secretsmanager.cron_secret_arn
+  unsubscribe_secret        = module.secretsmanager.unsubscribe_secret_arn
   stripe_price_id_monthly   = "price_1THKKkRXOMjZneV7ptKVgxPT"
   stripe_price_id_annual    = "price_1THKLCRXOMjZneV7bUdaFcDz"
 

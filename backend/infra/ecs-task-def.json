@@ -48,6 +48,9 @@
         { "name": "PAYPAL_PLAN_ID_MONTHLY", "value": "P-6YD57S96FT336305SNHG0NWY" },
         { "name": "PAYPAL_PLAN_ID_ANNUAL", "value": "P-8NL966S2UY946S01NHGO0IY" },
         { "name": "PAYPAL_WEBHOOK_ID", "value": "3B392581WH426842V" },
+        { "name": "SES_OUTREACH_ADDRESS", "value": "outreach@certshack.com" },
+        { "name": "EMAIL_TEMPLATES_TABLE", "value": "examapp-email-templates" },
+        { "name": "EMAIL_LOGS_TABLE", "value": "examapp-email-logs" },
         { "name": "RATE_LIMIT_MAX", "value": "100" }
       ],
       "secrets": [
@@ -66,6 +69,15 @@
         {
           "name": "PAYPAL_CLIENT_SECRET",
           "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-paypal-client-secret-sj8PIb"
+        }
+        ,
+        {
+          "name": "CRON_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-cron-secret-bu4WzD"
+        },
+        {
+          "name": "UNSUBSCRIBE_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-unsubscribe-secret-jcTbxM"
         }
       ],
       "logConfiguration": {

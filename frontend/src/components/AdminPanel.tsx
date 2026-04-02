@@ -1093,6 +1093,506 @@ function CognitoUsersPanel({
 /* ------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------ */
+/*  Sub-component: Emails Panel                                        */
+/* ------------------------------------------------------------------ */
+
+interface EmailTemplate {
+  templateId: string
+  name: string
+  subject: string
+  htmlBody: string
+  updatedAt?: string
+}
+
+interface EmailLogRecord {
+  logId: string
+  type: string
+  sentAt: string
+  sentBy?: string
+  recipientCount: number
+  subject: string
+  filters?: Record<string, any>
+}
+
+function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> }) {
+  const [open, setOpen] = useState(false)
+  const [subTab, setSubTab] = useState<'templates' | 'campaign' | 'logs'>('templates')
+
+  // Templates state
+  const [templates, setTemplates] = useState<EmailTemplate[]>([])
+  const [templatesLoading, setTemplatesLoading] = useState(false)
+  const [editing, setEditing] = useState<Partial<EmailTemplate> | null>(null)
+  const [templateErr, setTemplateErr] = useState<string | null>(null)
+  const [templateSuccess, setTemplateSuccess] = useState<string | null>(null)
+  const [testSending, setTestSending] = useState(false)
+
+  // Campaign state
+  const [campaignTemplate, setCampaignTemplate] = useState('')
+  const [campaignProvider, setCampaignProvider] = useState('')
+  const [previewCount, setPreviewCount] = useState<number | null>(null)
+  const [previewing, setPreviewing] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sendResult, setSendResult] = useState<{ sent: number; errors?: string[] } | null>(null)
+  const [confirmSend, setConfirmSend] = useState(false)
+  const [campaignErr, setCampaignErr] = useState<string | null>(null)
+
+  // Logs state
+  const [logs, setLogs] = useState<EmailLogRecord[]>([])
+  const [logsLoading, setLogsLoading] = useState(false)
+  const [logsErr, setLogsErr] = useState<string | null>(null)
+
+  const loadTemplates = useCallback(async () => {
+    setTemplatesLoading(true)
+    setTemplateErr(null)
+    try {
+      const res = await authFetch('/admin/email-templates')
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Load failed')
+      setTemplates(Array.isArray(data.templates) ? data.templates : [])
+    } catch (e: any) {
+      setTemplateErr(e?.message ?? 'Failed to load templates')
+    } finally {
+      setTemplatesLoading(false)
+    }
+  }, [authFetch])
+
+  const loadLogs = useCallback(async () => {
+    setLogsLoading(true)
+    setLogsErr(null)
+    try {
+      const res = await authFetch('/admin/email-logs?limit=50')
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Load failed')
+      setLogs(Array.isArray(data.logs) ? data.logs : [])
+    } catch (e: any) {
+      setLogsErr(e?.message ?? 'Failed to load logs')
+    } finally {
+      setLogsLoading(false)
+    }
+  }, [authFetch])
+
+  useEffect(() => {
+    if (!open) return
+    loadTemplates()
+  }, [open, loadTemplates])
+
+  useEffect(() => {
+    if (open && subTab === 'logs') loadLogs()
+  }, [open, subTab, loadLogs])
+
+  async function saveTemplate() {
+    if (!editing) return
+    const isNew = !editing.templateId
+    setTemplateErr(null)
+    try {
+      const res = await authFetch(
+        isNew ? '/admin/email-templates' : `/admin/email-templates/${editing.templateId}`,
+        {
+          method: isNew ? 'POST' : 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(editing),
+        }
+      )
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Save failed')
+      setTemplateSuccess('Saved!')
+      setTimeout(() => setTemplateSuccess(null), 3000)
+      setEditing(null)
+      loadTemplates()
+    } catch (e: any) {
+      setTemplateErr(e?.message ?? 'Save failed')
+    }
+  }
+
+  async function deleteTemplate(templateId: string) {
+    try {
+      const res = await authFetch(`/admin/email-templates/${templateId}`, { method: 'DELETE' })
+      if (res.ok) loadTemplates()
+    } catch { /* noop */ }
+  }
+
+  async function sendTest(templateId: string) {
+    setTestSending(true)
+    setTemplateErr(null)
+    try {
+      const res = await authFetch('/admin/email/test-send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Test send failed')
+      setTemplateSuccess('Test email sent to your address!')
+      setTimeout(() => setTemplateSuccess(null), 4000)
+    } catch (e: any) {
+      setTemplateErr(e?.message ?? 'Test send failed')
+    } finally {
+      setTestSending(false)
+    }
+  }
+
+  async function previewRecipients() {
+    setPreviewing(true)
+    setPreviewCount(null)
+    setCampaignErr(null)
+    try {
+      const res = await authFetch('/admin/email/preview-recipients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider: campaignProvider || undefined }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Preview failed')
+      setPreviewCount(data.count)
+    } catch (e: any) {
+      setCampaignErr(e?.message ?? 'Preview failed')
+    } finally {
+      setPreviewing(false)
+    }
+  }
+
+  async function sendCampaign() {
+    if (!campaignTemplate) return
+    setSending(true)
+    setSendResult(null)
+    setCampaignErr(null)
+    try {
+      const res = await authFetch('/admin/email/send-marketing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          templateId: campaignTemplate,
+          provider: campaignProvider || undefined,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Send failed')
+      setSendResult(data)
+      setConfirmSend(false)
+    } catch (e: any) {
+      setCampaignErr(e?.message ?? 'Send failed')
+      setConfirmSend(false)
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <div className="rounded-lg border border-border overflow-hidden">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-muted text-sm font-semibold hover:bg-muted/80 transition-colors"
+      >
+        <span>✉ Email Management</span>
+        <span className="text-muted-foreground text-xs">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {open && (
+        <div className="p-4 space-y-4">
+          {/* Sub-tabs */}
+          <div className="flex gap-1 bg-muted p-0.5 rounded">
+            {(['templates', 'campaign', 'logs'] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setSubTab(t)}
+                className={`flex-1 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                  subTab === t ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground dark:hover:text-foreground'
+                }`}
+              >
+                {{ templates: '📄 Templates', campaign: '📣 Send Campaign', logs: '📋 Logs' }[t]}
+              </button>
+            ))}
+          </div>
+
+          {/* TEMPLATES */}
+          {subTab === 'templates' && (
+            <div className="space-y-3">
+              {templateErr && (
+                <div className="p-3 rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-600 dark:text-red-400">
+                  {templateErr}
+                  <button onClick={() => setTemplateErr(null)} className="ml-2 underline">dismiss</button>
+                </div>
+              )}
+              {templateSuccess && (
+                <div className="p-2 rounded bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-600 dark:text-emerald-400">
+                  {templateSuccess}
+                </div>
+              )}
+
+              {editing !== null ? (
+                <div className="space-y-3 p-3 rounded-lg border border-border bg-card">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold">{editing.templateId ? 'Edit template' : 'New template'}</h3>
+                    <button onClick={() => setEditing(null)} className="text-xs text-muted-foreground hover:text-foreground dark:hover:text-foreground">Cancel</button>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Template name (e.g. new-content-july)"
+                    value={editing.name ?? ''}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Subject line"
+                    value={editing.subject ?? ''}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, subject: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">
+                      HTML body — use <code className="font-mono bg-muted px-1 rounded">{'{{name}}'}</code> for recipient name
+                    </label>
+                    <textarea
+                      rows={12}
+                      placeholder="<p>Hello {{name}}, ...</p>"
+                      value={editing.htmlBody ?? ''}
+                      onChange={(e) => setEditing((prev) => ({ ...prev, htmlBody: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary/40 resize-y"
+                    />
+                  </div>
+                  <button
+                    onClick={saveTemplate}
+                    disabled={!editing.name?.trim() || !editing.subject?.trim() || !editing.htmlBody?.trim()}
+                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors"
+                  >
+                    Save template
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setEditing({})}
+                  className="w-full px-3 py-2 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                >
+                  + New template
+                </button>
+              )}
+
+              {templatesLoading ? (
+                <p className="text-xs text-muted-foreground">Loading…</p>
+              ) : templates.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No templates yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {templates.map((tmpl) => (
+                    <div key={tmpl.templateId} className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold">{tmpl.name}</span>
+                          <span className="text-xs text-muted-foreground font-mono">{tmpl.templateId}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">{tmpl.subject}</p>
+                      </div>
+                      <div className="flex gap-1.5 shrink-0">
+                        <button
+                          onClick={() => sendTest(tmpl.templateId)}
+                          disabled={testSending}
+                          className="px-2 py-1 rounded text-xs bg-muted text-muted-foreground hover:text-foreground dark:hover:text-foreground transition-colors disabled:opacity-40"
+                        >
+                          Test send
+                        </button>
+                        <button
+                          onClick={() => setEditing(tmpl)}
+                          className="px-2 py-1 rounded text-xs bg-muted text-muted-foreground hover:text-foreground dark:hover:text-foreground transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteTemplate(tmpl.templateId)}
+                          className="px-2 py-1 rounded text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* CAMPAIGN */}
+          {subTab === 'campaign' && (
+            <div className="space-y-4">
+              {campaignErr && (
+                <div className="p-3 rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-600 dark:text-red-400">
+                  {campaignErr}
+                  <button onClick={() => setCampaignErr(null)} className="ml-2 underline">dismiss</button>
+                </div>
+              )}
+
+              {sendResult ? (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                    <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                      Campaign sent — {sendResult.sent} email{sendResult.sent !== 1 ? 's' : ''} delivered
+                    </p>
+                    {sendResult.errors && sendResult.errors.length > 0 && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                        {sendResult.errors.length} error{sendResult.errors.length !== 1 ? 's' : ''}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => { setSendResult(null); setPreviewCount(null) }}
+                    className="text-xs text-muted-foreground hover:text-foreground dark:hover:text-foreground underline"
+                  >
+                    Send another campaign
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-3 p-4 rounded-lg border border-border bg-card">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground block mb-1">Template</label>
+                      <select
+                        value={campaignTemplate}
+                        onChange={(e) => { setCampaignTemplate(e.target.value); setPreviewCount(null) }}
+                        className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      >
+                        <option value="">— Select a template —</option>
+                        {templates.map((tmpl) => (
+                          <option key={tmpl.templateId} value={tmpl.templateId}>{tmpl.name} — {tmpl.subject}</option>
+                        ))}
+                      </select>
+                      {templates.length === 0 && (
+                        <p className="text-xs text-muted-foreground mt-1">No templates yet — create one in the Templates tab.</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground block mb-1">Filter by provider (optional)</label>
+                      <select
+                        value={campaignProvider}
+                        onChange={(e) => { setCampaignProvider(e.target.value); setPreviewCount(null) }}
+                        className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      >
+                        <option value="">All opted-in customers</option>
+                        <option value="aws">AWS customers only</option>
+                        <option value="azure">Azure customers only</option>
+                        <option value="gcp">GCP customers only</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <button
+                        onClick={previewRecipients}
+                        disabled={previewing}
+                        className="px-3 py-1.5 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 disabled:opacity-40 transition-colors"
+                      >
+                        {previewing ? 'Checking…' : 'Preview recipients'}
+                      </button>
+                      {previewCount !== null && (
+                        <span className="text-sm">
+                          <strong>{previewCount}</strong> recipient{previewCount !== 1 ? 's' : ''} will receive this email
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {previewCount !== null && previewCount > 0 && campaignTemplate && (
+                    confirmSend ? (
+                      <div className="p-4 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 space-y-3">
+                        <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                          Send to {previewCount} recipient{previewCount !== 1 ? 's' : ''}? This cannot be undone.
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={sendCampaign}
+                            disabled={sending}
+                            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors"
+                          >
+                            {sending ? 'Sending…' : 'Confirm & send'}
+                          </button>
+                          <button
+                            onClick={() => setConfirmSend(false)}
+                            disabled={sending}
+                            className="px-4 py-2 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmSend(true)}
+                        className="w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition-colors"
+                      >
+                        Send campaign to {previewCount} recipient{previewCount !== 1 ? 's' : ''}
+                      </button>
+                    )
+                  )}
+                  {previewCount === 0 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400">No opted-in recipients match this filter.</p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* LOGS */}
+          {subTab === 'logs' && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">Recent email activity</p>
+                <button onClick={loadLogs} disabled={logsLoading} className="text-xs text-muted-foreground hover:text-foreground dark:hover:text-foreground underline">
+                  Refresh
+                </button>
+              </div>
+              {logsErr && (
+                <div className="p-3 rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-600 dark:text-red-400">
+                  {logsErr}
+                </div>
+              )}
+              {logsLoading ? (
+                <p className="text-xs text-muted-foreground">Loading…</p>
+              ) : logs.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No email activity recorded yet.</p>
+              ) : (
+                <div className="overflow-auto rounded-lg border border-border">
+                  <table className="w-full table-auto text-xs">
+                    <thead>
+                      <tr className="bg-muted text-muted-foreground text-left uppercase tracking-wider">
+                        <th className="px-3 py-2">Type</th>
+                        <th className="px-3 py-2">Date</th>
+                        <th className="px-3 py-2 text-right">Recipients</th>
+                        <th className="px-3 py-2">Subject</th>
+                        <th className="px-3 py-2">Sent by</th>
+                        <th className="px-3 py-2">Filters</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {logs.map((log) => (
+                        <tr key={log.logId} className="border-t border-border hover:bg-muted/30 transition-colors">
+                          <td className="px-3 py-2">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-primary/10 text-primary">{log.type}</span>
+                          </td>
+                          <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{new Date(log.sentAt).toLocaleString()}</td>
+                          <td className="px-3 py-2 text-right font-mono">{log.recipientCount}</td>
+                          <td className="px-3 py-2 max-w-[200px] truncate">{log.subject}</td>
+                          <td className="px-3 py-2 text-muted-foreground">{log.sentBy ?? '—'}</td>
+                          <td className="px-3 py-2 text-muted-foreground">
+                            {log.filters ? Object.entries(log.filters).map(([k, v]) => `${k}:${v}`).join(', ') : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main AdminPanel                                                    */
+/* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
 /*  Sub-component: Checklist Row                                       */
 /* ------------------------------------------------------------------ */
 
@@ -1788,6 +2288,7 @@ export default function AdminPanel() {
       <CognitoUsersPanel authFetch={authFetch} />
       <ErasurePanel authFetch={authFetch} users={users} />
       <CarouselPanel authFetch={authFetch} />
+      <EmailsPanel authFetch={authFetch} />
 
       {/* Toolbar: search + filters */}
       <div className="flex flex-wrap items-center gap-2">

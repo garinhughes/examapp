@@ -293,3 +293,65 @@ export async function setRegisteredAtIfNew(userId: string): Promise<void> {
 }
 
 export { ddb, USERS_TABLE, ENTITLEMENTS_TABLE, AUDIT_TABLE }
+
+// ── Email preferences ──────────────────────────────────────────────────────
+
+/**
+ * Sets emailOptIn + emailOptInAt on the user record.
+ * `value = true` on registration; `false` on unsubscribe / account toggle.
+ */
+export async function setEmailOptIn(userId: string, value: boolean): Promise<void> {
+  try {
+    await ddb.send(new UpdateCommand({
+      TableName: USERS_TABLE,
+      Key: { userId },
+      UpdateExpression: 'SET emailOptIn = :v, emailOptInAt = :now',
+      ExpressionAttributeValues: { ':v': value, ':now': new Date().toISOString() },
+    } as any))
+  } catch (err) {
+    console.warn('[dynamo] setEmailOptIn failed', err)
+  }
+}
+
+/**
+ * Guards against sending the welcome email more than once per user.
+ * Uses a condition expression so subsequent logins are a no-op.
+ * Returns true if the stamp was set (i.e. this IS a new user), false if already set.
+ */
+export async function setWelcomeEmailSent(userId: string): Promise<boolean> {
+  try {
+    await ddb.send(new UpdateCommand({
+      TableName: USERS_TABLE,
+      Key: { userId },
+      UpdateExpression: 'SET welcomeEmailSentAt = :now',
+      ConditionExpression: 'attribute_not_exists(welcomeEmailSentAt)',
+      ExpressionAttributeValues: { ':now': new Date().toISOString() },
+    } as any))
+    return true
+  } catch (err: any) {
+    if (err?.name !== 'ConditionalCheckFailedException') {
+      console.warn('[dynamo] setWelcomeEmailSent failed', err)
+    }
+    return false
+  }
+}
+
+/**
+ * Return all users who have emailOptIn = true.
+ * Used by the marketing bulk-send endpoint — caller applies provider filter separately.
+ */
+export async function getUsersWithEmailOptIn(): Promise<any[]> {
+  const users: any[] = []
+  let lastKey: any = undefined
+  do {
+    const res = await ddb.send(new ScanCommand({
+      TableName: USERS_TABLE,
+      FilterExpression: 'emailOptIn = :t',
+      ExpressionAttributeValues: { ':t': true },
+      ...(lastKey ? { ExclusiveStartKey: lastKey } : {}),
+    } as any))
+    users.push(...(res.Items ?? []))
+    lastKey = res.LastEvaluatedKey
+  } while (lastKey)
+  return users
+}

@@ -1,8 +1,8 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { randomUUID } from 'crypto'
-import { getUserBySub, listUsers, recordAdminAudit, updateUserFields, listIssueReports, resolveIssueReport, countNewIssueReports } from '../services/dynamo.js'
+import { getUserBySub, listUsers, recordAdminAudit, updateUserFields, listIssueReports, resolveIssueReport, countNewIssueReports, getUsersWithEmailOptIn } from '../services/dynamo.js'
 import { previewErasure, dryRunErasure, executeErasure } from '../services/erasureService.js'
-import { sendErasureReceiptEmail } from '../services/ses.js'
+import { sendErasureReceiptEmail, sendMarketingEmail } from '../services/ses.js'
 import {
   listAllRatings, countNewRatings,
   createPoll, getPollDef, listPollDefs, listPollVotes, updatePollDef, deletePollDef, deactivateAllPolls, countNewPollVotes,
@@ -12,6 +12,8 @@ import { PRODUCTS } from '../catalog.js'
 import { loadAllExams } from '../examLoader.js'
 import { listCognitoUsers, getCognitoUser, deleteCognitoUser, resendUserConfirmation } from '../services/cognitoAdmin.js'
 import { getCarouselSlides, saveCarouselSlides, getUploadPresignedUrl } from '../services/carouselStore.js'
+import { getTemplate, listTemplates, upsertTemplate, deleteTemplate } from '../services/emailTemplates.js'
+import { logEmailSend, listEmailLogs } from '../services/emailLogs.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Require auth and admin flag
@@ -552,5 +554,161 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err: any) {
       return reply.code(502).send({ message: 'Failed to generate upload URL', detail: err.message })
     }
+  })
+
+  // ── Email templates ──────────────────────────────────────────────────────
+
+  server.get('/email-templates', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async () => {
+    return { templates: await listTemplates() }
+  })
+
+  server.get('/email-templates/:templateId', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { templateId } = request.params as any
+    const t = await getTemplate(templateId)
+    if (!t) return reply.code(404).send({ message: 'template not found' })
+    return t
+  })
+
+  server.post('/email-templates', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const body = request.body as any
+    const { name, subject, htmlBody, textBody } = body ?? {}
+    if (!name || !subject || !htmlBody) {
+      return reply.code(400).send({ message: 'name, subject and htmlBody are required' })
+    }
+    const templateId = body.templateId || name.toLowerCase().replace(/\s+/g, '-')
+    const template = { templateId, name, subject, htmlBody, textBody: textBody ?? '', updatedAt: new Date().toISOString(), updatedBy: (request.user as any).sub }
+    await upsertTemplate(template)
+    await recordAdminAudit((request.user as any).sub, null, 'create_email_template', { templateId })
+    return { ok: true, template }
+  })
+
+  server.put('/email-templates/:templateId', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { templateId } = request.params as any
+    const body = request.body as any
+    const existing = await getTemplate(templateId)
+    if (!existing) return reply.code(404).send({ message: 'template not found' })
+    const updated = {
+      ...existing,
+      name: body.name ?? existing.name,
+      subject: body.subject ?? existing.subject,
+      htmlBody: body.htmlBody ?? existing.htmlBody,
+      textBody: body.textBody ?? existing.textBody,
+      updatedAt: new Date().toISOString(),
+      updatedBy: (request.user as any).sub,
+    }
+    await upsertTemplate(updated)
+    await recordAdminAudit((request.user as any).sub, null, 'update_email_template', { templateId })
+    return { ok: true, template: updated }
+  })
+
+  server.delete('/email-templates/:templateId', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request) => {
+    const { templateId } = request.params as any
+    await deleteTemplate(templateId)
+    await recordAdminAudit((request.user as any).sub, null, 'delete_email_template', { templateId })
+    return { ok: true }
+  })
+
+  // ── Email actions ────────────────────────────────────────────────────────
+
+  /** Send a test email to the requesting admin's own address */
+  server.post('/email/test-send', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { templateId } = request.body as any
+    if (!templateId) return reply.code(400).send({ message: 'templateId required' })
+    const template = await getTemplate(templateId)
+    if (!template) return reply.code(404).send({ message: 'template not found' })
+
+    const adminProfile = await getUserBySub((request.user as any).sub)
+    if (!adminProfile?.email) return reply.code(400).send({ message: 'admin email not found' })
+
+    await sendMarketingEmail({
+      to: adminProfile.email,
+      userId: (request.user as any).sub,
+      name: (adminProfile as any).name || (adminProfile as any).given_name,
+      subject: `[TEST] ${template.subject}`,
+      htmlBody: template.htmlBody,
+    })
+    return { ok: true, sentTo: adminProfile.email }
+  })
+
+  /** Preview the number of recipients for given filters (NO email is sent) */
+  server.post('/email/preview-recipients', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request) => {
+    const { provider } = request.body as any
+    const users = await getUsersWithEmailOptIn()
+    let filtered = users
+    if (provider) {
+      // Filter by users who have an active entitlement for the given provider's products
+      const providerProductIds = PRODUCTS.filter((p) => p.provider?.toLowerCase() === provider.toLowerCase()).map((p) => p.productId)
+      const usersWithEntitlement = await Promise.all(
+        users.map(async (u) => {
+          const ents = await getUserEntitlements(u.userId)
+          return ents.some((e) => providerProductIds.includes(e.productId)) ? u : null
+        })
+      )
+      filtered = usersWithEntitlement.filter(Boolean) as any[]
+    }
+    return { count: filtered.length }
+  })
+
+  /** Bulk marketing send — batched with 200ms delay between batches of 50 */
+  server.post('/email/send-marketing', { config: { rateLimit: { max: 5, timeWindow: '5 minutes' } } }, async (request, reply) => {
+    const { templateId, provider } = request.body as any
+    if (!templateId) return reply.code(400).send({ message: 'templateId required' })
+
+    const template = await getTemplate(templateId)
+    if (!template) return reply.code(404).send({ message: 'template not found' })
+
+    const users = await getUsersWithEmailOptIn()
+    let targets = users
+    if (provider) {
+      const providerProductIds = PRODUCTS.filter((p) => p.provider?.toLowerCase() === provider.toLowerCase()).map((p) => p.productId)
+      const filtered = await Promise.all(
+        users.map(async (u) => {
+          const ents = await getUserEntitlements(u.userId)
+          return ents.some((e) => providerProductIds.includes(e.productId)) ? u : null
+        })
+      )
+      targets = filtered.filter(Boolean) as any[]
+    }
+
+    let sent = 0
+    const errors: string[] = []
+    const BATCH = 50
+
+    for (let i = 0; i < targets.length; i += BATCH) {
+      const batch = targets.slice(i, i + BATCH)
+      await Promise.allSettled(
+        batch.map(async (u: any) => {
+          if (!u.email) return
+          try {
+            await sendMarketingEmail({ to: u.email, userId: u.userId, name: u.name || u.given_name, subject: template.subject, htmlBody: template.htmlBody })
+            sent++
+          } catch (e: any) {
+            errors.push(`${u.userId}: ${e.message ?? String(e)}`)
+          }
+        })
+      )
+      if (i + BATCH < targets.length) await new Promise((r) => setTimeout(r, 200))
+    }
+
+    await logEmailSend({
+      type: 'marketing',
+      sentBy: (request.user as any).sub,
+      templateId,
+      recipientCount: sent,
+      subject: template.subject,
+      filters: { provider: provider ?? 'all' },
+    })
+    await recordAdminAudit((request.user as any).sub, null, 'send_marketing_email', { templateId, sent, errors: errors.length, provider })
+
+    return { sent, errors: errors.length > 0 ? errors : undefined }
+  })
+
+  // ── Email logs ───────────────────────────────────────────────────────────
+
+  server.get('/email-logs', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request) => {
+    const q = request.query as any
+    const limit = Math.min(Number(q.limit || 50), 200)
+    const result = await listEmailLogs(limit, q.lastKey)
+    return { logs: result.items, lastKey: result.lastKey }
   })
 }

@@ -17,6 +17,9 @@ import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import crypto from 'crypto'
 import { getProduct } from '../catalog.js'
 import { grantEntitlement, revokeEntitlement } from '../services/entitlements.js'
+import { getUserBySub } from '../services/dynamo.js'
+import { sendPaymentConfirmedEmail } from '../services/ses.js'
+import { logEmailSend } from '../services/emailLogs.js'
 
 const STRIPE_API = 'https://api.stripe.com/v1'
 
@@ -264,6 +267,22 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
               })
             }
             server.log.info({ userId, productIds, sessionId: session.id }, '[stripe] entitlements granted')
+            // Send payment confirmation email (fire-and-forget)
+            try {
+              const user = await getUserBySub(userId)
+              if (user?.email) {
+                const products = productIds.map((pid) => {
+                  const p = getProduct(pid)
+                  return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
+                })
+                const totalPence = products.reduce((s, p) => s + p.priceGBP, 0)
+                sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId, products, totalPence, source: 'stripe' })
+                  .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'stripe-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your CertShack order is confirmed', filters: { productIds } }))
+                  .catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] payment confirmed email failed'))
+              }
+            } catch (e: any) {
+              server.log.warn({ err: e?.message }, '[stripe] payment confirmed email lookup failed')
+            }
           }
           break
         }

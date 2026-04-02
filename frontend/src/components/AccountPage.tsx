@@ -31,6 +31,38 @@ export default function AccountPage() {
   const [nameSaving, setNameSaving] = useState(false)
   const [nameMessage, setNameMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
 
+  // ── Email opt-in state ──
+  const [emailOptIn, setEmailOptIn] = useState(true)
+  const [emailOptInSaving, setEmailOptInSaving] = useState(false)
+
+  useEffect(() => {
+    authFetch('/auth/me')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data && typeof data.emailOptIn === 'boolean') {
+          setEmailOptIn(data.emailOptIn)
+        }
+      })
+      .catch(() => {})
+  }, [authFetch])
+
+  const toggleEmailOptIn = useCallback(async () => {
+    const next = !emailOptIn
+    setEmailOptIn(next)
+    setEmailOptInSaving(true)
+    try {
+      await authFetch('/auth/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailOptIn: next }),
+      })
+    } catch {
+      setEmailOptIn(!next)
+    } finally {
+      setEmailOptInSaving(false)
+    }
+  }, [emailOptIn, authFetch])
+
   useEffect(() => {
     if (user?.name) {
       const parts = user.name.trim().split(/\s+/)
@@ -409,6 +441,33 @@ export default function AccountPage() {
                 />
               </button>
             </div>
+          </div>
+
+          {/* Marketing emails opt-in */}
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground">Marketing &amp; update emails</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Receive emails about new content and exam updates</p>
+              </div>
+              <button
+                onClick={toggleEmailOptIn}
+                disabled={emailOptInSaving}
+                aria-label={emailOptIn ? 'Unsubscribe from marketing emails' : 'Subscribe to marketing emails'}
+                className={`relative inline-flex h-6 w-11 rounded-full transition-colors disabled:opacity-50 ${
+                  emailOptIn ? 'bg-primary' : 'bg-muted'
+                }`}
+              >
+                <span
+                  className={`inline-block w-4 h-4 rounded-full bg-card shadow transform transition-transform mt-1 ${
+                    emailOptIn ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Transactional emails (receipt, welcome, subscription reminders) are always sent.
+            </p>
           </div>
         </div>
       )}

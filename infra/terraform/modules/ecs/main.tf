@@ -188,6 +188,33 @@ variable "ses_support_address" {
   default = "support@certshack.com"
 }
 
+variable "ses_outreach_address" {
+  type    = string
+  default = "outreach@certshack.com"
+}
+
+variable "email_templates_table" {
+  type    = string
+  default = ""
+}
+
+variable "email_logs_table" {
+  type    = string
+  default = ""
+}
+
+variable "cron_secret" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "unsubscribe_secret" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
 variable "issue_reports_table" {
   type    = string
   default = ""
@@ -424,6 +451,9 @@ locals {
     { name = "FRONTEND_ORIGIN", value = var.frontend_origin },
     { name = "SES_FROM_ADDRESS", value = var.ses_from_address },
     { name = "SES_SUPPORT_ADDRESS", value = var.ses_support_address },
+    { name = "SES_OUTREACH_ADDRESS", value = var.ses_outreach_address },
+    { name = "EMAIL_TEMPLATES_TABLE", value = var.email_templates_table },
+    { name = "EMAIL_LOGS_TABLE", value = var.email_logs_table },
     { name = "ISSUE_REPORTS_TABLE", value = var.issue_reports_table },
     { name = "METRICS_TABLE", value = var.metrics_table },
     { name = "INTERACTIONS_TABLE", value = var.interactions_table },
@@ -452,6 +482,12 @@ locals {
     ] : [],
     var.paypal_client_secret_arn != "" ? [
       { name = "PAYPAL_CLIENT_SECRET", valueFrom = var.paypal_client_secret_arn }
+    ] : [],
+    var.cron_secret != "" ? [
+      { name = "CRON_SECRET", valueFrom = var.cron_secret }
+    ] : [],
+    var.unsubscribe_secret != "" ? [
+      { name = "UNSUBSCRIBE_SECRET", valueFrom = var.unsubscribe_secret }
     ] : [],
   )
 }

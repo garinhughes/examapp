@@ -31,3 +31,15 @@ variable "paypal_client_secret_name" {
   type        = string
   default     = "examapp-paypal-client-secret"
 }
+
+variable "cron_secret_name" {
+  description = "Name of the Secrets Manager secret for cron authentication"
+  type        = string
+  default     = "examapp-cron-secret"
+}
+
+variable "unsubscribe_secret_name" {
+  description = "Name of the Secrets Manager secret for unsubscribe token signing"
+  type        = string
+  default     = "examapp-unsubscribe-secret"
+}
