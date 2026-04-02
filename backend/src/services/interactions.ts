@@ -95,6 +95,7 @@ export interface PollDef {
   pollId: string
   question: string
   options: PollOption[]
+  allowComment?: boolean
   visible: boolean
   createdAt: string
   createdBy: string
@@ -106,6 +107,7 @@ export interface PollVote {
   interactionType: 'POLL_VOTE'
   pollId: string
   selectedOptions: string[]
+  otherText?: string
   userEmail?: string
   createdAt: string
   updatedAt: string
@@ -124,7 +126,8 @@ export async function createPoll(
   question: string,
   options: PollOption[],
   createdBy: string,
-  visible = false
+  visible = false,
+  allowComment = false
 ): Promise<PollDef> {
   const pollId = randomUUID()
   const now = new Date().toISOString()
@@ -135,6 +138,7 @@ export async function createPoll(
     pollId,
     question,
     options,
+    ...(allowComment && { allowComment: true }),
     visible,
     createdAt: now,
     createdBy,
@@ -227,20 +231,26 @@ export async function deletePollDef(pollId: string): Promise<void> {
 
 export async function updatePollDef(
   pollId: string,
-  updates: Partial<Pick<PollDef, 'question' | 'options' | 'visible'>>
+  updates: Partial<Pick<PollDef, 'question' | 'options' | 'visible' | 'allowComment'>>
 ): Promise<void> {
   const sets: string[] = []
+  const removes: string[] = []
   const vals: Record<string, any> = {}
   if (updates.question !== undefined) { sets.push('question = :q'); vals[':q'] = updates.question }
   if (updates.options !== undefined) { sets.push('options = :o'); vals[':o'] = updates.options }
   if (updates.visible !== undefined) { sets.push('visible = :v'); vals[':v'] = updates.visible }
-  if (sets.length === 0) return
+  if (updates.allowComment === true) { sets.push('allowComment = :ac'); vals[':ac'] = true }
+  else if (updates.allowComment === false) { removes.push('allowComment') }
+  if (sets.length === 0 && removes.length === 0) return
+  const expressions: string[] = []
+  if (sets.length > 0) expressions.push(`SET ${sets.join(', ')}`)
+  if (removes.length > 0) expressions.push(`REMOVE ${removes.join(', ')}`)
   try {
     await ddb.send(new UpdateCommand({
       TableName: INTERACTIONS_TABLE,
       Key: { userId: 'SYSTEM', SK: `POLL_DEF#${pollId}` },
-      UpdateExpression: `SET ${sets.join(', ')}`,
-      ExpressionAttributeValues: vals,
+      UpdateExpression: expressions.join(' '),
+      ...(Object.keys(vals).length > 0 && { ExpressionAttributeValues: vals }),
     }))
   } catch (err) {
     console.warn('[interactions] updatePollDef failed', err)

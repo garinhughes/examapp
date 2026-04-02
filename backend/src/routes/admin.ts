@@ -324,7 +324,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // POST /admin/polls — create a new poll
   server.post('/polls', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const body = request.body as any
-    const { question, options, active = false } = body ?? {}
+    const { question, options, active = false, allowComment = false } = body ?? {}
 
     if (!question || typeof question !== 'string') {
       return reply.code(400).send({ message: 'question is required' })
@@ -338,7 +338,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     if (active) await deactivateAllPolls()
 
-    const def = await createPoll(question, options, (request.user as any).sub, active ?? false)
+    const def = await createPoll(question, options, (request.user as any).sub, active ?? false, allowComment ?? false)
     return { ok: true, poll: def }
   })
 
@@ -353,6 +353,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const updates: any = {}
     if (body.question !== undefined) updates.question = body.question
     if (body.options !== undefined) updates.options = body.options
+    if (body.allowComment !== undefined) updates.allowComment = body.allowComment
     if (body.visible !== undefined) {
       updates.visible = body.visible
       if (body.visible === true) await deactivateAllPolls()

@@ -40,6 +40,7 @@ interface PollDef {
   pollId: string
   question: string
   options: PollOption[]
+  allowComment?: boolean
   visible: boolean
   createdAt: string
 }
@@ -48,6 +49,7 @@ interface PollVote {
   userId: string
   userEmail?: string
   selectedOptions: string[]
+  otherText?: string
   createdAt: string
 }
 
@@ -89,11 +91,13 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editQuestion, setEditQuestion] = useState('')
   const [editOptions, setEditOptions] = useState<PollOption[]>([])
+  const [editAllowComment, setEditAllowComment] = useState(false)
   const [saving, setSaving] = useState(false)
 
   // Create form
   const [question, setQuestion] = useState('')
   const [options, setOptions] = useState([{ id: crypto.randomUUID(), label: '' }, { id: crypto.randomUUID(), label: '' }])
+  const [allowComment, setAllowComment] = useState(false)
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
 
@@ -141,12 +145,14 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
     setEditingId(poll.pollId)
     setEditQuestion(poll.question)
     setEditOptions(poll.options.map((o) => ({ ...o })))
+    setEditAllowComment(poll.allowComment ?? false)
   }
 
   function cancelEdit() {
     setEditingId(null)
     setEditQuestion('')
     setEditOptions([])
+    setEditAllowComment(false)
   }
 
   async function saveEdit(pollId: string) {
@@ -157,7 +163,7 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
       const res = await authFetch(`/admin/polls/${pollId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: editQuestion.trim(), options: filledOptions }),
+        body: JSON.stringify({ question: editQuestion.trim(), options: filledOptions, allowComment: editAllowComment }),
       })
       if (res.ok) {
         cancelEdit()
@@ -191,11 +197,12 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
       const res = await authFetch('/admin/polls', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: question.trim(), options: filledOptions }),
+        body: JSON.stringify({ question: question.trim(), options: filledOptions, allowComment }),
       })
       if (res.ok) {
         setQuestion('')
         setOptions([{ id: crypto.randomUUID(), label: '' }, { id: crypto.randomUUID(), label: '' }])
+        setAllowComment(false)
         await loadPolls()
       } else {
         const d = await res.json()
@@ -292,6 +299,15 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
                 <Plus className="w-3.5 h-3.5" /> Add option
               </button>
             </div>
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={allowComment}
+                onChange={(e) => setAllowComment(e.target.checked)}
+                className="rounded border-border"
+              />
+              Allow free-text comment
+            </label>
             {createError && <p className="text-xs text-red-500">{createError}</p>}
             <button
               type="submit"
@@ -344,6 +360,15 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
                         <Plus className="w-3.5 h-3.5" /> Add option
                       </button>
                     </div>
+                    <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={editAllowComment}
+                        onChange={(e) => setEditAllowComment(e.target.checked)}
+                        className="rounded border-border"
+                      />
+                      Allow free-text comment
+                    </label>
                     <div className="flex gap-2 pt-1">
                       <button onClick={() => saveEdit(poll.pollId)} disabled={saving} className="flex items-center gap-1 px-3 py-1 rounded bg-primary text-white text-xs font-medium disabled:opacity-40">
                         <Check className="w-3.5 h-3.5" /> Save
@@ -381,6 +406,9 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
                       {poll.options.map((o) => (
                         <span key={o.id} className="px-2 py-0.5 rounded-full bg-muted text-xs text-muted-foreground">{o.label}</span>
                       ))}
+                      {poll.allowComment && (
+                        <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs">+ comments</span>
+                      )}
                     </div>
                     <p className="text-xs text-muted-foreground">{formatDate(poll.createdAt)}</p>
                   </>
@@ -425,6 +453,7 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
                         <tr className="bg-muted/50 text-muted-foreground text-xs">
                           <th className="text-left px-3 py-2 font-medium">User</th>
                           <th className="text-left px-3 py-2 font-medium">Selected</th>
+                          {selectedPoll?.allowComment && <th className="text-left px-3 py-2 font-medium">Comment</th>}
                           <th className="text-left px-3 py-2 font-medium">Date</th>
                         </tr>
                       </thead>
@@ -442,6 +471,11 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
                                 })}
                               </div>
                             </td>
+                            {selectedPoll?.allowComment && (
+                              <td className="px-3 py-2 text-xs text-muted-foreground max-w-[200px]">
+                                {v.otherText ? <span className="italic">{truncate(v.otherText, 100)}</span> : <span className="opacity-40">—</span>}
+                              </td>
+                            )}
                             <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{formatDate(v.createdAt)}</td>
                           </tr>
                         ))}

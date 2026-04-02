@@ -19,14 +19,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
   // POST /polls/:pollId/vote
   // Requires authentication; upserts user's vote
-  server.post<{ Params: { pollId: string }; Body: { selectedOptions: string[] } }>(
+  server.post<{ Params: { pollId: string }; Body: { selectedOptions: string[]; otherText?: string } }>(
     '/:pollId/vote',
     { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, // codeql[js/missing-rate-limiting]
     async (request, reply) => {
       if (!request.user) return reply.code(401).send({ message: 'Unauthorized' })
 
       const { pollId } = request.params
-      const { selectedOptions } = request.body as any
+      const { selectedOptions, otherText } = request.body as any
 
       if (!Array.isArray(selectedOptions) || selectedOptions.length === 0) {
         return reply.code(400).send({ message: 'selectedOptions must be a non-empty array' })
@@ -46,12 +46,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       const now = new Date().toISOString()
       const existing = await getPollVote(request.user.sub, pollId)
 
+      const trimmedComment = typeof otherText === 'string' ? otherText.trim().slice(0, 500) : undefined
+
       await putPollVote({
         userId: request.user.sub,
         SK: `POLL#${pollId}`,
         interactionType: 'POLL_VOTE',
         pollId,
         selectedOptions,
+        ...(trimmedComment && { otherText: trimmedComment }),
         userEmail: (request.user as any).email,
         createdAt: existing?.createdAt ?? now,
         updatedAt: now,

@@ -11,10 +11,12 @@ interface Poll {
   pollId: string
   question: string
   options: PollOption[]
+  allowComment?: boolean
 }
 
 interface PollVote {
   selectedOptions: string[]
+  otherText?: string
 }
 
 export function PollWidget() {
@@ -24,6 +26,7 @@ export function PollWidget() {
   const [poll, setPoll] = useState<Poll | null>(null)
   const [myVote, setMyVote] = useState<PollVote | null>(null)
   const [selected, setSelected] = useState<string[]>([])
+  const [comment, setComment] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [loaded, setLoaded] = useState(false)
@@ -38,6 +41,7 @@ export function PollWidget() {
           if (data.myVote) {
             setMyVote(data.myVote)
             setSelected(data.myVote.selectedOptions ?? [])
+            setComment(data.myVote.otherText ?? '')
             setSubmitted(true)
           }
         }
@@ -59,10 +63,12 @@ export function PollWidget() {
     if (!poll || selected.length === 0 || submitting) return
     setSubmitting(true)
     try {
+      const body: Record<string, unknown> = { selectedOptions: selected }
+      if (poll.allowComment && comment.trim()) body.otherText = comment.trim()
       await authFetch(`/polls/${poll.pollId}/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ selectedOptions: selected }),
+        body: JSON.stringify(body),
       })
     } catch {
       // fire & forget
@@ -77,9 +83,10 @@ export function PollWidget() {
       <p className="font-semibold text-sm mb-3">{poll.question}</p>
 
       {submitted ? (
-        <p className="text-sm text-muted-foreground">
-          Thanks for your feedback!{myVote && ' Your response has been recorded.'}
-        </p>
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Thanks for your feedback!{myVote && ' Your response has been recorded.'}</p>
+          {comment && <p className="italic text-xs">"{comment}"</p>}
+        </div>
       ) : (
         <>
           <div className="flex flex-wrap gap-2 mb-4">
@@ -101,6 +108,16 @@ export function PollWidget() {
               )
             })}
           </div>
+          {poll.allowComment && (
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Any additional comments? (optional)"
+              maxLength={500}
+              rows={2}
+              className="w-full mb-3 px-3 py-2 rounded-lg border border-border bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+          )}
           <button
             type="button"
             onClick={handleSubmit}
