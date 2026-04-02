@@ -82,7 +82,7 @@ export function computeDerivedAttempt(attemptObj: any, fallbackQuestions: Questi
   }
 }
 
-/** Inline markdown renderer — safe inside <button> (no block elements) */
+/** Inline markdown renderer - safe inside <button> (no block elements) */
 function MarkdownInline({ text }: { text: string }) {
   return (
     <ReactMarkdown
@@ -124,7 +124,7 @@ export function renderChoiceContent(val: any, q?: Question, inline = false) {
   return <MarkdownInline text={s} />
 }
 
-/** Render text as markdown — used for question text and explanation fields */
+/** Render text as markdown - used for question text and explanation fields */
 export function MarkdownText({ text, className }: { text: string; className?: string }) {
   return (
     <div className={className}>

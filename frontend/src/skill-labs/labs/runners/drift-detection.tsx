@@ -160,7 +160,7 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
                             <span className={`font-mono font-medium ${
                               showResult && diffKeys.includes(key) ? 'text-blue-600 dark:text-blue-400' : ''
                             }`}>
-                              {resource.expected[key] ?? '—'}
+                              {resource.expected[key] ?? '-'}
                             </span>
                           </div>
                         ))}
@@ -182,7 +182,7 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
                               <span className={`font-mono font-medium ${
                                 isDiff ? 'text-amber-600 dark:text-amber-400 font-bold' : ''
                               }`}>
-                                {resource.actual[key] ?? '—'}
+                                {resource.actual[key] ?? '-'}
                                 {showResult && isDiff && <span className="ml-1 text-destructive">⚠</span>}
                               </span>
                             </div>
@@ -202,7 +202,7 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
                           : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted/50'
                       }`}
                     >
-                      {userMarkedDrifted ? '⚠ Marked as Drifted — click to undo' : 'Mark as Drifted'}
+                      {userMarkedDrifted ? '⚠ Marked as Drifted - click to undo' : 'Mark as Drifted'}
                     </button>
                   )}
                 </div>

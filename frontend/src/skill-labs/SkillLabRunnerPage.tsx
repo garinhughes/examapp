@@ -9,13 +9,13 @@ interface SkillLabRunnerPageProps {
   timed?: boolean
 }
 
-// Provider-specific overrides — add entries here when a lab type needs genuinely different
+// Provider-specific overrides - add entries here when a lab type needs genuinely different
 // UI behaviour per provider (e.g. 'azure:cli'). Most labs will never need this.
 const providerRunnerImports: Partial<Record<string, () => Promise<{ default: ComponentType<any> }>>> = {
   // e.g. 'azure:cli': () => import('./labs/providers/azure/cli').then(m => ({ default: m.CliLabRunner })),
 }
 
-// Generic fallback runners — one file per type, shared across all providers
+// Generic fallback runners - one file per type, shared across all providers
 const genericRunnerImports: Record<SkillLabType, () => Promise<{ default: ComponentType<any> }>> = {
   'diagnose':              () => import('./labs/runners/diagnose').then(m => ({ default: m.DiagnoseLabRunner })),
   'cli':                   () => import('./labs/runners/cli').then(m => ({ default: m.CliLabRunner })),

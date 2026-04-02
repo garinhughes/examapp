@@ -175,7 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const refreshTk = getRefreshToken()
     if (!refreshTk) {
-      console.warn('[auth] No refresh token available — cannot refresh')
+      console.warn('[auth] No refresh token available - cannot refresh')
       return null
     }
 
@@ -244,7 +244,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const u = userFromToken(newToken)
             setUser(u)
           }
-          // If refresh fails the user stays logged out — they'll need to login
+          // If refresh fails the user stays logged out - they'll need to login
           setLoading(false)
         })
         return
@@ -380,7 +380,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = url
   }, [user, setUser, setToken])
 
-  /** Convenience alias — keeps backward compat for any code calling login() */
+  /** Convenience alias - keeps backward compat for any code calling login() */
   const login = useCallback(() => loginWithProvider('Google'), [loginWithProvider])
 
   /* ---- email/password auth methods ---- */

@@ -221,7 +221,7 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
         ) : (
           <div className="flex items-center justify-between w-full">
             <div className={`text-sm font-semibold ${allPass ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-              {allPass ? 'Policy validates successfully!' : 'Lab complete — review the explanation above.'}
+              {allPass ? 'Policy validates successfully!' : 'Lab complete - review the explanation above.'}
             </div>
             <button onClick={() => setRoute('skill-labs')} className="px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
               Back to Skill Labs

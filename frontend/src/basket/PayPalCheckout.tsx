@@ -1,5 +1,5 @@
 /**
- * PayPalCheckout — renders PayPal + Apple Pay buttons (via @paypal/react-paypal-js).
+ * PayPalCheckout - renders PayPal + Apple Pay buttons (via @paypal/react-paypal-js).
  *
  * Apple Pay is automatically shown on Safari/iOS when:
  *  - The device has Apple Pay configured

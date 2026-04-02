@@ -165,8 +165,8 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
           <div className="space-y-2">
             <div className={`font-semibold text-sm ${meetsTarget ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {meetsTarget
-                ? `✓ Cost reduced to $${currentTotal}/mo — under target!`
-                : `✗ Cost is $${currentTotal}/mo — still above $${lab.targetCost}/mo target`}
+                ? `✓ Cost reduced to $${currentTotal}/mo - under target!`
+                : `✗ Cost is $${currentTotal}/mo - still above $${lab.targetCost}/mo target`}
             </div>
             <ExplanationBlock text={lab.explanation} />
             <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">

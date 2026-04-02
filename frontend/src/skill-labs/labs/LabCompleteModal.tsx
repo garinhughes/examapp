@@ -1,5 +1,5 @@
 /**
- * LabCompleteModal — confirmation dialog shown before a skill lab is submitted.
+ * LabCompleteModal - confirmation dialog shown before a skill lab is submitted.
  * Mirrors the exam submit-confirmation pattern.
  */
 

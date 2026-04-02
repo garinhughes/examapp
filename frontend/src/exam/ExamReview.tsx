@@ -17,7 +17,7 @@ export function ExamReview() {
   const domains: string[] = attemptData?.perDomain ? Object.keys(attemptData.perDomain) : Array.from(new Set(questions.map((q) => (q as any).domain)))
   const allSelected = reviewDomains.includes('All')
 
-  // Base questions — restrict to answered for early-complete
+  // Base questions - restrict to answered for early-complete
   const baseQuestions = (attemptData?.earlyComplete && Array.isArray(attemptData?.answers))
     ? questions.filter((q) => attemptData.answers.some((a: any) => String(a.questionId) === String(q.id)))
     : questions
@@ -208,7 +208,7 @@ export function ExamReview() {
                           return (
                             <div key={slot.id} className={`px-3 py-2 rounded-lg border text-sm ${bg}`}>
                               <div className="font-medium">{si + 1}. {slot.label}</div>
-                              <div className="mt-1">Your answer: <strong>{choiceMap.get(userChoice)?.text ?? '—'}</strong></div>
+                              <div className="mt-1">Your answer: <strong>{choiceMap.get(userChoice)?.text ?? '-'}</strong></div>
                               {!isCorrectSlot && <div className="mt-0.5 text-green-600 dark:text-green-400 text-xs">Correct: {choiceMap.get(slot.correctChoiceId)?.text}</div>}
                             </div>
                           )

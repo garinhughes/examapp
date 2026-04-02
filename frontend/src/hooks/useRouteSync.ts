@@ -78,7 +78,7 @@ export function useRouteSync(): void {
   }, [location.pathname])
 
   // State → URL: when internal state changes (e.g. sidebar click, hero button).
-  // Skip on initial mount — the URL→state effect above owns the initial sync.
+  // Skip on initial mount - the URL→state effect above owns the initial sync.
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false

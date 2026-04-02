@@ -614,9 +614,9 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
     const key = `attempt:${selected}`
 
-    // Visitor (unauthenticated) — run exam client-side
+    // Visitor (unauthenticated) - run exam client-side
     if (!user) {
-      if (examMode === 'weakest-link') { setLastError('Sign in to use Weakest Link mode — it needs your attempt history.'); return }
+      if (examMode === 'weakest-link') { setLastError('Sign in to use Weakest Link mode - it needs your attempt history.'); return }
       const localId = `visitor-${Date.now()}`
       setAttemptId(localId)
       setExamStarted(true)
@@ -855,7 +855,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     const totalQuestions = displayQuestions.length
     try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
 
-    // Visitor — compute locally
+    // Visitor - compute locally
     if (!user) {
       const qs = displayQuestions as Question[]
       let correct = 0
@@ -883,7 +883,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    // Authenticated — call server finish
+    // Authenticated - call server finish
     try {
       const finOpts: RequestInit = { method: 'PATCH' }
       if (earlyComplete) { finOpts.headers = { 'Content-Type': 'application/json' }; finOpts.body = JSON.stringify({ earlyComplete: true }) }
@@ -974,7 +974,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     try { localStorage.setItem('theme', dark ? 'dark' : 'light') } catch {}
   }, [dark])
 
-  // Fetch global user tier (paying / registered / visitor) — independent of any exam
+  // Fetch global user tier (paying / registered / visitor) - independent of any exam
   useEffect(() => {
     if (!user) { setUserTier(null); setTrialDaysRemaining(null); return }
     authFetch('/auth/me')

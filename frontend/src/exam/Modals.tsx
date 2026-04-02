@@ -141,7 +141,7 @@ export function Modals() {
                     </div>
                   )}
                   <div className="text-sm text-muted-foreground mb-4">
-                    Your score will be calculated from the <strong>{answered}</strong> answered questions only — unanswered questions won't count against you.
+                    Your score will be calculated from the <strong>{answered}</strong> answered questions only - unanswered questions won't count against you.
                   </div>
                 </>
               )

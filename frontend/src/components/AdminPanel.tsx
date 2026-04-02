@@ -57,7 +57,7 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 function fmtDate(iso?: string | null) {
-  if (!iso) return '—'
+  if (!iso) return '-'
   try {
     return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
   } catch {
@@ -66,7 +66,7 @@ function fmtDate(iso?: string | null) {
 }
 
 function fmtDateTime(iso?: string | null) {
-  if (!iso) return '—'
+  if (!iso) return '-'
   try {
     return new Date(iso).toLocaleString('en-GB', {
       day: 'numeric', month: 'short', year: 'numeric',
@@ -236,14 +236,14 @@ function UserRow({
           <div className="flex items-center gap-2">
             <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${user.isActive !== false ? 'bg-emerald-500' : 'bg-red-500'}`} title={user.isActive !== false ? 'Active' : 'Deactivated'} />
             <div>
-              <div className="font-medium text-sm">{user.name || '—'}</div>
+              <div className="font-medium text-sm">{user.name || '-'}</div>
               {user.username && (
                 <div className="text-xs text-primary">@{user.username}</div>
               )}
             </div>
           </div>
         </td>
-        <td className="p-2.5 text-sm">{user.email || '—'}</td>
+        <td className="p-2.5 text-sm">{user.email || '-'}</td>
         <td className="p-2.5">
           <div className="flex items-center gap-1.5">
             {user.isAdmin && (
@@ -401,7 +401,7 @@ function UserRow({
                     <option value="">Select product to grant…</option>
                     {grantableProducts.map((p) => (
                       <option key={p.productId} value={p.productId}>
-                        {p.label} ({p.kind}) — £{(p.priceGBP / 100).toFixed(2)}
+                        {p.label} ({p.kind}) - £{(p.priceGBP / 100).toFixed(2)}
                       </option>
                     ))}
                   </select>
@@ -532,7 +532,7 @@ function BulkGrantModal({
         ) : (
           <>
             <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-800 dark:text-emerald-300">
-              Done — {result.granted} granted, {result.skipped} skipped (already had access).
+              Done - {result.granted} granted, {result.skipped} skipped (already had access).
               {result.errors.length > 0 && (
                 <div className="mt-1 text-red-600 dark:text-red-400">
                   {result.errors.length} error{result.errors.length !== 1 ? 's' : ''}
@@ -652,7 +652,7 @@ function BulkRevokeModal({
         ) : (
           <>
             <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-800 dark:text-emerald-300">
-              Done — {result.granted} revoked.
+              Done - {result.granted} revoked.
               {result.errors.length > 0 && (
                 <div className="mt-1 text-red-600 dark:text-red-400">
                   {result.errors.length} error{result.errors.length !== 1 ? 's' : ''}
@@ -765,7 +765,7 @@ function BulkMigratePanel({
               >
                 <option value="">{loadingExams ? 'Loading…' : 'Select exam…'}</option>
                 {exams.map((e) => (
-                  <option key={e.code} value={e.code}>{e.code} — {e.title}</option>
+                  <option key={e.code} value={e.code}>{e.code} - {e.title}</option>
                 ))}
               </select>
             </div>
@@ -780,7 +780,7 @@ function BulkMigratePanel({
               >
                 <option value="">{loadingExams ? 'Loading…' : 'Select exam…'}</option>
                 {exams.filter((e) => e.code !== fromCode).map((e) => (
-                  <option key={e.code} value={e.code}>{e.code} — {e.title}</option>
+                  <option key={e.code} value={e.code}>{e.code} - {e.title}</option>
                 ))}
               </select>
             </div>
@@ -847,7 +847,7 @@ function BulkMigratePanel({
           {/* Final result */}
           {result && (
             <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-800 dark:text-emerald-300">
-              Done — {result.grantedCount} granted, {result.skippedCount} skipped (already had it).
+              Done - {result.grantedCount} granted, {result.skippedCount} skipped (already had it).
               <button onClick={reset} className="ml-3 underline text-xs">Clear</button>
             </div>
           )}
@@ -1227,7 +1227,7 @@ function ErasurePanel({
       {open && (
         <div className="p-4 space-y-4 bg-card">
           {receipt ? (
-            // Step 4 — Receipt
+            // Step 4 - Receipt
             <div className="space-y-3 pt-3">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-sm">Erasure complete</h3>
@@ -1252,16 +1252,16 @@ function ErasurePanel({
                 <div className="flex items-center gap-2 text-xs text-muted-foreground border-t border-border pt-1.5 mt-1">
                   <span>–</span>
                   <span className="flex-1">Aggregate metrics</span>
-                  <span className="italic">kept — not personal data</span>
+                  <span className="italic">kept - not personal data</span>
                 </div>
               </div>
               {!receipt.allOk && (
                 <p className="text-xs text-destructive">Some steps failed. Check the audit log and re-run if needed.</p>
               )}
-              <p className="text-xs text-muted-foreground">Receipt emailed to support@certshack.com — forward to the data subject as evidence of erasure.</p>
+              <p className="text-xs text-muted-foreground">Receipt emailed to support@certshack.com - forward to the data subject as evidence of erasure.</p>
             </div>
           ) : selected && (preview || loadingPreview) ? (
-            // Step 2 + 3 — Preview checklist + Confirm
+            // Step 2 + 3 - Preview checklist + Confirm
             <div className="space-y-3 pt-3">
               <div className="flex items-center justify-between">
                 <div>
@@ -1286,7 +1286,7 @@ function ErasurePanel({
                   <div className="flex items-center gap-2 text-xs text-muted-foreground border-t border-border pt-1.5 mt-1">
                     <span>–</span>
                     <span className="flex-1">Aggregate metrics</span>
-                    <span className="italic">kept — not personal data (UK GDPR compliant)</span>
+                    <span className="italic">kept - not personal data (UK GDPR compliant)</span>
                   </div>
                 </div>
               )}
@@ -1310,7 +1310,7 @@ function ErasurePanel({
               {dryRun && (
                 <div className="rounded-lg border border-border bg-card p-3 space-y-1.5">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                    Dry run — no data deleted
+                    Dry run - no data deleted
                   </p>
                   {dryRun.steps.map((s) => (
                     <div key={s.name} className="flex items-center gap-2 text-xs">
@@ -1323,7 +1323,7 @@ function ErasurePanel({
                     </div>
                   ))}
                   {dryRun.allOk
-                    ? <p className="text-xs text-emerald-600 dark:text-emerald-400 pt-1">All checks passed — ready to execute.</p>
+                    ? <p className="text-xs text-emerald-600 dark:text-emerald-400 pt-1">All checks passed - ready to execute.</p>
                     : <p className="text-xs text-destructive pt-1">One or more checks failed. Fix the issues above and retry the dry run.</p>
                   }
                 </div>
@@ -1353,7 +1353,7 @@ function ErasurePanel({
               )}
             </div>
           ) : (
-            // Step 1 — Search
+            // Step 1 - Search
             <div className="space-y-3 pt-3">
               <p className="text-xs text-muted-foreground">
                 Search by the email address from the user's deletion request.

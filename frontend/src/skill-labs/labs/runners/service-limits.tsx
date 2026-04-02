@@ -158,7 +158,7 @@ export function ServiceLimitsRunner({ lab, timed = true }: Props) {
           <div className="space-y-2">
             <div className={`font-semibold text-sm ${allCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {allCorrect
-                ? '✓ All scaling actions correct — system stabilized!'
+                ? '✓ All scaling actions correct - system stabilized!'
                 : `✗ ${Object.values(results).filter(Boolean).length}/${lab.metrics.length} correct`}
             </div>
             <ExplanationBlock text={lab.explanation} />

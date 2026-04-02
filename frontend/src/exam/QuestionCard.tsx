@@ -169,7 +169,7 @@ export function QuestionCard() {
                             }}
                             className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
                           >
-                            <option value="">— Select —</option>
+                            <option value="">- Select -</option>
                             {q.choices.map((c) => (
                               <option key={c.id} value={c.id}>{c.text}</option>
                             ))}

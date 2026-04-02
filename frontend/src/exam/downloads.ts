@@ -60,7 +60,7 @@ export function downloadAttemptPDF(attemptData: any, selectedMeta: Exam | null, 
   const total = attemptData.total ?? 0
   const pm = typeof selectedMeta?.passMark === 'number' ? selectedMeta.passMark : 70
   const passed = score >= pm
-  const finishedAt = attemptData.finishedAt ? new Date(attemptData.finishedAt).toLocaleString() : '—'
+  const finishedAt = attemptData.finishedAt ? new Date(attemptData.finishedAt).toLocaleString() : '-'
 
   const qs = Array.isArray(attemptData.questions) && attemptData.questions.length > 0 ? attemptData.questions : questions
 
@@ -101,7 +101,7 @@ export function downloadAttemptPDF(attemptData: any, selectedMeta: Exam | null, 
     questionsHTML += `</div>`
   }
 
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${examTitle} — Report</title>
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${examTitle} - Report</title>
 <style>
   body{font-family:system-ui,-apple-system,sans-serif;max-width:800px;margin:0 auto;padding:24px;color:#1e293b;font-size:13px;}
   h1{font-size:22px;margin-bottom:4px;} h2{font-size:16px;margin-top:28px;border-bottom:1px solid #e2e8f0;padding-bottom:4px;}
@@ -120,7 +120,7 @@ export function downloadAttemptPDF(attemptData: any, selectedMeta: Exam | null, 
 </style></head><body>
 <h1>${examTitle} <span style="color:#94a3b8;font-weight:400;font-size:14px">${examCode}</span></h1>
 <div class="meta">
-  <span class="badge ${passed ? 'pass' : 'fail'}">${score}% — ${passed ? 'PASS' : 'FAIL'}</span>
+  <span class="badge ${passed ? 'pass' : 'fail'}">${score}% - ${passed ? 'PASS' : 'FAIL'}</span>
   &nbsp;&nbsp;${correctCount} / ${total} correct &nbsp;|&nbsp; Completed: ${finishedAt}
 </div>
 ${domainHTML}
@@ -150,7 +150,7 @@ export function downloadAnalyticsCSV(
   const pm = typeof selectedMeta?.passMark === 'number' ? selectedMeta.passMark : 70
 
   const rows: string[] = []
-  rows.push(`Analytics Report — ${examTitle} (${examCode})`)
+  rows.push(`Analytics Report - ${examTitle} (${examCode})`)
   rows.push('')
 
   const atts = analyticsAttempts || []
@@ -167,9 +167,9 @@ export function downloadAnalyticsCSV(
   rows.push('Metric,Value')
   rows.push(`Total attempts,${atts.length}`)
   rows.push(`Finished,${finished}`)
-  rows.push(`Average score,${avg !== null ? avg + '%' : '—'}`)
-  rows.push(`Best score,${best !== null ? best + '%' : '—'}`)
-  rows.push(`Pass rate,${passRate !== null ? passRate + '%' : '—'}`)
+  rows.push(`Average score,${avg !== null ? avg + '%' : '-'}`)
+  rows.push(`Best score,${best !== null ? best + '%' : '-'}`)
+  rows.push(`Pass rate,${passRate !== null ? passRate + '%' : '-'}`)
   rows.push('')
 
   if (analyticsDomains && Object.keys(analyticsDomains).length > 0) {

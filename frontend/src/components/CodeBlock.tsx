@@ -44,7 +44,7 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
     )
   }
 
-  // YAML tokeniser — highlights keys, values, booleans, and comments
+  // YAML tokeniser - highlights keys, values, booleans, and comments
   if (language === 'yaml' || language === 'yml') {
     const lines = code.split('\n')
     return (

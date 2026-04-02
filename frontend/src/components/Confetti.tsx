@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-/** Lightweight CSS confetti — no dependencies */
+/** Lightweight CSS confetti - no dependencies */
 export function Confetti({ duration = 3000, onDone }: { duration?: number; onDone?: () => void }) {
   const [particles] = useState(() =>
     Array.from({ length: 60 }, (_, i) => ({

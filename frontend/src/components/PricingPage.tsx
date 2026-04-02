@@ -18,7 +18,7 @@ import { clarityEvent, clarityTag } from '../clarity'
 /* ------------------------------------------------------------------ */
 
 const CHECK = '✓'
-const CROSS = '—'
+const CROSS = '-'
 
 function formatPrice(pence: number): string {
   const pounds = pence / 100
@@ -432,7 +432,7 @@ export default function PricingPage() {
         const codes = new Set<string>(json.map((e: any) => String(e.code).toUpperCase()))
         if (mounted) setAvailableExamCodes(codes)
       } catch (err) {
-        // ignore — we'll fallback to backend /pricing filtering
+        // ignore - we'll fallback to backend /pricing filtering
       }
     })()
     return () => { mounted = false }

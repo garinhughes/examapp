@@ -14,7 +14,7 @@ interface LabHeaderProps {
   subtitle?: string
   labId?: string
   onPauseChange?: (paused: boolean) => void
-  /** Called instead of setRoute when leaving an in-progress lab — saves progress first. */
+  /** Called instead of setRoute when leaving an in-progress lab - saves progress first. */
   onPauseAndExit?: () => void
   /** Called to discard saved progress and exit. When provided, a "Cancel Lab" option is shown. */
   onCancelLab?: () => void

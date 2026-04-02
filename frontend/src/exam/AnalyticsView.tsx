@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Download, Trash2, ChevronDown, ChevronRight, Search } from 'lucide-react'
+import { Trash2, ChevronDown, ChevronRight, Search } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
 import { ScoreHistoryChart } from './ScoreHistoryChart'
@@ -8,9 +8,9 @@ export function AnalyticsView() {
   const {
     selected, selectedMeta, exams, providers, scoreHistory, loadingScoreHistory,
     analyticsAttempts, analyticsDomains, deletingAttemptId, setDeletingAttemptId,
-    gamState, fetchScoreHistory, downloadAnalyticsCSV, setupExamFromMeta,
+    gamState, fetchScoreHistory, setupExamFromMeta,
     setRoute, authFetch, setAttemptData, setSelected, questions, setQuestions,
-    attemptId, setAttemptId, showToast, setExamStarted, userTier,
+    attemptId, setAttemptId, showToast, setExamStarted,
     examStarted, anySavedExam, savedProgress,
   } = useExam()
 
@@ -96,16 +96,7 @@ export function AnalyticsView() {
           )}
           {selected && (
             <>
-              {userTier && userTier !== 'visitor' && (
-              <button
-                className="px-3 py-1 rounded bg-accent text-sm inline-flex items-center gap-1.5 hover:bg-accent transition-colors"
-                onClick={downloadAnalyticsCSV}
-                title="Download analytics as CSV"
-              >
-                <Download className="w-3.5 h-3.5" />
-                CSV
-              </button>
-              )}
+
               {(() => {
                 const blocked = !!(examStarted || anySavedExam || (selected && savedProgress))
                 return (
@@ -253,7 +244,7 @@ export function AnalyticsView() {
               const stat = (label: string, value: any) => (
                 <div className="p-3 rounded bg-card/60 dark:bg-card border border-border/60 dark:border-border/60">
                   <div className="text-xs text-muted-foreground">{label}</div>
-                  <div className="text-lg font-semibold">{value ?? '—'}</div>
+                  <div className="text-lg font-semibold">{value ?? '-'}</div>
                 </div>
               )
 
@@ -261,7 +252,7 @@ export function AnalyticsView() {
                 <>
                   {stat('Attempts / Finished', `${total} / ${finished}`)}
                   {stat('Avg score', avg !== null ? `${avg}%` : null)}
-                  {stat('Best / Last', (best !== null || lastScore !== null) ? `${best ?? '—'}% / ${Number.isFinite(lastScore) ? `${lastScore}%` : '—'}` : null)}
+                  {stat('Best / Last', (best !== null || lastScore !== null) ? `${best ?? '-'}% / ${Number.isFinite(lastScore) ? `${lastScore}%` : '-'}` : null)}
                   {stat('Pass rate', passRate !== null ? `${passRate}%` : null)}
                 </>
               )
@@ -343,15 +334,15 @@ export function AnalyticsView() {
                                 <div className="font-medium truncate">
                                   {a.finishedAt
                                     ? `Finished: ${new Date(a.finishedAt).toLocaleString()}`
-                                    : `Started: ${a.startedAt ? new Date(a.startedAt).toLocaleString() : '—'}`}
+                                    : `Started: ${a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}`}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
                                   {typeof a.score === 'number'
                                     ? (() => {
                                         const ratio = (typeof a.correctCount === 'number' && typeof a.total === 'number') ? ` (${a.correctCount}/${a.total})` : ''
-                                        return `${a.score}%${ratio} — ${a.score >= passMark ? 'pass' : 'fail'}`
+                                        return `${a.score}%${ratio} - ${a.score >= passMark ? 'pass' : 'fail'}`
                                       })()
-                                    : (a.finishedAt ? '—' : `${a.answersCount ?? 0} answers`)}
+                                    : (a.finishedAt ? '-' : `${a.answersCount ?? 0} answers`)}
                                 </div>
                               </div>
                               <button
@@ -408,16 +399,16 @@ export function AnalyticsView() {
                         <div className="font-medium truncate">
                           {a.finishedAt
                             ? `Finished: ${new Date(a.finishedAt).toLocaleString()}`
-                            : `Started: ${a.startedAt ? new Date(a.startedAt).toLocaleString() : '—'}`}
+                            : `Started: ${a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}`}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {typeof a.score === 'number'
                             ? (() => {
                               const ratio = (typeof a.correctCount === 'number' && typeof a.total === 'number') ? ` (${a.correctCount}/${a.total})` : ''
                               const pass = a.score >= passMark
-                              return `${a.score}%${ratio} — ${pass ? 'pass' : 'fail'}`
+                              return `${a.score}%${ratio} - ${pass ? 'pass' : 'fail'}`
                             })()
-                            : (a.finishedAt ? '—' : `${a.answersCount ?? 0} answers`)}
+                            : (a.finishedAt ? '-' : `${a.answersCount ?? 0} answers`)}
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">

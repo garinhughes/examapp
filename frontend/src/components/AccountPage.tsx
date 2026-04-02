@@ -495,7 +495,7 @@ export default function AccountPage() {
               ].map((f) => (
                 <div key={f.label} className="flex items-center gap-2">
                   <span className={f.on ? 'text-emerald-500' : 'text-muted-foreground'}>
-                    {f.on ? '✓' : '—'}
+                    {f.on ? '✓' : '-'}
                   </span>
                   <span className={f.on ? 'text-foreground' : 'text-muted-foreground dark:text-muted-foreground'}>
                     {f.label}

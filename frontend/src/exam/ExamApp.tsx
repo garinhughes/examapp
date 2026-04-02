@@ -1,4 +1,4 @@
-import { Save, X, Play, Pause, Download, FileText, Info, BarChart3, BookOpen, Terminal, Minimize2, Maximize2 } from 'lucide-react'
+import { Save, X, Play, Pause, Info, BarChart3, BookOpen, Terminal, Minimize2, Maximize2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useRef, useEffect, useState } from 'react'
 import { clarityEvent, clarityTag } from '@/clarity'
@@ -58,7 +58,6 @@ function ExamAppInner() {
     selectedAnswers, flaggedQuestions,
     user, login, logout, gamState, gamLevel,
     authFetch, showToast, resumeExam, setupExamFromMeta, saveExamProgress,
-    downloadAttemptCSV, downloadAttemptPDF, userTier,
     setShowCancelConfirm, isAdmin,
   } = useExam()
 
@@ -325,7 +324,7 @@ function ExamAppInner() {
                               setRoute('practice')
                               clarityEvent('exam_saved_for_later')
                             }}
-                            title="Save progress and exit — resume later"
+                            title="Save progress and exit - resume later"
                           >
                             <Save className="w-4 h-4" />
                             Save for Later
@@ -395,7 +394,7 @@ function ExamAppInner() {
                       <li key={a.attemptId} className="flex items-center justify-between">
                         <div>
                           <div className="font-medium">{a.examCode}</div>
-                          <div className="text-xs text-muted-foreground">{a.attemptId} — {a.startedAt ? new Date(a.startedAt).toLocaleString() : '—'}</div>
+                          <div className="text-xs text-muted-foreground">{a.attemptId} - {a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}</div>
                         </div>
                         <div className="flex items-center gap-2">
                           {a.score !== null && <div className="text-sm font-semibold">{a.score}%</div>}
@@ -452,9 +451,9 @@ function ExamAppInner() {
                       <div>
                         <div className="text-sm text-muted-foreground">
                           {attemptData.correctCount ?? 0} / {attemptData.total ?? 0} correct
-                          {attemptData.earlyComplete && <span className="ml-2 text-primary">(completed early — {attemptData.answeredCount} of {attemptData.totalQuestions} questions)</span>}
+                          {attemptData.earlyComplete && <span className="ml-2 text-primary">(completed early - {attemptData.answeredCount} of {attemptData.totalQuestions} questions)</span>}
                         </div>
-                        <div className="mt-1 text-xs text-muted-foreground">Completed: {attemptData.finishedAt ? new Date(attemptData.finishedAt).toLocaleString() : '—'}</div>
+                        <div className="mt-1 text-xs text-muted-foreground">Completed: {attemptData.finishedAt ? new Date(attemptData.finishedAt).toLocaleString() : '-'}</div>
                       </div>
                     </div>
 
@@ -494,26 +493,7 @@ function ExamAppInner() {
                       })()}
                     </div>
                   </div>
-                  {userTier && userTier !== 'visitor' && (
-                  <div className="flex flex-col gap-2">
-                    <button
-                      className="px-3 py-1.5 rounded bg-accent text-sm inline-flex items-center gap-2 hover:bg-accent transition-colors"
-                      onClick={downloadAttemptCSV}
-                      title="Download report as CSV"
-                    >
-                      <Download className="w-4 h-4" />
-                      CSV
-                    </button>
-                    <button
-                      className="px-3 py-1.5 rounded bg-accent text-sm inline-flex items-center gap-2 hover:bg-accent transition-colors"
-                      onClick={downloadAttemptPDF}
-                      title="Open printable report (Save as PDF)"
-                    >
-                      <FileText className="w-4 h-4" />
-                      PDF
-                    </button>
-                  </div>
-                  )}
+
                 </div>
               </div>
             )}
@@ -558,7 +538,7 @@ function ResumeBanner() {
         </div>
         <div>
           <div className="font-semibold text-foreground">Exam in progress</div>
-          <div className="text-sm text-muted-foreground">{anySavedExam.title} — {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
+          <div className="text-sm text-muted-foreground">{anySavedExam.title} - {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
         </div>
       </div>
       <div>

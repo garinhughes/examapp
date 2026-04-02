@@ -182,7 +182,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Social sign-in — only on signin/register views */}
+        {/* Social sign-in - only on signin/register views */}
         {(view === 'signin' || view === 'register') && (
           <div className="space-y-3">
             <div className="relative py-2">
@@ -197,8 +197,8 @@ export default function LoginPage() {
               <Button variant="outline" size="icon" onClick={() => loginWithProvider('Google')} title="Continue with Google">
                 <GoogleIcon />
               </Button>
-              {/* Facebook login disabled — requires business verification */}
-              {/* Apple login disabled — requires paid Apple Developer account; revisit if building iOS app */}
+              {/* Facebook login disabled - requires business verification */}
+              {/* Apple login disabled - requires paid Apple Developer account; revisit if building iOS app */}
             </div>
 
             <div className="relative py-2">

@@ -80,7 +80,7 @@ export function DiagramLabelRunner({ lab, timed = true }: Props) {
         </div>
       )}
 
-      {/* Diagram canvas — natural image sizing so hotspot % coords map exactly to image pixels */}
+      {/* Diagram canvas - natural image sizing so hotspot % coords map exactly to image pixels */}
       <div className="flex-1 min-h-0 overflow-y-auto rounded-lg border border-border bg-card">
         <div className="relative w-full">
         <img
@@ -111,7 +111,7 @@ export function DiagramLabelRunner({ lab, timed = true }: Props) {
                   onChange={(e) => handleSelect(hotspot.id, e.target.value)}
                   className="text-xs border border-border rounded bg-card px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
                 >
-                  <option value="">— select —</option>
+                  <option value="">- select -</option>
                   {hotspot.options.map((opt) => (
                     <option key={opt} value={opt}>{opt}</option>
                   ))}

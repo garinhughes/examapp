@@ -1,5 +1,5 @@
 /**
- * useLabProgress — generic hook for saving/restoring in-progress skill lab state.
+ * useLabProgress - generic hook for saving/restoring in-progress skill lab state.
  *
  * Mirrors the exam `examProgress:{code}` localStorage pattern.
  * Key: `skillLabProgress:{labId}`
@@ -17,7 +17,7 @@ export function useLabProgress<T>(labId: string, timed?: boolean, labVersion?: s
   saveProgress: (state: T) => void
   clearProgress: () => void
 } {
-  // Read once on mount — useRef ensures we don't re-read on every render.
+  // Read once on mount - useRef ensures we don't re-read on every render.
   const initialRef = useRef<{ progress: T | null; timed: boolean | null } | undefined>(undefined)
   if (initialRef.current === undefined) {
     try {

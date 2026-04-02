@@ -29,7 +29,7 @@ export function useAuthFetch() {
           if (newToken) {
             token = newToken
           } else {
-            // Refresh failed — token is dead, force re-login
+            // Refresh failed - token is dead, force re-login
             logout()
             return new Response(JSON.stringify({ message: 'Session expired' }), {
               status: 401,
@@ -60,7 +60,7 @@ export function useAuthFetch() {
           return fetch(url, { ...init, headers: retryHeaders })
         }
 
-        // Refresh failed — force re-login
+        // Refresh failed - force re-login
         logout()
       }
 
@@ -70,7 +70,7 @@ export function useAuthFetch() {
   )
 }
 
-/** Quick client-side check — does the JWT exp claim say it's expired? */
+/** Quick client-side check - does the JWT exp claim say it's expired? */
 function isTokenExpiredQuick(token: string): boolean {
   try {
     const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')

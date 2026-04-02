@@ -127,7 +127,7 @@ export function ReportIssueModal({ contentType, contentId, examCode, provider, s
                 onChange={(e) => setIssueType(e.target.value)}
                 disabled={submitting}
               >
-                <option value="">— Select issue type —</option>
+                <option value="">- Select issue type -</option>
                 {options.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
@@ -139,7 +139,7 @@ export function ReportIssueModal({ contentType, contentId, examCode, provider, s
               <textarea
                 className="w-full rounded border border-border bg-background p-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary"
                 rows={4}
-                placeholder="Describe the issue — e.g. the explanation is incorrect because…"
+                placeholder="Describe the issue - e.g. the explanation is incorrect because…"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 maxLength={2000}

@@ -1,13 +1,13 @@
 /**
- * useEntitlements — hook to fetch the user's tier + entitlements from the backend.
+ * useEntitlements - hook to fetch the user's tier + entitlements from the backend.
  *
  * Returns:
- *   tier       — 'visitor' | 'registered' | 'paying'
- *   tierConfig — full tier feature flags
- *   entitlements — list of active product IDs
- *   products   — full catalog with `owned` flag per product
- *   loading    — true while fetching
- *   refresh()  — re-fetch entitlements
+ *   tier       - 'visitor' | 'registered' | 'paying'
+ *   tierConfig - full tier feature flags
+ *   entitlements - list of active product IDs
+ *   products   - full catalog with `owned` flag per product
+ *   loading    - true while fetching
+ *   refresh()  - re-fetch entitlements
  */
 
 import { useState, useEffect, useCallback } from 'react'
@@ -97,7 +97,7 @@ export function useEntitlements(): EntitlementState {
         })
       }
     } catch {
-      // fallback — use defaults
+      // fallback - use defaults
     } finally {
       setLoading(false)
     }

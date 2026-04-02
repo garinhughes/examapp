@@ -47,7 +47,7 @@ export function ExamSetup() {
                 {examTier === 'visitor' && (
                   <>
                     {examShowcase
-                      ? <>These <strong>{questions.length}</strong> questions are hand-picked and the same for all visitors — they don't change between sessions.</>
+                      ? <>These <strong>{questions.length}</strong> questions are hand-picked and the same for all visitors - they don't change between sessions.</>
                       : <>You have access to <strong>{questions.length}</strong> of <strong>{examTotalAvailable}</strong> questions.</>
                     }
                     {' '}Sign in for more.
@@ -56,7 +56,7 @@ export function ExamSetup() {
                 {examTier === 'registered' && (
                   <>
                     {examShowcase
-                      ? <>These <strong>{questions.length}</strong> questions are hand-picked and the same for your account — they don't rotate.</>
+                      ? <>These <strong>{questions.length}</strong> questions are hand-picked and the same for your account - they don't rotate.</>
                       : <>You have access to <strong>{questions.length}</strong> of <strong>{examTotalAvailable}</strong> questions.</>
                     }
                     {' '}
@@ -189,7 +189,7 @@ export function ExamSetup() {
                 disabled={locked || !user}
                 className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg border ${examMode === 'weakest-link' ? 'border-primary bg-primary/10' : 'border-transparent bg-transparent hover:bg-muted/20'} text-sm ${!user ? 'opacity-40 cursor-not-allowed' : ''}`}
                 aria-pressed={examMode === 'weakest-link'}
-                title={user ? 'Weakest Link — prioritises your weakest domains and previously wrong questions' : 'Sign in to use Weakest Link mode'}
+                title={user ? 'Weakest Link - prioritises your weakest domains and previously wrong questions' : 'Sign in to use Weakest Link mode'}
               >
                 <Brain className="w-5 h-5 text-primary" />
                 <span>Weakest Link</span>

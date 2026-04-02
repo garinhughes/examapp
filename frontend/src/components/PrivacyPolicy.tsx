@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
     <>
       <Helmet>
         <title>certshack | Privacy Policy</title>
-        <meta name="description" content="Read the certshack privacy policy — how we collect, use, and protect your data." />
+        <meta name="description" content="Read the certshack privacy policy - how we collect, use, and protect your data." />
         <link rel="canonical" href="https://certshack.com/privacy" />
       </Helmet>
       <div className="max-w-3xl mx-auto px-6 py-12">

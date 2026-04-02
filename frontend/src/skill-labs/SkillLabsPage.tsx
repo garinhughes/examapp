@@ -316,7 +316,7 @@ export function SkillLabsPage() {
         </div>
       </div>
 
-      {/* Resume banner — shown when a visible lab has saved progress */}
+      {/* Resume banner - shown when a visible lab has saved progress */}
       {(() => {
         const resumable = filtered.find((l) => inProgressLabs.has(l.id))
         if (!resumable) return null
@@ -408,7 +408,7 @@ export function SkillLabsPage() {
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {typeof lab.timeLimit === 'number' && lab.timeLimit > 0 ? `${Math.floor(lab.timeLimit / 60)} min` : '—'}
+                      {typeof lab.timeLimit === 'number' && lab.timeLimit > 0 ? `${Math.floor(lab.timeLimit / 60)} min` : '-'}
                     </span>
                   <span className="capitalize">{lab.category}</span>
                 </div>

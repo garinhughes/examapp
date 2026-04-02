@@ -1,6 +1,6 @@
 import type { BadgeDefinition } from './types'
 
-/** All badge definitions — order matters for display */
+/** All badge definitions - order matters for display */
 export const BADGES: BadgeDefinition[] = [
   // ── Milestones ──
   {

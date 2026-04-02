@@ -14,36 +14,36 @@ interface RouteMeta {
 
 const META: Partial<Record<AppRoute, RouteMeta>> = {
   home: {
-    title: 'certshack — IT Certification Practice Exams & Hands-On Skill Labs | AWS, Azure, GCP',
+    title: 'certshack - IT Certification Practice Exams & Hands-On Skill Labs | AWS, Azure, GCP',
     description: 'Free practice exams and interactive skill labs for AWS, Azure, and GCP certifications. Timed or casual mode, per-question explanations, domain analytics, and hands-on CLI & IAM labs to build real-world cloud engineering skills.',
     path: '/',
     keywords: 'practice exams, AWS certification, Azure certification, GCP certification, skill labs, cloud certification practice, IT exam prep, SAA-C03, AZ-900, hands-on labs, certification study',
   },
   practice: {
-    title: 'certshack — Practice Exams for AWS, Azure & GCP Certifications',
+    title: 'certshack - Practice Exams for AWS, Azure & GCP Certifications',
     description: 'Browse and attempt timed or casual practice exams for IT certifications including AWS SAA-C03, CLF-C02, DVA-C02, SOA-C02, SCS-C03, and Azure AZ-900. Per-domain scoring and detailed explanations.',
     path: '/exams',
     keywords: 'practice exams, AWS SAA-C03, AWS CLF-C02, AWS DVA-C02, AWS SOA-C02, AWS SCS-C03, AZ-900, timed exam, certification prep',
   },
   'skill-labs': {
-    title: 'certshack — Hands-On Skill Labs for Cloud Certifications',
+    title: 'certshack - Hands-On Skill Labs for Cloud Certifications',
     description: 'Interactive skill labs to practise real-world cloud tasks. Simulated AWS CLI, IAM policy debugging, architecture diagnosis, and more. Build the practical skills that examiners and employers test.',
     path: '/skill-labs',
     keywords: 'skill labs, hands-on labs, AWS CLI practice, IAM policy lab, cloud skills, interactive labs, certification lab',
   },
   pricing: {
-    title: 'certshack — Pricing | Free & Premium Plans',
+    title: 'certshack - Pricing | Free & Premium Plans',
     description: 'Simple, transparent pricing for certshack practice exams and skill labs. Start free with sample exams, upgrade for full access to all certifications and labs.',
     path: '/pricing',
   },
   analytics: {
-    title: 'certshack — Your Exam Analytics & Performance',
+    title: 'certshack - Your Exam Analytics & Performance',
     description: 'Your personal exam analytics and performance trends.',
     path: '/analytics',
     noindex: true,
   },
   account: {
-    title: 'certshack — Account Settings',
+    title: 'certshack - Account Settings',
     description: 'Manage your certshack account settings and achievements.',
     path: '/account',
     noindex: true,
@@ -88,7 +88,7 @@ const HOME_JSONLD = JSON.stringify({
           name: 'How do skill labs help me become a better engineer?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Skill labs simulate real-world tasks like debugging IAM policies, running AWS CLI commands, and diagnosing architecture issues — building practical muscle memory beyond exam knowledge.',
+            text: 'Skill labs simulate real-world tasks like debugging IAM policies, running AWS CLI commands, and diagnosing architecture issues - building practical muscle memory beyond exam knowledge.',
           },
         },
         {

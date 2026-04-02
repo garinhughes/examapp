@@ -42,7 +42,7 @@ export function ScoreHistoryChart({ data, passMark, showEmptyText }: { data: any
   }
 
   const dateLabel = (v: any) => {
-    try { return new Date(v).toLocaleDateString() } catch { return '—' }
+    try { return new Date(v).toLocaleDateString() } catch { return '-' }
   }
 
   return (
@@ -96,7 +96,7 @@ export function ScoreHistoryChart({ data, passMark, showEmptyText }: { data: any
                 onClick={(ev: any) => { ev.stopPropagation(); setActiveIdx(i === activeIdx ? null : i) }}
                 onTouchStart={(ev: any) => { ev.stopPropagation(); setActiveIdx(i === activeIdx ? null : i) }}
               />
-              <title>{`${when ? new Date(when).toLocaleString() : '—'} ${p.d.pct}%${ratio ? ` (${ratio})` : ''}`}</title>
+              <title>{`${when ? new Date(when).toLocaleString() : '-'} ${p.d.pct}%${ratio ? ` (${ratio})` : ''}`}</title>
             </g>
           )
         })}
@@ -114,7 +114,7 @@ export function ScoreHistoryChart({ data, passMark, showEmptyText }: { data: any
           const ty = Math.max(padT + 8, p.y - 28)
           const when = p.d.finishedAt || p.d.startedAt
           const ratio = (typeof p.d.correctCount === 'number' && typeof p.d.total === 'number') ? `${p.d.correctCount}/${p.d.total}` : null
-          const lines = [`${p.d.pct}%${ratio ? ` (${ratio})` : ''}`, when ? new Date(when).toLocaleString() : '—']
+          const lines = [`${p.d.pct}%${ratio ? ` (${ratio})` : ''}`, when ? new Date(when).toLocaleString() : '-']
           return (
             <g>
               <rect x={tx - 6} y={ty - 18} rx={6} ry={6} width={140} height={36} fill="#0f172a" stroke="#475569" strokeWidth={0.5} opacity={0.95} />

@@ -1,5 +1,5 @@
 /**
- * useLabSession — extracts all shared lifecycle boilerplate from lab runners:
+ * useLabSession - extracts all shared lifecycle boilerplate from lab runners:
  *   timer, pause/resume, submit scaffolding, gamification, attempt recording.
  *
  * Each runner only needs to implement its unique interaction surface and validation,
@@ -57,7 +57,7 @@ export function useLabSession<TProgress extends { timeLeft: number }>(options: {
     return () => clearTimeout(t)
   }, [resumeNotice])
 
-  // Timer — starts/stops based on submitted/timed/labPaused
+  // Timer - starts/stops based on submitted/timed/labPaused
   useEffect(() => {
     if (submitted || !timed || labPaused) return
     timerRef.current = setInterval(() => {

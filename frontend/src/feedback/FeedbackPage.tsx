@@ -473,7 +473,7 @@ function PollsTab({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch> })
                             </td>
                             {selectedPoll?.allowComment && (
                               <td className="px-3 py-2 text-xs text-muted-foreground max-w-[200px]">
-                                {v.otherText ? <span className="italic">{truncate(v.otherText, 100)}</span> : <span className="opacity-40">—</span>}
+                                {v.otherText ? <span className="italic">{truncate(v.otherText, 100)}</span> : <span className="opacity-40">-</span>}
                               </td>
                             )}
                             <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{formatDate(v.createdAt)}</td>
@@ -639,7 +639,7 @@ export function FeedbackPage() {
                         <br />
                         <span className="text-muted-foreground font-mono">{truncate(r.contentId, 24)}</span>
                       </td>
-                      <td className="px-3 py-2 text-xs">{r.issueType ?? '—'}</td>
+                      <td className="px-3 py-2 text-xs">{r.issueType ?? '-'}</td>
                       <td className="px-3 py-2 text-xs max-w-xs" title={r.description}>{truncate(r.description)}</td>
                       <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{formatDate(r.createdAt)}</td>
                       <td className="px-3 py-2 text-xs">
@@ -714,7 +714,7 @@ export function FeedbackPage() {
                       </td>
                       <td className="px-3 py-2"><StarDisplay count={r.stars} /></td>
                       <td className="px-3 py-2 text-xs capitalize">{r.difficulty.replace('-', ' ')}</td>
-                      <td className="px-3 py-2 text-xs text-muted-foreground max-w-xs" title={r.comment}>{r.comment ? truncate(r.comment) : '—'}</td>
+                      <td className="px-3 py-2 text-xs text-muted-foreground max-w-xs" title={r.comment}>{r.comment ? truncate(r.comment) : '-'}</td>
                       <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{formatDate(r.createdAt)}</td>
                     </tr>
                   ))}

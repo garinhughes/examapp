@@ -104,13 +104,13 @@ function correctRateBadge(rate: number) {
     : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${color}`}>
-      {rate}% — {correctRateLabel(rate)}
+      {rate}% - {correctRateLabel(rate)}
     </span>
   )
 }
 
 function formatSecs(secs: number | null): string {
-  if (secs === null) return '—'
+  if (secs === null) return '-'
   if (secs < 60) return `${secs}s`
   return `${Math.floor(secs / 60)}m ${secs % 60}s`
 }
@@ -160,7 +160,7 @@ function OverviewTab({ overview, exams }: { overview: OverviewData; exams: ExamS
 
       {/* Daily trend chart */}
       <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <h3 className="text-sm font-semibold mb-3 text-foreground">Daily Activity — Last 30 Days</h3>
+        <h3 className="text-sm font-semibold mb-3 text-foreground">Daily Activity - Last 30 Days</h3>
         <ResponsiveContainer width="100%" height={200}>
           <AreaChart data={overview.dailyTrend} margin={{ top: 4, right: 12, left: -20, bottom: 0 }}>
             <defs>
@@ -219,14 +219,14 @@ function OverviewTab({ overview, exams }: { overview: OverviewData; exams: ExamS
                             {mode}: {total > 0 ? Math.round(count / total * 100) : 0}%
                           </span>
                         ))}
-                        {Object.keys(exam.modeBreakdown).length === 0 && <span className="text-xs text-muted-foreground">—</span>}
+                        {Object.keys(exam.modeBreakdown).length === 0 && <span className="text-xs text-muted-foreground">-</span>}
                       </div>
                     </td>
                   </tr>
                 )
               })}
               {sorted.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-sm">No exam data yet — data accumulates as users complete attempts.</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-sm">No exam data yet - data accumulates as users complete attempts.</td></tr>
               )}
             </tbody>
           </table>
@@ -392,7 +392,7 @@ function QuestionsTab({ exams }: { exams: ExamSummary[] }) {
                 </tr>
               ))}
               {filtered.length === 0 && !loading && (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-sm">No question data yet — data accumulates as users finish attempts.</td></tr>
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-sm">No question data yet - data accumulates as users finish attempts.</td></tr>
               )}
             </tbody>
           </table>
@@ -697,7 +697,7 @@ function SuggestionsTab() {
       {!loading && filtered.length === 0 && (
         <div className="rounded-lg border border-border bg-card p-8 text-center shadow-sm">
           <CheckCircle2 className="w-8 h-8 text-green-500 mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">No suggestions — either no data yet or all metrics look healthy with the current thresholds.</p>
+          <p className="text-sm text-muted-foreground">No suggestions - either no data yet or all metrics look healthy with the current thresholds.</p>
         </div>
       )}
 
