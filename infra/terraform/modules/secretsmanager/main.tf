@@ -6,15 +6,15 @@ data "aws_secretsmanager_secret" "cognito_client_secret" {
 # Allow the ECS task execution role to read the secret
 resource "aws_secretsmanager_secret_policy" "cognito_client_secret_policy" {
   secret_arn = data.aws_secretsmanager_secret.cognito_client_secret.arn
-  policy     = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Sid    = "AllowEcsTaskGetSecret",
-        Effect = "Allow",
+        Sid       = "AllowEcsTaskGetSecret",
+        Effect    = "Allow",
         Principal = { AWS = var.ecs_task_execution_role_arn },
-        Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
-        Resource = data.aws_secretsmanager_secret.cognito_client_secret.arn
+        Action    = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        Resource  = data.aws_secretsmanager_secret.cognito_client_secret.arn
       }
     ]
   })
@@ -28,15 +28,15 @@ data "aws_secretsmanager_secret" "stripe_secret_key" {
 # Grant the ECS task execution role permission to read the Stripe secrets
 resource "aws_secretsmanager_secret_policy" "stripe_secret_key_policy" {
   secret_arn = data.aws_secretsmanager_secret.stripe_secret_key.arn
-  policy     = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Sid    = "AllowEcsTaskGetSecret",
-        Effect = "Allow",
+        Sid       = "AllowEcsTaskGetSecret",
+        Effect    = "Allow",
         Principal = { AWS = var.ecs_task_execution_role_arn },
-        Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
-        Resource = data.aws_secretsmanager_secret.stripe_secret_key.arn
+        Action    = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        Resource  = data.aws_secretsmanager_secret.stripe_secret_key.arn
       }
     ]
   })
@@ -48,15 +48,15 @@ data "aws_secretsmanager_secret" "stripe_webhook_secret" {
 
 resource "aws_secretsmanager_secret_policy" "stripe_webhook_secret_policy" {
   secret_arn = data.aws_secretsmanager_secret.stripe_webhook_secret.arn
-  policy     = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Sid    = "AllowEcsTaskGetSecret",
-        Effect = "Allow",
+        Sid       = "AllowEcsTaskGetSecret",
+        Effect    = "Allow",
         Principal = { AWS = var.ecs_task_execution_role_arn },
-        Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
-        Resource = data.aws_secretsmanager_secret.stripe_webhook_secret.arn
+        Action    = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        Resource  = data.aws_secretsmanager_secret.stripe_webhook_secret.arn
       }
     ]
   })
@@ -69,15 +69,15 @@ data "aws_secretsmanager_secret" "paypal_client_secret" {
 
 resource "aws_secretsmanager_secret_policy" "paypal_client_secret_policy" {
   secret_arn = data.aws_secretsmanager_secret.paypal_client_secret.arn
-  policy     = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Sid    = "AllowEcsTaskGetSecret",
-        Effect = "Allow",
+        Sid       = "AllowEcsTaskGetSecret",
+        Effect    = "Allow",
         Principal = { AWS = var.ecs_task_execution_role_arn },
-        Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
-        Resource = data.aws_secretsmanager_secret.paypal_client_secret.arn
+        Action    = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        Resource  = data.aws_secretsmanager_secret.paypal_client_secret.arn
       }
     ]
   })

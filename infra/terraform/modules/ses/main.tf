@@ -38,15 +38,6 @@ resource "aws_route53_record" "ses_verification" {
   records = [aws_ses_domain_identity.this.verification_token]
 }
 
-# WorkMail MX record — inbound-smtp.eu-west-1.amazonaws.com
-resource "aws_route53_record" "workmail_mx" {
-  zone_id = var.zone_id
-  name    = var.domain
-  type    = "MX"
-  ttl     = 300
-  records = ["10 inbound-smtp.eu-west-1.amazonaws.com"]
-}
-
 # Apex TXT records (SPF + any other apex TXT values) are managed in the
 # route53 module to keep all DNS records in one place.
 

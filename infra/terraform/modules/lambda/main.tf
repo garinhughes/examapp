@@ -16,7 +16,7 @@ resource "aws_lambda_function" "itemcount_publisher" {
 }
 
 resource "aws_lambda_function_url" "itemcount" {
-  function_name     = aws_lambda_function.itemcount_publisher.function_name
+  function_name      = aws_lambda_function.itemcount_publisher.function_name
   authorization_type = "AWS_IAM"
 }
 

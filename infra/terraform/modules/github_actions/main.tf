@@ -61,23 +61,23 @@ data "aws_iam_policy_document" "deploy_policy" {
   }
 
   statement {
-    actions = ["s3:PutObject","s3:DeleteObject","s3:ListBucket","s3:GetObject"]
-    resources = ["arn:aws:s3:::${var.project}-*","arn:aws:s3:::${var.project}-*/*"]
+    actions   = ["s3:PutObject", "s3:DeleteObject", "s3:ListBucket", "s3:GetObject"]
+    resources = ["arn:aws:s3:::${var.project}-*", "arn:aws:s3:::${var.project}-*/*"]
   }
 
   statement {
-    actions = ["cloudfront:CreateInvalidation"]
+    actions   = ["cloudfront:CreateInvalidation"]
     resources = ["*"]
   }
 
   statement {
-    actions = ["sts:GetCallerIdentity"]
+    actions   = ["sts:GetCallerIdentity"]
     resources = ["*"]
   }
 
   # Allow passing ECS task & execution roles when registering task definitions
   statement {
-    actions   = ["iam:PassRole"]
+    actions = ["iam:PassRole"]
     resources = [
       "arn:aws:iam::${var.account_id}:role/${var.project}-ecs-task-role",
       "arn:aws:iam::${var.account_id}:role/${var.project}-ecs-task-exec-role"

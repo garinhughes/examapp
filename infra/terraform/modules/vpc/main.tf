@@ -29,7 +29,7 @@ resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = { Name = "${var.project}-vpc" }
+  tags                 = { Name = "${var.project}-vpc" }
 }
 
 resource "aws_internet_gateway" "igw" {
@@ -44,7 +44,7 @@ resource "aws_subnet" "public" {
   cidr_block              = cidrsubnet(var.vpc_cidr, 8, count.index)
   map_public_ip_on_launch = true
   availability_zone       = data.aws_availability_zones.available.names[count.index]
-  tags = { Name = "${var.project}-public-${count.index + 1}" }
+  tags                    = { Name = "${var.project}-public-${count.index + 1}" }
 }
 
 resource "aws_route_table" "public" {
@@ -69,7 +69,7 @@ resource "aws_subnet" "private" {
   cidr_block              = cidrsubnet(var.vpc_cidr, 8, 100 + count.index)
   map_public_ip_on_launch = false
   availability_zone       = data.aws_availability_zones.available.names[count.index]
-  tags = { Name = "${var.project}-private-${count.index + 1}" }
+  tags                    = { Name = "${var.project}-private-${count.index + 1}" }
 }
 
 resource "aws_route_table" "private" {
@@ -89,7 +89,7 @@ resource "aws_vpc_endpoint" "s3" {
   service_name      = "com.amazonaws.${var.region}.s3"
   vpc_endpoint_type = "Gateway"
   route_table_ids   = [aws_route_table.public.id, aws_route_table.private.id]
-  tags = { Name = "${var.project}-vpce-s3" }
+  tags              = { Name = "${var.project}-vpce-s3" }
 }
 
 resource "aws_vpc_endpoint" "dynamodb" {
@@ -97,7 +97,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
   service_name      = "com.amazonaws.${var.region}.dynamodb"
   vpc_endpoint_type = "Gateway"
   route_table_ids   = [aws_route_table.public.id, aws_route_table.private.id]
-  tags = { Name = "${var.project}-vpce-dynamodb" }
+  tags              = { Name = "${var.project}-vpce-dynamodb" }
 }
 
 # Note: interface endpoints (ECR, STS, Logs, Monitoring) intentionally omitted

@@ -57,14 +57,14 @@ variable "desired_count" {
 
 variable "cpu" {
   description = "Fargate task CPU (256 = 0.25 vCPU — smallest)"
-  type    = number
-  default = 256
+  type        = number
+  default     = 256
 }
 
 variable "memory" {
   description = "Fargate task memory in MiB (512 = minimum for 256 CPU)"
-  type    = number
-  default = 512
+  type        = number
+  default     = 512
 }
 
 variable "dynamodb_table_name" {
@@ -466,12 +466,12 @@ resource "aws_ecs_task_definition" "backend" {
   task_role_arn            = var.ecs_task_role_arn
 
   container_definitions = jsonencode([{
-    name      = "backend"
-    image     = "${var.ecr_backend_url}:${var.backend_image_tag}"
-    essential = true
+    name         = "backend"
+    image        = "${var.ecr_backend_url}:${var.backend_image_tag}"
+    essential    = true
     portMappings = [{ containerPort = var.backend_port, protocol = "tcp" }]
-    environment = local.container_environment
-    secrets = local.container_secrets
+    environment  = local.container_environment
+    secrets      = local.container_secrets
     logConfiguration = {
       logDriver = "awslogs"
       options = {

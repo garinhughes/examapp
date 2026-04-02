@@ -9,8 +9,8 @@ terraform {
 
 resource "aws_wafv2_web_acl" "main" {
   provider = aws.useast1
-  name  = "${var.project}-waf"
-  scope = "CLOUDFRONT"
+  name     = "${var.project}-waf"
+  scope    = "CLOUDFRONT"
 
   default_action {
     allow {}

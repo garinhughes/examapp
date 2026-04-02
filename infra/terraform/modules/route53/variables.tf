@@ -55,3 +55,9 @@ variable "apex_txt_records" {
   default     = []
 }
 
+variable "create_mail_records" {
+  description = "When true, create Zoho MX and DKIM records for mail hosting"
+  type        = bool
+  default     = false
+}
+

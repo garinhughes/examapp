@@ -68,9 +68,9 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "DynamoDB"
-        Effect   = "Allow"
-        Action   = [
+        Sid    = "DynamoDB"
+        Effect = "Allow"
+        Action = [
           "dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem",
           "dynamodb:DeleteItem", "dynamodb:Query", "dynamodb:Scan",
           "dynamodb:BatchGetItem", "dynamodb:BatchWriteItem"
@@ -78,9 +78,9 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         Resource = "arn:aws:dynamodb:*:${var.account_id}:table/${var.project}-*"
       },
       {
-        Sid      = "S3Assets"
-        Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:GetObjectVersion", "s3:PutObject", "s3:ListBucket", "s3:ListBucketVersions"]
+        Sid    = "S3Assets"
+        Effect = "Allow"
+        Action = ["s3:GetObject", "s3:GetObjectVersion", "s3:PutObject", "s3:ListBucket", "s3:ListBucketVersions"]
         Resource = [
           "arn:aws:s3:::${var.project}-*",
           "arn:aws:s3:::${var.project}-*/*"
@@ -139,18 +139,18 @@ resource "aws_iam_role_policy" "lambda_itemcount" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = ["dynamodb:DescribeTable", "dynamodb:Scan"]
+        Effect   = "Allow"
+        Action   = ["dynamodb:DescribeTable", "dynamodb:Scan"]
         Resource = "*"
       },
       {
-        Effect = "Allow"
-        Action = ["cloudwatch:PutMetricData"]
+        Effect   = "Allow"
+        Action   = ["cloudwatch:PutMetricData"]
         Resource = "*"
       },
       {
-        Effect = "Allow"
-        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Effect   = "Allow"
+        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
         Resource = "*"
       }
     ]

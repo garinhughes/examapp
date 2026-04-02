@@ -3,11 +3,11 @@ resource "aws_api_gateway_rest_api" "this" {
   description = "Public proxy for ${var.project} - managed by terraform"
 
   body = templatefile("${path.module}/openapi.tftpl", {
-    region       = var.region
-    lambda_arn   = var.lambda_arn
+    region        = var.region
+    lambda_arn    = var.lambda_arn
     resource_path = trim(var.resource_path, "/")
-    stage_name   = var.stage_name
-    api_name     = var.api_name != null ? var.api_name : "${var.project}-api"
+    stage_name    = var.stage_name
+    api_name      = var.api_name != null ? var.api_name : "${var.project}-api"
   })
 }
 

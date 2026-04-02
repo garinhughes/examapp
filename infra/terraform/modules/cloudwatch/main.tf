@@ -13,7 +13,7 @@ resource "aws_cloudwatch_event_target" "itemcount_target" {
 
 # CloudWatch Dashboard (only created if dashboard_vars is provided)
 resource "aws_cloudwatch_dashboard" "certshack_examapp" {
-  count              = var.dashboard_template_path != "" ? 1 : 0
-  dashboard_name     = "${var.project}-dashboard"
-  dashboard_body     = templatefile(var.dashboard_template_path, var.dashboard_vars)
+  count          = var.dashboard_template_path != "" ? 1 : 0
+  dashboard_name = "${var.project}-dashboard"
+  dashboard_body = templatefile(var.dashboard_template_path, var.dashboard_vars)
 }
