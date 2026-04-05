@@ -18,6 +18,7 @@ import PricingPage from '../components/PricingPage'
 import { DiagramsView } from '../components/DiagramsView'
 import { SkillLabsPage } from '../skill-labs/SkillLabsPage'
 import { SkillLabRunnerPage } from '../skill-labs/SkillLabRunnerPage'
+import { SkillLabDetailPage } from '../skill-labs/SkillLabDetailPage'
 import BasketPage from '../basket/BasketPage'
 import { FeedbackProvider } from '../feedback/FeedbackContext'
 import { PollWidget } from '../components/PollWidget'
@@ -169,6 +170,9 @@ function ExamAppInner() {
 
             {/* Skill Labs pages */}
             {route === 'skill-labs' && <SkillLabsPage />}
+            {route.startsWith('skill-lab-detail:') && (
+              <SkillLabDetailPage labId={route.slice('skill-lab-detail:'.length)} />
+            )}
             {route.startsWith('skill-lab:') && (() => {
               const parts = route.slice('skill-lab:'.length)
               const lastColon = parts.lastIndexOf(':')

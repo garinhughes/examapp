@@ -64,6 +64,7 @@ async function loadLabsS3Summary(): Promise<any[]> {
     return entries.map((e) => ({
       id: e.labId,
       title: e.title ?? e.labId,
+      description: e.description ?? '',
       type: e.type,
       platform: e.platform ?? 'AWS',
       category: e.category ?? 'General',
@@ -114,8 +115,16 @@ function effectiveLabShowcaseCount(
   return TIERS.visitor.labShowcaseCount ?? 3
 }
 
+/** Attach a `locked` boolean to each lab based on which IDs are unlocked. */
+function withLocked(labs: any[], unlockedIds: Set<string> | null): any[] {
+  return labs.map((lab) => ({
+    ...lab,
+    locked: unlockedIds !== null && !unlockedIds.has(lab.id),
+  }))
+}
+
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
-  // GET /skill-labs — list available labs
+  // GET /skill-labs — list all labs; locked:true on labs the user cannot access
   server.get('/', async (request, reply) => {
     await server.optionalAuth(request, reply)
 
@@ -137,7 +146,6 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         }))
 
     if (request.user) {
-      // Resolve tier for authenticated users
       const userId = request.user.sub
       const { getActiveProductIds } = await import('../services/entitlements.js')
       const { resolveUserTier } = await import('../catalog.js')
@@ -146,27 +154,34 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds })
 
       if (tier === 'paying') {
-        return reply.send(allLabs)
+        // All labs unlocked — null means no lock filter
+        return reply.send(withLocked(allLabs, null))
       }
 
       const profile = await getUserBySub(userId)
       const trialActive = isTrialActive(profile?.registeredAt ?? null, TIERS.registered.trialDays ?? 3)
       const count = effectiveLabShowcaseCount('registered', trialActive) ?? 6
 
-      const showcase = allLabs
+      const unlockedIds = new Set<string>(
+        allLabs
+          .filter((l: any) => l.showcase)
+          .sort((a: any, b: any) => (a.showcaseOrder ?? 99) - (b.showcaseOrder ?? 99))
+          .slice(0, count)
+          .map((l: any) => l.id)
+      )
+      return reply.send(withLocked(allLabs, unlockedIds))
+    }
+
+    // Unauthenticated: visitor showcase unlocked
+    const count = effectiveLabShowcaseCount('visitor', false) ?? 3
+    const unlockedIds = new Set<string>(
+      allLabs
         .filter((l: any) => l.showcase)
         .sort((a: any, b: any) => (a.showcaseOrder ?? 99) - (b.showcaseOrder ?? 99))
         .slice(0, count)
-      return reply.send(showcase)
-    }
-
-    // Unauthenticated: visitor showcase only
-    const count = effectiveLabShowcaseCount('visitor', false) ?? 3
-    const showcase = allLabs
-      .filter((l: any) => l.showcase)
-      .sort((a: any, b: any) => (a.showcaseOrder ?? 99) - (b.showcaseOrder ?? 99))
-      .slice(0, count)
-    return reply.send(showcase)
+        .map((l: any) => l.id)
+    )
+    return reply.send(withLocked(allLabs, unlockedIds))
   })
 
   // GET /skill-labs/my-attempts — get current user's lab attempts

@@ -36,8 +36,13 @@ function pathnameToRoute(pathname: string): AppRoute | null {
       return 'metrics'
     case '/feedback':
       return 'feedback'
-    default:
+    default: {
+      if (pathname.startsWith('/skill-labs/')) {
+        const labId = pathname.slice('/skill-labs/'.length)
+        if (labId) return `skill-lab-detail:${labId}`
+      }
       return null
+    }
   }
 }
 
@@ -85,7 +90,23 @@ export function useRouteSync(): void {
       return
     }
     if (INTERNAL_ONLY_ROUTES.has(route)) return
-    if (route.startsWith('skill-lab:')) return
+
+    // skill-lab-detail and skill-lab runner both live at /skill-labs/:labId
+    if (route.startsWith('skill-lab-detail:')) {
+      const labId = route.slice('skill-lab-detail:'.length)
+      const target = `/skill-labs/${labId}`
+      if (location.pathname !== target) navigate(target, { replace: true })
+      return
+    }
+    if (route.startsWith('skill-lab:')) {
+      const parts = route.slice('skill-lab:'.length)
+      const lastColon = parts.lastIndexOf(':')
+      const labId = lastColon > 0 ? parts.slice(0, lastColon) : parts
+      const target = `/skill-labs/${labId}`
+      if (location.pathname !== target) navigate(target, { replace: true })
+      return
+    }
+
     const target = ROUTE_TO_PATHNAME[route]
     if (target && location.pathname !== target) {
       navigate(target, { replace: true })

@@ -50,6 +50,7 @@ export interface SkillLabIndexEntry {
   difficulty?: string
   timeLimit?: number
   technologies?: string[]
+  description?: string
   /** If true, this lab is part of the visitor/registered showcase */
   showcase?: boolean
   /** Position in the showcase ordering (lower = shown first) */

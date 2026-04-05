@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import Loader from '@/components/Loader'
 import { useExam } from '@/exam/ExamContext'
-import { Play, Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight, X } from 'lucide-react'
+import { Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight, X, Lock, ExternalLink } from 'lucide-react'
 import { clarityEvent, clarityTag } from '@/clarity'
 import type { LabSummary, SkillLevel } from './types'
 import { apiUrl } from '@/apiBase'
@@ -137,9 +137,9 @@ export function SkillLabsPage() {
     }
   }, [labs])
 
-  // Filtered labs
+  // Filtered labs — showcase labs always sorted first by showcaseOrder, then the rest
   const filtered = useMemo(() => {
-    return labs.filter((lab) => {
+    const result = labs.filter((lab) => {
       if (completionFilter === 'completed' && !completedLabIds.has(lab.id)) return false
       if (completionFilter === 'incomplete' && completedLabIds.has(lab.id)) return false
 
@@ -161,6 +161,14 @@ export function SkillLabsPage() {
       }
       return true
     })
+    result.sort((a, b) => {
+      const aS = a.showcase ? 1 : 0
+      const bS = b.showcase ? 1 : 0
+      if (aS !== bS) return bS - aS
+      if (aS && bS) return (a.showcaseOrder ?? 99) - (b.showcaseOrder ?? 99)
+      return 0
+    })
+    return result
   }, [labs, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, completionFilter, completedLabIds, showSavedOnly, bookmarkedLabIds, searchQuery])
 
   // Reset page when filters change (including search)
@@ -361,24 +369,35 @@ export function SkillLabsPage() {
           {paginated.map((lab) => (
             <div
               key={lab.id}
-              className="group relative p-5 rounded-lg border border-border bg-card shadow-sm flex flex-col justify-between hover:border-primary/30 hover:shadow-md transition-all"
+              className={`group relative p-5 rounded-lg border bg-card shadow-sm flex flex-col justify-between transition-all ${
+                lab.locked
+                  ? 'border-border opacity-70'
+                  : 'border-border hover:border-primary/30 hover:shadow-md'
+              }`}
             >
               <div>
                 {/* Title row */}
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <h3 className="font-semibold text-base leading-snug">{lab.title}</h3>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleToggleBookmark(lab.id) }}
-                      className="p-1 rounded hover:bg-muted/60 transition"
-                      title={bookmarkedLabIds.has(lab.id) ? 'Remove bookmark' : 'Save for later'}
-                    >
-                      <Heart
-                        className={`w-4 h-4 transition ${
-                          bookmarkedLabIds.has(lab.id) ? 'fill-red-500 text-red-500' : 'text-muted-foreground'
-                        }`}
-                      />
-                    </button>
+                    {lab.locked && (
+                      <span title="Premium lab">
+                        <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+                      </span>
+                    )}
+                    {!lab.locked && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleToggleBookmark(lab.id) }}
+                        className="p-1 rounded hover:bg-muted/60 transition"
+                        title={bookmarkedLabIds.has(lab.id) ? 'Remove bookmark' : 'Save for later'}
+                      >
+                        <Heart
+                          className={`w-4 h-4 transition ${
+                            bookmarkedLabIds.has(lab.id) ? 'fill-red-500 text-red-500' : 'text-muted-foreground'
+                          }`}
+                        />
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -414,45 +433,39 @@ export function SkillLabsPage() {
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center gap-2">
-                {(() => {
-                  const isInProgress = inProgressLabs.has(lab.id)
-                  const otherInProgress = !isInProgress && inProgressLabs.size > 0
-                  return (
-                    <>
-                      <button
-                        className="flex-1 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm inline-flex items-center gap-2 hover:bg-primary/90 transition justify-center disabled:opacity-40 disabled:cursor-not-allowed"
-                        disabled={otherInProgress}
-                        title={otherInProgress ? 'Finish or cancel your in-progress lab first' : undefined}
-                        onClick={() => {
-                          const savedTimed = inProgressLabs.get(lab.id)?.timed
-                          const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
-                          clarityEvent(isInProgress ? 'lab_resumed' : 'lab_started')
-                          clarityTag('lab_id', lab.id)
-                          clarityTag('lab_mode', mode)
-                          setRoute(`skill-lab:${lab.id}:${mode}` as any)
-                        }}
-                      >
-                        <Play className="w-4 h-4" />
-                        {isInProgress ? 'Resume Lab' : 'Start Lab'}
-                      </button>
-                      {isInProgress && (
-                        <button
-                          onClick={() => setConfirmCancelLabId(lab.id)}
-                          title="Cancel lab progress"
-                          className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-border text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </>
-                  )
-                })()}
-                {completedLabIds.has(lab.id) && !inProgressLabs.has(lab.id) && (
+              <div className="mt-4 space-y-2">
+                {lab.locked && (
+                  <p className="text-xs text-amber-700 dark:text-amber-400">
+                    Purchase required to access this lab.
+                  </p>
+                )}
+                <div className="flex items-center gap-2">
+                <button
+                  className="flex-1 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm inline-flex items-center gap-2 hover:bg-primary/90 transition justify-center"
+                  onClick={() => {
+                    clarityEvent('lab_visited')
+                    clarityTag('lab_id', lab.id)
+                    setRoute(`skill-lab-detail:${lab.id}` as any)
+                  }}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Visit Lab
+                </button>
+                {inProgressLabs.has(lab.id) && !lab.locked && (
+                  <button
+                    onClick={() => setConfirmCancelLabId(lab.id)}
+                    title="Cancel lab progress"
+                    className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-border text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+                {completedLabIds.has(lab.id) && !inProgressLabs.has(lab.id) && !lab.locked && (
                   <span title="Completed" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-600 text-white text-sm shadow-md">
                     <CheckCircle2 className="w-5 h-5" />
                   </span>
                 )}
+                </div>
               </div>
             </div>
           ))}

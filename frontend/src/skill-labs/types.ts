@@ -29,6 +29,9 @@ export interface LabSummary {
   technologies: string[]
   labCategory: string      // e.g. "Troubleshoot", "Design", "Implement"
   s3VersionId?: string
+  locked?: boolean
+  showcase?: boolean
+  showcaseOrder?: number
 }
 
 // --- Diagnose lab types ---

@@ -230,6 +230,10 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     const p = window.location.pathname
     if (p === '/exams') return 'practice'
     if (p === '/skill-labs') return 'skill-labs'
+    if (p.startsWith('/skill-labs/')) {
+      const labId = p.slice('/skill-labs/'.length)
+      if (labId) return `skill-lab-detail:${labId}`
+    }
     if (p === '/analytics') return 'analytics'
     if (p === '/pricing') return 'pricing'
     if (p === '/account') return 'account'
