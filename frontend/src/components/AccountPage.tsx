@@ -431,11 +431,11 @@ export default function AccountPage() {
               <button
                 onClick={toggleLeaderboard}
                 className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
-                  state.leaderboardOptIn ? 'bg-primary' : 'bg-muted'
+                  state.leaderboardOptIn ? 'bg-primary' : 'bg-gray-300 dark:bg-zinc-600'
                 }`}
               >
                 <span
-                  className={`inline-block w-4 h-4 rounded-full bg-card shadow transform transition-transform mt-1 ${
+                  className={`inline-block w-4 h-4 rounded-full bg-white shadow transform transition-transform mt-1 ${
                     state.leaderboardOptIn ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -455,11 +455,11 @@ export default function AccountPage() {
                 disabled={emailOptInSaving}
                 aria-label={emailOptIn ? 'Unsubscribe from marketing emails' : 'Subscribe to marketing emails'}
                 className={`relative inline-flex h-6 w-11 rounded-full transition-colors disabled:opacity-50 ${
-                  emailOptIn ? 'bg-primary' : 'bg-muted'
+                  emailOptIn ? 'bg-primary' : 'bg-gray-300 dark:bg-zinc-600'
                 }`}
               >
                 <span
-                  className={`inline-block w-4 h-4 rounded-full bg-card shadow transform transition-transform mt-1 ${
+                  className={`inline-block w-4 h-4 rounded-full bg-white shadow transform transition-transform mt-1 ${
                     emailOptIn ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -540,28 +540,6 @@ export default function AccountPage() {
                 Upgrade to unlock all questions, exports, leaderboard, and more.
               </p>
             )}
-          </div>
-
-          {/* Feature access summary */}
-          <div className="p-4 rounded-lg border border-border bg-card">
-            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Feature Access</h3>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              {[
-                { label: 'Review & explanations', on: tierConfig.reviewEnabled },
-                { label: 'CSV / PDF export', on: tierConfig.exportEnabled },
-                { label: 'Leaderboard', on: tierConfig.leaderboardEnabled },
-                { label: 'Domain mastery history', on: tierConfig.domainMasteryEnabled },
-              ].map((f) => (
-                <div key={f.label} className="flex items-center gap-2">
-                  <span className={f.on ? 'text-emerald-500' : 'text-muted-foreground'}>
-                    {f.on ? '✓' : '-'}
-                  </span>
-                  <span className={f.on ? 'text-foreground' : 'text-muted-foreground dark:text-muted-foreground'}>
-                    {f.label}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Active entitlements */}
