@@ -23,6 +23,7 @@ import BasketPage from '../basket/BasketPage'
 import { FeedbackProvider } from '../feedback/FeedbackContext'
 import { PollWidget } from '../components/PollWidget'
 import { FeedbackPage } from '../feedback/FeedbackPage'
+import { UserFeedbackPage } from '../feedback/UserFeedbackPage'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
 import { PracticeExams } from './PracticeExams'
@@ -229,8 +230,8 @@ function ExamAppInner() {
             )}
 
             {route === 'feedback' && !userIsAdmin && (
-              <div className="p-8 text-center text-muted-foreground">
-                You do not have permission to access this page.
+              <div className="mb-6">
+                <UserFeedbackPage />
               </div>
             )}
 

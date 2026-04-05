@@ -31,6 +31,7 @@ import pollsRoutes from './routes/polls.js'
 import imagesRoutes from './routes/images.js'
 import cronRoutes from './routes/cron.js'
 import unsubscribeRoutes from './routes/unsubscribe.js'
+import feedbackRoutes from './routes/feedback.js'
 
 const server = Fastify({ logger: true, trustProxy: true })
 
@@ -90,6 +91,8 @@ await server.register(metricsRoutes, { prefix: '/admin/metrics' })
 await server.register(skillLabsRoutes, { prefix: '/skill-labs' })
 // Issue reports
 await server.register(reportsRoutes, { prefix: '/reports' })
+// General user feedback
+await server.register(feedbackRoutes, { prefix: '/feedback' })
 // Ratings
 await server.register(ratingsRoutes, { prefix: '/ratings' })
 // Certificates

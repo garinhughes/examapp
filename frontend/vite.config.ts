@@ -28,6 +28,7 @@ export default defineConfig({
       '/ratings': 'http://localhost:3000',
       '/certificates': 'http://localhost:3000',
       '/polls': 'http://localhost:3000',
+      '/feedback': 'http://localhost:3000',
       // These paths are both frontend routes AND backend API prefixes.
       // Browser navigations (Accept: text/html) get index.html; API calls proxy to backend.
       '/exams': {

@@ -325,6 +325,31 @@ export async function sendIssueReportEmail(p: IssueReportPayload): Promise<void>
   }))
 }
 
+export async function sendGeneralFeedbackEmail(p: {
+  senderName: string
+  senderEmail: string
+  category?: string
+  message: string
+}): Promise<void> {
+  const subject = `[certshack] User feedback${p.category ? ` — ${p.category}` : ''}`
+  const body = [
+    `From:     ${p.senderName} <${p.senderEmail}>`,
+    `Category: ${p.category ?? 'N/A'}`,
+    ``,
+    `Message:`,
+    p.message,
+  ].join('\n')
+
+  await ses.send(new SendEmailCommand({
+    Source: FROM,
+    Destination: { ToAddresses: [TO] },
+    Message: {
+      Subject: { Data: subject, Charset: 'UTF-8' },
+      Body: { Text: { Data: body, Charset: 'UTF-8' } },
+    },
+  }))
+}
+
 export interface ErasureReceiptPayload {
   receiptId: string
   deletedAt: string

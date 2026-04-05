@@ -101,7 +101,11 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
         </div>
 
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-          {navItems.filter(item => (item.key !== 'admin' && item.key !== 'diagrams' && item.key !== 'metrics' && item.key !== 'feedback') || showAdmin).map((item) => {
+          {navItems.filter(item => {
+            if (item.key === 'admin' || item.key === 'diagrams' || item.key === 'metrics') return showAdmin
+            if (item.key === 'feedback') return !!user
+            return true
+          }).map((item) => {
             const isActive = currentRoute === item.key || (item.key === 'skill-labs' && currentRoute?.startsWith('skill-lab:'))
             return (
             <button
