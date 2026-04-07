@@ -6,6 +6,7 @@ import { clarityEvent, clarityTag } from '@/clarity'
 import { getBookmarkedLabs, toggleBookmark } from './shared'
 import { ReportIssueModal } from '@/components/ReportIssueModal'
 import { RatingModal } from '@/feedback/RatingModal'
+import { MarkdownText } from '@/exam/utils'
 
 interface LabHeaderProps {
   title: string
@@ -73,7 +74,7 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="font-semibold text-lg leading-snug">{title}</h2>
-            {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+            {subtitle && <MarkdownText text={subtitle} className="text-sm text-muted-foreground mt-1" />}
           </div>
           <div className="shrink-0">
           {timed ? (

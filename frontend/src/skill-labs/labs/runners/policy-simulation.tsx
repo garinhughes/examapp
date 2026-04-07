@@ -120,6 +120,7 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
         </div>
       )}
 
+      {/* Top row: Requirements left, Editor right */}
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Requirements panel */}
         <div className="w-64 shrink-0 rounded-lg border border-border bg-card p-4 overflow-y-auto">
@@ -151,7 +152,7 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
         </div>
 
         {/* Editor */}
-        <div className="flex-1 rounded-lg border border-border overflow-hidden">
+        <div className="flex-1 rounded-lg border border-border overflow-hidden min-w-0">
           <MonacoEditor
             height="100%"
             language="json"
@@ -161,73 +162,70 @@ export function PolicySimulationRunner({ lab, timed = true }: Props) {
             options={{ readOnly: session.submitted, minimap: { enabled: false }, fontSize: 13, lineNumbers: 'on', scrollBeyondLastLine: false }}
           />
         </div>
-
-        {/* Test results panel */}
-        <div className="w-64 shrink-0 rounded-lg border border-border bg-card p-4 overflow-y-auto">
-          <h3 className="font-semibold text-sm mb-3">Test Results</h3>
-          {testError && (
-            <div className="text-sm text-destructive bg-destructive/10 rounded p-2 mb-3">{testError}</div>
-          )}
-          {testResults ? (
-            <div className="space-y-2">
-              {testResults.map((r, i) => (
-                <div key={i} className={`p-2 rounded text-xs ${r.pass ? 'bg-green-500/10' : 'bg-destructive/10'}`}>
-                  <div className="flex items-center gap-2">
-                    <span className={r.pass ? 'text-green-600 dark:text-green-400 font-bold' : 'text-destructive font-bold'}>
-                      {r.pass ? '✓' : '✗'}
-                    </span>
-                    <span className="font-medium">{r.description}</span>
-                  </div>
-                  <div className="mt-1 text-muted-foreground">
-                    Expected: {r.expected} | Got: {r.actual}
-                  </div>
-                </div>
-              ))}
-              {allPass && (
-                <div className="mt-3 text-sm font-semibold text-green-600 dark:text-green-400">
-                  ✓ All tests pass!
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-xs text-muted-foreground">Click "Run Tests" to validate your policy against the test cases.</p>
-          )}
-
-          {session.submitted && (
-            <div className="mt-4 pt-3 border-t border-border">
-              <ExplanationBlock text={lab.explanation} />
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Action bar */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm flex items-center justify-between">
-        {!session.submitted ? (
-          <>
-            <button
-              className="text-sm text-muted-foreground hover:text-foreground transition"
-              onClick={handleGiveUp}
-            >
-              Give Up &amp; Show Answer
-            </button>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
-              onClick={handleRunTests}
-            >
-              Run Tests
-            </button>
-          </>
-        ) : (
-          <div className="flex items-center justify-between w-full">
-            <div className={`text-sm font-semibold ${allPass ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-              {allPass ? 'Policy validates successfully!' : 'Lab complete - review the explanation above.'}
-            </div>
-            <button onClick={() => setRoute('skill-labs')} className="px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
-              Back to Skill Labs
-            </button>
+      {/* Bottom row: Test Results (full width) */}
+      <div className="shrink-0 rounded-lg border border-border bg-card p-4">
+        <div className="flex items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-sm mb-2">Test Results</h3>
+            {testError && (
+              <div className="text-sm text-destructive bg-destructive/10 rounded p-2">{testError}</div>
+            )}
+            {testResults ? (
+              <div className="flex flex-wrap gap-2">
+                {testResults.map((r, i) => (
+                  <div key={i} className={`p-2 rounded text-xs ${r.pass ? 'bg-green-500/10' : 'bg-destructive/10'}`}>
+                    <div className="flex items-center gap-1">
+                      <span className={r.pass ? 'text-green-600 dark:text-green-400 font-bold' : 'text-destructive font-bold'}>
+                        {r.pass ? '✓' : '✗'}
+                      </span>
+                      <span className="font-medium">{r.description}</span>
+                    </div>
+                    <div className="mt-0.5 text-muted-foreground">
+                      Expected: {r.expected} | Got: {r.actual}
+                    </div>
+                  </div>
+                ))}
+                {allPass && (
+                  <div className="self-center text-sm font-semibold text-green-600 dark:text-green-400">
+                    ✓ All tests pass!
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">Click "Run Tests" to validate your policy against the test cases.</p>
+            )}
+            {session.submitted && (
+              <div className="mt-3 pt-3 border-t border-border">
+                <ExplanationBlock text={lab.explanation} />
+              </div>
+            )}
           </div>
-        )}
+
+          <div className="shrink-0 flex flex-col gap-2 min-w-40">
+            {!session.submitted ? (
+              <>
+                <button
+                  className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
+                  onClick={handleRunTests}
+                >
+                  Run Tests
+                </button>
+                <button
+                  className="px-4 py-2 rounded-md border border-border text-muted-foreground font-medium text-sm hover:bg-muted/50 transition"
+                  onClick={handleGiveUp}
+                >
+                  Give Up &amp; Show Answer
+                </button>
+              </>
+            ) : (
+              <button onClick={() => setRoute('skill-labs')} className="px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
+                Back to Skill Labs
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

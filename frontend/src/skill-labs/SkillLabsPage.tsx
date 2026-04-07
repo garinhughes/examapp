@@ -9,6 +9,14 @@ import { SearchableFilter } from './SearchableFilter'
 import { getBookmarkedLabs, toggleBookmark, getInProgressLabs, clearLabProgress } from './labs/shared'
 
 const DIFFICULTY_LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced']
+
+const SL_SESSION_KEY = 'skill-labs-session'
+function readLabsSession(): Record<string, unknown> {
+  try {
+    const raw = sessionStorage.getItem(SL_SESSION_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch { return {} }
+}
 const DIFFICULTY_COLORS: Record<SkillLevel, string> = {
   beginner: 'bg-green-500/15 text-green-700 dark:text-green-400',
   intermediate: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
@@ -23,16 +31,34 @@ export function SkillLabsPage() {
   const [error, setError] = useState<string | null>(null)
 
   // Timed/casual toggle (default to casual)
-  const [timed, setTimed] = useState(false)
+  const [timed, setTimed] = useState(() => {
+    const ss = readLabsSession()
+    return typeof ss.timed === 'boolean' ? ss.timed : false
+  })
 
   // Search query for titles & descriptions
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState(() => {
+    const ss = readLabsSession()
+    return typeof ss.searchQuery === 'string' ? ss.searchQuery : ''
+  })
 
   // Filters
-  const [selectedDifficulty, setSelectedDifficulty] = useState<SkillLevel | null>(null)
-  const [selectedPlatforms, setSelectedPlatforms] = useState<Set<string>>(new Set())
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set())
-  const [selectedTechnologies, setSelectedTechnologies] = useState<Set<string>>(new Set())
+  const [selectedDifficulty, setSelectedDifficulty] = useState<SkillLevel | null>(() => {
+    const ss = readLabsSession()
+    return DIFFICULTY_LEVELS.includes(ss.selectedDifficulty as SkillLevel) ? ss.selectedDifficulty as SkillLevel : null
+  })
+  const [selectedPlatforms, setSelectedPlatforms] = useState<Set<string>>(() => {
+    const ss = readLabsSession()
+    return Array.isArray(ss.selectedPlatforms) ? new Set(ss.selectedPlatforms as string[]) : new Set()
+  })
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(() => {
+    const ss = readLabsSession()
+    return Array.isArray(ss.selectedCategories) ? new Set(ss.selectedCategories as string[]) : new Set()
+  })
+  const [selectedTechnologies, setSelectedTechnologies] = useState<Set<string>>(() => {
+    const ss = readLabsSession()
+    return Array.isArray(ss.selectedTechnologies) ? new Set(ss.selectedTechnologies as string[]) : new Set()
+  })
 
   // Completion tracking
   const [completedLabIds, setCompletedLabIds] = useState<Set<string>>(new Set())
@@ -66,7 +92,10 @@ export function SkillLabsPage() {
 
   // Bookmarks
   const [bookmarkedLabIds, setBookmarkedLabIds] = useState<Set<string>>(() => getBookmarkedLabs())
-  const [showSavedOnly, setShowSavedOnly] = useState(false)
+  const [showSavedOnly, setShowSavedOnly] = useState(() => {
+    const ss = readLabsSession()
+    return typeof ss.showSavedOnly === 'boolean' ? ss.showSavedOnly : false
+  })
 
   const handleToggleBookmark = useCallback((labId: string) => {
     const updated = toggleBookmark(labId)
@@ -76,7 +105,10 @@ export function SkillLabsPage() {
   }, [])
 
   // Pagination
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(() => {
+    const ss = readLabsSession()
+    return typeof ss.page === 'number' && ss.page > 0 ? ss.page : 1
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -119,6 +151,22 @@ export function SkillLabsPage() {
       localStorage.setItem('skill-labs-completion-filter', completionFilter)
     } catch {}
   }, [completionFilter])
+
+  // Persist filter/page state to sessionStorage so returning from a lab restores position
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(SL_SESSION_KEY, JSON.stringify({
+        timed,
+        searchQuery,
+        selectedDifficulty,
+        selectedPlatforms: [...selectedPlatforms],
+        selectedCategories: [...selectedCategories],
+        selectedTechnologies: [...selectedTechnologies],
+        showSavedOnly,
+        page,
+      }))
+    } catch {}
+  }, [timed, searchQuery, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showSavedOnly, page])
 
   // Derive unique filter options from lab data
   const filterOptions = useMemo(() => {
@@ -171,9 +219,6 @@ export function SkillLabsPage() {
     return result
   }, [labs, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, completionFilter, completedLabIds, showSavedOnly, bookmarkedLabIds, searchQuery])
 
-  // Reset page when filters change (including search)
-  useEffect(() => { setPage(1) }, [selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, completionFilter, showSavedOnly, searchQuery])
-
   const totalPages = Math.max(1, Math.ceil(filtered.length / LABS_PER_PAGE))
   const paginated = filtered.slice((page - 1) * LABS_PER_PAGE, page * LABS_PER_PAGE)
 
@@ -184,11 +229,13 @@ export function SkillLabsPage() {
     setSelectedPlatforms(new Set())
     setSelectedCategories(new Set())
     setSelectedTechnologies(new Set())
+    setPage(1)
   }
   // Clear filters and search
   const clearAllFilters = () => {
     clearFilters()
     setSearchQuery('')
+    // setPage(1) already called in clearFilters
   }
 
   if (loading) return <Loader text="Loading skill labs…" />
@@ -230,7 +277,7 @@ export function SkillLabsPage() {
                 <input
                   type="search"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => { setSearchQuery(e.target.value); setPage(1) }}
                   placeholder="Search labs..."
                   className="ml-1 pl-8 w-full sm:w-64 md:w-80 px-3 py-1.5 rounded-md border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
@@ -249,7 +296,7 @@ export function SkillLabsPage() {
             {DIFFICULTY_LEVELS.map((level) => (
               <button
                 key={level}
-                onClick={() => setSelectedDifficulty(selectedDifficulty === level ? null : level)}
+                onClick={() => { setSelectedDifficulty(selectedDifficulty === level ? null : level); setPage(1) }}
                 className={`px-2.5 py-1 rounded text-xs font-medium capitalize transition ${
                   selectedDifficulty === level
                     ? DIFFICULTY_COLORS[level]
@@ -267,19 +314,19 @@ export function SkillLabsPage() {
             label="Platform"
             options={filterOptions.platforms}
             selected={selectedPlatforms}
-            onChange={setSelectedPlatforms}
+            onChange={(v) => { setSelectedPlatforms(v); setPage(1) }}
           />
           <SearchableFilter
             label="Category"
             options={filterOptions.categories}
             selected={selectedCategories}
-            onChange={setSelectedCategories}
+            onChange={(v) => { setSelectedCategories(v); setPage(1) }}
           />
           <SearchableFilter
             label="Technology"
             options={filterOptions.technologies}
             selected={selectedTechnologies}
-            onChange={setSelectedTechnologies}
+            onChange={(v) => { setSelectedTechnologies(v); setPage(1) }}
           />
 
           <div className="w-px h-6 bg-border" />
@@ -288,7 +335,7 @@ export function SkillLabsPage() {
             {(['all', 'incomplete', 'completed'] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => setCompletionFilter(f)}
+                onClick={() => { setCompletionFilter(f); setPage(1) }}
                 className={`px-2.5 py-1 rounded text-xs font-medium capitalize transition ${
                   completionFilter === f
                     ? 'bg-muted text-foreground shadow-sm'
@@ -301,7 +348,7 @@ export function SkillLabsPage() {
           </div>
 
           <button
-            onClick={() => setShowSavedOnly(!showSavedOnly)}
+            onClick={() => { setShowSavedOnly(!showSavedOnly); setPage(1) }}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition border ${
               showSavedOnly
                 ? 'border-primary bg-primary/10 text-primary'

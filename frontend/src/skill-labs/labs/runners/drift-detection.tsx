@@ -180,7 +180,7 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
                             <div key={key} className="flex justify-between text-xs">
                               <span className="font-mono text-muted-foreground">{key}</span>
                               <span className={`font-mono font-medium ${
-                                isDiff ? 'text-amber-600 dark:text-amber-400 font-bold' : ''
+                                showResult && isDiff ? 'text-amber-600 dark:text-amber-400 font-bold' : ''
                               }`}>
                                 {resource.actual[key] ?? '-'}
                                 {showResult && isDiff && <span className="ml-1 text-destructive">⚠</span>}

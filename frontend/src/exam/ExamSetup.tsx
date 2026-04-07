@@ -1,4 +1,4 @@
-import { X, Coffee, Timer, Brain, Eye, Lock, ChevronDown, Volume2 } from 'lucide-react'
+import { X, Coffee, Timer, Brain, Eye, Lock, ChevronDown, ChevronLeft, Volume2 } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { useTourContext } from '@/components/TourProvider'
 import { clarityEvent, clarityTag } from '@/clarity'
@@ -32,6 +32,14 @@ export function ExamSetup() {
 
   return (
     <>
+      <button
+        onClick={() => { setRoute('practice'); setSelected(null); setShowAttempts(false); setAttemptsList(null) }}
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition mb-4"
+      >
+        <ChevronLeft className="w-4 h-4" />
+        Practice Exams
+      </button>
+
       <div className="mb-6 p-4 rounded-lg border border-border bg-card shadow-sm flex flex-col">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -475,14 +483,7 @@ export function ExamSetup() {
         </div>
       </div>
 
-      {/* Return to Practice Exams button */}
-      <div className="container px-4 mt-3 md:col-span-4">
-        <div className="mb-6 flex justify-center">
-          <button className="px-4 py-2 rounded bg-accent text-sm" onClick={() => { setRoute('practice'); setSelected(null); setShowAttempts(false); setAttemptsList(null) }}>
-            Return to Practice Exams
-          </button>
-        </div>
-      </div>
+
     </>
   )
 }

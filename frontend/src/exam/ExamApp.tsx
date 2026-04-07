@@ -282,7 +282,7 @@ function ExamAppInner() {
             {/* ExamHeader bar */}
             {route === 'home' && selected ? (
               <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <h2 className="text-lg font-semibold">Questions</h2>
+                <h2 className="text-lg font-semibold">{examStarted && !isFinished ? 'Questions' : 'Practice Exam'}</h2>
                 <div className="flex min-w-0 flex-1 flex-col gap-2 lg:items-end">
                   <div className="text-sm text-muted-foreground break-words lg:text-right">{selected}{selectedMeta?.title ? ` - ${selectedMeta.title}` : ''}</div>
                   <div className="flex flex-col items-stretch gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">

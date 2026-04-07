@@ -83,6 +83,7 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
         </div>
       )}
 
+      {/* Top row: Scenario left, Editor right */}
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Left: Scenario */}
         <div className="w-72 shrink-0 rounded-lg border border-border bg-card p-4 overflow-y-auto">
@@ -92,14 +93,14 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
             <h4 className="font-semibold text-sm">Requirements</h4>
             {lab.validations.map((v, i) => (
               <div key={i} className="text-xs bg-muted/50 rounded px-2 py-1">
-                <span className="font-medium">{v.field}</span>: should be <code className="text-primary">{v.expected}</code>
+                <span className="font-medium">{v.field}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Center: Editor */}
-        <div className="flex-1 rounded-lg border border-border overflow-hidden">
+        {/* Right: Editor */}
+        <div className="flex-1 rounded-lg border border-border overflow-hidden min-w-0">
           <Editor
             height="100%"
             language={lab.language}
@@ -117,51 +118,53 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
             }}
           />
         </div>
+      </div>
 
-        {/* Right: Test Results */}
-        <div className="w-72 shrink-0 rounded-lg border border-border bg-card p-4 overflow-y-auto">
-          <h3 className="font-semibold text-base mb-3">Test Results</h3>
+      {/* Bottom row: Test Results (full width) */}
+      <div className="shrink-0 rounded-lg border border-border bg-card p-4">
+        <div className="flex items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-base mb-2">Test Results</h3>
 
-          {!validationResult && !session.submitted && (
-            <p className="text-sm text-muted-foreground">
-              Edit the code and click "Test Code" to validate your changes.
-            </p>
-          )}
+            {!validationResult && !session.submitted && (
+              <p className="text-sm text-muted-foreground">
+                Edit the code and click "Test Code" to validate your changes.
+              </p>
+            )}
 
-          {validationResult && (
-            <div className="space-y-3">
-              <div className={`flex items-center gap-2 font-semibold text-sm ${validationResult.success ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-                {validationResult.success ? '✓ All checks passed!' : '✗ Validation failed'}
-              </div>
-              {validationResult.errors.length > 0 && (
-                <ul className="space-y-1">
-                  {validationResult.errors.map((err, i) => (
-                    <li key={i} className="text-xs text-destructive bg-destructive/10 rounded px-2 py-1">
-                      {err}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {validationResult.success && (
-                <div className="mt-4">
-                  <ExplanationBlock text={lab.explanation} />
+            {validationResult && (
+              <div className="space-y-2">
+                <div className={`flex items-center gap-2 font-semibold text-sm ${validationResult.success ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+                  {validationResult.success ? '✓ All checks passed!' : '✗ Validation failed'}
                 </div>
-              )}
-            </div>
-          )}
+                {validationResult.errors.length > 0 && (
+                  <ul className="flex flex-wrap gap-2">
+                    {validationResult.errors.map((err, i) => (
+                      <li key={i} className="text-xs text-destructive bg-destructive/10 rounded px-2 py-1">
+                        {err}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {validationResult.success && (
+                  <ExplanationBlock text={lab.explanation} />
+                )}
+              </div>
+            )}
+          </div>
 
-          <div className="mt-6 space-y-2">
+          <div className="shrink-0 flex flex-col gap-2 min-w-40">
             {!session.submitted ? (
               <>
                 <button
-                  className="w-full px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
+                  className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
                   disabled={validating}
                   onClick={handleTest}
                 >
                   {validating ? 'Validating…' : 'Test Code'}
                 </button>
                 <button
-                  className="w-full px-4 py-2 rounded-md border border-border text-muted-foreground font-medium text-sm hover:bg-muted/50 transition"
+                  className="px-4 py-2 rounded-md border border-border text-muted-foreground font-medium text-sm hover:bg-muted/50 transition"
                   onClick={handleGiveUp}
                 >
                   Give Up & Show Answer
@@ -170,7 +173,7 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
             ) : (
               <button
                 onClick={() => setRoute('skill-labs')}
-                className="w-full px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition"
+                className="px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition"
               >
                 Back to Skill Labs
               </button>

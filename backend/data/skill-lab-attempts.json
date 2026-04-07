@@ -307,5 +307,45 @@
     "correct": false,
     "timeTaken": 5,
     "createdAt": "2026-03-30T18:57:59.628Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "cb9c8eda-d319-47bd-aeb7-fda1d16a705b",
+    "labId": "aws-write-s3-readonly-policy",
+    "labType": "diagnose",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 62,
+    "createdAt": "2026-04-07T09:04:36.690Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "5c749aa9-bf30-40b4-bdc4-c0d3cf51daa0",
+    "labId": "aws-wire-up-ec2-access",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"bastion-ssh-source\":\"0.0.0.0/0\",\"bastion-ssh-port\":\"3389\",\"app-ssh-source\":\"0.0.0.0/0\",\"app-traffic-port\":\"80\",\"db-mysql-source\":\"0.0.0.0/0\",\"db-mysql-port\":\"5432\",\"public-rt-target\":\"nat-xxxx\",\"private-rt-target\":\"igw-xxxx\"}",
+    "correct": false,
+    "timeTaken": 20,
+    "createdAt": "2026-04-07T09:08:07.602Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "cb95b343-9ad7-461d-a08a-3783773e1110",
+    "labId": "aws-label-vpc-architecture",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"h1\":\"NAT Gateway\",\"h4\":\"Bastion Host\",\"h2\":\"Private Subnet\",\"h5\":\"VPN Gateway\",\"h6\":\"Bastion Host\",\"h3\":\"Private Subnet\",\"h7\":\"Amazon ElastiCache\",\"h9\":\"10.0.0.0/16 → local\",\"h8\":\"0.0.0.0/0 → nat-xxxx\"}",
+    "correct": false,
+    "timeTaken": 26,
+    "createdAt": "2026-04-07T09:09:28.325Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "e5f7719e-880d-4979-b1fd-bd7734969499",
+    "labId": "aws-build-serverless-pipeline",
+    "labType": "diagnose",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 226,
+    "createdAt": "2026-04-07T10:44:12.821Z"
   }
 ]
