@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import Loader from '@/components/Loader'
 import { useExam } from '@/exam/ExamContext'
-import { Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight, X, Lock, ExternalLink } from 'lucide-react'
+import { Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight, X, Lock, ExternalLink, Play } from 'lucide-react'
 import { clarityEvent, clarityTag } from '@/clarity'
 import type { LabSummary, SkillLevel } from './types'
 import { apiUrl } from '@/apiBase'
@@ -377,12 +377,19 @@ export function SkillLabsPage() {
         const resumable = filtered.find((l) => inProgressLabs.has(l.id))
         if (!resumable) return null
         return (
-          <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-amber-400/40 bg-amber-50/60 dark:bg-amber-900/10 dark:border-amber-500/30">
-            <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
-              Lab in progress: <span className="font-semibold">{resumable.title}</span>
-            </p>
-            <div className="flex items-center gap-2 shrink-0">
+          <div className="mb-4 p-4 rounded-lg bg-card border border-border shadow-sm flex items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-md flex items-center justify-center bg-primary/10 text-primary text-lg flex-shrink-0">
+                <Play className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-semibold text-foreground">Lab in progress</div>
+                <div className="text-sm text-muted-foreground">{resumable.title}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
               <button
+                className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition"
                 onClick={() => {
                   const savedTimed = inProgressLabs.get(resumable.id)?.timed
                   const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
@@ -391,17 +398,16 @@ export function SkillLabsPage() {
                   clarityTag('lab_mode', mode)
                   setRoute(`skill-lab:${resumable.id}:${mode}` as any)
                 }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition"
               >
-                Resume <ArrowRight className="w-3.5 h-3.5" />
+                <Play className="w-4 h-4" /> Resume
               </button>
               <button
-                  onClick={() => setConfirmCancelLabId(resumable.id)}
-                  className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-xs text-amber-700 dark:text-amber-400 hover:bg-destructive/10 hover:text-destructive transition"
-                  title="Cancel lab progress"
-                >
-                  <X className="w-3.5 h-3.5" /> Cancel
-                </button>
+                className="px-3 py-1 rounded-md bg-muted text-muted-foreground border border-border text-sm inline-flex items-center gap-1.5 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
+                onClick={() => setConfirmCancelLabId(resumable.id)}
+                title="Cancel lab progress"
+              >
+                <X className="w-4 h-4" /> Cancel
+              </button>
             </div>
           </div>
         )
@@ -488,17 +494,31 @@ export function SkillLabsPage() {
                   </p>
                 )}
                 <div className="flex items-center gap-2">
-                <button
-                  className="flex-1 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm inline-flex items-center gap-2 hover:bg-primary/90 transition justify-center"
-                  onClick={() => {
-                    clarityEvent('lab_visited')
-                    clarityTag('lab_id', lab.id)
-                    setRoute(`skill-lab-detail:${lab.id}` as any)
-                  }}
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Visit Lab
-                </button>
+                {(() => {
+                  const anyInProgress = inProgressLabs.size > 0
+                  const thisInProgress = inProgressLabs.has(lab.id)
+                  const blockedByOther = anyInProgress && !thisInProgress && !lab.locked
+                  return (
+                    <button
+                      className={`flex-1 px-4 py-2 rounded-md font-medium text-sm inline-flex items-center gap-2 transition justify-center ${
+                        blockedByOther
+                          ? 'bg-muted/60 text-muted-foreground/60 border border-border cursor-not-allowed'
+                          : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                      }`}
+                      disabled={blockedByOther}
+                      title={blockedByOther ? 'Complete or cancel your current lab first' : undefined}
+                      onClick={() => {
+                        if (blockedByOther) return
+                        clarityEvent('lab_visited')
+                        clarityTag('lab_id', lab.id)
+                        setRoute(`skill-lab-detail:${lab.id}` as any)
+                      }}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Visit Lab
+                    </button>
+                  )
+                })()}
                 {inProgressLabs.has(lab.id) && !lab.locked && (
                   <button
                     onClick={() => setConfirmCancelLabId(lab.id)}

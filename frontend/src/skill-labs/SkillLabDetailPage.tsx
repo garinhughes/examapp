@@ -95,7 +95,7 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
   const isInProgress = inProgressEntry !== null
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-4">
       {/* Back link */}
       <button
         onClick={() => setRoute('skill-labs')}
@@ -105,10 +105,10 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
         Skill Labs
       </button>
 
-      {/* Header */}
-      <div className="space-y-3">
-        <div className="flex items-start gap-3">
-          <h1 className="text-2xl font-bold leading-snug flex-1">{lab.title}</h1>
+      {/* Lab info card */}
+      <div className="p-5 rounded-lg border border-border bg-card shadow-sm space-y-4">
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="text-2xl font-bold leading-snug">{lab.title}</h1>
           {lab.locked && (
             <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted border border-border text-xs font-medium text-muted-foreground">
               <Lock className="w-3 h-3" />
@@ -151,7 +151,7 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
       </div>
 
       {/* Action area */}
-      <div className="p-5 rounded-lg border border-border bg-card space-y-4">
+      <div className="p-5 rounded-lg border border-border bg-card shadow-sm space-y-4">
         {lab.locked ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">

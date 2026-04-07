@@ -140,12 +140,6 @@ function ExamAppInner() {
             {/* Header */}
             <header className={`flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6${focusMode ? ' hidden' : ''}`}>
               <div className="flex flex-col">
-                {selected && (
-                  <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
-                    <span>{selected}</span>
-                    {examTier && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs capitalize">{examTier}</span>}
-                  </div>
-                )}
                 {['practice', 'analytics', 'account', 'admin', 'metrics', 'diagrams', 'skill-labs', 'basket', 'feedback'].includes(route) && (
                   <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
                     <span className="text-primary font-extrabold">//</span>
@@ -279,7 +273,7 @@ function ExamAppInner() {
             {/* ExamHeader bar */}
             {route === 'home' && selected ? (
               <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <h2 className="text-lg font-semibold">{examStarted && !isFinished ? 'Questions' : 'Practice Exam'}</h2>
+                <h2 className="text-lg font-semibold flex items-center gap-2"><span className="text-primary font-extrabold">//</span>{examStarted && !isFinished ? 'Questions' : 'Practice Exam'}</h2>
                 <div className="flex min-w-0 flex-1 flex-col gap-2 lg:items-end">
                   <div className="text-sm text-muted-foreground break-words lg:text-right">{selected}{selectedMeta?.title ? ` - ${selectedMeta.title}` : ''}</div>
                   <div className="flex flex-col items-stretch gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">

@@ -101,13 +101,17 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
         return (
           <div>
             <pre className={`${className} p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-all max-w-full`} style={{ ...style }}>
-              {tokens.map((line, i) => (
-                <div key={i} {...getLineProps({ line, key: i })}>
-                  {line.map((token, k) => (
-                    <span key={k} {...getTokenProps({ token, key: k })} />
-                  ))}
-                </div>
-              ))}
+              {tokens.map((line, i) => {
+                const { key: lineKey, ...lineProps } = getLineProps({ line, key: i })
+                return (
+                  <div key={i} {...lineProps}>
+                    {line.map((token, k) => {
+                      const { key: tokenKey, ...tokenProps } = getTokenProps({ token, key: k })
+                      return <span key={k} {...tokenProps} />
+                    })}
+                  </div>
+                )
+              })}
             </pre>
           </div>
         )

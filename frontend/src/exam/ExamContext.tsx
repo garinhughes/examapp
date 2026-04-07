@@ -476,7 +476,6 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         const total = saved.numQuestions || 0
         const rawAnswered = Object.keys(saved.answers || {}).length
         const answeredCount = total > 0 ? Math.min(rawAnswered, total) : rawAnswered
-        if (answeredCount === 0) continue
         const age = Date.now() - (saved.timestamp || 0)
         if (age > 24 * 60 * 60 * 1000) { localStorage.removeItem(key); continue }
         const meta = exams.find((e: any) => e.code === code)

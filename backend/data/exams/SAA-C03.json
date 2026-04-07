@@ -329,23 +329,23 @@
       "choices": [
         {
           "id": "c1",
-          "text": "```json\n{\n  \"EventSourceArn\": \"arn:aws:kinesis:us-east-1:123456789012:stream/orders\",\n  \"BatchSize\": 100,\n  \"WindowInSeconds\": 5,\n  \"RecordAgeFilter\": 60,\n  \"StartingPosition\": \"LATEST\"\n}\n```",
+          "text": "{\n  \"EventSourceArn\": \"arn:aws:kinesis:us-east-1:123456789012:stream/orders\",\n  \"BatchSize\": 100,\n  \"WindowInSeconds\": 5,\n  \"RecordAgeFilter\": 60,\n  \"StartingPosition\": \"LATEST\"\n}",
           "explanation": "`WindowInSeconds` and `RecordAgeFilter` are not valid Lambda event source mapping parameters. The correct field names are `MaximumBatchingWindowInSeconds` and `MaximumRecordAgeInSeconds`. Unrecognized parameter names are silently ignored, leaving both batching window and record age filtering unconfigured."
         },
         {
           "id": "c2",
-          "text": "```json\n{\n  \"EventSourceArn\": \"arn:aws:kinesis:us-east-1:123456789012:stream/orders\",\n  \"BatchSize\": 100,\n  \"MaximumBatchingWindowInSeconds\": 5,\n  \"MaximumRecordAgeInSeconds\": 60,\n  \"StartingPosition\": \"LATEST\"\n}\n```",
+          "text": "{\n  \"EventSourceArn\": \"arn:aws:kinesis:us-east-1:123456789012:stream/orders\",\n  \"BatchSize\": 100,\n  \"MaximumBatchingWindowInSeconds\": 5,\n  \"MaximumRecordAgeInSeconds\": 60,\n  \"StartingPosition\": \"LATEST\"\n}",
           "sequence": 1,
           "explanation": "`MaximumBatchingWindowInSeconds: 5` buffers records for up to 5 seconds to build efficient batches up to the `BatchSize` limit. `MaximumRecordAgeInSeconds: 60` causes Lambda to automatically skip records older than 60 seconds at the ESM layer before they reach the function. `StartingPosition: LATEST` begins consuming only records produced after the event source mapping is created."
         },
         {
           "id": "c3",
-          "text": "```json\n{\n  \"EventSourceArn\": \"arn:aws:kinesis:us-east-1:123456789012:stream/orders\",\n  \"BatchSize\": 100,\n  \"MaximumBatchingWindowInSeconds\": 5,\n  \"FilterCriteria\": {\n    \"Filters\": [{ \"Pattern\": \"{\\\"data\\\": {\\\"age\\\": [{\\\"numeric\\\": [\\\"<\\\", 60]}]}}\" }]\n  },\n  \"StartingPosition\": \"LATEST\"\n}\n```",
+          "text": "{\n  \"EventSourceArn\": \"arn:aws:kinesis:us-east-1:123456789012:stream/orders\",\n  \"BatchSize\": 100,\n  \"MaximumBatchingWindowInSeconds\": 5,\n  \"FilterCriteria\": {\n    \"Filters\": [\n      {\n        \"Pattern\": {\n          \"data\": {\n            \"age\": [\n              {\n                \"numeric\": [\n                  \"<\",\n                  60\n                ]\n              }\n            ]\n          }\n        }\n      }\n    ]\n  },\n  \"StartingPosition\": \"LATEST\"\n}",
           "explanation": "`FilterCriteria` filters records based on pattern matching against event payload data fields, not against internal record metadata such as arrival age. Age-based record discarding is a dedicated Lambda Kinesis ESM capability controlled by the `MaximumRecordAgeInSeconds` parameter, not by filter expressions."
         },
         {
           "id": "c4",
-          "text": "```json\n{\n  \"EventSourceArn\": \"arn:aws:kinesis:us-east-1:123456789012:stream/orders\",\n  \"BatchSize\": 100,\n  \"TumblingWindowInSeconds\": 5,\n  \"MaximumRecordAgeInSeconds\": 60,\n  \"StartingPosition\": \"TRIM_HORIZON\"\n}\n```",
+          "text": "{\n  \"EventSourceArn\": \"arn:aws:kinesis:us-east-1:123456789012:stream/orders\",\n  \"BatchSize\": 100,\n  \"TumblingWindowInSeconds\": 5,\n  \"MaximumRecordAgeInSeconds\": 60,\n  \"StartingPosition\": \"TRIM_HORIZON\"\n}",
           "explanation": "`TumblingWindowInSeconds` enables stateful aggregation windows for computing running metrics (such as counts or sums) across fixed time intervals - it does not control the record buffering window used to accumulate batches. `StartingPosition: TRIM_HORIZON` begins processing from the oldest available shard record, causing the function to reprocess all historical stream data rather than only new records."
         }
       ],
@@ -558,22 +558,22 @@
       "choices": [
         {
           "id": "c1",
-          "text": "```\naws ec2 create-volume \\\n  --volume-type gp3 \\\n  --size 400 \\\n  --iops 32000 \\\n  --throughput 1000 \\\n  --availability-zone us-east-1a\n```",
+          "text": "aws ec2 create-volume \\\n  --volume-type gp3 \\\n  --size 400 \\\n  --iops 32000 \\\n  --throughput 1000 \\\n  --availability-zone us-east-1a",
           "explanation": "`gp3` volumes support a maximum of 16,000 IOPS per volume, regardless of the `--iops` value specified. Requesting 32,000 IOPS on a `gp3` volume will fail API validation. The `--throughput` flag is valid for `gp3` but cannot compensate for the IOPS ceiling."
         },
         {
           "id": "c2",
-          "text": "```\naws ec2 create-volume \\\n  --volume-type io1 \\\n  --size 400 \\\n  --iops 32000 \\\n  --multi-attach-enabled \\\n  --availability-zone us-east-1a\n```",
+          "text": "aws ec2 create-volume \\\n  --volume-type io1 \\\n  --size 400 \\\n  --iops 32000 \\\n  --multi-attach-enabled \\\n  --availability-zone us-east-1a",
           "explanation": "`io1` enforces a maximum IOPS-to-GiB ratio of 50:1. For a 400 GiB volume, the maximum provisioned IOPS is 20,000 (400 * 50). Requesting 32,000 IOPS exceeds this ratio and the API returns a validation error. `--multi-attach-enabled` is irrelevant to a single-instance database workload."
         },
         {
           "id": "c3",
-          "text": "```\naws ec2 create-volume \\\n  --volume-type io2 \\\n  --size 400 \\\n  --throughput 4000 \\\n  --availability-zone us-east-1a\n```",
+          "text": "aws ec2 create-volume \\\n  --volume-type io2 \\\n  --size 400 \\\n  --throughput 4000 \\\n  --availability-zone us-east-1a",
           "explanation": "The `--throughput` parameter is only valid for `gp3` volume types and is rejected by the API when `--volume-type io2` is specified. To provision IOPS on an `io2` volume the `--iops` flag must be used instead."
         },
         {
           "id": "c4",
-          "text": "```\naws ec2 create-volume \\\n  --volume-type io2 \\\n  --size 400 \\\n  --iops 32000 \\\n  --availability-zone us-east-1a\n```",
+          "text": "aws ec2 create-volume \\\n  --volume-type io2 \\\n  --size 400 \\\n  --iops 32000 \\\n  --availability-zone us-east-1a",
           "sequence": 1,
           "explanation": "`io2` supports a maximum IOPS-to-GiB ratio of 500:1 and an absolute maximum of 256,000 IOPS. For a 400 GiB volume, 32,000 IOPS requires a ratio of 80:1, well within the limit. The `--iops` flag correctly provisions the requested I/O performance."
         }
@@ -795,23 +795,23 @@
       "choices": [
         {
           "id": "c1",
-          "text": "```\naws s3 cp /data/files s3://my-bucket/uploads/ \\\n  --recursive \\\n  --exclude \"*.tmp\" \\\n  --sse aws:kms\n```",
+          "text": "aws s3 cp /data/files s3://my-bucket/uploads/ \\\n  --recursive \\\n  --exclude \"*.tmp\" \\\n  --sse aws:kms",
           "explanation": "`aws s3 cp --recursive` copies all matching source files unconditionally without comparing them against the destination. It does not skip already-uploaded or unchanged files, violating the incremental-transfer requirement."
         },
         {
           "id": "c2",
-          "text": "```\naws s3 sync /data/files s3://my-bucket/uploads/ \\\n  --exclude \"*.tmp\" \\\n  --sse aws:kms\n```",
+          "text": "aws s3 sync /data/files s3://my-bucket/uploads/ \\\n  --exclude \"*.tmp\" \\\n  --sse aws:kms",
           "sequence": 1,
           "explanation": "`aws s3 sync` compares source and destination by size and last-modified timestamp, transferring only new or modified files. `--exclude \"*.tmp\"` skips temporary files, and `--sse aws:kms` applies KMS server-side encryption to each uploaded object."
         },
         {
           "id": "c3",
-          "text": "```\naws s3 sync /data/files s3://my-bucket/uploads/ \\\n  --delete \\\n  --exclude \"*.tmp\" \\\n  --sse aws:kms\n```",
+          "text": "aws s3 sync /data/files s3://my-bucket/uploads/ \\\n  --delete \\\n  --exclude \"*.tmp\" \\\n  --sse aws:kms",
           "explanation": "The `--delete` flag removes objects from the S3 destination that no longer exist in the local source directory. This behavior was not requested and could cause unintended data loss in the S3 bucket."
         },
         {
           "id": "c4",
-          "text": "```\naws s3 sync /data/files s3://my-bucket/uploads/ \\\n  --exclude \"*.tmp\" \\\n  --server-side-encryption aws:kms\n```",
+          "text": "aws s3 sync /data/files s3://my-bucket/uploads/ \\\n  --exclude \"*.tmp\" \\\n  --server-side-encryption aws:kms",
           "explanation": "`--server-side-encryption` is not a valid parameter for `aws s3 sync`. The correct flag is `--sse`. This command fails with an `Unknown options: --server-side-encryption` error."
         }
       ],
