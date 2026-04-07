@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   BookOpen, Terminal, CheckCircle2, ChevronLeft, ChevronRight,
   BarChart3, Brain, Target, Award, Shield, Zap, Users,
-  TrendingUp, GraduationCap, Lightbulb, ArrowRight,
+  TrendingUp, GraduationCap, Lightbulb, ArrowRight, X, ZoomIn,
 } from 'lucide-react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
@@ -47,20 +47,34 @@ function usePresignedUrl(imageKey: string) {
   return src
 }
 
-function CarouselSlide({ imageKey, alt }: { imageKey: string; alt: string }) {
+function CarouselSlide({ imageKey, alt, onOpen }: { imageKey: string; alt: string; onOpen: (src: string, alt: string) => void }) {
   const src = usePresignedUrl(imageKey)
   return (
-    <div className="flex-[0_0_100%] min-w-0 relative">
+    <div
+      className="flex-[0_0_100%] min-w-0 relative group"
+      onClick={() => src && onOpen(src, alt)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && src && onOpen(src, alt)}
+      aria-label={`Enlarge: ${alt}`}
+    >
       {src ? (
         <img
           src={src}
           alt={alt}
-          className="w-full h-[320px] sm:h-[420px] object-contain rounded-xl bg-muted/30"
+          className="w-full h-[320px] sm:h-[420px] object-contain rounded-xl bg-muted/30 cursor-zoom-in"
           loading="lazy"
         />
       ) : (
         <div className="w-full h-[320px] sm:h-[420px] rounded-xl bg-muted/50 animate-pulse flex items-center justify-center">
           <span className="text-muted-foreground text-sm">Loading...</span>
+        </div>
+      )}
+      {src && (
+        <div className="pointer-events-none absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 rounded-full p-3">
+            <ZoomIn className="w-6 h-6 text-white" />
+          </div>
         </div>
       )}
       <div className="absolute bottom-2 left-4">
@@ -88,10 +102,31 @@ const researchData = [
 export function HomePage() {
   const navigate = useNavigate()
   const carouselSlides = useCarouselSlides()
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    Autoplay({ delay: 5000, stopOnInteraction: true }),
-  ])
+  const autoplay = useRef(Autoplay({ delay: 5000, stopOnInteraction: true }))
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [autoplay.current])
   const [selectedSlide, setSelectedSlide] = useState(0)
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null)
+
+  const openLightbox = useCallback((src: string, alt: string) => {
+    setLightbox({ src, alt })
+    autoplay.current.stop()
+  }, [])
+
+  const closeLightbox = useCallback(() => {
+    setLightbox(null)
+    autoplay.current.play()
+  }, [])
+
+  useEffect(() => {
+    if (!lightbox) return
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeLightbox() }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [lightbox, closeLightbox])
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return
@@ -114,13 +149,16 @@ export function HomePage() {
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi])
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
 
       {/* ── Hero ──────────────────────────────────────────────── */}
-      <section className="text-center py-3 md:py-6">
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 text-primary">
-          Train with intent. Certify with confidence.
-        </h1>
+      <section className="text-center -mt-4 pb-4">
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <img src="/favicon.png" alt="certshack" className="w-12 h-12 rounded-xl" />
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-primary">
+            certshack
+          </h1>
+        </div>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
           Practice exams and hands-on skill labs for AWS, Azure, GCP and more.<br />
           Build real-world skills, not just exam knowledge.
@@ -231,7 +269,7 @@ export function HomePage() {
           <div ref={emblaRef} className="overflow-hidden rounded-xl">
             <div className="flex">
               {carouselSlides.map((img) => (
-                <CarouselSlide key={img.key} imageKey={img.key} alt={img.alt} />
+                <CarouselSlide key={img.key} imageKey={img.key} alt={img.alt} onOpen={openLightbox} />
               ))}
             </div>
           </div>
@@ -497,6 +535,36 @@ export function HomePage() {
           </button>
         </div>
       </section>
+
+      {/* ── Lightbox ──────────────────────────────────────────── */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={closeLightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label={lightbox.alt}
+        >
+          <button
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-10"
+            aria-label="Close image"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <img
+            src={lightbox.src}
+            alt={lightbox.alt}
+            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none">
+            <span className="bg-black/80 text-white text-sm font-medium px-3 py-1.5 rounded-lg whitespace-nowrap">
+              {lightbox.alt}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

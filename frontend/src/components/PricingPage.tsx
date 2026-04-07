@@ -5,6 +5,7 @@
  */
 
 import { useState, useMemo, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { useEntitlements, type CatalogProduct } from '../hooks/useEntitlements'
 import { useAuthFetch } from '../auth/useAuthFetch'
@@ -99,13 +100,13 @@ function ProductCard({ product, onBuy, optionLabel, inBasket }: { product: Catal
       )}
       <div className="flex items-start justify-between">
         <div>
-          <span className="inline-block text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground mb-1.5">
+          <span className="inline-block text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground mb-2">
             {kindLabels[product.kind] ?? product.kind}
           </span>
-          <h3 className="font-semibold text-foreground">{product.label}</h3>
-          <p className="text-sm text-muted-foreground mt-0.5">{product.description}</p>
+          <h3 className="font-semibold text-foreground leading-snug">{product.label}</h3>
+          <p className="text-sm text-muted-foreground mt-1.5 leading-snug">{product.description}</p>
           {product.billingPeriod && (
-            <p className="text-xs text-muted-foreground mt-1">Billed {product.billingPeriod === 'annual' ? 'annually' : 'monthly'}</p>
+            <p className="text-xs text-muted-foreground mt-2">Billed {product.billingPeriod === 'annual' ? 'annually' : 'monthly'}</p>
           )}
         </div>
         <div className="text-right ml-4 flex-shrink-0">
@@ -126,7 +127,7 @@ function ProductCard({ product, onBuy, optionLabel, inBasket }: { product: Catal
         </div>
       )}
 
-      <div className="mt-3 mt-auto">
+      <div className="mt-auto pt-3">
         {product.owned ? (
           <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
             <Check className="w-4 h-4" /> Owned
@@ -246,7 +247,7 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
   return (
     <div className="p-5 rounded-xl border border-primary/30 bg-primary/5">
       <div className="flex items-center gap-2 mb-4">
-        <Zap className="w-5 h-5 text-primary" />
+        <span className="text-primary font-extrabold text-lg leading-none">//</span>
         <h3 className="text-lg font-bold text-foreground">Find your plan</h3>
       </div>
 
@@ -406,6 +407,7 @@ function ExamProviderGroup({
 /* ------------------------------------------------------------------ */
 
 export default function PricingPage() {
+  const navigate = useNavigate()
   const { user, login } = useAuth()
   const { tier, products, loading } = useEntitlements()
   const authFetch = useAuthFetch()
@@ -481,7 +483,7 @@ export default function PricingPage() {
       {/* ── Tier comparison table ── */}
       <section>
         <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-primary" /> What's included
+          <span className="text-primary font-extrabold">//</span> What's included
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -507,7 +509,7 @@ export default function PricingPage() {
       {/* ── All-Access subscriptions ── */}
       {subs.length > 0 && (
         <section>
-          <h3 className="text-lg font-bold mb-3">🔑 All-Access</h3>
+          <h3 className="text-lg font-bold mb-3"><span className="text-primary font-extrabold">//</span> All-Access</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {subs.map((p, i) => (
               <ProductCard
@@ -525,7 +527,7 @@ export default function PricingPage() {
       {/* ── Exam Packs (bundles) ── */}
       {bundles.length > 0 && (
         <section>
-          <h3 className="text-lg font-bold mb-3">📦 Exam Packs</h3>
+          <h3 className="text-lg font-bold mb-3"><span className="text-primary font-extrabold">//</span> Exam Packs</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {bundles.map((p) => (
               <ProductCard key={p.productId} product={p} onBuy={handleBuy} inBasket={basket.has(p.productId)} />
@@ -537,7 +539,8 @@ export default function PricingPage() {
       {/* ── Single exam passes ── */}
       {exams.length > 0 && (
         <section>
-          <h3 className="text-lg font-bold mb-4">📝 Exam Passes</h3>
+          <h3 className="text-lg font-bold mb-2"><span className="text-primary font-extrabold">//</span> Exam Passes</h3>
+          <p className="text-sm text-muted-foreground mb-4">Expand any of the providers below to see individual exam pricing</p>
           <div className="space-y-6">
             {Object.entries(
               exams.reduce<Record<string, CatalogProduct[]>>((acc, p) => {
@@ -563,12 +566,12 @@ export default function PricingPage() {
       {/* Not logged in CTA */}
       {!user && (
         <div className="text-center p-6 rounded-xl border border-dashed border-border bg-muted/40">
-          <p className="text-muted-foreground mb-3">Register for free to unlock a full practice exam for 3 days.</p>
+          <p className="text-muted-foreground mb-3">Register for free to unlock more content for 3 days.</p>
           <button
-            onClick={login}
+            onClick={() => navigate('/login')}
             className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-semibold"
           >
-            Sign in with Google
+            Login / Register
           </button>
         </div>
       )}

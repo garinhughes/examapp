@@ -108,10 +108,6 @@ function ExamAppInner() {
     <div className="flex flex-col h-screen w-full overflow-hidden bg-background text-foreground">
       <PageMeta route={route} />
       <CookieConsent />
-      {/* Work-in-progress banner */}
-      <div className={`shrink-0 bg-amber-500 text-amber-950 text-xs font-medium text-center py-1.5 px-4${focusMode ? ' hidden' : ''}`}>
-        This site is a work in progress and is not ready for use. Features may be incomplete or change without notice.
-      </div>
       <div className="flex flex-1 overflow-hidden">
       <div className={focusMode ? 'hidden' : ''}>
       <Sidebar
@@ -151,10 +147,11 @@ function ExamAppInner() {
                   </div>
                 )}
                 {['practice', 'analytics', 'account', 'admin', 'metrics', 'diagrams', 'skill-labs', 'basket', 'feedback'].includes(route) && (
-                  <h1 className="text-3xl font-bold tracking-tight">
+                  <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                    <span className="text-primary font-extrabold">//</span>
                     {route === 'practice' && 'Practice Exams'}
                     {route === 'analytics' && 'Analytics'}
-                    {route === 'account' && 'Account Settings'}
+                    {route === 'account' && 'Account'}
                     {route === 'admin' && 'Admin Console'}
                     {route === 'metrics' && 'Metrics'}
                     {route === 'diagrams' && 'Architecture Diagrams'}

@@ -191,12 +191,13 @@ export function SkillLabsPage() {
       if (completionFilter === 'completed' && !completedLabIds.has(lab.id)) return false
       if (completionFilter === 'incomplete' && completedLabIds.has(lab.id)) return false
 
-      // Search query: match title or description
+      // Search query: match title, description, or technologies
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase()
         const title = (lab.title || '').toLowerCase()
         const desc = (lab.description || '').toLowerCase()
-        if (!title.includes(q) && !desc.includes(q)) return false
+        const techs = (lab.technologies || []).join(' ').toLowerCase()
+        if (!title.includes(q) && !desc.includes(q) && !techs.includes(q)) return false
       }
 
       if (showSavedOnly && !bookmarkedLabIds.has(lab.id)) return false
