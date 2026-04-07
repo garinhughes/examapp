@@ -106,6 +106,15 @@ export const PRODUCTS: Product[] = [
     provider: 'AWS',
   },
   {
+    productId: 'exam:AIF-C01',
+    kind: 'exam',
+    label: 'Exam Pass - AIF-C01',
+    description: 'AWS Certified AI Practitioner - full question bank + all AWS skill labs for 1 year',
+    priceGBP: 900,
+    examCodes: ['AIF-C01'],
+    provider: 'AWS',
+  },
+  {
     productId: 'exam:CLF-C02',
     kind: 'exam',
     label: 'Exam Pass - CLF-C02',

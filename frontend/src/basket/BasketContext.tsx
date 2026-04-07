@@ -142,42 +142,76 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     const result: BasketSuggestion[] = []
     const examItems = items.filter((i) => i.product.kind === 'exam')
     const hasSubscription = items.some((i) => i.product.kind === 'subscription')
+    const hasBundle = items.some((i) => i.product.kind === 'bundle')
 
-    if (hasSubscription) return result
+    if (hasSubscription || hasBundle) return result
 
+    const examTotal = examItems.reduce((s, i) => s + i.product.priceGBP, 0)
+    const pick2Price = 1700 // £17
+    const pick3Price = 2500 // £25
     const monthlyPrice = 1000 // £10/mo
-    const annualPrice = 9600  // £96/yr (£8/mo)
+    const annualPrice = 9600  // £96/yr
 
-    // Single exam: gently suggest All-Access as an upgrade (non-intrusive)
-    if (!hasSubscription && examItems.length === 1) {
-      const singlePrice = examItems[0].product.priceGBP
-      const diff = monthlyPrice - singlePrice
+    // 1 exam: tease the 2-for-£17 deal
+    if (examItems.length === 1) {
+      const saving = examItems[0].product.priceGBP * 2 - pick2Price
       result.push({
-        message: `Have you considered All-Access? You'll get every exam and all skill labs for just ${formatPence(monthlyPrice)}/mo - that's ${diff > 0 ? `only ${formatPence(diff)} more` : 'a great value'} and you can cancel anytime.`,
-        suggestedProductId: 'sub:all-access',
-        saving: 0,
+        message: `Add a 2nd exam and pay just £17 for both — that's £${(pick2Price / 100).toFixed(0)} instead of £${((examItems[0].product.priceGBP * 2) / 100).toFixed(0)}.`,
+        suggestedProductId: 'bundle:pick-2',
+        saving,
       })
     }
 
-    // 2+ individual exams and total exceeds monthly? Suggest monthly sub
-    if (examItems.length >= 2) {
-      const examTotal = examItems.reduce((s, i) => s + i.product.priceGBP, 0)
-      if (examTotal >= monthlyPrice) {
+    // 2 exams: offer the pick-2 bundle (saves £1) and tease pick-3
+    if (examItems.length === 2) {
+      const saving2 = examTotal - pick2Price
+      if (saving2 > 0) {
         result.push({
-          message: `You have ${examItems.length} exams in your basket (${formatPence(examTotal)}). The monthly All-Access plan gives unlimited access to every exam and skill lab for just ${formatPence(monthlyPrice)}/mo.`,
-          suggestedProductId: 'sub:all-access',
-          saving: examTotal - monthlyPrice,
+          message: `Switch to the 2-exam pack for £17 and save £${(saving2 / 100).toFixed(0)} vs buying individually.`,
+          suggestedProductId: 'bundle:pick-2',
+          saving: saving2,
+        })
+      }
+      result.push({
+        message: `Or go bigger — the 3-exam pack is just £25. Add one more exam and save even more.`,
+        suggestedProductId: 'bundle:pick-3',
+        saving: examItems[0].product.priceGBP * 3 - pick3Price,
+      })
+    }
+
+    // 3 exams: offer the pick-3 bundle (saves £2)
+    if (examItems.length === 3) {
+      const saving3 = examTotal - pick3Price
+      if (saving3 > 0) {
+        result.push({
+          message: `Switch to the 3-exam pack for £25 and save £${(saving3 / 100).toFixed(0)} vs buying individually.`,
+          suggestedProductId: 'bundle:pick-3',
+          saving: saving3,
         })
       }
     }
 
-    // 3+ exams? Also suggest annual
-    if (examItems.length >= 3) {
-      const examTotal = examItems.reduce((s, i) => s + i.product.priceGBP, 0)
+    // 4+ exams: suggest All-Access
+    if (examItems.length >= 4) {
       result.push({
-        message: `Save even more with the annual plan at ${formatPence(annualPrice)}/year (${formatPence(800)}/mo).`,
+        message: `With ${examItems.length} exams (${formatPence(examTotal)}), the All-Access Monthly plan is better value — unlimited access to every exam and skill lab for just ${formatPence(monthlyPrice)}/mo.`,
+        suggestedProductId: 'sub:all-access',
+        saving: examTotal - monthlyPrice,
+      })
+      result.push({
+        message: `Or save more with the All-Access Annual plan at ${formatPence(annualPrice)}/year (${formatPence(800)}/mo).`,
         suggestedProductId: 'sub:all-access-annual',
         saving: examTotal - annualPrice,
+      })
+      return result
+    }
+
+    // 2+ exams total exceeds monthly sub price: also offer All-Access
+    if (examItems.length >= 2 && examTotal >= monthlyPrice) {
+      result.push({
+        message: `Or go unlimited — All-Access Monthly gives every exam and skill lab for just ${formatPence(monthlyPrice)}/mo.`,
+        suggestedProductId: 'sub:all-access',
+        saving: examTotal - monthlyPrice,
       })
     }
 

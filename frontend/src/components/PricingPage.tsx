@@ -47,16 +47,15 @@ interface FeatureDef {
 }
 
 const FEATURES: FeatureDef[] = [
-  { label: 'Practice questions',     visitor: '10 sample', registered: '40 questions per exam', paid: 'Full question bank' },
-  { label: 'Skill Labs',             visitor: '3 labs',     registered: '6 labs',               paid: 'All labs' },
+  { label: 'Practice exams',     visitor: '10 sample', registered: '40 questions per exam', paid: 'All (per exam)' },
+  { label: 'Skill labs',             visitor: '3 labs',     registered: '6 labs',               paid: 'All (per provider)' },
   { label: 'Review & explanations',  visitor: CHECK,       registered: CHECK,                  paid: CHECK },
   { label: 'Saved attempts',         visitor: CROSS,       registered: '3 per exam',           paid: 'Unlimited' },
   { label: 'Analytics',              visitor: CROSS,      registered: CHECK,                  paid: CHECK },
-  { label: 'CSV / PDF export',       visitor: CROSS,       registered: '1 per exam',           paid: CHECK },
-  { label: 'Leaderboard',            visitor: CROSS,       registered: CROSS,                  paid: CHECK },
   { label: 'Rewards & badges',       visitor: CROSS,       registered: CHECK,                  paid: CHECK },
+  { label: 'Leaderboard',            visitor: CROSS,       registered: CROSS,                  paid: CHECK },
   { label: 'Report issues',          visitor: CROSS,       registered: CROSS,                  paid: CHECK },
-  { label: 'Request features',       visitor: CROSS,       registered: CROSS,                  paid: CHECK },
+  { label: 'Request content & features',       visitor: CROSS,       registered: CROSS,                  paid: CHECK },
   { label: 'Certificates',           visitor: CROSS,       registered: CROSS,                  paid: CHECK },
 ]
 
@@ -472,7 +471,7 @@ export default function PricingPage() {
       </div>
 
       {/* ── Recommendation wizard ── */}
-      <RecommendationWizard products={products} onBuy={handleBuy} />
+      <RecommendationWizard products={[...exams, ...bundles, ...subs]} onBuy={handleBuy} />
 
       {actionError && (
         <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm">
