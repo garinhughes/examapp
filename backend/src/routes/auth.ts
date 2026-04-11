@@ -11,7 +11,6 @@ import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { jwtVerify, createRemoteJWKSet, decodeProtectedHeader } from 'jose'
 import { upsertUserFromCognito, getUserBySub, setRegisteredAtIfNew, updateUserFields, setEmailOptIn, setWelcomeEmailSent } from '../services/dynamo.js'
 import { sendWelcomeEmail } from '../services/ses.js'
-import { TIERS } from '../catalog.js'
 import {
   CognitoIdentityProviderClient,
   SignUpCommand,
@@ -32,18 +31,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const userId = request.user!.sub
     const profile = await getUserBySub(userId)
     const registeredAt: string | null = profile?.registeredAt ?? null
-    let trialDaysRemaining: number | null = null
-    if (request.tier === 'registered' && registeredAt) {
-      const trialDays = TIERS.registered.trialDays ?? 3
-      const elapsed = Math.floor((Date.now() - Date.parse(registeredAt)) / 86_400_000)
-      trialDaysRemaining = Math.max(0, trialDays - elapsed)
-    }
     return {
       user: request.user,
       authMode: AUTH_MODE,
       tier: request.tier,
       registeredAt,
-      trialDaysRemaining,
+      trialDaysRemaining: null,
       emailOptIn: profile?.emailOptIn ?? true,
     }
   })

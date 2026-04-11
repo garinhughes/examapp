@@ -5,7 +5,7 @@ import { clarityEvent, clarityTag } from '@/clarity'
 
 export function ExamSetup() {
   const {
-    selected, selectedMeta, exams, questions, examTier, examTotalAvailable, examLimited, examShowcase, trialDaysRemaining,
+    selected, selectedMeta, exams, questions, examTier, examTotalAvailable, examLimited, examShowcase,
     examMode, setExamMode, revealAnswers, setRevealAnswers, ttsEnabled, setTtsEnabled, timed, setTimed,
     durationMinutes, setDurationMinutes, numQuestions, setNumQuestions,
     availableFilteredCount, attemptId, isFinished, user, login,
@@ -67,14 +67,7 @@ export function ExamSetup() {
                       ? <>These <strong>{questions.length}</strong> questions are hand-picked and the same for your account - they don't rotate.</>
                       : <>You have access to <strong>{questions.length}</strong> of <strong>{examTotalAvailable}</strong> questions.</>
                     }
-                    {' '}
-                    {trialDaysRemaining !== null && trialDaysRemaining > 0
-                      ? <>{trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} left on your free trial. </>
-                      : trialDaysRemaining === 0
-                        ? <>Your free trial has ended. </>
-                        : null
-                    }
-                    Upgrade to unlock the full question bank.
+                    {' '}Upgrade to unlock the full question bank.
                   </>
                 )}
               </span>

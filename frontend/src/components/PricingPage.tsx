@@ -47,10 +47,10 @@ interface FeatureDef {
 }
 
 const FEATURES: FeatureDef[] = [
-  { label: 'Practice exams',     visitor: '10 sample', registered: '40 questions per exam', paid: 'All (per exam)' },
-  { label: 'Skill labs',             visitor: '3 labs',     registered: '6 labs',               paid: 'All (per provider)' },
+  { label: 'Practice exams',     visitor: '20 questions', registered: '40 questions per exam', paid: 'All (per exam)' },
+  { label: 'Skill labs',             visitor: '6 labs',     registered: '12 labs',               paid: 'All (per provider)' },
   { label: 'Review & explanations',  visitor: CHECK,       registered: CHECK,                  paid: CHECK },
-  { label: 'Saved attempts',         visitor: CROSS,       registered: '3 per exam',           paid: 'Unlimited' },
+  { label: 'Saved attempts',         visitor: CROSS,       registered: '5 per exam',           paid: 'Unlimited' },
   { label: 'Analytics',              visitor: CROSS,      registered: CHECK,                  paid: CHECK },
   { label: 'Rewards & badges',       visitor: CROSS,       registered: CHECK,                  paid: CHECK },
   { label: 'Leaderboard',            visitor: CROSS,       registered: CROSS,                  paid: CHECK },
@@ -200,7 +200,7 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
         alternative: products.find((p) => p.productId === 'sub:all-access'),
         reason: saving > 0
           ? `The 3-exam pack saves you ${formatPrice(saving)} compared to buying individually.`
-          : 'The 3-exam pack gives you a year of access to 3 exams and their skill labs.',
+          : 'The 3-exam pack gives you 1 year of access to 3 exams and 1 month of skill labs.',
       }
     }
 
@@ -213,7 +213,7 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
         alternative: products.find((p) => p.productId === 'sub:all-access'),
         reason: saving > 0
           ? `The 2-exam pack saves you ${formatPrice(saving)} compared to buying individually.`
-          : 'The 2-exam pack gives you a year of access to 2 exams and their skill labs.',
+          : 'The 2-exam pack gives you 1 year of access to 2 exams and 1 month of skill labs.',
       }
     }
 
@@ -224,7 +224,7 @@ function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[];
     return {
       primary: match,
       alternative: products.find((p) => p.productId === 'sub:all-access'),
-      reason: 'A single Exam Pass gives you a full year of access to the question bank and all provider skill labs.',
+      reason: 'A single Exam Pass gives you 1 year of access to the full question bank and 1 month of all provider skill labs.',
     }
   }, [step, pickedExams, examCount, wantLabs, products, examProducts])
 
@@ -490,7 +490,7 @@ export default function PricingPage() {
               <tr className="border-b-2 border-border">
                 <th className="py-3 px-3 text-sm font-semibold text-muted-foreground w-1/3">Feature</th>
                 <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">Visitor</th>
-                <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">Registered (3 day trial)</th>
+                <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">Registered (Free)</th>
                 <th className="py-3 px-3 text-sm font-semibold text-center text-primary">Paid</th>
               </tr>
             </thead>
@@ -565,7 +565,7 @@ export default function PricingPage() {
       {/* Not logged in CTA */}
       {!user && (
         <div className="text-center p-6 rounded-xl border border-dashed border-border bg-muted/40">
-          <p className="text-muted-foreground mb-3">Register for free to unlock more content for 3 days.</p>
+          <p className="text-muted-foreground mb-3">Register for free to unlock more questions, labs, and saved attempts.</p>
           <button
             onClick={() => navigate('/login')}
             className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-semibold"

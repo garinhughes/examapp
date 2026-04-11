@@ -347,5 +347,15 @@
     "correct": false,
     "timeTaken": 226,
     "createdAt": "2026-04-07T10:44:12.821Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "d048818b-e0a8-43f6-a3e6-1351456a48aa",
+    "labId": "aws-disaster-recovery-runbook",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"q1:b2\":\"eu-west-2\",\"q1:b1\":\"1\",\"q2:b3\":\"2\",\"q2:b4\":\"eu-west-2\",\"q3:b5\":\"AddRecord\",\"q4:b6\":\"sync\",\"q5:b7\":\"invalidation\",\"q6:b8\":\"notify\"}",
+    "correct": false,
+    "timeTaken": 159,
+    "createdAt": "2026-04-11T09:01:19.097Z"
   }
 ]

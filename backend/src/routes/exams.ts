@@ -4,12 +4,6 @@ import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS, hasExamAccess } from '../catalog.js'
 import { computeDomainWeights, selectWeakestLinkQuestions, type DomainStats } from '../services/weakestLink.js'
 import { loadAllExams, loadExam, shuffleQuestions, getShowcaseQuestions } from '../examLoader.js'
-import { getUserBySub } from '../services/dynamo.js'
-
-function isTrialActive(registeredAt: string | null, trialDays: number): boolean {
-  if (!registeredAt) return true // no record yet → just registered
-  return Date.now() - Date.parse(registeredAt) < trialDays * 86_400_000
-}
 
 const attemptsFile = new URL('../../data/attempts.json', import.meta.url)
 
@@ -82,15 +76,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const allQuestions = exam.questions as any[]
 
     if (tier !== 'paying') {
-      // Determine showcase count: registered trial → 40, visitor/expired → 10
-      let showcaseCount = tierConfig.questionLimit ?? 10
-      if (tier === 'registered' && request.user) {
-        const profile = await getUserBySub(request.user.sub)
-        const trialDays = TIERS.registered.trialDays ?? 3
-        if (!isTrialActive(profile?.registeredAt ?? null, trialDays)) {
-          showcaseCount = TIERS.visitor.questionLimit ?? 10
-        }
-      }
+      const showcaseCount = tierConfig.questionLimit ?? 20
       const showcase = getShowcaseQuestions(exam, showcaseCount)
       if (showcase) {
         return {

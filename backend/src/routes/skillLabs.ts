@@ -9,7 +9,6 @@ import {
   listLabIndex,
 } from '../services/skillLabStore.js'
 import { updateMetricsOnLabAttempt } from '../services/metricsStore.js'
-import { getUserBySub } from '../services/dynamo.js'
 import { TIERS } from '../catalog.js'
 
 const LABS_DIR = path.join(process.cwd(), 'data', 'skill-labs')
@@ -97,22 +96,16 @@ async function findLabS3(id: string): Promise<any | null> {
 /*  Tier helpers                                                       */
 /* ------------------------------------------------------------------ */
 
-function isTrialActive(registeredAt: string | null, trialDays: number): boolean {
-  if (!registeredAt) return true
-  return Date.now() - Date.parse(registeredAt) < trialDays * 86_400_000
-}
-
 /**
  * How many showcase labs this tier can access.
  * null = all labs (paying).
  */
 function effectiveLabShowcaseCount(
   tier: 'visitor' | 'registered' | 'paying',
-  trialActive: boolean,
 ): number | null {
   if (tier === 'paying') return null
-  if (tier === 'registered' && trialActive) return TIERS.registered.labShowcaseCount ?? 6
-  return TIERS.visitor.labShowcaseCount ?? 3
+  if (tier === 'registered') return TIERS.registered.labShowcaseCount ?? 12
+  return TIERS.visitor.labShowcaseCount ?? 6
 }
 
 /** Attach a `locked` boolean to each lab based on which IDs are unlocked. */
@@ -158,9 +151,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         return reply.send(withLocked(allLabs, null))
       }
 
-      const profile = await getUserBySub(userId)
-      const trialActive = isTrialActive(profile?.registeredAt ?? null, TIERS.registered.trialDays ?? 3)
-      const count = effectiveLabShowcaseCount('registered', trialActive) ?? 6
+      const count = effectiveLabShowcaseCount('registered') ?? 12
 
       const unlockedIds = new Set<string>(
         allLabs
@@ -173,7 +164,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     // Unauthenticated: visitor showcase unlocked
-    const count = effectiveLabShowcaseCount('visitor', false) ?? 3
+    const count = effectiveLabShowcaseCount('visitor') ?? 6
     const unlockedIds = new Set<string>(
       allLabs
         .filter((l: any) => l.showcase)
@@ -211,9 +202,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
       if (tier === 'paying') return reply.send(lab)
 
-      const profile = await getUserBySub(userId)
-      const trialActive = isTrialActive(profile?.registeredAt ?? null, TIERS.registered.trialDays ?? 3)
-      const count = effectiveLabShowcaseCount('registered', trialActive) ?? 6
+      const count = effectiveLabShowcaseCount('registered') ?? 12
 
       if (!lab.showcase) {
         return reply.status(403).send({ message: 'Sign in and upgrade to access this lab.' })
@@ -224,8 +213,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       return reply.send(lab)
     }
 
-    // Unauthenticated visitor: must be in visitor showcase (positions 1–3)
-    const visitorCount = effectiveLabShowcaseCount('visitor', false) ?? 3
+    // Unauthenticated visitor: must be in visitor showcase (positions 1–6)
+    const visitorCount = effectiveLabShowcaseCount('visitor') ?? 6
     if (!lab.showcase) {
       return reply.status(403).send({ message: 'Sign in to access this lab.' })
     }

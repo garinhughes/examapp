@@ -24,26 +24,26 @@ function highlightCode(text: string): React.ReactNode[] {
     if (m.index > lastIndex) nodes.push(text.slice(lastIndex, m.index))
     const [full, comment, flag, sq, dq, bslash, arn, s3uri, awsSvc, svc, awsAlone] = m
     if (comment !== undefined) {
-      nodes.push(<span key={k++} className="text-slate-400 dark:text-slate-500 italic">{comment}</span>)
+      nodes.push(<span key={k++} className="text-slate-500 dark:text-slate-400 italic">{comment}</span>)
     } else if (flag !== undefined) {
-      nodes.push(<span key={k++} className="text-yellow-500 dark:text-yellow-300">{flag}</span>)
+      nodes.push(<span key={k++} className="text-amber-600 dark:text-amber-400">{flag}</span>)
     } else if (sq !== undefined || dq !== undefined) {
-      nodes.push(<span key={k++} className="text-orange-500 dark:text-orange-300">{full}</span>)
+      nodes.push(<span key={k++} className="text-orange-600 dark:text-orange-400">{full}</span>)
     } else if (bslash !== undefined) {
       nodes.push(<span key={k++} className="text-slate-400 dark:text-slate-500">{full}</span>)
     } else if (arn !== undefined || s3uri !== undefined) {
-      nodes.push(<span key={k++} className="text-emerald-600 dark:text-emerald-400">{full}</span>)
+      nodes.push(<span key={k++} className="text-emerald-700 dark:text-emerald-400">{full}</span>)
     } else if (awsSvc !== undefined) {
       const gap = full.slice(awsSvc.length, -svc!.length)
       nodes.push(
         <span key={k++}>
-          <span className="text-sky-600 dark:text-sky-400 font-bold">{awsSvc}</span>
+          <span className="text-sky-700 dark:text-sky-300 font-semibold">{awsSvc}</span>
           {gap}
-          <span className="text-cyan-600 dark:text-cyan-400">{svc}</span>
+          <span className="text-sky-500 dark:text-sky-300">{svc}</span>
         </span>
       )
     } else if (awsAlone !== undefined) {
-      nodes.push(<span key={k++} className="text-sky-600 dark:text-sky-400 font-bold">{awsAlone}</span>)
+      nodes.push(<span key={k++} className="text-sky-700 dark:text-sky-300 font-semibold">{awsAlone}</span>)
     }
     lastIndex = m.index + full.length
   }
@@ -156,12 +156,12 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
                             disabled={session.submitted}
                             spellCheck={false}
                             autoComplete="off"
-                            className={`inline font-mono text-sm px-2 py-0.5 rounded border w-36 align-middle focus:outline-none focus:ring-1 focus:ring-primary ${
+                            className={`inline font-mono text-sm px-2 py-0.5 rounded border w-44 align-middle focus:outline-none focus:ring-1 focus:ring-primary ${
                               isCorrect === true
-                                ? 'border-green-500 bg-green-500/10 text-green-700 dark:text-green-400'
+                                ? 'border-green-600 bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                                 : isCorrect === false
-                                  ? 'border-destructive bg-destructive/10 text-destructive'
-                                  : 'border-border bg-background'
+                                  ? 'border-red-600 bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                  : 'border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-800'
                             }`}
                           />
                         )

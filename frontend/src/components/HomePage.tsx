@@ -238,7 +238,7 @@ export function HomePage() {
                 'Scenario-based tasks aligned to real job responsibilities',
                 'Various modes: Timed & Casual',
                 'Simulated CLI terminals for hands-on command practice',
-                'JSON & YAML code editor',
+                'Live code editor e.g. JSON & YAML',
                 'Design or fix architectures using interactive diagrams',
                 'Save & Resume labs - grab a coffee without losing progress',
                 'Filter by difficulty, platform, category and technology',
