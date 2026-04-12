@@ -219,11 +219,18 @@ export function BasketProvider({ children }: { children: ReactNode }) {
   }, [items])
 
   const switchTo = useCallback((product: CatalogProduct) => {
-    const next = [{ product, addedAt: Date.now() }]
+    // For bundles, stamp the currently selected exam codes onto the product so
+    // checkout can grant the correct individual exam entitlements.
+    const examItems = items.filter((i) => i.product.kind === 'exam')
+    const enriched: CatalogProduct =
+      product.kind === 'bundle' && examItems.length > 0
+        ? { ...product, examCodes: examItems.flatMap((i) => i.product.examCodes ?? [i.product.productId.replace(/^exam:/, '')]) }
+        : product
+    const next = [{ product: enriched, addedAt: Date.now() }]
     setItems(next)
     saveToStorage(next)
     setLastError(null)
-  }, [])
+  }, [items])
 
   const clearError = useCallback(() => setLastError(null), [])
 

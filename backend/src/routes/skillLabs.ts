@@ -9,7 +9,7 @@ import {
   listLabIndex,
 } from '../services/skillLabStore.js'
 import { updateMetricsOnLabAttempt } from '../services/metricsStore.js'
-import { TIERS } from '../catalog.js'
+import { TIERS, hasLabAccess } from '../catalog.js'
 
 const LABS_DIR = path.join(process.cwd(), 'data', 'skill-labs')
 
@@ -146,7 +146,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       try { ownedProductIds = await getActiveProductIds(userId) } catch { /* ignore */ }
       const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds })
 
-      if (tier === 'paying') {
+      if (hasLabAccess(ownedProductIds)) {
         // All labs unlocked — null means no lock filter
         return reply.send(withLocked(allLabs, null))
       }
@@ -200,7 +200,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       try { ownedProductIds = await getActiveProductIds(userId) } catch { /* ignore */ }
       const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds })
 
-      if (tier === 'paying') return reply.send(lab)
+      if (hasLabAccess(ownedProductIds)) return reply.send(lab)
 
       const count = effectiveLabShowcaseCount('registered') ?? 12
 

@@ -22,7 +22,12 @@ export default function PayPalCheckout() {
   const { user, login } = useAuth()
 
   const hasSubscription = items.some((i) => i.product.kind === 'subscription')
-  const productIds = items.map((i) => i.product.productId)
+  const productIds = items.flatMap((i) => {
+    if (i.product.kind === 'bundle' && i.product.examCodes && i.product.examCodes.length > 0) {
+      return [i.product.productId, ...i.product.examCodes.map((c) => `exam:${c}`)]
+    }
+    return [i.product.productId]
+  })
 
   function authHeaders(): Record<string, string> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }

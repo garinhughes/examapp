@@ -322,7 +322,12 @@ function UserRow({
                               Admin-granted
                             </span>
                           )}
-                          <span className="text-[10px] text-muted-foreground">{fmtDate(ent.purchasedAt)}</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            Purchased {fmtDate(ent.purchasedAt)}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {ent.expiresAt ? `Expires ${fmtDate(ent.expiresAt)}` : 'No expiry'}
+                          </span>
 
                           {/* Revoke button with confirmation */}
                           {confirmRevoke === ent.productId ? (
@@ -371,7 +376,10 @@ function UserRow({
                                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${STATUS_COLORS[ent.status]}`}>
                                   {ent.status}
                                 </span>
-                                <span className="text-[10px] text-muted-foreground">{fmtDate(ent.purchasedAt)}</span>
+                                <span className="text-[10px] text-muted-foreground">Purchased {fmtDate(ent.purchasedAt)}</span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {ent.expiresAt ? `Expired ${fmtDate(ent.expiresAt)}` : 'No expiry'}
+                                </span>
                                 {/* Re-grant button for revoked/expired */}
                                 <button
                                   onClick={(e) => {

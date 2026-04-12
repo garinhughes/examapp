@@ -1,4 +1,5 @@
 import { X, Coffee, Timer, Brain, Eye, Lock, ChevronDown, ChevronLeft, Volume2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useExam } from './ExamContext'
 import { useTourContext } from '@/components/TourProvider'
 import { clarityEvent, clarityTag } from '@/clarity'
@@ -24,6 +25,7 @@ export function ExamSetup() {
     setShowAttempts, setAttemptsList,
   } = useExam()
 
+  const navigate = useNavigate()
   const tour = useTourContext()
   const locked = !!attemptId && !isFinished
 
@@ -58,7 +60,7 @@ export function ExamSetup() {
                       ? <>These <strong>{questions.length}</strong> questions are hand-picked and the same for all visitors - they don't change between sessions.</>
                       : <>You have access to <strong>{questions.length}</strong> of <strong>{examTotalAvailable}</strong> questions.</>
                     }
-                    {' '}Sign in for more.
+                    {' '}Only a limited set of domains are available for visitors.
                   </>
                 )}
                 {examTier === 'registered' && (
@@ -72,7 +74,7 @@ export function ExamSetup() {
                 )}
               </span>
               <button
-                onClick={() => examTier === 'visitor' ? login() : setRoute('pricing')}
+                onClick={() => examTier === 'visitor' ? navigate('/login') : setRoute('pricing')}
                 className="px-3 py-1 rounded text-xs font-semibold bg-primary text-white hover:bg-primary/80"
               >
                 {examTier === 'visitor' ? 'Sign in' : 'View plans'}
@@ -99,7 +101,7 @@ export function ExamSetup() {
               </button>
 
               {domainOpen && !locked && (
-                <div ref={domainRef} className="absolute z-50 mt-1 w-full max-h-56 overflow-auto rounded-lg bg-card border border-border/60 shadow-xl">
+                <div ref={domainRef} className="absolute z-50 mt-1 w-full max-h-56 overflow-auto rounded-lg bg-white dark:bg-zinc-900 border border-border/60 shadow-xl">
                   <div className="flex gap-2 px-2 py-1.5 border-b border-border/40">
                     <button className="text-[10px] text-primary hover:text-primary dark:hover:text-primary transition" onClick={() => { setTakeDomains([...domainsList]); setDomainOpen(false) }}>Select all individually</button>
                     <button className="text-[10px] text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground transition" onClick={() => { setTakeDomains(['All']); setDomainOpen(false) }}>All (default)</button>
@@ -330,8 +332,16 @@ export function ExamSetup() {
             <div className="mt-3">
               <label className="block text-sm font-medium mb-1">Questions <span className="text-xs text-muted-foreground font-normal">({availableFilteredCount} available)</span></label>
               <div className="flex items-center gap-3">
-                <input type="range" min={1} max={Math.max(availableFilteredCount, 1)} step={1} value={Math.min(numQuestions, availableFilteredCount || 1)} onChange={(e) => setNumQuestions(Math.min(Number(e.target.value) || 1, availableFilteredCount || 1))} className="flex-1" disabled={locked} />
-                <input type="number" min={1} max={availableFilteredCount || 1} step={1} value={Math.min(numQuestions, availableFilteredCount || 1)} onChange={(e) => setNumQuestions(Math.min(Math.max(1, Number(e.target.value) || 1), availableFilteredCount || 1))} className="w-28 px-2 py-1 rounded bg-muted/40 text-foreground border border-border dark:border-transparent" disabled={locked} />
+                {(() => {
+                  const examMax = selectedMeta?.defaultQuestions ?? availableFilteredCount
+                  const maxQ = Math.max(Math.min(availableFilteredCount, examMax), 1)
+                  const clampedVal = Math.min(numQuestions, maxQ)
+                  return <>
+                    <input type="range" min={1} max={maxQ} step={1} value={clampedVal} onChange={(e) => setNumQuestions(Math.min(Number(e.target.value) || 1, maxQ))} className="flex-1" disabled={locked} />
+                    <input type="number" min={1} max={maxQ} step={1} value={clampedVal} onChange={(e) => setNumQuestions(Math.min(Math.max(1, Number(e.target.value) || 1), maxQ))} className="w-28 px-2 py-1 rounded bg-muted/40 text-foreground border border-border dark:border-transparent" disabled={locked} />
+                    {clampedVal >= maxQ && <span className="text-xs font-semibold text-orange-500">max</span>}
+                  </>
+                })()}
               </div>
             </div>
           </div>

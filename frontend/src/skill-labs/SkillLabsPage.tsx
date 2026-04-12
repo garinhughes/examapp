@@ -125,7 +125,17 @@ export function SkillLabsPage() {
       }
     }
     fetchLabs()
-    return () => { cancelled = true }
+
+    // Re-fetch on tab focus so locked state reflects any entitlement changes
+    // (e.g. lab access expiring or a purchase completing in another tab).
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible') fetchLabs()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      cancelled = true
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
   }, [])
 
   // Load completed lab IDs from localStorage + backend

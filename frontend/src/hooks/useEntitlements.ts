@@ -107,6 +107,16 @@ export function useEntitlements(): EntitlementState {
     fetchPricing()
   }, [fetchPricing])
 
+  // Re-fetch when the tab regains focus, so expiring entitlements (e.g. lab access)
+  // are reflected in the UI without requiring a full page reload.
+  useEffect(() => {
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible') fetchPricing()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange)
+  }, [fetchPricing])
+
   return {
     ...data,
     loading,

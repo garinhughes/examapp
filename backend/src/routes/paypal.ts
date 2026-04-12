@@ -71,6 +71,7 @@ async function _grantFromSession(
     server.log.warn({ pk, sk }, '[paypal] no session found')
     return
   }
+  let maxLabMonths = 0
   for (const pid of sess.productIds) {
     const prod = getProduct(pid)
     const isSubscription = prod?.kind === 'subscription'
@@ -84,6 +85,18 @@ async function _grantFromSession(
       stripeSubscriptionId: isSubscription ? sk : undefined,
       meta: { source: 'paypal', paypalId: sk },
     })
+    if (prod?.labMonths && prod.labMonths > maxLabMonths) maxLabMonths = prod.labMonths
+  }
+  // Grant time-limited lab access if any purchased product includes lab months
+  if (maxLabMonths > 0) {
+    const labExpiresAt = new Date(Date.now() + maxLabMonths * 30 * 24 * 60 * 60 * 1000).toISOString()
+    await grantEntitlement({
+      userId: sess.userId,
+      productId: 'extra:lab-access',
+      kind: 'extra',
+      expiresAt: labExpiresAt,
+      meta: { source: 'paypal', paypalId: sk, labMonths: maxLabMonths },
+    })
   }
   server.log.info(
     { pk, sk, userId: sess.userId, productIds: sess.productIds },
@@ -93,12 +106,20 @@ async function _grantFromSession(
   try {
     const user = await getUserBySub(sess.userId)
     if (user?.email) {
-      const products = sess.productIds.map((pid: string) => {
-        const p = getProduct(pid)
-        return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
-      })
-      const totalPence = products.reduce((s: number, p: { priceGBP: number }) => s + p.priceGBP, 0)
-      sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId: sess.userId, products, totalPence, source: 'paypal' })
+      const bundleExamCodesEmail = new Set(
+        (sess.productIds as string[])
+          .map((pid: string) => getProduct(pid))
+          .filter((p: any) => p?.kind === 'bundle')
+          .flatMap((p: any) => (p.examCodes ?? []).map((c: string) => `exam:${c}`))
+      )
+      const emailProducts = (sess.productIds as string[])
+        .filter((pid: string) => !bundleExamCodesEmail.has(pid))
+        .map((pid: string) => {
+          const p = getProduct(pid)
+          return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
+        })
+      const totalPence: number = sess.amountPence
+      sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId: sess.userId, products: emailProducts, totalPence, source: 'paypal' })
         .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'paypal-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your certshack order is confirmed', filters: { productIds: sess.productIds } }))
         .catch((e: any) => server.log.warn({ err: e?.message }, '[paypal] payment confirmed email failed'))
     }
@@ -119,6 +140,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       return reply.status(400).send({ message: 'productIds array required' })
     }
 
+    // Exams that are children of a bundle in the same order are entitlement-only;
+    // exclude them from the charge total to avoid double-counting.
+    const bundleExamCodes = new Set(
+      productIds
+        .map((pid: string) => getProduct(pid))
+        .filter((p: any) => p?.kind === 'bundle')
+        .flatMap((p: any) => (p.examCodes ?? []).map((c: string) => `exam:${c}`))
+    )
     let amountPence = 0
     for (const pid of productIds) {
       const prod = getProduct(pid)
@@ -126,7 +155,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       if (prod.kind === 'subscription') {
         return reply.status(400).send({ message: `Use /create-subscription for subscription products` })
       }
-      amountPence += prod.priceGBP
+      if (!bundleExamCodes.has(pid)) amountPence += prod.priceGBP
     }
 
     const userId = request.user?.sub

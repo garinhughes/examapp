@@ -46,7 +46,12 @@ export default function BasketPage() {
 
     clarityEvent('checkout_initiated')
     clarityTag('payment_method', 'stripe')
-    const productIds = items.map((i) => i.product.productId)
+    const productIds = items.flatMap((i) => {
+      if (i.product.kind === 'bundle' && i.product.examCodes && i.product.examCodes.length > 0) {
+        return [i.product.productId, ...i.product.examCodes.map((c) => `exam:${c}`)]
+      }
+      return [i.product.productId]
+    })
     if (productIds.length === 0) return
 
     try {
@@ -121,6 +126,18 @@ export default function BasketPage() {
             <div className="flex-1 min-w-0">
               <div className="font-medium text-sm">{item.product.label}</div>
               <div className="text-xs text-muted-foreground mt-0.5">{item.product.description}</div>
+              {item.product.kind === 'bundle' && item.product.examCodes && item.product.examCodes.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {item.product.examCodes.map((code) => {
+                    const match = products.find((p) => p.productId === `exam:${code}`)
+                    return (
+                      <span key={code} className="text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
+                        {match ? match.label.replace(/^Exam Pass - /, '') : code}
+                      </span>
+                    )
+                  })}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-3 ml-4 flex-shrink-0">
               <span className="font-semibold">{formatPrice(item.product.priceGBP)}</span>

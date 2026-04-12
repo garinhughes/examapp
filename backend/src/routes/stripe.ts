@@ -156,15 +156,24 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             },
           })
         } else {
-          // One-time payment mode — inline price_data per product
-          const lineItems = products.map((prod) => ({
-            price_data: {
-              currency: 'gbp',
-              unit_amount: prod.priceGBP,
-              product_data: { name: prod.label },
-            },
-            quantity: 1,
-          }))
+          // One-time payment mode — inline price_data per product.
+          // Exams that are children of a bundle in the same order are
+          // entitlement-only (the bundle covers the charge), so exclude them.
+          const bundleExamCodes = new Set(
+            products
+              .filter((p) => p.kind === 'bundle')
+              .flatMap((p) => (p.examCodes ?? []).map((c) => `exam:${c}`))
+          )
+          const lineItems = products
+            .filter((prod) => !bundleExamCodes.has(prod.productId))
+            .map((prod) => ({
+              price_data: {
+                currency: 'gbp',
+                unit_amount: prod.priceGBP,
+                product_data: { name: prod.label },
+              },
+              quantity: 1,
+            }))
 
           session = await stripePost('/checkout/sessions', {
             mode: 'payment',
@@ -248,7 +257,13 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       switch (event.type) {
         case 'checkout.session.completed': {
           const session = event.data.object
-          // Only grant when payment is confirmed (not for unpaid/trial sessions)
+          // For mode=subscription, payment_status is 'no_payment_required' on this event —
+          // entitlements and the confirmation email are handled via invoice.payment_succeeded instead.
+          // For mode=payment, payment_status must be 'paid' before granting.
+          if (session.mode === 'subscription') {
+            server.log.info({ sessionId: session.id }, '[stripe] subscription checkout — deferring grant to invoice.payment_succeeded')
+            break
+          }
           if (session.payment_status !== 'paid') {
             server.log.info({ sessionId: session.id, payment_status: session.payment_status }, '[stripe] skipping grant — payment not yet paid')
             break
@@ -257,13 +272,30 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           const userId: string = metadata.userId
           const productIds: string[] = JSON.parse(metadata.productIds ?? '[]')
           if (userId && productIds.length > 0) {
+            let maxLabMonths = 0
             for (const pid of productIds) {
               const prod = getProduct(pid)
+              const isSubscription = prod?.kind === 'subscription'
               await grantEntitlement({
                 userId,
                 productId: pid,
                 kind: prod?.kind ?? 'extra',
+                expiresAt: isSubscription
+                  ? null
+                  : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
                 meta: { source: 'stripe.checkout.session.completed', stripeSessionId: session.id },
+              })
+              if (prod?.labMonths && prod.labMonths > maxLabMonths) maxLabMonths = prod.labMonths
+            }
+            // Grant time-limited lab access if any purchased product includes lab months
+            if (maxLabMonths > 0) {
+              const labExpiresAt = new Date(Date.now() + maxLabMonths * 30 * 24 * 60 * 60 * 1000).toISOString()
+              await grantEntitlement({
+                userId,
+                productId: 'extra:lab-access',
+                kind: 'extra',
+                expiresAt: labExpiresAt,
+                meta: { source: 'stripe.checkout.session.completed', stripeSessionId: session.id, labMonths: maxLabMonths },
               })
             }
             server.log.info({ userId, productIds, sessionId: session.id }, '[stripe] entitlements granted')
@@ -271,12 +303,20 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             try {
               const user = await getUserBySub(userId)
               if (user?.email) {
-                const products = productIds.map((pid) => {
-                  const p = getProduct(pid)
-                  return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
-                })
-                const totalPence = products.reduce((s, p) => s + p.priceGBP, 0)
-                sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId, products, totalPence, source: 'stripe' })
+                const bundleExamCodesEmail = new Set(
+                  productIds
+                    .map((pid) => getProduct(pid))
+                    .filter((p) => p?.kind === 'bundle')
+                    .flatMap((p) => (p!.examCodes ?? []).map((c) => `exam:${c}`))
+                )
+                const emailProducts = productIds
+                  .filter((pid) => !bundleExamCodesEmail.has(pid))
+                  .map((pid) => {
+                    const p = getProduct(pid)
+                    return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
+                  })
+                const totalPence = session.amount_total ?? emailProducts.reduce((s, p) => s + p.priceGBP, 0)
+                sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId, products: emailProducts, totalPence, source: 'stripe' })
                   .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'stripe-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your certshack order is confirmed', filters: { productIds } }))
                   .catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] payment confirmed email failed'))
               }
@@ -289,8 +329,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
         case 'invoice.payment_succeeded': {
           const invoice = event.data.object
-          // Only act on subscription renewal cycles (not the initial invoice — that's covered by checkout.session.completed)
-          if (invoice.subscription && invoice.billing_reason === 'subscription_cycle') {
+          // Handle both initial subscription payment (subscription_create) and renewals (subscription_cycle).
+          // For mode=subscription checkouts, payment_status on checkout.session.completed is 'no_payment_required'
+          // so we cannot rely on that event — subscription grants and the initial confirmation email are done here.
+          const isCreate = invoice.billing_reason === 'subscription_create'
+          const isCycle = invoice.billing_reason === 'subscription_cycle'
+          if (invoice.subscription && (isCreate || isCycle)) {
             try {
               const sub = await stripeGet(`/subscriptions/${invoice.subscription}`)
               const metadata = sub.metadata ?? {}
@@ -303,15 +347,35 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
                     userId,
                     productId: pid,
                     kind: prod?.kind ?? 'subscription',
-                    meta: { source: 'stripe.invoice.payment_succeeded', invoiceId: invoice.id },
+                    expiresAt: null,
+                    stripeSubscriptionId: invoice.subscription,
+                    meta: { source: 'stripe.invoice.payment_succeeded', invoiceId: invoice.id, billingReason: invoice.billing_reason },
                   })
                 }
-                server.log.info({ userId, productIds, invoiceId: invoice.id }, '[stripe] subscription entitlement renewed')
+                server.log.info({ userId, productIds, invoiceId: invoice.id, billingReason: invoice.billing_reason }, '[stripe] subscription entitlement granted/renewed')
+                // Send confirmation email only on initial purchase, not on renewals
+                if (isCreate) {
+                  try {
+                    const user = await getUserBySub(userId)
+                    if (user?.email) {
+                      const emailProducts = productIds.map((pid) => {
+                        const p = getProduct(pid)
+                        return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
+                      })
+                      const totalPence = invoice.amount_paid ?? emailProducts.reduce((s, p) => s + p.priceGBP, 0)
+                      sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId, products: emailProducts, totalPence, source: 'stripe' })
+                        .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'stripe-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your certshack order is confirmed', filters: { productIds } }))
+                        .catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] subscription payment confirmed email failed'))
+                    }
+                  } catch (e: any) {
+                    server.log.warn({ err: e?.message }, '[stripe] subscription payment confirmed email lookup failed')
+                  }
+                }
               } else {
                 server.log.warn({ subscriptionId: invoice.subscription }, '[stripe] invoice.payment_succeeded — no userId/productIds in subscription metadata')
               }
             } catch (err) {
-              server.log.error({ err, subscriptionId: invoice.subscription }, '[stripe] failed to fetch subscription for renewal')
+              server.log.error({ err, subscriptionId: invoice.subscription }, '[stripe] failed to fetch subscription for invoice.payment_succeeded')
             }
           }
           break

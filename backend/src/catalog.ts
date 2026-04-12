@@ -89,13 +89,15 @@ export interface Product {
   examCodes?: string[]
   /** Cloud provider — used to group exam passes in the UI */
   provider?: string
+  /** Months of full skill lab access granted on purchase (null = none) */
+  labMonths?: number | null
 }
 
 /**
  * Master product list.
  */
 export const PRODUCTS: Product[] = [
-  // -- Single exams (Exam Pass - £9 each, 1 year question bank + 1 month skill labs) --
+  // -- Single exams (Exam Pass - £9 each, 1 year question bank; AWS exams include 1 month skill labs) --
   {
     productId: 'exam:SAA-C03',
     kind: 'exam',
@@ -104,6 +106,7 @@ export const PRODUCTS: Product[] = [
     priceGBP: 900,
     examCodes: ['SAA-C03'],
     provider: 'AWS',
+    labMonths: 1,
   },
   {
     productId: 'exam:AIF-C01',
@@ -113,6 +116,7 @@ export const PRODUCTS: Product[] = [
     priceGBP: 900,
     examCodes: ['AIF-C01'],
     provider: 'AWS',
+    labMonths: 1,
   },
   {
     productId: 'exam:CLF-C02',
@@ -122,24 +126,7 @@ export const PRODUCTS: Product[] = [
     priceGBP: 900,
     examCodes: ['CLF-C02'],
     provider: 'AWS',
-  },
-  {
-    productId: 'exam:DVA-C02',
-    kind: 'exam',
-    label: 'Exam Pass - DVA-C02',
-    description: 'AWS Developer Associate - full question bank for 1 year + all AWS skill labs for 1 month',
-    priceGBP: 900,
-    examCodes: ['DVA-C02'],
-    provider: 'AWS',
-  },
-  {
-    productId: 'exam:SOA-C02',
-    kind: 'exam',
-    label: 'Exam Pass - SOA-C02',
-    description: 'AWS SysOps Administrator Associate - full question bank for 1 year + all AWS skill labs for 1 month',
-    priceGBP: 900,
-    examCodes: ['SOA-C02'],
-    provider: 'AWS',
+    labMonths: 1,
   },
   {
     productId: 'exam:SCS-C03',
@@ -149,15 +136,16 @@ export const PRODUCTS: Product[] = [
     priceGBP: 900,
     examCodes: ['SCS-C03'],
     provider: 'AWS',
+    labMonths: 1,
   },
   {
-    productId: 'exam:AZ-900',
+    productId: 'exam:CCA-F',
     kind: 'exam',
-    label: 'Exam Pass - AZ-900',
-    description: 'Azure Fundamentals - full question bank for 1 year + all Azure skill labs for 1 month',
+    label: 'Exam Pass - CCA-F',
+    description: 'Claude Certified Architect - Foundations - full question bank for 1 year',
     priceGBP: 900,
-    examCodes: ['AZ-900'],
-    provider: 'Azure',
+    examCodes: ['CCA-F'],
+    provider: 'Anthropic',
   },
 
   // -- Bundles (Exam Pack - pick 2 for £17, pick 3 for £25) --
@@ -167,6 +155,7 @@ export const PRODUCTS: Product[] = [
     label: 'Exam Pack - Any 2 Exams',
     description: 'Choose any 2 practice exams (1 year) + provider skill labs for 1 month (save over individual purchases)',
     priceGBP: 1700,
+    labMonths: 1,
   },
   {
     productId: 'bundle:pick-3',
@@ -174,6 +163,7 @@ export const PRODUCTS: Product[] = [
     label: 'Exam Pack - Any 3 Exams',
     description: 'Choose any 3 practice exams (1 year) + provider skill labs for 1 month (best multi-exam value)',
     priceGBP: 2500,
+    labMonths: 1,
   },
 
   // -- Subscription (All-Access) --
@@ -201,6 +191,16 @@ export const PRODUCTS: Product[] = [
 
 export function getProduct(productId: string): Product | undefined {
   return PRODUCTS.find((p) => p.productId === productId)
+}
+
+/**
+ * Returns true if the user currently has full skill lab access.
+ * Active subscriptions grant unlimited lab access.
+ * One-time exam/bundle purchases grant lab access via a time-limited extra:lab-access entitlement.
+ */
+export function hasLabAccess(ownedProductIds: string[]): boolean {
+  if (ownedProductIds.some((id) => id.startsWith('sub:'))) return true
+  return ownedProductIds.includes('extra:lab-access')
 }
 
 /** Given a set of product IDs the user owns, does that grant access to the exam? */

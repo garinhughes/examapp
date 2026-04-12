@@ -90,7 +90,7 @@ export function PracticeExams() {
               else setCollapsedProviders(new Set(providers.map(p => p.provider)))
             }}
           >
-            {allCollapsed() ? 'Show all' : 'Hide all'}
+            {allCollapsed() ? 'Expand all' : 'Collapse all'}
           </button>
         </div>
         {providers.map((p, pIndex) => {
