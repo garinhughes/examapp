@@ -89,7 +89,7 @@
         }
       ],
       "tip": "Consider how the cost per customer database instance changes when AWS runs databases for millions of customers versus a company running databases only for itself.",
-      "explanation": "The economies of scale principle is fundamental to AWS cost advantages over on-premises infrastructure.\n\n**Why it works:** AWS amortizes its massive infrastructure, real estate, power, cooling, and staffing costs across millions of customers globally. This allows the cost per customer to be significantly lower than any individual organization could achieve managing their own data centers. Amazon RDS exemplifies this by offering managed database instances at a fraction of the cost of equivalent on-premises deployments when total cost of ownership—including management, patching, backups, and redundancy—is calculated.\n\n**Why the others fail:**\n- Reserved instances provide pricing discounts through commitment, not through economies of scale.\n- On-premises infrastructure costs more due to lack of scale and shared resource distribution, not due to larger hardware requirements.\n- Cloud databases are typically cheaper than on-premises due to economies of scale, not more expensive.\n\n**Implementation:** Leverage AWS managed services and reserved instances to maximize the economies of scale benefits. Consult the AWS Pricing Calculator to compare on-premises TCO with RDS costs.",
+      "explanation": "The economies of scale principle is fundamental to AWS cost advantages over on-premises infrastructure.\n\n**Why it works:** AWS amortizes its massive infrastructure, real estate, power, cooling, and staffing costs across millions of customers globally. This allows the cost per customer to be significantly lower than any individual organization could achieve managing their own data centers. Amazon RDS exemplifies this by offering managed database instances at a fraction of the cost of equivalent on-premises deployments when total cost of ownership\u2014including management, patching, backups, and redundancy\u2014is calculated.\n\n**Why the others fail:**\n- Reserved instances provide pricing discounts through commitment, not through economies of scale.\n- On-premises infrastructure costs more due to lack of scale and shared resource distribution, not due to larger hardware requirements.\n- Cloud databases are typically cheaper than on-premises due to economies of scale, not more expensive.\n\n**Implementation:** Leverage AWS managed services and reserved instances to maximize the economies of scale benefits. Consult the AWS Pricing Calculator to compare on-premises TCO with RDS costs.",
       "domain": "Cloud Concepts",
       "difficulty": 2,
       "lastReviewed": "2026-03-31"
@@ -182,7 +182,7 @@
         }
       ],
       "tip": "Consider what AWS controls at the infrastructure level versus what customers control on their deployed resources.",
-      "explanation": "AWS is responsible for the security OF the cloud—physical infrastructure, power, cooling, and host security. Customers are responsible for security IN the cloud, including OS patching, firewall rules, and application-level encryption.\n\n**Why it works:** AWS manages all physical data center components and hardware; this is fundamental to their infrastructure responsibility.\n\n**Why the others fail:**\n- Configuring security groups/NACLs: These are customer-managed network controls on deployed resources.\n- Installing/patching the OS: Customers manage the guest OS; AWS manages only the hypervisor level.\n- Encrypting application data: Customers choose and implement encryption strategies for their data.\n\n**Implementation:** Review AWS Shared Responsibility Model documentation at https://aws.amazon.com/compliance/shared-responsibility-model/",
+      "explanation": "AWS is responsible for the security OF the cloud\u2014physical infrastructure, power, cooling, and host security. Customers are responsible for security IN the cloud, including OS patching, firewall rules, and application-level encryption.\n\n**Why it works:** AWS manages all physical data center components and hardware; this is fundamental to their infrastructure responsibility.\n\n**Why the others fail:**\n- Configuring security groups/NACLs: These are customer-managed network controls on deployed resources.\n- Installing/patching the OS: Customers manage the guest OS; AWS manages only the hypervisor level.\n- Encrypting application data: Customers choose and implement encryption strategies for their data.\n\n**Implementation:** Review AWS Shared Responsibility Model documentation at https://aws.amazon.com/compliance/shared-responsibility-model/",
       "domain": "Security and Compliance",
       "difficulty": 1,
       "lastReviewed": "2026-03-31"
@@ -224,7 +224,7 @@
           "explanation": "AWS manages both automated patching and backups for RDS as part of the managed database service responsibility."
         }
       ],
-      "tip": "Think about what 'managed service' means—AWS handles infrastructure concerns while customers focus on configuration and strategy decisions.",
+      "tip": "Think about what 'managed service' means\u2014AWS handles infrastructure concerns while customers focus on configuration and strategy decisions.",
       "explanation": "Amazon RDS exemplifies a managed service where AWS handles operational tasks like patching and backups, but customers retain control over configuration, retention policies, and performance tuning.\n\n**Why it works:** AWS automates engine patches and backup execution; customers set retention policies and configure recovery objectives based on their requirements.\n\n**Why the others fail:**\n- AWS manages everything: RDS is managed but not fully autonomous; customers configure access, performance, and backup strategies.\n- Customer handles all patching/availability: AWS manages the database engine and infrastructure; customers focus on application-level concerns.\n- AWS handles backups only: AWS manages both automated backups and patching for RDS.\n\n**Implementation:** Configure RDS backup retention via AWS Console > RDS > Databases > Modify > Backup Retention Period or use `aws rds modify-db-instance --backup-retention-period`.",
       "domain": "Security and Compliance",
       "difficulty": 2,
@@ -377,7 +377,7 @@
       "skills": [
         "2.2.3: Describing how customers secure resources on AWS (for example, Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield)."
       ],
-      "question": "Centralizing security findings from multiple AWS security services into a single dashboard — including compliance checks and security alerts — is a key operational requirement.\n\nWhich TWO options address this?",
+      "question": "Centralizing security findings from multiple AWS security services into a single dashboard \u2014 including compliance checks and security alerts \u2014 is a key operational requirement.\n\nWhich TWO options address this?",
       "choices": [
         {
           "id": "c1",
@@ -584,7 +584,7 @@
         }
       ],
       "tip": "Consider how to optimize storage costs while meeting regulatory data retention requirements.",
-      "explanation": "S3 lifecycle policies automatically transition objects between storage classes to optimize costs based on access patterns.\n\n**Why it works:** Policies can move objects from S3 Standard (hot) → S3 Intelligent-Tiering → Glacier (warm) → Deep Archive (cold) as they age, reducing storage costs significantly.\n\n**Why the others fail:**\n- Encryption: Managed separately via server-side encryption settings, not lifecycle policies\n- Access restrictions: Controlled by bucket policies and IAM, not object age rules\n- Compression: Pre-processing task, not automated by lifecycle policies\n\n**Implementation:** Create an S3 lifecycle policy in the bucket settings to transition objects after 30 days to Glacier and after 1 year to Deep Archive.",
+      "explanation": "S3 lifecycle policies automatically transition objects between storage classes to optimize costs based on access patterns.\n\n**Why it works:** Policies can move objects from S3 Standard (hot) \u2192 S3 Intelligent-Tiering \u2192 Glacier (warm) \u2192 Deep Archive (cold) as they age, reducing storage costs significantly.\n\n**Why the others fail:**\n- Encryption: Managed separately via server-side encryption settings, not lifecycle policies\n- Access restrictions: Controlled by bucket policies and IAM, not object age rules\n- Compression: Pre-processing task, not automated by lifecycle policies\n\n**Implementation:** Create an S3 lifecycle policy in the bucket settings to transition objects after 30 days to Glacier and after 1 year to Deep Archive.",
       "domain": "Cloud Technology and Services",
       "difficulty": 1,
       "lastReviewed": "2026-03-31"
@@ -644,7 +644,7 @@
       "skills": [
         "3.6.6: Understanding use cases for lifecycle policies."
       ],
-      "question": "Three distinct access tiers define the data lifecycle: frequently accessed databases (first 3 months), occasionally accessed archives (3–12 months), and rarely accessed long-term compliance records (beyond 1 year). Both cost and performance must be optimized.\n\nWhich TWO lifecycle policy strategies address this?",
+      "question": "Three distinct access tiers define the data lifecycle: frequently accessed databases (first 3 months), occasionally accessed archives (3\u201312 months), and rarely accessed long-term compliance records (beyond 1 year). Both cost and performance must be optimized.\n\nWhich TWO lifecycle policy strategies address this?",
       "choices": [
         {
           "id": "c1",
@@ -760,7 +760,7 @@
         }
       ],
       "tip": "For long-term, infrequently accessed compliance data, consider the cheapest storage class even with retrieval delays.",
-      "explanation": "S3 Glacier Deep Archive minimizes storage costs for compliance archives with quarterly access.\n\n**Why it works:** Deep Archive charges approximately $1.26/TB/month with a 12-hour retrieval window—acceptable for quarterly compliance audits.\n\n**Why the others fail:**\n- S3 Standard: Costs 10x more than Deep Archive for inactive compliance data\n- Intelligent-Tiering: More expensive than Deep Archive for predictable infrequent access\n- EBS Snapshots: Designed for database backups, not long-term data retention\n\n**Implementation:** Move compliance archives to Deep Archive via lifecycle rules after initial access period to minimize 10-year retention costs.",
+      "explanation": "S3 Glacier Deep Archive minimizes storage costs for compliance archives with quarterly access.\n\n**Why it works:** Deep Archive charges approximately $1.26/TB/month with a 12-hour retrieval window\u2014acceptable for quarterly compliance audits.\n\n**Why the others fail:**\n- S3 Standard: Costs 10x more than Deep Archive for inactive compliance data\n- Intelligent-Tiering: More expensive than Deep Archive for predictable infrequent access\n- EBS Snapshots: Designed for database backups, not long-term data retention\n\n**Implementation:** Move compliance archives to Deep Archive via lifecycle rules after initial access period to minimize 10-year retention costs.",
       "domain": "Billing, Pricing, and Support",
       "difficulty": 2,
       "lastReviewed": "2026-03-31"
@@ -778,7 +778,7 @@
       "skills": [
         "4.1.5: Understanding different pricing options for various storage options and tiers."
       ],
-      "question": "Storage costs must be optimized across data sets with unpredictable access patterns — some objects are frequently accessed, while others vary in usage over time.\n\nWhich TWO pricing strategies help reduce total storage costs?",
+      "question": "Storage costs must be optimized across data sets with unpredictable access patterns \u2014 some objects are frequently accessed, while others vary in usage over time.\n\nWhich TWO pricing strategies help reduce total storage costs?",
       "choices": [
         {
           "id": "c1",
@@ -1093,7 +1093,7 @@
       "skills": [
         "4.3.2: Identifying and locating AWS technical resources (for example, AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post)."
       ],
-      "question": "Migrating a legacy application to AWS requires detailed implementation guidance — architecture diagrams, code examples, and step-by-step instructions.\n\nWhich AWS technical resource best provides this information?",
+      "question": "Migrating a legacy application to AWS requires detailed implementation guidance \u2014 architecture diagrams, code examples, and step-by-step instructions.\n\nWhich AWS technical resource best provides this information?",
       "choices": [
         {
           "id": "c1",
@@ -1346,6 +1346,948 @@
       "domain": "Security",
       "difficulty": 2,
       "lastReviewed": "2026-03-31"
+    },
+    {
+      "id": "CLF-C02-0031",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "format": "text",
+      "services": [
+        "AWS Pricing"
+      ],
+      "skills": [
+        "1.1.1: Understanding the economies of scale (for example, cost savings)."
+      ],
+      "question": "The infrastructure team is evaluating a migration to AWS. Their adviser explains that cloud providers like AWS can offer lower prices than most organizations could achieve by purchasing hardware independently.\n\nWhich AWS pricing principle best explains this cost advantage?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "AWS charges a flat monthly fee regardless of usage, ensuring all customers pay the same predictable amount for infrastructure regardless of workload size",
+          "explanation": "AWS uses consumption-based pricing, not flat fees. Customers pay based on what they actually consume."
+        },
+        {
+          "id": "c2",
+          "text": "AWS purchases infrastructure in very large volumes, spreading fixed costs across millions of customers and reducing per-unit pricing",
+          "sequence": 1,
+          "explanation": "Economies of scale allow AWS to buy hardware and services in bulk, distributing those costs across a massive customer base and passing the savings on through lower prices."
+        },
+        {
+          "id": "c3",
+          "text": "AWS locks customers into long-term hardware contracts negotiated directly with manufacturers, guaranteeing discounted rates for a minimum three-year commitment period",
+          "explanation": "AWS manages infrastructure procurement internally. Customers are not locked into manufacturer hardware contracts; optional `Reserved Instances` are a separate customer-facing pricing model."
+        },
+        {
+          "id": "c4",
+          "text": "AWS uses a shared pricing model where high-usage enterprise customers subsidize infrastructure costs for newer, smaller customers during the first year of service",
+          "explanation": "AWS does not redistribute costs between customer tiers. Pricing is driven by AWS's own purchasing efficiencies and operational scale, not by usage-based cross-subsidies."
+        }
+      ],
+      "tip": "Think about how large organizations are able to negotiate better prices than individuals when making the same purchase in much greater volume.",
+      "explanation": "AWS achieves lower prices by purchasing infrastructure at massive scale and distributing those costs across millions of customers worldwide, a principle known as economies of scale.\n\n**Why it works:** When a provider buys at enormous scale, per-unit costs fall significantly. AWS passes these savings to customers through regular price reductions.\n\n**Why the others don't work:**\n- Flat monthly fee: AWS pricing is pay-as-you-go based on consumption, not a fixed charge.\n- Hardware contracts: AWS manages procurement internally; customers are not bound to manufacturer agreements.\n- Cross-customer subsidies: AWS does not redistribute costs between enterprise and smaller customers.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0032",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "format": "text",
+      "services": [
+        "Amazon S3",
+        "AWS Pricing"
+      ],
+      "skills": [
+        "1.1.1: Understanding the economies of scale (for example, cost savings)."
+      ],
+      "question": "During a quarterly business review, the CTO highlights that AWS has reduced the price of Amazon S3 storage multiple times over the past decade. She asks her team to explain the underlying business reason for these recurring reductions.\n\nWhich factor most directly enables AWS to lower prices on a regular basis?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "As AWS grows, economies of scale improve operational efficiency and reduce per-unit infrastructure costs, enabling AWS to pass savings on to customers through price reductions",
+          "sequence": 1,
+          "explanation": "Amazon S3 and other services become cheaper over time because AWS's growing scale reduces what it costs to store and serve each unit of data, and those savings are shared with customers."
+        },
+        {
+          "id": "c2",
+          "text": "AWS must reduce prices annually as part of its cloud service agreements with government regulatory bodies in each region where it holds an operating licence",
+          "explanation": "There is no regulatory requirement for AWS to reduce prices. Price changes are business decisions driven by operational efficiencies, not legal obligations."
+        },
+        {
+          "id": "c3",
+          "text": "AWS reduces prices by slowing the construction of new data centers each year, cutting capital expenditure and redirecting those savings directly to customer billing discounts",
+          "explanation": "AWS continuously expands its data center footprint globally. Limiting construction would reduce capacity and reliability, not primarily drive service price reductions."
+        },
+        {
+          "id": "c4",
+          "text": "AWS offsets infrastructure costs by requiring all customers to purchase `Reserved Instance` contracts before they become eligible to benefit from any service price reductions",
+          "explanation": "`Reserved Instances` are an optional commitment mechanism offering separate discounts. Standard on-demand price reductions apply to all customers and are not conditional on purchasing reservations."
+        }
+      ],
+      "tip": "Consider how a business that grows much larger than its competitors is able to reduce its own costs over time and what it does with those savings.",
+      "explanation": "As AWS's customer base and infrastructure grow, its operational efficiency improves and per-unit costs decline. AWS regularly passes these savings on to customers through price reductions across services like Amazon S3.\n\n**Why it works:** Economies of scale mean the cost of providing each unit of compute, storage, or bandwidth decreases as overall volume increases.\n\n**Why the others don't work:**\n- Regulatory requirement: No government mandate requires AWS to reduce prices.\n- Limiting construction: AWS's strategy involves expanding infrastructure to meet growing demand.\n- Reserved contracts: On-demand price reductions are not conditional on customers purchasing reservations.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0033",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "format": "text",
+      "services": [
+        "AWS Pricing",
+        "Amazon EC2",
+        "Amazon S3"
+      ],
+      "skills": [
+        "1.1.1: Understanding the economies of scale (for example, cost savings)."
+      ],
+      "question": "During an infrastructure cost review, a cloud consultant explains that economies of scale are a key driver of how AWS is able to sustain and improve its pricing model. The finance team wants to understand exactly what this delivers in practice.\n\nWhich TWO outcomes result directly from AWS economies of scale? (Select TWO)",
+      "selectCount": 2,
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Customers pay lower per-unit costs as AWS distributes infrastructure expenses across its expanding global customer base",
+          "sequence": 1,
+          "explanation": "When fixed infrastructure costs are shared across millions of customers, each customer's effective per-unit cost decreases - a direct benefit of economies of scale."
+        },
+        {
+          "id": "c2",
+          "text": "AWS can invest in research and innovation at scale, enabling the development of more efficient services that are offered at lower prices over time",
+          "sequence": 2,
+          "explanation": "Large-scale revenue funds continuous innovation in hardware (such as custom AWS Graviton processors) and software, improving efficiency and reducing costs across services."
+        },
+        {
+          "id": "c3",
+          "text": "Individual customers receive access to dedicated private hardware at no additional cost because of bulk purchasing agreements AWS holds with its manufacturers",
+          "explanation": "`Dedicated Hosts` and `Dedicated Instances` are optional paid features, not a free entitlement available to all customers through bulk hardware agreements."
+        },
+        {
+          "id": "c4",
+          "text": "Customers are guaranteed that AWS will not increase prices for any service for the duration of their active account, regardless of changes in AWS operating costs",
+          "explanation": "AWS does not contractually guarantee static pricing for standard on-demand usage. Pricing can change, though efficiency gains typically push prices downward over time."
+        },
+        {
+          "id": "c5",
+          "text": "AWS eliminates data transfer charges between all Regions for customers whose total monthly spend exceeds a predefined usage threshold in any billing period",
+          "explanation": "AWS does not waive inter-Region data transfer costs based on monthly spend thresholds. Data transfer pricing is based on the volume of data moved, not total account spend."
+        }
+      ],
+      "tip": "Focus on what a very large buyer gains over a small buyer when purchasing and operating the same goods or services at scale.",
+      "explanation": "AWS achieves economies of scale by aggregating infrastructure demand across millions of customers worldwide. This results in lower per-unit costs that AWS regularly passes on to customers, and it enables sustained investment in efficiency and innovation.\n\n**Why the others don't work:**\n- Dedicated hardware: `Dedicated Hosts` are a paid option, not a free benefit of scale for all customers.\n- Price guarantees: Standard on-demand pricing is not contractually locked; it typically decreases over time.\n- Data transfer waivers: No spend-based threshold eliminates inter-Region data transfer charges.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0034",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "services": [
+        "AWS Pricing"
+      ],
+      "skills": [
+        "1.1.1: Understanding the economies of scale (for example, cost savings)."
+      ],
+      "question": "Match each aspect of AWS's economies of scale to the customer benefit it delivers.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "Bulk infrastructure purchasing",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s2",
+          "label": "Shared operational costs",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s3",
+          "label": "Large-scale innovation investment",
+          "correctChoiceId": "c2"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Each customer's share of data center overhead decreases as the overall customer base grows",
+          "explanation": "Fixed costs such as facilities, power, and staffing are distributed across a growing customer base, reducing the effective overhead cost per customer."
+        },
+        {
+          "id": "c2",
+          "text": "Continuous development of more efficient services and technologies at a lower marginal cost per unit",
+          "explanation": "Large-scale revenue funds ongoing R&D and hardware innovation, such as custom AWS Graviton processors, improving performance per dollar spent."
+        },
+        {
+          "id": "c3",
+          "text": "Lower per-unit hardware costs that AWS passes on to customers through regular price reductions",
+          "explanation": "Purchasing in bulk allows AWS to secure lower prices per component, and those savings are reflected in periodically reduced prices for services like Amazon EC2 and Amazon S3."
+        }
+      ],
+      "tip": "Think about the three separate ways a very large organization benefits compared to a smaller one when managing shared infrastructure at scale.",
+      "explanation": "AWS economies of scale operate across three distinct dimensions: purchasing hardware in bulk reduces per-unit costs, which are passed on as price reductions; distributing fixed operational costs across millions of customers lowers each customer's overhead share; and large-scale revenue enables sustained R&D investment that produces more efficient technologies and further lowers costs over time.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0035",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html",
+      "format": "text",
+      "services": [
+        "Amazon CloudFront",
+        "Amazon EC2"
+      ],
+      "skills": [
+        "1.1.2: Understanding the benefits of global infrastructure (for example, speed of deployment, global reach)."
+      ],
+      "question": "The engineering team serves customers across Europe, Asia, and North America and wants to reduce the latency users experience when loading the company's website.\n\nWhich feature of AWS global infrastructure directly enables companies to serve content from locations closer to their users?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "AWS consolidates all customer workloads in a single central data center, providing consistent and uniform performance for users regardless of their geographic location",
+          "explanation": "AWS operates many geographically distributed data centers, not a single central one. Consolidating workloads in one location would increase latency for distant users."
+        },
+        {
+          "id": "c2",
+          "text": "AWS provides dedicated satellite uplinks from each customer office to a centralized US-based data center, reducing network round-trip times through direct point-to-point connections",
+          "explanation": "AWS does not provide satellite uplinks to customer offices. Content is delivered over the public internet or AWS Direct Connect, not dedicated satellite links."
+        },
+        {
+          "id": "c3",
+          "text": "AWS Regions allow customers to deploy resources in specific geographic areas worldwide, and Amazon CloudFront delivers content from nearby edge locations to reduce network latency",
+          "sequence": 1,
+          "explanation": "Deploying in multiple AWS Regions places compute closer to users, and Amazon CloudFront caches content at hundreds of edge locations globally to further reduce round-trip times."
+        },
+        {
+          "id": "c4",
+          "text": "AWS uses a single Availability Zone per country to minimize infrastructure management complexity while maintaining international coverage for all customer workloads",
+          "explanation": "Each AWS Region contains multiple Availability Zones, not one per country. Single-zone deployments reduce redundancy rather than minimize latency."
+        }
+      ],
+      "tip": "Think about how distributing resources geographically affects the distance data must travel to reach end users.",
+      "explanation": "AWS Regions and Amazon CloudFront edge locations allow companies to serve content from points geographically close to their users, directly reducing network latency.\n\n**Why it works:** Shorter physical distance between server and user means fewer network hops and lower round-trip times.\n\n**Why the others don't work:**\n- Single central data center: This increases latency for users far from that location.\n- Satellite uplinks: AWS does not offer customer-office satellite connections for content delivery.\n- One zone per country: Regions have multiple Availability Zones; this option conflates zone count with latency management.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0036",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html",
+      "format": "text",
+      "services": [
+        "Amazon EC2",
+        "AWS Global Infrastructure"
+      ],
+      "skills": [
+        "1.1.2: Understanding the benefits of global infrastructure (for example, speed of deployment, global reach)."
+      ],
+      "question": "Following a board decision to enter three new countries within the next month, the CTO explains that using AWS will make geographic expansion significantly faster than building private data centers in each country.\n\nWhat is the primary reason AWS global infrastructure enables faster geographic expansion compared to an on-premises approach?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "AWS operates data centers in Regions worldwide that customers can access immediately via APIs and management tools, enabling deployment in new Regions within minutes or hours rather than months",
+          "sequence": 1,
+          "explanation": "Because AWS already manages the physical infrastructure in each Region, customers can provision resources in a new Region almost instantly without procuring or installing any hardware."
+        },
+        {
+          "id": "c2",
+          "text": "AWS ships pre-configured hardware appliances to each new geographic location the customer specifies, which teams install on-site, reducing typical deployment timelines from years to several weeks",
+          "explanation": "AWS does not ship hardware appliances for customers to install. AWS Outposts brings AWS infrastructure on-premises, but is not the reason global expansion is faster than building private data centers."
+        },
+        {
+          "id": "c3",
+          "text": "AWS holds exclusive agreements with national internet providers in each country it operates in, guaranteeing customers faster traffic routing compared to any locally hosted alternative",
+          "explanation": "AWS does not hold exclusive agreements with national internet providers. Its global network improves performance, but not through exclusive ISP arrangements."
+        },
+        {
+          "id": "c4",
+          "text": "AWS automatically copies existing application workloads to every Region it launches, removing the need for customers to perform any deployment steps when entering new geographic markets",
+          "explanation": "AWS does not automatically replicate customer workloads to new Regions. Customers control where their resources are deployed and must configure cross-Region deployments explicitly."
+        }
+      ],
+      "tip": "Consider what an organization would need to build and procure to open its own data center in a foreign country, versus what AWS has already built.",
+      "explanation": "AWS maintains ready-to-use infrastructure in Regions around the world. Customers can deploy into a new Region via the AWS Management Console, CLI, or APIs in minutes, bypassing the months or years needed to build and equip a private data center.\n\n**Why it works:** The physical infrastructure, power, cooling, and networking already exist. Customers only need to provision the logical resources they require.\n\n**Why the others don't work:**\n- Pre-configured appliances: AWS does not ship appliances for on-site installation as part of standard global expansion.\n- Exclusive ISP agreements: No such agreements form the basis of AWS's global reach.\n- Automatic replication: Customers must explicitly deploy into each Region they wish to use.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0037",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html",
+      "format": "text",
+      "services": [
+        "Amazon CloudFront",
+        "AWS Global Infrastructure",
+        "Amazon Route 53"
+      ],
+      "skills": [
+        "1.1.2: Understanding the benefits of global infrastructure (for example, speed of deployment, global reach)."
+      ],
+      "question": "During an international expansion review, the team is comparing AWS to building its own private data centers in each target country.\n\nWhich TWO benefits does AWS global infrastructure provide that would be difficult or costly to replicate with private data centers? (Select TWO)",
+      "selectCount": 2,
+      "choices": [
+        {
+          "id": "c1",
+          "text": "The ability to deploy applications in multiple geographic Regions within minutes, without procuring or installing any physical hardware",
+          "sequence": 1,
+          "explanation": "Because AWS already manages the physical infrastructure globally, customers can enter new markets almost immediately by provisioning resources in additional Regions through the console or APIs."
+        },
+        {
+          "id": "c2",
+          "text": "Low-latency delivery of content to global end users through AWS's worldwide network of edge locations, without building or operating any additional infrastructure",
+          "sequence": 2,
+          "explanation": "Amazon CloudFront uses hundreds of edge locations worldwide to cache and serve content close to users, providing low latency that would require significant capital investment to replicate privately."
+        },
+        {
+          "id": "c3",
+          "text": "Guaranteed zero data transfer costs between all AWS Regions for customers running multi-region workloads, included at no charge in the standard pricing model",
+          "explanation": "AWS does charge for data transfer between Regions. Inter-Region data transfer costs vary by Region and are not included at no charge in standard pricing."
+        },
+        {
+          "id": "c4",
+          "text": "Automatic compliance with every country's data residency and sovereignty regulations without any additional customer configuration or architecture decisions required",
+          "explanation": "AWS provides tools and controls for data residency, but compliance with local regulations is a shared responsibility. Customers must configure their deployments to meet specific regulatory requirements."
+        },
+        {
+          "id": "c5",
+          "text": "Exclusive access to internet bandwidth that is technologically unavailable to privately operated data centers of any size or geographic footprint",
+          "explanation": "AWS does not offer exclusive bandwidth technology unavailable to private data centers. Its network advantages come from scale and optimization, not proprietary bandwidth exclusivity."
+        }
+      ],
+      "tip": "Focus on what AWS has already built globally and how quickly customers can make use of it, compared to starting from nothing.",
+      "explanation": "AWS global infrastructure removes the capital and time investment of building physical data centers in new countries. Customers benefit from instant access to Regions worldwide and from Amazon CloudFront's edge network for low-latency content delivery.\n\n**Why the others don't work:**\n- Zero inter-Region data transfer: AWS charges for data transferred between Regions.\n- Automatic compliance: Customers must still architect their deployments to meet local data residency laws.\n- Exclusive bandwidth: AWS's network advantages are based on scale and engineering, not proprietary exclusivity.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0038",
+      "type": "ordering",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html",
+      "services": [
+        "Amazon EC2",
+        "Amazon Route 53",
+        "Amazon CloudFront",
+        "Amazon CloudWatch"
+      ],
+      "skills": [
+        "1.1.2: Understanding the benefits of global infrastructure (for example, speed of deployment, global reach)."
+      ],
+      "question": "The team needs to expand its application to serve users in a new geographic region using AWS global infrastructure.\n\nArrange the following steps in the correct order to complete the expansion.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Select the target AWS Region geographically closest to the new user base to minimize network latency",
+          "sequence": 1,
+          "explanation": "Choosing the right Region is the first decision. The Region must be selected before any resources can be provisioned within it."
+        },
+        {
+          "id": "c2",
+          "text": "Provision application resources such as Amazon EC2 instances and databases within the chosen Region",
+          "sequence": 2,
+          "explanation": "With the Region selected, the application's compute and storage components can be deployed. This must happen before traffic can be directed to the new Region."
+        },
+        {
+          "id": "c3",
+          "text": "Configure Amazon CloudFront to cache and deliver content to users from edge locations near the new Region",
+          "sequence": 3,
+          "explanation": "Amazon CloudFront is set up after the origin resources exist in the Region, so the distribution can point to them and begin serving cached content closer to users."
+        },
+        {
+          "id": "c4",
+          "text": "Update Amazon Route 53 routing policies to direct user traffic to resources in the newly deployed Region",
+          "sequence": 4,
+          "explanation": "DNS routing changes are the final step that makes the new Region live for users. Updating Amazon Route 53 before resources are ready would send traffic to an unavailable endpoint."
+        }
+      ],
+      "tip": "Consider which actions must be complete before each subsequent step can take effect.",
+      "explanation": "Global expansion on AWS follows a logical sequence: first select the target Region to minimize latency, then provision the application resources that will serve traffic, then configure Amazon CloudFront to cache content at edge locations near users, and finally update Amazon Route 53 to route traffic to the new deployment. Each step depends on the previous one being complete.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0039",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "format": "text",
+      "services": [
+        "Amazon EC2",
+        "Elastic Load Balancing",
+        "AWS Auto Scaling"
+      ],
+      "skills": [
+        "1.1.3: Understanding the advantages of high availability, elasticity, and agility."
+      ],
+      "question": "The operations team manages a patient-record application on Amazon EC2 for a healthcare organization. They want to ensure the application remains accessible to staff even if one part of the underlying infrastructure experiences an unexpected failure.\n\nWhich AWS approach best supports high availability for this application?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Deploying Amazon EC2 instances across multiple Availability Zones within a Region so that a failure in one zone does not take the entire application offline",
+          "sequence": 1,
+          "explanation": "Spreading instances across multiple Availability Zones means an infrastructure failure in one zone only affects that zone's resources while instances in other zones continue to serve traffic normally."
+        },
+        {
+          "id": "c2",
+          "text": "Running all Amazon EC2 instances in a single large instance type within one Availability Zone to simplify management and consolidate all workloads into one location",
+          "explanation": "Concentrating all workloads in a single Availability Zone creates a single point of failure. If that zone experiences issues, the entire application becomes unavailable."
+        },
+        {
+          "id": "c3",
+          "text": "Configuring Amazon EC2 instances with automated Amazon EBS snapshots every 24 hours so the application state can be fully restored from the previous day's backup if needed",
+          "explanation": "Daily Amazon EBS snapshots enable recovery from data loss but do not prevent downtime. Restoring from a snapshot takes time and cannot substitute for live redundancy."
+        },
+        {
+          "id": "c4",
+          "text": "Enabling Amazon CloudWatch detailed monitoring on all Amazon EC2 instances to receive performance alerts within one minute of any degradation event occurring",
+          "explanation": "Amazon CloudWatch monitoring helps detect problems quickly but does not prevent or automatically recover from failures. Detection is not the same as availability."
+        }
+      ],
+      "tip": "Consider what would happen to service continuity if a single physical location or component failed.",
+      "explanation": "High availability on AWS is achieved by distributing resources across multiple Availability Zones. If one zone fails, traffic continues to be served by instances in the other zones, keeping the application online.\n\n**Why it works:** Each Availability Zone is physically isolated with independent power and networking. A failure in one does not cascade to others.\n\n**Why the others don't work:**\n- Single zone: Consolidating in one zone creates a single point of failure, removing high availability.\n- EBS snapshots: Snapshots support recovery but require downtime. They do not provide continuous availability.\n- CloudWatch monitoring: Alerts help identify problems but do not automatically keep the application running.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0040",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "format": "text",
+      "services": [
+        "AWS Auto Scaling",
+        "Amazon EC2"
+      ],
+      "skills": [
+        "1.1.3: Understanding the advantages of high availability, elasticity, and agility."
+      ],
+      "question": "During the holiday season, traffic to the e-commerce platform spikes to up to 10 times its normal load, followed by months of significantly lower activity. The infrastructure team wants to handle peak demand without permanently paying for the extra capacity.\n\nWhich cloud advantage directly addresses this requirement?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "High availability, which ensures the application runs across multiple Availability Zones to prevent downtime during high-traffic periods and routine infrastructure maintenance",
+          "explanation": "High availability addresses fault tolerance and uptime, not the ability to scale capacity up and down in response to traffic changes."
+        },
+        {
+          "id": "c2",
+          "text": "Agility, which allows the team to deploy entirely new application versions within hours rather than weeks, reducing the time needed to release seasonal features before peak traffic",
+          "explanation": "Agility relates to the speed of provisioning and releasing new resources or features, not to automatically matching capacity to real-time demand fluctuations."
+        },
+        {
+          "id": "c3",
+          "text": "Elasticity, which allows AWS resources to scale up automatically when traffic increases and scale back down when demand falls, with the customer paying only for what is in use",
+          "sequence": 1,
+          "explanation": "AWS Auto Scaling and other elastic services match resource capacity to actual demand. During the holiday peak, more instances are added; after the peak, they are removed and billing decreases accordingly."
+        },
+        {
+          "id": "c4",
+          "text": "Reserved capacity, which allows the retailer to commit to and pay for maximum-traffic capacity upfront at a discounted rate, ensuring resources are always available during the busiest periods",
+          "explanation": "`Reserved Instances` provide cost discounts for predictable workloads but require upfront commitments. They do not automatically scale with traffic, and paying for peak capacity year-round defeats the cost-saving goal."
+        }
+      ],
+      "tip": "Think about which cloud property allows resources to grow and shrink with actual demand rather than being sized for the worst-case scenario at all times.",
+      "explanation": "Elasticity is the ability to automatically scale resources up during high-demand periods and scale them back down when demand drops. This means the retailer only pays for the extra Amazon EC2 capacity during the holiday peak rather than all year.\n\n**Why it works:** Services like AWS Auto Scaling monitor demand and adjust capacity in real time, matching resources to actual workload.\n\n**Why the others don't work:**\n- High availability: Focuses on fault tolerance and uptime across zones, not on matching capacity to demand.\n- Agility: Relates to provisioning speed and experimentation, not automatic demand-driven scaling.\n- Reserved capacity: A fixed commitment priced for peak usage year-round, which is what the team wants to avoid.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0041",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "format": "text",
+      "services": [
+        "AWS Auto Scaling",
+        "Amazon EC2",
+        "AWS CloudFormation"
+      ],
+      "skills": [
+        "1.1.3: Understanding the advantages of high availability, elasticity, and agility."
+      ],
+      "question": "The development team is planning to experiment with a new product feature. They need to quickly provision a test environment, evaluate results within a few days, and then decommission everything if the test is unsuccessful.\n\nWhich TWO AWS advantages make this rapid experimentation approach practical and cost-effective? (Select TWO)",
+      "selectCount": 2,
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Agility, because AWS allows resources to be provisioned in minutes, enabling teams to test new ideas much faster than on-premises infrastructure procurement would allow",
+          "sequence": 1,
+          "explanation": "Agility means a team can launch a full test environment in minutes using the AWS Management Console, CLI, or AWS CloudFormation, without any hardware purchase or installation delays."
+        },
+        {
+          "id": "c2",
+          "text": "Elasticity, because resources can be terminated when experiments are complete, ensuring the team is only billed for the duration of the test rather than maintaining idle infrastructure",
+          "sequence": 2,
+          "explanation": "Elastic, pay-as-you-go resources mean the team pays only while the test environment is running. Terminating instances immediately stops billing, making short-lived experiments inexpensive."
+        },
+        {
+          "id": "c3",
+          "text": "High availability, because running test environments across multiple Availability Zones ensures experiment results are not skewed by any infrastructure failure during the evaluation period",
+          "explanation": "High availability is valuable for production uptime, not for short-lived experimentation where multi-zone redundancy is not a cost-effective or necessary concern."
+        },
+        {
+          "id": "c4",
+          "text": "Reserved capacity commitment, because pre-purchasing `Reserved Instances` for the test environment guarantees the resources will be available and priced consistently when the test begins",
+          "explanation": "`Reserved Instances` require long-term commitments (one or three years) and are not appropriate for short-duration experiments. On-demand resources are more cost-effective for temporary use."
+        },
+        {
+          "id": "c5",
+          "text": "Global reach, because deploying the experiment simultaneously across multiple AWS Regions provides statistically more representative test data from a geographically diverse user population",
+          "explanation": "Global reach benefits production applications serving international users, not a controlled internal feature experiment where geographic distribution would add unnecessary cost and complexity."
+        }
+      ],
+      "tip": "Consider which properties help a team start quickly and then stop paying once the experiment is finished.",
+      "explanation": "Agility lets teams provision complete environments within minutes, and elasticity ensures they only pay for the time those resources are running. Together, these advantages make rapid, low-cost experimentation practical on AWS.\n\n**Why the others don't work:**\n- High availability: Multi-zone redundancy is a production concern, not a requirement for a short-lived test.\n- Reserved capacity: Long-term commitments are the opposite of what a temporary experiment needs.\n- Global reach: Deploying across multiple Regions adds unnecessary cost to an internal feature test.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0042",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "services": [
+        "AWS Auto Scaling",
+        "Amazon EC2",
+        "AWS CloudFormation"
+      ],
+      "skills": [
+        "1.1.3: Understanding the advantages of high availability, elasticity, and agility."
+      ],
+      "question": "Match each cloud computing advantage to the business problem it is primarily designed to solve.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "High availability",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s2",
+          "label": "Elasticity",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s3",
+          "label": "Agility",
+          "correctChoiceId": "c1"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "A team needs to launch a new application environment within hours rather than waiting weeks for hardware procurement and setup",
+          "explanation": "Agility refers to the speed at which resources can be provisioned. AWS CloudFormation and the AWS Management Console allow environments to be created in minutes rather than weeks."
+        },
+        {
+          "id": "c2",
+          "text": "An application must continue serving users without interruption even when one data center location experiences a hardware or power failure",
+          "explanation": "High availability is achieved by distributing workloads across multiple Availability Zones so that a failure in one location does not take the application offline."
+        },
+        {
+          "id": "c3",
+          "text": "A workload experiences large traffic fluctuations and the organization wants to avoid paying for unused capacity during quiet periods",
+          "explanation": "Elasticity, provided by AWS Auto Scaling, automatically adjusts the number of running resources to match real-time demand, eliminating the cost of over-provisioned idle capacity."
+        }
+      ],
+      "tip": "Focus on the distinct problem each term solves: availability of service, matching capacity to demand, and speed of delivery.",
+      "explanation": "High availability, elasticity, and agility each address a different operational challenge. High availability ensures workloads survive infrastructure failures by using redundant, isolated locations. Elasticity automatically matches resource capacity to demand so organizations do not pay for idle resources. Agility enables rapid provisioning, allowing teams to deliver features and experiments in hours rather than weeks.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0043",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
+      "format": "text",
+      "services": [
+        "AWS Well-Architected Framework"
+      ],
+      "skills": [
+        "1.2.1: Understanding the pillars of the Well-Architected Framework (for example, operational excellence, security, reliability, performance efficiency, cost optimization, sustainability)."
+      ],
+      "question": "The engineering team is evaluating their cloud architecture to ensure the system can automatically recover from infrastructure failures without manual intervention.\n\nWhich pillar of the AWS Well-Architected Framework primarily addresses this concern?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Performance Efficiency",
+          "explanation": "Performance Efficiency focuses on using computing resources efficiently to meet system performance requirements. It does not primarily address automatic recovery from infrastructure failures."
+        },
+        {
+          "id": "c2",
+          "text": "Operational Excellence",
+          "explanation": "Operational Excellence covers running and monitoring systems to deliver business value and continually improving processes. It does not specifically address automatic infrastructure failure recovery."
+        },
+        {
+          "id": "c3",
+          "text": "Reliability",
+          "sequence": 1,
+          "explanation": "Reliability is defined as the ability of a workload to perform its intended function correctly and consistently, including the ability to recover automatically from infrastructure or service disruptions."
+        },
+        {
+          "id": "c4",
+          "text": "Security",
+          "explanation": "The Security pillar focuses on protecting information, systems, and assets while delivering business value through risk assessment and mitigation. It does not address infrastructure failure recovery."
+        }
+      ],
+      "tip": "Consider which pillar focuses specifically on a workload's ability to withstand and recover automatically from disruptions.",
+      "explanation": "Reliability is the correct answer.\n\n**Why it works:** The Reliability pillar encompasses the ability to recover from infrastructure or service disruptions, dynamically acquire resources to meet demand, and mitigate disruptions from misconfigurations or transient failures - directly matching the team's requirement.\n\n**Why the others don't work:**\n- Performance Efficiency: Addresses efficient use of computing resources for performance targets, not failure recovery.\n- Operational Excellence: Focuses on operational monitoring and process improvement, not the architecture of failure recovery.\n- Security: Concerned with protecting data and systems from threats and unauthorized access, not infrastructure availability.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0044",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html",
+      "format": "text",
+      "services": [
+        "Amazon EC2",
+        "AWS Well-Architected Framework"
+      ],
+      "skills": [
+        "1.2.1: Understanding the pillars of the Well-Architected Framework (for example, operational excellence, security, reliability, performance efficiency, cost optimization, sustainability)."
+      ],
+      "question": "During a quarterly architecture review, the team identifies that several Amazon EC2 instances are consistently running at 5% CPU utilization. They want to reduce unnecessary cloud spending without impacting application performance.\n\nWhich pillar of the AWS Well-Architected Framework provides guidance for this type of decision?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Performance Efficiency",
+          "explanation": "Performance Efficiency is about using resources efficiently to meet performance requirements. Choosing the right instance size to save money is a Cost Optimization concern, not a Performance Efficiency concern."
+        },
+        {
+          "id": "c2",
+          "text": "Sustainability",
+          "explanation": "The Sustainability pillar focuses on minimizing the environmental impact of cloud workloads. While reducing overprovisioned instances can have sustainability benefits, the primary guidance for reducing spend comes from Cost Optimization."
+        },
+        {
+          "id": "c3",
+          "text": "Operational Excellence",
+          "explanation": "Operational Excellence covers running and monitoring systems to deliver business value. It does not specifically address cloud cost management or instance right-sizing decisions."
+        },
+        {
+          "id": "c4",
+          "text": "Cost Optimization",
+          "sequence": 1,
+          "explanation": "Cost Optimization focuses on avoiding unnecessary costs by running at the lowest price point that meets requirements, including identifying and rightsizing underutilized instances such as those running at 5% CPU."
+        }
+      ],
+      "tip": "Identify the pillar whose primary objective is financial stewardship and avoiding unnecessary cloud expenditure.",
+      "explanation": "Cost Optimization is the correct pillar for this scenario.\n\n**Why it works:** The Cost Optimization pillar provides guidance on avoiding unnecessary costs, including identifying and rightsizing underutilized instances. Running Amazon EC2 instances at 5% CPU represents clear waste that this pillar addresses.\n\n**Why the others don't work:**\n- Performance Efficiency: Concerned with efficient resource use to meet performance targets, not financial cost reduction.\n- Sustainability: Addresses environmental impact, not financial cost as its primary concern.\n- Operational Excellence: Focuses on operational processes and monitoring, not cloud spend management.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0045",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+      "format": "text",
+      "services": [
+        "AWS Well-Architected Framework"
+      ],
+      "skills": [
+        "1.2.1: Understanding the pillars of the Well-Architected Framework (for example, operational excellence, security, reliability, performance efficiency, cost optimization, sustainability)."
+      ],
+      "question": "Following a board decision to build a new customer-facing application on AWS, the architecture team reviews two key requirements: the system must automatically recover from component failures, and all customer data must meet regulatory requirements for encryption and access control.\n\nWhich TWO pillars of the AWS Well-Architected Framework directly address these requirements? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Performance Efficiency",
+          "explanation": "Performance Efficiency focuses on using resources efficiently for performance targets. It does not specifically address automatic recovery from failures or data encryption regulatory requirements."
+        },
+        {
+          "id": "c2",
+          "text": "Reliability",
+          "sequence": 1,
+          "explanation": "Reliability directly addresses automatic recovery from component failures, covering fault isolation, workload recovery patterns, and dynamic resource provisioning to maintain continuous operation."
+        },
+        {
+          "id": "c3",
+          "text": "Cost Optimization",
+          "explanation": "Cost Optimization is focused on reducing unnecessary cloud spending. It does not address failure recovery architecture or data protection regulatory compliance."
+        },
+        {
+          "id": "c4",
+          "text": "Security",
+          "sequence": 2,
+          "explanation": "The Security pillar directly addresses regulatory requirements for data protection, providing guidance on encrypting data at rest and in transit, and implementing least-privilege access controls."
+        },
+        {
+          "id": "c5",
+          "text": "Operational Excellence",
+          "explanation": "Operational Excellence focuses on running and improving operational processes and monitoring. It does not specifically address automatic failure recovery architecture or encryption regulatory requirements."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Match each stated requirement to the pillar whose primary focus directly and specifically aligns with it.",
+      "explanation": "Reliability and Security are the two correct pillars.\n\n**Why it works:** Reliability provides architecture guidance for automatic recovery from component failures, including fault isolation and workload recovery patterns. Security provides guidance on meeting regulatory data protection requirements, including encryption at rest and in transit and access control.\n\n**Why the others don't work:**\n- Performance Efficiency: Addresses efficient resource use for performance, not failure recovery or regulatory compliance.\n- Cost Optimization: Focused on financial efficiency, not on recovery architecture or data protection standards.\n- Operational Excellence: Guides operational processes and monitoring, not the specific architectural patterns for these two requirements.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0046",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+      "services": [
+        "AWS Well-Architected Framework"
+      ],
+      "skills": [
+        "1.2.1: Understanding the pillars of the Well-Architected Framework (for example, operational excellence, security, reliability, performance efficiency, cost optimization, sustainability)."
+      ],
+      "question": "Match each AWS Well-Architected Framework pillar to its primary area of focus.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "Operational Excellence",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "Security",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "Reliability",
+          "correctChoiceId": "c3"
+        },
+        {
+          "id": "s4",
+          "label": "Performance Efficiency",
+          "correctChoiceId": "c4"
+        },
+        {
+          "id": "s5",
+          "label": "Cost Optimization",
+          "correctChoiceId": "c5"
+        },
+        {
+          "id": "s6",
+          "label": "Sustainability",
+          "correctChoiceId": "c6"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Running and monitoring systems to deliver business value and continuously improve processes and procedures",
+          "explanation": "Operational Excellence is defined by the ability to support development and run workloads effectively, gain operational insights, and continuously improve supporting processes."
+        },
+        {
+          "id": "c2",
+          "text": "Protecting information, systems, and assets while delivering business value through risk assessment and mitigation",
+          "explanation": "The Security pillar encompasses confidentiality and integrity of data, managing user permissions, and detecting and responding to security events."
+        },
+        {
+          "id": "c3",
+          "text": "Ensuring a workload performs its intended function correctly and consistently, and recovers automatically from failures",
+          "explanation": "Reliability covers a workload's ability to recover from infrastructure disruptions, dynamically acquire resources to meet demand, and mitigate disruptions from misconfigurations or transient issues."
+        },
+        {
+          "id": "c4",
+          "text": "Using computing resources efficiently to meet system requirements and maintaining efficiency as demand and technology evolve",
+          "explanation": "Performance Efficiency is about selecting the right resource types and sizes, monitoring performance, and adapting as business needs and technology change."
+        },
+        {
+          "id": "c5",
+          "text": "Delivering business outcomes at the lowest possible financial cost by eliminating unnecessary cloud expenditure",
+          "explanation": "Cost Optimization focuses on understanding spending, using cost-effective resources, scaling to meet business needs, and avoiding unnecessary costs."
+        },
+        {
+          "id": "c6",
+          "text": "Minimizing the environmental impact of running cloud workloads through efficient resource use and reduced consumption",
+          "explanation": "The Sustainability pillar addresses the long-term environmental impact of cloud workloads, focusing on reducing energy consumption and maximizing the efficiency of the underlying infrastructure."
+        }
+      ],
+      "tip": "Each pillar has a single most distinctive purpose - focus on the unique primary goal that separates it from the others.",
+      "explanation": "The six pillars of the AWS Well-Architected Framework each have a distinct primary focus: Operational Excellence runs and improves operations; Security protects data and systems; Reliability ensures consistent function and recovery from failures; Performance Efficiency uses resources efficiently for performance; Cost Optimization delivers value at the lowest financial cost; Sustainability minimizes environmental impact.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0047",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html",
+      "format": "text",
+      "services": [
+        "Amazon EC2",
+        "AWS Well-Architected Framework"
+      ],
+      "skills": [
+        "1.2.2: Identifying differences between the pillars of the Well-Architected Framework."
+      ],
+      "question": "To reduce their monthly AWS bill, the operations team is analyzing which Amazon EC2 instance types are oversized for their workload and considering Savings Plans for predictable usage patterns.\n\nWhich pillar of the AWS Well-Architected Framework is the team applying?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Operational Excellence",
+          "explanation": "Operational Excellence focuses on running and monitoring systems to deliver business value and improve processes. It does not address cloud spending decisions or instance pricing models."
+        },
+        {
+          "id": "c2",
+          "text": "Cost Optimization",
+          "sequence": 1,
+          "explanation": "Cost Optimization focuses on avoiding unnecessary costs, including rightsizing compute resources and selecting cost-effective pricing models such as Savings Plans for predictable workloads."
+        },
+        {
+          "id": "c3",
+          "text": "Performance Efficiency",
+          "explanation": "Performance Efficiency focuses on using resources efficiently to meet performance requirements. Choosing the right instance type to improve performance is distinct from choosing it to reduce financial cost."
+        },
+        {
+          "id": "c4",
+          "text": "Sustainability",
+          "explanation": "The Sustainability pillar is focused on minimizing the environmental impact of cloud workloads. While rightsizing may benefit sustainability, the team's primary driver here is cost reduction, not environmental impact."
+        }
+      ],
+      "tip": "Distinguish between efficiency for performance goals and efficiency for financial goals - different pillars address these.",
+      "explanation": "Cost Optimization is the correct answer.\n\n**Why it works:** The Cost Optimization pillar provides guidance on avoiding unnecessary costs, which includes rightsizing oversized instances and using Savings Plans to reduce spend on predictable workloads - exactly what the team is doing.\n\n**Why the others don't work:**\n- Operational Excellence: Focused on operational processes and monitoring, not on cloud cost management or instance purchasing decisions.\n- Performance Efficiency: Concerned with resource efficiency for meeting performance targets, not financial expenditure reduction.\n- Sustainability: Addresses environmental impact, not financial cost reduction as a primary objective.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0048",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
+      "format": "text",
+      "services": [
+        "Amazon RDS",
+        "Amazon Route 53",
+        "AWS Well-Architected Framework"
+      ],
+      "skills": [
+        "1.2.2: Identifying differences between the pillars of the Well-Architected Framework."
+      ],
+      "question": "After a database failure caused a multi-hour production outage, the architecture team implements Amazon RDS Multi-AZ for automatic database failover and configures Amazon Route 53 health checks to reroute traffic away from unhealthy endpoints.\n\nWhich pillar of the AWS Well-Architected Framework best describes these architectural changes?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Operational Excellence",
+          "explanation": "Operational Excellence addresses running, monitoring, and improving operational processes. Updating runbooks after an incident relates to Operational Excellence, but implementing Multi-AZ and health checks to achieve automatic recovery targets the Reliability pillar."
+        },
+        {
+          "id": "c2",
+          "text": "Performance Efficiency",
+          "explanation": "Performance Efficiency is concerned with using resources efficiently to meet performance requirements. Amazon RDS Multi-AZ and Route 53 health checks provide availability and automatic recovery, not performance improvements."
+        },
+        {
+          "id": "c3",
+          "text": "Security",
+          "explanation": "The Security pillar focuses on protecting data and systems from unauthorized access and threats. Database failover and DNS health checks address availability, not security protection measures."
+        },
+        {
+          "id": "c4",
+          "text": "Reliability",
+          "sequence": 1,
+          "explanation": "Reliability focuses on the ability of a workload to recover from failures and continue performing its intended function. Amazon RDS Multi-AZ enables automatic database failover and Route 53 health checks enable traffic rerouting - both are foundational reliability patterns."
+        }
+      ],
+      "tip": "Focus on the intended outcome of the changes - what type of problem are Multi-AZ and health checks designed to solve?",
+      "explanation": "Reliability is the correct pillar.\n\n**Why it works:** The Reliability pillar specifically addresses automatic recovery from infrastructure failures. Amazon RDS Multi-AZ provides automated failover when the primary database becomes unavailable, and Amazon Route 53 health checks reroute traffic away from unhealthy endpoints - both are core reliability mechanisms.\n\n**Why the others don't work:**\n- Operational Excellence: Concerned with running and improving operational procedures, not the architectural patterns for automatic failure recovery.\n- Performance Efficiency: Addresses efficient resource use for performance targets, not availability and fault tolerance.\n- Security: Focused on protecting against threats and unauthorized access, not recovering from infrastructure failures.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0049",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+      "format": "text",
+      "services": [
+        "Amazon EBS",
+        "Amazon S3",
+        "AWS Well-Architected Framework"
+      ],
+      "skills": [
+        "1.2.2: Identifying differences between the pillars of the Well-Architected Framework."
+      ],
+      "question": "The platform team is conducting a Well-Architected review and identifies two open issues: several Amazon EBS volumes attached to stopped instances have been unused for six months and continue to incur charges, and an Amazon S3 bucket containing customer records has a bucket policy that permits public read access.\n\nWhich TWO pillars of the AWS Well-Architected Framework do these issues fall under? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Reliability",
+          "explanation": "Reliability addresses the ability to recover from failures and maintain consistent operation. Unused storage volumes and overly permissive bucket policies are not reliability concerns."
+        },
+        {
+          "id": "c2",
+          "text": "Cost Optimization",
+          "sequence": 1,
+          "explanation": "Unused EBS volumes continuing to incur charges represent unnecessary expenditure, a Cost Optimization concern. The pillar recommends identifying and deprovisioning unused resources to eliminate waste."
+        },
+        {
+          "id": "c3",
+          "text": "Operational Excellence",
+          "explanation": "Operational Excellence covers running and improving operational processes. While operational hygiene is related, these specific issues - unnecessary cost and data exposure - are each addressed by their respective dedicated pillars."
+        },
+        {
+          "id": "c4",
+          "text": "Security",
+          "sequence": 2,
+          "explanation": "A public-read bucket policy on a bucket containing customer records is a data exposure risk, directly addressed by the Security pillar, which provides guidance on protecting data from unauthorized access."
+        },
+        {
+          "id": "c5",
+          "text": "Performance Efficiency",
+          "explanation": "Performance Efficiency focuses on using resources efficiently to meet performance requirements. Unused volumes and access control misconfiguration are not performance efficiency concerns."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Map each identified issue to the pillar whose primary concern most closely matches the nature of that specific problem.",
+      "explanation": "Cost Optimization and Security are the two correct pillars.\n\n**Why it works:** Unused EBS volumes generating charges represent wasted spend, which is the primary domain of Cost Optimization. An Amazon S3 bucket with public read access to customer data is a data protection failure, which is the primary domain of Security.\n\n**Why the others don't work:**\n- Reliability: Concerned with workload availability and failure recovery, not cost waste or access control misconfigurations.\n- Operational Excellence: Provides guidance on operational processes and improvement; these issues are categorized under their own specific pillars.\n- Performance Efficiency: Addresses efficient resource use for performance targets, not unnecessary charges or data exposure risks.",
+      "domain": "Cloud Concepts",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-13"
+    },
+    {
+      "id": "CLF-C02-0050",
+      "type": "ordering",
+      "docs": "https://docs.aws.amazon.com/wellarchitected/latest/userguide/review-create.html",
+      "services": [
+        "AWS Well-Architected Tool"
+      ],
+      "skills": [
+        "1.2.2: Identifying differences between the pillars of the Well-Architected Framework."
+      ],
+      "question": "Arrange the following steps in the correct order to conduct a workload review using the AWS Well-Architected Tool.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Define the workload and its properties in the AWS Well-Architected Tool",
+          "sequence": 1,
+          "explanation": "Defining the workload is always the first step - it establishes the review context, including workload name, environment, and team details, before any assessment can begin."
+        },
+        {
+          "id": "c2",
+          "text": "Answer the milestone questions for each of the six framework pillars",
+          "sequence": 2,
+          "explanation": "Once the workload is defined, the team works through guiding questions for each pillar to assess the current architecture against Well-Architected best practices."
+        },
+        {
+          "id": "c3",
+          "text": "Review the identified high and medium risks and the improvement plan generated by the tool",
+          "sequence": 3,
+          "explanation": "After completing the pillar questions, the tool surfaces identified risks and generates a prioritized improvement plan, which the team must review before taking action."
+        },
+        {
+          "id": "c4",
+          "text": "Prioritize the recommended improvements and implement changes to address identified risks",
+          "sequence": 4,
+          "explanation": "The final step is to act on the improvement plan by prioritizing items by risk level and implementing the architectural changes needed to improve the workload."
+        }
+      ],
+      "tip": "Consider the logical dependency between steps - you cannot assess a workload before it is defined, and cannot act on findings before they have been identified and reviewed.",
+      "explanation": "The correct sequence follows the natural flow of a Well-Architected Review: define the workload to establish context, answer pillar questions to assess the current architecture, review the generated risk findings and improvement plan, then prioritize and implement the recommended changes. Each step depends on the completion of the previous one.",
+      "domain": "Cloud Concepts",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-13"
     }
   ],
   "showcaseQuestionIds": [
