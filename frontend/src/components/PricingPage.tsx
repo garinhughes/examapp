@@ -48,7 +48,7 @@ interface FeatureDef {
 
 const FEATURES: FeatureDef[] = [
   { label: 'Practice exams',     visitor: '20 questions', registered: '40 questions per exam', paid: 'All (per exam)' },
-  { label: 'Skill labs',             visitor: '6 labs',     registered: '12 labs',               paid: 'All (per provider)' },
+  { label: 'Skill labs',             visitor: '6 per provider',     registered: '12 per provider',               paid: 'All (per provider)' },
   { label: 'Review & explanations',  visitor: CHECK,       registered: CHECK,                  paid: CHECK },
   { label: 'Saved attempts',         visitor: CROSS,       registered: '5 per exam',           paid: 'Unlimited' },
   { label: 'Analytics',              visitor: CROSS,      registered: CHECK,                  paid: CHECK },

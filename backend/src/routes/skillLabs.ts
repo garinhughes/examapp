@@ -97,7 +97,7 @@ async function findLabS3(id: string): Promise<any | null> {
 /* ------------------------------------------------------------------ */
 
 /**
- * How many showcase labs this tier can access.
+ * How many showcase labs this tier can access **per provider/platform**.
  * null = all labs (paying).
  */
 function effectiveLabShowcaseCount(
@@ -108,12 +108,49 @@ function effectiveLabShowcaseCount(
   return TIERS.visitor.labShowcaseCount ?? 6
 }
 
+/**
+ * Build the set of unlocked lab IDs by picking the top `count` showcase labs
+ * per platform/provider (ordered by showcaseOrder), rather than globally.
+ */
+function unlockedShowcaseIds(allLabs: any[], count: number): Set<string> {
+  // Group showcase labs by platform
+  const byPlatform = new Map<string, any[]>()
+  for (const lab of allLabs) {
+    if (!lab.showcase) continue
+    const platform = (lab.platform ?? 'Other').toString().trim() || 'Other'
+    if (!byPlatform.has(platform)) byPlatform.set(platform, [])
+    byPlatform.get(platform)!.push(lab)
+  }
+  const ids = new Set<string>()
+  for (const platformLabs of byPlatform.values()) {
+    platformLabs
+      .sort((a: any, b: any) => (a.showcaseOrder ?? 99) - (b.showcaseOrder ?? 99))
+      .slice(0, count)
+      .forEach((l: any) => ids.add(l.id))
+  }
+  return ids
+}
+
 /** Attach a `locked` boolean to each lab based on which IDs are unlocked. */
 function withLocked(labs: any[], unlockedIds: Set<string> | null): any[] {
   return labs.map((lab) => ({
     ...lab,
     locked: unlockedIds !== null && !unlockedIds.has(lab.id),
   }))
+}
+
+/**
+ * For a single lab access check: load the full lab list and compute the
+ * per-provider unlocked IDs for the given showcase count.
+ */
+async function buildUnlockedIdsForLab(lab: any, count: number): Promise<Set<string>> {
+  const allLabs = USE_S3 ? await loadLabsS3Summary() : (await loadLabsLocal()).map((l) => ({
+    id: l.id,
+    showcase: l.showcase ?? false,
+    showcaseOrder: l.showcaseOrder ?? 99,
+    platform: l.platform ?? 'AWS',
+  }))
+  return unlockedShowcaseIds(allLabs, count)
 }
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
@@ -152,27 +189,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }
 
       const count = effectiveLabShowcaseCount('registered') ?? 12
-
-      const unlockedIds = new Set<string>(
-        allLabs
-          .filter((l: any) => l.showcase)
-          .sort((a: any, b: any) => (a.showcaseOrder ?? 99) - (b.showcaseOrder ?? 99))
-          .slice(0, count)
-          .map((l: any) => l.id)
-      )
-      return reply.send(withLocked(allLabs, unlockedIds))
+      return reply.send(withLocked(allLabs, unlockedShowcaseIds(allLabs, count)))
     }
 
-    // Unauthenticated: visitor showcase unlocked
+    // Unauthenticated: visitor showcase unlocked (per provider)
     const count = effectiveLabShowcaseCount('visitor') ?? 6
-    const unlockedIds = new Set<string>(
-      allLabs
-        .filter((l: any) => l.showcase)
-        .sort((a: any, b: any) => (a.showcaseOrder ?? 99) - (b.showcaseOrder ?? 99))
-        .slice(0, count)
-        .map((l: any) => l.id)
-    )
-    return reply.send(withLocked(allLabs, unlockedIds))
+    return reply.send(withLocked(allLabs, unlockedShowcaseIds(allLabs, count)))
   })
 
   // GET /skill-labs/my-attempts — get current user's lab attempts
@@ -203,22 +225,19 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       if (hasLabAccess(ownedProductIds)) return reply.send(lab)
 
       const count = effectiveLabShowcaseCount('registered') ?? 12
+      const registeredUnlocked = await buildUnlockedIdsForLab(lab, count)
 
-      if (!lab.showcase) {
-        return reply.status(403).send({ message: 'Sign in and upgrade to access this lab.' })
-      }
-      if ((lab.showcaseOrder ?? 99) > count) {
+      if (!lab.showcase || !registeredUnlocked.has(lab.id)) {
         return reply.status(403).send({ message: 'Upgrade to access more labs.' })
       }
       return reply.send(lab)
     }
 
-    // Unauthenticated visitor: must be in visitor showcase (positions 1–6)
+    // Unauthenticated visitor: must be in visitor showcase (per provider)
     const visitorCount = effectiveLabShowcaseCount('visitor') ?? 6
-    if (!lab.showcase) {
-      return reply.status(403).send({ message: 'Sign in to access this lab.' })
-    }
-    if ((lab.showcaseOrder ?? 99) > visitorCount) {
+    const visitorUnlocked = await buildUnlockedIdsForLab(lab, visitorCount)
+
+    if (!lab.showcase || !visitorUnlocked.has(lab.id)) {
       return reply.status(403).send({ message: 'Sign in to access more labs.' })
     }
     return reply.send(lab)
