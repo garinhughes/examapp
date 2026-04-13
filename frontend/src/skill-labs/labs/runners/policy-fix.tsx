@@ -6,6 +6,7 @@ import type { PolicyFixLabDefinition } from '../../types'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { LabHeader } from '../LabHeader'
 import { useLabSession } from '../useLabSession'
+import { MarkdownText } from '@/exam/utils'
 
 interface PolicyFixLabRunnerProps {
   lab: PolicyFixLabDefinition
@@ -89,7 +90,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
         {/* Left: Scenario */}
         <div className="w-72 shrink-0 rounded-lg border border-border bg-card p-4 overflow-y-auto">
           <h3 className="font-semibold text-base mb-3">Scenario</h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">{lab.scenario}</p>
+          <MarkdownText text={lab.scenario} className="text-sm text-muted-foreground leading-relaxed" />
           <div className="mt-4 space-y-2">
             <h4 className="font-semibold text-sm">Requirements</h4>
             {lab.validations.map((v, i) => (
