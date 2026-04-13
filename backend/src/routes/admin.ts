@@ -66,6 +66,30 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
   })
 
+  // ── Delete user ──
+
+  server.delete('/users/:sub', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { sub } = request.params as any
+    if (!request.user) return reply.code(401).send({ message: 'Unauthorized' })
+    // Prevent self-deletion
+    if (sub === (request.user as any).sub) {
+      return reply.code(403).send({ message: 'Cannot delete your own account' })
+    }
+    const targetUser = await getUserBySub(sub)
+    if (!targetUser) return reply.code(404).send({ message: 'User not found' })
+
+    try {
+      const receipt = await executeErasure(sub, (request.user as any).sub)
+      // Do NOT call sendErasureReceiptEmail — this is admin-initiated, not a GDPR self-request
+      if (receipt.allOk) return { ok: true }
+      // Partial success (e.g. Cognito user already gone) — 207 is in 200–299 so res.ok is still true
+      return reply.code(207).send({ ok: false, steps: receipt.steps, message: 'Partial deletion — some steps failed' })
+    } catch (err: any) {
+      request.log?.error?.({ err: err.message }, 'admin delete user failed')
+      return reply.code(500).send({ message: 'Delete failed', detail: err.message })
+    }
+  })
+
   // ── Entitlements ──
 
   /** List all products from catalog — annotate exam products with availability */

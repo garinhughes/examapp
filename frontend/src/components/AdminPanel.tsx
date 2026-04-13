@@ -122,6 +122,7 @@ function UserRow({
   authFetch,
   onReload,
   onError,
+  onDeleteUser,
   selected,
   onToggleSelect,
 }: {
@@ -130,6 +131,7 @@ function UserRow({
   authFetch: ReturnType<typeof useAuthFetch>
   onReload: () => void
   onError: (msg: string) => void
+  onDeleteUser: (userId: string) => void
   selected: boolean
   onToggleSelect: (userId: string) => void
 }) {
@@ -140,6 +142,8 @@ function UserRow({
   const [granting, setGranting] = useState(false)
   const [revoking, setRevoking] = useState<string | null>(null)
   const [confirmRevoke, setConfirmRevoke] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const loadEntitlements = useCallback(async () => {
     setLoadingEnts(true)
@@ -209,6 +213,22 @@ function UserRow({
       onError(err.message || 'Revoke failed')
     } finally {
       setRevoking(null)
+    }
+  }
+
+  async function deleteUser() {
+    setDeleting(true)
+    try {
+      const res = await authFetch(`/admin/users/${encodeURIComponent(user.userId)}`, { method: 'DELETE' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error((data as any).message || `HTTP ${res.status}`)
+      if (!(data as any).ok) onError('User partially deleted — check audit log')
+      onDeleteUser(user.userId)
+    } catch (err: any) {
+      onError(err.message || 'Delete failed')
+      setConfirmDelete(false)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -289,6 +309,33 @@ function UserRow({
                 >
                   {user.isActive === false ? '✓ Activate' : '✗ Deactivate'}
                 </button>
+                {confirmDelete ? (
+                  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                    <span className="text-xs text-red-600 dark:text-red-400 font-semibold">
+                      {user.isAdmin ? 'Warning: this user is an admin. ' : ''}Delete {user.email || user.name}?
+                    </span>
+                    <button
+                      onClick={deleteUser}
+                      disabled={deleting}
+                      className="px-2.5 py-1 rounded text-xs font-semibold bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
+                    >
+                      {deleting ? 'Deleting…' : 'Confirm Delete'}
+                    </button>
+                    <button
+                      onClick={() => setConfirmDelete(false)}
+                      className="px-2.5 py-1 rounded text-xs bg-accent text-muted-foreground transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setConfirmDelete(true) }}
+                    className="px-2.5 py-1 rounded text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                  >
+                    Delete User
+                  </button>
+                )}
               </div>
 
               {/* Entitlements section */}
@@ -2253,6 +2300,15 @@ export default function AdminPanel() {
     }
   }
 
+  function handleDeleteUser(userId: string) {
+    setUsers((prev) => prev.filter((u) => u.userId !== userId))
+    setSelectedUserIds((prev) => {
+      const next = new Set(prev)
+      next.delete(userId)
+      return next
+    })
+  }
+
   function toggleSort(col: typeof sortBy) {
     if (sortBy === col) setSortDir((d) => d === 'asc' ? 'desc' : 'asc')
     else { setSortBy(col); setSortDir('asc') }
@@ -2400,6 +2456,7 @@ export default function AdminPanel() {
                     authFetch={authFetch}
                     onReload={load}
                     onError={(msg) => setError(msg)}
+                    onDeleteUser={handleDeleteUser}
                     selected={selectedUserIds.has(u.userId)}
                     onToggleSelect={toggleSelect}
                   />
