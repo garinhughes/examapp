@@ -1235,7 +1235,7 @@
       "skills": [
         "1.5.2: Understanding hook patterns that intercept outgoing tool calls to enforce compliance rules (for example, blocking refunds above a threshold)."
       ],
-      "question": "An engineer is building a customer-support agent that can call a `process_refund` tool. Compliance policy requires that any refund request above £500 must be reviewed by a human operator before the tool executes. The engineer needs to enforce this rule programmatically on every invocation.\n\nWhich hook type allows the engineer to inspect the outgoing tool call arguments and prevent execution when the threshold is breached?",
+      "question": "An engineer is building a customer-support agent that can call a `process_refund` tool. Compliance policy requires that any refund request above \u00a3500 must be reviewed by a human operator before the tool executes. The engineer needs to enforce this rule programmatically on every invocation.\n\nWhich hook type allows the engineer to inspect the outgoing tool call arguments and prevent execution when the threshold is breached?",
       "choices": [
         {
           "id": "c1",
@@ -1250,7 +1250,7 @@
         },
         {
           "id": "c3",
-          "text": "A system prompt rule explicitly instructing Claude never to call `process_refund` with amounts above £500, relying on the model's instruction-following behaviour to enforce the threshold consistently across every conversation turn and tool invocation.",
+          "text": "A system prompt rule explicitly instructing Claude never to call `process_refund` with amounts above \u00a3500, relying on the model's instruction-following behaviour to enforce the threshold consistently across every conversation turn and tool invocation.",
           "explanation": "System prompt instructions are probabilistic; the model may occasionally deviate under unusual inputs, which does not satisfy a hard compliance requirement for financial transactions."
         },
         {
@@ -1359,7 +1359,7 @@
       "skills": [
         "1.5.5: Implementing tool call interception hooks that block policy-violating actions (for example, refunds exceeding $500) and redirect to alternative workflows (for example, human escalation)."
       ],
-      "question": "A developer is building a billing agent that can call a `cancel_subscription` tool. When the cancellation request is for a high-value account with an annual contract above £2,000, the agent must not execute the cancellation automatically and must instead route the request to a retention specialist. The developer wants to implement both the block and the redirect entirely through the hook system.\n\nWhich approach correctly implements the block-and-redirect behaviour?",
+      "question": "A developer is building a billing agent that can call a `cancel_subscription` tool. When the cancellation request is for a high-value account with an annual contract above \u00a32,000, the agent must not execute the cancellation automatically and must instead route the request to a retention specialist. The developer wants to implement both the block and the redirect entirely through the hook system.\n\nWhich approach correctly implements the block-and-redirect behaviour?",
       "choices": [
         {
           "id": "c1",
@@ -2295,7 +2295,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.1: Understanding tool descriptions as the primary mechanism LLMs use for tool selection and that minimal descriptions lead to unreliable selection among similar tools."
       ],
@@ -2334,7 +2336,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.2: Understanding the importance of including input formats, example queries, edge cases, and boundary explanations in tool descriptions."
       ],
@@ -2373,7 +2377,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.3: Understanding how ambiguous or overlapping tool descriptions cause misrouting (for example, analyze_content vs analyze_document with near-identical descriptions)."
       ],
@@ -2412,7 +2418,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.4: Understanding the impact of system prompt wording on tool selection: keyword-sensitive instructions can create unintended tool associations."
       ],
@@ -2451,7 +2459,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.5: Writing tool descriptions that clearly differentiate each tool's purpose, expected inputs, outputs, and when to use it versus similar alternatives."
       ],
@@ -2490,7 +2500,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.6: Renaming tools and updating descriptions to eliminate functional overlap (for example, renaming analyze_content to extract_web_results with a web-specific description)."
       ],
@@ -2529,7 +2541,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.7: Splitting generic tools into purpose-specific tools with defined input/output contracts (for example, splitting a generic analyze_document into extract_data_points, summarize_content, and verify_claim_against_source)."
       ],
@@ -2568,7 +2582,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.8: Reviewing system prompts for keyword-sensitive instructions that might override well-written tool descriptions."
       ],
@@ -2607,7 +2623,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.1: Understanding tool descriptions as the primary mechanism LLMs use for tool selection and that minimal descriptions lead to unreliable selection among similar tools."
       ],
@@ -2646,7 +2664,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.2: Understanding the importance of including input formats, example queries, edge cases, and boundary explanations in tool descriptions."
       ],
@@ -2685,7 +2705,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.3: Understanding how ambiguous or overlapping tool descriptions cause misrouting (for example, analyze_content vs analyze_document with near-identical descriptions)."
       ],
@@ -2724,7 +2746,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.4: Understanding the impact of system prompt wording on tool selection: keyword-sensitive instructions can create unintended tool associations."
       ],
@@ -2763,7 +2787,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.5: Writing tool descriptions that clearly differentiate each tool's purpose, expected inputs, outputs, and when to use it versus similar alternatives."
       ],
@@ -2802,7 +2828,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.6: Renaming tools and updating descriptions to eliminate functional overlap (for example, renaming analyze_content to extract_web_results with a web-specific description)."
       ],
@@ -2841,7 +2869,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.7: Splitting generic tools into purpose-specific tools with defined input/output contracts (for example, splitting a generic analyze_document into extract_data_points, summarize_content, and verify_claim_against_source)."
       ],
@@ -2880,7 +2910,9 @@
       "type": "single-choice",
       "format": "text",
       "domain": "Tool Design & MCP Integration",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "2.1.8: Reviewing system prompts for keyword-sensitive instructions that might override well-written tool descriptions."
       ],
@@ -2922,7 +2954,9 @@
       "skills": [
         "2.2.1: Understanding the MCP isError flag pattern for communicating tool failures back to the agent."
       ],
-      "services": [],
+      "services": [
+        "MCP"
+      ],
       "difficulty": 2,
       "question": "A developer is integrating an MCP server with a Claude-based agent. The tool occasionally fails due to upstream API timeouts, and the developer wants Claude to understand when a tool call has failed rather than treating the response content as a valid result.\n\nWhat is the recommended MCP pattern for signalling that a tool execution has failed?",
       "choices": [
@@ -2961,7 +2995,9 @@
       "skills": [
         "2.2.2: Understanding the distinction between transient errors (timeouts, service unavailability), validation errors (invalid input), business errors (policy violations), and permission errors."
       ],
-      "services": [],
+      "services": [
+        "MCP"
+      ],
       "difficulty": 2,
       "question": "A Claude-based payment agent invokes a `charge_card` tool and receives a failure response. The developer needs to determine the correct error category so the agent can decide whether to retry or escalate. The error indicates that the customer's credit limit has been exceeded.\n\nWhich error category best describes this failure?",
       "choices": [
@@ -3000,7 +3036,9 @@
       "skills": [
         "2.2.3: Understanding why uniform error responses (generic \"Operation failed\") prevent the agent from making appropriate recovery decisions."
       ],
-      "services": [],
+      "services": [
+        "MCP"
+      ],
       "difficulty": 2,
       "question": "A Claude agent orchestrates several backend tools that all return the message \"Operation failed\" when something goes wrong. During a test run, two tool calls fail consecutively - one due to a network timeout and one due to an invalid input parameter.\n\nWhy does returning a generic \"Operation failed\" message from both failures create a problem for the agent?",
       "choices": [
@@ -3039,7 +3077,9 @@
       "skills": [
         "2.2.4: Understanding the difference between retryable and non-retryable errors and how returning structured metadata prevents wasted retry attempts."
       ],
-      "services": [],
+      "services": [
+        "MCP"
+      ],
       "difficulty": 2,
       "question": "A developer is building a document processing agent that calls a `fetch_document` tool. The tool sometimes fails because the remote server is temporarily overloaded, and sometimes fails because the requested document ID does not exist.\n\nHow should the tool classify these two failure types in its response so the agent can avoid wasted retry attempts?",
       "choices": [
@@ -3078,7 +3118,9 @@
       "skills": [
         "2.2.5: Returning structured error metadata including errorCategory (transient/validation/permission), isRetryable boolean, and human-readable descriptions."
       ],
-      "services": [],
+      "services": [
+        "MCP"
+      ],
       "difficulty": 2,
       "question": "An engineer is designing the error response format for a suite of MCP tools that will be called by a Claude agent. The agent needs to decide whether to retry a failed call, escalate to a human, or request corrected input from the user.\n\nWhich combination of fields in the error response best supports all three of these agent decisions?",
       "choices": [
@@ -3117,7 +3159,9 @@
       "skills": [
         "2.2.6: Including retriable: false flags and customer-friendly explanations for business rule violations so the agent can communicate appropriately."
       ],
-      "services": [],
+      "services": [
+        "MCP"
+      ],
       "difficulty": 2,
       "question": "A customer service agent invokes a `cancel_subscription` tool and receives an error because the user's subscription is still within a 30-day lock-in period. The business policy does not allow cancellation during this window.\n\nWhat should the tool response include so the agent can properly communicate the outcome to the user?",
       "choices": [
@@ -3156,7 +3200,9 @@
       "skills": [
         "2.2.7: Implementing local error recovery within subagents for transient failures, propagating to the coordinator only errors that cannot be resolved locally along with partial results and what was attempted."
       ],
-      "services": [],
+      "services": [
+        "MCP"
+      ],
       "difficulty": 3,
       "question": "A coordinator agent delegates a data retrieval task to a subagent. The subagent calls a tool that fails with a network timeout on the first attempt but succeeds on retry. A second tool call then fails with a permission error that the subagent cannot resolve on its own.\n\nWhat is the correct error handling approach for the subagent in this situation?",
       "choices": [
@@ -3195,7 +3241,9 @@
       "skills": [
         "2.2.8: Distinguishing between access failures (needing retry decisions) and valid empty results (representing successful queries with no matches)."
       ],
-      "services": [],
+      "services": [
+        "MCP"
+      ],
       "difficulty": 2,
       "question": "A Claude agent invokes a `search_records` tool to look up customer orders by ID. The developer needs to decide how the tool should represent two different underlying conditions: the database being unreachable, and a successful query that found no matching records.\n\nWhich approach best distinguishes these two outcomes so the agent can act appropriately on each?",
       "choices": [
@@ -3234,7 +3282,9 @@
       "skills": [
         "2.3.1: Understanding that giving an agent access to too many tools degrades tool selection reliability by increasing decision complexity."
       ],
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "difficulty": 2,
       "question": "A developer builds a general-purpose research agent and provides it with 45 tools covering web search, file operations, calendar, email, data analysis, code execution, database queries, and communication services. After deployment, reviewers report that the agent frequently calls the wrong tool for a given task even when the tool descriptions appear accurate.\n\nWhat is the most likely cause of the tool selection errors?",
       "choices": [
@@ -3273,7 +3323,9 @@
       "skills": [
         "2.3.2: Understanding why agents with tools outside their specialization tend to misuse them (for example, a synthesis agent attempting web searches)."
       ],
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "difficulty": 2,
       "question": "An architect is reviewing the design of a multi-agent research pipeline. The synthesis agent, whose primary role is to combine findings and draft summaries, has also been given access to `web_search` and `scrape_page` tools so it can fill in gaps when source material seems incomplete.\n\nWhat risk does this design introduce?",
       "choices": [
@@ -3312,7 +3364,9 @@
       "skills": [
         "2.3.3: Understanding scoped tool access: giving agents only the tools needed for their role, with limited cross-role tools for specific high-frequency needs."
       ],
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "difficulty": 2,
       "question": "A team is designing a multi-agent customer support system with three specialist subagents: a retrieval agent, a response-drafting agent, and an escalation agent. Currently every subagent has access to all tools used by the system.\n\nWhat change would best improve tool selection reliability across all three subagents?",
       "choices": [
@@ -3351,7 +3405,9 @@
       "skills": [
         "2.3.4: Understanding tool_choice configuration options: \"auto\", \"any\", and forced tool selection ({\"type\": \"tool\", \"name\": \"...\"})."
       ],
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "difficulty": 2,
       "question": "A developer is configuring a Claude API request for an agent that must always call at least one tool per turn, but does not need to control which specific tool is selected on most steps.\n\nWhich `tool_choice` setting should the developer use?",
       "choices": [
@@ -3390,7 +3446,9 @@
       "skills": [
         "2.3.5: Restricting each subagent's tool set to those relevant to its role, preventing cross-specialization misuse."
       ],
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "difficulty": 2,
       "question": "A pipeline includes a summarisation subagent that has been given tools including `search_web`, `fetch_document`, `write_file`, `summarise_text`, and `send_email`. During evaluation the team observes that the subagent occasionally calls `search_web` to retrieve additional context rather than operating on documents already passed to it.\n\nWhat is the most direct way to prevent the subagent from invoking tools outside its intended role?",
       "choices": [
@@ -3429,7 +3487,9 @@
       "skills": [
         "2.3.6: Replacing generic tools with constrained alternatives (for example, replacing fetch_url with load_document that validates document URLs)."
       ],
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "difficulty": 2,
       "question": "A document review agent uses a `fetch_url` tool that accepts any URL and retrieves its content. The security team flags that during testing the agent fetched external web pages and social media links instead of limiting requests to the organisation's document repository.\n\nWhat is the recommended approach for constraining the tool's scope without removing URL fetching entirely?",
       "choices": [
@@ -3468,7 +3528,9 @@
       "skills": [
         "2.3.7: Providing scoped cross-role tools for high-frequency needs (for example, a verify_fact tool for the synthesis agent) while routing complex cases through the coordinator."
       ],
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "difficulty": 3,
       "question": "A multi-agent research pipeline includes a synthesis agent whose primary role is to combine findings and draft summaries. During evaluation the team finds that the synthesis agent frequently needs to confirm individual facts referenced in source material, but routing every verification request through the coordinator adds significant latency to the pipeline.\n\nWhat design pattern best addresses this need while keeping complex verification tasks managed by the coordinator?",
       "choices": [
@@ -3507,7 +3569,9 @@
       "skills": [
         "2.3.8: Using tool_choice forced selection to ensure a specific tool is called first (for example, forcing extract_metadata before enrichment tools), then processing subsequent steps in follow-up turns."
       ],
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "difficulty": 2,
       "question": "A developer is building a document enrichment pipeline using Claude. Each document must have its metadata extracted before any enrichment tools are applied, but during testing Claude sometimes skips directly to enrichment steps without first calling `extract_metadata`.\n\nWhat API configuration ensures `extract_metadata` is always called at the start of each document processing run?",
       "choices": [
@@ -3546,7 +3610,9 @@
       "skills": [
         "2.3.9: Setting tool_choice: \"any\" to guarantee the model calls a tool rather than returning conversational text."
       ],
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "difficulty": 2,
       "question": "A developer is building a stateful workflow pipeline where each turn must trigger a tool execution to advance the workflow state. During testing, the model occasionally returns a conversational response explaining what it intends to do next rather than making an actual tool call.\n\nWhich `tool_choice` setting prevents the model from returning conversational text and guarantees a tool is called each turn?",
       "choices": [
@@ -3581,7 +3647,10 @@
       "id": "CCA-F-0088",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code",
+        "MCP"
+      ],
       "skills": [
         "2.4.1: Understanding MCP server scoping: project-level (.mcp.json) for shared team tooling vs user-level (~/.claude.json) for personal/experimental servers."
       ],
@@ -3620,7 +3689,10 @@
       "id": "CCA-F-0089",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code",
+        "MCP"
+      ],
       "skills": [
         "2.4.2: Understanding environment variable expansion in .mcp.json (for example, ${GITHUB_TOKEN}) for credential management without committing secrets."
       ],
@@ -3659,7 +3731,10 @@
       "id": "CCA-F-0090",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code",
+        "MCP"
+      ],
       "skills": [
         "2.4.3: Understanding that tools from all configured MCP servers are discovered at connection time and available simultaneously to the agent."
       ],
@@ -3698,7 +3773,10 @@
       "id": "CCA-F-0091",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code",
+        "MCP"
+      ],
       "skills": [
         "2.4.4: Understanding MCP resources as a mechanism for exposing content catalogs (for example, issue summaries, documentation hierarchies, database schemas) to reduce exploratory tool calls."
       ],
@@ -3737,7 +3815,10 @@
       "id": "CCA-F-0092",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code",
+        "MCP"
+      ],
       "skills": [
         "2.4.5: Configuring shared MCP servers in project-scoped .mcp.json with environment variable expansion for authentication tokens."
       ],
@@ -3776,7 +3857,10 @@
       "id": "CCA-F-0093",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code",
+        "MCP"
+      ],
       "skills": [
         "2.4.6: Configuring personal/experimental MCP servers in user-scoped ~/.claude.json."
       ],
@@ -3815,7 +3899,10 @@
       "id": "CCA-F-0094",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code",
+        "MCP"
+      ],
       "skills": [
         "2.4.7: Enhancing MCP tool descriptions to explain capabilities and outputs in detail, preventing the agent from preferring built-in tools over more capable MCP tools."
       ],
@@ -3854,7 +3941,10 @@
       "id": "CCA-F-0095",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code",
+        "MCP"
+      ],
       "skills": [
         "2.4.8: Choosing existing community MCP servers over custom implementations for standard integrations (for example, Jira), reserving custom servers for team-specific workflows."
       ],
@@ -3893,7 +3983,10 @@
       "id": "CCA-F-0096",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code",
+        "MCP"
+      ],
       "skills": [
         "2.4.9: Exposing content catalogs as MCP resources to give agents visibility into available data without requiring exploratory tool calls."
       ],
@@ -3932,7 +4025,9 @@
       "id": "CCA-F-0097",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "2.5.1: Understanding Grep for content search (searching file contents for patterns like function names, error messages, or import statements)."
       ],
@@ -3971,7 +4066,9 @@
       "id": "CCA-F-0098",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "2.5.2: Understanding Glob for file path pattern matching (finding files by name or extension patterns)."
       ],
@@ -4010,7 +4107,9 @@
       "id": "CCA-F-0099",
       "type": "matching",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "2.5.3: Understanding Read/Write for full file operations and Edit for targeted modifications using unique text matching."
       ],
@@ -4061,7 +4160,9 @@
       "id": "CCA-F-0100",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "2.5.4: Understanding that when Edit fails due to non-unique text matches, using Read + Write as a fallback for reliable file modifications."
       ],
@@ -4100,7 +4201,9 @@
       "id": "CCA-F-0101",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "2.5.5: Selecting Grep for searching code content across a codebase (for example, finding all callers of a function, locating error messages)."
       ],
@@ -4139,7 +4242,9 @@
       "id": "CCA-F-0102",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "2.5.6: Selecting Glob for finding files matching naming patterns (for example, **/*.test.tsx)."
       ],
@@ -4178,7 +4283,9 @@
       "id": "CCA-F-0103",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "2.5.7: Using Read to load full file contents followed by Write when Edit cannot find unique anchor text."
       ],
@@ -4217,7 +4324,9 @@
       "id": "CCA-F-0104",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "2.5.8: Building codebase understanding incrementally: starting with Grep to find entry points, then using Read to follow imports and trace flows, rather than reading all files upfront."
       ],
@@ -4256,7 +4365,9 @@
       "id": "CCA-F-0105",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "2.5.9: Tracing function usage across wrapper modules by first identifying all exported names, then searching for each name across the codebase."
       ],
@@ -4295,7 +4406,9 @@
       "id": "CCA-F-0106",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.1.1: Understanding the CLAUDE.md configuration hierarchy: user-level (~/.claude/CLAUDE.md), project-level (.claude/CLAUDE.md or root CLAUDE.md), and directory-level (subdirectory CLAUDE.md files)."
       ],
@@ -4334,7 +4447,9 @@
       "id": "CCA-F-0107",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.1.2: Understanding that user-level settings apply only to that user and instructions in ~/.claude/CLAUDE.md are not shared with teammates via version control."
       ],
@@ -4373,7 +4488,9 @@
       "id": "CCA-F-0108",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.1.3: Understanding the @import syntax for referencing external files to keep CLAUDE.md modular (for example, importing specific standards files relevant to each package)."
       ],
@@ -4412,7 +4529,9 @@
       "id": "CCA-F-0109",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.1.4: Understanding the .claude/rules/ directory for organizing topic-specific rule files as an alternative to a monolithic CLAUDE.md."
       ],
@@ -4451,7 +4570,9 @@
       "id": "CCA-F-0110",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.1.5: Diagnosing configuration hierarchy issues (for example, a new team member not receiving instructions because they're in user-level rather than project-level configuration)."
       ],
@@ -4490,7 +4611,9 @@
       "id": "CCA-F-0111",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.1.6: Using @import to selectively include relevant standards files in each package's CLAUDE.md based on maintainer domain knowledge."
       ],
@@ -4529,7 +4652,9 @@
       "id": "CCA-F-0112",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.1.7: Splitting large CLAUDE.md files into focused topic-specific files in .claude/rules/ (for example, testing.md, api-conventions.md, deployment.md)."
       ],
@@ -4568,7 +4693,9 @@
       "id": "CCA-F-0113",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.1.8: Using the /memory command to verify which memory files are loaded and diagnose inconsistent behavior across sessions."
       ],
@@ -4607,7 +4734,9 @@
       "id": "CCA-F-0114",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.2.1: Understanding project-scoped commands in .claude/commands/ (shared via version control) vs user-scoped commands in ~/.claude/commands/ (personal)."
       ],
@@ -4646,7 +4775,9 @@
       "id": "CCA-F-0115",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.2.2: Understanding skills in .claude/skills/ with SKILL.md files that support frontmatter configuration including context: fork, allowed-tools, and argument-hint."
       ],
@@ -4685,7 +4816,9 @@
       "id": "CCA-F-0116",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.2.3: Understanding the context: fork frontmatter option for running skills in an isolated sub-agent context, preventing skill outputs from polluting the main conversation."
       ],
@@ -4724,7 +4857,9 @@
       "id": "CCA-F-0117",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.2.4: Understanding personal skill customization: creating personal variants in ~/.claude/skills/ with different names to avoid affecting teammates."
       ],
@@ -4763,7 +4898,9 @@
       "id": "CCA-F-0118",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.2.5: Creating project-scoped slash commands in .claude/commands/ for team-wide availability via version control."
       ],
@@ -4802,7 +4939,9 @@
       "id": "CCA-F-0119",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.2.6: Using context: fork to isolate skills that produce verbose output (for example, codebase analysis) or exploratory context (for example, brainstorming alternatives) from the main session."
       ],
@@ -4841,7 +4980,9 @@
       "id": "CCA-F-0120",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.2.7: Configuring allowed-tools in skill frontmatter to restrict tool access during skill execution (for example, limiting to file write operations to prevent destructive actions)."
       ],
@@ -4880,7 +5021,9 @@
       "id": "CCA-F-0121",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.2.8: Using argument-hint frontmatter to prompt developers for required parameters when they invoke the skill without arguments."
       ],
@@ -4919,7 +5062,9 @@
       "id": "CCA-F-0122",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.2.9: Choosing between skills (on-demand invocation for task-specific workflows) and CLAUDE.md (always-loaded universal standards)."
       ],
@@ -4958,7 +5103,9 @@
       "id": "CCA-F-0123",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.3.1: Understanding .claude/rules/ files with YAML frontmatter paths fields containing glob patterns for conditional rule activation."
       ],
@@ -4997,7 +5144,9 @@
       "id": "CCA-F-0124",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.3.2: Understanding how path-scoped rules load only when editing matching files, reducing irrelevant context and token usage."
       ],
@@ -5036,7 +5185,9 @@
       "id": "CCA-F-0125",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.3.3: Understanding the advantage of glob-pattern rules over directory-level CLAUDE.md files for conventions that span multiple directories (for example, test files spread throughout a codebase)."
       ],
@@ -5075,7 +5226,9 @@
       "id": "CCA-F-0126",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.3.4: Creating .claude/rules/ files with YAML frontmatter path scoping (for example, paths: [\"terraform/**/*\"]) so rules load only when editing matching files."
       ],
@@ -5114,7 +5267,9 @@
       "id": "CCA-F-0127",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.3.5: Using glob patterns in path-specific rules to apply conventions to files by type regardless of directory location (for example, **/*.test.tsx for all test files)."
       ],
@@ -5153,7 +5308,9 @@
       "id": "CCA-F-0128",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.3.6: Choosing path-specific rules over subdirectory CLAUDE.md files when conventions must apply to files spread across the codebase."
       ],
@@ -5192,7 +5349,9 @@
       "id": "CCA-F-0129",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.4.1: Understanding that plan mode is designed for complex tasks involving large-scale changes, multiple valid approaches, architectural decisions, and multi-file modifications."
       ],
@@ -5231,7 +5390,9 @@
       "id": "CCA-F-0130",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.4.2: Understanding that direct execution is appropriate for simple, well-scoped changes (for example, adding a single validation check to one function)."
       ],
@@ -5270,7 +5431,9 @@
       "id": "CCA-F-0131",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.4.3: Understanding that plan mode enables safe codebase exploration and design before committing to changes, preventing costly rework."
       ],
@@ -5309,7 +5472,9 @@
       "id": "CCA-F-0132",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.4.4: Understanding the Explore subagent for isolating verbose discovery output and returning summaries to preserve main conversation context."
       ],
@@ -5348,7 +5513,9 @@
       "id": "CCA-F-0133",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.4.5: Selecting plan mode for tasks with architectural implications (for example, microservice restructuring, library migrations affecting 45+ files, choosing between integration approaches with different infrastructure requirements)."
       ],
@@ -5387,7 +5554,9 @@
       "id": "CCA-F-0134",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.4.6: Selecting direct execution for well-understood changes with clear scope (for example, a single-file bug fix with a clear stack trace, adding a date validation conditional)."
       ],
@@ -5426,7 +5595,9 @@
       "id": "CCA-F-0135",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.4.7: Using the Explore subagent for verbose discovery phases to prevent context window exhaustion during multi-phase tasks."
       ],
@@ -5465,7 +5636,9 @@
       "id": "CCA-F-0136",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.4.8: Combining plan mode for investigation with direct execution for implementation (for example, planning a library migration, then executing the planned approach)."
       ],
@@ -5504,7 +5677,9 @@
       "id": "CCA-F-0137",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.5.1: Understanding concrete input/output examples as the most effective way to communicate expected transformations when prose descriptions are interpreted inconsistently."
       ],
@@ -5543,7 +5718,9 @@
       "id": "CCA-F-0138",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.5.2: Understanding test-driven iteration: writing test suites first, then iterating by sharing test failures to guide progressive improvement."
       ],
@@ -5582,7 +5759,9 @@
       "id": "CCA-F-0139",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.5.3: Understanding the interview pattern: having Claude ask questions to surface considerations the developer may not have anticipated before implementing."
       ],
@@ -5621,7 +5800,9 @@
       "id": "CCA-F-0140",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.5.4: Understanding when to provide all issues in a single message (interacting problems) versus fixing them sequentially (independent problems)."
       ],
@@ -5660,7 +5841,9 @@
       "id": "CCA-F-0141",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.5.5: Providing 2-3 concrete input/output examples to clarify transformation requirements when natural language descriptions produce inconsistent results."
       ],
@@ -5699,7 +5882,9 @@
       "id": "CCA-F-0142",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.5.6: Writing test suites covering expected behavior, edge cases, and performance requirements before implementation, then iterating by sharing test failures."
       ],
@@ -5738,7 +5923,9 @@
       "id": "CCA-F-0143",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.5.7: Using the interview pattern to surface design considerations (for example, cache invalidation strategies, failure modes) before implementing solutions in unfamiliar domains."
       ],
@@ -5777,7 +5964,9 @@
       "id": "CCA-F-0144",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.5.8: Providing specific test cases with example input and expected output to fix edge case handling (for example, null values in migration scripts)."
       ],
@@ -5816,7 +6005,9 @@
       "id": "CCA-F-0145",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude Code"
+      ],
       "skills": [
         "3.5.9: Addressing multiple interacting issues in a single detailed message when fixes interact, versus sequential iteration for independent issues."
       ],
@@ -7249,7 +7440,9 @@
       "id": "CCA-F-0180",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.4.1: Understanding retry-with-error-feedback: appending specific validation errors to the prompt on retry to guide the model toward correction."
       ],
@@ -7288,7 +7481,9 @@
       "id": "CCA-F-0181",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.4.2: Understanding the limits of retry: retries are ineffective when the required information is simply absent from the source document (vs format or structural errors)."
       ],
@@ -7327,7 +7522,9 @@
       "id": "CCA-F-0182",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.4.3: Understanding feedback loop design: tracking which code constructs trigger findings (detected_pattern field) to enable systematic analysis of dismissal patterns."
       ],
@@ -7366,7 +7563,9 @@
       "id": "CCA-F-0183",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.4.4: Understanding the difference between semantic validation errors (values don't sum, wrong field placement) and schema syntax errors (eliminated by tool use)."
       ],
@@ -7405,7 +7604,9 @@
       "id": "CCA-F-0184",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.4.5: Implementing follow-up requests that include the original document, the failed extraction, and specific validation errors for model self-correction."
       ],
@@ -7444,7 +7645,9 @@
       "id": "CCA-F-0185",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.4.6: Identifying when retries will be ineffective (for example, information exists only in an external document not provided) versus when they will succeed (format mismatches, structural output errors)."
       ],
@@ -7483,7 +7686,9 @@
       "id": "CCA-F-0186",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.4.7: Adding detected_pattern fields to structured findings to enable analysis of false positive patterns when developers dismiss findings."
       ],
@@ -7522,7 +7727,9 @@
       "id": "CCA-F-0187",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.4.8: Designing self-correction validation flows: extracting \"calculated_total\" alongside \"stated_total\" to flag discrepancies, adding \"conflict_detected\" booleans for inconsistent source data."
       ],
@@ -7561,7 +7768,9 @@
       "id": "CCA-F-0188",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.5.1: Understanding the Message Batches API: 50% cost savings, up to 24-hour processing window, no guaranteed latency SLA."
       ],
@@ -7600,7 +7809,9 @@
       "id": "CCA-F-0189",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.5.2: Understanding that batch processing is appropriate for non-blocking, latency-tolerant workloads (overnight reports, weekly audits, nightly test generation) and inappropriate for blocking workflows (pre-merge checks)."
       ],
@@ -7639,7 +7850,9 @@
       "id": "CCA-F-0190",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.5.3: Understanding that the batch API does not support multi-turn tool calling within a single request (cannot execute tools mid-request and return results)."
       ],
@@ -7678,7 +7891,9 @@
       "id": "CCA-F-0191",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.5.4: Understanding custom_id fields for correlating batch request/response pairs."
       ],
@@ -7717,7 +7932,9 @@
       "id": "CCA-F-0192",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.5.5: Matching API approach to workflow latency requirements: synchronous API for blocking pre-merge checks, batch API for overnight/weekly analysis."
       ],
@@ -7756,7 +7973,9 @@
       "id": "CCA-F-0193",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.5.6: Calculating batch submission frequency based on SLA constraints (for example, 4-hour windows to guarantee 30-hour SLA with 24-hour batch processing)."
       ],
@@ -7795,7 +8014,9 @@
       "id": "CCA-F-0194",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.5.7: Handling batch failures: resubmitting only failed documents (identified by custom_id) with appropriate modifications (for example, chunking documents that exceeded context limits)."
       ],
@@ -7834,7 +8055,9 @@
       "id": "CCA-F-0195",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.5.8: Using prompt refinement on a sample set before batch-processing large volumes to maximize first-pass success rates and reduce iterative resubmission costs."
       ],
@@ -7873,7 +8096,9 @@
       "id": "CCA-F-0196",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.6.1: Understanding self-review limitations: a model retains reasoning context from generation, making it less likely to question its own decisions in the same session."
       ],
@@ -7912,7 +8137,9 @@
       "id": "CCA-F-0197",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.6.2: Understanding that independent review instances (without prior reasoning context) are more effective at catching subtle issues than self-review instructions or extended thinking."
       ],
@@ -7951,7 +8178,9 @@
       "id": "CCA-F-0198",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.6.3: Understanding multi-pass review: splitting large reviews into per-file local analysis passes plus cross-file integration passes to avoid attention dilution and contradictory findings."
       ],
@@ -7990,7 +8219,9 @@
       "id": "CCA-F-0199",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.6.4: Using a second independent Claude instance to review generated code without the generator's reasoning context."
       ],
@@ -8029,7 +8260,9 @@
       "id": "CCA-F-0200",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.6.5: Splitting large multi-file reviews into focused per-file passes for local issues plus separate integration passes for cross-file data flow analysis."
       ],
@@ -8068,7 +8301,9 @@
       "id": "CCA-F-0201",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "4.6.6: Running verification passes where the model self-reports confidence alongside each finding to enable calibrated review routing."
       ],
@@ -8107,7 +8342,9 @@
       "id": "CCA-F-0202",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.1: Understanding progressive summarization risks: condensing numerical values, percentages, dates, and customer-stated expectations into vague summaries."
       ],
@@ -8146,7 +8383,9 @@
       "id": "CCA-F-0203",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.2: Understanding the \"lost in the middle\" effect: models reliably process information at the beginning and end of long inputs but may omit findings from middle sections."
       ],
@@ -8154,7 +8393,7 @@
       "difficulty": 2,
       "question": "An automated audit system passes twenty sub-agent compliance reports to a synthesizer as a single concatenated input. After the synthesis run, the team notices that findings from reports one through three and eighteen through twenty appear consistently in the output, while findings from reports seven through thirteen are frequently missing despite containing significant violations.\n\nWhich model behaviour best explains this pattern?",
       "tip": "Think about how model attention is distributed across the tokens of a very long input, focusing on where in the sequence the omitted content appears.",
-      "explanation": "The lost-in-the-middle effect describes the empirically observed tendency for large language models to process and retain information presented at the very beginning and the very end of a long context more reliably than information placed in the middle. Reports 7–13 fall in the middle of the twenty-report concatenation, making their findings structurally likely to receive less attention during synthesis - not because of their content, but because of their position.\n\n**Why the others do not work:**\n- Per-document token limits: the model's context window applies to the entire input, not to individual documents; there is no per-document cap.\n- Middle reports containing less relevant content: position, not relevance, explains the systematic gap; the question states the middle reports contain significant violations.\n- Summarization applied to middle sections: the scenario describes raw concatenation, not summarization; no compression step is mentioned.",
+      "explanation": "The lost-in-the-middle effect describes the empirically observed tendency for large language models to process and retain information presented at the very beginning and the very end of a long context more reliably than information placed in the middle. Reports 7\u201313 fall in the middle of the twenty-report concatenation, making their findings structurally likely to receive less attention during synthesis - not because of their content, but because of their position.\n\n**Why the others do not work:**\n- Per-document token limits: the model's context window applies to the entire input, not to individual documents; there is no per-document cap.\n- Middle reports containing less relevant content: position, not relevance, explains the systematic gap; the question states the middle reports contain significant violations.\n- Summarization applied to middle sections: the scenario describes raw concatenation, not summarization; no compression step is mentioned.",
       "docs": "https://platform.claude.com/docs/en/build-with-claude/context-windows",
       "lastReviewed": "2026-04-12",
       "choices": [
@@ -8185,7 +8424,9 @@
       "id": "CCA-F-0204",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.3: Understanding how tool results accumulate in context and consume tokens disproportionately to their relevance (for example, 40+ fields per order lookup when only 5 are relevant)."
       ],
@@ -8224,7 +8465,9 @@
       "id": "CCA-F-0205",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.4: Understanding the importance of passing complete conversation history in subsequent API requests to maintain conversational coherence."
       ],
@@ -8263,7 +8506,9 @@
       "id": "CCA-F-0206",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.5: Extracting transactional facts (amounts, dates, order numbers, statuses) into a persistent \"case facts\" block included in each prompt, outside summarized history."
       ],
@@ -8302,7 +8547,9 @@
       "id": "CCA-F-0207",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.6: Extracting and persisting structured issue data (order IDs, amounts, statuses) into a separate context layer for multi-issue sessions."
       ],
@@ -8341,7 +8588,9 @@
       "id": "CCA-F-0208",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.7: Trimming verbose tool outputs to only relevant fields before they accumulate in context (for example, keeping only return-relevant fields from order lookups)."
       ],
@@ -8380,7 +8629,9 @@
       "id": "CCA-F-0209",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.8: Placing key findings summaries at the beginning of aggregated inputs and organizing detailed results with explicit section headers to mitigate position effects."
       ],
@@ -8419,7 +8670,9 @@
       "id": "CCA-F-0210",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.9: Requiring subagents to include metadata (dates, source locations, methodological context) in structured outputs to support accurate downstream synthesis."
       ],
@@ -8458,7 +8711,9 @@
       "id": "CCA-F-0211",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.1.10: Modifying upstream agents to return structured data (key facts, citations, relevance scores) instead of verbose content and reasoning chains when downstream agents have limited context budgets."
       ],
@@ -8497,7 +8752,9 @@
       "id": "CCA-F-0212",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.2.1: Understanding appropriate escalation triggers: customer requests for a human, policy exceptions/gaps (not just complex cases), and inability to make meaningful progress."
       ],
@@ -8536,7 +8793,9 @@
       "id": "CCA-F-0213",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.2.2: Understanding the distinction between escalating immediately when a customer explicitly demands it versus offering to resolve when the issue is straightforward."
       ],
@@ -8575,7 +8834,9 @@
       "id": "CCA-F-0214",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.2.3: Understanding why sentiment-based escalation and self-reported confidence scores are unreliable proxies for actual case complexity."
       ],
@@ -8614,7 +8875,9 @@
       "id": "CCA-F-0215",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.2.4: Understanding how multiple customer matches require clarification (requesting additional identifiers) rather than heuristic selection."
       ],
@@ -8653,7 +8916,9 @@
       "id": "CCA-F-0216",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.2.5: Adding explicit escalation criteria with few-shot examples to the system prompt demonstrating when to escalate versus resolve autonomously."
       ],
@@ -8692,7 +8957,9 @@
       "id": "CCA-F-0217",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.2.6: Honoring explicit customer requests for human agents immediately without first attempting investigation."
       ],
@@ -8731,7 +8998,9 @@
       "id": "CCA-F-0218",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.2.7: Acknowledging frustration while offering resolution when the issue is within the agent's capability, escalating only if the customer reiterates their preference."
       ],
@@ -8770,13 +9039,15 @@
       "id": "CCA-F-0219",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.2.8: Escalating when policy is ambiguous or silent on the customer's specific request (for example, competitor price matching when policy only addresses own-site adjustments)."
       ],
       "domain": "Context Management & Reliability",
       "difficulty": 3,
-      "question": "A customer asks an e-commerce support agent to match a price they found on a rival retailer's website. The company's pricing policy explicitly covers adjustments for price drops on the company's own website within 14 days of purchase, but is entirely silent on competitor price matching. The agent determines the rival's price is genuine and would represent a £15 reduction.\n\nWhat should the agent do?",
+      "question": "A customer asks an e-commerce support agent to match a price they found on a rival retailer's website. The company's pricing policy explicitly covers adjustments for price drops on the company's own website within 14 days of purchase, but is entirely silent on competitor price matching. The agent determines the rival's price is genuine and would represent a \u00a315 reduction.\n\nWhat should the agent do?",
       "tip": "Think about the difference between deciding within a documented policy and deciding in an area the policy does not address at all.",
       "explanation": "The company's policy covers own-site price adjustments but says nothing about competitor matching. This is not a case where the policy clearly permits or clearly denies the request - it is a policy gap. When a request falls in an area where policy is silent or ambiguous, the agent should escalate to a human who can make a judgment call or obtain authorization, rather than improvising a decision that could create unintended precedent or financial exposure. Denying outright or approving outright would both involve the agent making a policy judgment in an area it has not been authorized to decide.\n\n**Why the others do not work:**\n- Deny because not explicitly permitted: the policy's silence does not constitute a denial; applying a closed-world assumption to policy gaps imposes a decision the agent has not been authorized to make.\n- Approve using own-price adjustment logic: the own-price adjustment logic applies to a different scenario; applying it to competitor matching extends the policy beyond its defined scope without authorization.\n- Request evidence then apply discount: this still results in the agent making an unauthorized policy decision in a gap area, regardless of whether evidence is verified.",
       "docs": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
@@ -8800,7 +9071,7 @@
         },
         {
           "id": "c4",
-          "text": "Ask the customer to provide documentary evidence of the competitor's price, then apply the same £15 discount using the own-site price adjustment workflow as the closest available equivalent.",
+          "text": "Ask the customer to provide documentary evidence of the competitor's price, then apply the same \u00a315 discount using the own-site price adjustment workflow as the closest available equivalent.",
           "explanation": "Even with verified evidence, applying the own-site price adjustment workflow to a competitor match is an improvised policy extension in an unapproved area. The agent is still making an unauthorized decision in a gap - it must escalate rather than substitute an adjacent policy."
         }
       ]
@@ -8809,7 +9080,9 @@
       "id": "CCA-F-0220",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.2.9: Instructing the agent to ask for additional identifiers when tool results return multiple matches, rather than selecting based on heuristics."
       ],
@@ -8848,7 +9121,9 @@
       "id": "CCA-F-0221",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.3.1: Understanding structured error context (failure type, attempted query, partial results, alternative approaches) as enabling intelligent coordinator recovery decisions."
       ],
@@ -8887,7 +9162,9 @@
       "id": "CCA-F-0222",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.3.2: Understanding the distinction between access failures (timeouts needing retry decisions) and valid empty results (successful queries with no matches)."
       ],
@@ -8926,7 +9203,9 @@
       "id": "CCA-F-0223",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.3.3: Understanding why generic error statuses (\"search unavailable\") hide valuable context from the coordinator."
       ],
@@ -8965,7 +9244,9 @@
       "id": "CCA-F-0224",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.3.4: Understanding why silently suppressing errors (returning empty results as success) or terminating entire workflows on single failures are both anti-patterns."
       ],
@@ -9004,7 +9285,9 @@
       "id": "CCA-F-0225",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.3.5: Returning structured error context including failure type, what was attempted, partial results, and potential alternatives to enable coordinator recovery."
       ],
@@ -9043,7 +9326,9 @@
       "id": "CCA-F-0226",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.3.6: Distinguishing access failures from valid empty results in error reporting so the coordinator can make appropriate decisions."
       ],
@@ -9082,7 +9367,9 @@
       "id": "CCA-F-0227",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.3.7: Having subagents implement local recovery for transient failures and only propagate errors they cannot resolve, including what was attempted and partial results."
       ],
@@ -9121,7 +9408,9 @@
       "id": "CCA-F-0228",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Claude API"
+      ],
       "skills": [
         "5.3.8: Structuring synthesis output with coverage annotations indicating which findings are well-supported versus which topic areas have gaps due to unavailable sources."
       ],

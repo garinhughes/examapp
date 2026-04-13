@@ -234,6 +234,10 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       const labId = p.slice('/skill-labs/'.length)
       if (labId) return `skill-lab-detail:${labId}`
     }
+    if (p.startsWith('/exams/')) {
+      const examCode = p.slice('/exams/'.length)
+      if (examCode && !examCode.includes('/')) return 'home'
+    }
     if (p === '/analytics') return 'analytics'
     if (p === '/pricing') return 'pricing'
     if (p === '/account') return 'account'
@@ -248,7 +252,14 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     return 'home'
   })
   const [exams, setExams] = useState<Exam[]>([])
-  const [selected, setSelected] = useState<string | null>(null)
+  const [selected, setSelected] = useState<string | null>(() => {
+    const p = window.location.pathname
+    if (p.startsWith('/exams/')) {
+      const examCode = p.slice('/exams/'.length)
+      if (examCode && !examCode.includes('/')) return examCode
+    }
+    return null
+  })
   const [questions, setQuestions] = useState<Question[]>([])
   const [examTier, setExamTier] = useState<string | null>(null)
   const [userTier, setUserTier] = useState<string | null>(null)
@@ -622,6 +633,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       if (examMode === 'weakest-link') { setLastError('Sign in to use Weakest Link mode - it needs your attempt history.'); return }
       const localId = `visitor-${Date.now()}`
       setAttemptId(localId)
+      try { localStorage.setItem(`attempt:${selected}`, JSON.stringify({ attemptId: localId, examVersion: null, attemptSchemaVersion: 1 })) } catch {}
       setExamStarted(true)
       if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
       return
@@ -881,6 +893,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         finishedAt: new Date().toISOString(),
         questions: qs.map((qn) => ({ ...qn, selectedChoiceId: Array.isArray(selectedAnswers[qn.id]) ? undefined : selectedAnswers[qn.id] as string, selectedChoiceIds: Array.isArray(selectedAnswers[qn.id]) ? selectedAnswers[qn.id] : undefined })),
       })
+      try { localStorage.removeItem(`attempt:${selected}`) } catch {}
       setExamStarted(false); setTimeLeft(null)
       setShowSubmitConfirm(false); setShowCompleteEarlyConfirm(false)
       return
@@ -913,6 +926,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         answers: selectedAnswers, flagged: Array.from(flaggedQuestions), currentIndex: currentQuestionIndex,
         numQuestions: displayQuestions.length > 0 ? displayQuestions.length : numQuestions, timed, timeLeft, durationMinutes, attemptId: attemptId ?? null,
         examMode: examMode ?? 'casual', revealAnswers: revealAnswers ?? 'immediately', timestamp: Date.now(),
+        questionIds: displayQuestions.map((q) => String(q.id)),
       }))
     } catch {}
   }
@@ -939,6 +953,12 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       if (saved.revealAnswers) setRevealAnswers(saved.revealAnswers)
       if (saved.attemptId) { setAttemptId(saved.attemptId) }
       else if (!user) { setAttemptId(`visitor-${Date.now()}`) }
+      // Restore question order — re-sort the loaded questions to match the saved sequence
+      if (Array.isArray(saved.questionIds) && saved.questionIds.length > 0 && questions.length > 0) {
+        const qMap = new Map(questions.map((q) => [String(q.id), q]))
+        const ordered = (saved.questionIds as string[]).map((id) => qMap.get(id)).filter(Boolean) as Question[]
+        if (ordered.length > 0) setQuestions(ordered)
+      }
       setExamStarted(true)
       setTimeout(() => { resumingRef.current = false }, 100)
     } catch (err) { console.error('resumeExam error', err); resumingRef.current = false }
@@ -1023,11 +1043,37 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!selected) return
     if (Array.isArray(attemptData?.questions) && attemptData.questions.length > 0) return
+    // If an in-progress server attempt exists, the validate-attempt effect will restore questions
+    // from the attempt (correct shuffled order). Don't race it with a fresh shuffle here.
+    // Visitor attempts (prefixed "visitor-") are not server-backed, so we still need to fetch questions.
+    try {
+      const existingRaw = localStorage.getItem(`attempt:${selected}`)
+      if (existingRaw) {
+        const parsed = JSON.parse(existingRaw)
+        const existingAttemptId = typeof parsed === 'string' ? parsed : parsed?.attemptId
+        if (existingAttemptId && !String(existingAttemptId).startsWith('visitor-')) return
+      }
+    } catch {}
     authFetch(`/exams/${selected}/questions`)
       .then((r) => { if (!r.ok) throw new Error(`Failed to load questions (${r.status})`); return r.json() })
       .then((data) => {
-        if (Array.isArray(data)) { setQuestions(data); setExamTier(null); setExamTotalAvailable(data.length); setExamLimited(false); setExamShowcase(false) }
-        else if (data && Array.isArray(data.questions)) { setQuestions(data.questions); setExamTier(data.tier ?? null); setExamTotalAvailable(data.totalAvailable ?? data.questions.length); setExamLimited(!!data.limited); setExamShowcase(!!data.showcase) }
+        let raw: any[] = []
+        let tier: string | null = null, totalAvailable = 0, limited = false, showcase = false
+        if (Array.isArray(data)) { raw = data; totalAvailable = data.length }
+        else if (data && Array.isArray(data.questions)) { raw = data.questions; tier = data.tier ?? null; totalAvailable = data.totalAvailable ?? data.questions.length; limited = !!data.limited; showcase = !!data.showcase }
+        // If restoring a visitor exam in-progress, reorder to match the saved question sequence
+        try {
+          const progressRaw = localStorage.getItem(`examProgress:${selected}`)
+          if (progressRaw) {
+            const saved = JSON.parse(progressRaw)
+            if (Array.isArray(saved.questionIds) && saved.questionIds.length > 0) {
+              const qMap = new Map(raw.map((q) => [String(q.id), q]))
+              const ordered = (saved.questionIds as string[]).map((id) => qMap.get(id)).filter(Boolean) as Question[]
+              if (ordered.length > 0) raw = ordered
+            }
+          }
+        } catch {}
+        setQuestions(raw); setExamTier(tier); setExamTotalAvailable(totalAvailable); setExamLimited(limited); setExamShowcase(showcase)
       })
       .catch((e) => { console.error(e); setLastError(String(e)) })
   }, [selected, user])
@@ -1061,15 +1107,18 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   // Auto-save progress
   useEffect(() => {
     if (!examStarted || !selected || isFinished) return
+    // Don't overwrite a valid saved state with empty questions — wait until questions are loaded
+    if (displayQuestions.length === 0) return
     const key = `examProgress:${selected}`
     try {
       localStorage.setItem(key, JSON.stringify({
         answers: selectedAnswers, flagged: Array.from(flaggedQuestions), currentIndex: currentQuestionIndex,
-        numQuestions: displayQuestions.length > 0 ? displayQuestions.length : numQuestions, timed, timeLeft, durationMinutes, attemptId: attemptId ?? null,
+        numQuestions: displayQuestions.length, timed, timeLeft, durationMinutes, attemptId: attemptId ?? null,
         examMode: examMode ?? 'casual', revealAnswers: revealAnswers ?? 'immediately', timestamp: Date.now(),
+        questionIds: displayQuestions.map((q) => String(q.id)),
       }))
     } catch {}
-  }, [selectedAnswers, flaggedQuestions, currentQuestionIndex, examStarted, selected, isFinished, timeLeft])
+  }, [selectedAnswers, flaggedQuestions, currentQuestionIndex, examStarted, selected, isFinished, timeLeft, displayQuestions])
 
   // Auto-cap numQuestions
   useEffect(() => {
@@ -1089,6 +1138,41 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       return existingRaw
     })()
     if (!existing) { setAttemptId(null); setExamStarted(false); return }
+
+    // Helper: restore exam session state from examProgress after confirming attempt is valid
+    function restoreProgressState(progressRaw: string | null) {
+      if (!progressRaw) return
+      try {
+        const saved = JSON.parse(progressRaw)
+        if (saved.answers && Object.keys(saved.answers).length > 0) setSelectedAnswers(saved.answers)
+        if (Array.isArray(saved.flagged)) setFlaggedQuestions(new Set(saved.flagged))
+        if (typeof saved.currentIndex === 'number') setCurrentQuestionIndex(saved.currentIndex)
+        if (saved.examMode) setExamMode(saved.examMode)
+        if (saved.revealAnswers) setRevealAnswers(saved.revealAnswers)
+        if (typeof saved.timed === 'boolean') setTimed(saved.timed)
+        if (typeof saved.durationMinutes === 'number') setDurationMinutes(saved.durationMinutes)
+        if (saved.timed && typeof saved.timeLeft === 'number' && saved.timeLeft > 0) setTimeLeft(saved.timeLeft)
+      } catch {}
+    }
+
+    const progressRaw = (() => { try { return localStorage.getItem(`examProgress:${selected}`) } catch { return null } })()
+
+    // Visitor (unauthenticated): attempt IDs are prefixed "visitor-" and not server-backed.
+    // Questions are fetched fresh (no server-side shuffle to preserve), state is restored from examProgress.
+    if (existing.startsWith('visitor-')) {
+      if (!progressRaw) { setAttemptId(null); setExamStarted(false); return }
+      try {
+        const saved = JSON.parse(progressRaw)
+        const age = Date.now() - (saved.timestamp || 0)
+        if (age > 24 * 60 * 60 * 1000) { try { localStorage.removeItem(`examProgress:${selected}`) } catch {}; setAttemptId(null); setExamStarted(false); return }
+        setAttemptId(existing)
+        restoreProgressState(progressRaw)
+        if (typeof saved.numQuestions === 'number') setNumQuestions(saved.numQuestions)
+        setExamStarted(true)
+      } catch (err) { console.error('restore visitor attempt error', err); setAttemptId(null); setExamStarted(false) }
+      return
+    }
+
     ;(async () => {
       try {
         const r = await authFetch(`/attempts/${existing}`)
@@ -1096,7 +1180,11 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         const data = await r.json()
         if (data?.finishedAt) { try { localStorage.removeItem(key) } catch {}; setAttemptId(null); setExamStarted(false); return }
         setAttemptId(existing); setAttemptData(data)
-        if (Array.isArray(data.questions)) setQuestions(data.questions)
+        if (Array.isArray(data.questions)) {
+          setQuestions(data.questions)
+          setNumQuestions(data.questions.length)
+        }
+        restoreProgressState(progressRaw)
         setExamStarted(true)
       } catch (err) { console.error('validate existing attempt error', err); setAttemptId(null); setExamStarted(false) }
     })()

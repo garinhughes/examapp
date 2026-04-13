@@ -25,6 +25,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<ExamAppWrapped />} />
       <Route path="/exams" element={<ExamAppWrapped />} />
+      <Route path="/exams/:examCode" element={<ExamAppWrapped />} />
       <Route path="/skill-labs" element={<ExamAppWrapped />} />
       <Route path="/skill-labs/:labId" element={<ExamAppWrapped />} />
       <Route path="/analytics" element={<ExamAppWrapped />} />

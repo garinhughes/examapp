@@ -47,7 +47,7 @@ function pathnameToRoute(pathname: string): AppRoute | null {
 }
 
 const ROUTE_TO_PATHNAME: Partial<Record<AppRoute, string>> = {
-  home: '/',
+  // 'home' is handled separately: /exams/:examCode when selected, / when not
   practice: '/exams',
   'skill-labs': '/skill-labs',
   analytics: '/analytics',
@@ -68,14 +68,24 @@ const ROUTE_TO_PATHNAME: Partial<Record<AppRoute, string>> = {
  * Mount once inside ExamApp (which is always inside BrowserRouter).
  */
 export function useRouteSync(): void {
-  const { route, setRoute } = useExam()
+  const { route, setRoute, selected, setSelected } = useExam()
   const location = useLocation()
   const navigate = useNavigate()
   const isInitialMount = useRef(true)
 
   // URL → state: when the user navigates directly or uses back/forward
   useEffect(() => {
-    const mapped = pathnameToRoute(location.pathname)
+    const pathname = location.pathname
+    // /exams/:examCode — exam setup / in-progress / review
+    if (pathname.startsWith('/exams/')) {
+      const examCode = pathname.slice('/exams/'.length)
+      if (examCode && !examCode.includes('/')) {
+        if (examCode !== selected) setSelected(examCode)
+        if (route !== 'home') setRoute('home')
+        return
+      }
+    }
+    const mapped = pathnameToRoute(pathname)
     if (mapped && mapped !== route) {
       setRoute(mapped)
     }
@@ -107,10 +117,17 @@ export function useRouteSync(): void {
       return
     }
 
+    // home: URL is /exams/:examCode when an exam is selected, / otherwise
+    if (route === 'home') {
+      const target = selected ? `/exams/${selected}` : '/'
+      if (location.pathname !== target) navigate(target, { replace: true })
+      return
+    }
+
     const target = ROUTE_TO_PATHNAME[route]
     if (target && location.pathname !== target) {
       navigate(target, { replace: true })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route])
+  }, [route, selected])
 }
