@@ -98,6 +98,7 @@ async function main() {
       difficulty: lab.difficulty,
       timeLimit: lab.timeLimit,
       technologies: lab.technologies,
+      description: lab.description,
       showcase: lab.showcase,
       showcaseOrder: lab.showcaseOrder,
     })

@@ -149,6 +149,7 @@ export async function publishLab(
     difficulty?: string
     timeLimit?: number
     technologies?: string[]
+    description?: string
     showcase?: boolean
     showcaseOrder?: number
   },
@@ -167,6 +168,7 @@ export async function publishLab(
     difficulty: meta.difficulty,
     timeLimit: meta.timeLimit,
     technologies: meta.technologies,
+    description: meta.description,
     showcase: meta.showcase,
     showcaseOrder: meta.showcaseOrder,
   }

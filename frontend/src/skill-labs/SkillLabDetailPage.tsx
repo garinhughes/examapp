@@ -6,6 +6,7 @@ import { clarityEvent, clarityTag } from '@/clarity'
 import { apiUrl } from '@/apiBase'
 import type { LabSummary, SkillLevel } from './types'
 import { getInProgressLabs, clearLabProgress } from './labs/shared'
+import { MarkdownText } from '@/exam/utils'
 
 const DIFFICULTY_COLORS: Record<SkillLevel, string> = {
   beginner: 'bg-green-500/15 text-green-700 dark:text-green-400',
@@ -136,7 +137,7 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
         </div>
 
         {lab.description && (
-          <p className="text-muted-foreground leading-relaxed">{lab.description}</p>
+          <MarkdownText text={lab.description} className="text-muted-foreground leading-relaxed" />
         )}
 
         {(lab.technologies ?? []).length > 0 && (
