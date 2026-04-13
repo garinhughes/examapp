@@ -93,9 +93,9 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await confirmEmail(email, code)
-      setInfo('Email confirmed! You can now sign in.')
-      setView('signin')
       setCode('')
+      await loginWithEmail(email, password)
+      navigate('/')
     } catch (err: any) {
       setError(err.message)
     } finally {
