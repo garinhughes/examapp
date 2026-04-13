@@ -1,0 +1,465 @@
+[
+  {
+    "id": "cca-f-sequence-agentic-loop",
+    "title": "Sequence the Agentic Loop",
+    "description": "Put the five steps of a Claude agentic loop in the correct order. Tests your mental model before writing any code.",
+    "type": "ordering",
+    "timeLimit": 300,
+    "difficulty": "beginner",
+    "platform": "Anthropic",
+    "category": "Agentic Architecture",
+    "technologies": ["Claude API", "Tool Use"],
+    "labCategory": "Implement",
+    "scenario": "You are implementing a Claude agentic loop from scratch using the Messages API. The loop must correctly handle tool calls until Claude signals it has finished.\n\nPut the following steps in the correct order.",
+    "steps": [
+      {
+        "id": "step-send",
+        "text": "Send a request to the Claude Messages API with the current messages array",
+        "correctPosition": 1
+      },
+      {
+        "id": "step-check",
+        "text": "Inspect the response's `stop_reason` field to determine whether Claude wants to call a tool (`\"tool_use\"`) or has finished (`\"end_turn\"`)",
+        "correctPosition": 2
+      },
+      {
+        "id": "step-extract",
+        "text": "Extract the tool name and input arguments from the `tool_use` content block in the response",
+        "correctPosition": 3
+      },
+      {
+        "id": "step-execute",
+        "text": "Execute the requested tool with the extracted arguments",
+        "correctPosition": 4
+      },
+      {
+        "id": "step-append",
+        "text": "Append the assistant response (including the `tool_use` block) and a new user message containing the `tool_result` block, then loop back to step 1",
+        "correctPosition": 5
+      }
+    ],
+    "explanation": "The correct order:\n\n1. **Send request** — Submit the full conversation history to `POST /v1/messages`.\n2. **Inspect `stop_reason`** — This is the authoritative signal. `\"tool_use\"` means Claude wants to call a tool; `\"end_turn\"` means it has finished. Never rely on parsing Claude's text output to detect completion.\n3. **Extract tool name and input** — Find the `tool_use` block(s) in `response.content`. Each block has a unique `id`, a `name`, and an `input` object.\n4. **Execute the tool** — Run the tool in your own code and capture the result.\n5. **Append and loop** — Append `{role: \"assistant\", content: response.content}` to preserve the `tool_use` block, then append `{role: \"user\", content: [{type: \"tool_result\", tool_use_id: block.id, content: result}]}` and send the next request.\n\nSkipping step 5's assistant append is the most common bug: without the `tool_use` block in history, Claude cannot match the result to its original request.",
+    "showcase": true,
+    "showcaseOrder": 1
+  },
+  {
+    "id": "cca-f-fix-agentic-loop-stop-reason",
+    "title": "Fix a Broken Agentic Loop",
+    "description": "The loop checks whether the last content block type is `tool_use` to decide whether to continue. Fix it to check `stop_reason` instead — the authoritative signal.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "beginner",
+    "platform": "Anthropic",
+    "category": "Agentic Architecture",
+    "technologies": ["Claude API", "Python", "Tool Use"],
+    "labCategory": "Implement",
+    "scenario": "A developer wrote an agentic loop that checks whether the last content block is a `tool_use` block to decide whether to keep iterating. During testing, the loop occasionally exits early (missing tool calls) and occasionally runs one extra iteration after Claude has finished.\n\nFix the loop termination condition to use the authoritative API signal.",
+    "language": "python",
+    "brokenCode": "import anthropic\n\nclient = anthropic.Anthropic()\n\ndef run_agent(tools, messages):\n    while True:\n        response = client.messages.create(\n            model=\"claude-opus-4-6\",\n            max_tokens=4096,\n            tools=tools,\n            messages=messages\n        )\n\n        messages.append({\"role\": \"assistant\", \"content\": response.content})\n\n        # BUG: checks content block type instead of stop_reason\n        last_block = response.content[-1] if response.content else None\n        if not last_block or last_block.type != \"tool_use\":\n            break\n\n        tool_results = []\n        for block in response.content:\n            if block.type == \"tool_use\":\n                result = execute_tool(block.name, block.input)\n                tool_results.append({\n                    \"type\": \"tool_result\",\n                    \"tool_use_id\": block.id,\n                    \"content\": result\n                })\n\n        messages.append({\"role\": \"user\", \"content\": tool_results})\n\n    return next((b.text for b in response.content if b.type == \"text\"), \"\")",
+    "correctCode": "import anthropic\n\nclient = anthropic.Anthropic()\n\ndef run_agent(tools, messages):\n    while True:\n        response = client.messages.create(\n            model=\"claude-opus-4-6\",\n            max_tokens=4096,\n            tools=tools,\n            messages=messages\n        )\n\n        messages.append({\"role\": \"assistant\", \"content\": response.content})\n\n        # FIX: use stop_reason as the authoritative loop termination signal\n        if response.stop_reason == \"end_turn\":\n            break\n\n        tool_results = []\n        for block in response.content:\n            if block.type == \"tool_use\":\n                result = execute_tool(block.name, block.input)\n                tool_results.append({\n                    \"type\": \"tool_result\",\n                    \"tool_use_id\": block.id,\n                    \"content\": result\n                })\n\n        messages.append({\"role\": \"user\", \"content\": tool_results})\n\n    return next((b.text for b in response.content if b.type == \"text\"), \"\")",
+    "validations": [
+      {
+        "field": "stop_reason",
+        "expected": "response.stop_reason == \"end_turn\""
+      }
+    ],
+    "explanation": "The bug is checking `last_block.type != \"tool_use\"` instead of `response.stop_reason == \"end_turn\"`.\n\n**Why the original is wrong:** Claude may include both a `text` block and one or more `tool_use` blocks in the same response. When that happens, the last block might be `text` even though `stop_reason` is `\"tool_use\"` — causing the loop to exit early. Conversely, Claude can return a lone `tool_use` block followed by a final text-only response; the next iteration would run unnecessarily.\n\n**Why `stop_reason` is correct:** The `stop_reason` field is the API's authoritative, machine-readable signal. `\"tool_use\"` always means \"I want a tool result\"; `\"end_turn\"` always means \"I am done\". It is independent of how many content blocks are in the response and of their order.\n\n**Other valid `stop_reason` values to handle:**\n- `\"max_tokens\"`: the response was cut short — increase `max_tokens` or handle gracefully.\n- `\"pause_turn\"`: a server-side tool loop hit its iteration cap — re-send to continue.",
+    "showcase": true,
+    "showcaseOrder": 2
+  },
+  {
+    "id": "cca-f-fix-tool-result-id",
+    "title": "Fix a Mismatched Tool Result ID",
+    "description": "The code generates a fresh UUID for `tool_use_id` in the tool result. Fix it to use the `id` from the original `tool_use` block.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "beginner",
+    "platform": "Anthropic",
+    "category": "Agentic Architecture",
+    "technologies": ["Claude API", "Python", "Tool Use"],
+    "labCategory": "Implement",
+    "scenario": "An agent is returning tool results, but Claude keeps responding with an error saying it cannot match the result to any outstanding tool request. A code review reveals that the developer is generating a new UUID for `tool_use_id` rather than echoing the ID from the `tool_use` block.\n\nFix the tool result construction so Claude can correctly match each result to its originating request.",
+    "language": "python",
+    "brokenCode": "import uuid\nimport anthropic\n\nclient = anthropic.Anthropic()\n\ndef process_tool_calls(response_content, tools_map):\n    \"\"\"Execute all tool calls in a response and return tool_result blocks.\"\"\"\n    tool_results = []\n\n    for block in response_content:\n        if block.type == \"tool_use\":\n            result = tools_map[block.name](**block.input)\n\n            # BUG: generates a new UUID instead of using block.id\n            tool_results.append({\n                \"type\": \"tool_result\",\n                \"tool_use_id\": str(uuid.uuid4()),\n                \"content\": str(result)\n            })\n\n    return tool_results",
+    "correctCode": "import anthropic\n\nclient = anthropic.Anthropic()\n\ndef process_tool_calls(response_content, tools_map):\n    \"\"\"Execute all tool calls in a response and return tool_result blocks.\"\"\"\n    tool_results = []\n\n    for block in response_content:\n        if block.type == \"tool_use\":\n            result = tools_map[block.name](**block.input)\n\n            # FIX: echo block.id so Claude can match the result to its request\n            tool_results.append({\n                \"type\": \"tool_result\",\n                \"tool_use_id\": block.id,\n                \"content\": str(result)\n            })\n\n    return tool_results",
+    "validations": [
+      {
+        "field": "tool_use_id",
+        "expected": "tool_use_id\": block.id"
+      }
+    ],
+    "explanation": "Each `tool_use` block Claude emits contains a unique `id` field (e.g. `\"toolu_01XBj...\"`). When you send the result back, the `tool_use_id` in the `tool_result` block **must exactly match** that `id`.\n\n**Why the original is wrong:** `str(uuid.uuid4())` generates a random ID that has no relationship to any `tool_use` block. Claude's API validates that every `tool_use_id` in a `tool_result` corresponds to a `tool_use` block it emitted in the preceding assistant turn. A mismatch causes a `400 Bad Request` with an error like `\"tool_use_id does not match any tool_use block\"`.\n\n**Why `block.id` is correct:** The `id` on each `tool_use` block is the API-assigned correlation key for that specific invocation. Echoing it back is how the stateless Messages API knows which result belongs to which tool call — especially important when Claude makes multiple tool calls in a single response.",
+    "showcase": true,
+    "showcaseOrder": 3
+  },
+  {
+    "id": "cca-f-diagnose-multi-agent-routing",
+    "title": "Diagnose a Broken Multi-Agent Architecture",
+    "description": "A coordinator has three subagents, but they are communicating peer-to-peer, bypassing the coordinator. Inspect the architecture to find the root cause.",
+    "type": "diagnose",
+    "timeLimit": 300,
+    "difficulty": "intermediate",
+    "platform": "Anthropic",
+    "category": "Agentic Architecture",
+    "technologies": ["Claude API", "Multi-Agent"],
+    "labCategory": "Troubleshoot",
+    "nodes": [
+      { "id": "coordinator", "label": "Coordinator Agent", "x": 300, "y": 50 },
+      { "id": "subagent-a", "label": "Subagent A\n(Research)", "x": 100, "y": 250 },
+      { "id": "subagent-b", "label": "Subagent B\n(Analysis)", "x": 300, "y": 250 },
+      { "id": "subagent-c", "label": "Subagent C\n(Synthesis)", "x": 500, "y": 250 },
+      { "id": "peer-edge", "label": "Direct Channel\n(no logging)", "x": 200, "y": 350 }
+    ],
+    "edges": [
+      { "source": "coordinator", "target": "subagent-a", "label": "Task" },
+      { "source": "coordinator", "target": "subagent-b", "label": "Task" },
+      { "source": "coordinator", "target": "subagent-c", "label": "Task" },
+      { "source": "subagent-a", "target": "peer-edge", "label": "Result" },
+      { "source": "subagent-b", "target": "peer-edge", "label": "Result" },
+      { "source": "peer-edge", "target": "subagent-b", "label": "Raw data" },
+      { "source": "peer-edge", "target": "subagent-c", "label": "Raw data" }
+    ],
+    "inspections": {
+      "coordinator": {
+        "title": "Coordinator Agent",
+        "details": [
+          { "label": "Role", "value": "Orchestrates research pipeline" },
+          { "label": "Spawns subagents via", "value": "Task tool" },
+          { "label": "Receives results from", "value": "Subagent C only" },
+          { "label": "Logging", "value": "Enabled" },
+          { "label": "Error handling", "value": "Enabled" }
+        ]
+      },
+      "subagent-a": {
+        "title": "Subagent A — Research",
+        "details": [
+          { "label": "Role", "value": "Fetches raw web sources" },
+          { "label": "Passes output to", "value": "Direct channel (peer-to-peer)" },
+          { "label": "Logging", "value": "Disabled" },
+          { "label": "Error handling", "value": "None" },
+          { "label": "Coordinator visibility", "value": "None after handoff" }
+        ]
+      },
+      "subagent-b": {
+        "title": "Subagent B — Analysis",
+        "details": [
+          { "label": "Role", "value": "Analyses research data" },
+          { "label": "Receives input from", "value": "Direct channel (peer-to-peer)" },
+          { "label": "Passes output to", "value": "Direct channel (peer-to-peer)" },
+          { "label": "Logging", "value": "Disabled" },
+          { "label": "Error handling", "value": "None" },
+          { "label": "Coordinator visibility", "value": "None" }
+        ]
+      },
+      "subagent-c": {
+        "title": "Subagent C — Synthesis",
+        "details": [
+          { "label": "Role", "value": "Synthesises final report" },
+          { "label": "Receives input from", "value": "Direct channel (peer-to-peer)" },
+          { "label": "Returns result to", "value": "Coordinator" },
+          { "label": "Logging", "value": "Disabled" },
+          { "label": "Error handling", "value": "None" }
+        ]
+      },
+      "peer-edge": {
+        "title": "Direct Channel",
+        "details": [
+          { "label": "Type", "value": "Peer-to-peer subagent communication" },
+          { "label": "Bypasses coordinator", "value": "Yes" },
+          { "label": "Logging", "value": "None" },
+          { "label": "Error handling", "value": "None" },
+          { "label": "Audit trail", "value": "None" },
+          { "label": "Retry logic", "value": "None" }
+        ]
+      }
+    },
+    "answers": [
+      {
+        "id": "a1",
+        "text": "The coordinator is spawning too many subagents simultaneously, causing race conditions"
+      },
+      {
+        "id": "a2",
+        "text": "Subagents A and B are communicating peer-to-peer, bypassing the coordinator — there is no logging, error handling, or coordinator oversight of intermediate results",
+        "correct": true
+      },
+      {
+        "id": "a3",
+        "text": "The coordinator is not passing the correct context to each subagent when spawning them"
+      },
+      {
+        "id": "a4",
+        "text": "Subagent C is returning results to the coordinator in the wrong format"
+      }
+    ],
+    "explanation": "Subagents A and B are communicating directly with each other via a peer-to-peer channel that bypasses the coordinator entirely.\n\n**Why this is a problem:**\n- **No oversight**: The coordinator cannot inspect, log, or react to intermediate results. If Subagent A returns bad data, the error propagates silently through B to C before the coordinator sees anything.\n- **No error handling**: The direct channel has no retry logic or error boundaries. A failure in A leaves B waiting indefinitely.\n- **No audit trail**: Peer-to-peer messages are invisible to the coordinator's logging, making debugging difficult.\n- **Trust boundary violation**: In a well-designed multi-agent system, the coordinator is the single control plane. Subagents should only receive tasks from and return results to the coordinator — they should never grant each other elevated trust or direct access.\n\n**The fix**: Route all inter-subagent communication through the coordinator. Each subagent receives its input from the coordinator and returns its output to the coordinator, which then decides what to pass to the next subagent.",
+    "showcase": true,
+    "showcaseOrder": 4
+  },
+  {
+    "id": "cca-f-fix-agent-definition-task-tool",
+    "title": "Fix a Broken AgentDefinition",
+    "description": "The coordinator's `allowedTools` is missing `\"Task\"`, so it never spawns subagents. Add the missing tool to enable subagent delegation.",
+    "type": "policy-fix",
+    "timeLimit": 600,
+    "difficulty": "intermediate",
+    "platform": "Anthropic",
+    "category": "Agentic Architecture",
+    "technologies": ["Claude API", "Agent SDK", "Multi-Agent"],
+    "labCategory": "Implement",
+    "scenario": "A coordinator agent is configured to delegate research tasks to specialized subagents, but it never spawns them. Instead it attempts all research itself, ignoring the `Task` tool entirely.\n\nA code review reveals the `AgentDefinition` JSON. Fix it to allow the coordinator to spawn subagents.",
+    "brokenPolicy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"WebSearch\",\n    \"FileRead\"\n  ]\n}",
+    "correctPolicy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"Task\",\n    \"WebSearch\",\n    \"FileRead\"\n  ]\n}",
+    "validations": [
+      {
+        "field": "allowedTools",
+        "expected": "\"Task\""
+      }
+    ],
+    "explanation": "The `Task` tool is the mechanism by which a coordinator agent spawns subagents. If `\"Task\"` is not listed in `allowedTools`, the coordinator cannot invoke it — even if the system prompt instructs it to.\n\n**Why it was broken:** `allowedTools` is an allowlist. Any tool not listed is unavailable. The coordinator's system prompt said to use the `Task` tool, but the tool was blocked at the configuration level, so the model fell back to doing the research itself.\n\n**Why adding `\"Task\"` fixes it:** Once `\"Task\"` is in `allowedTools`, the coordinator can emit `Task` tool calls in its response. The Agent SDK intercepts these, spawns the corresponding subagents, executes them, and returns their results as `tool_result` blocks for the coordinator to reason about.\n\n**Important:** `WebSearch` and `FileRead` were already correctly listed — the coordinator may also use those tools directly. The fix is additive: `\"Task\"` does not replace the other tools, it supplements them.",
+    "showcase": true,
+    "showcaseOrder": 5
+  },
+  {
+    "id": "cca-f-fix-subagent-context-passing",
+    "title": "Fix Subagent Context Passing",
+    "description": "The coordinator gathers order data into its own context but spawns the subagent with an empty prompt. Fix it to embed the data explicitly in the subagent's prompt.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "intermediate",
+    "platform": "Anthropic",
+    "category": "Agentic Architecture",
+    "technologies": ["Claude API", "TypeScript", "Multi-Agent"],
+    "labCategory": "Implement",
+    "scenario": "A coordinator agent collects customer order data from a database tool, accumulating it in its own conversation history. It then spawns a fraud-detection subagent — but the subagent always returns `\"No order data provided to analyse.\"`\n\nFix the coordinator so it passes the order data explicitly in the subagent's prompt.",
+    "language": "typescript",
+    "brokenCode": "import Anthropic from \"@anthropic-ai/sdk\";\n\nconst client = new Anthropic();\n\nasync function runFraudDetection(userId: string): Promise<string> {\n  // Step 1: Coordinator fetches orders (result stays in coordinator context only)\n  const coordinatorResponse = await client.messages.create({\n    model: \"claude-opus-4-6\",\n    max_tokens: 4096,\n    system: \"You are a fraud detection coordinator.\",\n    tools: [getOrdersTool],\n    messages: [{\n      role: \"user\",\n      content: `Fetch all orders for user ${userId}`\n    }]\n  });\n\n  // Extract order data from coordinator's tool result\n  const orderData = extractOrderData(coordinatorResponse);\n\n  // Step 2: BUG — spawns subagent without passing the order data\n  const subagentResponse = await client.messages.create({\n    model: \"claude-opus-4-6\",\n    max_tokens: 4096,\n    system: \"You are a fraud detection specialist. Analyse the provided orders.\",\n    messages: [{\n      role: \"user\",\n      content: \"Analyse these orders for fraud patterns.\"\n      // Missing: the actual order data\n    }]\n  });\n\n  return extractText(subagentResponse);\n}",
+    "correctCode": "import Anthropic from \"@anthropic-ai/sdk\";\n\nconst client = new Anthropic();\n\nasync function runFraudDetection(userId: string): Promise<string> {\n  // Step 1: Coordinator fetches orders\n  const coordinatorResponse = await client.messages.create({\n    model: \"claude-opus-4-6\",\n    max_tokens: 4096,\n    system: \"You are a fraud detection coordinator.\",\n    tools: [getOrdersTool],\n    messages: [{\n      role: \"user\",\n      content: `Fetch all orders for user ${userId}`\n    }]\n  });\n\n  // Extract order data from coordinator's tool result\n  const orderData = extractOrderData(coordinatorResponse);\n\n  // Step 2: FIX — embed order data explicitly in the subagent's prompt\n  const subagentResponse = await client.messages.create({\n    model: \"claude-opus-4-6\",\n    max_tokens: 4096,\n    system: \"You are a fraud detection specialist. Analyse the provided orders.\",\n    messages: [{\n      role: \"user\",\n      content: `Analyse these orders for fraud patterns:\\n\\n${JSON.stringify(orderData, null, 2)}`\n    }]\n  });\n\n  return extractText(subagentResponse);\n}",
+    "validations": [
+      {
+        "field": "subagent_prompt",
+        "expected": "orderData"
+      }
+    ],
+    "explanation": "Each Claude API request is stateless. A subagent spawned with `client.messages.create()` starts with a completely fresh context — it has no access to any conversation history, tool results, or intermediate data from the coordinator's session.\n\n**Why the original is wrong:** The coordinator correctly fetched `orderData` but then threw it away when spawning the subagent. The subagent's `messages` array contained only a generic instruction with no data, so it had nothing to analyse.\n\n**Why the fix works:** Embedding `JSON.stringify(orderData, null, 2)` directly in the subagent's user message provides all the context it needs within a single, self-contained request. The subagent can now reason about the actual orders.\n\n**General rule:** Any data a subagent needs must be explicitly included in its prompt. Subagents do not share memory with their coordinator, cannot see previous turns in the coordinator's conversation, and cannot access tool results that weren't passed to them.",
+    "showcase": true,
+    "showcaseOrder": 6
+  },
+  {
+    "id": "cca-f-fill-claude-md-hierarchy",
+    "title": "Complete a CLAUDE.md Hierarchy",
+    "description": "Fill in the blanks in a CLAUDE.md configuration: the `@import` path for a shared rules file, a `paths:` glob to scope a rule, and the correct user-level file location.",
+    "type": "fill-command",
+    "timeLimit": 600,
+    "difficulty": "intermediate",
+    "platform": "Anthropic",
+    "category": "Claude Code Configuration",
+    "technologies": ["Claude Code", "CLAUDE.md"],
+    "labCategory": "Implement",
+    "scenario": "A monorepo uses a three-tier CLAUDE.md hierarchy: user-level, project-level, and directory-level. Several configuration files have gaps that prevent Claude Code from applying the right rules in the right places.\n\nFill in the missing values to complete the configuration.",
+    "questions": [
+      {
+        "id": "q1",
+        "template": "# api/CLAUDE.md\n# This package needs the shared API contract rules.\n# Pull them in using the import directive:\n\n___ shared/api-contracts.md\n\nAll API endpoints must return JSON.",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "import directive",
+            "answer": "@import"
+          }
+        ],
+        "hint": "Claude Code supports a special directive for including another file's contents into the active configuration."
+      },
+      {
+        "id": "q2",
+        "template": "# .claude/rules/testing.md\n# This rule should only apply when editing test files.\n# Test files follow the pattern **/*.test.ts across all packages.\n\n---\npaths: ___\n---\n\nAlways use `describe` blocks and `it` for test names.",
+        "blanks": [
+          {
+            "id": "b2",
+            "placeholder": "glob pattern",
+            "answer": "**/*.test.ts"
+          }
+        ],
+        "hint": "Use a glob pattern to match all `.test.ts` files anywhere in the repository."
+      },
+      {
+        "id": "q3",
+        "template": "# Location: ___/CLAUDE.md\n# This file contains personal productivity shortcuts\n# and prompt patterns for one developer only.\n# It must NOT be committed to version control.",
+        "blanks": [
+          {
+            "id": "b3",
+            "placeholder": "directory path",
+            "answer": "~/.claude"
+          }
+        ],
+        "hint": "The user-level Claude Code configuration lives outside the project directory, in the user's home folder."
+      }
+    ],
+    "explanation": "The three-tier CLAUDE.md hierarchy:\n\n**1. `@import` directive (Q1):**\n`@import path/to/file.md` is the Claude Code syntax for including another file's contents into the current configuration scope. When a package's CLAUDE.md contains `@import shared/api-contracts.md`, Claude Code loads that file and applies its rules as if they were written inline. This enables modular, DRY configuration across packages.\n\n**2. `paths:` glob scoping (Q2):**\nA rule file in `.claude/rules/` can include a `paths:` frontmatter field with a glob pattern. Claude Code only applies the rule when the file being edited matches the glob. `**/*.test.ts` matches any `.test.ts` file at any depth, making it perfect for test-specific conventions that span multiple directories.\n\n**3. User-level location (Q3):**\n`~/.claude/CLAUDE.md` is the user-level configuration file. It lives in the user's home directory, is never committed to version control, and affects only that user's Claude Code sessions across all projects. Project-level configuration lives at `.claude/CLAUDE.md` (or the project root `CLAUDE.md`) and is committed to the repository.",
+    "showcase": true,
+    "showcaseOrder": 7
+  },
+  {
+    "id": "cca-f-fix-sequential-to-parallel-subagents",
+    "title": "Fix Sequential Subagents to Run in Parallel",
+    "description": "The coordinator issues one `Task` tool call per turn, waiting for each result before dispatching the next. Fix it to emit all three `Task` calls in a single response for concurrent dispatch.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "advanced",
+    "platform": "Anthropic",
+    "category": "Agentic Architecture",
+    "technologies": ["Claude API", "Python", "Multi-Agent"],
+    "labCategory": "Implement",
+    "scenario": "A coordinator agent fetches data from three independent APIs (weather, stocks, news) before synthesising a report. Currently it issues one `Task` call per turn, waiting for each result — so total latency is roughly `T_weather + T_stocks + T_news`.\n\nFix the coordinator's system prompt and tool configuration so it emits all three `Task` calls in a single response, triggering parallel dispatch. Target latency: `max(T_weather, T_stocks, T_news)`.",
+    "language": "python",
+    "brokenCode": "import anthropic\n\nclient = anthropic.Anthropic()\n\n# BUG: system prompt instructs the coordinator to call subagents one at a time\nSYSTEM_PROMPT = \"\"\"\nYou are a data coordinator. To gather the report data:\n1. First, call the weather subagent using the Task tool.\n2. Wait for the result, then call the stocks subagent.\n3. Wait for that result, then call the news subagent.\n4. Once you have all three results, synthesise the final report.\n\"\"\"\n\ndef run_coordinator(user_request: str) -> str:\n    response = client.messages.create(\n        model=\"claude-opus-4-6\",\n        max_tokens=8192,\n        system=SYSTEM_PROMPT,\n        tools=[\n            {\n                \"name\": \"Task\",\n                \"description\": \"Spawn a subagent to handle a subtask\",\n                \"input_schema\": {\n                    \"type\": \"object\",\n                    \"properties\": {\n                        \"description\": {\"type\": \"string\"},\n                        \"prompt\": {\"type\": \"string\"}\n                    },\n                    \"required\": [\"description\", \"prompt\"]\n                }\n            }\n        ],\n        messages=[{\"role\": \"user\", \"content\": user_request}]\n    )\n    # ... agentic loop continues\n    return extract_final_response(response)",
+    "correctCode": "import anthropic\n\nclient = anthropic.Anthropic()\n\n# FIX: instruct the coordinator to call all independent subagents in one response\nSYSTEM_PROMPT = \"\"\"\nYou are a data coordinator. The weather, stocks, and news data are completely independent.\nTo minimise latency, call all three subagents in a single response by emitting multiple\nTask tool calls at once — do not wait for one result before requesting the next.\nOnce you have all three results, synthesise the final report.\n\"\"\"\n\ndef run_coordinator(user_request: str) -> str:\n    response = client.messages.create(\n        model=\"claude-opus-4-6\",\n        max_tokens=8192,\n        system=SYSTEM_PROMPT,\n        tools=[\n            {\n                \"name\": \"Task\",\n                \"description\": \"Spawn a subagent to handle a subtask\",\n                \"input_schema\": {\n                    \"type\": \"object\",\n                    \"properties\": {\n                        \"description\": {\"type\": \"string\"},\n                        \"prompt\": {\"type\": \"string\"}\n                    },\n                    \"required\": [\"description\", \"prompt\"]\n                }\n            }\n        ],\n        messages=[{\"role\": \"user\", \"content\": user_request}]\n    )\n    # ... agentic loop continues\n    return extract_final_response(response)",
+    "validations": [
+      {
+        "field": "system_prompt",
+        "expected": "single response"
+      }
+    ],
+    "explanation": "When a coordinator emits **multiple `Task` tool calls in a single assistant response**, the Agent SDK dispatches all of them concurrently. Total latency collapses from the sum of all durations to the duration of the slowest subagent.\n\n**Why the original is sequential:** The system prompt explicitly said \"First, call the weather subagent... Wait for the result, then call the stocks subagent...\" This instructed the model to make one tool call per turn, which means the SDK runs them one after another.\n\n**Why the fix works:** The new system prompt instructs the coordinator to emit all three `Task` calls in a single response. When the SDK receives a response with three `tool_use` blocks, it dispatches all three subagents simultaneously and collects all three `tool_result` blocks before the next coordinator turn.\n\n**Key insight:** Parallelism in Claude's tool system is driven by how many tool calls appear in a **single assistant turn**. Tool calls across separate turns are always sequential. The prompt must explicitly invite Claude to batch its tool calls when the sub-tasks are independent.\n\n**Additional lever:** You can also set `tool_choice: {type: \"any\"}` and ensure `disable_parallel_tool_use` is not set (it defaults to `false`), but the system prompt instruction is the primary driver.",
+    "showcase": true,
+    "showcaseOrder": 8
+  },
+  {
+    "id": "cca-f-fix-prompt-gate-to-programmatic-gate",
+    "title": "Replace a Prompt Gate with a Programmatic Gate",
+    "description": "A system prompt instruction is the only guard before a wire transfer. Add a code-level prerequisite check that blocks `initiate_wire_transfer` if identity verification hasn't completed.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "advanced",
+    "platform": "Anthropic",
+    "category": "Agentic Architecture",
+    "technologies": ["Claude API", "TypeScript", "Security"],
+    "labCategory": "Implement",
+    "scenario": "A fintech agent can initiate wire transfers. The system prompt says:\n\n> \"You MUST always call `verify_customer_identity` before calling `initiate_wire_transfer`. This is a regulatory requirement.\"\n\nA penetration test shows an adversarial prompt can cause the model to skip verification and call `initiate_wire_transfer` directly.\n\nAdd a programmatic gate in the tool dispatcher that enforces the prerequisite at the code level, independent of the model's behaviour.",
+    "language": "typescript",
+    "brokenCode": "import Anthropic from \"@anthropic-ai/sdk\";\n\nconst client = new Anthropic();\n\n// RISK: the only enforcement is a prompt instruction — a non-zero failure rate\nconst SYSTEM = `You are a fintech assistant.\nYou MUST always call verify_customer_identity before calling initiate_wire_transfer.\nThis is a regulatory requirement. Never skip verification.`;\n\nasync function executeTool(\n  toolName: string,\n  toolInput: Record<string, unknown>\n): Promise<string> {\n  if (toolName === \"verify_customer_identity\") {\n    return await verifyIdentity(toolInput.customerId as string);\n  }\n\n  if (toolName === \"initiate_wire_transfer\") {\n    // BUG: no code-level check — relies entirely on the model following the prompt\n    return await initiateTransfer(toolInput);\n  }\n\n  throw new Error(`Unknown tool: ${toolName}`);\n}",
+    "correctCode": "import Anthropic from \"@anthropic-ai/sdk\";\n\nconst client = new Anthropic();\n\nconst SYSTEM = `You are a fintech assistant.\nYou MUST always call verify_customer_identity before calling initiate_wire_transfer.\nThis is a regulatory requirement. Never skip verification.`;\n\n// FIX: track verification state in the harness, not in the model's memory\nlet identityVerified = false;\n\nasync function executeTool(\n  toolName: string,\n  toolInput: Record<string, unknown>\n): Promise<string> {\n  if (toolName === \"verify_customer_identity\") {\n    const result = await verifyIdentity(toolInput.customerId as string);\n    identityVerified = true; // record that verification completed\n    return result;\n  }\n\n  if (toolName === \"initiate_wire_transfer\") {\n    // Programmatic gate: enforce prerequisite regardless of model behaviour\n    if (!identityVerified) {\n      return JSON.stringify({\n        error: \"PREREQUISITE_NOT_MET\",\n        message: \"Identity verification must be completed before initiating a transfer. Please call verify_customer_identity first.\"\n      });\n    }\n    return await initiateTransfer(toolInput);\n  }\n\n  throw new Error(`Unknown tool: ${toolName}`);\n}",
+    "validations": [
+      {
+        "field": "prerequisite_check",
+        "expected": "identityVerified"
+      },
+      {
+        "field": "error_return",
+        "expected": "PREREQUISITE_NOT_MET"
+      }
+    ],
+    "explanation": "System prompt instructions have a non-zero failure rate under adversarial conditions. Prompt injection, jailbreak attempts, or sufficiently creative user inputs can cause a model to skip instructed steps. For irreversible financial operations, a prompt instruction alone does not meet the bar for regulatory compliance.\n\n**Why the original is insufficient:** The `SYSTEM` prompt says to call verification first, but there is no code that enforces this. If the model skips `verify_customer_identity` for any reason, `initiateTransfer` runs unchecked.\n\n**Why the programmatic gate works:** The `identityVerified` flag lives in your harness — code the model cannot read or modify. When `initiate_wire_transfer` is called, your dispatcher checks the flag before running any financial logic. If verification hasn't completed, it returns a structured error telling Claude to complete verification first. Claude then calls `verify_customer_identity`, the flag is set, and the next transfer attempt succeeds.\n\n**Design principles:**\n- **Prompt instructions** are good for shaping model behaviour in the happy path.\n- **Programmatic gates** are required for deterministic enforcement of security-critical prerequisites.\n- Returning a structured error (rather than throwing) lets Claude recover gracefully and complete the task in the correct order.",
+    "showcase": true,
+    "showcaseOrder": 9
+  },
+  {
+    "id": "cca-f-diagnose-context-window-degradation",
+    "title": "Diagnose a Context Window Degradation Failure",
+    "description": "A long-running research agent is losing earlier case facts mid-session. Inspect the architecture to find why — and which node is the root cause.",
+    "type": "diagnose",
+    "timeLimit": 300,
+    "difficulty": "advanced",
+    "platform": "Anthropic",
+    "category": "Context Management",
+    "technologies": ["Claude API", "Multi-Agent", "Context Management"],
+    "labCategory": "Troubleshoot",
+    "nodes": [
+      { "id": "user", "label": "User", "x": 50, "y": 200 },
+      { "id": "coordinator", "label": "Coordinator\nAgent", "x": 250, "y": 200 },
+      { "id": "subagent-1", "label": "Subagent 1\n(Web Search)", "x": 450, "y": 100 },
+      { "id": "subagent-2", "label": "Subagent 2\n(Document Reader)", "x": 450, "y": 200 },
+      { "id": "subagent-3", "label": "Subagent 3\n(Data Extractor)", "x": 450, "y": 300 },
+      { "id": "tool-results", "label": "Tool Results\nAccumulator", "x": 650, "y": 200 }
+    ],
+    "edges": [
+      { "source": "user", "target": "coordinator", "label": "Research task" },
+      { "source": "coordinator", "target": "subagent-1", "label": "Task" },
+      { "source": "coordinator", "target": "subagent-2", "label": "Task" },
+      { "source": "coordinator", "target": "subagent-3", "label": "Task" },
+      { "source": "subagent-1", "target": "tool-results", "label": "Full verbose result" },
+      { "source": "subagent-2", "target": "tool-results", "label": "Full verbose result" },
+      { "source": "subagent-3", "target": "tool-results", "label": "Full verbose result" },
+      { "source": "tool-results", "target": "coordinator", "label": "All results appended" }
+    ],
+    "inspections": {
+      "user": {
+        "title": "User",
+        "details": [
+          { "label": "Request type", "value": "Multi-iteration research task" },
+          { "label": "Expected output", "value": "Comprehensive case analysis" },
+          { "label": "Observed symptom", "value": "Agent forgets early case facts in later iterations" }
+        ]
+      },
+      "coordinator": {
+        "title": "Coordinator Agent",
+        "details": [
+          { "label": "Context management", "value": "None — all messages kept" },
+          { "label": "Compaction", "value": "Not configured" },
+          { "label": "Tool result trimming", "value": "Disabled" },
+          { "label": "Iterations completed", "value": "12 of 20 planned" },
+          { "label": "Context usage at iteration 12", "value": "~185,000 tokens (approaching 200K limit)" }
+        ]
+      },
+      "subagent-1": {
+        "title": "Subagent 1 — Web Search",
+        "details": [
+          { "label": "Output format", "value": "Full raw HTML + metadata per result" },
+          { "label": "Average result size", "value": "~8,000 tokens per search" },
+          { "label": "Trimming applied", "value": "None" },
+          { "label": "Summary generated", "value": "No" }
+        ]
+      },
+      "subagent-2": {
+        "title": "Subagent 2 — Document Reader",
+        "details": [
+          { "label": "Output format", "value": "Full document text" },
+          { "label": "Average result size", "value": "~15,000 tokens per document" },
+          { "label": "Trimming applied", "value": "None" },
+          { "label": "Summary generated", "value": "No" }
+        ]
+      },
+      "subagent-3": {
+        "title": "Subagent 3 — Data Extractor",
+        "details": [
+          { "label": "Output format", "value": "Full JSON payloads" },
+          { "label": "Average result size", "value": "~5,000 tokens per extraction" },
+          { "label": "Trimming applied", "value": "None" },
+          { "label": "Summary generated", "value": "No" }
+        ]
+      },
+      "tool-results": {
+        "title": "Tool Results Accumulator",
+        "details": [
+          { "label": "Strategy", "value": "Append all results verbatim, never remove" },
+          { "label": "Total tokens after 12 iterations", "value": "~156,000 in tool results alone" },
+          { "label": "Compaction step", "value": "Not present" },
+          { "label": "Summarisation step", "value": "Not present" },
+          { "label": "Oldest results still in context", "value": "Yes — never evicted" }
+        ]
+      }
+    },
+    "answers": [
+      {
+        "id": "a1",
+        "text": "The coordinator is spawning too many subagents in parallel, causing rate limit errors that corrupt the context"
+      },
+      {
+        "id": "a2",
+        "text": "The subagents are using the wrong model and producing low-quality summaries"
+      },
+      {
+        "id": "a3",
+        "text": "Verbose tool results are never trimmed or summarised, accumulating until the context window is exhausted — early case facts are pushed out by the \"lost in the middle\" effect",
+        "correct": true
+      },
+      {
+        "id": "a4",
+        "text": "The user's initial request is too large and is consuming most of the available context"
+      }
+    ],
+    "explanation": "The root cause is in the **Tool Results Accumulator**: raw, verbose tool outputs are appended to the coordinator's context without ever being trimmed, summarised, or compacted. After 12 iterations, tool results alone consume ~156,000 tokens — leaving little room for the coordinator's own reasoning and causing Claude to \"forget\" earlier case facts due to the **lost in the middle** effect.\n\n**Lost in the middle:** Research shows that large language models attend more reliably to content at the beginning and end of their context window than to content buried in the middle. As iterations proceed, early case facts get pushed toward the middle by accumulating tool results and become less influential in the model's outputs.\n\n**The fix — multiple complementary strategies:**\n1. **Trim tool results**: Before appending to context, have each subagent return a compact summary (key facts, not raw HTML/JSON). Target <500 tokens per result instead of 5–15k.\n2. **Enable compaction**: Use `context_management: {edits: [{type: \"compact_20260112\"}]}` with the `compact-2026-01-12` beta header. The API automatically summarises earlier context when approaching the limit.\n3. **Context editing**: Configure thresholds to clear old tool results and thinking blocks after a certain age.\n4. **Periodic summarisation**: After every N iterations, instruct the coordinator to produce a structured summary of findings so far, then truncate the raw tool results that led to it.",
+    "showcase": true,
+    "showcaseOrder": 10
+  }
+]

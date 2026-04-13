@@ -227,6 +227,7 @@ module "cloudwatch_scheduler" {
   dashboard_vars = {
     region             = var.region
     project            = var.project
+    account_id         = data.aws_caller_identity.current.account_id
     alb_arn_suffix     = module.ecs.alb_arn_suffix
     tg_arn_suffix      = module.ecs.target_group_arn_suffix
     ecs_cluster_name   = module.ecs.cluster_name

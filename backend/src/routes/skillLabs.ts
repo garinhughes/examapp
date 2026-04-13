@@ -246,18 +246,35 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     const errors: string[] = []
+
+    // AWS IAM policy: validate against Statement array
     const statements = parsed?.Statement
-    if (!Array.isArray(statements) || statements.length === 0) {
-      return reply.send({ success: false, errors: ['Policy must contain at least one Statement.'] })
+    if (Array.isArray(statements) && statements.length > 0) {
+      for (const v of lab.validations) {
+        const found = statements.some((s: any) => {
+          const fieldValue = s[v.field]
+          if (Array.isArray(fieldValue)) return fieldValue.includes(v.expected)
+          return fieldValue === v.expected
+        })
+        if (!found) {
+          errors.push(`Expected ${v.field} to include "${v.expected}"`)
+        }
+      }
+      return reply.send({ success: errors.length === 0, errors })
+    }
+
+    // Generic JSON policy (e.g. AgentDefinition): check that each expected value
+    // appears somewhere in the parsed object (deep value search)
+    function deepIncludes(obj: any, expected: string): boolean {
+      if (obj === null || obj === undefined) return false
+      if (typeof obj === 'string') return obj === expected || obj.includes(expected)
+      if (Array.isArray(obj)) return obj.some((item) => deepIncludes(item, expected))
+      if (typeof obj === 'object') return Object.values(obj).some((v) => deepIncludes(v, expected))
+      return String(obj) === expected
     }
 
     for (const v of lab.validations) {
-      const found = statements.some((s: any) => {
-        const fieldValue = s[v.field]
-        if (Array.isArray(fieldValue)) return fieldValue.includes(v.expected)
-        return fieldValue === v.expected
-      })
-      if (!found) {
+      if (!deepIncludes(parsed, v.expected)) {
         errors.push(`Expected ${v.field} to include "${v.expected}"`)
       }
     }

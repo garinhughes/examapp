@@ -142,10 +142,11 @@ export const PRODUCTS: Product[] = [
     productId: 'exam:CCA-F',
     kind: 'exam',
     label: 'Exam Pass - CCA-F',
-    description: 'Claude Certified Architect - Foundations - full question bank for 1 year',
+    description: 'Claude Certified Architect - Foundations - full question bank for 1 year + all Anthropic skill labs for 1 month',
     priceGBP: 900,
     examCodes: ['CCA-F'],
     provider: 'Anthropic',
+    labMonths: 1,
   },
 
   // -- Bundles (Exam Pack - pick 2 for £17, pick 3 for £25) --
