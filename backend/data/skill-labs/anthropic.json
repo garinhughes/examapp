@@ -1,6 +1,6 @@
 [
   {
-    "id": "cca-f-sequence-agentic-loop",
+    "id": "anthropic-sequence-agentic-loop",
     "title": "Sequence the Agentic Loop",
     "description": "Put the five steps of a Claude agentic loop in the correct order. Tests your mental model before writing any code.",
     "type": "ordering",
@@ -46,7 +46,7 @@
     "showcaseOrder": 1
   },
   {
-    "id": "cca-f-fix-agentic-loop-stop-reason",
+    "id": "anthropic-fix-agentic-loop-stop-reason",
     "title": "Fix a Broken Agentic Loop",
     "description": "The loop checks whether the last content block type is `tool_use` to decide whether to continue. Fix it to check `stop_reason` instead — the authoritative signal.",
     "type": "code-fix",
@@ -75,7 +75,7 @@
     "showcaseOrder": 2
   },
   {
-    "id": "cca-f-fix-tool-result-id",
+    "id": "anthropic-fix-tool-result-id",
     "title": "Fix a Mismatched Tool Result ID",
     "description": "The code generates a fresh UUID for `tool_use_id` in the tool result. Fix it to use the `id` from the original `tool_use` block.",
     "type": "code-fix",
@@ -104,7 +104,7 @@
     "showcaseOrder": 3
   },
   {
-    "id": "cca-f-diagnose-multi-agent-routing",
+    "id": "anthropic-diagnose-multi-agent-routing",
     "title": "Diagnose a Broken Multi-Agent Architecture",
     "description": "A coordinator has three subagents, but they are communicating peer-to-peer, bypassing the coordinator. Inspect the architecture to find the root cause.",
     "type": "diagnose",
@@ -345,7 +345,7 @@
     "showcaseOrder": 4
   },
   {
-    "id": "cca-f-fix-agent-definition-task-tool",
+    "id": "anthropic-fix-agent-definition-task-tool",
     "title": "Fix a Broken AgentDefinition",
     "description": "The coordinator's `allowedTools` is missing `\"Task\"`, so it never spawns subagents. Add the missing tool to enable subagent delegation.",
     "type": "policy-fix",
@@ -373,7 +373,7 @@
     "showcaseOrder": 5
   },
   {
-    "id": "cca-f-fix-subagent-context-passing",
+    "id": "anthropic-fix-subagent-context-passing",
     "title": "Fix Subagent Context Passing",
     "description": "The coordinator gathers order data into its own context but spawns the subagent with an empty prompt. Fix it to embed the data explicitly in the subagent's prompt.",
     "type": "code-fix",
@@ -402,7 +402,7 @@
     "showcaseOrder": 6
   },
   {
-    "id": "cca-f-fill-claude-md-hierarchy",
+    "id": "anthropic-fill-claude-md-hierarchy",
     "title": "Complete a CLAUDE.md Hierarchy",
     "description": "Fill in the blanks in a CLAUDE.md configuration: the `@import` path for a shared rules file, a `paths:` glob to scope a rule, and the correct user-level file location.",
     "type": "fill-command",
@@ -459,7 +459,7 @@
     "showcaseOrder": 7
   },
   {
-    "id": "cca-f-fix-sequential-to-parallel-subagents",
+    "id": "anthropic-fix-sequential-to-parallel-subagents",
     "title": "Fix Sequential Subagents to Run in Parallel",
     "description": "The coordinator issues one `Task` tool call per turn, waiting for each result before dispatching the next. Fix it to emit all three `Task` calls in a single response for concurrent dispatch.",
     "type": "code-fix",
@@ -488,7 +488,7 @@
     "showcaseOrder": 8
   },
   {
-    "id": "cca-f-fix-prompt-gate-to-programmatic-gate",
+    "id": "anthropic-fix-prompt-gate-to-programmatic-gate",
     "title": "Replace a Prompt Gate with a Programmatic Gate",
     "description": "A system prompt instruction is the only guard before a wire transfer. Add a code-level prerequisite check that blocks `initiate_wire_transfer` if identity verification hasn't completed.",
     "type": "code-fix",
@@ -521,7 +521,7 @@
     "showcaseOrder": 9
   },
   {
-    "id": "cca-f-diagnose-context-window-degradation",
+    "id": "anthropic-diagnose-context-window-degradation",
     "title": "Diagnose a Context Window Degradation Failure",
     "description": "A long-running research agent is losing earlier case facts mid-session. Inspect the architecture to find why — and which node is the root cause.",
     "type": "diagnose",
@@ -771,7 +771,7 @@
     "showcaseOrder": 10
   },
   {
-    "id": "cca-f-fix-missing-assistant-turn",
+    "id": "anthropic-fix-missing-assistant-turn",
     "title": "Fix a Missing Assistant Turn in History",
     "description": "After executing a tool, the code appends only the `tool_result` user message — omitting the assistant turn that contains the `tool_use` block. Fix it so the full history is preserved.",
     "type": "code-fix",
@@ -800,7 +800,7 @@
     "showcaseOrder": 11
   },
   {
-    "id": "cca-f-fix-tool-schema-required",
+    "id": "anthropic-fix-tool-schema-required",
     "title": "Fix a Tool Schema with a Missing `required` Field",
     "description": "A `create_event` tool declares `date` and `title` as properties but omits the `required` array. Claude passes them as optional, causing the downstream function to crash. Fix the schema.",
     "type": "code-fix",
@@ -829,7 +829,7 @@
     "showcaseOrder": 12
   },
   {
-    "id": "cca-f-order-prompt-caching-prefix",
+    "id": "anthropic-order-prompt-caching-prefix",
     "title": "Order the Prompt Caching Prefix",
     "description": "Arrange the four elements of a Messages API request in the correct order for maximum cache reuse: tools → system prompt → conversation history → per-request user message.",
     "type": "ordering",
@@ -870,7 +870,7 @@
     "showcaseOrder": 13
   },
   {
-    "id": "cca-f-diagnose-cache-miss",
+    "id": "anthropic-diagnose-cache-miss",
     "title": "Diagnose a Prompt Cache Miss",
     "description": "`cache_read_input_tokens` is always zero despite `cache_control` being set on the system prompt. Inspect the architecture to find the silent cache invalidator.",
     "type": "diagnose",
@@ -1039,7 +1039,7 @@
     "showcaseOrder": 14
   },
   {
-    "id": "cca-f-diagnose-tool-never-called",
+    "id": "anthropic-diagnose-tool-never-called",
     "title": "Diagnose a Tool That Claude Never Invokes",
     "description": "A `search_files` tool is defined but Claude never calls it — it describes glob patterns in prose instead. Inspect the tool definition to find why.",
     "type": "diagnose",
@@ -1187,7 +1187,7 @@
     "showcaseOrder": 15
   },
   {
-    "id": "cca-f-fill-pause-turn-loop",
+    "id": "anthropic-fill-pause-turn-loop",
     "title": "Complete a `pause_turn` Agentic Loop",
     "description": "Fill in three blanks in an agentic loop that handles server-side tools: the stop reason that signals a server-side tool is running, how to extend message history before re-sending, and the stop condition that ends the loop.",
     "type": "fill-command",
@@ -1245,7 +1245,7 @@
     "showcaseOrder": 16
   },
   {
-    "id": "cca-f-diagnose-cache-invalidation-dynamic",
+    "id": "anthropic-diagnose-cache-invalidation-dynamic",
     "title": "Diagnose a Cache Invalidation from Dynamic Context Injection",
     "description": "An agent's prompt caching hit rate is 0% despite `cache_control` being set. Three candidate root causes are shown — identify the one that is actually invalidating the cache.",
     "type": "diagnose",
@@ -1409,7 +1409,7 @@
     "showcaseOrder": 17
   },
   {
-    "id": "cca-f-fix-structured-output-constraints",
+    "id": "anthropic-fix-structured-output-constraints",
     "title": "Fix a Structured Output Schema with Unsupported Constraints",
     "description": "A Pydantic model includes `min_length` and `minimum` constraints that the API silently strips. The app crashes later when it relies on them. Remove the unsupported constraints and add client-side validation instead.",
     "type": "code-fix",
@@ -1442,7 +1442,7 @@
     "showcaseOrder": 18
   },
   {
-    "id": "cca-f-diagnose-trust-escalation",
+    "id": "anthropic-diagnose-trust-escalation",
     "title": "Diagnose a Multi-Agent Trust Escalation",
     "description": "A web-search subagent injects a `tool_result` containing a `SYSTEM:` prefix. The coordinator's system prompt grants elevated permissions to any message with that prefix. Identify the vulnerability.",
     "type": "diagnose",
@@ -1599,7 +1599,7 @@
     "showcaseOrder": 19
   },
   {
-    "id": "cca-f-fill-compaction-config",
+    "id": "anthropic-fill-compaction-config",
     "title": "Complete a Compaction Configuration",
     "description": "Fill in three blanks in a long-running agent: the beta header that enables compaction, the `context_management` edit type, and the correct way to append the assistant response so compaction blocks are preserved.",
     "type": "fill-command",
@@ -1657,7 +1657,7 @@
     "showcaseOrder": 20
   },
   {
-    "id": "cca-f-policy-fix-tool-input-schema",
+    "id": "anthropic-policy-fix-tool-input-schema",
     "title": "Fix a Tool Input Schema with a Missing `required` Field",
     "description": "A `schedule_meeting` tool schema declares `attendees` and `start_time` as properties but omits the `required` array. Fix the JSON schema so Claude always supplies both fields.",
     "type": "policy-fix",
@@ -1693,7 +1693,7 @@
     "showcaseOrder": 21
   },
   {
-    "id": "cca-f-policy-fix-subagent-model",
+    "id": "anthropic-policy-fix-subagent-model",
     "title": "Fix a Subagent Definition with the Wrong Model",
     "description": "A high-stakes legal summarisation subagent is configured with `claude-haiku-4-5-20251001` to cut costs. Fix the `AgentDefinition` to use an appropriately capable model for the task.",
     "type": "policy-fix",
