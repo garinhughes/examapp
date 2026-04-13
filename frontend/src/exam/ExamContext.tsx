@@ -1000,7 +1000,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   // Fetch available services when exam selected
   useEffect(() => {
     if (!selected) { setAvailableServices([]); setSelectedServices([]); return }
-    fetch(`/exams/${selected}/services`)
+    fetch(apiUrl(`/exams/${selected}/services`))
       .then((r) => (r.ok ? r.json() : []))
       .then((svcs: string[]) => { setAvailableServices(Array.isArray(svcs) ? svcs : []); setSelectedServices([]) })
       .catch(() => setAvailableServices([]))
