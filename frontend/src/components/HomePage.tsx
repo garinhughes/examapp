@@ -205,7 +205,7 @@ export function HomePage() {
                 'Single, multiple-choice, ordering & matching question types',
                 'Optional toggles like text-to-speech audio and focus mode',
                 'Save & Resume exams - pick up exactly where you left off',
-                'Filter by domain or keyword to target specific areas',
+                'Filter questions by domain, service and keyword',
               ].map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
@@ -241,7 +241,7 @@ export function HomePage() {
                 'Live code editor e.g. JSON & YAML',
                 'Design or fix architectures using interactive diagrams',
                 'Save & Resume labs - grab a coffee without losing progress',
-                'Filter by difficulty, platform, category and technology',
+                'Filter skill labs by difficulty, platform, category and technology',
                 ].map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
