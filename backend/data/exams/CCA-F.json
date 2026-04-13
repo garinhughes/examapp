@@ -60,7 +60,7 @@
       "skills": [
         "1.1.2: Understanding how tool results are appended to conversation history so the model can reason about the next action."
       ],
-      "question": "A team is building a multi-step research agent using the Claude Messages API. During a session the agent calls a `search_documents` tool and receives a large JSON result. The developer needs to feed this result back to Claude so it can decide whether to search again or summarize its findings.\n\nHow should the developer structure the next API request to ensure Claude can reason correctly about the tool output?",
+      "question": "During a multi-step research session, the agent calls a `search_documents` tool and receives a large JSON result. The developer needs to feed this result back to Claude so it can decide whether to search again or summarize its findings.\n\nHow should the developer structure the next API request to ensure Claude can reason correctly about the tool output?",
       "choices": [
         {
           "id": "c1",
@@ -104,7 +104,7 @@
       "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
       "difficulty": 2,
       "lastReviewed": "2026-04-12",
-      "question": "A team is designing an agentic workflow where Claude must gather data from multiple sources before answering a user query. The data sources needed vary depending on the question -- sometimes only one API is relevant, and other times three or four must be consulted. A junior engineer proposes hard-coding a fixed sequence that always calls every data source in a predetermined order before generating a response.\n\nWhat is the most effective way to structure this workflow using Claude's agentic capabilities?",
+      "question": "Data sources needed vary depending on the query -- sometimes only one API is relevant, and other times three or four must be consulted. A junior engineer proposes hard-coding a fixed sequence that always calls every data source in a predetermined order before generating a response.\n\nWhat is the most effective way to structure this workflow using Claude's agentic capabilities?",
       "choices": [
         {
           "id": "c1",
@@ -145,7 +145,7 @@
       "docs": "https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons",
       "difficulty": 2,
       "lastReviewed": "2026-04-12",
-      "question": "A team is implementing an agentic assistant that can call multiple tools in sequence before delivering a final answer. Their loop sends a request to the Claude Messages API and then inspects the response to decide whether to continue or stop.\n\nWhich approach correctly implements the control flow for this agentic loop?",
+      "question": "An agentic assistant must call multiple tools in sequence before delivering a final answer. Each iteration sends a request to the Claude Messages API and inspects the response to decide whether to continue or stop.\n\nWhich approach correctly implements the control flow for this agentic loop?",
       "choices": [
         {
           "id": "c1",
@@ -183,7 +183,7 @@
       "skills": [
         "1.1.5: Adding tool results to conversation context between iterations so the model can incorporate new information into its reasoning."
       ],
-      "question": "A team is building an agentic assistant that retrieves live pricing data via a tool call. After the first iteration, Claude returns a `tool_use` block requesting a `get_pricing` tool. The developer executes the tool and receives a JSON payload with current prices.\n\nHow should the developer add this tool result to the conversation before sending the next API request?",
+      "question": "Claude has returned a `tool_use` block requesting a `get_pricing` tool. The developer executes the tool and receives a JSON payload with current prices.\n\nHow should the developer add this tool result to the conversation before sending the next API request?",
       "choices": [
         {
           "id": "c1",
@@ -224,7 +224,7 @@
       "skills": [
         "1.1.6: Avoiding anti-patterns such as parsing natural language signals to determine loop termination, setting arbitrary iteration caps as the primary stopping mechanism, or checking for assistant text content as a completion indicator."
       ],
-      "question": "A team is building an agentic loop with the Claude Messages API and needs to decide when the loop should stop iterating. One engineer proposes scanning each assistant response for phrases like \"I have completed the task\" to determine when to exit. Another suggests capping the loop at 10 iterations regardless of progress.\n\nWhich approach correctly determines when the agentic loop should terminate?",
+      "question": "One engineer proposes scanning each assistant response for phrases like \"I have completed the task\" to determine when an agentic loop should exit. Another suggests capping the loop at 10 iterations regardless of progress.\n\nWhich approach correctly determines when the agentic loop should terminate?",
       "choices": [
         {
           "id": "c1",
@@ -305,7 +305,7 @@
         "Claude API"
       ],
       "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices",
-      "question": "A team is building a multi-agent system where a coordinator agent delegates research tasks to specialized subagents via the Claude API. During testing, they notice that a subagent fails to reference details the user shared earlier in the coordinator's conversation.\n\nWhat is the most likely cause of this behavior?",
+      "question": "During testing, a subagent in a multi-agent system fails to reference details the user shared earlier in the coordinator's conversation.\n\nWhat is the most likely cause of this behavior?",
       "tip": "Consider what context each agent instance receives when it is invoked.",
       "choices": [
         {
@@ -391,7 +391,7 @@
       "difficulty": 3,
       "lastReviewed": "2026-04-12",
       "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
-      "question": "A team is building a multi-agent research system where a coordinator agent decomposes user queries and delegates subtasks to specialized worker agents. During testing, users submit broad questions like \"Analyze the environmental and economic impacts of offshore wind energy.\" The coordinator consistently breaks these into very specific subtasks such as \"Find the average cost per megawatt-hour of offshore wind\" and \"List bird species affected by turbines.\" Testers report that final answers feel shallow and miss entire dimensions of the topic.\n\nWhat is the most likely root cause of this issue?",
+      "question": "Users submit broad questions like \"Analyze the environmental and economic impacts of offshore wind energy.\" The coordinator consistently breaks these into very specific subtasks such as \"Find the average cost per megawatt-hour of offshore wind\" and \"List bird species affected by turbines.\" Testers report that final answers feel shallow and miss entire dimensions of the topic.\n\nWhat is the most likely root cause of this issue?",
       "tip": "Consider how the granularity of task decomposition affects whether all relevant aspects of a broad topic are explored.",
       "choices": [
         {
@@ -429,7 +429,7 @@
       "skills": [
         "1.2.5: Designing coordinator agents that analyze query requirements and dynamically select which subagents to invoke rather than always routing through the full pipeline."
       ],
-      "question": "A development team has built a multi-agent system with subagents for web search, code generation, data analysis, and document summarization. Currently, every user query passes through all four subagents sequentially, even when only one or two are relevant. The team notices increased latency and token costs on simple queries like \"summarize this PDF.\"\n\nWhich change to the coordinator agent best addresses these issues?",
+      "question": "Every user query passes through all four subagents sequentially -- web search, code generation, data analysis, and document summarization -- even when only one or two are relevant. Latency and token costs are rising on simple queries like \"summarize this PDF.\"\n\nWhich change to the coordinator agent best addresses these issues?",
       "choices": [
         {
           "id": "c1",
@@ -514,7 +514,7 @@
       "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
       "difficulty": 3,
       "lastReviewed": "2026-04-12",
-      "question": "A team is building a research assistant using a coordinator agent that delegates to search and analysis subagents, then synthesizes their results into a final report. During testing, they find that initial synthesis outputs frequently miss key subtopics because the first round of search results does not cover the full scope of the query.\n\nWhat approach should the team implement to ensure the coordinator produces comprehensive reports?",
+      "question": "Initial synthesis outputs from a coordinator-based research assistant frequently miss key subtopics. The first round of search results does not cover the full scope of the query.\n\nWhat approach should the team implement to ensure the coordinator produces comprehensive reports?",
       "choices": [
         {
           "id": "c1",
@@ -552,7 +552,7 @@
       "skills": [
         "1.2.8: Routing all subagent communication through the coordinator for observability, consistent error handling, and controlled information flow."
       ],
-      "question": "A development team has built a multi-agent system with a coordinator and three subagents. During testing, they discover that two subagents have started exchanging intermediate results directly with each other to reduce latency. The team notices that errors occurring during these direct exchanges are not being logged and sometimes cause silent data loss.\n\nWhat is the best way to address this problem?",
+      "question": "Two subagents in a coordinator-worker system have begun exchanging intermediate results directly with each other to reduce latency. Errors during these exchanges are not being logged and sometimes cause silent data loss.\n\nWhat is the best way to address this problem?",
       "choices": [
         {
           "id": "c1",
@@ -671,7 +671,7 @@
       "skills": [
         "1.3.3: Understanding the AgentDefinition configuration including descriptions, system prompts, and tool restrictions for each subagent type."
       ],
-      "question": "A team is building a multi-agent customer support system using the Claude Agent SDK. They have a coordinator agent that delegates tasks to specialized subagents. One subagent handles order lookups and another handles refund processing. During testing, the refund subagent begins calling the `lookup_order` tool directly instead of deferring to the order-lookup subagent, causing duplicated logic and inconsistent results.\n\nWhich `AgentDefinition` property should the team configure to prevent this behavior?",
+      "question": "In a multi-agent customer support system, the refund subagent has begun calling the `lookup_order` tool directly instead of deferring to the order-lookup subagent. This causes duplicated logic and inconsistent results.\n\nWhich `AgentDefinition` property should the team configure to prevent this behavior?",
       "choices": [
         {
           "id": "c1",
@@ -876,7 +876,7 @@
       "skills": [
         "1.3.8: Designing coordinator prompts that specify research goals and quality criteria rather than step-by-step procedural instructions, to enable subagent adaptability."
       ],
-      "question": "A team is building an orchestrator-workers system where a coordinator agent dispatches research tasks to subagents. During testing, the team notices that subagents fail when source data is structured differently than expected, because the coordinator prompt prescribes a rigid sequence of parsing steps.\n\nHow should the team redesign the coordinator prompt to improve subagent adaptability?",
+      "question": "Subagents in an orchestrator-workers pipeline fail when source data is structured differently than expected. The coordinator prompt prescribes a rigid sequence of parsing steps that cannot accommodate variation.\n\nHow should the team redesign the coordinator prompt to improve subagent adaptability?",
       "choices": [
         {
           "id": "c1",
@@ -919,7 +919,7 @@
       ],
       "domain": "Agentic Architecture & Orchestration",
       "difficulty": 2,
-      "question": "A team building a multi-step document review agent needs to guarantee that `classify_document` always executes before `archive_document` in every workflow run. One developer proposes adding a step-ordering instruction to the system prompt. A senior architect advocates for a programmatic prerequisite gate instead.\n\nWhat is the primary architectural reason to prefer the programmatic gate?",
+      "question": "`classify_document` must always execute before `archive_document` in every workflow run. One developer proposes adding a step-ordering instruction to the system prompt; a senior architect advocates for a programmatic prerequisite gate instead.\n\nWhat is the primary architectural reason to prefer the programmatic gate?",
       "choices": [
         {
           "id": "c1",
@@ -1359,7 +1359,7 @@
       "skills": [
         "1.5.5: Implementing tool call interception hooks that block policy-violating actions (for example, refunds exceeding $500) and redirect to alternative workflows (for example, human escalation)."
       ],
-      "question": "A developer is building a billing agent that can call a `cancel_subscription` tool. When the cancellation request is for a high-value account with an annual contract above \u00a32,000, the agent must not execute the cancellation automatically and must instead route the request to a retention specialist. The developer wants to implement both the block and the redirect entirely through the hook system.\n\nWhich approach correctly implements the block-and-redirect behaviour?",
+      "question": "For high-value accounts with annual contracts above \u00a32,000, the billing agent must not execute `cancel_subscription` automatically and must instead route the request to a retention specialist. Both the block and the redirect must be implemented entirely through the hook system.\n\nWhich approach correctly implements the block-and-redirect behaviour?",
       "choices": [
         {
           "id": "c1",
@@ -1667,7 +1667,7 @@
         "1.6.6: Decomposing open-ended tasks (for example, adding comprehensive tests to a legacy codebase) by first mapping structure, identifying high-impact areas, then creating a prioritized plan that adapts as dependencies are discovered."
       ],
       "difficulty": 3,
-      "question": "A team is using Claude to add comprehensive test coverage to a large legacy codebase that has no existing tests and poorly documented module dependencies. The lead architect instructs the agent to first scan the project structure and identify the modules with the highest complexity and risk before writing any tests, and to revise the test plan as module interdependencies are uncovered during implementation.\n\nWhy is mapping the codebase structure before generating tests the recommended approach for this open-ended decomposition task?",
+      "question": "A large legacy codebase has no existing tests and poorly documented module dependencies. The lead architect instructs the agent to first scan the project structure and identify the highest-risk modules before writing any tests, and to revise the test plan as interdependencies surface during implementation.\n\nWhy is mapping the codebase structure before generating tests the recommended approach for this open-ended decomposition task?",
       "choices": [
         {
           "id": "c1",
@@ -1933,7 +1933,7 @@
         "1.6.6: Decomposing open-ended tasks (for example, adding comprehensive tests to a legacy codebase) by first mapping structure, identifying high-impact areas, then creating a prioritized plan that adapts as dependencies are discovered."
       ],
       "difficulty": 3,
-      "question": "A team is using Claude to add comprehensive test coverage to a large legacy codebase that has no existing tests and poorly documented module dependencies. The lead architect instructs the agent to first scan the project structure and identify the modules with the highest complexity and risk before writing any tests, and to revise the test plan as module interdependencies are uncovered during implementation.\n\nWhy is mapping the codebase structure before generating tests the recommended approach for this open-ended decomposition task?",
+      "question": "A large legacy codebase has no existing tests and poorly documented module dependencies. The lead architect instructs the agent to first scan the project structure and identify the highest-risk modules before writing any tests, and to revise the test plan as interdependencies surface during implementation.\n\nWhy is mapping the codebase structure before generating tests the recommended approach for this open-ended decomposition task?",
       "choices": [
         {
           "id": "c1",

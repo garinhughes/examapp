@@ -20,7 +20,7 @@
       "skills": [
         "1.1.1: Applying AWS security best practices to IAM users and root users (for example, multi-factor authentication [MFA])."
       ],
-      "question": "A company with 150 IAM users across three departments must enforce MFA for all console logins. Users who have not yet enrolled an MFA device must still be able to configure their own MFA before gaining access to other AWS services. The security team wants enforcement applied automatically to all current and future IAM users without per-user intervention.\n\nWhich IAM configuration enforces this requirement with the least operational overhead?",
+      "question": "An AWS account has 150 IAM users spread across three departments. The security team must enforce MFA for all console logins. Users who have not yet enrolled an MFA device must still be able to configure their own MFA before gaining access to other AWS services. Enforcement must apply automatically to all current and future IAM users without per-user intervention.\n\nWhich IAM configuration enforces this requirement with the least operational overhead?",
       "choices": [
         {
           "id": "c1",
@@ -63,7 +63,7 @@
       "skills": [
         "1.1.1: Applying AWS security best practices to IAM users and root users (for example, multi-factor authentication [MFA])."
       ],
-      "question": "A cloud security architect is designing controls for a newly created AWS Organizations structure with a management account and 30 member accounts. The architect must ensure that root user credentials for all member accounts cannot be used to sign in under any circumstances, and that any future accounts added to the organization automatically inherit the same protection. The solution must require minimal per-account configuration.\n\nWhich approach provides the strongest protection against root user access in member accounts with automatic enforcement for new accounts?",
+      "question": "Thirty member accounts exist under a management account in AWS Organizations. Root user credentials for member accounts must be prevented from signing in under any circumstances. Any future accounts joined to the organization must automatically inherit the same protection, with minimal per-account configuration.\n\nWhich approach provides the strongest protection against root user access in member accounts with automatic enforcement for new accounts?",
       "choices": [
         {
           "id": "c1",
@@ -104,7 +104,7 @@
       "skills": [
         "1.1.1: Applying AWS security best practices to IAM users and root users (for example, multi-factor authentication [MFA])."
       ],
-      "question": "A security engineer reviews the following IAM policy attached to an IAM group. Group members have no other policies. The engineer wants to confirm which action a user in this group can perform immediately after signing in to the console without MFA.\n\n```json\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyWithoutMFA\",\n      \"Effect\": \"Deny\",\n      \"NotAction\": [\n        \"iam:CreateVirtualMFADevice\",\n        \"iam:EnableMFADevice\",\n        \"iam:GetUser\",\n        \"iam:ListMFADevices\",\n        \"iam:ResyncMFADevice\",\n        \"sts:GetSessionToken\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"BoolIfExists\": {\n          \"aws:MultiFactorAuthPresent\": \"false\"\n        }\n      }\n    }\n  ]\n}\n```\n\nWhich action can the user successfully perform immediately after signing in without MFA?",
+      "question": "The following IAM policy is attached to an IAM group. Group members have no other policies. Which action can a user in this group perform immediately after signing in to the console without MFA?\n\n```json\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyWithoutMFA\",\n      \"Effect\": \"Deny\",\n      \"NotAction\": [\n        \"iam:CreateVirtualMFADevice\",\n        \"iam:EnableMFADevice\",\n        \"iam:GetUser\",\n        \"iam:ListMFADevices\",\n        \"iam:ResyncMFADevice\",\n        \"sts:GetSessionToken\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"BoolIfExists\": {\n          \"aws:MultiFactorAuthPresent\": \"false\"\n        }\n      }\n    }\n  ]\n}\n```",
       "choices": [
         {
           "id": "c1",
@@ -146,7 +146,7 @@
       "skills": [
         "1.1.1: Applying AWS security best practices to IAM users and root users (for example, multi-factor authentication [MFA])."
       ],
-      "question": "A security team is hardening a standalone AWS account that is not part of an organization. The team must implement two independent preventive controls to minimize the risk of unauthorized root user access. The root user currently has a valid password, no MFA device registered, and two active access keys.\n\nWhich TWO actions should the team take to reduce the risk of unauthorized root user access?",
+      "question": "During a security audit of a standalone AWS account that is not part of an organization, a team finds the root user has a valid password, no registered MFA device, and two active access keys. Two independent preventive controls must be implemented to minimize the risk of unauthorized root user access.\n\nWhich TWO actions should the team take to reduce the risk of unauthorized root user access?",
       "choices": [
         {
           "id": "c1",
@@ -194,7 +194,7 @@
       "skills": [
         "1.1.1: Applying AWS security best practices to IAM users and root users (for example, multi-factor authentication [MFA])."
       ],
-      "question": "A security engineer discovers that an IAM user's long-term access key has been exposed in a public GitHub repository. The engineer must contain the breach immediately and restore the IAM user to a secure state.\n\nArrange the following steps in the correct order to remediate the exposed access key.",
+      "question": "An IAM user's long-term access key has been found exposed in a public GitHub repository. The breach must be contained immediately and the IAM user restored to a secure state.\n\nArrange the following steps in the correct order to remediate the exposed access key.",
       "choices": [
         {
           "id": "c1",
@@ -239,7 +239,7 @@
       "skills": [
         "2.1.1: Designing event-driven, microservice, and/or multi-tier architectures based on requirements."
       ],
-      "question": "An e-commerce company processes orders through a central checkout service on AWS. When an order is confirmed, an inventory service, a shipping service, and a fraud detection service must each independently receive and process every order event. The inventory service experiences scheduled maintenance windows lasting up to 10 minutes, during which it cannot consume messages.\n\nWhich architecture ensures all three services receive every order event, maintains message delivery during downstream outages, and allows each service to process events at its own rate?",
+      "question": "Orders are processed through a central checkout service on AWS. When an order is confirmed, an inventory service, a shipping service, and a fraud detection service must each independently receive and process every order event. The inventory service experiences scheduled maintenance windows lasting up to 10 minutes, during which it cannot consume messages.\n\nWhich architecture ensures all three services receive every order event, maintains message delivery during downstream outages, and allows each service to process events at its own rate?",
       "choices": [
         {
           "id": "c1",
@@ -283,7 +283,7 @@
       "skills": [
         "2.1.1: Designing event-driven, microservice, and/or multi-tier architectures based on requirements."
       ],
-      "question": "A sports analytics company is building a real-time event processing platform for live broadcasts. During peak events, the platform ingests 160,000 sensor messages per second with strict per-game ordering requirements. Four independent analytics teams each need to consume the full message stream simultaneously without sharing read throughput or competing with one another for access to the same records.\n\nWhich AWS service and configuration best satisfies the ordering, throughput, and consumer isolation requirements?",
+      "question": "During peak live sports events, a streaming platform ingests 160,000 sensor messages per second with strict per-game ordering requirements. Four independent analytics teams must each consume the full message stream simultaneously without sharing read throughput or competing for access to the same records.\n\nWhich AWS service and configuration best satisfies the ordering, throughput, and consumer isolation requirements?",
       "choices": [
         {
           "id": "c1",
@@ -325,7 +325,7 @@
       "skills": [
         "2.1.1: Designing event-driven, microservice, and/or multi-tier architectures based on requirements."
       ],
-      "question": "A development team deploys an AWS Lambda function to process records from an Amazon Kinesis Data Stream for real-time order analytics. The function must process up to 100 records per invocation, discard any records older than 60 seconds to prevent stale data from reaching the processor, and buffer incoming records for up to 5 seconds to improve batch efficiency. The function should begin consuming only records produced after the event source mapping is created.\n\nWhich Lambda event source mapping configuration is correct?",
+      "question": "The following requirements must be met when configuring a Lambda event source mapping for an Amazon Kinesis Data Stream used for real-time order analytics: process up to 100 records per invocation, discard records older than 60 seconds, buffer incoming records for up to 5 seconds, and begin consuming only records produced after the mapping is created.\n\nWhich event source mapping configuration satisfies all four requirements?",
       "choices": [
         {
           "id": "c1",
@@ -370,7 +370,7 @@
       "skills": [
         "2.1.1: Designing event-driven, microservice, and/or multi-tier architectures based on requirements."
       ],
-      "question": "An e-commerce startup is decomposing a monolithic application into independent microservices on AWS. After a purchase is saved to the database, an inventory service, a shipping coordinator, and a loyalty program service must each receive and independently process every purchase event. The checkout service must return a response to the customer immediately without waiting for downstream processing. Any downstream service may be unavailable for up to 15 minutes during rolling deployments.\n\nWhich TWO AWS services should the solutions architect combine to deliver purchase events durably to all three downstream services?",
+      "question": "During a migration from a monolith to microservices on AWS, the checkout service must return a response to the customer immediately after saving a purchase to the database — without waiting for downstream processing. Three downstream services (inventory, shipping, and loyalty) must each independently receive every purchase event and may be unavailable for up to 15 minutes during rolling deployments.\n\nWhich TWO AWS services should the solutions architect combine to deliver purchase events durably to all three downstream services?",
       "choices": [
         {
           "id": "c1",
@@ -419,7 +419,7 @@
       "skills": [
         "2.1.1: Designing event-driven, microservice, and/or multi-tier architectures based on requirements."
       ],
-      "question": "A solutions architect is migrating a tightly coupled multi-tier web application to an event-driven microservice architecture using Amazon EventBridge, Amazon SQS, and AWS Lambda.\n\nArrange the following steps in the correct order to complete the migration.",
+      "question": "Migrating a tightly coupled multi-tier web application to an event-driven microservice architecture requires coordinating several steps across Amazon EventBridge, Amazon SQS, and AWS Lambda.\n\nArrange the following steps in the correct order to complete the migration.",
       "choices": [
         {
           "id": "c1",
@@ -470,7 +470,7 @@
       "skills": [
         "3.1.1: Determining storage services and configurations that meet performance demands."
       ],
-      "question": "A media company is deploying a video transcoding application on a single Amazon EC2 instance. The application requires block storage with consistent 64,000 IOPS, sub-millisecond latency, and the volume must persist independently of the instance lifecycle. The architect must select the correct EBS configuration.\n\nWhich volume type meets all three requirements?",
+      "question": "Block storage for a video transcoding application on Amazon EC2 must deliver consistent 64,000 IOPS with sub-millisecond latency and persist independently of the instance lifecycle.\n\nWhich EBS volume type meets all three requirements?",
       "choices": [
         {
           "id": "c1",
@@ -512,7 +512,7 @@
       "skills": [
         "3.1.1: Determining storage services and configurations that meet performance demands."
       ],
-      "question": "A media processing pipeline stores millions of video thumbnails in Amazon S3 under the single key prefix `thumbnails/`. During peak processing windows the pipeline issues 20,000 GET requests per second against this prefix and observes intermittent 503 SlowDown errors. Thumbnails are generated once and retrieved infrequently by independent workers with low cache-hit potential.\n\nWhich change resolves the 503 SlowDown errors?",
+      "question": "Millions of video thumbnails are stored in Amazon S3 under the single key prefix `thumbnails/`. During peak windows the pipeline issues 20,000 GET requests per second against this prefix and observes intermittent 503 SlowDown errors. Thumbnails are generated once and retrieved infrequently by independent workers with low cache-hit potential.\n\nWhich change resolves the 503 SlowDown errors?",
       "choices": [
         {
           "id": "c1",
@@ -554,7 +554,7 @@
       "skills": [
         "3.1.1: Determining storage services and configurations that meet performance demands."
       ],
-      "question": "A solutions architect is provisioning storage for a high-performance database workload on Amazon EC2. The application requires a single 400 GiB EBS volume with consistent 32,000 IOPS and sub-millisecond latency. The architect needs to create the volume using the AWS CLI in `us-east-1a`.\n\nWhich command correctly provisions the required volume?",
+      "question": "Storage for a high-performance database on Amazon EC2 must be a single 400 GiB EBS volume with consistent 32,000 IOPS and sub-millisecond latency, provisioned using the AWS CLI in `us-east-1a`.\n\nWhich command correctly provisions the required volume?",
       "choices": [
         {
           "id": "c1",
@@ -596,7 +596,7 @@
       "skills": [
         "3.1.1: Determining storage services and configurations that meet performance demands."
       ],
-      "question": "A financial analytics company runs a data warehouse on Amazon Redshift and queries a 200 TB dataset stored in Amazon S3 using Amazon Redshift Spectrum. Over the past month query execution times have increased by 60% as the dataset has grown, and all files are currently stored in CSV format under a flat key prefix. The team must improve S3 data access performance without reloading data into Redshift managed storage.\n\nWhich TWO configurations improve Redshift Spectrum query performance?",
+      "question": "Over the past month, Redshift Spectrum query times against a 200 TB S3 dataset have increased by 60% as the dataset has grown. All files are stored in CSV format under a flat key prefix. S3 data access performance must be improved without reloading data into Redshift managed storage.\n\nWhich TWO configurations improve Redshift Spectrum query performance?",
       "choices": [
         {
           "id": "c1",
@@ -646,7 +646,7 @@
       "skills": [
         "3.1.1: Determining storage services and configurations that meet performance demands."
       ],
-      "question": "A solutions architect is evaluating AWS storage services for four workloads with distinct performance profiles. Match each storage service to the performance characteristic that best describes it.",
+      "question": "Four workloads with distinct performance profiles need to be matched to the appropriate AWS storage service. Match each storage service to the performance characteristic that best describes it.",
       "slots": [
         {
           "id": "s1",
@@ -708,7 +708,7 @@
       "skills": [
         "4.1.1: Designing appropriate storage strategies (for example, batch uploads to Amazon S3 compared with individual uploads)."
       ],
-      "question": "A genomics company regularly transfers individual sequencing files ranging from 1 GB to 8 GB to an Amazon S3 bucket from on-premises servers across a 500 Mbps internet connection. Network interruptions occur several times per week, causing entire uploads to restart from zero. The company wants to minimize wasted data transfer costs and maximize upload resilience.\n\nWhich approach best meets these requirements?",
+      "question": "Individual genomic sequencing files ranging from 1 GB to 8 GB are regularly transferred to an Amazon S3 bucket from on-premises servers across a 500 Mbps internet connection. Network interruptions occur several times per week, causing entire uploads to restart from zero. The solution must minimize wasted data transfer costs and maximize upload resilience.\n\nWhich approach best meets these requirements?",
       "choices": [
         {
           "id": "c1",
@@ -749,7 +749,7 @@
       "skills": [
         "4.1.1: Designing appropriate storage strategies (for example, batch uploads to Amazon S3 compared with individual uploads)."
       ],
-      "question": "An e-commerce company has 800 million product image objects stored in a single Amazon S3 bucket. The finance team requires cost allocation tags (`department` and `product-line`) to be retroactively applied to all objects within one week. An engineer proposes a multi-threaded application that calls `s3:ListObjectsV2` and `s3:PutObjectTagging` in a loop, but a solutions architect identifies a significantly cheaper and more operationally efficient alternative.\n\nWhich solution best minimizes total cost and operational overhead for this tagging task?",
+      "question": "800 million product image objects are stored in a single Amazon S3 bucket. Cost allocation tags (`department` and `product-line`) must be retroactively applied to all objects within one week. An engineer proposes a multi-threaded application that calls `s3:ListObjectsV2` and `s3:PutObjectTagging` in a loop, but a solutions architect identifies a significantly cheaper and more operationally efficient alternative.\n\nWhich solution best minimizes total cost and operational overhead for this tagging task?",
       "choices": [
         {
           "id": "c1",
@@ -791,7 +791,7 @@
       "skills": [
         "4.1.1: Designing appropriate storage strategies (for example, batch uploads to Amazon S3 compared with individual uploads)."
       ],
-      "question": "A DevOps engineer needs to upload a local directory containing 10,000 mixed-size files to an Amazon S3 bucket from an EC2 instance. The upload must skip `.tmp` files, apply AWS KMS server-side encryption, and only transfer files that do not already exist in the destination or have been modified since the last run.\n\nWhich AWS CLI command correctly satisfies all three requirements?",
+      "question": "A local directory containing 10,000 mixed-size files must be uploaded to an Amazon S3 bucket from an EC2 instance. The upload must skip `.tmp` files, apply AWS KMS server-side encryption, and only transfer files that do not already exist in the destination or have been modified since the last run.\n\nWhich AWS CLI command correctly satisfies all three requirements?",
       "choices": [
         {
           "id": "c1",
@@ -832,7 +832,7 @@
       "skills": [
         "4.1.1: Designing appropriate storage strategies (for example, batch uploads to Amazon S3 compared with individual uploads)."
       ],
-      "question": "A company's batch pipeline initiates multipart uploads to Amazon S3 for large compressed archives but frequently fails mid-upload without cleanup. Over six months the bucket has accumulated hundreds of thousands of incomplete multipart uploads occupying tens of terabytes and generating ongoing storage charges. The team must eliminate the existing charges and prevent future accumulation.\n\nWhich TWO actions together resolve both the existing and future incomplete multipart upload costs?",
+      "question": "Over six months, hundreds of thousands of incomplete multipart uploads have accumulated in an S3 bucket, occupying tens of terabytes and generating ongoing storage charges. The root cause is a batch pipeline that initiates multipart uploads for large compressed archives and frequently fails mid-upload without cleanup. Both the existing backlog and future accumulation must be addressed.\n\nWhich TWO actions together resolve both the existing and future incomplete multipart upload costs?",
       "choices": [
         {
           "id": "c1",

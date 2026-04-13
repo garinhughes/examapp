@@ -19,7 +19,7 @@
       "skills": [
         "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
       ],
-      "question": "A machine learning engineer is developing a system to recognize defective products on a manufacturing assembly line. The engineer trains a model on thousands of images of both defective and normal products.\n\nWhich term best describes the process of using the trained model to identify new defective products in real-time?",
+      "question": "Defective products are slipping through a manufacturing assembly line. An engineer has trained a model on thousands of labeled images of both defective and normal products to catch them.\n\nWhich term best describes the process of using the trained model to identify defective products in real-time?",
       "choices": [
         {
           "id": "c1",
@@ -101,7 +101,7 @@
       "skills": [
         "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
       ],
-      "question": "A data scientist is evaluating different machine learning algorithms for predicting customer churn. After testing multiple algorithms on a validation dataset, the team selects the one that achieves the best accuracy without being overly complex.\n\nWhat concept is the team demonstrating in selecting this algorithm?",
+      "question": "After testing multiple machine learning algorithms for predicting customer churn, a team selects the model that achieves the best accuracy without becoming overly complex.\n\nWhat concept does this selection demonstrate?",
       "choices": [
         {
           "id": "c1",
@@ -143,7 +143,7 @@
       "skills": [
         "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
       ],
-      "question": "A retail company is implementing a system to automatically tag products in their image database. The system needs to identify objects, recognize text on packaging, and understand scene composition. The team is evaluating which combination of AI capabilities to use.\n\nWhich TWO capabilities best address the company's requirements?",
+      "question": "An image database containing thousands of product photos needs to be automatically tagged. The tagging system must identify objects, recognize text on packaging, and understand scene composition.\n\nWhich TWO AI capabilities best address these requirements?",
       "choices": [
         {
           "id": "c1",
@@ -294,7 +294,7 @@
       "skills": [
         "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
       ],
-      "question": "A customer service company wants to automatically convert phone call recordings into searchable text transcripts. The system needs to understand spoken language from callers with various accents and speaking styles.\n\nWhich AI capability should the company use?",
+      "question": "Phone call recordings from a customer service center need to be converted automatically into searchable text transcripts. The system must handle callers with various accents and speaking styles.\n\nWhich AI capability should be used?",
       "choices": [
         {
           "id": "c1",
@@ -487,7 +487,7 @@
       "skills": [
         "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
       ],
-      "question": "A marketing team wants to automatically create multiple variations of product descriptions for A/B testing. They need to generate different versions quickly without manual rewriting.\n\nWhich generative AI capability would be most suitable for this use case?",
+      "question": "Multiple variations of product descriptions are needed for A/B testing. The goal is to generate different versions quickly without manual rewriting.\n\nWhich generative AI capability would be most suitable for this use case?",
       "choices": [
         {
           "id": "c1",
@@ -528,7 +528,7 @@
       "skills": [
         "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
       ],
-      "question": "A software development company has technical documentation in English and needs to provide it to customers in multiple languages including Spanish, French, and Mandarin. The company needs to automate this process to keep translations current as documentation updates.\n\nWhich generative AI use case applies here?",
+      "question": "Technical documentation exists in English and must be made available in Spanish, French, and Mandarin. As documentation is updated, translations must stay current automatically.\n\nWhich generative AI use case applies here?",
       "choices": [
         {
           "id": "c1",
@@ -569,7 +569,7 @@
       "skills": [
         "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
       ],
-      "question": "A software development team wants to improve productivity by automating routine coding tasks. They want AI to suggest code completions and generate boilerplate code based on comments and function signatures.\n\nWhich generative AI capability would best serve this use case?",
+      "question": "Routine coding tasks — boilerplate generation and code completions based on comments and function signatures — are slowing down developer productivity.\n\nWhich generative AI capability would best address this?",
       "choices": [
         {
           "id": "c1",
@@ -611,7 +611,7 @@
       "skills": [
         "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
       ],
-      "question": "A customer service department is implementing a comprehensive AI solution with multiple capabilities. They want to deploy a conversational system to handle customer inquiries, condense long customer emails into brief summaries for agents, and generate responses in the customer's preferred language.\n\nWhich TWO generative AI use cases are essential for this solution?",
+      "question": "A customer service team needs three capabilities: a conversational system to handle inquiries, the ability to condense long customer emails into brief summaries for agents, and responses generated in each customer's preferred language.\n\nWhich TWO generative AI use cases are essential for this solution?",
       "choices": [
         {
           "id": "c1",
@@ -721,7 +721,7 @@
       "skills": [
         "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
       ],
-      "question": "A financial services company needs a generative AI model for highly accurate and secure document summarization. The company must ensure compliance with financial regulations like SOX and data never leaves their infrastructure.\n\nWhich critical factors should the company prioritize when selecting a model?",
+      "question": "Document summarization for a regulated financial services company must be highly accurate and secure. Compliance with regulations like SOX is mandatory, and data must never leave the company's own infrastructure.\n\nWhich critical factors should be prioritized when selecting a model?",
       "choices": [
         {
           "id": "c1",
@@ -762,7 +762,7 @@
       "skills": [
         "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
       ],
-      "question": "A startup is building a real-time translation mobile app that needs fast response times to provide a smooth user experience. The app must work with limited bandwidth and run on user devices with modest computational resources.\n\nWhich factors are most important in selecting a generative AI model for this use case?",
+      "question": "A real-time translation mobile app must deliver fast response times on devices with limited bandwidth and modest computational resources.\n\nWhich factors are most important in selecting a generative AI model for this use case?",
       "choices": [
         {
           "id": "c1",
@@ -1189,7 +1189,7 @@
       "skills": [
         "3.2.2: Understanding techniques for prompt engineering (for example, chain-of-thought, zero-shot, single-shot, few-shot, prompt templates)."
       ],
-      "question": "A data analyst wants to extract insights from customer feedback data using an AI model. The analyst provides the model with one sample of well-formatted feedback analysis as an example and then asks the model to analyze new feedback in the same format.\n\nWhich prompt engineering technique is the analyst using?",
+      "question": "To analyze customer feedback data, an analyst provides the AI model with one sample of well-formatted feedback analysis as a worked example, then asks it to analyze new feedback in the same format.\n\nWhich prompt engineering technique is the analyst using?",
       "choices": [
         {
           "id": "c1",
@@ -1230,7 +1230,7 @@
       "skills": [
         "3.2.2: Understanding techniques for prompt engineering (for example, chain-of-thought, zero-shot, single-shot, few-shot, prompt templates)."
       ],
-      "question": "A developer is building a question-answering system and provides the AI model with three different examples of how to answer complex questions: one example showing step-by-step reasoning, another showing research summary, and a third showing detailed explanation. The developer then asks the model to answer new questions in a similar style.\n\nWhich prompt engineering technique is the developer using?",
+      "question": "To build a question-answering system, a developer provides the AI model with three worked examples: one showing step-by-step reasoning, one showing a research summary, and one showing a detailed explanation. The model is then asked to answer new questions in a similar style.\n\nWhich prompt engineering technique is the developer using?",
       "choices": [
         {
           "id": "c1",
@@ -1313,7 +1313,7 @@
       "skills": [
         "3.2.2: Understanding techniques for prompt engineering (for example, chain-of-thought, zero-shot, single-shot, few-shot, prompt templates)."
       ],
-      "question": "A machine learning team is deploying an AI system to handle customer service inquiries. They need a scalable approach that can be reused across different customer service scenarios without requiring many examples or complex reasoning breakdowns. The system should follow a consistent output format.\n\nWhich TWO prompt engineering techniques would best support the team's requirements for scalability and consistency?",
+      "question": "Customer service inquiries need to be handled at scale across many different scenarios. The solution must be reusable without requiring many examples or detailed reasoning breakdowns, and must produce a consistent output format.\n\nWhich TWO prompt engineering techniques would best support these requirements?",
       "choices": [
         {
           "id": "c1",
@@ -1423,7 +1423,7 @@
       "skills": [
         "3.3.1: Describing the key elements of training a foundation model (for example, pre-training, fine-tuning, continuous pre-training)."
       ],
-      "question": "A technology company is creating a large language model from scratch by training it on billions of text documents from the internet. The model learns general language patterns, grammar, and world knowledge across diverse topics.\n\nWhich key training element is the company performing?",
+      "question": "Training a large language model from scratch on billions of internet text documents allows the model to learn general language patterns, grammar, and world knowledge across diverse topics.\n\nWhich key training element does this describe?",
       "choices": [
         {
           "id": "c1",
@@ -1505,7 +1505,7 @@
       "skills": [
         "3.3.1: Describing the key elements of training a foundation model (for example, pre-training, fine-tuning, continuous pre-training)."
       ],
-      "question": "A company maintains a large language model that was pre-trained years ago. Recent events and new developments in various fields have occurred since the model's last training. The company wants to update the model with recent information without losing its existing knowledge or completely retraining from scratch.\n\nWhich training approach would best address the company's needs?",
+      "question": "A pre-trained language model hasn't seen information from recent events and developments that occurred after its training cutoff. The team wants to incorporate that recent knowledge without losing existing capabilities or retraining from scratch.\n\nWhich training approach would best address this need?",
       "choices": [
         {
           "id": "c1",
@@ -1885,7 +1885,7 @@
       "skills": [
         "4.2.3: Identifying tradeoffs between model safety and transparency (for example, measure interpretability and performance)."
       ],
-      "question": "A financial institution implements a credit scoring model that makes accurate predictions but provides minimal explanation for credit decisions. The regulator requires the institution to explain every credit denial to applicants.\n\nWhich tradeoff is the institution facing?",
+      "question": "A credit scoring model produces accurate predictions but provides little explanation for its decisions. Regulators now require the institution to explain every credit denial to applicants.\n\nWhich tradeoff is the institution facing?",
       "choices": [
         {
           "id": "c1",
@@ -2008,7 +2008,7 @@
       "skills": [
         "4.2.3: Identifying tradeoffs between model safety and transparency (for example, measure interpretability and performance)."
       ],
-      "question": "A social media company is deploying an AI system to moderate harmful content at scale. The system must handle millions of decisions daily with very high accuracy to prevent harmful content while minimizing false positives. However, the company also faces pressure to explain moderation decisions to users. The organization must understand the fundamental tradeoff it faces.\n\nWhich TWO aspects best describe the responsible AI tradeoff the company must navigate?",
+      "question": "Millions of content moderation decisions are needed daily. The system must prevent harmful content with high accuracy while minimizing false positives — but regulators and users also expect moderation decisions to be explainable.\n\nWhich TWO aspects best describe the responsible AI tradeoff the company must navigate?",
       "choices": [
         {
           "id": "c1",
@@ -2190,7 +2190,7 @@
       "skills": [
         "5.2.1: Identifying regulatory compliance standards for AI systems (for example, International Organization for Standardization [ISO], System and Organization Controls [SOC], algorithm accountability laws)."
       ],
-      "question": "A fintech company is designing an AI system for automated financial trading and wants to ensure it meets international best practices for quality and safety. The company seeks a globally recognized framework that would provide standardized guidelines for developing reliable AI systems across multiple countries.\n\nWhich standard would best support the company's goals for global consistency?",
+      "question": "An automated financial trading system must meet international best practices for quality and safety. The development team wants a globally recognized framework that provides standardized development guidelines applicable across multiple countries.\n\nWhich standard would best support this goal?",
       "choices": [
         {
           "id": "c1",

@@ -21,7 +21,7 @@
       "skills": [
         "1.1.1: Understanding the economies of scale (for example, cost savings)."
       ],
-      "question": "A startup is launching a web application and wants to minimize infrastructure costs by leveraging shared AWS resources across thousands of customers.\n\nWhich principle of AWS cloud computing best explains how this cost reduction is achieved?",
+      "question": "Shared infrastructure across millions of AWS customers enables dramatically lower per-unit costs than any single company could achieve independently.\n\nWhich principle of AWS cloud computing best explains how this cost reduction is achieved?",
       "choices": [
         {
           "id": "c1",
@@ -64,7 +64,7 @@
       "skills": [
         "1.1.1: Understanding the economies of scale (for example, cost savings)."
       ],
-      "question": "A solutions architect is designing a database solution and must decide between purchasing and maintaining on-premises servers or using Amazon RDS with reserved instances.\n\nHow does the economies of scale principle impact the total cost of ownership in this decision?",
+      "question": "Two database options are under evaluation: purchasing and maintaining on-premises servers versus using Amazon RDS with reserved instances.\n\nHow does the economies of scale principle impact the total cost of ownership in this decision?",
       "choices": [
         {
           "id": "c1",
@@ -108,7 +108,7 @@
       "skills": [
         "1.1.1: Understanding the economies of scale (for example, cost savings)."
       ],
-      "question": "An enterprise is evaluating AWS adoption and wants to understand how the cloud provider reduces costs for all customers.\n\nWhich TWO factors directly enable AWS to offer lower costs through economies of scale?",
+      "question": "Understanding how AWS reduces costs for all customers is a key consideration when evaluating cloud adoption.\n\nWhich TWO factors directly enable AWS to offer lower costs through economies of scale?",
       "choices": [
         {
           "id": "c1",
@@ -157,7 +157,7 @@
       "skills": [
         "2.1.1: Recognizing the components of the AWS shared responsibility model."
       ],
-      "question": "A company is deploying a web application on Amazon EC2 instances to serve customer data. According to the AWS Shared Responsibility Model, which of the following is the responsibility of AWS?\n\nWhich responsibility belongs to AWS?",
+      "question": "Under the AWS Shared Responsibility Model, security responsibilities are divided between AWS and the customer. A web application is being deployed on Amazon EC2 to serve customer data.\n\nWhich of the following is the responsibility of AWS?",
       "choices": [
         {
           "id": "c1",
@@ -200,7 +200,7 @@
       "skills": [
         "2.1.1: Recognizing the components of the AWS shared responsibility model."
       ],
-      "question": "An organization is running a production database on Amazon RDS for PostgreSQL. The company wants to understand their responsibility for database availability and backup management.\n\nWhich statement correctly describes the shared responsibility for Amazon RDS?",
+      "question": "Production database availability and backup management on Amazon RDS for PostgreSQL must be understood through the lens of the shared responsibility model.\n\nWhich statement correctly describes the shared responsibility for Amazon RDS?",
       "choices": [
         {
           "id": "c1",
@@ -243,7 +243,7 @@
       "skills": [
         "2.1.1: Recognizing the components of the AWS shared responsibility model."
       ],
-      "question": "A solutions architect is designing a security strategy for an enterprise deploying multiple AWS services. She needs to identify which responsibilities fall under the shared responsibility model.\n\nWhich TWO of the following are customer responsibilities in the AWS Shared Responsibility Model?",
+      "question": "Designing a security strategy across multiple AWS services requires identifying which responsibilities belong to the customer versus AWS.\n\nWhich TWO of the following are customer responsibilities in the AWS Shared Responsibility Model?",
       "choices": [
         {
           "id": "c1",
@@ -292,7 +292,7 @@
       "skills": [
         "2.2.3: Describing how customers secure resources on AWS (for example, Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield)."
       ],
-      "question": "A company wants to continuously identify vulnerabilities and network exposure in its AWS resources. The organization requires automated scanning of EC2 instances and container images to detect software flaws.\n\nWhich service best meets this requirement?",
+      "question": "Continuous identification of vulnerabilities and network exposure across AWS resources is required, including automated scanning of EC2 instances and container images.\n\nWhich service best meets this requirement?",
       "choices": [
         {
           "id": "c1",
@@ -334,7 +334,7 @@
       "skills": [
         "2.2.3: Describing how customers secure resources on AWS (for example, Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield)."
       ],
-      "question": "An organization needs to protect its web application from common web exploits such as SQL injection and cross-site scripting (XSS) attacks. The solution must operate at the application layer.\n\nWhich security service should be implemented?",
+      "question": "Protecting a web application from SQL injection and cross-site scripting (XSS) attacks requires a solution that operates at the application layer.\n\nWhich security service should be implemented?",
       "choices": [
         {
           "id": "c1",
@@ -377,7 +377,7 @@
       "skills": [
         "2.2.3: Describing how customers secure resources on AWS (for example, Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield)."
       ],
-      "question": "A company needs a centralized security view that aggregates findings from multiple AWS security services. The solution must consolidate compliance checks and security alerts in a single dashboard.\n\nWhich TWO options address this?",
+      "question": "Centralizing security findings from multiple AWS security services into a single dashboard — including compliance checks and security alerts — is a key operational requirement.\n\nWhich TWO options address this?",
       "choices": [
         {
           "id": "c1",
@@ -426,7 +426,7 @@
       "skills": [
         "1.4.2: Understanding costs that are associated with on-premises environments."
       ],
-      "question": "An organization is evaluating the total cost of ownership (TCO) for migrating from an on-premises data center to AWS. What is a major capital expenditure that the company incurs with on-premises infrastructure?\n\nWhich of the following represents the largest ongoing cost in an on-premises environment?",
+      "question": "Evaluating the total cost of ownership (TCO) for migrating from an on-premises data center to AWS requires identifying the major capital expenditures unique to on-premises infrastructure.\n\nWhich of the following represents the largest ongoing cost in an on-premises environment?",
       "choices": [
         {
           "id": "c1",
@@ -468,7 +468,7 @@
       "skills": [
         "1.4.2: Understanding costs that are associated with on-premises environments."
       ],
-      "question": "A company is comparing cloud costs with on-premises infrastructure expenses. Which hidden cost is typically NOT incurred in AWS but IS a significant expense in an on-premises data center?\n\nWhich factor best represents this difference?",
+      "question": "Comparing cloud costs with on-premises infrastructure expenses reveals hidden costs that exist on-premises but disappear in AWS.\n\nWhich hidden cost is typically NOT incurred in AWS but IS a significant expense in an on-premises data center?",
       "choices": [
         {
           "id": "c1",
@@ -510,7 +510,7 @@
       "skills": [
         "1.4.2: Understanding costs that are associated with on-premises environments."
       ],
-      "question": "When evaluating the cost advantages of migrating from on-premises to AWS, which TWO cost areas demonstrate significant savings?",
+      "question": "Cost advantages emerge across several areas when migrating from on-premises to AWS.\n\nWhich TWO cost areas demonstrate significant savings?",
       "choices": [
         {
           "id": "c1",
@@ -559,7 +559,7 @@
       "skills": [
         "3.6.6: Understanding use cases for lifecycle policies."
       ],
-      "question": "A company stores log files in Amazon S3 that are frequently accessed during the first month but rarely accessed afterward. The organization wants to reduce storage costs while maintaining compliance with a 7-year retention requirement.\n\nWhich use case best describes the application of S3 lifecycle policies?",
+      "question": "Log files in Amazon S3 are frequently accessed during the first month but rarely accessed afterward. Storage costs must be reduced while maintaining compliance with a 7-year retention requirement.\n\nWhich use case best describes the application of S3 lifecycle policies?",
       "choices": [
         {
           "id": "c1",
@@ -601,7 +601,7 @@
       "skills": [
         "3.6.6: Understanding use cases for lifecycle policies."
       ],
-      "question": "An organization accumulates large volumes of backup data that must be kept for legal compliance but is rarely accessed after the first few months. Manual deletion and archival would be time-consuming and error-prone.\n\nHow can lifecycle policies improve this scenario?",
+      "question": "Large volumes of backup data accumulate over time and must be kept for legal compliance, but the data is rarely accessed after the first few months. Manual deletion and archival are time-consuming and error-prone.\n\nHow can lifecycle policies improve this scenario?",
       "choices": [
         {
           "id": "c1",
@@ -644,7 +644,7 @@
       "skills": [
         "3.6.6: Understanding use cases for lifecycle policies."
       ],
-      "question": "An enterprise stores data with varying access patterns: frequently accessed databases (first 3 months), occasionally accessed archives (3-12 months), and rarely accessed long-term compliance records (beyond 1 year). The company wants to optimize both cost and performance.\n\nWhich TWO lifecycle policy strategies address this?",
+      "question": "Three distinct access tiers define the data lifecycle: frequently accessed databases (first 3 months), occasionally accessed archives (3–12 months), and rarely accessed long-term compliance records (beyond 1 year). Both cost and performance must be optimized.\n\nWhich TWO lifecycle policy strategies address this?",
       "choices": [
         {
           "id": "c1",
@@ -693,7 +693,7 @@
       "skills": [
         "4.1.5: Understanding different pricing options for various storage options and tiers."
       ],
-      "question": "A company needs to store frequently accessed data that requires low-latency retrieval. Data is accessed regularly throughout the week but cost optimization is also a concern.\n\nWhich S3 storage class offers the best balance between access speed and cost for this scenario?",
+      "question": "Frequently accessed data requiring low-latency retrieval must be stored in S3. The data is accessed regularly throughout the week, and cost optimization is a concern.\n\nWhich S3 storage class offers the best balance between access speed and cost for this scenario?",
       "choices": [
         {
           "id": "c1",
@@ -735,7 +735,7 @@
       "skills": [
         "4.1.5: Understanding different pricing options for various storage options and tiers."
       ],
-      "question": "An organization stores compliance archives that are accessed approximately once per quarter for audits. The data must be retained for 10 years but the budget for storage is limited.\n\nWhich storage option provides the lowest cost for this use case?",
+      "question": "Compliance archives accessed approximately once per quarter for audits must be retained for 10 years under a limited storage budget.\n\nWhich storage option provides the lowest cost for this use case?",
       "choices": [
         {
           "id": "c1",
@@ -778,7 +778,7 @@
       "skills": [
         "4.1.5: Understanding different pricing options for various storage options and tiers."
       ],
-      "question": "A company wants to optimize storage costs while maintaining flexibility for unpredictable access patterns across different data sets. Some objects are accessed frequently, while others have varying usage patterns over time.\n\nWhich TWO pricing strategies help reduce total storage costs?",
+      "question": "Storage costs must be optimized across data sets with unpredictable access patterns — some objects are frequently accessed, while others vary in usage over time.\n\nWhich TWO pricing strategies help reduce total storage costs?",
       "choices": [
         {
           "id": "c1",
@@ -827,7 +827,7 @@
       "skills": [
         "3.8.4: Choosing the appropriate option for business support assistance."
       ],
-      "question": "A startup is running a production web application on AWS and needs technical support with a maximum response time of 1 hour for production issues. The team prefers cost-effective support with sufficient coverage.\n\nWhich AWS Support plan best meets these requirements?",
+      "question": "Technical support with a maximum 1-hour response time for production issues is required for a production web application on AWS. The team prefers cost-effective coverage.\n\nWhich AWS Support plan best meets these requirements?",
       "choices": [
         {
           "id": "c1",
@@ -869,7 +869,7 @@
       "skills": [
         "3.8.4: Choosing the appropriate option for business support assistance."
       ],
-      "question": "A large enterprise runs mission-critical applications on AWS that directly impact revenue. The organization needs 15-minute response time for critical issues and wants a dedicated technical account manager (TAM) to provide guidance on AWS architecture.\n\nWhich support plan provides the best fit?",
+      "question": "Mission-critical applications on AWS directly impact revenue. Required: a 15-minute response time for critical issues and a dedicated technical account manager (TAM) for AWS architecture guidance.\n\nWhich support plan provides the best fit?",
       "choices": [
         {
           "id": "c1",
@@ -911,7 +911,7 @@
       "skills": [
         "3.8.4: Choosing the appropriate option for business support assistance."
       ],
-      "question": "An organization is deciding which AWS Support plan to adopt based on its operational maturity and business needs. The company wants guidance on choosing appropriate support tiers across different scenarios.\n\nWhich TWO support plan decisions are correct for their respective scenarios?",
+      "question": "Choosing the right AWS Support plan depends on operational maturity and business needs. Guidance is needed on matching support tiers to different scenarios.\n\nWhich TWO support plan decisions are correct for their respective scenarios?",
       "choices": [
         {
           "id": "c1",
@@ -960,7 +960,7 @@
       "skills": [
         "3.5.4: Identifying edge services (for example, CloudFront, Global Accelerator)."
       ],
-      "question": "An organization needs to distribute video content to users globally with minimal latency. The content is stored centrally in Amazon S3 but must be served quickly from locations near the end users.\n\nWhich AWS edge service best addresses this requirement?",
+      "question": "Video content stored centrally in Amazon S3 must be distributed globally to end users with minimal latency, served from locations near each user.\n\nWhich AWS edge service best addresses this requirement?",
       "choices": [
         {
           "id": "c1",
@@ -1002,7 +1002,7 @@
       "skills": [
         "3.5.4: Identifying edge services (for example, CloudFront, Global Accelerator)."
       ],
-      "question": "A gaming company operates multiplayer game servers in multiple AWS Regions but users experience high latency when connecting to distant regions. The company needs to automatically route players to the region with the best network performance.\n\nWhich AWS service optimizes this routing scenario?",
+      "question": "Multiplayer game servers run in multiple AWS Regions, but players connecting to distant regions experience high latency. Traffic must be automatically routed to the region with the best network performance.\n\nWhich AWS service optimizes this routing scenario?",
       "choices": [
         {
           "id": "c1",
@@ -1044,7 +1044,7 @@
       "skills": [
         "3.5.4: Identifying edge services (for example, CloudFront, Global Accelerator)."
       ],
-      "question": "An enterprise needs to improve global performance for two distinct use cases: (1) delivering static website content and media to end users worldwide, and (2) optimizing API responses from backend services across regions. The company wants to leverage AWS edge infrastructure for both.\n\nWhich TWO edge services should be used for these scenarios?",
+      "question": "Two distinct global performance requirements must be addressed using AWS edge infrastructure: (1) delivering static website content and media to end users worldwide, and (2) optimizing API responses from backend services across regions.\n\nWhich TWO edge services should be used for these scenarios?",
       "choices": [
         {
           "id": "c1",
@@ -1093,7 +1093,7 @@
       "skills": [
         "4.3.2: Identifying and locating AWS technical resources (for example, AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post)."
       ],
-      "question": "A company needs implementation patterns and best practices for migrating a legacy application to AWS. The team is looking for detailed guidance that includes architecture diagrams, code examples, and step-by-step instructions.\n\nWhich AWS technical resource best provides this information?",
+      "question": "Migrating a legacy application to AWS requires detailed implementation guidance — architecture diagrams, code examples, and step-by-step instructions.\n\nWhich AWS technical resource best provides this information?",
       "choices": [
         {
           "id": "c1",
@@ -1135,7 +1135,7 @@
       "skills": [
         "4.3.2: Identifying and locating AWS technical resources (for example, AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post)."
       ],
-      "question": "A developer encounters an error while using the AWS SDK and wants to find a solution quickly. The team needs to search through community Q&A where other AWS customers have shared solutions to similar problems.\n\nWhich AWS technical resource is best suited for this scenario?",
+      "question": "During AWS SDK development, a team encounters an error and needs to quickly find community Q&A where other AWS customers have shared solutions to similar problems.\n\nWhich AWS technical resource is best suited for this scenario?",
       "choices": [
         {
           "id": "c1",
@@ -1177,7 +1177,7 @@
       "skills": [
         "4.3.2: Identifying and locating AWS technical resources (for example, AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post)."
       ],
-      "question": "An organization is building expertise in AWS services and needs access to different types of resources. The team needs official documentation, best-practice patterns, and quick answers to common questions from a variety of sources.\n\nWhich TWO resources should the team use to cover all these needs?",
+      "question": "Building AWS expertise requires access to multiple resource types: official documentation, best-practice patterns, and quick answers to common questions.\n\nWhich TWO resources should the team use to cover all these needs?",
       "choices": [
         {
           "id": "c1",
@@ -1226,7 +1226,7 @@
       "skills": [
         "2.2.4: Identifying different encryption options (for example, encryption in transit, encryption at rest)."
       ],
-      "question": "A healthcare company stores patient data in Amazon S3 and needs to ensure data is encrypted when stored in AWS, meeting HIPAA compliance requirements. The data should not be decrypted unless explicitly authorized.\n\nWhich encryption approach best addresses this requirement?",
+      "question": "Patient data stored in Amazon S3 must be encrypted at rest to meet HIPAA compliance requirements. The data should not be decrypted unless explicitly authorized.\n\nWhich encryption approach best addresses this requirement?",
       "choices": [
         {
           "id": "c1",
@@ -1268,7 +1268,7 @@
       "skills": [
         "2.2.4: Identifying different encryption options (for example, encryption in transit, encryption at rest)."
       ],
-      "question": "An organization uses Amazon RDS databases and wants to prevent eavesdropping on database queries transmitted over the network between application servers and the database.\n\nWhich encryption type is required for this scenario?",
+      "question": "Database queries transmitted over the network between application servers and Amazon RDS must be protected from eavesdropping.\n\nWhich encryption type is required for this scenario?",
       "choices": [
         {
           "id": "c1",
@@ -1310,7 +1310,7 @@
       "skills": [
         "2.2.4: Identifying different encryption options (for example, encryption in transit, encryption at rest)."
       ],
-      "question": "A financial services company needs comprehensive data protection for sensitive customer information stored in AWS and transmitted across networks. The organization requires encryption in both scenarios: when data is stored and when it is transmitted.\n\nWhich TWO encryption strategies provide complete coverage?",
+      "question": "Sensitive customer information must be protected both when stored in AWS and when transmitted across networks. Comprehensive encryption coverage is required for both scenarios.\n\nWhich TWO encryption strategies provide complete coverage?",
       "choices": [
         {
           "id": "c1",

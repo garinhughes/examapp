@@ -193,7 +193,7 @@
         "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
       ],
       "domain": "Data Protection",
-      "question": "A security architect is documenting the data integrity controls for a multi-tier compliance platform on AWS. Each control addresses a distinct data integrity scenario. Match each integrity requirement to the AWS mechanism that best satisfies it.",
+      "question": "The data integrity layer of a multi-tier compliance platform on AWS uses distinct controls for different scenarios. Match each integrity requirement to the AWS mechanism that best satisfies it.",
       "slots": [
         {
           "id": "s1",
@@ -254,7 +254,7 @@
         "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
       ],
       "domain": "Data Protection",
-      "question": "A security engineer is implementing an immutable archive using S3 Glacier Vault Lock to satisfy a compliance requirement that audit logs cannot be deleted or modified for seven years.\n\nArrange the following steps in the correct order to complete the Vault Lock policy enforcement process.",
+      "question": "Audit logs must be protected from deletion or modification for seven years using S3 Glacier Vault Lock. The enforcement process follows a specific sequence that, once completed, cannot be reversed.\n\nArrange the following steps in the correct order to complete the Vault Lock policy enforcement process.",
       "choices": [
         {
           "id": "c1",
@@ -300,7 +300,7 @@
         "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
       ],
       "domain": "Data Protection",
-      "question": "A cloud security team is reviewing data integrity controls across their AWS environment. Each scenario describes a protection requirement. Match each requirement to the AWS feature that best satisfies it.",
+      "question": "Several distinct data integrity protection requirements exist across an AWS environment. Match each requirement to the AWS feature that best satisfies it.",
       "slots": [
         {
           "id": "s1",
@@ -452,7 +452,7 @@
         "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
       ],
       "domain": "Detection",
-      "question": "A security team manages a multi-account AWS environment and uses AWS Security Hub as their central finding aggregation point. They need to build a Security Hub custom insight that surfaces the five S3 buckets with the highest number of CRITICAL severity findings over the past 30 days across all member accounts.\n\nWhich TWO actions are required to build this custom insight?",
+      "question": "AWS Security Hub is the central finding aggregation point for a multi-account AWS environment. The team needs a custom insight that surfaces the five S3 buckets with the highest number of CRITICAL severity findings over the past 30 days across all member accounts.\n\nWhich TWO actions are required to build this custom insight?",
       "choices": [
         {
           "id": "c1",
@@ -500,7 +500,7 @@
         "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
       ],
       "domain": "Detection",
-      "question": "A security engineer is writing an EventBridge rule pattern to match GuardDuty findings of type `UnauthorizedAccess:EC2/SSHBruteForce` with a severity of HIGH or CRITICAL (numeric value 7.0 or above). The rule must match the finding source correctly and avoid triggering on lower-severity variants of the same finding type.\n\nWhich EventBridge rule pattern correctly captures these findings?",
+      "question": "An EventBridge rule must match GuardDuty findings of type `UnauthorizedAccess:EC2/SSHBruteForce` with a severity of HIGH or CRITICAL (numeric value 7.0 or above). The rule must match the finding source correctly and avoid triggering on lower-severity variants of the same finding type.\n\nWhich EventBridge rule pattern correctly captures these findings?",
       "choices": [
         {
           "id": "c1",
@@ -543,7 +543,7 @@
         "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
       ],
       "domain": "Detection",
-      "question": "A cloud security architect is designing the detection layer for a large enterprise AWS environment. Each detection requirement has a specific service best suited to address it. Match each requirement to the AWS security service that natively satisfies it.",
+      "question": "The detection layer of a large enterprise AWS environment relies on different native services for different threat types. Match each detection requirement to the AWS security service that best satisfies it.",
       "slots": [
         {
           "id": "s1",
@@ -736,7 +736,7 @@
       "skills": [
         "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
       ],
-      "question": "A security team is building a dedicated logging account (999888777666) to centralize CloudWatch Logs from 20 application accounts. A Kinesis Data Stream named `central-log-stream` already exists in the logging account. An application account (111222333444) has a log group `/prod/app-server` that must stream events to this central stream in near real time.\n\nWhich TWO actions must be performed to enable streaming from the application account to the logging account?",
+      "question": "Log group `/prod/app-server` in application account 111222333444 must stream events in near real time to a Kinesis Data Stream named `central-log-stream` in a dedicated logging account (999888777666) that centralizes CloudWatch Logs from 20 application accounts.\n\nWhich TWO actions must be performed to enable this cross-account streaming?",
       "choices": [
         {
           "id": "c1",
@@ -786,7 +786,7 @@
       "skills": [
         "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
       ],
-      "question": "A security architect is setting up a centralized CloudTrail organization trail for a newly created AWS Organization. The trail must deliver logs to an S3 bucket in a dedicated logging account and also stream copies to CloudWatch Logs for real-time alerting. Arrange the following steps in the correct order to complete the configuration.",
+      "question": "A newly created AWS Organization needs a centralized CloudTrail trail that delivers logs to an S3 bucket in a dedicated logging account and streams copies to CloudWatch Logs for real-time alerting. The setup steps must be performed in a specific sequence.\n\nArrange the following steps in the correct order to complete the configuration.",
       "choices": [
         {
           "id": "c1",
@@ -1010,7 +1010,7 @@
       "skills": [
         "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
       ],
-      "question": "A security engineer is implementing a custom AWS Secrets Manager Lambda rotation function for an Amazon RDS database. During each rotation cycle, Secrets Manager invokes the Lambda function four times, each time passing a different value for the `Step` parameter. Each invocation performs a distinct and non-interchangeable action in the rotation workflow.\n\nArrange the following steps in the correct order in which Secrets Manager invokes them during a single rotation cycle.",
+      "question": "When AWS Secrets Manager rotates an RDS database secret using a custom Lambda rotation function, it invokes the Lambda four times per cycle, each time with a different `Step` parameter value. Each invocation performs a distinct and non-interchangeable action in the rotation workflow.\n\nArrange the following steps in the correct order in which Secrets Manager invokes them during a single rotation cycle.",
       "choices": [
         {
           "id": "c1",
