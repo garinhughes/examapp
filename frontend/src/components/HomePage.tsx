@@ -262,7 +262,7 @@ export function HomePage() {
       {/* ── Image Carousel ────────────────────────────────────── */}
       <section>
         <div className="text-center mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold">See it in Action</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold">Platform Preview</h2>
           <p className="text-muted-foreground mt-2">A closer look at the certshack experience.</p>
         </div>
         <div className="relative max-w-4xl mx-auto">
