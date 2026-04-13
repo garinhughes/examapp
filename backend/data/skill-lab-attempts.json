@@ -357,5 +357,15 @@
     "correct": false,
     "timeTaken": 159,
     "createdAt": "2026-04-11T09:01:19.097Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "f13aa30c-76d5-423d-be67-66b92a085d88",
+    "labId": "cca-f-diagnose-cache-invalidation-dynamic",
+    "labType": "diagnose",
+    "selectedAnswer": "a1",
+    "correct": true,
+    "timeTaken": 20,
+    "createdAt": "2026-04-13T18:41:58.953Z"
   }
 ]
