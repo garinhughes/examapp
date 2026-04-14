@@ -5,20 +5,26 @@
  *   - 'dev'     : injects a mock user from env vars (no real auth needed)
  *   - 'cognito' : verifies AWS Cognito JWT access tokens via JWKS
  *
+ * Also handles backend-signed impersonation tokens (type: 'impersonation') regardless
+ * of AUTH_MODE, so admins can browse as another user in any environment.
+ *
  * After registration the plugin decorates:
- *   request.user  — { sub: string; email: string; name?: string } | null
+ *   request.user  — { sub: string; email: string; name?: string; impersonatedBy?: string } | null
  *   server.authenticate — preHandler hook that rejects unauthenticated requests
  *   server.optionalAuth — preHandler hook that attaches user if token present but doesn't reject
  */
 
 import fp from 'fastify-plugin'
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import { createSecretKey } from 'crypto'
 // ——— Types ———
 
 export interface AuthUser {
   sub: string
   email: string
   name?: string
+  /** Set when this session is an admin impersonating another user. */
+  impersonatedBy?: string
 }
 
 declare module 'fastify' {
@@ -45,6 +51,37 @@ function decodeJwt(token: string) {
   const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString())
   const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString())
   return { header, payload }
+}
+
+/** Decode only the payload of a JWT without verification */
+function decodeJwtPayload(token: string): Record<string, any> | null {
+  try {
+    return decodeJwt(token).payload
+  } catch {
+    return null
+  }
+}
+
+/** Verify a backend-signed impersonation token */
+async function verifyImpersonationToken(token: string): Promise<AuthUser> {
+  const secret = process.env.CRON_SECRET
+  if (!secret) throw new Error('CRON_SECRET is not configured')
+
+  const { jwtVerify } = await import('jose')
+  const secretKey = createSecretKey(Buffer.from(secret, 'utf-8'))
+
+  const { payload } = await jwtVerify(token, secretKey, { algorithms: ['HS256'] })
+  const p = payload as any
+
+  if (p.type !== 'impersonation') throw new Error('Not an impersonation token')
+  if (!p.sub || !p.impersonatedBy) throw new Error('Malformed impersonation token')
+
+  return {
+    sub: p.sub as string,
+    email: (p.email as string) || '',
+    name: (p.name as string) || undefined,
+    impersonatedBy: p.impersonatedBy as string,
+  }
 }
 
 /** Verify a Cognito JWT using JWKS */
@@ -119,6 +156,23 @@ async function authPlugin(server: FastifyInstance) {
 }
 
 async function extractUser(request: FastifyRequest) {
+  // Always check for an impersonation token first — works in both dev and cognito modes.
+  const authHeader = request.headers.authorization
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.slice(7)
+    const payload = decodeJwtPayload(token)
+    if (payload?.type === 'impersonation') {
+      try {
+        request.user = await verifyImpersonationToken(token)
+        return
+      } catch (err: any) {
+        request.log.warn({ err: err.message }, 'Impersonation token verification failed')
+        request.user = null
+        return
+      }
+    }
+  }
+
   if (AUTH_MODE === 'dev') {
     // In dev mode, inject a mock user from env vars
     request.user = {
@@ -130,7 +184,6 @@ async function extractUser(request: FastifyRequest) {
   }
 
   // Cognito mode: extract Bearer token from Authorization header
-  const authHeader = request.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     request.user = null
     return

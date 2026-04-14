@@ -31,6 +31,12 @@ interface AuthContextValue {
   refreshToken: () => Promise<string | null>
   /** Immediately update the user's display name in React state (for post-save UI). */
   updateUserName: (name: string) => void
+  /** Non-null while an admin is impersonating another user. */
+  impersonating: AuthUser | null
+  /** Start an impersonation session using a backend-issued token. */
+  startImpersonation: (token: string, targetUser: AuthUser) => void
+  /** End the impersonation session and restore the admin's own identity. */
+  stopImpersonation: () => void
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -48,6 +54,9 @@ const AuthContext = createContext<AuthContextValue>({
   getToken: () => null,
   refreshToken: async () => null,
   updateUserName: () => {},
+  impersonating: null,
+  startImpersonation: () => {},
+  stopImpersonation: () => {},
 })
 
 export const useAuth = () => useContext(AuthContext)
@@ -57,6 +66,7 @@ export const useAuth = () => useContext(AuthContext)
 /* ------------------------------------------------------------------ */
 const TOKEN_KEY = 'examapp_id_token'
 const REFRESH_TOKEN_KEY = 'examapp_refresh_token'
+const IMPERSONATION_TOKEN_KEY = 'examapp_impersonation_token'
 const MODE = import.meta.env.VITE_AUTH_MODE || 'dev'
 
 /** Seconds before expiry at which we proactively refresh (5 minutes) */
@@ -112,12 +122,16 @@ function tokenExpiresIn(token: string): number {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const [impersonating, setImpersonating] = useState<AuthUser | null>(null)
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   /** Guard against concurrent refresh calls */
   const refreshPromiseRef = useRef<Promise<string | null> | null>(null)
 
   /* ---- token helpers ---- */
+  // Returns the impersonation token when active, otherwise the regular session token.
   const getToken = useCallback((): string | null => {
+    const impToken = localStorage.getItem(IMPERSONATION_TOKEN_KEY)
+    if (impToken) return impToken
     return localStorage.getItem(TOKEN_KEY)
   }, [])
 
@@ -210,6 +224,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshPromiseRef.current = promise
     return promise
   }, [getRefreshToken, setToken, userFromToken, scheduleRefresh])
+
+  /* ---- restore impersonation state on page reload ---- */
+  useEffect(() => {
+    const impToken = localStorage.getItem(IMPERSONATION_TOKEN_KEY)
+    if (!impToken) return
+    const payload = parseJwtPayload(impToken)
+    if (!payload || payload.type !== 'impersonation') {
+      localStorage.removeItem(IMPERSONATION_TOKEN_KEY)
+      return
+    }
+    // Clear if expired
+    const nowSecs = Math.floor(Date.now() / 1000)
+    if (payload.exp && payload.exp <= nowSecs) {
+      localStorage.removeItem(IMPERSONATION_TOKEN_KEY)
+      return
+    }
+    const targetUser: AuthUser = {
+      sub: payload.sub as string,
+      email: (payload.email as string) || '',
+      name: (payload.name as string) || '',
+    }
+    setImpersonating(targetUser)
+    setUser(targetUser)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ---- dev mode: auto-login with mock user ---- */
   useEffect(() => {
@@ -449,10 +487,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!res.ok) throw new Error(data.message || 'Reset failed')
   }, [])
 
+  /* ---- impersonation ---- */
+  const startImpersonation = useCallback((token: string, targetUser: AuthUser) => {
+    localStorage.setItem(IMPERSONATION_TOKEN_KEY, token)
+    setImpersonating(targetUser)
+    // Switch the visible user identity so the whole UI reflects the impersonated user.
+    setUser(targetUser)
+  }, [])
+
+  const stopImpersonation = useCallback(() => {
+    localStorage.removeItem(IMPERSONATION_TOKEN_KEY)
+    setImpersonating(null)
+    // Restore the admin's identity from their original session token.
+    const adminToken = localStorage.getItem(TOKEN_KEY)
+    if (adminToken) {
+      const adminUser = userFromToken(adminToken)
+      setUser(adminUser)
+    }
+  }, [userFromToken])
+
   /* ---- logout ---- */
   const logout = useCallback(() => {
     const hadToken = !!localStorage.getItem(TOKEN_KEY)
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
+    // Also clear any active impersonation session
+    localStorage.removeItem(IMPERSONATION_TOKEN_KEY)
+    setImpersonating(null)
     clearToken()
     setUser(null)
 
@@ -491,6 +551,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       forgotPassword, resetPassword,
       logout, getToken, refreshToken: doRefresh,
       updateUserName,
+      impersonating, startImpersonation, stopImpersonation,
     }}>
       {children}
     </AuthContext.Provider>

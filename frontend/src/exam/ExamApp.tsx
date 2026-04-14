@@ -34,6 +34,7 @@ import { QuestionNav } from './QuestionNav'
 import { QuestionCard } from './QuestionCard'
 import { Modals } from './Modals'
 import Footer from '@/components/Footer'
+import { ImpersonationBanner } from '@/components/ImpersonationBanner'
 import { HomePage } from '@/components/HomePage'
 import PrivacyPolicy from '@/components/PrivacyPolicy'
 import TermsOfService from '@/components/TermsOfService'
@@ -107,6 +108,7 @@ function ExamAppInner() {
     <FeedbackProvider authFetch={authFetch} isAdmin={userIsAdmin}>
     <div className="flex flex-col h-screen w-full overflow-hidden bg-background text-foreground">
       <PageMeta route={route} />
+      <ImpersonationBanner />
       <CookieConsent />
       <div className="flex flex-1 overflow-hidden">
       <div className={focusMode ? 'hidden' : ''}>

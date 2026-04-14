@@ -370,7 +370,7 @@
       "skills": [
         "2.1.1: Designing event-driven, microservice, and/or multi-tier architectures based on requirements."
       ],
-      "question": "During a migration from a monolith to microservices on AWS, the checkout service must return a response to the customer immediately after saving a purchase to the database — without waiting for downstream processing. Three downstream services (inventory, shipping, and loyalty) must each independently receive every purchase event and may be unavailable for up to 15 minutes during rolling deployments.\n\nWhich TWO AWS services should the solutions architect combine to deliver purchase events durably to all three downstream services?",
+      "question": "During a migration from a monolith to microservices on AWS, the checkout service must return a response to the customer immediately after saving a purchase to the database, without waiting for downstream processing. Three downstream services (inventory, shipping, and loyalty) must each independently receive every purchase event and may be unavailable for up to 15 minutes during rolling deployments.\n\nWhich TWO AWS services should the solutions architect combine to deliver purchase events durably to all three downstream services?",
       "choices": [
         {
           "id": "c1",

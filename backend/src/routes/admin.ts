@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
-import { randomUUID } from 'crypto'
+import { randomUUID, createSecretKey } from 'crypto'
+import { SignJWT } from 'jose'
 import { getUserBySub, listUsers, recordAdminAudit, updateUserFields, listIssueReports, resolveIssueReport, countNewIssueReports, getUsersWithEmailOptIn } from '../services/dynamo.js'
 import { previewErasure, dryRunErasure, executeErasure } from '../services/erasureService.js'
 import { sendErasureReceiptEmail, sendMarketingEmail } from '../services/ses.js'
@@ -87,6 +88,67 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err: any) {
       request.log?.error?.({ err: err.message }, 'admin delete user failed')
       return reply.code(500).send({ message: 'Delete failed', detail: err.message })
+    }
+  })
+
+  // ── Impersonation ──
+
+  /**
+   * POST /admin/impersonate/:sub
+   * Returns a short-lived (1h) signed token that lets the admin browse as
+   * the target user.  Blocked for admins and self.  Audited.
+   */
+  server.post('/impersonate/:sub', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => {
+    if (!request.user) return reply.code(401).send({ message: 'Unauthorized' })
+
+    const { sub } = request.params as any
+    const adminSub = (request.user as any).sub
+
+    if (sub === adminSub) {
+      return reply.code(400).send({ message: 'Cannot impersonate yourself' })
+    }
+
+    const targetUser = await getUserBySub(sub)
+    if (!targetUser) return reply.code(404).send({ message: 'User not found' })
+
+    if (targetUser.isAdmin) {
+      return reply.code(403).send({ message: 'Cannot impersonate another admin' })
+    }
+
+    const secret = process.env.CRON_SECRET
+    if (!secret) {
+      request.log.error('CRON_SECRET env var is not set')
+      return reply.code(503).send({ message: 'Impersonation is not configured on this server' })
+    }
+
+    const secretKey = createSecretKey(Buffer.from(secret, 'utf-8'))
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+
+    const token = await new SignJWT({
+      sub: targetUser.userId,
+      email: targetUser.email || '',
+      name: targetUser.name || '',
+      type: 'impersonation',
+      impersonatedBy: adminSub,
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('1h')
+      .sign(secretKey)
+
+    await recordAdminAudit(adminSub, sub, 'impersonate_user', {
+      targetEmail: targetUser.email,
+      targetName: targetUser.name,
+    })
+
+    return {
+      token,
+      expiresAt: expiresAt.toISOString(),
+      user: {
+        sub: targetUser.userId,
+        email: targetUser.email || '',
+        name: targetUser.name || '',
+      },
     }
   })
 

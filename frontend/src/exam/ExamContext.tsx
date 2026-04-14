@@ -628,16 +628,8 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
     const key = `attempt:${selected}`
 
-    // Visitor (unauthenticated) - run exam client-side
-    if (!user) {
-      if (examMode === 'weakest-link') { setLastError('Sign in to use Weakest Link mode - it needs your attempt history.'); return }
-      const localId = `visitor-${Date.now()}`
-      setAttemptId(localId)
-      try { localStorage.setItem(`attempt:${selected}`, JSON.stringify({ attemptId: localId, examVersion: null, attemptSchemaVersion: 1 })) } catch {}
-      setExamStarted(true)
-      if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
-      return
-    }
+    // Visitor mode still uses the server API (answers stored under visitor UUID)
+    if (!user && examMode === 'weakest-link') { setLastError('Sign in to use Weakest Link mode - it needs your attempt history.'); return }
 
     try {
       // Weakest Link mode
@@ -757,7 +749,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function sendAnswerToServer(qId: string, payload: Record<string, any>) {
-    if (!user || !attemptId) return
+    if (!attemptId) return
     try {
       const res = await authFetch(`/attempts/${attemptId}/answer`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -799,7 +791,6 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function finishAttempt(aid: string) {
-    if (!user) { setExamStarted(false); setTimeLeft(null); return }
     try {
       const fin = await authFetch(`/attempts/${aid}/finish`, { method: 'PATCH' })
       const finData = await fin.json()
@@ -817,7 +808,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   }
 
   function handleGamificationReward(finData: any) {
-    if (typeof finData?.score !== 'number') return
+    if (!user || typeof finData?.score !== 'number') return
     try {
       const examCode = finData.examCode ?? selected ?? ''
       const allAttemptScores = (attemptsList ?? [])
@@ -870,36 +861,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     const totalQuestions = displayQuestions.length
     try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
 
-    // Visitor - compute locally
-    if (!user) {
-      const qs = displayQuestions as Question[]
-      let correct = 0
-      const perDomain: Record<string, { correct: number; total: number; score?: number }> = {}
-      for (const qn of qs) {
-        const sel = selectedAnswers[qn.id]
-        const dom = (qn as any).domain || 'General'
-        if (!perDomain[dom]) perDomain[dom] = { correct: 0, total: 0 }
-        if (sel === undefined) { if (!earlyComplete) perDomain[dom].total++; continue }
-        perDomain[dom].total++
-        const isRight = isAnswerCorrect(qn, sel)
-        if (isRight) { correct++; perDomain[dom].correct++ }
-      }
-      for (const k of Object.keys(perDomain)) { const e = perDomain[k]; e.score = e.total > 0 ? Math.round((e.correct / e.total) * 100) : 0 }
-      const denom = earlyComplete ? answeredCount : totalQuestions
-      const score = denom > 0 ? Math.round((correct / denom) * 100) : 0
-      setAttemptData({
-        attemptId, examCode: selected, score, correctCount: correct,
-        total: denom, answeredCount, totalQuestions, earlyComplete, perDomain,
-        finishedAt: new Date().toISOString(),
-        questions: qs.map((qn) => ({ ...qn, selectedChoiceId: Array.isArray(selectedAnswers[qn.id]) ? undefined : selectedAnswers[qn.id] as string, selectedChoiceIds: Array.isArray(selectedAnswers[qn.id]) ? selectedAnswers[qn.id] : undefined })),
-      })
-      try { localStorage.removeItem(`attempt:${selected}`) } catch {}
-      setExamStarted(false); setTimeLeft(null)
-      setShowSubmitConfirm(false); setShowCompleteEarlyConfirm(false)
-      return
-    }
-
-    // Authenticated - call server finish
+    // Call server to finish (works for both authenticated users and visitors via X-Visitor-Id)
     try {
       const finOpts: RequestInit = { method: 'PATCH' }
       if (earlyComplete) { finOpts.headers = { 'Content-Type': 'application/json' }; finOpts.body = JSON.stringify({ earlyComplete: true }) }

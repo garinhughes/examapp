@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { useAuthFetch } from '../auth/useAuthFetch'
+import { useAuth, type AuthUser } from '../auth/AuthContext'
 import { apiUrl } from '@/apiBase'
 
 /* ------------------------------------------------------------------ */
@@ -123,6 +124,7 @@ function UserRow({
   onReload,
   onError,
   onDeleteUser,
+  onImpersonate,
   selected,
   onToggleSelect,
 }: {
@@ -132,6 +134,7 @@ function UserRow({
   onReload: () => void
   onError: (msg: string) => void
   onDeleteUser: (userId: string) => void
+  onImpersonate: (token: string, targetUser: AuthUser) => void
   selected: boolean
   onToggleSelect: (userId: string) => void
 }) {
@@ -144,6 +147,7 @@ function UserRow({
   const [confirmRevoke, setConfirmRevoke] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [impersonating, setImpersonating] = useState(false)
 
   const loadEntitlements = useCallback(async () => {
     setLoadingEnts(true)
@@ -213,6 +217,24 @@ function UserRow({
       onError(err.message || 'Revoke failed')
     } finally {
       setRevoking(null)
+    }
+  }
+
+  async function handleImpersonate(e: React.MouseEvent) {
+    e.stopPropagation()
+    setImpersonating(true)
+    try {
+      const res = await authFetch(`/admin/impersonate/${encodeURIComponent(user.userId)}`, { method: 'POST' })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: 'Impersonation failed' }))
+        throw new Error((err as any).message || `HTTP ${res.status}`)
+      }
+      const data = await res.json()
+      onImpersonate(data.token, data.user as AuthUser)
+    } catch (err: any) {
+      onError(err.message || 'Impersonation failed')
+    } finally {
+      setImpersonating(false)
     }
   }
 
@@ -289,6 +311,16 @@ function UserRow({
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground font-mono truncate max-w-[260px]" title={user.userId}>ID: {user.userId}</span>
                 <div className="flex-1" />
+                {!user.isAdmin && (
+                  <button
+                    onClick={handleImpersonate}
+                    disabled={impersonating}
+                    className="px-2.5 py-1 rounded text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50 disabled:opacity-50 transition-colors"
+                    title="Browse the app as this user"
+                  >
+                    {impersonating ? 'Starting…' : '👤 Become User'}
+                  </button>
+                )}
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleFlag('isAdmin', !user.isAdmin) }}
                   className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
@@ -2211,6 +2243,7 @@ function CarouselPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetc
 
 export default function AdminPanel() {
   const authFetch = useAuthFetch()
+  const { startImpersonation } = useAuth()
   const [users, setUsers] = useState<UserRecord[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(false)
@@ -2307,6 +2340,10 @@ export default function AdminPanel() {
       next.delete(userId)
       return next
     })
+  }
+
+  function handleImpersonate(token: string, targetUser: AuthUser) {
+    startImpersonation(token, targetUser)
   }
 
   function toggleSort(col: typeof sortBy) {
@@ -2457,6 +2494,7 @@ export default function AdminPanel() {
                     onReload={load}
                     onError={(msg) => setError(msg)}
                     onDeleteUser={handleDeleteUser}
+                    onImpersonate={handleImpersonate}
                     selected={selectedUserIds.has(u.userId)}
                     onToggleSelect={toggleSelect}
                   />

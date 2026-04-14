@@ -6,12 +6,25 @@ import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS } from '../catalog.js'
 import { updateMetricsOnAttemptFinish } from '../services/metricsStore.js'
 
+/** Extract userId from a JWT-authenticated user or a visitor ID header. */
+function extractUserId(request: any): string | null {
+  if (request.user?.sub) return request.user.sub
+  const vid = request.headers['x-visitor-id']
+  if (typeof vid === 'string' && vid.length >= 1 && vid.length <= 256) {
+    return `visitor:${vid}`
+  }
+  return null
+}
+
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Start an attempt
-  server.post('/', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.post('/', { preHandler: [server.optionalAuth], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const body = request.body as any
     const examCode = body?.examCode
     if (!examCode) return reply.status(400).send({ message: 'examCode required' })
+
+    const userId = extractUserId(request)
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
 
     const id = randomUUID()
     const now = new Date().toISOString()
@@ -20,9 +33,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const exam = await loadExam(lc)
     if (!exam) return reply.status(400).send({ message: 'exam not found' })
 
-    // Enforce per-exam attempt limit based on user tier
-    const userId = request.user?.sub ?? ''
-    {
+    // Enforce per-exam attempt limit for authenticated users only (visitors are anonymous)
+    if (!userId.startsWith('visitor:')) {
       const ownedProductIds = await getActiveProductIds(userId).catch(() => [])
       const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds, examCode })
       const tierConfig = TIERS[tier]
@@ -115,7 +127,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     const attempt = {
       attemptId: id,
-      userId: request.user?.sub ?? null,
+      userId,
       examCode,
       // Snapshot the exam version at time of attempt creation so edits to the
       // canonical exam file do not affect scoring/resume for this attempt.
@@ -171,12 +183,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Submit an answer for an attempt
-  server.post('/:id/answer', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.post('/:id/answer', { preHandler: [server.optionalAuth], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
     const body = request.body as any
     if (!body?.questionId) return reply.status(400).send({ message: 'questionId required' })
 
-    const userId = request.user?.sub
+    const userId = extractUserId(request)
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
     const attempt = await attemptsStore.get(userId, id)
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
@@ -283,9 +295,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Finish attempt and compute score
-  server.patch('/:id/finish', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.patch('/:id/finish', { preHandler: [server.optionalAuth], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
-    const userId = request.user?.sub
+    const userId = extractUserId(request)
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
     const attempt = await attemptsStore.get(userId, id)
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
@@ -371,9 +383,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // Get attempt (user must own it)
-  server.get('/:id', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.get('/:id', { preHandler: [server.optionalAuth], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
-    const userId = request.user?.sub
+    const userId = extractUserId(request)
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
     const attempt = await attemptsStore.get(userId, id)
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })

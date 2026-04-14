@@ -1,6 +1,7 @@
 import { useAuth } from './AuthContext'
 import { useCallback, useRef } from 'react'
 import { apiUrl } from '../apiBase'
+import { getOrCreateVisitorId } from './visitorId'
 
 /**
  * Returns a fetch wrapper that automatically injects the Authorization header.
@@ -42,6 +43,8 @@ export function useAuthFetch() {
       const headers = new Headers(init?.headers)
       if (token) {
         headers.set('Authorization', `Bearer ${token}`)
+      } else {
+        headers.set('X-Visitor-Id', getOrCreateVisitorId())
       }
 
       // Prefix relative paths with the API base when set (production)

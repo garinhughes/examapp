@@ -569,7 +569,7 @@
       "skills": [
         "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
       ],
-      "question": "Routine coding tasks — boilerplate generation and code completions based on comments and function signatures — are slowing down developer productivity.\n\nWhich generative AI capability would best address this?",
+      "question": "Routine coding tasks (boilerplate generation and code completions based on comments and function signatures) are slowing down developer productivity.\n\nWhich generative AI capability would best address this?",
       "choices": [
         {
           "id": "c1",
@@ -2008,7 +2008,7 @@
       "skills": [
         "4.2.3: Identifying tradeoffs between model safety and transparency (for example, measure interpretability and performance)."
       ],
-      "question": "Millions of content moderation decisions are needed daily. The system must prevent harmful content with high accuracy while minimizing false positives — but regulators and users also expect moderation decisions to be explainable.\n\nWhich TWO aspects best describe the responsible AI tradeoff the company must navigate?",
+      "question": "Millions of content moderation decisions are needed daily. The system must prevent harmful content with high accuracy while minimizing false positives, but regulators and users also expect moderation decisions to be explainable.\n\nWhich TWO aspects best describe the responsible AI tradeoff the company must navigate?",
       "choices": [
         {
           "id": "c1",
