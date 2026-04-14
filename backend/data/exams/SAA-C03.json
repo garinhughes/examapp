@@ -931,6 +931,922 @@
       "domain": "Design Cost-Optimized Architectures",
       "difficulty": 3,
       "lastReviewed": "2026-03-30"
+    },
+    {
+      "id": "SAA-C03-0021",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html",
+      "format": "text",
+      "services": [
+        "IAM",
+        "Amazon EC2",
+        "Amazon S3"
+      ],
+      "skills": [
+        "1.1.2: Designing a flexible authorization model that includes IAM users, groups, roles, and policies."
+      ],
+      "question": "The operations team discovered that developers embedded IAM user access keys directly in application code running on Amazon EC2 instances to access Amazon S3. The team must eliminate long-term credentials from all EC2 workloads.\n\nWhich approach provides the MOST secure solution?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Attach an IAM role with the required S3 permissions to the EC2 instances as an instance profile.",
+          "sequence": 1,
+          "explanation": "IAM roles deliver short-lived, automatically rotated temporary credentials to EC2 instances through the instance metadata service, removing the need to create or store any long-term access keys."
+        },
+        {
+          "id": "c2",
+          "text": "Move the IAM user access keys into AWS Secrets Manager with automatic rotation enabled, then retrieve the current key at application startup using the EC2 instance metadata endpoint.",
+          "explanation": "Secrets Manager improves key management and rotation, but the underlying credentials are still long-term IAM user access keys. IAM roles eliminate the need for those keys entirely."
+        },
+        {
+          "id": "c3",
+          "text": "Move the IAM user access keys into AWS Systems Manager Parameter Store as SecureString parameters, retrieve them at application startup through a Parameter Store API call, and rotate them every 30 days.",
+          "explanation": "Parameter Store is a secure location for sensitive values, but the IAM user access keys stored there remain long-term credentials. Moving them out of source code reduces exposure without removing the underlying risk that IAM roles avoid."
+        },
+        {
+          "id": "c4",
+          "text": "Move the IAM user access keys into an Amazon S3 bucket with server-side encryption enabled, load them at runtime using a pre-signed URL, and restrict bucket access with a resource-based bucket policy.",
+          "explanation": "Retrieving long-term credentials from an encrypted S3 bucket adds operational complexity without addressing the core problem. The access keys are still long-term credentials and remain subject to exposure."
+        }
+      ],
+      "tip": "Identify the credential mechanism that AWS recommends for EC2 workloads that avoids creating or storing long-term access keys at all.",
+      "explanation": "Attaching an IAM role as an instance profile is the AWS-recommended approach for granting EC2 instances access to AWS services. The instance metadata service delivers short-lived temporary credentials that AWS rotates automatically, so no access keys ever need to be created or stored.\n\n**Why it works:** Applications use the AWS SDK or CLI, which automatically retrieves rotating credentials from the metadata service. There are no persistent access keys to protect, rotate, or accidentally expose.\n\n**Why the others don't work:**\n- Moving keys to Secrets Manager still produces long-term IAM user credentials. Rotation reduces risk but does not eliminate persistent access keys.\n- Parameter Store has the same fundamental limitation. The credentials are still long-term, only their storage location changes.\n- Loading keys from an encrypted S3 bucket at runtime adds retrieval complexity without resolving the root cause.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0022",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html",
+      "format": "text",
+      "services": [
+        "IAM"
+      ],
+      "skills": [
+        "1.1.2: Designing a flexible authorization model that includes IAM users, groups, roles, and policies."
+      ],
+      "question": "During a security audit, it was found that each of 50 junior developers has a unique set of IAM user policies granting access to Amazon S3 and Amazon DynamoDB. Whenever permissions need to change, the team must update each user individually.\n\nWhat is the LEAST operationally demanding approach to manage these permissions going forward?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Create an IAM group with the required permissions and add all 50 developer IAM users to the group.",
+          "sequence": 1,
+          "explanation": "IAM groups allow a single policy update to apply immediately to all members, removing the need to modify individual users when permissions change."
+        },
+        {
+          "id": "c2",
+          "text": "Write an AWS Lambda function that enumerates all 50 IAM users and programmatically attaches or detaches the required managed policies whenever a permission change is requested by the team.",
+          "explanation": "Automating policy changes with Lambda reduces manual work but requires building and maintaining custom tooling. IAM groups provide the same outcome natively without any additional infrastructure."
+        },
+        {
+          "id": "c3",
+          "text": "Create an IAM role with the consolidated permissions policy and configure each developer to assume the role whenever they need to access Amazon S3 or Amazon DynamoDB, using a named session for audit logging.",
+          "explanation": "Requiring developers to assume a role each time they need access adds workflow friction. This approach also does not eliminate the need to manage the underlying IAM user policies or group memberships."
+        },
+        {
+          "id": "c4",
+          "text": "Create an AWS CloudFormation template that defines all 50 IAM users with the shared permissions policy attached and redeploy the stack using change sets whenever permissions need to be updated across the team.",
+          "explanation": "CloudFormation provides a codified approach to IAM resource management, but each permission change requires a stack update cycle. IAM groups apply changes instantly with a single API call and no deployment workflow."
+        }
+      ],
+      "tip": "Think about the built-in IAM construct that lets you attach a policy once and propagate it automatically to any number of users without modifying each user record.",
+      "explanation": "IAM groups are purpose-built for sharing permissions across multiple users. Attaching a policy to a group instantly applies it to every member, so a single policy change covers all 50 developers with no per-user modifications required.\n\n**Why it works:** Policies on an IAM group automatically propagate to all users in the group. Adding or changing a group policy is one operation, regardless of how many users belong to the group.\n\n**Why the others don't work:**\n- A Lambda automation function achieves the same result but requires writing, deploying, and maintaining custom code for a problem that IAM groups solve natively.\n- Role assumption per request is a useful access delegation pattern but does not simplify ongoing permission management in the same way as groups.\n- CloudFormation manages IAM resources as code, but the stack redeployment cycle makes it slower than direct IAM group policy updates for iterative permission changes.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0023",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html",
+      "format": "text",
+      "services": [
+        "IAM"
+      ],
+      "skills": [
+        "1.1.2: Designing a flexible authorization model that includes IAM users, groups, roles, and policies."
+      ],
+      "question": "The engineering team is evaluating how to delegate IAM administration to junior admins while ensuring those admins cannot grant themselves or others more access than the security team has defined. The team wants to enforce this constraint using a native IAM mechanism within the account.\n\nWhich TWO actions should the team take? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Create a permissions boundary policy that defines the maximum allowable permissions and attach it to each junior admin's IAM user.",
+          "sequence": 1,
+          "explanation": "A permissions boundary sets a ceiling on the effective permissions of the IAM user. Even if a broader policy is attached later, the boundary ensures those extra permissions do not take effect."
+        },
+        {
+          "id": "c2",
+          "text": "Configure the junior admin's IAM policies to allow `iam:CreateRole` and related write actions only when the target role also has the same permissions boundary attached, enforced through an IAM condition.",
+          "sequence": 2,
+          "explanation": "Adding a condition that requires boundary propagation closes the escalation path through newly created roles. Any role the junior admin creates must also carry the boundary, maintaining the constraint end-to-end."
+        },
+        {
+          "id": "c3",
+          "text": "Enable AWS Organizations service control policies on the root organizational unit to restrict IAM privilege escalation across all accounts, removing the need for account-level controls on individual admin users.",
+          "explanation": "SCPs operate at the AWS Organizations level and restrict account-wide maximum permissions. They do not replace the fine-grained delegation control that permissions boundaries provide for specific IAM identities within a single account."
+        },
+        {
+          "id": "c4",
+          "text": "Create a dedicated AWS account for junior admin activity and configure AWS Control Tower guardrails to prevent privilege escalation, keeping the primary account free of delegated admin permissions entirely.",
+          "explanation": "Isolating junior admins in a separate account with Control Tower adds architectural complexity well beyond what the scenario requires. Permissions boundaries achieve the same delegation constraint within a single account."
+        },
+        {
+          "id": "c5",
+          "text": "Enable AWS IAM Access Analyzer to scan for policies that exceed the defined maximum permissions and generate findings to alert the security team whenever a junior admin creates an overly permissive policy.",
+          "explanation": "IAM Access Analyzer is a detective control that identifies overly permissive policies after they are created. It cannot prevent a junior admin from escalating permissions at the moment of policy evaluation."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Consider which IAM feature actively caps the effective permissions of a principal at evaluation time, and how to ensure that cap extends to anything that principal creates.",
+      "explanation": "Permissions boundaries define the maximum effective permissions for an IAM entity. Attaching a boundary to a junior admin user ensures that even if a broad policy is later granted, only the intersection of the policy and the boundary takes effect. Pairing this with a condition on IAM write actions that mandates boundary propagation closes the escalation path through newly created roles.\n\n**Why it works:** Permissions boundaries are evaluated by IAM at request time. The condition on `iam:CreateRole` ensures every new role inherits the boundary, maintaining the constraint across the full permission chain.\n\n**Why the others don't work:**\n- SCPs restrict account-level maximum permissions from outside the account and are not designed to scope delegated admin permissions for individual users within a single account.\n- A separate account with Control Tower adds organizational complexity that is unnecessary when account-level IAM controls can address the requirement directly.\n- IAM Access Analyzer is a monitoring tool, not a preventive control, and cannot block privilege escalation in real time.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0024",
+      "type": "ordering",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html",
+      "services": [
+        "IAM",
+        "Amazon EC2",
+        "Amazon DynamoDB"
+      ],
+      "skills": [
+        "1.1.2: Designing a flexible authorization model that includes IAM users, groups, roles, and policies."
+      ],
+      "question": "Arrange the following steps in the correct order to grant an Amazon EC2 instance access to an Amazon DynamoDB table using an IAM role.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Create an IAM policy that allows the required DynamoDB actions on the target table.",
+          "sequence": 1,
+          "explanation": "The permissions policy must exist before it can be attached to a role. Defining what actions are allowed is the first dependency in the chain."
+        },
+        {
+          "id": "c2",
+          "text": "Create an IAM role and select Amazon EC2 as the trusted service in the role trust policy.",
+          "sequence": 2,
+          "explanation": "The role establishes the identity that EC2 can assume. The trust policy naming EC2 as the principal must be configured before any permissions policy is attached."
+        },
+        {
+          "id": "c3",
+          "text": "Attach the IAM policy to the IAM role.",
+          "sequence": 3,
+          "explanation": "Both the policy and the role must exist before they can be linked. Attaching the policy grants the role the DynamoDB permissions it needs."
+        },
+        {
+          "id": "c4",
+          "text": "Assign the IAM role to the Amazon EC2 instance as an instance profile.",
+          "sequence": 4,
+          "explanation": "Assigning the completed role to the instance as an instance profile is the final step. The instance then retrieves temporary credentials from the metadata service to access DynamoDB."
+        }
+      ],
+      "tip": "Follow the dependency chain: the policy must exist before it can be attached, and the role must be fully configured before it can be assigned to an instance.",
+      "explanation": "The setup follows a strict dependency chain. The policy defines what is allowed, the role establishes who can use those permissions, attaching the policy combines both components, and assigning the role to the instance activates the access.\n\n**Why it works:** Each step builds on what was created in the previous step. The IAM policy defines DynamoDB actions, the EC2 trust policy makes the role assumable by EC2, attaching the policy creates a usable role, and assigning it as an instance profile delivers temporary credentials to the instance through the metadata service.\n\n**Why the others don't work:**\n- Creating the role before the policy is technically possible, but the attachment in step three requires the policy to already exist.\n- Assigning the role to the instance before attaching the policy would temporarily leave the instance with no DynamoDB permissions.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0025",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html",
+      "format": "text",
+      "services": [
+        "IAM",
+        "Amazon S3",
+        "STS"
+      ],
+      "skills": [
+        "1.1.3: Designing a role-based access control strategy (for example, AWS Security Token Service [AWS STS], role switching, cross-account access)."
+      ],
+      "question": "The organization is looking to grant a development team in Account A read-only access to Amazon S3 buckets in Account B. The security team requires that no long-term credentials be shared between accounts.\n\nWhat is the MOST appropriate approach?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Create an IAM role in Account B with a trust policy allowing Account A to assume it, and attach a read-only Amazon S3 permissions policy to the role.",
+          "sequence": 1,
+          "explanation": "The role lives in Account B where the S3 resources reside. The trust policy names Account A as the permitted principal, and developers in Account A assume the role via AWS STS to receive temporary credentials."
+        },
+        {
+          "id": "c2",
+          "text": "Create an IAM role in Account A with a trust policy allowing Account B principals to assume it, and attach a read-only Amazon S3 policy to enable cross-account bucket access from Account A.",
+          "explanation": "The trust relationship points in the wrong direction. A role in Account A cannot grant access to resources in Account B. The role must be created in Account B, the account that owns the resources."
+        },
+        {
+          "id": "c3",
+          "text": "Create an IAM role in Account B with a trust policy allowing any AWS principal to assume it, attach a read-only Amazon S3 permissions policy, and rely on Amazon S3 bucket conditions to restrict access to Account A prefixes.",
+          "explanation": "Allowing any AWS principal to assume the role is overly permissive and violates least-privilege principles. The trust policy must explicitly restrict assumption to Account A's principals only."
+        },
+        {
+          "id": "c4",
+          "text": "Create an IAM user in Account B with read-only Amazon S3 permissions and use AWS Secrets Manager to securely distribute the access key and secret key to the Account A development team.",
+          "explanation": "Distributing access keys through Secrets Manager still shares long-term credentials between accounts, violating the security team's explicit requirement regardless of how securely the keys are stored."
+        }
+      ],
+      "tip": "Consider which account should own the IAM role and which direction the trust relationship must point to grant access from one account to resources in another.",
+      "explanation": "Creating the IAM role in Account B with Account A as the trusted principal is the standard cross-account access pattern. Developers in Account A call `sts:AssumeRole` and receive temporary, time-limited credentials that are scoped to the read-only S3 policy on the role.\n\n**Why it works:** The role resides in Account B alongside the S3 buckets. The trust policy grants Account A the right to assume it. No long-term credentials are generated or shared.\n\n**Why the others don't work:**\n- Placing the role in Account A reverses the trust direction. Account A cannot grant itself access to Account B's resources through its own role.\n- Allowing all AWS principals to assume the role violates least privilege. Only Account A should be trusted.\n- Distributing IAM user access keys contradicts the requirement to avoid long-term credentials between accounts.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0026",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html",
+      "format": "text",
+      "services": [
+        "IAM",
+        "STS"
+      ],
+      "skills": [
+        "1.1.3: Designing a role-based access control strategy (for example, AWS Security Token Service [AWS STS], role switching, cross-account access)."
+      ],
+      "question": "Following a company merger, contractors from the acquired company need access to AWS resources for exactly 8 hours each working day. The security policy mandates that credentials expire at the end of each session and cannot be extended without re-authentication.\n\nWhich mechanism provides the MOST secure access that satisfies these requirements?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Create IAM roles for the contractors and use AWS STS to issue temporary security credentials with an 8-hour session duration, requiring contractors to re-authenticate to obtain fresh credentials each day.",
+          "sequence": 1,
+          "explanation": "AWS STS with a configurable session duration is the purpose-built solution for time-limited access. Credentials issued with an 8-hour duration expire automatically, and obtaining new credentials requires re-authentication."
+        },
+        {
+          "id": "c2",
+          "text": "Create IAM users for each contractor with strong password policies and require MFA for all console sign-ins, then configure an AWS Config rule to automatically revoke access keys after 8 hours of inactivity have elapsed.",
+          "explanation": "IAM user access keys are long-term credentials that do not have a built-in session expiration. An AWS Config inactivity check does not enforce credential expiry at the end of an active working session."
+        },
+        {
+          "id": "c3",
+          "text": "Create IAM roles for the contractors and store the role session credentials in AWS Secrets Manager, scheduling automatic rotation every 8 hours to simulate session expiration without requiring contractor re-authentication.",
+          "explanation": "Storing STS-issued role credentials in Secrets Manager and rotating them on a schedule does not force contractors to re-authenticate. The policy explicitly requires re-authentication to renew access, which only active role assumption enforces."
+        },
+        {
+          "id": "c4",
+          "text": "Create IAM users for each contractor and deploy a scheduled AWS Lambda function that attaches an explicit Deny policy to each contractor's account at the end of the 8-hour window and removes it the following morning.",
+          "explanation": "Toggling Deny policies with a scheduled Lambda function is fragile and subject to timing drift. This approach does not produce cryptographically expiring credentials and depends on automation remaining perfectly in sync with contractor schedules."
+        }
+      ],
+      "tip": "Look for the credential type that carries a built-in expiration time set at issuance, rather than one that relies on external automation to simulate expiry.",
+      "explanation": "AWS STS issues temporary security credentials with a session duration specified at the time of role assumption. Setting an 8-hour duration ensures the credentials cryptographically expire at that point, and re-authentication is required to obtain new ones - satisfying both policy constraints.\n\n**Why it works:** STS credentials include an expiration timestamp baked in. When the session duration elapses, the access key, secret, and session token all become invalid. No external process is needed to enforce expiry.\n\n**Why the others don't work:**\n- IAM user access keys are long-term credentials with no built-in session expiry. Config-based inactivity checks do not guarantee expiration at the end of an active session.\n- Storing and rotating role credentials in Secrets Manager sidesteps the re-authentication requirement, violating the security policy.\n- Lambda functions that toggle Deny policies are error-prone and do not produce time-limited credentials with cryptographic expiry.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0027",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html",
+      "format": "text",
+      "services": [
+        "IAM",
+        "Lambda",
+        "Amazon DynamoDB",
+        "STS"
+      ],
+      "skills": [
+        "1.1.3: Designing a role-based access control strategy (for example, AWS Security Token Service [AWS STS], role switching, cross-account access)."
+      ],
+      "question": "Management has decided that an AWS Lambda function in Account A must read data from an Amazon DynamoDB table in Account B. A solutions architect must configure IAM to enable this cross-account access securely.\n\nWhich TWO configurations are required? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Create an IAM role in Account B with a trust policy allowing Account A's Lambda execution role to assume it, and attach a DynamoDB read-only permissions policy to that role.",
+          "sequence": 1,
+          "explanation": "The role in Account B provides the execution context needed to read DynamoDB. Its trust policy must explicitly permit Account A's Lambda execution role to assume it via AWS STS."
+        },
+        {
+          "id": "c2",
+          "text": "Update the Lambda function's execution role in Account A to grant `sts:AssumeRole` permission for the IAM role ARN in Account B.",
+          "sequence": 2,
+          "explanation": "Without explicit `sts:AssumeRole` permission on Account A's execution role for the Account B role ARN, the Lambda function cannot assume that role even if Account B's trust policy allows it."
+        },
+        {
+          "id": "c3",
+          "text": "Enable Amazon DynamoDB global tables with a replica region corresponding to Account A so the Lambda function can read from a local replica using its existing execution role without cross-account IAM configuration.",
+          "explanation": "DynamoDB global tables replicate data within a single AWS account across multiple regions. They do not support cross-account replication and cannot substitute for cross-account IAM role configuration."
+        },
+        {
+          "id": "c4",
+          "text": "Attach a resource-based policy to the Lambda function in Account A allowing Account B's DynamoDB service principal to invoke the function, enabling indirect data access through the function's return values.",
+          "explanation": "This reverses the access direction. The Lambda needs permission to call DynamoDB in Account B, not to receive calls from Database B. A resource-based policy on the Lambda function does not grant the function outbound DynamoDB access."
+        },
+        {
+          "id": "c5",
+          "text": "Create an IAM user in Account B with DynamoDB read permissions and store the access key and secret key in AWS Secrets Manager in Account A for the Lambda function to retrieve at runtime.",
+          "explanation": "Using long-term IAM user access keys is the legacy approach. IAM role assumption via STS is the recommended cross-account pattern because it avoids storing persistent credentials and produces automatically expiring temporary credentials."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Think about what each account must contribute to the cross-account trust relationship - one side establishes the trust and the other needs permission to use it.",
+      "explanation": "Cross-account IAM role assumption requires two complementary configurations. Account B creates a role that trusts Account A's Lambda execution role, and Account A's execution role must have permission to call `sts:AssumeRole` for that role ARN. Together these form the complete trust chain required for the function to access DynamoDB in Account B.\n\n**Why it works:** When the Lambda function runs, its execution role calls `sts:AssumeRole` targeting Account B's role. Account B's trust policy permits this. AWS STS returns temporary credentials the function uses to read from DynamoDB in Account B.\n\n**Why the others don't work:**\n- DynamoDB global tables operate within a single account across regions. They do not enable cross-account data access.\n- Attaching a resource-based policy to the Lambda function grants other services permission to invoke it, not permission for the function itself to call external services.\n- Storing long-term IAM user credentials in Secrets Manager contradicts the preferred STS-based cross-account pattern.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0028",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_terms-and-concepts.html",
+      "services": [
+        "IAM",
+        "STS"
+      ],
+      "skills": [
+        "1.1.3: Designing a role-based access control strategy (for example, AWS Security Token Service [AWS STS], role switching, cross-account access)."
+      ],
+      "question": "Match each IAM role component to its primary function.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "Trust policy",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "Permissions policy",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "Session duration",
+          "correctChoiceId": "c3"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Specifies which AWS services, IAM users, or external principals are authorized to assume the role.",
+          "explanation": "The trust policy is a resource-based policy attached to the role that defines the trusted principals. Only identities listed here can call sts:AssumeRole to obtain the role's temporary credentials."
+        },
+        {
+          "id": "c2",
+          "text": "Defines the AWS actions and resources the role is permitted to access after it has been assumed.",
+          "explanation": "The permissions policy attached to the role determines what the holder of the temporary credentials can do in AWS. Without this, an assumed role has no effective permissions."
+        },
+        {
+          "id": "c3",
+          "text": "Controls how long the temporary credentials issued by AWS STS when the role is assumed remain valid.",
+          "explanation": "Session duration sets the lifetime of the STS-issued access key, secret, and session token. When the duration elapses the credentials expire and the role must be assumed again to continue."
+        },
+        {
+          "id": "c4",
+          "text": "Lists the IAM groups that can inherit the role's permissions through standard IAM group membership.",
+          "explanation": "IAM roles do not support group membership. Groups are a feature that applies to IAM users only. This is not a component of an IAM role."
+        }
+      ],
+      "tip": "Each IAM role component controls a different dimension of the role - who can use it, what they are allowed to do, and for how long those permissions remain active.",
+      "explanation": "An IAM role has three key configuration dimensions. The trust policy defines who is authorized to assume the role. The permissions policy defines what the assuming entity can do once it holds the role. Session duration determines how long the temporary credentials issued by AWS STS remain valid before the role must be assumed again.\n\n**Why it works:** These three components work together to implement role-based access control: establishing authorized callers, granting specific permissions, and enforcing time-limited access.\n\n**Why the decoy does not fit:** IAM roles do not have group membership. Groups are used to manage permissions for IAM users. A role cannot be added to a group, and group membership cannot propagate role permissions.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0029",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
+      "format": "text",
+      "services": [
+        "AWS Organizations",
+        "CloudTrail"
+      ],
+      "skills": [
+        "1.1.4: Designing a security strategy for multiple AWS accounts (for example, AWS Control Tower, service control policies [SCPs])."
+      ],
+      "question": "The security team needs to ensure that developers in any member account within AWS Organizations can never disable AWS CloudTrail logging, regardless of the IAM permissions they hold within their account.\n\nWhich is the MOST appropriate control mechanism?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Attach a service control policy to the organizational unit containing those accounts with an explicit Deny on `cloudtrail:StopLogging` and `cloudtrail:DeleteTrail`.",
+          "sequence": 1,
+          "explanation": "An SCP with an explicit Deny overrides any Allow in any IAM policy within the member accounts, preventing developers from disabling CloudTrail regardless of their IAM permissions."
+        },
+        {
+          "id": "c2",
+          "text": "Create a Deny IAM policy for `cloudtrail:StopLogging` in each developer account, attach it to every IAM user and role, and configure AWS Config to alert whenever the policy is modified or removed by any privileged user.",
+          "explanation": "An IAM Deny policy in the member account can be overridden by an administrator in that same account. It does not provide the cross-account, tamper-resistant enforcement that an SCP delivers from the management account."
+        },
+        {
+          "id": "c3",
+          "text": "Enable an AWS Config rule in each developer account to detect CloudTrail logging changes and trigger an AWS Systems Manager Automation runbook to re-enable logging within five minutes of any disruption.",
+          "explanation": "An AWS Config-based remediation is a reactive detective control. It detects the violation after it occurs and attempts to remediate it, leaving a window during which CloudTrail is disabled and audit coverage is lost."
+        },
+        {
+          "id": "c4",
+          "text": "Configure an Amazon EventBridge rule in each developer account to detect `cloudtrail:StopLogging` API calls and trigger an AWS Lambda function that immediately re-enables the trail and sends an alert to the security team.",
+          "explanation": "Like Config-based remediation, an EventBridge and Lambda solution is reactive. There is always a brief window between the `StopLogging` call and the Lambda re-enabling the trail, during which audit logging is inactive."
+        }
+      ],
+      "tip": "Think about which control can enforce a restriction that applies above the account level, making it impossible for any IAM principal within the account to override it.",
+      "explanation": "Service control policies in AWS Organizations apply from outside the member account and override any Allow statement in any IAM policy within that account. An explicit Deny SCP on `cloudtrail:StopLogging` and `cloudtrail:DeleteTrail` ensures that no IAM principal in the member account - regardless of their permissions - can disable CloudTrail.\n\n**Why it works:** SCPs act as a permission ceiling applied from the management account. Unlike IAM policies within a member account, SCPs cannot be circumvented by account-level administrators.\n\n**Why the others don't work:**\n- An IAM Deny policy within the member account can be modified or removed by a sufficiently privileged administrator in that same account. It offers no cross-account protection.\n- Config-based remediation detects and corrects violations after they happen. There is always a gap during which CloudTrail is inactive.\n- EventBridge and Lambda remediation is also reactive and subject to the same timing gap as Config remediation.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0030",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/controltower/latest/userguide/what-is-control-tower.html",
+      "format": "text",
+      "services": [
+        "AWS Control Tower",
+        "AWS Organizations"
+      ],
+      "skills": [
+        "1.1.4: Designing a security strategy for multiple AWS accounts (for example, AWS Control Tower, service control policies [SCPs])."
+      ],
+      "question": "Following a board decision to expand cloud operations, the platform engineering team must provision multiple new AWS accounts with pre-configured security baselines, compliance guardrails, and a self-service account vending mechanism to standardize configuration from day one.\n\nWhich solution is MOST aligned with AWS best practices for this requirement?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Deploy AWS Control Tower to automate account provisioning with built-in security guardrails and an Account Factory that standardizes configuration for every account from the moment it is created.",
+          "sequence": 1,
+          "explanation": "AWS Control Tower is the AWS-recommended service for multi-account governance. Account Factory provides a self-service mechanism to provision accounts with pre-approved baselines and mandatory guardrails enforced from creation."
+        },
+        {
+          "id": "c2",
+          "text": "Write AWS CloudFormation StackSets to deploy a security baseline across each new account and build a custom AWS Service Catalog portfolio to provide a self-service account provisioning portal for the platform team.",
+          "explanation": "CloudFormation StackSets and Service Catalog can implement parts of this solution, but building and maintaining a custom account vending system from scratch requires significant ongoing effort. Control Tower provides this capability natively."
+        },
+        {
+          "id": "c3",
+          "text": "Use AWS Organizations to create each new account manually and apply service control policies at the management account root level to enforce a shared security baseline across all member accounts from that point forward.",
+          "explanation": "Manually creating accounts through AWS Organizations does not provide a self-service vending mechanism and does not enforce per-account security baselines at provisioning time. SCPs at the root level also apply to all accounts without the per-OU granularity that Control Tower supports."
+        },
+        {
+          "id": "c4",
+          "text": "Configure AWS Security Hub with cross-account aggregation and implement automated remediation rules in each newly provisioned account to bring resources into compliance with the required security standards on first use.",
+          "explanation": "Security Hub provides visibility and detective controls after accounts are provisioned, but does not offer a self-service account vending mechanism or enforce proactive security baselines during account creation."
+        }
+      ],
+      "tip": "Identify the AWS service specifically designed to automate multi-account setup with consistent guardrails and a built-in account provisioning workflow.",
+      "explanation": "AWS Control Tower is purpose-built for landing zone setup and ongoing multi-account governance. Account Factory enables a self-service account provisioning workflow, and built-in guardrails (implemented as SCPs and AWS Config rules) apply automatically to every new account, ensuring compliance from the start.\n\n**Why it works:** Control Tower orchestrates AWS Organizations, AWS Config, CloudTrail, and IAM to establish a governed landing zone. Account Factory provides the self-service vending mechanism and ensures every provisioned account inherits the approved baseline.\n\n**Why the others don't work:**\n- CloudFormation StackSets and Service Catalog can approximate this but require custom development and maintenance with no native account lifecycle management.\n- Manually creating accounts through Organizations lacks automation and a self-service capability.\n- Security Hub is a detective and compliance monitoring service, not an account provisioning or baseline enforcement tool.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0031",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_evaluation.html",
+      "format": "text",
+      "services": [
+        "AWS Organizations"
+      ],
+      "skills": [
+        "1.1.4: Designing a security strategy for multiple AWS accounts (for example, AWS Control Tower, service control policies [SCPs])."
+      ],
+      "question": "The cloud governance team plans to use service control policies in AWS Organizations to limit which AWS services member accounts can use. Before deployment, they want to confirm their understanding of SCP behavior.\n\nWhich TWO statements accurately describe how SCPs work? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "SCPs do not grant permissions on their own; they define the maximum permission envelope within which IAM policies in member accounts can operate.",
+          "sequence": 1,
+          "explanation": "SCPs are a guardrail, not a grant. A principal in a member account can only perform an action if both the relevant SCP and the applicable IAM policy allow it. An SCP Allow alone is not sufficient."
+        },
+        {
+          "id": "c2",
+          "text": "SCPs apply to all IAM principals in a member account, including the account root user, but do not restrict principals in the management account itself.",
+          "sequence": 2,
+          "explanation": "SCPs apply to all principals in member accounts, including the root user of those accounts. The management account is explicitly exempt from SCP enforcement regardless of how SCPs are configured."
+        },
+        {
+          "id": "c3",
+          "text": "SCPs override all IAM Allow statements for principals in member accounts when there is a conflict, and also apply the same restrictions to the management account root user under a root OU SCP.",
+          "explanation": "SCPs supersede IAM Allows in member accounts, but they do not apply to the management account. Attaching an SCP to the root OU does not restrict the management account's root user or any of its principals."
+        },
+        {
+          "id": "c4",
+          "text": "SCPs can directly grant permissions to IAM principals in member accounts when no identity-based policy is attached to those principals, acting as a fallback authorization source.",
+          "explanation": "SCPs never grant permissions. They only restrict them. If a principal has no IAM policy attached, an SCP Allow does not give that principal any access. Both an SCP Allow and an IAM policy Allow must be present for access to succeed."
+        },
+        {
+          "id": "c5",
+          "text": "SCPs apply exclusively to IAM roles in member accounts and have no effect on IAM users or the account root user, making them suitable only for restricting service-to-service access patterns.",
+          "explanation": "SCPs apply to all IAM principals in a member account - IAM users, IAM roles, and the account root user. They are not limited to IAM roles or service-to-service access patterns."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Focus on two fundamental SCP properties: what they can and cannot grant, and to which accounts and principals they apply.",
+      "explanation": "SCPs define a permission ceiling for member accounts but never grant permissions themselves. A principal needs both an applicable SCP Allow and a corresponding IAM policy Allow for an action to succeed. SCPs apply to all IAM principals within member accounts, including root users, but the management account is explicitly excluded from SCP enforcement.\n\n**Why it works:** These two properties - SCPs as guardrails rather than grants, and their coverage of all member account principals except the management account - are the foundational behaviors needed to design safe SCP deployments.\n\n**Why the others don't work:**\n- SCPs do not apply to the management account under any configuration, including root OU attachment.\n- SCPs cannot grant permissions. Absence of an IAM policy means no access, regardless of any SCP Allow.\n- SCPs apply to all principals in member accounts, not just IAM roles.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0032",
+      "type": "ordering",
+      "docs": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
+      "services": [
+        "AWS Organizations"
+      ],
+      "skills": [
+        "1.1.4: Designing a security strategy for multiple AWS accounts (for example, AWS Control Tower, service control policies [SCPs])."
+      ],
+      "question": "Arrange the following steps in the correct order to create and apply a service control policy that restricts a specific AWS service across an organizational unit.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Enable service control policies as a policy type in the AWS Organizations management account.",
+          "sequence": 1,
+          "explanation": "SCP functionality must be enabled in the organization before any SCP can be created or attached. This is a prerequisite for all subsequent steps."
+        },
+        {
+          "id": "c2",
+          "text": "Create the service control policy document with an explicit Deny statement for the target AWS service actions.",
+          "sequence": 2,
+          "explanation": "Once SCPs are enabled, the policy document can be authored and saved in Organizations. The policy must exist before it can be attached to any target."
+        },
+        {
+          "id": "c3",
+          "text": "Attach the service control policy to the organizational unit that contains the member accounts requiring the restriction.",
+          "sequence": 3,
+          "explanation": "Attaching the SCP to the OU propagates it to all member accounts in that OU and any nested OUs. The policy and the OU must both exist before attachment is possible."
+        },
+        {
+          "id": "c4",
+          "text": "Verify the restriction is active by testing the denied service actions from a member account within the targeted organizational unit.",
+          "sequence": 4,
+          "explanation": "Verification confirms the SCP is correctly applied and the intended actions are blocked. Testing from within a member account in the targeted OU is the appropriate validation step."
+        }
+      ],
+      "tip": "Each step builds on the previous one: there is nothing to create until the feature is enabled, nothing to attach until the policy exists, and nothing to verify until the policy is attached.",
+      "explanation": "The process follows a logical dependency chain. SCPs must be enabled as a feature before any policy can be created. The policy document must exist before it can be attached, and attachment must complete before the restriction can be verified from within a member account.\n\n**Why it works:** AWS Organizations requires SCP functionality to be explicitly enabled before use. Creating, attaching, and testing the SCP in sequence ensures each dependency is satisfied before the next step is attempted.\n\n**Why the others don't work:**\n- Creating a policy before enabling SCPs will fail because the SCP policy type is not yet active.\n- Attaching before creating is not possible - there is no policy to attach.\n- Verifying before attaching would show no restriction because the policy has not taken effect yet.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0033",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-overview.html",
+      "format": "text",
+      "services": [
+        "IAM",
+        "Amazon S3",
+        "Lambda"
+      ],
+      "skills": [
+        "1.1.5: Determining the appropriate use of resource policies for AWS services."
+      ],
+      "question": "The development team needs to allow an AWS Lambda function in a different AWS account to read objects from an Amazon S3 bucket, without requiring the external account to create an IAM role for cross-account access.\n\nWhich is the MOST appropriate configuration?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Attach a resource-based bucket policy to the Amazon S3 bucket that grants `s3:GetObject` permission to the external Lambda function's IAM execution role ARN.",
+          "sequence": 1,
+          "explanation": "An S3 bucket policy is a resource-based policy that can grant cross-account access directly, without requiring the external account to create an IAM role or assume any role in the bucket owner's account."
+        },
+        {
+          "id": "c2",
+          "text": "Create an IAM role in the bucket owner's account with AmazonS3ReadOnlyAccess attached, configure the trust policy to allow the external account to assume the role, and instruct the Lambda function to call sts:AssumeRole before reading objects.",
+          "explanation": "Creating a cross-account IAM role does enable the Lambda to read from the bucket, but the question specifically asks for an approach that does not require the external account to use role assumption. An S3 bucket policy satisfies this directly."
+        },
+        {
+          "id": "c3",
+          "text": "Enable Amazon S3 Block Public Access on the bucket and configure an IAM identity-based policy in the S3 bucket owner's account that delegates read access to the external Lambda function's execution role.",
+          "explanation": "An IAM identity-based policy in the bucket owner's account only controls what identities in that account can do. It cannot grant access to principals in an external account. Cross-account access to S3 requires a resource-based bucket policy or cross-account role assumption."
+        },
+        {
+          "id": "c4",
+          "text": "Create an Amazon S3 access point for the bucket with a policy granting the external account read access to objects through the access point alias, then update the Lambda function to use the access point URL for all object retrieval.",
+          "explanation": "S3 access points simplify access management for large shared datasets but still require the underlying bucket policy to delegate access, and they add configuration complexity compared to a direct bucket policy grant."
+        }
+      ],
+      "tip": "Consider which type of policy can be attached directly to the resource to grant external account access, without requiring the requester to assume a role in the resource owner's account.",
+      "explanation": "An Amazon S3 bucket policy is a resource-based policy attached directly to the bucket. It can grant principals from external accounts access to the bucket without requiring those principals to assume an IAM role, making it the simplest solution when cross-account access without role assumption is required.\n\n**Why it works:** S3 bucket policies support cross-account principal grants using account IDs and IAM ARNs. The external Lambda function's execution role ARN can be specified directly in the bucket policy, granting it read access without any role assumption on the external account's side.\n\n**Why the others don't work:**\n- A cross-account IAM role satisfies the use case functionally but explicitly requires role assumption, which the question excludes.\n- An IAM identity-based policy in the bucket owner's account cannot extend permissions to principals in a different account.\n- S3 access points do simplify access management, but they require a corresponding bucket policy delegation and add unnecessary complexity for a straightforward cross-account grant.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0034",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html",
+      "format": "text",
+      "services": [
+        "IAM",
+        "Lambda",
+        "API Gateway"
+      ],
+      "skills": [
+        "1.1.5: Determining the appropriate use of resource policies for AWS services."
+      ],
+      "question": "During a security review, the team confirmed that only Amazon API Gateway should be able to invoke a specific AWS Lambda function in the same account. No other AWS service or IAM principal should be able to trigger the function directly.\n\nWhich is the MOST suitable control to enforce this restriction?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Add a resource-based policy to the Lambda function that grants `lambda:InvokeFunction` exclusively to the Amazon API Gateway service principal for that specific API.",
+          "sequence": 1,
+          "explanation": "A Lambda resource-based policy is the purpose-built control for specifying which services and principals can invoke the function. Granting lambda:InvokeFunction only to the API Gateway service principal with a source ARN condition restricts invocation to that specific API."
+        },
+        {
+          "id": "c2",
+          "text": "Attach an IAM permissions boundary to the Lambda function's execution role that restricts the function from being invoked by any principal except Amazon API Gateway, preventing unauthorized service triggers.",
+          "explanation": "A permissions boundary controls what the Lambda execution role itself can do when making outbound AWS API calls. It has no effect on who is allowed to invoke the Lambda function. Invocation control requires a resource-based policy on the function."
+        },
+        {
+          "id": "c3",
+          "text": "Enable AWS WAF on the Amazon API Gateway stage with IP-based and rate-limiting rules to filter incoming requests, preventing callers that do not originate through the API Gateway endpoint from reaching the Lambda function.",
+          "explanation": "AWS WAF inspects HTTP requests at the API Gateway layer and can block unwanted web traffic. It cannot prevent direct Lambda invocations made through the AWS SDK or CLI that bypass API Gateway entirely."
+        },
+        {
+          "id": "c4",
+          "text": "Move the Lambda function into a VPC with no internet gateway and configure a VPC endpoint for API Gateway, ensuring that only requests routed through the private internal network can trigger the function.",
+          "explanation": "Placing Lambda in a VPC restricts network-level access but does not prevent IAM-authorized invocations through the AWS API. A principal with the appropriate IAM permissions can still invoke the function via the AWS SDK even when it is deployed inside a VPC."
+        }
+      ],
+      "tip": "Look for the control that is attached to the Lambda function itself and specifies which callers are permitted to invoke it, independent of network path.",
+      "explanation": "A Lambda resource-based policy is the correct mechanism for controlling who can invoke a function. By granting `lambda:InvokeFunction` only to the API Gateway service principal and scoping it to a specific source ARN, the policy ensures that no other service or IAM principal can trigger the function.\n\n**Why it works:** Lambda resource-based policies are evaluated whenever the function is invoked. Only callers explicitly permitted by the policy can invoke the function, regardless of how or where the invocation originates.\n\n**Why the others don't work:**\n- A permissions boundary controls outbound permissions for the execution role, not inbound invocation rights for the function itself.\n- AWS WAF operates at the HTTP layer of API Gateway and cannot block direct AWS API invocations that do not go through API Gateway.\n- A VPC configuration restricts network-layer access but does not prevent AWS API-plane invocations from authorized IAM principals.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0035",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/sns/latest/dg/sns-send-message-to-sqs-cross-account.html",
+      "format": "text",
+      "services": [
+        "SNS",
+        "SQS",
+        "IAM"
+      ],
+      "skills": [
+        "1.1.5: Determining the appropriate use of resource policies for AWS services."
+      ],
+      "question": "The platform team is designing a workflow where an Amazon SNS topic in Account A must deliver messages to an Amazon SQS queue in Account B. The Account B team will create the SNS subscription from their side. The team needs to configure the appropriate permissions for this cross-account, cross-service message delivery.\n\nWhich TWO configurations are required? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Attach a resource-based policy to the Amazon SQS queue in Account B that grants `sqs:SendMessage` permission to the Amazon SNS topic ARN in Account A.",
+          "sequence": 1,
+          "explanation": "The SQS queue needs a resource-based policy authorizing the SNS topic to send messages to it. Without this, Amazon SNS cannot deliver messages cross-account even if the subscription exists."
+        },
+        {
+          "id": "c2",
+          "text": "Update the Amazon SNS topic's access policy in Account A to allow Account B principals to call `sns:Subscribe` on the topic.",
+          "sequence": 2,
+          "explanation": "Because Account B will create the subscription from their side, Account A's SNS topic must have an access policy granting Account B permission to call sns:Subscribe. Without this, Account B cannot create the cross-account subscription."
+        },
+        {
+          "id": "c3",
+          "text": "Configure Amazon VPC peering between Account A and Account B so the SNS topic can route messages directly to the SQS queue through a private network path without requiring resource-based policies.",
+          "explanation": "VPC peering enables private network connectivity between VPCs and does not affect AWS service-to-service permissions. SNS and SQS communicate through AWS service APIs independently of VPC networking, so peering cannot replace resource-based policies."
+        },
+        {
+          "id": "c4",
+          "text": "Create an IAM role in Account A with permission to call `sqs:SendMessage` on Account B's queue, and configure the SNS topic to assume that role before delivering each message to the queue.",
+          "explanation": "Amazon SNS does not support assuming an IAM role for message delivery to SQS. Cross-account SNS-to-SQS delivery is enabled through resource-based policies on the SQS queue and SNS topic, not through IAM role assumption by the SNS service."
+        },
+        {
+          "id": "c5",
+          "text": "Enable an Amazon EventBridge event bus in Account A with a resource-based policy allowing Account B to receive events, then configure an EventBridge rule to forward SNS messages to Account B's SQS queue.",
+          "explanation": "Introducing EventBridge as an intermediary adds unnecessary complexity and changes the message delivery path. The requirement is for SNS in Account A to deliver directly to SQS in Account B, which is achievable with the appropriate resource-based policies on both services."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Consider what each service needs to authorize from its own perspective - the receiving service must allow the sender access, and the sending service must allow the subscriber to register.",
+      "explanation": "Cross-account SNS-to-SQS delivery requires two resource-based policies. The SQS queue in Account B must grant `sqs:SendMessage` to the SNS topic ARN so SNS can deliver messages. The SNS topic in Account A must grant `sns:Subscribe` to Account B so the Account B team can create the subscription.\n\n**Why it works:** Resource-based policies on both services handle the authorization for each direction of the interaction. The SQS policy allows SNS to push messages; the SNS topic policy allows Account B to subscribe.\n\n**Why the others don't work:**\n- VPC peering is a network-layer feature and has no bearing on AWS service API permissions between accounts.\n- SNS does not assume IAM roles for SQS delivery. Cross-account delivery uses resource-based policies, not role assumption by the SNS service.\n- Using EventBridge as an intermediary is a different architecture that adds unnecessary complexity to a problem solvable with direct resource-based policy configuration.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0036",
+      "type": "matching",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+      "services": [
+        "IAM"
+      ],
+      "skills": [
+        "1.1.5: Determining the appropriate use of resource policies for AWS services."
+      ],
+      "question": "Match each IAM policy type to its primary characteristic.",
+      "slots": [
+        {
+          "id": "s1",
+          "label": "Identity-based policy",
+          "correctChoiceId": "c1"
+        },
+        {
+          "id": "s2",
+          "label": "Resource-based policy",
+          "correctChoiceId": "c2"
+        },
+        {
+          "id": "s3",
+          "label": "Permissions boundary",
+          "correctChoiceId": "c3"
+        }
+      ],
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Attached to an IAM user, group, or role to specify what actions that principal is allowed to perform on AWS resources.",
+          "explanation": "Identity-based policies define the permissions of the principal they are attached to. They can be managed policies or inline policies and control what the principal can do across any resource."
+        },
+        {
+          "id": "c2",
+          "text": "Attached directly to an AWS resource to define which principals can access it, including principals from other AWS accounts.",
+          "explanation": "Resource-based policies are attached to the resource rather than to the requesting principal. They are important for enabling cross-account access without requiring the external account to assume a role."
+        },
+        {
+          "id": "c3",
+          "text": "Sets a ceiling on the effective permissions an IAM user or role can exercise, without itself granting any permissions.",
+          "explanation": "A permissions boundary limits the maximum permissions available to the entity it is attached to. The effective permissions are the intersection of the boundary and the identity-based policies, never exceeding either alone."
+        },
+        {
+          "id": "c4",
+          "text": "Applied by AWS Organizations to restrict the maximum permissions available to all IAM principals within a member account.",
+          "explanation": "This describes a service control policy (SCP), not an IAM policy type. SCPs operate at the Organizations level and are distinct from identity-based policies, resource-based policies, and permissions boundaries."
+        }
+      ],
+      "tip": "Consider where each policy type is attached - to the requester, to the resource, or as a ceiling applied to an existing identity - to distinguish their roles in the IAM evaluation logic.",
+      "explanation": "The three main IAM policy types each play a distinct role. Identity-based policies define what a principal can do. Resource-based policies define who can access a resource. Permissions boundaries cap the maximum effective permissions of an IAM entity without granting anything on their own.\n\n**Why it works:** Each policy type addresses a different axis of access control, and they can be combined to implement layered security.\n\n**Why the decoy does not fit:** The fourth option describes a service control policy, which is an AWS Organizations feature. SCPs operate at the account level, outside IAM, and are not one of the four IAM policy types. They are a separate control layer evaluated alongside IAM policies.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0037",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_saml.html",
+      "format": "text",
+      "services": [
+        "IAM",
+        "IAM Identity Center"
+      ],
+      "skills": [
+        "1.1.6: Determining when to federate a directory service with IAM roles."
+      ],
+      "question": "The organization is looking to provide 500 employees who already have Active Directory identities with federated access to the AWS Management Console. The security policy prohibits creating individual IAM users for each employee.\n\nWhich is the MOST appropriate solution?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Configure SAML 2.0 federation by creating an IAM SAML identity provider and mapping Active Directory groups to IAM roles, allowing employees to sign in with their existing corporate credentials.",
+          "sequence": 1,
+          "explanation": "SAML 2.0 federation lets existing Active Directory users authenticate with their corporate credentials and switch into AWS roles without creating individual IAM users. Group-to-role mappings scale across hundreds of employees."
+        },
+        {
+          "id": "c2",
+          "text": "Create 500 IAM users in the AWS account with initial passwords matching each employee's Active Directory credentials and configure an automated synchronization script to propagate Active Directory password changes on a weekly schedule.",
+          "explanation": "Creating individual IAM users violates the security policy and introduces a parallel identity system. Synchronizing passwords between two separate identity stores is operationally unsustainable and creates security risks."
+        },
+        {
+          "id": "c3",
+          "text": "Deploy an Amazon EC2 instance running Active Directory Federation Services and configure it to issue AWS Management Console session tokens directly, without registering the IdP as an IAM SAML identity provider in AWS.",
+          "explanation": "Active Directory Federation Services can act as the SAML identity provider, but the IdP must be registered as an IAM SAML identity provider for AWS to validate SAML assertions. Bypassing IAM identity provider registration breaks the federation chain."
+        },
+        {
+          "id": "c4",
+          "text": "Enable AWS Directory Service to create a directory that connects to the on-premises Active Directory and configure a scheduled Lambda function to create corresponding IAM users for each directory account automatically.",
+          "explanation": "Automatically creating IAM users for each directory account still produces individual IAM users, violating the stated security policy. Federation eliminates the need for any per-employee IAM user accounts."
+        }
+      ],
+      "tip": "Consider the authentication mechanism that allows existing corporate directory identities to be used for AWS access without replicating those identities as individual IAM entities.",
+      "explanation": "SAML 2.0 federation with an IAM identity provider is the standard approach for granting existing directory users console access at scale. The corporate identity provider authenticates users and issues SAML assertions, which AWS validates against the registered IAM identity provider to allow users to switch into mapped IAM roles.\n\n**Why it works:** Employees authenticate with their existing corporate credentials. Active Directory groups are mapped to IAM roles. No individual IAM users are created. The solution scales to any number of employees through group-based role assignments.\n\n**Why the others don't work:**\n- Creating 500 IAM users violates the stated security policy and adds a parallel identity system that must be kept in sync.\n- AD FS can serve as the SAML IdP, but skipping IAM identity provider registration means AWS cannot validate the SAML assertions, blocking federation.\n- Using Directory Service with a Lambda to create IAM users still produces IAM user accounts, which the policy explicitly prohibits.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0038",
+      "type": "single-choice",
+      "docs": "https://docs.aws.amazon.com/cognito/latest/developerguide/identity-pools.html",
+      "format": "text",
+      "services": [
+        "Amazon Cognito",
+        "IAM",
+        "Amazon DynamoDB",
+        "STS"
+      ],
+      "skills": [
+        "1.1.6: Determining when to federate a directory service with IAM roles."
+      ],
+      "question": "A startup is building a mobile application that lets users sign in with their existing Google accounts. After authentication, the app needs to make AWS API calls on each user's behalf to store personal data in Amazon DynamoDB.\n\nWhich is the MOST appropriate mechanism to provide authenticated users with scoped temporary AWS credentials?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Configure an Amazon Cognito identity pool with Google as an identity provider and map authenticated users to an IAM role that grants scoped access to their own Amazon DynamoDB items.",
+          "sequence": 1,
+          "explanation": "Cognito identity pools are designed for this use case. They accept Google OIDC tokens, exchange them for temporary AWS credentials via AWS STS, and map authenticated users to a designated IAM role with appropriate DynamoDB permissions."
+        },
+        {
+          "id": "c2",
+          "text": "Create a single IAM user for the application with full DynamoDB access and embed the long-term access key in the mobile application, relying on Google sign-in only for application-layer identity tracking.",
+          "explanation": "Embedding a long-term IAM access key in a mobile application is a critical security risk. The key is accessible to anyone who decompiles the application, and a single shared key cannot enforce per-user data scoping."
+        },
+        {
+          "id": "c3",
+          "text": "Configure an OIDC identity provider in AWS IAM for Google and create a shared IAM role that all authenticated Google users assume simultaneously, granting DynamoDB read and write access without user-level scoping.",
+          "explanation": "Configuring an IAM OIDC provider and shared role is technically possible but produces shared temporary credentials with no per-user data isolation. Cognito identity pools are the recommended pattern for mobile application federation with per-user access control."
+        },
+        {
+          "id": "c4",
+          "text": "Set up a backend AWS Lambda function to validate each user's Google token, generate a short-lived DynamoDB item key unique to that user, and return it to the mobile app as a substitute for AWS credentials.",
+          "explanation": "DynamoDB item keys are not security credentials and cannot substitute for IAM temporary credentials. This approach bypasses AWS IAM entirely and does not produce credentials the mobile app can use to call AWS APIs directly."
+        }
+      ],
+      "tip": "Look for the AWS service specifically designed to federate social identity provider logins into temporary AWS credentials for mobile and web application users.",
+      "explanation": "Amazon Cognito identity pools are the recommended AWS solution for federating external identity providers - including Google - into temporary AWS credentials for mobile applications. The identity pool accepts the Google OIDC token, exchanges it for STS-issued temporary credentials, and maps the authenticated user to a configured IAM role.\n\n**Why it works:** Cognito identity pools handle the OIDC token validation and STS credential exchange automatically. IAM condition keys such as `cognito-identity.amazonaws.com:sub` can be used to scope DynamoDB access to each user's own items.\n\n**Why the others don't work:**\n- Embedding a long-term IAM access key in a mobile application is a high-severity security vulnerability. Any user of the app can extract the key.\n- A shared IAM OIDC role grants all authenticated users the same permissions with no isolation. Cognito identity pools provide per-user credential issuance.\n- A custom Lambda token exchange does not produce IAM-compatible AWS credentials and would require rebuilding what Cognito identity pools already provide.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0039",
+      "type": "multiple-choice",
+      "docs": "https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html",
+      "format": "text",
+      "services": [
+        "IAM Identity Center",
+        "AWS Organizations",
+        "IAM"
+      ],
+      "skills": [
+        "1.1.6: Determining when to federate a directory service with IAM roles."
+      ],
+      "question": "The enterprise IT team needs to provide federated console access to multiple AWS accounts for on-premises Active Directory users. The solution must support group-based permission assignment across accounts without creating individual IAM users in any account.\n\nWhich TWO actions should the team take? (Select TWO)",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Enable AWS IAM Identity Center and connect it to the on-premises Active Directory using an AWS Directory Service connector or a SAML 2.0 identity provider integration.",
+          "sequence": 1,
+          "explanation": "AWS IAM Identity Center is the centralized service for multi-account federated access. Connecting it to Active Directory via a Directory Service connector or SAML IdP integration allows on-premises users to authenticate with their existing credentials."
+        },
+        {
+          "id": "c2",
+          "text": "Create permission sets in AWS IAM Identity Center that define the required access levels and assign them to Active Directory groups for each relevant AWS account.",
+          "sequence": 2,
+          "explanation": "Permission sets define the IAM policies applied when a user accesses an account. Assigning permission sets to Active Directory groups provides group-based access control across multiple accounts without any per-user IAM configuration."
+        },
+        {
+          "id": "c3",
+          "text": "Create IAM groups in each AWS account that mirror the on-premises Active Directory group structure and use a scheduled Lambda function to synchronize group membership through Active Directory API calls.",
+          "explanation": "Replicating Active Directory groups into per-account IAM groups with a custom synchronization Lambda is complex, fragile, and still results in IAM-managed identities rather than federated access. IAM Identity Center handles this centrally."
+        },
+        {
+          "id": "c4",
+          "text": "Configure AWS Organizations service control policies in each account to accept Active Directory group names as principal identifiers in IAM policy conditions, enabling group-based access without a federation layer.",
+          "explanation": "SCPs do not support Active Directory group names as IAM principal identifiers. SCPs restrict maximum account permissions; they are not a mechanism for federating Active Directory identities into AWS accounts."
+        },
+        {
+          "id": "c5",
+          "text": "Deploy Amazon Cognito user pools in every AWS account to replicate the on-premises Active Directory structure and federate Cognito identities with IAM roles to provide Management Console access to employees.",
+          "explanation": "Cognito user pools are designed for customer-facing web and mobile application authentication, not for enterprise employee console access across multiple AWS accounts. AWS IAM Identity Center is the appropriate service for this use case."
+        }
+      ],
+      "selectCount": 2,
+      "tip": "Think about the AWS service that provides centralized multi-account access management with native directory integration, and what its two core configuration elements are.",
+      "explanation": "AWS IAM Identity Center is the AWS-recommended approach for centralized multi-account, group-based federated access. Connecting it to on-premises Active Directory provides the identity source, and permission sets assigned to AD groups provide the access control layer - covering multiple accounts without any per-user IAM configuration.\n\n**Why it works:** IAM Identity Center acts as a central control plane that integrates with Active Directory for authentication and uses permission sets to define what each group can do in each account. Users see a single portal and can access all assigned accounts and roles.\n\n**Why the others don't work:**\n- Mirroring AD groups in per-account IAM groups with a custom Lambda introduces drift risk and operational complexity. IAM Identity Center handles synchronization natively.\n- SCPs restrict account-level permissions. They cannot use Active Directory group names as principals and are not a federation mechanism.\n- Cognito user pools serve app-level authentication, not enterprise employee console access across a multi-account organization.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-14"
+    },
+    {
+      "id": "SAA-C03-0040",
+      "type": "ordering",
+      "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_saml.html",
+      "services": [
+        "IAM"
+      ],
+      "skills": [
+        "1.1.6: Determining when to federate a directory service with IAM roles."
+      ],
+      "question": "Arrange the following steps in the correct order to configure SAML 2.0 federation so that corporate Active Directory users can sign in to the AWS Management Console using their existing credentials.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Configure the corporate identity provider to generate SAML 2.0 assertions for AWS and export its SAML metadata document.",
+          "sequence": 1,
+          "explanation": "The identity provider must be configured with AWS as a relying party before any other step can proceed. The metadata document produced here is needed to register the IdP with AWS in the next step."
+        },
+        {
+          "id": "c2",
+          "text": "Create an IAM SAML identity provider in AWS using the metadata document exported from the corporate identity provider.",
+          "sequence": 2,
+          "explanation": "Registering the IAM SAML identity provider in AWS establishes the trust between AWS and the corporate IdP. This must happen before any IAM roles can reference it in their trust policies."
+        },
+        {
+          "id": "c3",
+          "text": "Create IAM roles with trust policies that reference the IAM SAML identity provider and attach the appropriate permission policies for each user group.",
+          "sequence": 3,
+          "explanation": "The IAM roles define what authenticated users can do in AWS. Their trust policies must reference the newly created SAML identity provider. Both the identity provider and the roles must exist before attribute mappings can be configured."
+        },
+        {
+          "id": "c4",
+          "text": "Configure attribute mappings in the identity provider to map Active Directory group membership to specific IAM role ARNs and verify federation by signing in with a test user account.",
+          "sequence": 4,
+          "explanation": "Configuring attribute mappings completes the configuration by linking AD groups to IAM roles. Testing with a representative user confirms the full federation flow is working end-to-end before the rollout."
+        }
+      ],
+      "tip": "Each step depends on what was created in the step before it: the IdP metadata is needed to register with AWS, registered IdP is needed to create role trust policies, and those roles must exist before attribute mappings can reference them.",
+      "explanation": "The SAML 2.0 federation setup follows a chain of dependencies. The corporate IdP is configured and its metadata exported first, that metadata is used to register the IAM SAML identity provider, IAM roles are created referencing the new provider, and finally attribute mappings in the IdP link AD groups to those roles.\n\n**Why it works:** Each step builds on the output of the previous one. The metadata document enables IdP registration, IdP registration enables role trust policy configuration, and completed roles enable group-to-role attribute mapping.\n\n**Why the others don't work:**\n- Registering the IAM SAML identity provider before the IdP is configured leaves no metadata document to import.\n- Creating IAM roles before registering the IdP means the trust policy cannot reference an IdP that does not yet exist.\n- Configuring attribute mappings before the IAM roles exist means there are no role ARNs to map the groups to.",
+      "domain": "Design Secure Architectures",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-14"
     }
   ],
   "showcaseQuestionIds": [
