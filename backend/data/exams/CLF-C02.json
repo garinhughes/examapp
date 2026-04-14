@@ -89,7 +89,7 @@
         }
       ],
       "tip": "Consider how the cost per customer database instance changes when AWS runs databases for millions of customers versus a company running databases only for itself.",
-      "explanation": "The economies of scale principle is fundamental to AWS cost advantages over on-premises infrastructure.\n\n**Why it works:** AWS amortizes its massive infrastructure, real estate, power, cooling, and staffing costs across millions of customers globally. This allows the cost per customer to be significantly lower than any individual organization could achieve managing their own data centers. Amazon RDS exemplifies this by offering managed database instances at a fraction of the cost of equivalent on-premises deployments when total cost of ownership\u2014including management, patching, backups, and redundancy\u2014is calculated.\n\n**Why the others fail:**\n- Reserved instances provide pricing discounts through commitment, not through economies of scale.\n- On-premises infrastructure costs more due to lack of scale and shared resource distribution, not due to larger hardware requirements.\n- Cloud databases are typically cheaper than on-premises due to economies of scale, not more expensive.\n\n**Implementation:** Leverage AWS managed services and reserved instances to maximize the economies of scale benefits. Consult the AWS Pricing Calculator to compare on-premises TCO with RDS costs.",
+      "explanation": "The economies of scale principle is fundamental to AWS cost advantages over on-premises infrastructure.\n\n**Why it works:** AWS amortizes its massive infrastructure, real estate, power, cooling, and staffing costs across millions of customers globally. This allows the cost per customer to be significantly lower than any individual organization could achieve managing their own data centers. Amazon RDS exemplifies this by offering managed database instances at a fraction of the cost of equivalent on-premises deployments when total cost of ownership, including management, patching, backups, and redundancy, is calculated.\n\n**Why the others fail:**\n- Reserved instances provide pricing discounts through commitment, not through economies of scale.\n- On-premises infrastructure costs more due to lack of scale and shared resource distribution, not due to larger hardware requirements.\n- Cloud databases are typically cheaper than on-premises due to economies of scale, not more expensive.\n\n**Implementation:** Leverage AWS managed services and reserved instances to maximize the economies of scale benefits. Consult the AWS Pricing Calculator to compare on-premises TCO with RDS costs.",
       "domain": "Cloud Concepts",
       "difficulty": 2,
       "lastReviewed": "2026-03-31"
@@ -182,7 +182,7 @@
         }
       ],
       "tip": "Consider what AWS controls at the infrastructure level versus what customers control on their deployed resources.",
-      "explanation": "AWS is responsible for the security OF the cloud\u2014physical infrastructure, power, cooling, and host security. Customers are responsible for security IN the cloud, including OS patching, firewall rules, and application-level encryption.\n\n**Why it works:** AWS manages all physical data center components and hardware; this is fundamental to their infrastructure responsibility.\n\n**Why the others fail:**\n- Configuring security groups/NACLs: These are customer-managed network controls on deployed resources.\n- Installing/patching the OS: Customers manage the guest OS; AWS manages only the hypervisor level.\n- Encrypting application data: Customers choose and implement encryption strategies for their data.\n\n**Implementation:** Review AWS Shared Responsibility Model documentation at https://aws.amazon.com/compliance/shared-responsibility-model/",
+      "explanation": "AWS is responsible for the security OF the cloud: physical infrastructure, power, cooling, and host security. Customers are responsible for security IN the cloud, including OS patching, firewall rules, and application-level encryption.\n\n**Why it works:** AWS manages all physical data center components and hardware; this is fundamental to their infrastructure responsibility.\n\n**Why the others fail:**\n- Configuring security groups/NACLs: These are customer-managed network controls on deployed resources.\n- Installing/patching the OS: Customers manage the guest OS; AWS manages only the hypervisor level.\n- Encrypting application data: Customers choose and implement encryption strategies for their data.\n\n**Implementation:** Review AWS Shared Responsibility Model documentation at https://aws.amazon.com/compliance/shared-responsibility-model/",
       "domain": "Security and Compliance",
       "difficulty": 1,
       "lastReviewed": "2026-03-31"
@@ -224,7 +224,7 @@
           "explanation": "AWS manages both automated patching and backups for RDS as part of the managed database service responsibility."
         }
       ],
-      "tip": "Think about what 'managed service' means\u2014AWS handles infrastructure concerns while customers focus on configuration and strategy decisions.",
+      "tip": "Think about what 'managed service' means: AWS handles infrastructure concerns while customers focus on configuration and strategy decisions.",
       "explanation": "Amazon RDS exemplifies a managed service where AWS handles operational tasks like patching and backups, but customers retain control over configuration, retention policies, and performance tuning.\n\n**Why it works:** AWS automates engine patches and backup execution; customers set retention policies and configure recovery objectives based on their requirements.\n\n**Why the others fail:**\n- AWS manages everything: RDS is managed but not fully autonomous; customers configure access, performance, and backup strategies.\n- Customer handles all patching/availability: AWS manages the database engine and infrastructure; customers focus on application-level concerns.\n- AWS handles backups only: AWS manages both automated backups and patching for RDS.\n\n**Implementation:** Configure RDS backup retention via AWS Console > RDS > Databases > Modify > Backup Retention Period or use `aws rds modify-db-instance --backup-retention-period`.",
       "domain": "Security and Compliance",
       "difficulty": 2,
@@ -377,7 +377,7 @@
       "skills": [
         "2.2.3: Describing how customers secure resources on AWS (for example, Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield)."
       ],
-      "question": "Centralizing security findings from multiple AWS security services into a single dashboard \u2014 including compliance checks and security alerts \u2014 is a key operational requirement.\n\nWhich TWO options address this?",
+      "question": "Centralizing security findings from multiple AWS security services into a single dashboard (including compliance checks and security alerts) is a key operational requirement.\n\nWhich TWO options address this?",
       "choices": [
         {
           "id": "c1",
@@ -760,7 +760,7 @@
         }
       ],
       "tip": "For long-term, infrequently accessed compliance data, consider the cheapest storage class even with retrieval delays.",
-      "explanation": "S3 Glacier Deep Archive minimizes storage costs for compliance archives with quarterly access.\n\n**Why it works:** Deep Archive charges approximately $1.26/TB/month with a 12-hour retrieval window\u2014acceptable for quarterly compliance audits.\n\n**Why the others fail:**\n- S3 Standard: Costs 10x more than Deep Archive for inactive compliance data\n- Intelligent-Tiering: More expensive than Deep Archive for predictable infrequent access\n- EBS Snapshots: Designed for database backups, not long-term data retention\n\n**Implementation:** Move compliance archives to Deep Archive via lifecycle rules after initial access period to minimize 10-year retention costs.",
+      "explanation": "S3 Glacier Deep Archive minimizes storage costs for compliance archives with quarterly access.\n\n**Why it works:** Deep Archive charges approximately $1.26/TB/month with a 12-hour retrieval window, which is acceptable for quarterly compliance audits.\n\n**Why the others fail:**\n- S3 Standard: Costs 10x more than Deep Archive for inactive compliance data\n- Intelligent-Tiering: More expensive than Deep Archive for predictable infrequent access\n- EBS Snapshots: Designed for database backups, not long-term data retention\n\n**Implementation:** Move compliance archives to Deep Archive via lifecycle rules after initial access period to minimize 10-year retention costs.",
       "domain": "Billing, Pricing, and Support",
       "difficulty": 2,
       "lastReviewed": "2026-03-31"
@@ -778,7 +778,7 @@
       "skills": [
         "4.1.5: Understanding different pricing options for various storage options and tiers."
       ],
-      "question": "Storage costs must be optimized across data sets with unpredictable access patterns \u2014 some objects are frequently accessed, while others vary in usage over time.\n\nWhich TWO pricing strategies help reduce total storage costs?",
+      "question": "Storage costs must be optimized across data sets with unpredictable access patterns: some objects are frequently accessed, while others vary in usage over time.\n\nWhich TWO pricing strategies help reduce total storage costs?",
       "choices": [
         {
           "id": "c1",
@@ -1093,7 +1093,7 @@
       "skills": [
         "4.3.2: Identifying and locating AWS technical resources (for example, AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post)."
       ],
-      "question": "Migrating a legacy application to AWS requires detailed implementation guidance \u2014 architecture diagrams, code examples, and step-by-step instructions.\n\nWhich AWS technical resource best provides this information?",
+      "question": "Migrating a legacy application to AWS requires detailed implementation guidance, including architecture diagrams, code examples, and step-by-step instructions.\n\nWhich AWS technical resource best provides this information?",
       "choices": [
         {
           "id": "c1",
