@@ -161,7 +161,7 @@ export function HomePage() {
         </div>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
           Practice exams and hands-on skill labs for AWS, Azure, GCP and more.<br />
-          Build real-world skills, not just exam knowledge.
+          Build real-world skills on top of exam knowledge.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
