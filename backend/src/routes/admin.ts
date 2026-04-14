@@ -716,45 +716,67 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     return { ok: true, sentTo: adminProfile.email }
   })
 
+  /**
+   * Shared helper — applies AND-combined filters to a list of opted-in users.
+   * Filters: provider, examProductId (exact entitlement match), monthlyOnly.
+   * Each active filter must match; unset filters are skipped.
+   */
+  async function filterEmailRecipients(
+    users: any[],
+    filters: { provider?: string; examProductId?: string; monthlyOnly?: boolean }
+  ): Promise<any[]> {
+    const { provider, examProductId, monthlyOnly } = filters
+    if (!provider && !examProductId && !monthlyOnly) return users
+
+    const results = await Promise.all(
+      users.map(async (u) => {
+        const ents = await getUserEntitlements(u.userId)
+        const productIds = ents.map((e: any) => e.productId)
+
+        if (provider) {
+          const providerProductIds = PRODUCTS
+            .filter((p) => p.provider?.toLowerCase() === provider.toLowerCase())
+            .map((p) => p.productId)
+          if (!productIds.some((pid: string) => providerProductIds.includes(pid))) return null
+        }
+
+        if (examProductId) {
+          if (!productIds.includes(examProductId)) return null
+        }
+
+        if (monthlyOnly) {
+          if (!productIds.includes('sub:all-access')) return null
+        }
+
+        return u
+      })
+    )
+
+    return results.filter(Boolean) as any[]
+  }
+
   /** Preview the number of recipients for given filters (NO email is sent) */
   server.post('/email/preview-recipients', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request) => {
-    const { provider } = request.body as any
+    const { provider, examProductId, monthlyOnly } = request.body as any
     const users = await getUsersWithEmailOptIn()
-    let filtered = users
-    if (provider) {
-      // Filter by users who have an active entitlement for the given provider's products
-      const providerProductIds = PRODUCTS.filter((p) => p.provider?.toLowerCase() === provider.toLowerCase()).map((p) => p.productId)
-      const usersWithEntitlement = await Promise.all(
-        users.map(async (u) => {
-          const ents = await getUserEntitlements(u.userId)
-          return ents.some((e) => providerProductIds.includes(e.productId)) ? u : null
-        })
-      )
-      filtered = usersWithEntitlement.filter(Boolean) as any[]
-    }
-    return { count: filtered.length }
+    const filtered = await filterEmailRecipients(users, { provider, examProductId, monthlyOnly })
+    const sample = filtered
+      .filter((u: any) => u.email)
+      .slice(0, 10)
+      .map((u: any) => ({ email: u.email, name: u.name || u.given_name || '' }))
+    return { count: filtered.length, sample }
   })
 
   /** Bulk marketing send — batched with 200ms delay between batches of 50 */
   server.post('/email/send-marketing', { config: { rateLimit: { max: 5, timeWindow: '5 minutes' } } }, async (request, reply) => {
-    const { templateId, provider } = request.body as any
+    const { templateId, provider, examProductId, monthlyOnly } = request.body as any
     if (!templateId) return reply.code(400).send({ message: 'templateId required' })
 
     const template = await getTemplate(templateId)
     if (!template) return reply.code(404).send({ message: 'template not found' })
 
     const users = await getUsersWithEmailOptIn()
-    let targets = users
-    if (provider) {
-      const providerProductIds = PRODUCTS.filter((p) => p.provider?.toLowerCase() === provider.toLowerCase()).map((p) => p.productId)
-      const filtered = await Promise.all(
-        users.map(async (u) => {
-          const ents = await getUserEntitlements(u.userId)
-          return ents.some((e) => providerProductIds.includes(e.productId)) ? u : null
-        })
-      )
-      targets = filtered.filter(Boolean) as any[]
-    }
+    const targets = await filterEmailRecipients(users, { provider, examProductId, monthlyOnly })
 
     let sent = 0
     const errors: string[] = []
@@ -782,9 +804,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       templateId,
       recipientCount: sent,
       subject: template.subject,
-      filters: { provider: provider ?? 'all' },
+      filters: { provider: provider ?? 'all', examProductId: examProductId ?? 'all', monthlyOnly: monthlyOnly ?? false },
     })
-    await recordAdminAudit((request.user as any).sub, null, 'send_marketing_email', { templateId, sent, errors: errors.length, provider })
+    await recordAdminAudit((request.user as any).sub, null, 'send_marketing_email', { templateId, sent, errors: errors.length, provider, examProductId, monthlyOnly })
 
     return { sent, errors: errors.length > 0 ? errors : undefined }
   })

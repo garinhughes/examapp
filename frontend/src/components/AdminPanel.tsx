@@ -1216,7 +1216,10 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
   // Campaign state
   const [campaignTemplate, setCampaignTemplate] = useState('')
   const [campaignProvider, setCampaignProvider] = useState('')
+  const [campaignExamProductId, setCampaignExamProductId] = useState('')
+  const [campaignMonthlyOnly, setCampaignMonthlyOnly] = useState(false)
   const [previewCount, setPreviewCount] = useState<number | null>(null)
+  const [previewSample, setPreviewSample] = useState<{ email: string; name: string }[]>([])
   const [previewing, setPreviewing] = useState(false)
   const [sending, setSending] = useState(false)
   const [sendResult, setSendResult] = useState<{ sent: number; errors?: string[] } | null>(null)
@@ -1318,19 +1321,29 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
     }
   }
 
+  function resetPreview() {
+    setPreviewCount(null)
+    setPreviewSample([])
+  }
+
   async function previewRecipients() {
     setPreviewing(true)
-    setPreviewCount(null)
+    resetPreview()
     setCampaignErr(null)
     try {
       const res = await authFetch('/admin/email/preview-recipients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider: campaignProvider || undefined }),
+        body: JSON.stringify({
+          provider: campaignProvider || undefined,
+          examProductId: campaignExamProductId || undefined,
+          monthlyOnly: campaignMonthlyOnly || undefined,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Preview failed')
       setPreviewCount(data.count)
+      setPreviewSample(data.sample ?? [])
     } catch (e: any) {
       setCampaignErr(e?.message ?? 'Preview failed')
     } finally {
@@ -1350,6 +1363,8 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
         body: JSON.stringify({
           templateId: campaignTemplate,
           provider: campaignProvider || undefined,
+          examProductId: campaignExamProductId || undefined,
+          monthlyOnly: campaignMonthlyOnly || undefined,
         }),
       })
       const data = await res.json()
@@ -1521,7 +1536,7 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
                     )}
                   </div>
                   <button
-                    onClick={() => { setSendResult(null); setPreviewCount(null) }}
+                    onClick={() => { setSendResult(null); resetPreview() }}
                     className="text-xs text-muted-foreground hover:text-foreground dark:hover:text-foreground underline"
                   >
                     Send another campaign
@@ -1529,53 +1544,104 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
                 </div>
               ) : (
                 <>
-                  <div className="space-y-3 p-4 rounded-lg border border-border bg-card">
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground block mb-1">Template</label>
-                      <select
-                        value={campaignTemplate}
-                        onChange={(e) => { setCampaignTemplate(e.target.value); setPreviewCount(null) }}
-                        className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      >
-                        <option value="">— Select a template —</option>
-                        {templates.map((tmpl) => (
-                          <option key={tmpl.templateId} value={tmpl.templateId}>{tmpl.name} — {tmpl.subject}</option>
-                        ))}
-                      </select>
-                      {templates.length === 0 && (
-                        <p className="text-xs text-muted-foreground mt-1">No templates yet — create one in the Templates tab.</p>
-                      )}
-                    </div>
+                  {/* Template */}
+                  <div className="p-4 rounded-lg border border-border bg-card space-y-2">
+                    <label className="text-xs font-medium text-muted-foreground block">Template</label>
+                    <select
+                      value={campaignTemplate}
+                      onChange={(e) => { setCampaignTemplate(e.target.value); resetPreview() }}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    >
+                      <option value="">— Select a template —</option>
+                      {templates.map((tmpl) => (
+                        <option key={tmpl.templateId} value={tmpl.templateId}>{tmpl.name} — {tmpl.subject}</option>
+                      ))}
+                    </select>
+                    {templates.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No templates yet — create one in the Templates tab.</p>
+                    )}
+                  </div>
 
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground block mb-1">Filter by provider (optional)</label>
+                  {/* Filters */}
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">Audience filters <span className="font-normal">(all active filters are ANDed)</span></p>
+
+                    {/* Provider filter */}
+                    <div className="p-3 rounded-lg border border-border bg-card space-y-1.5">
+                      <label className="text-xs font-medium block">By provider</label>
                       <select
                         value={campaignProvider}
-                        onChange={(e) => { setCampaignProvider(e.target.value); setPreviewCount(null) }}
+                        onChange={(e) => { setCampaignProvider(e.target.value); resetPreview() }}
                         className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                       >
-                        <option value="">All opted-in customers</option>
-                        <option value="aws">AWS customers only</option>
-                        <option value="azure">Azure customers only</option>
-                        <option value="gcp">GCP customers only</option>
+                        <option value="">Any provider</option>
+                        <option value="AWS">AWS customers</option>
+                        <option value="Anthropic">Anthropic customers</option>
                       </select>
                     </div>
 
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <button
-                        onClick={previewRecipients}
-                        disabled={previewing}
-                        className="px-3 py-1.5 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 disabled:opacity-40 transition-colors"
+                    {/* Exam filter */}
+                    <div className="p-3 rounded-lg border border-border bg-card space-y-1.5">
+                      <label className="text-xs font-medium block">By exam pass</label>
+                      <select
+                        value={campaignExamProductId}
+                        onChange={(e) => { setCampaignExamProductId(e.target.value); resetPreview() }}
+                        className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                       >
-                        {previewing ? 'Checking…' : 'Preview recipients'}
-                      </button>
-                      {previewCount !== null && (
-                        <span className="text-sm">
-                          <strong>{previewCount}</strong> recipient{previewCount !== 1 ? 's' : ''} will receive this email
-                        </span>
-                      )}
+                        <option value="">Any exam</option>
+                        <option value="exam:SAA-C03">SAA-C03 — AWS Solutions Architect Associate</option>
+                        <option value="exam:AIF-C01">AIF-C01 — AWS AI Practitioner</option>
+                        <option value="exam:CLF-C02">CLF-C02 — AWS Cloud Practitioner</option>
+                        <option value="exam:SCS-C03">SCS-C03 — AWS Security Specialty</option>
+                        <option value="exam:CCA-F">CCA-F — Claude Certified Architect Foundations</option>
+                      </select>
+                    </div>
+
+                    {/* Monthly subscriber filter */}
+                    <div className="p-3 rounded-lg border border-border bg-card">
+                      <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={campaignMonthlyOnly}
+                          onChange={(e) => { setCampaignMonthlyOnly(e.target.checked); resetPreview() }}
+                          className="w-4 h-4 rounded border-border accent-primary"
+                        />
+                        <span className="text-sm">Monthly subscribers only</span>
+                      </label>
                     </div>
                   </div>
+
+                  {/* Preview action */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <button
+                      onClick={previewRecipients}
+                      disabled={previewing || !campaignTemplate}
+                      className="px-3 py-1.5 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 disabled:opacity-40 transition-colors"
+                    >
+                      {previewing ? 'Checking…' : 'Preview recipients'}
+                    </button>
+                    {previewCount !== null && (
+                      <span className="text-sm">
+                        <strong>{previewCount}</strong> recipient{previewCount !== 1 ? 's' : ''} will receive this email
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Sample recipient list */}
+                  {previewSample.length > 0 && (
+                    <div className="p-3 rounded-lg border border-border bg-muted/40 space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground mb-2">
+                        Sample — first {previewSample.length} recipient{previewSample.length !== 1 ? 's' : ''}
+                      </p>
+                      {previewSample.map((r, i) => (
+                        <div key={i} className="flex items-center gap-2 text-xs font-mono">
+                          <span className="text-muted-foreground w-5 text-right shrink-0">{i + 1}.</span>
+                          <span className="truncate">{r.email}</span>
+                          {r.name && <span className="text-muted-foreground truncate">({r.name})</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {previewCount !== null && previewCount > 0 && campaignTemplate && (
                     confirmSend ? (
@@ -1610,7 +1676,7 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
                     )
                   )}
                   {previewCount === 0 && (
-                    <p className="text-xs text-amber-600 dark:text-amber-400">No opted-in recipients match this filter.</p>
+                    <p className="text-xs text-amber-600 dark:text-amber-400">No opted-in recipients match these filters.</p>
                   )}
                 </>
               )}
