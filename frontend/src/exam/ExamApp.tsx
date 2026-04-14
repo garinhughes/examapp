@@ -67,6 +67,9 @@ function ExamAppInner() {
   const userIsAdmin = isAdmin()
 
   const [focusMode, setFocusMode] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem('sidebar-collapsed') === 'true' } catch { return false }
+  })
 
   // Exit focus mode when the exam ends
   useEffect(() => {
@@ -111,31 +114,80 @@ function ExamAppInner() {
       <ImpersonationBanner />
       <CookieConsent />
       <div className="flex flex-1 overflow-hidden">
-      <div className={focusMode ? 'hidden' : ''}>
-      <Sidebar
-        currentRoute={route}
-        onNavigate={(key) => {
-          if (examStarted && !isFinished && selected && key !== 'home') {
-            saveExamProgress()
-            setExamStarted(false)
-          }
-          setRoute(key as any)
-          if (key === 'home') { setSelected(null); setExamStarted(false); setAttemptData(null); setShowAttempts(false); setAttemptsList(null) }
-        }}
-        logout={logout}
-        login={login}
-        user={user}
-        xp={gamState.xp}
-        level={gamLevel.level}
-        streak={gamState.streak}
-        showAdmin={userIsAdmin}
-      />
-      </div>
+      {!focusMode && (
+        <Sidebar
+          currentRoute={route}
+          onNavigate={(key) => {
+            if (examStarted && !isFinished && selected && key !== 'home') {
+              saveExamProgress()
+              setExamStarted(false)
+            }
+            setRoute(key as any)
+            if (key === 'home') { setSelected(null); setExamStarted(false); setAttemptData(null); setShowAttempts(false); setAttemptsList(null) }
+          }}
+          logout={logout}
+          login={login}
+          user={user}
+          xp={gamState.xp}
+          level={gamLevel.level}
+          streak={gamState.streak}
+          showAdmin={userIsAdmin}
+          collapsed={sidebarCollapsed}
+          onCollapse={(v) => { setSidebarCollapsed(v); try { localStorage.setItem('sidebar-collapsed', String(v)) } catch {} }}
+        />
+      )}
 
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        <div className="absolute top-4 right-4 z-10 hidden md:flex gap-2">
-          <ThemeToggle />
-        </div>
+        {/* Focus mode compact toolbar */}
+        {focusMode && examStarted && !isFinished && (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-border bg-background/95 backdrop-blur-sm z-20 shrink-0">
+            <button
+              onClick={() => setFocusMode(false)}
+              title="Exit Focus Mode"
+              className="p-1.5 rounded hover:bg-accent transition-colors"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+            {attemptId && (
+              <>
+                <button
+                  onClick={() => { saveExamProgress(); setExamStarted(false); setRoute('practice'); clarityEvent('exam_saved_for_later') }}
+                  title="Save for Later"
+                  className="p-1.5 rounded hover:bg-accent transition-colors"
+                >
+                  <Save className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => { setShowCancelConfirm(true); clarityEvent('exam_cancel_initiated') }}
+                  title="Cancel Exam"
+                  className="p-1.5 rounded hover:bg-red-600/10 text-red-500 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </>
+            )}
+            {timed && timeLeft !== null && (
+              <>
+                <button
+                  onClick={() => setPaused(p => !p)}
+                  title={paused ? 'Resume timer' : 'Pause timer'}
+                  className={`p-1.5 rounded transition-colors ${paused ? 'bg-primary/10 text-primary' : 'hover:bg-accent'}`}
+                >
+                  {paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+                </button>
+                <span className={`text-xs tabular-nums ${paused ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`}>
+                  {Math.floor(timeLeft / 60).toString().padStart(2, '0')}:{(timeLeft % 60).toString().padStart(2, '0')}
+                </span>
+              </>
+            )}
+          </div>
+        )}
+
+        {!focusMode && (
+          <div className="absolute top-4 right-4 z-10 hidden md:flex gap-2">
+            <ThemeToggle />
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="container mx-auto max-w-6xl space-y-8">
@@ -273,7 +325,7 @@ function ExamAppInner() {
             {route === 'home' && !selected && <HomePage />}
 
             {/* ExamHeader bar */}
-            {route === 'home' && selected ? (
+            {route === 'home' && selected && !focusMode ? (
               <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <h2 className="text-lg font-semibold flex items-center gap-2"><span className="text-primary font-extrabold">//</span>{examStarted && !isFinished ? 'Questions' : 'Practice Exam'}</h2>
                 <div className="flex min-w-0 flex-1 flex-col gap-2 lg:items-end">
@@ -357,7 +409,7 @@ function ExamAppInner() {
             ) : null}
 
             {/* Attempts list panel */}
-            {showAttempts && selected && (
+            {showAttempts && selected && !focusMode && (
               <div className="mb-4 p-3 rounded bg-card/60 dark:bg-card">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold mb-2">Attempts</h3>
@@ -426,7 +478,7 @@ function ExamAppInner() {
             )}
 
             {/* Results */}
-            {attemptData && typeof attemptData.score === 'number' && route === 'home' && (
+            {attemptData && typeof attemptData.score === 'number' && route === 'home' && !focusMode && (
               <div className="mb-4 p-4 rounded bg-card/60 dark:bg-card">
                 <div className="flex items-start gap-4">
                   {(() => {
@@ -503,10 +555,10 @@ function ExamAppInner() {
             {!examStarted && selected && !isFinished && route === 'home' && <ExamSetup />}
 
             {/* Question navigation (during exam) */}
-            {!isFinished && examStarted && displayQuestions.length > 0 && route === 'home' && <QuestionNav />}
+            {!isFinished && examStarted && displayQuestions.length > 0 && route === 'home' && <QuestionNav focusMode={focusMode} />}
 
             {/* Question card (during exam) */}
-            {!isFinished && examStarted && route === 'home' && <QuestionCard />}
+            {!isFinished && examStarted && route === 'home' && <QuestionCard focusMode={focusMode} />}
 
             {/* Return to Practice Exams button removed here (kept inside ExamSetup) */}
 

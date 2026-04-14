@@ -68,7 +68,15 @@ export function RewardModal({
         className="bg-card rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 text-center animate-[reward-pop_0.4s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-4xl mb-2">🎉</div>
+        <div className="mb-2 flex justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+            <circle cx="32" cy="36" r="20" fill="#f59e0b" />
+            <circle cx="32" cy="36" r="15" fill="#fbbf24" />
+            <text x="32" y="42" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#92400e">1</text>
+            <rect x="28" y="4" width="8" height="18" rx="3" fill="#6366f1" />
+            <polygon points="24,4 40,4 44,14 20,14" fill="#818cf8" />
+          </svg>
+        </div>
         <h2 className="text-xl font-bold mb-1">{title}</h2>
         {subtitle && <p className="text-sm text-muted-foreground mb-3">{subtitle}</p>}
 

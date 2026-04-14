@@ -46145,6 +46145,1194 @@
       "earlyComplete": true,
       "answeredCount": 4,
       "totalQuestions": 20
+    },
+    {
+      "attemptId": "3b77258b-6493-4fbf-be29-b3851fadeac2",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SCS-C03",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-04-14T18:08:02.095Z",
+      "finishedAt": "2026-04-14T18:12:58.878Z",
+      "score": 100,
+      "answers": [
+        {
+          "questionId": "SCS-C03-0009",
+          "selectedChoiceId": "c1",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-14T18:10:41.469Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "SCS-C03-0020",
+          "type": "single-choice",
+          "question": "A security engineer has deployed a Lambda rotation function using the `SecretsManagerRDSMySQLRotationSingleUser` template for a secret named `prod/db/master-credentials`. The engineer runs the following command to associate the rotation function with the secret:\n\n`aws secretsmanager rotate-secret --secret-id prod/db/master-credentials --rotation-lambda-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn`\n\nThe command completes successfully and an immediate rotation occurs, but the secret is never rotated automatically again.\n\nWhich command should the engineer run to configure a 30-day automatic rotation schedule without triggering another immediate rotation?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "aws secretsmanager rotate-secret \\\n  --secret-id prod/db/master-credentials \\\n  --rotation-lambda-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn \\\n  --rotation-rules AutomaticallyAfterDays=30 \\\n  --no-rotate-immediately",
+              "isCorrect": true,
+              "explanation": "The `rotate-secret` subcommand manages both the rotation Lambda association and the rotation schedule. The `--rotation-rules AutomaticallyAfterDays=30` parameter sets up the 30-day recurring schedule. By default, `rotate-secret` also invokes the Lambda immediately - adding `--no-rotate-immediately` suppresses that invocation so the schedule is updated without consuming another rotation cycle.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "aws secretsmanager update-secret \\\n  --secret-id prod/db/master-credentials \\\n  --rotation-lambda-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn \\\n  --rotation-rules AutomaticallyAfterDays=30 \\\n  --rotation-enabled true",
+              "isCorrect": false,
+              "explanation": "The `update-secret` subcommand modifies secret metadata such as description, KMS key, or secret value. It does not accept `--rotation-lambda-arn`, `--rotation-rules`, or `--rotation-enabled` parameters. Rotation configuration including the Lambda ARN and schedule is managed exclusively through the `rotate-secret` subcommand."
+            },
+            {
+              "id": "c4",
+              "text": "aws secretsmanager create-rotation-schedule \\\n  --secret-id prod/db/master-credentials \\\n  --lambda-function-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn \\\n  --schedule-expression 'rate(30 days)' \\\n  --rotation-enabled true",
+              "isCorrect": false,
+              "explanation": "There is no `create-rotation-schedule` subcommand in the AWS Secrets Manager CLI, and Secrets Manager rotation does not accept EventBridge-style rate expressions. Rotation frequency is specified as an integer number of days via the `--rotation-rules AutomaticallyAfterDays=N` parameter of the `rotate-secret` subcommand."
+            },
+            {
+              "id": "c2",
+              "text": "aws secretsmanager put-rotation-configuration \\\n  --secret-id prod/db/master-credentials \\\n  --rotation-function-arn arn:aws:lambda:us-east-1:123456789012:function:MyRotationFn \\\n  --automatically-after-days 30 \\\n  --enable-rotation",
+              "isCorrect": false,
+              "explanation": "There is no `put-rotation-configuration` subcommand in the AWS Secrets Manager CLI. This command would fail with an unknown command error. Rotation scheduling is configured exclusively using the `rotate-secret` subcommand with the `--rotation-rules` parameter."
+            }
+          ],
+          "selectCount": 1,
+          "format": "cli",
+          "domain": "Data Protection",
+          "skills": [
+            "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+          ],
+          "services": [
+            "Secrets Manager",
+            "Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/cli/latest/reference/secretsmanager/rotate-secret.html",
+          "tip": "Both the rotation Lambda association and the rotation schedule are controlled by a single Secrets Manager CLI subcommand. Look for a parameter that sets the recurrence interval and a flag that decouples the configuration update from triggering an immediate rotation cycle.",
+          "explanation": "The `rotate-secret` subcommand is the correct tool for both associating a rotation Lambda and configuring a recurrence schedule.\n\n**Why it works:** Without `--rotation-rules AutomaticallyAfterDays=N`, Secrets Manager performs a one-time rotation only. Adding `--rotation-rules AutomaticallyAfterDays=30` sets the recurring 30-day schedule. The `--no-rotate-immediately` flag suppresses the default immediate Lambda invocation, updating only the schedule without consuming a rotation cycle.\n\n**Why the others fail:**\n- `update-secret`: does not accept rotation parameters - rotation configuration is managed exclusively through `rotate-secret`.\n- `put-rotation-configuration`: does not exist in the Secrets Manager CLI.\n- `create-rotation-schedule`: does not exist; Secrets Manager does not accept EventBridge-style rate expressions.\n\n**Implementation:** After running the command, verify with `aws secretsmanager describe-secret --secret-id prod/db/master-credentials` and inspect the `RotationEnabled`, `RotationRules`, and `NextRotationDate` fields.",
+          "image": "aws/rotate-secret-lambda.png",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0012",
+          "type": "matching",
+          "question": "The detection layer of a large enterprise AWS environment relies on different native services for different threat types. Match each detection requirement to the AWS security service that best satisfies it.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "AWS Security Hub",
+              "isCorrect": false,
+              "explanation": "Security Hub aggregates findings from integrated services (GuardDuty, Macie, Inspector, Config, etc.), maps them to compliance framework controls (CIS, PCI DSS, NIST 800-53), and computes a consolidated security score per account and region - exactly the correlation and scoring use case described."
+            },
+            {
+              "id": "c4",
+              "text": "Amazon Security Lake",
+              "isCorrect": false,
+              "explanation": "Security Lake automatically collects, transforms, and normalizes security data from AWS services and third-party sources into the Open Cybersecurity Schema Framework (OCSF) format, storing it in S3 in Parquet for scalable, long-term analysis. It is purpose-built for the data lake use case."
+            },
+            {
+              "id": "c1",
+              "text": "Amazon GuardDuty",
+              "isCorrect": false,
+              "explanation": "GuardDuty continuously analyzes CloudTrail, VPC Flow Logs, and DNS logs using threat intelligence feeds. It has built-in detection for Tor-related activity (finding type: `UnauthorizedAccess:IAMUser/TorIPCaller`) and other network-based anomalies without any configuration beyond enablement."
+            },
+            {
+              "id": "c2",
+              "text": "Amazon Macie",
+              "isCorrect": false,
+              "explanation": "Macie uses machine learning and pattern matching to discover sensitive data - including PCI DSS payment card numbers - within S3 objects. It produces per-bucket and per-object findings with the specific sensitive data type detected, making it the right tool for data classification requirements."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s3",
+              "label": "Aggregate and normalize findings from GuardDuty, Inspector, and Macie into a single OCSF-formatted data lake for long-term analysis",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s2",
+              "label": "Identify S3 buckets that contain unencrypted payment card numbers",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s1",
+              "label": "Detect IAM credentials being used from a Tor exit node",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s4",
+              "label": "Correlate findings across multiple AWS security services and apply compliance framework controls to produce a consolidated security score",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon GuardDuty",
+            "Amazon Macie",
+            "AWS Security Hub",
+            "Amazon Security Lake"
+          ],
+          "docs": "https://docs.aws.amazon.com/security-hub/latest/userguide/what-is-securityhub.html",
+          "tip": "Consider each service's primary design purpose: threat detection, data classification, finding aggregation/scoring, or security data lake.",
+          "explanation": "Each service has a distinct primary function in the detection layer.\n\n**Why it works:**\n- GuardDuty: threat intelligence and behavioral detection - identifies malicious network activity including Tor-based credential use (`UnauthorizedAccess:IAMUser/TorIPCaller`) from integrated log sources.\n- Macie: sensitive data discovery for S3, detecting PCI, PII, and other regulated data categories using ML and pattern matching.\n- Security Hub: aggregation and compliance posture layer - imports findings, maps them to control frameworks, and scores security posture.\n- Security Lake: OCSF-normalized security data lake - centralized, long-term retention and analysis across AWS and third-party sources.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0008",
+          "type": "single-choice",
+          "question": "A security operations team has enabled Amazon GuardDuty across all accounts in an AWS Organization. The team wants to receive a Slack notification within five minutes whenever GuardDuty generates a HIGH severity finding in any member account. The solution must require no additional infrastructure to poll for findings.\n\nWhich approach delivers near-real-time Slack alerts with the least operational overhead?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Create a CloudWatch Metrics Alarm on the GuardDuty finding count metric filtered by HIGH severity, set an SNS action, and subscribe Lambda to the SNS topic.",
+              "isCorrect": false,
+              "explanation": "GuardDuty doesn't publish a standard CloudWatch metric for finding severity, so there's nothing to alarm on. CloudWatch Metric Alarms also have a minimum evaluation period of 60 seconds with no finer granularity. EventBridge is the purpose-built real-time routing mechanism for GuardDuty findings."
+            },
+            {
+              "id": "c3",
+              "text": "Enable AWS Security Hub in the administrator account, configure Security Hub to forward HIGH findings to an SNS topic, and subscribe the Slack webhook URL directly to the SNS topic.",
+              "isCorrect": false,
+              "explanation": "SNS doesn't natively support Slack webhooks as a subscription protocol, so you'd still need Lambda in the middle. On top of that, routing through Security Hub adds an unnecessary hop (GuardDuty → Security Hub → SNS → Lambda) when EventBridge handles the whole thing directly."
+            },
+            {
+              "id": "c2",
+              "text": "Enable GuardDuty S3 export, configure an S3 event notification to trigger Lambda when new finding files arrive, and post to Slack from Lambda.",
+              "isCorrect": false,
+              "explanation": "GuardDuty S3 export uses GZIP-compressed NDJSON files that get delivered periodically (every 6 hours by default for active findings). That's way too slow for a 5-minute alerting requirement and completely misses the real-time EventBridge stream."
+            },
+            {
+              "id": "c1",
+              "text": "Create an EventBridge rule in the GuardDuty delegated administrator account that matches GuardDuty findings with severity >= 7, invoke a Lambda function as the target, and have the function post to a Slack webhook.",
+              "isCorrect": true,
+              "explanation": "GuardDuty publishes findings as EventBridge events in near-real time. A single EventBridge rule in the delegated administrator account picks up aggregated findings from all member accounts. Filtering on `severity >= 7` limits it to HIGH findings only. Lambda handles the Slack webhook call with no polling infrastructure needed.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon GuardDuty",
+            "Amazon EventBridge",
+            "AWS Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings_cloudwatch.html",
+          "tip": "You want instant notifications, not batch reports delivered hours later. Which service gives you real-time event delivery from GuardDuty?",
+          "explanation": "GuardDuty has a direct pipeline to EventBridge. When it detects something suspicious it fires an event within minutes. Since you want alerts from all member accounts, set up the rule in your delegated administrator account where findings from everywhere get aggregated.\n\n**The setup is straightforward:** create an EventBridge rule that filters for `severity >= 7` (this catches HIGH findings at 7–8.9 and CRITICAL at 9+), then wire it to a Lambda function that posts to your Slack webhook. Sub-minute latency with zero infrastructure to manage.\n\n**Why the other options miss the mark:**\n- S3 export is batch-oriented and can take up to 6 hours to deliver\n- Security Hub adds an unnecessary extra hop and you'd still need Lambda anyway\n- CloudWatch doesn't have per-finding severity metrics for GuardDuty\n\nThe EventBridge approach is both the simplest and the fastest option here.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0009",
+          "type": "single-choice",
+          "question": "A financial services company enables Amazon Macie to monitor all S3 buckets for sensitive data exposure. After a week, the security team notices that Macie is generating hundreds of daily findings for intentionally public marketing asset buckets, obscuring genuine alerts. The team needs to suppress Macie findings for these known-safe buckets while continuing to alert on all other S3 findings.\n\nWhich Macie feature directly addresses this without disabling monitoring on those buckets?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Create Macie suppression rules that filter findings based on the S3 bucket name, setting the finding status to Suppressed for findings matching the marketing buckets.",
+              "isCorrect": true,
+              "explanation": "Suppression rules let you filter findings based on criteria like bucket name, finding type, or classification job ARN. Matching findings get automatically archived with a `Suppressed` status. They still exist in Macie for audit purposes but they're hidden from the active findings view and won't trigger downstream EventBridge events.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Add the marketing buckets to the Macie allow list so that sensitive data detected in those buckets is not reported as a finding.",
+              "isCorrect": false,
+              "explanation": "Allow lists suppress findings for specific text patterns or regular expressions, like known test credit card numbers. They don't suppress all findings for an entire bucket. If those marketing buckets contained real sensitive data outside the allow list pattern, Macie would still flag it."
+            },
+            {
+              "id": "c4",
+              "text": "Publish all Macie findings to Security Hub and create a Security Hub suppression filter scoped to the marketing bucket ARNs.",
+              "isCorrect": false,
+              "explanation": "Security Hub suppression filters work on findings after they arrive in Security Hub and do hide them from the Security Hub console. But the findings still show up in the native Macie console and still trigger EventBridge events. Suppressing at the Macie layer with suppression rules is more thorough."
+            },
+            {
+              "id": "c3",
+              "text": "Disable the Macie classification job for the marketing buckets and enable it only for remaining buckets.",
+              "isCorrect": false,
+              "explanation": "Disabling a classification job stops Macie from scanning those buckets entirely so you'd lose all visibility. Suppression rules are the better approach because they keep the audit trail and still run discovery. They just filter the noise out of your operational dashboards."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon Macie",
+            "Amazon S3",
+            "AWS Security Hub"
+          ],
+          "docs": "https://docs.aws.amazon.com/macie/latest/user/findings-suppression.html",
+          "tip": "You need to quiet the noise from buckets you know are safe without losing protection everywhere else. What Macie feature lets you selectively hide findings?",
+          "explanation": "Suppression rules are purpose-built for exactly this scenario. You tell Macie \"stop showing me findings from these specific buckets\" and it marks them as `Suppressed`. They're still logged for audit purposes, but they vanish from your operational dashboard and won't fire downstream alerts.\n\n**Why the other approaches fall short:**\n- Allow lists work on text patterns, not whole buckets. If those marketing buckets accidentally contained real sensitive data outside the allowed pattern, you'd still get findings.\n- Disabling classification jobs kills monitoring entirely and you lose all visibility, which isn't the goal.\n- Security Hub filters only suppress findings within Security Hub itself. The noise persists in Macie and still triggers EventBridge events.\n\nThe beauty of suppression rules is they work at the source. Macie applies them before sending findings anywhere else.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0006",
+          "type": "ordering",
+          "question": "Audit logs must be protected from deletion or modification for seven years using S3 Glacier Vault Lock. The enforcement process follows a specific sequence that, once completed, cannot be reversed.\n\nArrange the following steps in the correct order to complete the Vault Lock policy enforcement process.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Call complete-vault-lock with the lock ID to permanently enforce the Compliance-mode policy",
+              "isCorrect": true,
+              "explanation": "`complete-vault-lock` commits the policy and there's no going back. Once you call it, the policy cannot be changed or deleted by anyone for the entire retention period.",
+              "sequence": 3
+            },
+            {
+              "id": "c1",
+              "text": "Call initiate-vault-lock to attach a policy and receive a lock ID in the In-Progress state",
+              "isCorrect": true,
+              "explanation": "`initiate-vault-lock` always goes first. It creates the policy in a 24-hour trial window and hands you a lock ID. You can't complete the lock without it.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Abort the lock (if policy is incorrect) and restart from initiate-vault-lock with a corrected policy",
+              "isCorrect": true,
+              "explanation": "`abort-vault-lock` is your escape hatch when validation in step 2 reveals a problem. It cancels the InProgress lock so you can start fresh. If validation passes, you skip this and go straight to `complete-vault-lock`. It's listed last because in the normal flow it's a conditional rollback and the happy path ends at step 3.",
+              "sequence": 4
+            },
+            {
+              "id": "c2",
+              "text": "Validate the policy by testing deny conditions against the vault during the 24-hour window",
+              "isCorrect": true,
+              "explanation": "The 24-hour InProgress window exists specifically so you can validate your policy. Test your deny conditions before committing. Once a Compliance-mode policy is locked, you can't modify it. Ever.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3 Glacier"
+          ],
+          "docs": "https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html",
+          "tip": "Vault Lock is like signing a contract: there's a review period where you can still back out and then it becomes permanent. What order makes sense?",
+          "explanation": "Vault Lock has deliberate safety steps built in to prevent accidents.\n\nYou start by initiating the lock with a draft policy. This gives you a 24-hour window where the vault is in \"InProgress\" state and you can test everything. During this time, run your deny conditions against the vault to confirm the policy behaves as expected.\n\nIf everything checks out, complete the vault lock to make it permanent. After that, nobody, not even root users, can change or delete the policy for the entire retention period. That's real compliance-grade immutability.\n\nBut if you spot a problem during testing? Use `abort-vault-lock` to tear it all down and start over. This escape hatch only exists during that initial 24-hour window.\n\nThe safe deployment pattern is always: initiate → test thoroughly → complete (or abort if something's off).",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0004",
+          "type": "single-choice",
+          "question": "A compliance engineer must lock a Glacier vault's access policy to enforce a 10-year retention requirement for archived medical records. The vault and an InProgress vault lock policy have already been created. The engineer must complete the lock using the AWS CLI and only has the lock ID from the `initiate-vault-lock` response.\n\nWhich command correctly completes the vault lock?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "aws glacier set-vault-access-policy \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --policy file://lock-policy.json",
+              "isCorrect": false,
+              "explanation": "`set-vault-access-policy` manages the standard (mutable) access policy on a vault and has nothing to do with the vault lock mechanism. It won't transition your InProgress lock to the Locked state, and policies set this way can be changed at any time. Not what you need for compliance."
+            },
+            {
+              "id": "c4",
+              "text": "aws glacier put-vault-lock \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --lock-id <lockId>",
+              "isCorrect": false,
+              "explanation": "`put-vault-lock` doesn't exist in the Glacier CLI. The correct two-step process goes `initiate-vault-lock` (creates the InProgress policy and gives you a lock ID) then `complete-vault-lock` (finalizes it permanently). Running a nonexistent subcommand just returns an error."
+            },
+            {
+              "id": "c1",
+              "text": "aws glacier complete-vault-lock \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --lock-id <lockId>",
+              "isCorrect": true,
+              "explanation": "`complete-vault-lock` moves the vault lock from InProgress to the permanent Locked state using the lock ID you got from `initiate-vault-lock`. The `--account-id -` flag tells the CLI to use your current account. Once locked, the policy becomes truly immutable and nobody can delete or modify it.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "aws glacier initiate-vault-lock \\\n  --account-id - \\\n  --vault-name medical-records-vault \\\n  --policy file://lock-policy.json",
+              "isCorrect": false,
+              "explanation": "`initiate-vault-lock` starts a new InProgress vault lock, but you've already done that step. Running it again would abort your existing InProgress policy and restart the 24-hour completion window from scratch, which is the opposite of what you want."
+            }
+          ],
+          "selectCount": 1,
+          "format": "cli",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3 Glacier"
+          ],
+          "docs": "https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html",
+          "tip": "Glacier Vault Lock is a two-phase process: you start it then finalize it. Which phase makes the lock permanent?",
+          "explanation": "Glacier Vault Lock works in two phases. First, `initiate-vault-lock` creates an InProgress policy and hands you a lock ID, kicking off a 24-hour window to test everything. Then `complete-vault-lock` uses that lock ID to make the policy permanent.\n\n**Why the other commands don't work:**\n- `set-vault-access-policy` manages regular mutable access policies. It has nothing to do with the vault lock mechanism.\n- Running `initiate-vault-lock` again would abort your existing InProgress lock and reset the 24-hour timer back to zero.\n- `put-vault-lock` simply doesn't exist in the Glacier API.\n\n**To complete the lock:** `aws glacier complete-vault-lock --account-id - --vault-name <vault-name> --lock-id <lockId>` (the `--account-id -` flag is required by the Glacier CLI).",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0019",
+          "type": "single-choice",
+          "question": "A company's central security account stores RDS database credentials in AWS Secrets Manager, encrypted with a customer managed KMS key (CMK). A workload IAM role in a separate application account must retrieve these credentials. The security team has already added the workload role ARN to the Secrets Manager resource-based policy with `secretsmanager:GetSecretValue` permission, but every `GetSecretValue` call from the workload account still returns `AccessDeniedException`.\n\nWhich configuration must the security engineer apply to resolve the access failure?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Update the CMK key policy in the central security account to grant the application account root IAM principal `kms:Decrypt`, enabling IAM identity policies in the application account to independently control CMK access without referencing the workload role ARN directly in the key policy",
+              "isCorrect": false,
+              "explanation": "Granting the application account root in the CMK key policy does enable IAM delegation for `kms:Decrypt` within that account. However, the workload role's IAM identity policy must still explicitly include `kms:Decrypt` - access is not inherited automatically from the account-root key policy grant. Without that IAM permission the role remains unauthorized and `AccessDeniedException` continues."
+            },
+            {
+              "id": "c3",
+              "text": "Update the CMK key policy in the central security account to grant `kms:Decrypt` directly to the workload role ARN, and ensure the workload role's IAM identity policy in the application account includes both `secretsmanager:GetSecretValue` and `kms:Decrypt`",
+              "isCorrect": true,
+              "explanation": "When Secrets Manager retrieves a CMK-encrypted secret for a cross-account caller, it performs `kms:Decrypt` using the calling principal's identity. KMS evaluates the key policy and the caller's IAM policy independently - both must permit the operation. The Secrets Manager resource policy was already configured, so authorization is failing at the KMS layer. Adding the workload role ARN directly to the CMK key policy with `kms:Decrypt`, combined with matching IAM permissions on the workload role, satisfies both checks and resolves the error.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "Update the CMK key policy in the central security account to add a `kms:ViaService` condition restricting decryption only to the secretsmanager.amazonaws.com service principal, and add a separate key policy statement granting `kms:CreateGrant` to the workload role ARN so it can delegate decrypt permissions",
+              "isCorrect": false,
+              "explanation": "A `kms:ViaService` condition restricts which service may use the key but does not grant the cross-account principal any authorization. `kms:CreateGrant` allows the holder to delegate specific key operations but does not itself confer `kms:Decrypt` capability. Neither change authorizes the workload role to perform `kms:Decrypt`, so `AccessDeniedException` persists."
+            },
+            {
+              "id": "c4",
+              "text": "Update the CMK key policy in the central security account to grant `kms:Decrypt` to the secretsmanager.amazonaws.com service principal for all accounts in the organization using an `aws:PrincipalOrgID` condition key, and use an SCP to restrict `kms:Decrypt` usage to the workload role ARN in the application account",
+              "isCorrect": false,
+              "explanation": "Granting `kms:Decrypt` to the `secretsmanager.amazonaws.com` service principal org-wide allows any Secrets Manager call within the organization to decrypt secrets, which is excessively permissive and does not authenticate the specific calling IAM role. SCPs are guardrails that restrict what IAM can allow within an account - they cannot grant cross-account permissions to resources in another account. For this reason the approach is both insecure and architecturally incorrect."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+          ],
+          "services": [
+            "Secrets Manager",
+            "KMS",
+            "IAM"
+          ],
+          "docs": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples_cross.html",
+          "tip": "When cross-account access fails despite the resource policy being configured, identify every independent authorization layer that the API call traverses and verify that each one explicitly grants access to the calling identity.",
+          "explanation": "Retrieving a CMK-encrypted secret involves two independent authorization layers: the Secrets Manager resource policy and the KMS key policy.\n\n**Why it works:** AWS KMS does not automatically delegate key authorization to IAM unless the account root or the specific principal is added to the key policy. The Secrets Manager resource policy was already set, so the missing piece is the CMK key policy granting `kms:Decrypt` to the workload role ARN. Additionally, the calling role's own IAM identity policy must explicitly permit both `secretsmanager:GetSecretValue` and `kms:Decrypt`.\n\n**Why the others fail:**\n- `kms:ViaService` + `kms:CreateGrant`: restricts which service uses the key but does not authorize the cross-account principal to decrypt - `AccessDeniedException` persists.\n- Account root grant: enables IAM delegation but still requires an explicit IAM grant on the workload role - incomplete on its own.\n- `secretsmanager.amazonaws.com` service principal org-wide: overly permissive; SCPs cannot grant cross-account permissions to resources in another account.\n\n**Implementation:** KMS (central account) > edit CMK key policy > add statement granting `kms:Decrypt` to the workload role ARN. Then update the workload role's IAM policy to include `secretsmanager:GetSecretValue` and `kms:Decrypt` scoped to the specific secret ARN and CMK ARN.",
+          "difficulty": 5,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0018",
+          "type": "single-choice",
+          "question": "A company runs a high-traffic e-commerce application using Amazon RDS PostgreSQL, with database credentials stored in AWS Secrets Manager. During a recent credential rotation, application connection errors surged because the Lambda rotation function updated the RDS user password before all active connections using the previous password had closed. The security team needs a rotation strategy that prevents these connection interruptions in future rotations.\n\nWhich rotation strategy should the security engineer configure?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Configure the single user rotation strategy and enable Amazon RDS Multi-AZ, which automatically promotes a standby database instance before each rotation cycle begins to shield active connection pools from the password update",
+              "isCorrect": false,
+              "explanation": "Amazon RDS Multi-AZ maintains a synchronous standby replica and promotes it during infrastructure failures. It does not coordinate with Secrets Manager rotation timing. A password change applied to the primary RDS instance is replicated to the standby simultaneously, so enabling Multi-AZ does not create a transition window that preserves old credentials or prevents connection errors during single user rotation."
+            },
+            {
+              "id": "c1",
+              "text": "Configure the single user rotation strategy with a drain period by setting a ROTATION_SLEEP_SECONDS Lambda environment variable on the rotation function to delay the password update until existing connections close",
+              "isCorrect": false,
+              "explanation": "There is no `ROTATION_SLEEP_SECONDS` environment variable in AWS-provided Secrets Manager rotation function templates - this parameter is fabricated. The single user strategy replaces the database user's password atomically, so any connection presenting the old password immediately after rotation fails. Artificial delays reduce but do not eliminate the interruption window and introduce operational fragility."
+            },
+            {
+              "id": "c2",
+              "text": "Configure the alternating users rotation strategy, which maintains two dedicated database users and rotates credentials between them, keeping the previous user's credentials valid while existing connections drain",
+              "isCorrect": true,
+              "explanation": "The alternating users strategy provisions two dedicated database users. While one user's credentials are `AWSCURRENT`, the other user's new credentials are staged as `AWSPENDING`. After promotion, the previously active credentials are retained under the `AWSPREVIOUS` label, allowing in-flight application connections to drain without errors before the old user's password is eventually decommissioned.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Configure the single user rotation strategy and set a Lambda reserved concurrency of 1 on the rotation function to serialize invocations, preventing concurrent password updates from disrupting active database sessions across multiple simultaneous callers",
+              "isCorrect": false,
+              "explanation": "Lambda reserved concurrency limits the number of parallel executions of the rotation function. Secrets Manager invokes the rotation function for a given secret sequentially anyway, so a concurrency limit of 1 has no practical effect. Single user rotation still replaces the password atomically in a single operation, causing connections presenting the old password to fail immediately regardless of invocation concurrency."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+          ],
+          "services": [
+            "Secrets Manager",
+            "RDS",
+            "Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets-strategies.html",
+          "tip": "Consider whether any rotation approach can preserve the previous credentials' validity for a period after the new credentials are activated, eliminating the gap that causes connection errors.",
+          "explanation": "The alternating users rotation strategy is designed specifically to eliminate rotation-induced downtime.\n\n**Why it works:** Secrets Manager maintains two database users - one active (`AWSCURRENT`) and one being rotated (`AWSPENDING`). After the new credentials are validated and promoted, the previously active credentials are retained under the `AWSPREVIOUS` label, giving applications with cached connections time to close naturally before the old user is decommissioned.\n\n**Why the others fail:**\n- Single user rotation: performs an in-place password replacement with no fallback, creating an immediate gap where old-credential connections fail - artificial delays or concurrency limits do not change this.\n- RDS Multi-AZ: a disaster recovery feature entirely independent of Secrets Manager rotation scheduling; password changes replicate to the standby simultaneously.\n\n**Implementation:** Console > Secrets Manager > select the secret > Edit rotation > select \"Alternating users\" rotation strategy. A superuser secret with permission to modify database user passwords is also required.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0011",
+          "type": "single-choice",
+          "question": "An EventBridge rule must match GuardDuty findings of type `UnauthorizedAccess:EC2/SSHBruteForce` with a severity of HIGH or CRITICAL (numeric value 7.0 or above). The rule must match the finding source correctly and avoid triggering on lower-severity variants of the same finding type.\n\nWhich EventBridge rule pattern correctly captures these findings?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "{\n  \"source\": [\"aws.guardduty\"],\n  \"detail-type\": [\"GuardDuty Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [\"HIGH\", \"CRITICAL\"]\n  }\n}",
+              "isCorrect": false,
+              "explanation": "GuardDuty severity in EventBridge events is a numeric float (e.g., 7.8), not a string label like `HIGH` or `CRITICAL`. String matching against these labels will never match and the rule will never fire."
+            },
+            {
+              "id": "c3",
+              "text": "{\n  \"source\": [\"guardduty.amazonaws.com\"],\n  \"detail-type\": [\"GuardDuty Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [{ \"numeric\": [\">=\", 7] }]\n  }\n}",
+              "isCorrect": false,
+              "explanation": "The source for GuardDuty EventBridge events is `aws.guardduty`, not `guardduty.amazonaws.com`. Using the wrong source string means the rule will consequently never match any GuardDuty finding regardless of the correct detail filter."
+            },
+            {
+              "id": "c1",
+              "text": "{\n  \"source\": [\"aws.guardduty\"],\n  \"detail-type\": [\"GuardDuty Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [{ \"numeric\": [\">=\", 7] }]\n  }\n}",
+              "isCorrect": true,
+              "explanation": "GuardDuty publishes events with source `aws.guardduty` and detail-type `GuardDuty Finding`. The detail block contains the finding type and numeric severity. EventBridge numeric matching with `>=` 7 correctly captures HIGH (7–8.9) and CRITICAL (9+) while excluding MEDIUM and LOW.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "{\n  \"source\": [\"aws.guardduty\"],\n  \"detail-type\": [\"Security Finding\"],\n  \"detail\": {\n    \"type\": [\"UnauthorizedAccess:EC2/SSHBruteForce\"],\n    \"severity\": [{ \"numeric\": [\">=\", 7] }]\n  }\n}",
+              "isCorrect": false,
+              "explanation": "The correct detail-type for GuardDuty EventBridge events is `GuardDuty Finding`, not `Security Finding`. `Security Finding` is used by AWS Security Hub for its aggregated findings format (ASFF). Using the wrong detail-type means the rule will not match GuardDuty-native events."
+            }
+          ],
+          "selectCount": 1,
+          "format": "json",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "Amazon GuardDuty",
+            "Amazon EventBridge"
+          ],
+          "docs": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings_cloudwatch.html",
+          "tip": "Focus on the exact values GuardDuty uses for source, detail-type, and the data type of the severity field in its EventBridge event schema.",
+          "explanation": "GuardDuty EventBridge events use: source=`aws.guardduty`, detail-type=`GuardDuty Finding`, and a numeric severity float in the detail object.\n\n**Why it works:** The rule pattern that specifies the correct source, the correct detail-type, and a numeric comparison `>= 7` matches HIGH and CRITICAL findings as intended.\n\n**Why the others fail:**\n- One option uses string labels (`HIGH`, `CRITICAL`) for severity which do not match the numeric float field - the rule will consequently never fire.\n- Another option uses the wrong source (`guardduty.amazonaws.com` is an API endpoint, not an EventBridge source).\n- Another option uses `Security Finding`, which is the Security Hub ASFF detail-type rather than GuardDuty's native `GuardDuty Finding`.\n\n**Implementation:** Console > EventBridge > Rules > Create rule, paste the JSON pattern that uses `aws.guardduty`, `GuardDuty Finding`, and `detail.severity` numeric comparison into the Event pattern editor.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0003",
+          "type": "multiple-choice",
+          "question": "A media company stores master video assets in S3 and requires that accidental overwrites by developers preserve the previous object content and that permanent deletion of any specific version requires multi-factor authentication from the bucket owner. The solution must use native S3 capabilities without restricting the development team's ability to upload new versions.\n\nWhich TWO configurations should the security engineer apply?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Configure an S3 bucket policy that denies `s3:DeleteObject` for all IAM principals except the bucket owner, and enable S3 Versioning.",
+              "isCorrect": false,
+              "explanation": "Denying `s3:DeleteObject` via bucket policy blocks deletion of the current object but misses the real target. With versioning enabled, permanent removal requires `s3:DeleteObjectVersion`, which is a completely different action. The policy also doesn't enforce MFA, and the bucket owner can change it whenever they want."
+            },
+            {
+              "id": "c2",
+              "text": "Enable MFA Delete on the versioned bucket, requiring the bucket owner to supply a valid MFA code when permanently deleting a specific object version or suspending versioning.",
+              "isCorrect": true,
+              "explanation": "MFA Delete puts the most destructive S3 operations behind a hardware MFA token that only the bucket owner can provide. Both permanent version deletion and versioning suspension require that MFA code, so no developer or compromised credential can permanently wipe out object history without it.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Apply S3 Object Lock in Governance mode with a 90-day retention period and grant all developers the `s3:BypassGovernanceRetention` permission for operational flexibility.",
+              "isCorrect": false,
+              "explanation": "Granting `s3:BypassGovernanceRetention` to every developer completely defeats the purpose of Object Lock. On top of that, the fixed retention period would stop developers from correcting accidental uploads, which directly conflicts with their operational needs."
+            },
+            {
+              "id": "c1",
+              "text": "Enable S3 Versioning on the bucket so that all PUT operations create a new version rather than overwriting the existing object.",
+              "isCorrect": true,
+              "explanation": "Versioning turns every overwrite into a new object version instead of replacing what's already there. Developers keep full write access and all original content stays recoverable. Delete operations just add a delete marker and previous versions remain untouched.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Enable S3 Cross-Region Replication with delete marker replication disabled and rely on the replica bucket as the authoritative copy for recovery.",
+              "isCorrect": false,
+              "explanation": "CRR copies objects to another region for availability but doesn't stop permanent deletion in the source bucket. Turning off delete marker replication causes the replica to gradually drift out of sync with the source. Neither approach adds MFA enforcement to delete operations."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiFactorAuthenticationDelete.html",
+          "tip": "Think of this as two separate problems: keeping previous versions when files get overwritten, and requiring extra authorization before anything gets permanently deleted.",
+          "explanation": "These two features solve different problems. Versioning keeps every object version around so developers can recover anything they accidentally overwrite. MFA Delete locks down the destructive stuff: permanently deleting a version or suspending versioning both require a hardware MFA code from the bucket owner.\n\n**Why the other options fall short:**\n- Giving every developer `s3:BypassGovernanceRetention` permission completely undermines Object Lock protection.\n- A bucket policy denying `s3:DeleteObject` targets the wrong action. With versioning on, you need to block `s3:DeleteObjectVersion` instead and there's no MFA enforcement either.\n- Cross-Region Replication provides availability in another region but nothing to prevent deletion at the source.\n\n**To set this up:** `aws s3api put-bucket-versioning --bucket <bucket-name> --versioning-configuration Status=Enabled,MFADelete=Enabled --mfa \"<serial-number> <token-code>\"` (must be run as the root account).",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0010",
+          "type": "multiple-choice",
+          "question": "AWS Security Hub is the central finding aggregation point for a multi-account AWS environment. The team needs a custom insight that surfaces the five S3 buckets with the highest number of CRITICAL severity findings over the past 30 days across all member accounts.\n\nWhich TWO actions are required to build this custom insight?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Set the workflow status filter to NEW and NOTIFIED to exclude already-remediated findings from the insight results.",
+              "isCorrect": false,
+              "explanation": "Filtering on `WorkflowStatus` NEW and NOTIFIED keeps the insight focused on open findings rather than resolved ones. That's a nice touch but it's not required to create a working insight. The filter set with grouping attribute plus the aggregation scope are the minimum requirements for what the question describes."
+            },
+            {
+              "id": "c2",
+              "text": "Enable Security Hub cross-Region aggregation or ensure the finding aggregator is configured to pull findings from all member account Regions into the administrator account.",
+              "isCorrect": true,
+              "explanation": "Custom insights can only surface findings that are actually visible in the account and Region where the insight lives. Without cross-account aggregation (delegated administrator with all members enabled) and cross-Region aggregation, findings from member accounts and other Regions simply won't show up in the insight results.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Configure each GuardDuty member account to forward findings directly to Security Hub in the administrator account using a GuardDuty cross-account publishing rule.",
+              "isCorrect": false,
+              "explanation": "GuardDuty findings reach Security Hub through the standard per-account integration, not through some special cross-account publishing rule. The aggregation model goes: GuardDuty → Security Hub (per account) → Security Hub administrator via cross-account membership. There's no direct GuardDuty-to-admin-Security-Hub shortcut."
+            },
+            {
+              "id": "c3",
+              "text": "Create an EventBridge rule that matches Security Hub findings, writes them to a DynamoDB table, and query the table to compute the top-five bucket ranking.",
+              "isCorrect": false,
+              "explanation": "This builds a custom pipeline around Security Hub instead of using the built-in custom insights feature. The question specifically asks about the native capability. Wiring up EventBridge + DynamoDB adds unnecessary complexity and isn't how Security Hub insights work."
+            },
+            {
+              "id": "c1",
+              "text": "Define the insight with a filter that sets Severity Label to CRITICAL, Resource Type to AwsS3Bucket, and record state to ACTIVE, then group results by Resource Id.",
+              "isCorrect": true,
+              "explanation": "Custom insights need a filter set to scope findings (severity, resource type, `RecordState`) and a grouping attribute to aggregate counts. Grouping by `Resource Id` (the bucket ARN) gives you a ranked list of buckets ordered by finding count, which is exactly what the question asks for.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
+          ],
+          "services": [
+            "AWS Security Hub",
+            "Amazon GuardDuty",
+            "Amazon Inspector",
+            "AWS Config"
+          ],
+          "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-insights-create.html",
+          "tip": "Split this into two concerns: what data needs to be visible in your Security Hub account, and how does the insight group that data into a ranked list?",
+          "explanation": "You need to solve two problems here.\n\n**First, define the insight itself.** Filter for CRITICAL findings on S3 buckets that are still ACTIVE, then group by Resource ID (the bucket ARN). This gives you a count-based ranking showing which buckets have the most critical issues.\n\n**Second, make sure Security Hub can actually see everything.** Without proper cross-account aggregation (and cross-Region if you're using multiple regions), your insight only shows findings from the local account and region. Pretty useless for a multi-account setup.\n\n**Why the other options miss the mark:**\n- Building your own EventBridge + DynamoDB pipeline ignores Security Hub's built-in insights feature\n- \"GuardDuty cross-account publishing rules\" aren't a real thing; findings flow through the standard per-account integration\n- Workflow status filtering is a nice-to-have refinement but not required for the basic insight\n\nOnce both pieces are in place, Security Hub automatically ranks your buckets by critical finding count.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0007",
+          "type": "matching",
+          "question": "Several distinct data integrity protection requirements exist across an AWS environment. Match each requirement to the AWS feature that best satisfies it.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "S3 Versioning",
+              "isCorrect": false,
+              "explanation": "S3 Versioning turns PUT operations into new versions rather than replacements. Any previous version can be restored using its version ID, making accidental overwrites fully recoverable."
+            },
+            {
+              "id": "c2",
+              "text": "S3 Object Lock - Compliance mode",
+              "isCorrect": false,
+              "explanation": "Compliance mode applies WORM protection that nobody can override, not even root, during the retention period. Use this when regulatory mandates like SEC 17a-4 or HIPAA demand absolute immutability."
+            },
+            {
+              "id": "c1",
+              "text": "CloudTrail log file validation",
+              "isCorrect": false,
+              "explanation": "CloudTrail creates hourly SHA-256 digest files and signs them with AWS's private key. When you run `aws cloudtrail validate-logs`, it recomputes the file hashes and checks them against those signed digests. If any log was altered or deleted after delivery, you'll know right away."
+            },
+            {
+              "id": "c4",
+              "text": "KMS key deletion cancellation / key policy with DenyScheduleKeyDeletion",
+              "isCorrect": false,
+              "explanation": "A KMS key policy condition can deny `kms:ScheduleKeyDeletion` and `kms:DisableKey` for all principals during a retention window. This protects the encryption key that your S3 data depends on. If someone deleted the key, all your stored ciphertexts would become permanently unrecoverable."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "Detect whether a CloudTrail log file was modified or deleted after it was delivered to S3",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s4",
+              "label": "Ensure a KMS key used for S3 encryption cannot be deleted or disabled during a retention window",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s3",
+              "label": "Recover a specific earlier version of an S3 object after an accidental overwrite",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "Prevent S3 objects from being overwritten or deleted for a fixed period, enforced even against the root account",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3",
+            "AWS CloudTrail",
+            "Amazon S3 Glacier",
+            "AWS KMS"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+          "tip": "Think about what each control actually protects: is it the data itself, the audit trail, previous versions or the encryption key? Match the control to the right layer.",
+          "explanation": "Each control targets a different layer of data integrity.\n\n**Here's how they map:**\n- CloudTrail log file validation detects post-delivery tampering of audit logs through signed digests. It proves integrity after the fact without preventing writes.\n- S3 Object Lock Compliance mode enforces WORM immutability that no account can override, making it the right tool for hard regulatory retention mandates.\n- S3 Versioning preserves every object state so you can do point-in-time recovery after accidental overwrites.\n- KMS key policy controls protect the encryption layer. Denying `kms:ScheduleKeyDeletion` and `kms:DisableKey` keeps the key alive. Without it, your encrypted S3 data becomes permanently unreadable.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0002",
+          "type": "single-choice",
+          "question": "A security team at a healthcare company suspects that CloudTrail log files stored in their centralized S3 bucket were deleted and recreated with modified content by a compromised administrator account. The team needs a native AWS mechanism that can cryptographically prove whether logs were altered after CloudTrail delivered them to S3.\n\nWhich feature provides this capability?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "AWS Config rule cloudtrail-s3-dataevents-enabled to monitor whether the CloudTrail bucket receives new objects, triggering an SNS alert on anomalies.",
+              "isCorrect": false,
+              "explanation": "Config managed rules check whether your setup matches compliance standards and can't do cryptographic verification of log file content. This particular rule only checks if data events are enabled, so it tells you nothing about whether delivered logs are genuine or have been tampered with."
+            },
+            {
+              "id": "c2",
+              "text": "Amazon Macie configured to scan the CloudTrail S3 bucket for sensitive data patterns and alert when log file sizes deviate from a baseline.",
+              "isCorrect": false,
+              "explanation": "Macie is built for sensitive data discovery and anomaly detection and doesn't provide cryptographic proof of file integrity. Size-based alerts are heuristic, so if someone modified the content without changing the file size, Macie wouldn't catch it."
+            },
+            {
+              "id": "c1",
+              "text": "CloudTrail log file validation, which generates hourly digest files containing SHA-256 hashes of all delivered log files, signed by AWS using a private key.",
+              "isCorrect": true,
+              "explanation": "Log file validation creates hourly digest files containing SHA-256 hashes of every log delivered in that window. AWS signs these digests with their RSA private key, so when you run `aws cloudtrail validate-logs` it recomputes the hashes and checks them against those signed digests, catching any modification, deletion or injection. It even detects cases where someone deleted and recreated the log files from scratch.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "S3 Object Lock in Governance mode applied to the CloudTrail bucket, preventing modification of log files during the retention window.",
+              "isCorrect": false,
+              "explanation": "Governance mode prevents deletion during a retention period but can't retroactively verify whether files were tampered with after delivery. It also has no way to detect if a privileged user with `s3:BypassGovernanceRetention` swapped out files before the lock kicked in."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "AWS CloudTrail",
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html",
+          "tip": "You're looking for something that can prove a file hasn't been tampered with after it was created. What AWS feature gives you cryptographic proof?",
+          "explanation": "Here's the key insight: you need cryptographic proof that files haven't been messed with after delivery. CloudTrail log file validation is the only option that actually does this.\n\nWhat makes this work? AWS creates hourly SHA-256 digest files and signs them with their RSA private key. When you run `aws cloudtrail validate-logs`, it recomputes the hashes and checks them against those signed digests. If someone modified, deleted, or added files after delivery, you'll know immediately.\n\nThe other options miss the mark:\n- Macie is great for finding sensitive data, but it doesn't verify file integrity\n- Object Lock Governance mode stops future changes but can't tell you about past tampering (plus it can be bypassed anyway)\n- Config rules check if your setup matches policies, not whether files have been altered\n\nTo enable this: use `--enable-log-file-validation` when creating your trail, or add it to an existing one.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0016",
+          "type": "multiple-choice",
+          "question": "Log group `/prod/app-server` in application account 111222333444 must stream events in near real time to a Kinesis Data Stream named `central-log-stream` in a dedicated logging account (999888777666) that centralizes CloudWatch Logs from 20 application accounts.\n\nWhich TWO actions must be performed to enable this cross-account streaming?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "In the logging account, configure an Amazon EventBridge cross-account event bus and create a rule matching CloudWatch Logs delivery events from account 111222333444, using a resource-based policy granting `events:PutEvents` to the source account.",
+              "isCorrect": false,
+              "explanation": "EventBridge handles structured AWS service events and custom application events. It does not receive raw CloudWatch Logs log stream data and cannot serve as a replacement for the CloudWatch Logs destination mechanism. Creating an event bus rule for CloudWatch Logs delivery events does not stream log group data to Kinesis."
+            },
+            {
+              "id": "c5",
+              "text": "In the logging account, enable AWS Organizations delegated administrator for CloudWatch and apply an organizations-managed log aggregation policy that automatically subscribes all member account log groups to 'central-log-stream' without additional per-account configuration.",
+              "isCorrect": false,
+              "explanation": "AWS Organizations integration with CloudWatch exists for certain features like cross-account observability, but there is no Organizations-managed policy that automatically subscribes log groups in member accounts to a Kinesis stream. Cross-account CloudWatch Logs streaming requires explicit destination creation and per-log-group subscription filter configuration in each source account."
+            },
+            {
+              "id": "c2",
+              "text": "In account 111222333444, create a CloudWatch Logs subscription filter on '/prod/app-server' specifying the destination ARN from the logging account as the target.",
+              "isCorrect": true,
+              "explanation": "A subscription filter in the source account connects the log group to the cross-account destination. It specifies the destination ARN and an optional filter pattern, then causes CloudWatch Logs to forward all matching events to the Kinesis stream in near real time. Without the subscription filter, no data flows from the source log group to the destination.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "In the logging account, create a CloudWatch Logs destination that wraps 'central-log-stream' and attach a destination access policy granting `logs:PutSubscriptionFilter` to account 111222333444.",
+              "isCorrect": true,
+              "explanation": "A CloudWatch Logs destination in the receiving account exposes the Kinesis stream as a cross-account target. The destination access policy is the authorization mechanism that permits the source account to create a subscription filter pointing to this destination. Without the destination and its policy, the source account cannot reference the Kinesis stream across account boundaries.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "In account 111222333444, configure a CloudWatch Logs export task to periodically export '/prod/app-server' to an S3 bucket in the logging account, then deploy a Lambda function in the logging account that reads the S3 exports and writes them into 'central-log-stream'.",
+              "isCorrect": false,
+              "explanation": "Export tasks deliver CloudWatch Logs data to S3 in batches on a scheduled basis, not in near real time. The requirement specifies near real-time streaming, which is only achievable via subscription filters. Adding a Lambda re-import step introduces latency, operational complexity, and additional failure points - it does not fulfill the streaming requirement."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+          ],
+          "services": [
+            "CloudWatch Logs",
+            "Kinesis Data Streams",
+            "IAM"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CrossAccountSubscriptions.html",
+          "tip": "Cross-account log streaming requires one configuration step in the receiving account to expose the target and authorize access, and a separate configuration step in the source account to activate the data flow.",
+          "explanation": "Cross-account CloudWatch Logs streaming uses a two-sided setup.\n\n**Why it works:** The logging account creates a CloudWatch Logs destination that wraps `central-log-stream` and attaches a destination access policy authorizing the source account to write (`logs:PutSubscriptionFilter`). The source account then creates a subscription filter on `/prod/app-server` referencing that destination ARN, activating near real-time forwarding.\n\n**Why the others fail:**\n- EventBridge cross-account event buses: handle structured AWS service events and custom events - they do not receive raw CloudWatch Logs stream data and cannot substitute for the destination-and-subscription-filter mechanism.\n- CloudWatch Logs export tasks: deliver data to S3 in batches on a scheduled basis, not in near real time; routing back into Kinesis via Lambda adds latency.\n- Organizations-managed auto-subscription: does not exist - cross-account streaming requires explicit per-log-group subscription filter configuration.\n\n**Implementation:** `aws logs put-destination` and `aws logs put-destination-policy` in the logging account, then `aws logs put-subscription-filter` in the application account referencing the returned destination ARN.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0015",
+          "type": "single-choice",
+          "question": "A security architect must create a multi-region CloudTrail organization trail in management account 123456789012. The trail must deliver logs to S3 bucket `org-audit-logs` and also stream copies to a CloudWatch Logs log group `/cloudtrail/org-trail` for real-time alerting. An IAM role named `CloudTrail_CWLogs_Role` already exists in the account for log streaming.\n\nWhich AWS CLI command correctly creates this trail?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "aws cloudtrail create-trail \\\n  --name org-trail \\\n  --s3-bucket-name org-audit-logs \\\n  --s3-key-prefix AWSLogs \\\n  --is-multi-region-trail \\\n  --is-organization-trail \\\n  --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail \\\n  --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
+              "isCorrect": false,
+              "explanation": "This command is missing the `:*` suffix on the log group ARN. CloudTrail requires the log group ARN to end with `:*` when specified via the CLI, because the ARN must reference the log group and all its associated log streams. Without the suffix the command consequently returns a validation error indicating the log group ARN format is invalid."
+            },
+            {
+              "id": "c1",
+              "text": "aws cloudtrail create-trail \\\n  --name org-trail \\\n  --s3-bucket-name org-audit-logs \\\n  --is-multi-region-trail \\\n  --is-organization-trail \\\n  --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:* \\\n  --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
+              "isCorrect": true,
+              "explanation": "This command includes all required parameters: `--is-multi-region-trail` for cross-region coverage, `--is-organization-trail` to propagate the trail to all member accounts, `--cloud-watch-logs-log-group-arn` with the required `:*` suffix referencing the log group and its streams, and `--cloud-watch-logs-role-arn` specifying the IAM role CloudTrail uses to deliver to CloudWatch Logs. Both CloudWatch Logs parameters must be present together.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "aws cloudtrail create-trail \\\n  --name org-trail \\\n  --s3-bucket-name org-audit-logs \\\n  --include-global-service-events \\\n  --is-organization-trail \\\n  --enable-log-file-validation \\\n  --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:* \\\n  --cloud-watch-logs-role-arn arn:aws:iam::123456789012:role/CloudTrail_CWLogs_Role",
+              "isCorrect": false,
+              "explanation": "`--include-global-service-events` enables logging of global services like IAM and STS but does not make the trail multi-region. Without `--is-multi-region-trail`, CloudTrail only captures API calls in the single region where the trail was created. The requirement specifies a multi-region trail, so this command leaves all other regions unmonitored."
+            },
+            {
+              "id": "c2",
+              "text": "aws cloudtrail create-trail \\\n  --name org-trail \\\n  --s3-bucket-name org-audit-logs \\\n  --is-multi-region-trail \\\n  --is-organization-trail \\\n  --enable-log-file-validation \\\n  --kms-key-id arn:aws:kms:us-east-1:123456789012:alias/cloudtrail-key \\\n  --cloud-watch-logs-log-group-arn arn:aws:logs:us-east-1:123456789012:log-group:/cloudtrail/org-trail:*",
+              "isCorrect": false,
+              "explanation": "`--enable-log-file-validation` and `--kms-key-id` are valid but optional parameters. However, this command is missing the required `--cloud-watch-logs-role-arn` parameter. When specifying `--cloud-watch-logs-log-group-arn`, the role ARN is mandatory - CloudTrail needs it to assume the delivery role and write to CloudWatch Logs. The command will therefore fail with a validation error."
+            }
+          ],
+          "selectCount": 1,
+          "format": "cli",
+          "domain": "Detection",
+          "skills": [
+            "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+          ],
+          "services": [
+            "CloudTrail",
+            "CloudWatch Logs",
+            "IAM"
+          ],
+          "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-create-and-update-a-trail-by-using-the-aws-cli.html",
+          "tip": "When configuring two delivery destinations for a CloudTrail trail, identify every required parameter for each destination and verify that ARN formats match exactly what the API expects.",
+          "explanation": "Creating a CloudTrail trail with CloudWatch Logs delivery requires four key parameters together: `--is-organization-trail`, `--is-multi-region-trail`, `--cloud-watch-logs-log-group-arn` (with `:*` suffix), and `--cloud-watch-logs-role-arn`.\n\n**Why the others fail:**\n- An option that sets `--enable-log-file-validation` and `--kms-key-id` but omits `--cloud-watch-logs-role-arn`: both CloudWatch Logs parameters must be supplied together - omitting the role ARN causes a validation error.\n- An option that uses `--include-global-service-events` instead of `--is-multi-region-trail`: this only enables logging of global services like IAM and STS and does not make the trail multi-region, leaving other regions unmonitored.\n- An option missing the `:*` suffix on the log group ARN: CloudTrail requires the `:*` wildcard suffix to identify the log group and its associated streams - omitting it causes a format validation error.\n\n**Implementation:** After creating the trail, run `aws cloudtrail start-logging --name org-trail` to begin capturing events.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0014",
+          "type": "single-choice",
+          "question": "A DevOps engineer deployed the CloudWatch agent on a fleet of Amazon Linux 2 EC2 instances using AWS Systems Manager. The agent configuration specifies `/var/log/app/application.log` as the source and `/app/prod-logs` as the target CloudWatch Logs log group. Three days after deployment, the log group exists in CloudWatch but contains no log streams or events.\n\nWhat is the most likely cause and remediation?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "The log group '/app/prod-logs' was auto-created without a retention policy, causing all ingested log events to expire immediately. Set the log group retention to at least 90 days using the CloudWatch console, then redeploy the agent configuration using the SSM Run Command document AWS-ConfigureAWSPackage.",
+              "isCorrect": false,
+              "explanation": "CloudWatch log groups created without an explicit retention policy default to \"Never expire\", meaning no logs are deleted automatically. A missing retention policy cannot cause log events to disappear immediately after ingestion. Redeploying the agent via SSM does not address an IAM permissions gap and would not resolve the underlying delivery failure."
+            },
+            {
+              "id": "c1",
+              "text": "The EC2 instance profile role lacks the CloudWatchAgentServerPolicy permissions. Attach this managed policy to the role and restart the CloudWatch agent on each affected instance.",
+              "isCorrect": true,
+              "explanation": "The CloudWatch agent requires `logs:CreateLogGroup`, `logs:CreateLogStream`, and `logs:PutLogEvents` IAM permissions. The log group existing confirms `logs:CreateLogGroup` succeeded, but missing `logs:PutLogEvents` prevents log stream creation and event delivery. Attaching `CloudWatchAgentServerPolicy` to the instance profile role grants all required permissions. Restarting the agent allows it to retry delivery with the updated credentials.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "The agent is using the legacy awslogs daemon configuration format, which is incompatible with the unified CloudWatch agent on Amazon Linux 2. Regenerate the configuration using the amazon-cloudwatch-agent-config-wizard, upload the result to SSM Parameter Store, and redeploy it across the fleet using the AmazonCloudWatch-ManageAgent SSM document.",
+              "isCorrect": false,
+              "explanation": "A configuration format incompatibility would typically cause the agent to fail at startup with a parse error, which would also prevent the initial `logs:CreateLogGroup` call. Since the log group was successfully created, the agent started and ran at least one API call successfully. The issue is not a configuration format problem but a missing IAM permission for write operations."
+            },
+            {
+              "id": "c3",
+              "text": "The EC2 instances are in a private subnet with no VPC endpoint for CloudWatch Logs, blocking all API calls from the agent. Create an interface VPC endpoint for com.amazonaws.region.logs, attach an endpoint policy allowing the required logs actions, and update the agent configuration with the endpoint URL.",
+              "isCorrect": false,
+              "explanation": "A missing VPC endpoint would block all CloudWatch Logs API calls, which would prevent the log group from being created as well. Since the log group already exists, the agent has already made at least one successful API call. The symptom of a log group with no streams points to a permissions issue on write operations specifically, not a network connectivity failure."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+          ],
+          "services": [
+            "CloudWatch Logs",
+            "EC2",
+            "IAM"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html",
+          "tip": "When a resource is created successfully but data is not flowing into it, consider what specific permissions govern the write operation versus the creation operation.",
+          "explanation": "The log group exists but has no streams or events - `logs:CreateLogGroup` succeeded, but `logs:CreateLogStream` and `logs:PutLogEvents` are failing silently.\n\n**Why it works:** This is a classic partial IAM permissions symptom. The instance profile role likely has `logs:CreateLogGroup` but is missing `logs:CreateLogStream` and `logs:PutLogEvents`. Attaching `CloudWatchAgentServerPolicy` grants all required permissions in one step.\n\n**Why the others fail:**\n- Missing VPC endpoint: would block all CloudWatch Logs API calls - the pre-existing log group proves `logs:CreateLogGroup` succeeded, ruling out a connectivity failure.\n- Missing retention policy: defaults to never-expire and cannot cause log events to disappear immediately after ingestion.\n- Configuration format incompatibility: would prevent the agent from starting at all, also blocking the initial `logs:CreateLogGroup` call.\n\n**Implementation:** IAM > attach `CloudWatchAgentServerPolicy` to the EC2 instance profile role, then run `sudo systemctl restart amazon-cloudwatch-agent` on the instances.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0022",
+          "type": "ordering",
+          "question": "When AWS Secrets Manager rotates an RDS database secret using a custom Lambda rotation function, it invokes the Lambda four times per cycle, each time with a different `Step` parameter value. Each invocation performs a distinct and non-interchangeable action in the rotation workflow.\n\nArrange the following steps in the correct order in which Secrets Manager invokes them during a single rotation cycle.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "setSecret - Apply the AWSPENDING credential value to the protected resource by updating the RDS database user's password to match the new staged version",
+              "isCorrect": true,
+              "explanation": "`setSecret` is invoked second. It reads the `AWSPENDING` credential from Secrets Manager and updates the actual protected resource - for RDS, this means connecting with the existing `AWSCURRENT` credentials and executing an `ALTER USER` command to set the new password. This step requires `createSecret` to have completed so the new credential value exists in `AWSPENDING`.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "testSecret - Authenticate against the protected resource using the AWSPENDING credential to confirm the new password was applied successfully",
+              "isCorrect": true,
+              "explanation": "`testSecret` is invoked third. It attempts to authenticate against the RDS database using the credential stored in `AWSPENDING` to verify that `setSecret` successfully updated the user's password. This validation step prevents `finishSecret` from promoting an untested or broken credential to `AWSCURRENT`.",
+              "sequence": 3
+            },
+            {
+              "id": "c1",
+              "text": "createSecret - Generate a new credential value and store it as a new secret version with the AWSPENDING staging label attached",
+              "isCorrect": true,
+              "explanation": "`createSecret` is always invoked first. The rotation Lambda generates a new password and calls `PutSecretValue` to store it as a new version with the `AWSPENDING` label. All subsequent steps depend on finding an `AWSPENDING` version to act on, so this step must complete successfully before any other step can proceed.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "finishSecret - Promote the AWSPENDING version to AWSCURRENT, relabel the previous AWSCURRENT version as AWSPREVIOUS, and complete the rotation cycle",
+              "isCorrect": true,
+              "explanation": "`finishSecret` is the final step. It calls `UpdateSecretVersionStage` to move the `AWSCURRENT` label to the successfully validated `AWSPENDING` version, making the new credential active. The version that was previously `AWSCURRENT` is relabeled `AWSPREVIOUS` and retained briefly to support applications that may still hold cached connections using the old credential.",
+              "sequence": 4
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Data Protection",
+          "skills": [
+            "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+          ],
+          "services": [
+            "Secrets Manager",
+            "Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotate-secrets_lambda-functions.html",
+          "tip": "Each step produces a specific artifact or state change that the next step depends on. Consider which action must complete and produce a verifiable result before the following action can begin.",
+          "explanation": "Secrets Manager defines a strict four-step rotation lifecycle: `createSecret` → `setSecret` → `testSecret` → `finishSecret`.\n\n**Why it works:** `createSecret` must run first because it generates the new credential and stores it with the `AWSPENDING` label - the artifact all other steps consume. `setSecret` reads `AWSPENDING` and applies the new password to the protected resource. `testSecret` verifies the `AWSPENDING` credential against the live resource before promotion. `finishSecret` promotes `AWSPENDING` to `AWSCURRENT` only after successful testing, completing the atomic rotation.\n\n**Implementation:** The rotation function handler should inspect the `Step` parameter value and dispatch to the appropriate sub-function using a switch or if-else chain. The `AWSPREVIOUS` label set by `finishSecret` provides a brief fallback window for applications holding connections that use the old credential.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0021",
+          "type": "multiple-choice",
+          "question": "A financial services company manages 15 AWS accounts through AWS Organizations. The company's security policy mandates that all Secrets Manager secrets must have rotation configured and must have been rotated successfully within the past 90 days. The security team discovers that some accounts contain secrets with rotation disabled, while others have rotation enabled but last rotated successfully more than 90 days ago. The team requires continuous automated compliance monitoring and automated remediation for both violation types without manual triage.\n\nWhich TWO actions should the security engineer implement to satisfy both requirements?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Deploy the secretsmanager-scheduled-rotation-success-idle-too-long AWS Config managed rule as an Organization Config rule with the maxDaysSinceRotation parameter set to 90 across all member accounts, and configure automatic Systems Manager Automation remediation to invoke rotation for secrets exceeding the threshold",
+              "isCorrect": true,
+              "explanation": "The `secretsmanager-scheduled-rotation-success-idle-too-long` managed rule flags secrets where rotation is enabled but the last successful rotation occurred more than the configured number of days ago. Setting `maxDaysSinceRotation=90` and deploying org-wide as an Organization Config rule addresses the second violation type. Automatic Systems Manager Automation remediation invokes rotation for overdue secrets without requiring manual review.",
+              "sequence": 2
+            },
+            {
+              "id": "c2",
+              "text": "Deploy the secretsmanager-rotation-enabled-check AWS Config managed rule as an Organization Config rule across all member accounts, and configure automatic Systems Manager Automation remediation to associate a rotation Lambda function for secrets where rotation is disabled",
+              "isCorrect": true,
+              "explanation": "The `secretsmanager-rotation-enabled-check` managed rule flags secrets that do not have rotation enabled. Deploying it as an Organization Config rule from a delegated administrator account provides centralized continuous evaluation across all 15 accounts. Pairing it with automatic Systems Manager Automation remediation addresses the first violation type - rotation entirely disabled - without manual intervention.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "Create an Amazon EventBridge rule in the management account that captures RotateSecret CloudTrail API events, uses content-based filtering to identify secrets whose last rotation timestamp exceeds 90 days, and routes non-compliant events to an SNS topic for security team review",
+              "isCorrect": false,
+              "explanation": "EventBridge content filtering operates on the fields present in the event at the moment it fires. A `RotateSecret` event fires when rotation occurs - it cannot identify secrets that have not recently emitted a rotation event. Routing findings to SNS for security team review is a manual notification mechanism, not automated remediation. This approach cannot continuously detect either violation type."
+            },
+            {
+              "id": "c5",
+              "text": "Deploy a centralized Lambda function triggered daily by Amazon EventBridge that assumes cross-account IAM roles in each member account, calls `secretsmanager:ListSecrets` to evaluate last rotation timestamps, and publishes overdue secret ARNs to AWS Security Hub as custom findings for the security team to remediate",
+              "isCorrect": false,
+              "explanation": "This polling-based approach requires manual action to remediate Security Hub custom findings and consequently introduces significant operational overhead with cross-account role assumption and custom finding lifecycle management. AWS Config Organization rules provide native continuous evaluation, automatic evidence collection, and built-in automatic remediation without requiring a custom polling architecture."
+            },
+            {
+              "id": "c3",
+              "text": "Enable AWS Security Hub in all accounts with the AWS Foundational Security Best Practices standard, which includes SecretsManager.1 and SecretsManager.4 controls for rotation compliance, and configure Security Hub custom actions to invoke a Lambda function that triggers rotation for non-compliant secrets",
+              "isCorrect": false,
+              "explanation": "AWS Security Hub FSBP includes SecretsManager controls that detect rotation issues. However, Security Hub custom actions require a human to manually select findings and click the action - they are configured responses, not automatic remediation. This approach satisfies continuous detection but fails the automated remediation requirement. Config rules with auto-remediation provide this capability natively."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
+          ],
+          "services": [
+            "Secrets Manager",
+            "Config",
+            "Systems Manager",
+            "Organizations"
+          ],
+          "docs": "https://docs.aws.amazon.com/config/latest/developerguide/secretsmanager-rotation-enabled-check.html",
+          "tip": "Each violation type represents a distinct compliance condition. Look for AWS-native tools designed for continuous configuration compliance evaluation that also support automated remediation, and identify which individual rule addresses each specific condition.",
+          "explanation": "Two distinct AWS Config managed rules are required because the two violation types are different conditions.\n\n**Why it works:** The `secretsmanager-rotation-enabled-check` rule detects secrets where rotation has never been configured. The `secretsmanager-scheduled-rotation-success-idle-too-long` rule (with `maxDaysSinceRotation=90`) detects secrets where rotation is configured but has not succeeded within the required period. Together, deployed as Organization Config rules with automatic Systems Manager Automation remediation, they provide complete coverage of both conditions across all 15 accounts without manual intervention.\n\n**Why the others fail:**\n- EventBridge on `RotateSecret` events: cannot continuously detect secrets that have not recently emitted rotation events; SNS routing is manual notification, not automated remediation.\n- Security Hub FSBP custom actions: custom actions require human selection - not automated remediation.\n- Custom Lambda polling: adds architectural complexity while providing weaker remediation capability than native Config auto-remediation.\n\n**Implementation:** Console > Config > Rules > Add rule, search for each managed rule, configure Organization-level deployment and auto-remediation actions in the rule scope settings.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0017",
+          "type": "ordering",
+          "question": "A newly created AWS Organization needs a centralized CloudTrail trail that delivers logs to an S3 bucket in a dedicated logging account and streams copies to CloudWatch Logs for real-time alerting. The setup steps must be performed in a specific sequence.\n\nArrange the following steps in the correct order to complete the configuration.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Create an S3 bucket in the logging account and attach a bucket policy granting cloudtrail.amazonaws.com `s3:GetBucketAcl` and `s3:PutObject`, with a StringEquals condition on `aws:SourceOrgID` matching the organization ID.",
+              "isCorrect": true,
+              "explanation": "The destination S3 bucket and its policy must exist before the trail is created. During trail creation, CloudTrail validates that it has write access to the specified bucket. If the bucket policy is missing or incorrect at creation time, the API call therefore fails with an `InsufficientS3BucketPolicyException`, requiring the policy to be fixed before retrying.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Enable CloudTrail as a trusted service in AWS Organizations from the management account console or by running `aws organizations enable-aws-service-access --service-principal cloudtrail.amazonaws.com`.",
+              "isCorrect": true,
+              "explanation": "Enabling CloudTrail as a trusted service in Organizations is the first prerequisite. This creates the `AWSServiceRoleForCloudTrail` service-linked role and grants CloudTrail the permissions it needs to create and manage trails in member accounts. Without this step, the `IsOrganizationTrail` flag cannot be used successfully.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Enable logging on the trail using `aws cloudtrail start-logging --name org-trail`, then verify delivery by checking for log files in the S3 bucket prefix and confirming that log streams appear in the CloudWatch Logs log group.",
+              "isCorrect": true,
+              "explanation": "Creating a trail does not automatically start log delivery - the trail must be explicitly started with `start-logging`. Verifying that both delivery paths are working (S3 and CloudWatch Logs) confirms that the end-to-end configuration is correct and that management events from all member accounts are being captured and routed to both destinations.",
+              "sequence": 4
+            },
+            {
+              "id": "c3",
+              "text": "Create the organization trail in the management account with `IsOrganizationTrail` enabled, specifying the S3 bucket as the primary destination and providing the CloudWatch Logs log group ARN and IAM role ARN for log streaming.",
+              "isCorrect": true,
+              "explanation": "With Organizations integration active and the S3 bucket policy in place, the trail can be created. Setting `IsOrganizationTrail` automatically deploys the trail configuration to all current and future member accounts. Providing both CloudWatch Logs parameters at creation time enables dual delivery - to S3 for durable storage and to CloudWatch Logs for real-time alerting.",
+              "sequence": 3
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Detection",
+          "skills": [
+            "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+          ],
+          "services": [
+            "CloudTrail",
+            "S3",
+            "AWS Organizations",
+            "CloudWatch Logs"
+          ],
+          "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html",
+          "tip": "Consider which resources and permissions must exist before each step can succeed - the sequence is determined by the dependencies between steps.",
+          "explanation": "The steps follow a strict dependency chain determined by API validation requirements.\n\n**Why it works:** (1) Enable CloudTrail in Organizations first - this creates the `AWSServiceRoleForCloudTrail` service-linked role needed for org-wide trail management; (2) create and configure the S3 bucket before trail creation - CloudTrail validates bucket access during `create-trail`, so the bucket policy must be ready; (3) create the organization trail referencing the pre-configured destinations - this simultaneously deploys the trail to all member accounts; (4) start logging and verify both delivery paths.\n\n**Implementation:** Attempting steps out of order results in API errors: creating the trail before step 1 fails because the service-linked role does not exist, and creating the trail before step 2 fails with `InsufficientS3BucketPolicyException`.",
+          "difficulty": 5,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0005",
+          "type": "matching",
+          "question": "The data integrity layer of a multi-tier compliance platform on AWS uses distinct controls for different scenarios. Match each integrity requirement to the AWS mechanism that best satisfies it.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "S3 Object Lock in Compliance mode with a fixed retention period",
+              "isCorrect": false,
+              "explanation": "Compliance mode enforces WORM immutability that nobody, including root, can override during the retention window. This is the go-to control for regulatory archive requirements like SEC 17a-4 or HIPAA retention mandates."
+            },
+            {
+              "id": "c4",
+              "text": "Digital code signing verified against a trusted certificate authority",
+              "isCorrect": false,
+              "explanation": "Digital code signing uses asymmetric cryptography: a publisher signs a release with their private key and any recipient can verify the signature against the corresponding public certificate. If the signature doesn't match, you know the software was tampered with or corrupted after signing."
+            },
+            {
+              "id": "c2",
+              "text": "S3 Versioning to convert overwrites into new object versions",
+              "isCorrect": false,
+              "explanation": "S3 Versioning keeps every object version by turning PUT operations into new versions instead of replacements. DELETE operations become recoverable delete markers. You can restore any prior state just by referencing its version ID."
+            },
+            {
+              "id": "c1",
+              "text": "CloudTrail log file validation with SHA-256 digest files",
+              "isCorrect": false,
+              "explanation": "CloudTrail log file validation generates hourly SHA-256 digest files that AWS signs with their RSA private key. Running `aws cloudtrail validate-logs` recomputes the hashes and checks them against those signed digests, so you'll immediately know if any log was modified, deleted, or injected after delivery."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s4",
+              "label": "Preserve all previous object states when developers overwrite S3 objects",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s1",
+              "label": "Detect tampering of audit log files after delivery to S3",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "Prevent any user from deleting archived records for a fixed regulatory period",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s3",
+              "label": "Ensure software releases have not been altered since the publisher signed them",
+              "correctChoiceId": "c4"
+            }
+          ],
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3",
+            "AWS CloudTrail",
+            "Amazon S3 Glacier",
+            "AWS KMS"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+          "tip": "Each control protects data in a different way: some prevent changes, others detect tampering after the fact and some preserve history. Match the protection style to the threat.",
+          "explanation": "Think of data integrity as layers, each covering a different scenario.\n\nCloudTrail log file validation catches tampering after the fact. It uses cryptographically signed digests to prove whether audit logs have been modified since delivery.\n\nS3 Object Lock Compliance mode is your regulatory compliance tool. Once enabled, nobody (not even root) can delete or modify objects during the retention period. It's immutable storage that satisfies the strictest archive requirements.\n\nDigital code signing proves software authenticity. It's how you verify that a release actually came from the legitimate publisher and hasn't been altered along the way.\n\nS3 Versioning is your safety net for human error. Every time someone overwrites a file, the previous version sticks around so you can recover it later.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-05"
+        },
+        {
+          "id": "SCS-C03-0013",
+          "type": "single-choice",
+          "question": "A security engineer is replacing 50 per-account CloudTrail trails in an AWS Organization with a single centralized trail. The management account hosts an S3 bucket named `org-audit-logs` where all management events must be delivered. The engineer has created a trail in the management account but events from member accounts are not appearing in the bucket.\n\nWhich configuration change will resolve this?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Enable the IsOrganizationTrail flag on the trail and update the S3 bucket policy to use a Principal of \"*\" with an `aws:PrincipalOrgID` condition restricting writes to the organization, then apply an SCP that prevents trail modification in all member accounts.",
+              "isCorrect": false,
+              "explanation": "Using a wildcard Principal with `aws:PrincipalOrgID` allows any identity in the organization to call `s3:PutObject`, which is overly permissive and not the correct model. CloudTrail needs to be the granted principal, not all organization members. An SCP preventing trail modification is a useful governance control but does not fix log delivery to S3."
+            },
+            {
+              "id": "c1",
+              "text": "Enable the IsOrganizationTrail flag on the trail and update the S3 bucket policy to grant cloudtrail.amazonaws.com `s3:PutObject` with a condition on `aws:SourceArn` matching the organization trail ARN.",
+              "isCorrect": true,
+              "explanation": "An organization trail must have `IsOrganizationTrail` set to true so CloudTrail automatically propagates it to all member accounts. The S3 bucket policy must allow the `cloudtrail.amazonaws.com` service principal to write objects using the `aws:SourceArn` condition to prevent cross-service confused deputy attacks. This is the standard, supported mechanism for centralized organization-level audit logging.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Deploy a CloudFormation StackSet from the management account to re-create a matching CloudTrail trail in each member account referencing the same S3 bucket, then update the bucket policy to allow `s3:PutObject` from the CloudFormation StackSet service role ARN.",
+              "isCorrect": false,
+              "explanation": "Deploying per-account trails via StackSets reproduces the original distributed architecture the engineer is trying to replace. It increases operational overhead and cost. Granting `s3:PutObject` to the CloudFormation service role is also incorrect - CloudTrail, not CloudFormation, is the principal that writes log files. This approach does not use the organization trail feature."
+            },
+            {
+              "id": "c2",
+              "text": "Enable the IsOrganizationTrail flag on the trail and update the S3 bucket policy to allow `s3:PutObject` from all member account root principals using `aws:PrincipalOrgID` as the condition key, eliminating the need for service principal grants in the bucket policy.",
+              "isCorrect": false,
+              "explanation": "Granting `s3:PutObject` to member account root principals is not how CloudTrail organization trails deliver logs. The `cloudtrail.amazonaws.com` service principal writes on behalf of all accounts; individual accounts do not push directly to S3. A bucket policy scoped to account principals would not allow the service to write and would not resolve the missing event delivery."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Detection",
+          "skills": [
+            "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent). Version 1.0 SCS-C03 4 | PAGE"
+          ],
+          "services": [
+            "CloudTrail",
+            "S3",
+            "AWS Organizations"
+          ],
+          "docs": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html",
+          "tip": "Think about this in two parts: how do you make the trail apply to all accounts, and who actually writes the log files to S3?",
+          "explanation": "You're dealing with two separate problems here:\n\nFirst, make your trail organization-wide by setting `IsOrganizationTrail` to true. This tells CloudTrail to automatically replicate the trail to all current and future member accounts - no need to set up trails individually.\n\nSecond, fix the bucket permissions. The key insight is that the CloudTrail service itself writes the log files, not the individual member accounts. So your bucket policy needs to allow `cloudtrail.amazonaws.com` to write objects. Add the `aws:SourceArn` condition pointing to your trail ARN to prevent confused deputy attacks.\n\nWhy the other approaches don't work:\n- Granting permissions to member account root principals misses how this actually works - CloudTrail writes on behalf of all accounts, not the accounts themselves\n- Using a wildcard principal is overly broad and still doesn't solve the real issue\n- Going back to per-account trails with StackSets defeats the whole purpose of centralization\n\nOnce you enable the organization flag and fix the bucket policy, events from all member accounts will start flowing to your central bucket.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-24"
+        },
+        {
+          "id": "SCS-C03-0001",
+          "type": "single-choice",
+          "question": "A financial services company stores compliance audit logs in Amazon S3 and must retain them immutably for 7 years to satisfy SEC 17a-4 regulations. The security architect must ensure that no user, including those with Administrator access or root credentials, can delete or shorten the retention period during that window.\n\nWhich S3 Object Lock configuration satisfies this requirement?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Enable S3 Versioning on the bucket, configure MFA Delete, and apply an SCP that denies `s3:PutBucketPolicy` changes for 7 years.",
+              "isCorrect": false,
+              "explanation": "MFA Delete adds protection for version deletions but doesn't create a fixed retention window. SCPs only govern member accounts in Organizations and can't stop the management account or root from changing policies. Therefore, this combination still falls short of what SEC 17a-4 requires."
+            },
+            {
+              "id": "c1",
+              "text": "Apply S3 Object Lock in Governance mode with a 7-year retention period and deny the `s3:BypassGovernanceRetention` action in all IAM policies.",
+              "isCorrect": false,
+              "explanation": "Governance mode has a loophole: users with `s3:BypassGovernanceRetention` permission can override it, and that includes root. You might think denying this in IAM policies would fix things, but IAM deny statements don't apply to the root account."
+            },
+            {
+              "id": "c3",
+              "text": "Enable S3 Versioning on the bucket and configure an S3 Lifecycle policy to expire objects after 7 years, combined with an S3 bucket policy that denies `s3:DeleteObject`.",
+              "isCorrect": false,
+              "explanation": "Versioning with a bucket policy stops casual deletions but doesn't enforce true immutability. A bucket owner can just modify or remove the policy whenever they want. Worse, Lifecycle expiration actively deletes objects, which is the exact opposite of what you need here."
+            },
+            {
+              "id": "c2",
+              "text": "Apply S3 Object Lock in Compliance mode with a 7-year retention period on the bucket.",
+              "isCorrect": true,
+              "explanation": "Compliance mode enforces true WORM (Write Once Read Many) immutability. Nobody can override it, not admins, not even root, for the entire retention period. It's the only Object Lock mode that actually meets strict regulatory requirements like SEC 17a-4.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Data Protection",
+          "skills": [
+            "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)"
+          ],
+          "services": [
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html",
+          "tip": "You need a retention mode that absolutely nobody can override - not even root users. Which one locks down data permanently?",
+          "explanation": "When you need true regulatory compliance, Compliance mode is your only option. Here's why: once you set it, nobody can change it - not administrators, not root users, nobody. The retention period is locked in stone.\n\nThe other approaches have escape hatches:\n- Governance mode sounds similar but users with `s3:BypassGovernanceRetention` permission can override it, and root always has this capability regardless of IAM policies\n- Versioning plus lifecycle policies can be changed by bucket owners at any time\n- MFA Delete and SCPs add layers but don't create an immutable retention window\n\nFor SEC 17a-4 compliance, you need that iron-clad guarantee that Compliance mode provides.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-05"
+        }
+      ],
+      "perDomain": {
+        "Detection": {
+          "total": 1,
+          "correct": 1,
+          "score": 100
+        }
+      },
+      "earlyComplete": true,
+      "answeredCount": 1,
+      "totalQuestions": 22
     }
   ]
 }

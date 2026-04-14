@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Check, Flag, Star } from 'lucide-react'
+import { Check, Flag, Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { ReportIssueModal } from '../components/ReportIssueModal'
 import { RatingModal } from '@/feedback/RatingModal'
@@ -7,7 +7,7 @@ import { clarityEvent } from '@/clarity'
 
 const PAGE_SIZE = 20
 
-export function QuestionNav() {
+export function QuestionNav({ focusMode = false }: { focusMode?: boolean }) {
   const {
     displayQuestions, selectedAnswers, flaggedQuestions, currentQuestionIndex,
     setCurrentQuestionIndex, setFlaggedQuestions, isFinished, revealAnswers,
@@ -93,7 +93,6 @@ export function QuestionNav() {
       <div>
         <div className="mb-1 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span>Question {Math.min(currentQuestionIndex + 1, displayQuestions.length)}/{displayQuestions.length}</span>
             <span className="text-xs text-muted-foreground">{answeredCount} answered · {pct}%</span>
             {flaggedCount > 0 && <span className="text-xs text-primary">🚩 {flaggedCount} flagged</span>}
           </div>
@@ -115,7 +114,7 @@ export function QuestionNav() {
         </div>
         {/* Prev / Next navigation */}
         <div className="mt-1.5 flex flex-wrap items-center gap-2 justify-end w-full">
-          {canReport && curQ && !isFinished && (
+          {canReport && curQ && !isFinished && !focusMode && (
             <>
               <button
                 onClick={() => { setReporting(true); setPaused(true) }}
@@ -135,22 +134,31 @@ export function QuestionNav() {
           <button
             onClick={() => setCurrentQuestionIndex((i) => Math.max(0, i - 1))}
             disabled={currentQuestionIndex <= 0}
-            className="px-3 py-1 rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 whitespace-nowrap"
-          >← Prev</button>
+            title="Previous question"
+            className={`rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 whitespace-nowrap inline-flex items-center justify-center ${focusMode ? 'p-1.5' : 'px-3 py-1'}`}
+          >
+            {focusMode ? <ChevronLeft className="w-4 h-4" /> : '← Prev'}
+          </button>
           {immediateMode && curShowFeedback && curAnswered ? (
             <button
               onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
               disabled={currentQuestionIndex >= displayQuestions.length - 1}
-              className="px-3 py-1 rounded-md bg-primary text-white text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors whitespace-nowrap"
-            >Next →</button>
+              title="Next question"
+              className={`rounded-md bg-primary text-white text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors whitespace-nowrap inline-flex items-center justify-center ${focusMode ? 'p-1.5' : 'px-3 py-1'}`}
+            >
+              {focusMode ? <ChevronRight className="w-4 h-4" /> : 'Next →'}
+            </button>
           ) : (
             <button
               onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
               disabled={currentQuestionIndex >= displayQuestions.length - 1}
-              className="px-3 py-1 rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 whitespace-nowrap"
-            >Next →</button>
+              title="Next question"
+              className={`rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 whitespace-nowrap inline-flex items-center justify-center ${focusMode ? 'p-1.5' : 'px-3 py-1'}`}
+            >
+              {focusMode ? <ChevronRight className="w-4 h-4" /> : 'Next →'}
+            </button>
           )}
-          {!allAnswered && answeredCount > 0 && (
+          {!allAnswered && answeredCount > 0 && !focusMode && (
             <button
               className="px-3 py-1 rounded-md bg-emerald-600 text-white text-sm font-semibold inline-flex items-center gap-1.5 shadow-sm hover:bg-emerald-700 transition-colors whitespace-nowrap"
               onClick={() => setShowCompleteEarlyConfirm(true)}

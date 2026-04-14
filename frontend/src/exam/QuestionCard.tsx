@@ -9,7 +9,7 @@ import { SortableOrderItem } from './SortableOrderItem'
 import { QuestionImage } from './QuestionImage'
 import type { QuestionType } from './types'
 
-export function QuestionCard() {
+export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
   const {
     displayQuestions, currentQuestionIndex, selectedAnswers, multiSelectPending, setMultiSelectPending,
     matchingAnswers, setMatchingAnswers, orderingAnswers, setOrderingAnswers,
@@ -102,8 +102,9 @@ export function QuestionCard() {
                     onClick={() => { setShowTipMap((s) => ({ ...s, [q.id]: !s[q.id] })); if (!showTipMap[q.id]) clarityEvent('hint_revealed') }}
                     className="h-8 text-sm px-2 rounded bg-muted/50 text-muted-foreground border border-border hover:bg-muted transition-colors inline-flex items-center gap-1"
                     aria-label={showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
+                    title={showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
                   >
-                    <Lightbulb className="w-3.5 h-3.5" /> {showTipMap[q.id] ? 'Hide Tip' : 'Show Tip'}
+                    <Lightbulb className="w-3.5 h-3.5" /> {!focusMode && (showTipMap[q.id] ? 'Hide Tip' : 'Show Tip')}
                   </button>
                 )}
                 {!isFinished && (
@@ -122,9 +123,10 @@ export function QuestionCard() {
                           setCurrentQuestionIndex((idx) => Math.min(displayQuestions.length - 1, idx + 1))
                         }
                       }}
+                      title={flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}
                       className={`h-8 text-sm px-2 rounded font-medium transition-colors ${flaggedQuestions.has(q.id) ? 'bg-primary text-white' : 'bg-accent text-primary border border-border'}`}
                     >
-                      🚩 {flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}
+                      🚩{!focusMode && ` ${flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}`}
                     </button>
                   </>
                 )}

@@ -278,13 +278,10 @@ export function AnalyticsView() {
                       : isWarn
                         ? 'linear-gradient(90deg, #f59e0b, #fbbf24)'
                         : 'linear-gradient(90deg, var(--color-incorrect), var(--color-incorrect-2))'
-                    const mastery = gamState.domainMastery[domain]
-                    const tierIcon = mastery?.tier === 'gold' ? '🥇' : mastery?.tier === 'silver' ? '🥈' : mastery?.tier === 'bronze' ? '🥉' : null
                     return (
                       <div key={domain}>
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm mb-1 gap-2">
                           <div className="flex items-center gap-2 min-w-0">
-                            {tierIcon && <span className="text-sm" title={`${mastery?.tier} mastery`}>{tierIcon}</span>}
                             <div className="font-medium truncate text-sm" style={{ minWidth: 0 }}>{domain}</div>
                             <div className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ color: labelColor, backgroundColor: `${labelColor}26` }}>{label}</div>
                           </div>
