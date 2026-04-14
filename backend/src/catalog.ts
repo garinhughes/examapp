@@ -47,7 +47,7 @@ export const TIERS: Record<Tier, TierConfig> = {
     tier: 'registered',
     label: 'Registered (Free)',
     questionLimit: 40,
-    attemptLimit: 5,
+    attemptLimit: null,
     reviewEnabled: true,
     exportEnabled: true,
     leaderboardEnabled: false,

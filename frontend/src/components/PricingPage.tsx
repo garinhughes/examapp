@@ -49,9 +49,9 @@ interface FeatureDef {
 const FEATURES: FeatureDef[] = [
   { label: 'Practice exams',     visitor: '20 questions', registered: '40 questions per exam', paid: 'All (per exam)' },
   { label: 'Skill labs',             visitor: '6 per provider',     registered: '12 per provider',               paid: 'All (per provider)' },
+  { label: 'Saved attempts',         visitor: 'Unlimited',       registered: 'Unlimited',            paid: 'Unlimited' },
   { label: 'Review & explanations',  visitor: CHECK,       registered: CHECK,                  paid: CHECK },
-  { label: 'Saved attempts',         visitor: CROSS,       registered: '5 per exam',           paid: 'Unlimited' },
-  { label: 'Analytics',              visitor: CROSS,      registered: CHECK,                  paid: CHECK },
+  { label: 'Analytics',              visitor: CROSS,       registered: CHECK,                  paid: CHECK },
   { label: 'Rewards & badges',       visitor: CROSS,       registered: CHECK,                  paid: CHECK },
   { label: 'Leaderboard',            visitor: CROSS,       registered: CROSS,                  paid: CHECK },
   { label: 'Report issues',          visitor: CROSS,       registered: CROSS,                  paid: CHECK },
@@ -565,7 +565,7 @@ export default function PricingPage() {
       {/* Not logged in CTA */}
       {!user && (
         <div className="text-center p-6 rounded-xl border border-dashed border-border bg-muted/40">
-          <p className="text-muted-foreground mb-3">Register for free to unlock more questions, labs, and saved attempts.</p>
+          <p className="text-muted-foreground mb-3">Register for free to unlock more questions, labs, analytics, and unlimited saved attempts.</p>
           <button
             onClick={() => navigate('/login')}
             className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-semibold"
