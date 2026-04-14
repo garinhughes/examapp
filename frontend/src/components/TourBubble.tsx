@@ -91,10 +91,15 @@ export function TourBubble() {
     window.addEventListener('resize', update)
     window.addEventListener('scroll', update, true)
 
+    // Re-run when layout shifts (e.g. entitlement banner renders after async data loads)
+    const ro = new ResizeObserver(update)
+    ro.observe(document.body)
+
     return () => {
       cancelAnimationFrame(rafId)
       window.removeEventListener('resize', update)
       window.removeEventListener('scroll', update, true)
+      ro.disconnect()
     }
   }, [tour.active, tour.step])
 
