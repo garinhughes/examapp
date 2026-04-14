@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Trophy, Flame } from 'lucide-react'
 import { useAuthFetch } from '../auth/useAuthFetch'
 import { useGamification } from '../gamification/GamificationContext'
 
@@ -41,7 +42,10 @@ export default function Leaderboard() {
   return (
     <div className="p-4 rounded-lg border border-border bg-card">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-muted-foreground">🏆 Leaderboard</h3>
+        <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-1.5">
+          <Trophy size={14} className="text-amber-500" />
+          Leaderboard
+        </h3>
         <div className="flex gap-1 bg-muted p-0.5 rounded">
           <button
             onClick={() => setTab('xp')}
@@ -75,8 +79,17 @@ export default function Leaderboard() {
                 e.isYou ? 'bg-primary/10 ring-1 ring-primary/40' : 'bg-muted/50'
               }`}
             >
-              <span className="w-6 text-center font-bold text-muted-foreground">
-                {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
+              <span className="w-6 flex justify-center">
+                {i <= 2 ? (
+                  <span
+                    className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold text-white"
+                    style={{ background: ['#f59e0b', '#9ca3af', '#cd7f32'][i] }}
+                  >
+                    {i + 1}
+                  </span>
+                ) : (
+                  <span className="font-bold text-muted-foreground text-xs">{i + 1}</span>
+                )}
               </span>
               <span className="flex-1 min-w-0">
                 <span className="font-medium truncate block">{e.name}{e.isYou ? ' (you)' : ''}</span>
@@ -85,7 +98,7 @@ export default function Leaderboard() {
               {tab === 'xp' ? (
                 <span className="text-primary font-semibold">{e.xp.toLocaleString()} XP</span>
               ) : (
-                <span className="text-primary font-semibold">🔥 {e.streak}d</span>
+                <span className="text-primary font-semibold flex items-center gap-1"><Flame size={13} className="text-orange-500" />{e.streak}d</span>
               )}
               <span className="text-xs text-muted-foreground">Lv{e.level}</span>
             </div>

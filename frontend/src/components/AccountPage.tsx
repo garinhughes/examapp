@@ -6,14 +6,15 @@ import { levelFromXP } from '../gamification/types'
 import { BADGES } from '../gamification/badges'
 import { useEntitlements } from '../hooks/useEntitlements'
 import CertificatesTab from './CertificatesTab'
+import { BadgeIcon } from '../gamification/BadgeIcon'
 
 const CATEGORY_LABELS: Record<string, string> = {
-  milestone: '📚 Milestones',
-  score: '🎯 Score',
-  streak: '🔥 Streaks',
-  mastery: '🏅 Mastery',
-  special: '✨ Special',
-  journey: '🗺️ Journey',
+  milestone: 'Milestones',
+  score: 'Score',
+  streak: 'Streaks',
+  mastery: 'Mastery',
+  special: 'Special',
+  journey: 'Journey',
 }
 
 
@@ -270,7 +271,7 @@ export default function AccountPage() {
                 : 'text-muted-foreground hover:text-foreground dark:hover:text-foreground'
             }`}
           >
-            {{ overview: '📊 Overview', badges: '🏅 Achievements', certificates: '🎓 Certificates', purchases: '💳 Purchases' }[t]}
+            {{ overview: 'Overview', badges: 'Achievements', certificates: 'Certificates', purchases: 'Purchases' }[t]}
           </button>
         ))}
       </div>
@@ -412,7 +413,7 @@ export default function AccountPage() {
                   if (!def) return null
                   return (
                     <div key={eb.id} className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/50 text-sm" title={def.description}>
-                      <span>{def.icon}</span>
+                      <BadgeIcon id={eb.id} size={16} />
                       <span className="font-medium">{def.name}</span>
                     </div>
                   )
@@ -492,7 +493,7 @@ export default function AccountPage() {
                           : 'border-border opacity-50 grayscale'
                       }`}
                     >
-                      <span className="text-2xl">{b.icon}</span>
+                      <span className="flex-shrink-0"><BadgeIcon id={b.id} size={24} /></span>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold truncate">{b.name}</div>
                         <div className="text-xs text-muted-foreground truncate">{b.description}</div>

@@ -842,7 +842,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         setShowConfetti(true)
         const badgeInfo = event.newBadges.map((eb: any) => {
           const def = BADGES.find((b) => b.id === eb.id)
-          return { icon: def?.icon ?? '🏅', name: def?.name ?? eb.id }
+          return { id: eb.id, icon: def?.icon ?? '🏅', name: def?.name ?? eb.id }
         })
         const title = event.newLevel !== null ? `Level Up! Level ${event.newLevel}` : passed ? 'Exam Passed! 🎉' : 'New Badges Unlocked!'
         const subtitle = passed && event.newLevel === null ? `You scored ${finData.score}%` : event.newLevel !== null ? `You scored ${finData.score}%` : undefined

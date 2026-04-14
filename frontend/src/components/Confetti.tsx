@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { BadgeIcon } from '../gamification/BadgeIcon'
 
 /** Lightweight CSS confetti - no dependencies */
 export function Confetti({ duration = 3000, onDone }: { duration?: number; onDone?: () => void }) {
@@ -59,7 +60,7 @@ export function RewardModal({
   title: string
   subtitle?: string
   xpGained: number
-  badges: { icon: string; name: string }[]
+  badges: { id: string; icon: string; name: string }[]
   onClose: () => void
 }) {
   return (
@@ -91,7 +92,7 @@ export function RewardModal({
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">New Badges</p>
             {badges.map((b) => (
               <div key={b.name} className="flex items-center gap-2 justify-center">
-                <span className="text-2xl animate-[badge-bounce_0.6s_ease-out]">{b.icon}</span>
+                <span className="animate-[badge-bounce_0.6s_ease-out]"><BadgeIcon id={b.id} size={24} /></span>
                 <span className="font-medium">{b.name}</span>
               </div>
             ))}
