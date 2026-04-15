@@ -3641,6 +3641,418 @@
       "domain": "Attacks and Exploits",
       "difficulty": 3,
       "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0086",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "5.1: Post-exploitation activities: establishing persistence, performing lateral movement, and cleaning up artifacts."
+      ],
+      "question": "After confirming initial access on a Windows workstation during a red team engagement, you determine the compromised account is a standard domain user with no local administrator privileges. The rules of engagement require that persistence survives a system reboot without triggering privilege escalation alerts from the endpoint detection platform.\n\nWhich persistence mechanism can be installed without requiring elevated privileges?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Create a new Windows service configured to start automatically at system boot, storing the payload binary in a writable directory and registering the service under a name that resembles a legitimate system process.",
+          "explanation": "Creating a Windows service requires local administrator privileges to interact with the Service Control Manager. A standard domain user account cannot register new services."
+        },
+        {
+          "id": "c2",
+          "text": "Modify the `HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Userinit` key to append the payload path, ensuring the payload runs at every user logon for all accounts on the system.",
+          "explanation": "Writing to `HKLM` (HKEY_LOCAL_MACHINE) registry hives requires administrator privileges. A standard user account does not have write access to this key."
+        },
+        {
+          "id": "c3",
+          "text": "Add a registry value under `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run` pointing to the payload binary so it executes when the compromised user logs in.",
+          "sequence": 1,
+          "explanation": "The `HKCU` (HKEY_CURRENT_USER) hive is fully writable by the current user without elevated privileges. Run keys in this hive execute the listed binary at each logon of the owning user."
+        },
+        {
+          "id": "c4",
+          "text": "Install a scheduled task configured to run under the SYSTEM account at system startup, setting the task to run hidden with the highest available privileges to ensure execution across all user sessions.",
+          "explanation": "Creating scheduled tasks that run as SYSTEM or with highest privileges requires local administrator rights. A standard domain user cannot create tasks in the SYSTEM context."
+        }
+      ],
+      "tip": "Consider what level of access rights each persistence mechanism requires and whether those rights are available to the compromised account.",
+      "explanation": "Adding a value to the `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run` key is a persistence technique that does not require elevated privileges because each user has full write access to their own `HKCU` hive.\n\n**Why it works:** Windows processes Run keys in `HKCU` at user logon using the session's own access token, so no elevation is needed to write or execute from this location.\n\n**Why the others don't work:**\n- Service creation: Registering a Windows service requires local administrator privileges to interact with the Service Control Manager.\n- `HKLM\\Winlogon\\Userinit`: Modifying `HKLM` keys requires administrator or SYSTEM privileges, which this account lacks.\n- SYSTEM scheduled task: Configuring a task to run as SYSTEM requires local admin rights that are unavailable to a standard user.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0087",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "Mimikatz"
+      ],
+      "skills": [
+        "5.1: Post-exploitation activities: establishing persistence, performing lateral movement, and cleaning up artifacts."
+      ],
+      "question": "Midway through an internal red team assessment, you have compromised a workstation and used `mimikatz` to extract credentials from LSASS memory. The output contains NTLM hashes but no plaintext passwords. A file server on the same subnet uses the same local administrator account, and `Kerberos` authentication is unavailable between these two hosts. Your current session is about to expire.\n\nWhich technique should you use to establish access on the file server before losing your current foothold?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Use the extracted NTLM hash with `mimikatz` to forge a Golden Ticket for the domain, then inject the ticket into the current session to access the file server through standard domain `Kerberos` authentication.",
+          "explanation": "A Golden Ticket requires the `krbtgt` account hash, not a workstation local admin hash. Additionally, the scenario specifies that `Kerberos` is unavailable between these hosts."
+        },
+        {
+          "id": "c2",
+          "text": "Use `pass-the-hash` over `SMB` to authenticate to the file server, injecting the extracted NTLM hash directly into the authentication process without requiring the plaintext password.",
+          "sequence": 1,
+          "explanation": "`Pass-the-hash` leverages `NTLM` authentication to present a password hash in place of a cleartext credential. Because the file server shares the same local admin hash and `NTLM` is available, this technique establishes a valid session without cracking the hash."
+        },
+        {
+          "id": "c3",
+          "text": "Configure an `NTLM` relay listener on the attacking host, then coerce the compromised workstation to initiate an outbound authentication request and relay it to the file server to impersonate the local administrator account in real time.",
+          "explanation": "`NTLM` relay requires intercepting a live authentication attempt from a victim host. You already hold the hash directly, making relay an overcomplicated approach that introduces unnecessary detection risk."
+        },
+        {
+          "id": "c4",
+          "text": "Use `mimikatz` to convert the extracted NTLM hash into a Kerberos ticket-granting ticket by leveraging domain controller replication, then present the generated ticket to authenticate to the file server using `Kerberos`.",
+          "explanation": "NTLM hashes cannot be converted to `Kerberos` tickets through domain controller replication - that process requires domain admin privileges and the `krbtgt` hash. Additionally, `Kerberos` is specified as unavailable for this target."
+        }
+      ],
+      "tip": "Consider which authentication protocol is available between the two hosts and which technique works directly with a stored hash rather than requiring interception of live traffic.",
+      "explanation": "`Pass-the-hash` is the correct technique when an NTLM hash is available and `Kerberos` authentication is not reachable for the target host.\n\n**Why it works:** `NTLM` authentication uses the password hash directly as the credential. By injecting the hash into the authentication context, a valid `SMB` session can be established without ever recovering the plaintext password.\n\n**Why the others don't work:**\n- Golden Ticket: Requires the domain `krbtgt` hash, not a local account hash, and `Kerberos` is unavailable for this target anyway.\n- `NTLM` relay: Requires intercepting live authentication traffic from a victim. You already hold the hash directly, so relay is unnecessary.\n- TGT conversion via replication: NTLM hashes cannot be converted into `Kerberos` tickets this way; `DCSync` produces account hashes, not TGTs from arbitrary NTLM hashes.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 3,
+      "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0088",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "shred"
+      ],
+      "skills": [
+        "5.1: Post-exploitation activities: establishing persistence, performing lateral movement, and cleaning up artifacts."
+      ],
+      "question": "With the active testing phase complete on a Linux application server, you need to clean up artifacts from the engagement. The rules of engagement specify that all tester-installed tools and temporary files must be removed, but the client's incident response team requires that system logs remain intact so they can validate the engagement timeline and test their detection capabilities.\n\nWhich cleanup approach satisfies both requirements?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Remove all installed tools and temporary files from the system, then truncate `/var/log/auth.log` and `/var/log/syslog` to eliminate all evidence of tester activity while preserving the server's current running state.",
+          "explanation": "Truncating `/var/log/auth.log` and `/var/log/syslog` destroys the log evidence the client's incident response team requires to validate the engagement and evaluate their detection capabilities."
+        },
+        {
+          "id": "c2",
+          "text": "Remove all installed tools and temporary files from the server, then overwrite the contents of the `/var/log/` directory with zeros to ensure no forensic artifacts remain accessible to the client's security team.",
+          "explanation": "Overwriting the entire log directory eliminates all evidence of tester activity, directly violating the client's requirement that system logs remain available for the incident response review."
+        },
+        {
+          "id": "c3",
+          "text": "Uninstall all tester-installed tools using the system package manager, securely delete temporary files using `shred`, and clear bash history for all accessed accounts by writing `/dev/null` to `HISTFILE` to remove all forensic traces of the engagement.",
+          "explanation": "Clearing bash history and removing all forensic traces violates the client's requirement to retain log evidence. The incident response team cannot validate detection capabilities without the session records."
+        },
+        {
+          "id": "c4",
+          "text": "Remove tester-installed tools and temporary files from the filesystem, then leave system logs untouched so the client's incident response team retains a complete record of tester activity.",
+          "sequence": 1,
+          "explanation": "This approach satisfies both requirements: tools and temporary files are removed as mandated by the rules of engagement, while system logs are preserved for the client's incident response review."
+        }
+      ],
+      "tip": "Identify which requirement governs each artifact type separately - the rules of engagement may treat installed files and system logs differently.",
+      "explanation": "Removing tools and temporary files while leaving system logs intact is the only approach that satisfies both requirements simultaneously.\n\n**Why it works:** The rules of engagement specifically require removal of tester-installed tools and files, not log sanitization. Preserving logs serves the client's incident response and detection-validation objectives.\n\n**Why the others don't work:**\n- Truncating auth.log and syslog: Destroys the log evidence the client requires for their incident response review.\n- Overwriting `/var/log/`: Eliminates all log evidence, directly contradicting the client's retention requirement.\n- Clearing `HISTFILE` and all traces: Although tools are removed, wiping forensic history violates the log retention requirement.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0089",
+      "type": "multiple-choice",
+      "selectCount": 2,
+      "format": "text",
+      "services": [
+        "WMI"
+      ],
+      "skills": [
+        "5.1: Post-exploitation activities: establishing persistence, performing lateral movement, and cleaning up artifacts."
+      ],
+      "question": "Following initial access on a Windows domain workstation, you have extracted valid Kerberos ticket-granting tickets (TGTs) for a domain service account from memory. The domain controller is reachable from your current position, and you also hold local administrator credentials on the compromised workstation. You need to pivot to additional hosts in the environment.\n\nSelect TWO lateral movement techniques that are applicable to this scenario.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Use `pass-the-ticket` by injecting the extracted TGT into a new logon session to impersonate the domain service account and access domain resources without needing to crack any credentials.",
+          "sequence": 1,
+          "explanation": "Injecting an extracted TGT allows impersonation of the service account to authenticate to domain resources using `Kerberos` without requiring the account's password, making it a direct lateral movement technique."
+        },
+        {
+          "id": "c2",
+          "text": "Execute a `Kerberoasting` attack by requesting service tickets for all Service Principal Names registered in the domain and exporting them for offline cracking to harvest additional plaintext service account passwords.",
+          "explanation": "`Kerberoasting` is a credential harvesting technique targeting service account passwords for offline cracking. It does not directly establish access on a remote host and is therefore not a lateral movement technique."
+        },
+        {
+          "id": "c3",
+          "text": "Use `WMI` remote execution with the local administrator credentials from the compromised host to spawn a remote command process on another in-scope workstation on the same network segment.",
+          "sequence": 2,
+          "explanation": "`WMI` remote execution allows an attacker with local administrator credentials to run commands on a remote Windows host, directly establishing code execution on a new target and qualifying as lateral movement."
+        },
+        {
+          "id": "c4",
+          "text": "Perform a `DCSync` attack using the service account's TGT to replicate the domain password database from the domain controller and extract all user account hashes for the environment.",
+          "explanation": "`DCSync` is a credential harvesting technique that requires Domain Admin-equivalent replication privileges. A standard service account TGT is unlikely to carry these rights, and `DCSync` does not move laterally to a new host."
+        },
+        {
+          "id": "c5",
+          "text": "Enumerate all `LDAP` objects in the domain directory using the current session context to identify high-value accounts, group memberships, and computer objects before selecting a lateral movement target.",
+          "explanation": "`LDAP` enumeration is a reconnaissance technique used to map the domain environment. While useful before lateral movement, it does not itself constitute establishing access on a different host."
+        }
+      ],
+      "tip": "Focus on which actions result in establishing a new session or executing code on a different host, rather than harvesting credentials or gathering intelligence.",
+      "explanation": "Injecting an extracted TGT using `pass-the-ticket` and executing commands remotely using `WMI` are both lateral movement techniques that establish access or code execution on additional hosts.\n\n**Why they work:** `Pass-the-ticket` leverages the extracted TGT to authenticate as the service account to domain resources. `WMI` remote execution uses existing local admin credentials to spawn a process on a remote host - both achieve the goal of pivoting to new systems.\n\n**Why the others don't qualify:**\n- `Kerberoasting`: Harvests service ticket hashes for offline cracking. It is a credential theft technique, not movement to a new host.\n- `DCSync`: Requires Domain Admin replication rights that a standard service account TGT typically does not carry, and it harvests hashes rather than moving laterally.\n- `LDAP` enumeration: Is reconnaissance that informs target selection but does not establish access on a new host.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 3,
+      "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0090",
+      "type": "ordering",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "5.1: Post-exploitation activities: establishing persistence, performing lateral movement, and cleaning up artifacts."
+      ],
+      "question": "The rules of engagement for a black-box internal penetration test specify that after achieving initial access, the tester must follow a defined post-exploitation process before concluding the engagement. The client requires documentation of each phase in sequence to support their incident response team's review.\n\nArrange the following post-exploitation activities in the correct operational sequence.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Deploy a persistence mechanism on the initially compromised host to maintain access across sessions and survive potential reboots",
+          "sequence": 1,
+          "explanation": "Establishing persistence is the first priority after gaining initial access, ensuring the foothold is not lost if the session drops or the host reboots before further objectives are completed."
+        },
+        {
+          "id": "c2",
+          "text": "Conduct internal network enumeration from the compromised host to identify reachable systems, open services, and potential lateral movement paths",
+          "sequence": 2,
+          "explanation": "Internal enumeration maps the network from the current position, providing the intelligence needed to select targets and plan lateral movement effectively before pivoting."
+        },
+        {
+          "id": "c3",
+          "text": "Perform lateral movement to additional in-scope hosts using harvested credentials, session tokens, or trust relationships identified during enumeration",
+          "sequence": 3,
+          "explanation": "Lateral movement builds on the intelligence gathered during enumeration, using available credentials and relationships to pivot to higher-value targets within the environment."
+        },
+        {
+          "id": "c4",
+          "text": "Remove tester-deployed tools, temporary files, and modified configurations, then sanitise relevant log entries per the rules of engagement before concluding the assessment",
+          "sequence": 4,
+          "explanation": "Artifact cleanup is the final post-exploitation step, restoring the environment as close as possible to its pre-engagement state and removing evidence of tester activity in accordance with the rules of engagement."
+        }
+      ],
+      "tip": "Consider the dependency between each step - what must be in place before each subsequent action becomes possible.",
+      "explanation": "Post-exploitation follows a logical dependency chain: persistence protects the foothold, enumeration maps the environment, lateral movement expands access, and cleanup concludes the engagement responsibly.\n\nEstablishing persistence first protects the initial foothold from interruption. Enumeration then maps the internal environment to inform targeting decisions. Lateral movement uses that intelligence to pivot to additional systems. Finally, artifact cleanup removes evidence of tester activity in line with the rules of engagement.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0091",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "5.2: Documentation: creating attack narratives and providing remediation recommendations."
+      ],
+      "question": "The client's CISO has requested a complete attack narrative as part of the penetration test report deliverable. During the engagement, you exploited a web application vulnerability to gain an initial foothold and then used harvested credentials to pivot to an internal domain controller. The client wants to understand exactly how the attack progressed and where their defenses failed to detect it.\n\nWhich approach produces the most actionable attack narrative for this purpose?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "List all vulnerabilities discovered during the engagement sorted in descending CVSS score order, with technical exploit details for each finding, enabling the client to prioritize remediation without needing to follow the full attack chain.",
+          "explanation": "A vulnerability list sorted by CVSS score is a findings inventory, not an attack narrative. It does not show how individual weaknesses were chained to achieve the outcome, which is what the client needs to understand where defenses failed."
+        },
+        {
+          "id": "c2",
+          "text": "Provide a single paragraph summarizing the worst-case outcome - unauthorized access to the domain controller - without detailing the intermediate steps, keeping the narrative concise for executive readers who need only the final impact.",
+          "explanation": "A single-paragraph summary describes the outcome but omits the exploitation chain. The client specifically wants to understand how the attack progressed and where defenses failed, which requires step-by-step detail."
+        },
+        {
+          "id": "c3",
+          "text": "Present the attack as a sequential, timestamped narrative showing how each exploitation step enabled the next, from the initial web application foothold through to domain controller access.",
+          "sequence": 1,
+          "explanation": "A sequential, timestamped narrative documents the complete attack chain, showing how each step depended on the previous one. This format allows the client to trace exactly where detections should have triggered and which defensive gaps to address first."
+        },
+        {
+          "id": "c4",
+          "text": "Create a technical appendix listing every tool used and every command executed during the engagement in chronological order, without grouping steps into logical phases or explaining the significance of each action within the broader attack chain.",
+          "explanation": "A raw command log provides data but does not constitute a narrative. Without contextualizing each step within the attack chain and explaining its significance, the client cannot understand how the attack progressed or where their defenses failed."
+        }
+      ],
+      "tip": "Consider what format allows the client to trace cause and effect across the full exploitation chain, not just identify which vulnerabilities exist.",
+      "explanation": "A sequential, timestamped attack narrative is the correct format because it shows the causal chain from initial access to the final objective, enabling the client to identify each point where detection or prevention should have occurred.\n\n**Why it works:** By documenting each step in order with timestamps and showing how it enabled the next, the narrative makes the attack chain fully traceable. The client can identify which defensive controls failed at each stage.\n\n**Why the others don't work:**\n- CVSS-ordered vulnerability list: This is a findings inventory, not a narrative. It does not show how vulnerabilities were chained or how the attack progressed.\n- Single-paragraph summary: Describes the outcome but omits the exploitation chain the client needs to understand their detection failures.\n- Raw command log appendix: Providing uncontextualized command history does not help the client understand attack progression or the significance of each step.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0092",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "5.2: Documentation: creating attack narratives and providing remediation recommendations."
+      ],
+      "question": "Following the completion of a penetration test against a healthcare organization, you have identified twelve vulnerabilities across multiple systems. The client has limited IT staff and cannot address all findings simultaneously. You need to structure your remediation recommendations to guide the client's prioritization decisions.\n\nWhich approach most effectively helps the client allocate their constrained resources?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Prioritize all twelve findings by CVSS score and provide only the vendor-recommended patch reference for each issue, leaving the client's security team to determine their own remediation schedule based on the severity rankings provided.",
+          "explanation": "CVSS scores reflect technical severity but not business context or remediation effort. Providing only patch references without guidance on sequencing leaves the client without the decision support they need to work within their resource constraints."
+        },
+        {
+          "id": "c2",
+          "text": "Prioritize all twelve findings by CVSS score and include detailed technical remediation steps for each, but present them as a fixed sequence that must be completed in order from highest to lowest severity regardless of remediation complexity or staff capacity.",
+          "explanation": "Requiring findings to be addressed strictly in CVSS order ignores remediation effort and staff availability. A high-severity finding requiring months of architectural work may block low-effort quick wins that could meaningfully reduce risk immediately."
+        },
+        {
+          "id": "c3",
+          "text": "Present all twelve findings grouped by affected system with a uniform remediation template for each, ensuring consistency across the report but without distinguishing urgency or implementation effort between individual findings.",
+          "explanation": "Grouping by system with a uniform template does not help the client decide where to begin. Without urgency or effort indicators, the client has no basis for prioritizing their limited staff toward the highest-impact remediations."
+        },
+        {
+          "id": "c4",
+          "text": "Prioritize by business impact and group findings by remediation effort - separating quick wins from complex architectural changes - so the client can reduce risk early while planning longer-term work within their constraints.",
+          "sequence": 1,
+          "explanation": "Combining business impact with remediation effort gives resource-constrained clients an actionable path: address high-impact, low-effort issues first to achieve early risk reduction, then plan complex changes strategically."
+        }
+      ],
+      "tip": "Consider what factors beyond vulnerability severity are relevant when a client cannot address all findings simultaneously.",
+      "explanation": "Prioritizing recommendations by business impact and grouping them by remediation effort is the most effective approach for a resource-constrained client.\n\n**Why it works:** Business impact prioritization ensures the client addresses the findings that pose the greatest real-world risk first. Separating quick wins from complex changes allows the team to achieve meaningful risk reduction immediately while scheduling larger architectural projects appropriately.\n\n**Why the others don't work:**\n- CVSS with patch references only: Provides severity ranking but no guidance on sequencing relative to available resources or the effort each fix requires.\n- Fixed CVSS-order sequence: Forces a rigid sequence that may block low-effort improvements behind high-effort architectural projects, wasting the benefit of easily addressed findings.\n- System-grouped uniform template: Offers no prioritization signal, leaving the client without the information needed to decide where their limited staff should begin.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0093",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "5.2: Documentation: creating attack narratives and providing remediation recommendations."
+      ],
+      "question": "A penetration test has concluded for an organization whose stakeholder list includes a non-technical board of directors and a hands-on internal security team. Both groups will receive the same report document. The board needs to understand business risk exposure while the security team requires sufficient technical detail to plan and implement remediation.\n\nWhich report structure best accommodates both audiences within a single deliverable?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Write the entire report at a technical level, covering exploit methods, proof-of-concept details, and reproduction steps in full, then attach a one-page risk-rating summary at the front that board members can review before the technical content begins.",
+          "explanation": "A brief risk summary does not make a fully technical document accessible to a non-technical board. Executives need findings framed in business-risk language throughout their section, not a single-page header on a document written for engineers."
+        },
+        {
+          "id": "c2",
+          "text": "Structure the report with a concise executive summary at the front using business-risk language, followed by detailed technical findings sections that provide proof-of-exploitation evidence and specific remediation guidance.",
+          "sequence": 1,
+          "explanation": "This structure is the industry-standard approach for penetration test reports. The executive summary allows non-technical readers to understand risk exposure in business terms, while the technical sections give the security team the detail needed to implement fixes."
+        },
+        {
+          "id": "c3",
+          "text": "Produce two completely separate report documents - one for the board containing only business risk language with no technical content, and one for the security team with full technical detail - and distribute them through separate delivery channels to maintain audience separation.",
+          "explanation": "While two separate documents can serve different audiences, this approach adds delivery complexity and is non-standard for most engagements. A well-structured single report with layered sections is the conventional deliverable."
+        },
+        {
+          "id": "c4",
+          "text": "Organize the report exclusively by technical severity using CVSS scores as the primary sorting mechanism throughout the document, then add a glossary of security terms at the back to help non-technical readers interpret the findings without requiring a dedicated executive section.",
+          "explanation": "CVSS-ordered technical content with a back-of-document glossary does not translate vulnerability severity into business risk. Non-technical board members cannot derive risk exposure from CVSS scores and technical terminology even with a glossary present."
+        }
+      ],
+      "tip": "Consider how the structure of the document itself can serve readers at different levels of technical depth without requiring them to work through content intended for a different audience.",
+      "explanation": "A report with a concise executive summary followed by detailed technical sections is the established format for serving both executive and technical audiences within a single deliverable.\n\n**Why it works:** The executive summary frames the engagement outcome in business-risk terms, allowing board members to understand exposure without reading technical content. The technical sections that follow give the security team the specifics they need to remediate findings.\n\n**Why the others don't work:**\n- Fully technical report with risk summary header: Non-technical readers cannot use a document written for engineers, regardless of a brief summary at the start.\n- Two separate documents: Adds unnecessary delivery complexity and is non-standard for most engagements where a structured single report suffices.\n- CVSS-ordered report with glossary: CVSS scores are not interpretable as business risk even with a glossary; the framing itself needs to change for a non-technical audience.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0094",
+      "type": "multiple-choice",
+      "selectCount": 2,
+      "format": "text",
+      "services": [],
+      "skills": [
+        "5.2: Documentation: creating attack narratives and providing remediation recommendations."
+      ],
+      "question": "During a post-engagement debrief, the client's incident response team asks you to clarify what the attack narrative section of the report should contain. They intend to use the narrative to evaluate their detection coverage and understand exactly where their monitoring failed during the engagement.\n\nSelect TWO elements that are essential in an attack narrative written for this use case.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "A timestamped sequence of attacker actions showing the specific techniques applied at each stage of the engagement from initial access through to the final objective.",
+          "sequence": 1,
+          "explanation": "A timestamped action sequence gives the incident response team a precise record of what occurred and when, enabling them to compare each step against their detection timeline and identify gaps in visibility."
+        },
+        {
+          "id": "c2",
+          "text": "A complete inventory of all IP addresses and hostnames that were scanned or probed during the reconnaissance phase, including systems that were never exploited or included in the final findings.",
+          "explanation": "A full scan inventory describes reconnaissance scope but does not explain how the attack chain progressed or where detection gaps exist. This data belongs in a technical appendix rather than the attack narrative."
+        },
+        {
+          "id": "c3",
+          "text": "CVSS base scores and CVE identifiers for every vulnerability exploited during the engagement, formatted to enable direct comparison of technical severity across all findings in the report.",
+          "explanation": "CVSS scores and CVE references are relevant to the vulnerability findings section, not the attack narrative. They quantify individual vulnerabilities but do not trace the exploitation chain or reveal where detection failures occurred."
+        },
+        {
+          "id": "c4",
+          "text": "Identification of the specific points in the attack chain where existing defensive controls were present but failed to detect or block the tester's activity.",
+          "sequence": 2,
+          "explanation": "Documenting where detection opportunities existed but went untriggered directly serves an incident response team evaluating their coverage gaps. It maps each step in the narrative to specific control failures that the team can address."
+        },
+        {
+          "id": "c5",
+          "text": "A breakdown of estimated remediation costs for each identified weakness, organized by affected system and cross-referenced against the client's asset criticality register to support budget planning.",
+          "explanation": "Remediation cost estimates belong in the remediation recommendations section, not the attack narrative. The narrative's purpose is to trace the exploitation chain, not to provide financial planning data."
+        }
+      ],
+      "tip": "Focus on what the incident response team can directly use to evaluate their detection capabilities - the narrative must serve their specific review goal.",
+      "explanation": "A timestamped action sequence and identification of detection gaps are the two elements most essential for an attack narrative used to evaluate detection coverage.\n\n**Why they work:** The timestamped action sequence gives the incident response team the full record of attacker behavior to compare against their detection logs. Documenting where defenses were present but failed to trigger tells them exactly which controls need tuning or replacement.\n\n**Why the others don't qualify:**\n- Full reconnaissance inventory: Useful supplementary data but does not trace the attack chain or reveal detection failures.\n- CVSS scores and CVE identifiers: These belong in the vulnerability findings section and do not address attack chain progression or detection gaps.\n- Remediation cost estimates: Financial planning data for the recommendations section that is not part of the attack narrative.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 3,
+      "lastReviewed": "2026-04-15"
+    },
+    {
+      "id": "PT0-003-0095",
+      "type": "ordering",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "5.2: Documentation: creating attack narratives and providing remediation recommendations."
+      ],
+      "question": "After the technical phase of a penetration test is complete, the engagement team must produce the final deliverable. The client has requested a report that follows industry-standard structure and is traceable back to evidence gathered during testing.\n\nArrange the following report production steps in the correct sequence to deliver a complete and accurate deliverable.",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Organize all evidence gathered during the engagement - screenshots, tool output, and session logs - into a structured repository referenced by finding",
+          "sequence": 1,
+          "explanation": "Organizing evidence first creates the foundation for all subsequent documentation. Every finding, narrative step, and recommendation must be traceable to specific evidence gathered during testing."
+        },
+        {
+          "id": "c2",
+          "text": "Document each individual finding with a title, affected component, risk rating, and proof-of-exploitation reference drawn from the evidence repository",
+          "sequence": 2,
+          "explanation": "Individual findings documentation converts raw evidence into structured, reviewable records. These form the building blocks used when writing the attack narrative and executive summary."
+        },
+        {
+          "id": "c3",
+          "text": "Write the attack narrative, tracing the complete exploitation chain from initial access through to the highest privilege level or objective achieved during the engagement",
+          "sequence": 3,
+          "explanation": "The attack narrative synthesizes individual findings into a coherent chain of events. It can only be written accurately once findings are documented and their relationships are understood."
+        },
+        {
+          "id": "c4",
+          "text": "Draft the executive summary, translating key findings and overall risk exposure into business-risk language appropriate for non-technical stakeholders",
+          "sequence": 4,
+          "explanation": "The executive summary is written after the technical content is complete because it synthesizes findings and the attack narrative into a high-level overview. It cannot be drafted accurately until the underlying detail is finalized."
+        },
+        {
+          "id": "c5",
+          "text": "Conduct a final quality review to verify technical accuracy, remove any sensitive credential material, and deliver the approved report to the client",
+          "sequence": 5,
+          "explanation": "Final review and delivery is the last step. It ensures accuracy and that no sensitive data - such as recovered passwords or private keys - has been inadvertently included before the report reaches the client."
+        }
+      ],
+      "tip": "Consider what each step depends on - some sections cannot be accurately written until earlier sections are complete.",
+      "explanation": "Report production follows a dependency chain: evidence must be organized before findings can be documented, findings must be documented before the narrative can be written, the narrative must be complete before the executive summary can be drafted, and all content must be reviewed before delivery.\n\nThe evidence repository underpins the findings, the findings underpin the narrative, the narrative informs the executive summary, and the review ensures the final deliverable is accurate and safe to distribute to the client.",
+      "domain": "Post-Exploitation and Lateral Movement",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-15"
     }
   ]
 }
