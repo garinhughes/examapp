@@ -21,9 +21,9 @@ const META: Partial<Record<AppRoute, RouteMeta>> = {
   },
   practice: {
     title: 'certshack | Practice Exams',
-    description: 'Browse and attempt timed or casual practice exams for IT certifications including AWS SAA-C03, CLF-C02, DVA-C02, SOA-C02, SCS-C03, and Azure AZ-900. Per-domain scoring and detailed explanations.',
+    description: 'Browse and attempt timed or casual practice exams for IT certifications including AWS SAA-C03, CLF-C02, SCS-C03, CompTIA PenTest+ PT0-003, and more. Per-domain scoring and detailed explanations.',
     path: '/exams',
-    keywords: 'practice exams, AWS SAA-C03, AWS CLF-C02, AWS DVA-C02, AWS SOA-C02, AWS SCS-C03, AZ-900, timed exam, certification prep',
+    keywords: 'practice exams, AWS SAA-C03, AWS CLF-C02, AWS SCS-C03, CompTIA PenTest+, PT0-003, timed exam, certification prep',
   },
   'skill-labs': {
     title: 'certshack | Skill Labs',
@@ -96,7 +96,7 @@ const HOME_JSONLD = JSON.stringify({
           name: 'Which certifications do you cover?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'certshack offers practice exams and skill labs for AWS (SAA-C03, CLF-C02, DVA-C02, SOA-C02, SCS-C03) and Azure (AZ-900), with new certifications added regularly.',
+            text: 'certshack offers practice exams and skill labs for AWS (SAA-C03, CLF-C02, SCS-C03), CompTIA (PenTest+ PT0-003), Anthropic (CCA-F), and more, with new certifications added regularly.',
           },
         },
         {

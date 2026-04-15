@@ -148,6 +148,15 @@ export const PRODUCTS: Product[] = [
     provider: 'Anthropic',
     labMonths: 1,
   },
+  {
+    productId: 'exam:PT0-003',
+    kind: 'exam',
+    label: 'Exam Pass - PT0-003',
+    description: 'CompTIA PenTest+ - full question bank for 1 year',
+    priceGBP: 900,
+    examCodes: ['PT0-003'],
+    provider: 'CompTIA',
+  },
 
   // -- Bundles (Exam Pack - pick 2 for £17, pick 3 for £25) --
   {

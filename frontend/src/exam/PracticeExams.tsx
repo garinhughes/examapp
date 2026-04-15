@@ -1,7 +1,5 @@
 import { useExam } from './ExamContext'
-import { Play, Info, Activity, ShoppingCart, ChevronDown, ChevronRight, X, Search } from 'lucide-react'
-import { useBasket } from '@/basket/BasketContext'
-import { useEntitlements } from '@/hooks/useEntitlements'
+import { Play, Info, Activity, ChevronDown, ChevronRight, X, Search } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTourContext } from '@/components/TourProvider'
 
@@ -12,9 +10,6 @@ export function PracticeExams() {
     user, authLoading, setShowCancelConfirm, showToast,
   } = useExam()
   const tour = useTourContext()
-  const basket = useBasket()
-  const { products } = useEntitlements()
-  const [actionError, setActionError] = useState<string | null>(null)
   const [collapsedProviders, setCollapsedProviders] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -32,19 +27,10 @@ export function PracticeExams() {
   }
 
   useEffect(() => {
-    if (basket.lastError) setActionError(basket.lastError)
-  }, [basket.lastError])
-
-  useEffect(() => {
     if (!authLoading && !user && !tour.active && !tour.completed && providers.length > 0) {
       tour.start()
     }
   }, [authLoading, user, providers.length])
-
-  function formatPrice(pence: number): string {
-    const pounds = pence / 100
-    return pounds % 1 === 0 ? `£${pounds}` : `£${pounds.toFixed(2)}`
-  }
 
   return (
     <div className="mb-6">
@@ -139,31 +125,6 @@ export function PracticeExams() {
                       <Activity className="w-4 h-4" aria-hidden />
                       <span className="sr-only">Analytics</span>
                     </button>
-                    {(() => {
-                      const productId = `exam:${ex.code}`
-                      const product = products.find((p) => p.productId === productId)
-                      if (!product || product.owned) return null
-                      const inBasket = basket.has(productId)
-                      return (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); if (!inBasket) {
-                            const ok = basket.add(product)
-                            if (ok) showToast(`${product.label} added to basket`, 'info')
-                            else setActionError(basket.lastError)
-                          } }}
-                          title={inBasket ? 'Already in basket' : `Add ${ex.code} to basket`}
-                          className={`h-7 px-2 rounded text-sm inline-flex items-center gap-2 ${
-                            inBasket
-                              ? 'bg-primary/10 text-primary cursor-default'
-                              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                          }`}
-                          aria-label={inBasket ? `${ex.code} in basket` : `Add ${ex.code} to basket`}
-                        >
-                          <ShoppingCart className="w-4 h-4" aria-hidden />
-                          {!inBasket && <span className="text-xs font-medium">{formatPrice(product.priceGBP)}</span>}
-                        </button>
-                      )
-                    })()}
                   </div>
                   {ex.logo && (
                     ex.logoHref ? (

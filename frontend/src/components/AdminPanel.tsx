@@ -1594,6 +1594,7 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
                         <option value="exam:CLF-C02">CLF-C02 — AWS Cloud Practitioner</option>
                         <option value="exam:SCS-C03">SCS-C03 — AWS Security Specialty</option>
                         <option value="exam:CCA-F">CCA-F — Claude Certified Architect Foundations</option>
+                        <option value="exam:PT0-003">PT0-003 — CompTIA PenTest+</option>
                       </select>
                     </div>
 
