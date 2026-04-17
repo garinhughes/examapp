@@ -17,6 +17,7 @@ interface UserRecord {
   provider?: string
   lastLogin?: string
   createdAt?: string
+  tier?: 'visitor' | 'registered' | 'pro' | 'pro_plus'
 }
 
 interface Entitlement {
@@ -141,6 +142,14 @@ function UserRow({
   const [expanded, setExpanded] = useState(false)
   const [entitlements, setEntitlements] = useState<Entitlement[]>([])
   const [loadingEnts, setLoadingEnts] = useState(false)
+  const [stats, setStats] = useState<{ examsCompleted: number; labsCompleted: number; questionsAnswered: number } | null>(null)
+
+  useEffect(() => {
+    authFetch(`/admin/users/${encodeURIComponent(user.userId)}/stats`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d) setStats(d) })
+      .catch(() => {})
+  }, [authFetch, user.userId])
   const [grantProductId, setGrantProductId] = useState('')
   const [granting, setGranting] = useState(false)
   const [revoking, setRevoking] = useState<string | null>(null)
@@ -278,7 +287,21 @@ function UserRow({
           <div className="flex items-center gap-2">
             <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${user.isActive !== false ? 'bg-emerald-500' : 'bg-red-500'}`} title={user.isActive !== false ? 'Active' : 'Deactivated'} />
             <div>
-              <div className="font-medium text-sm">{user.name || '-'}</div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-medium text-sm">{user.name || '-'}</span>
+                {user.isAdmin && (
+                  <span className="px-1 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary">ADMIN</span>
+                )}
+                {user.tier && (
+                  <span className={`px-1 py-0.5 rounded text-[10px] font-bold ${
+                    user.tier === 'pro_plus' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                    : user.tier === 'pro' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+                    : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {user.tier === 'pro_plus' ? 'Pro Plus' : user.tier === 'pro' ? 'Pro' : 'Free'}
+                  </span>
+                )}
+              </div>
               {user.username && (
                 <div className="text-xs text-primary">@{user.username}</div>
               )}
@@ -286,15 +309,16 @@ function UserRow({
           </div>
         </td>
         <td className="p-2.5 text-sm">{user.email || '-'}</td>
-        <td className="p-2.5">
-          <div className="flex items-center gap-1.5">
-            {user.isAdmin && (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary">ADMIN</span>
-            )}
-            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${user.provider === 'google' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' : 'bg-muted text-muted-foreground'}`}>
-              {user.provider || 'cognito'}
-            </span>
-          </div>
+        <td className="p-2.5 text-xs text-muted-foreground">
+          {stats ? (
+            <div className="flex gap-2.5">
+              <span title="Exams completed">{stats.examsCompleted} exams</span>
+              <span title="Labs completed">{stats.labsCompleted} labs</span>
+              <span title="Questions answered">{stats.questionsAnswered} Qs</span>
+            </div>
+          ) : (
+            <span className="text-muted-foreground/50">—</span>
+          )}
         </td>
         <td className="p-2.5 text-xs text-muted-foreground">{fmtDateTime(user.lastLogin)}</td>
         <td className="p-2.5 text-right">
@@ -2315,6 +2339,8 @@ export default function AdminPanel() {
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'inactive'>('all')
+  const [filterTier, setFilterTier] = useState<'all' | 'visitor' | 'registered' | 'pro' | 'pro_plus'>('all')
+  const [usersOpen, setUsersOpen] = useState(true)
   const [sortBy, setSortBy] = useState<'name' | 'email' | 'lastLogin'>('lastLogin')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set())
@@ -2370,6 +2396,7 @@ export default function AdminPanel() {
     .filter((u) => {
       if (filterRole === 'admin' && !u.isAdmin) return false
       if (filterRole === 'inactive' && u.isActive !== false) return false
+      if (filterTier !== 'all' && u.tier !== filterTier) return false
       if (search) {
         const q = search.toLowerCase()
         return (
@@ -2421,28 +2448,6 @@ export default function AdminPanel() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3 flex-wrap">
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {users.length} user{users.length !== 1 ? 's' : ''} registered
-            {filtered.length !== users.length && ` · ${filtered.length} shown`}
-          </p>
-          {promoStats && (
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${promoStats.count >= promoStats.limit ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'bg-primary/10 text-primary'}`}>
-              Promo slots: {promoStats.count} / {promoStats.limit} used
-            </span>
-          )}
-        </div>
-        <button
-          onClick={load}
-          disabled={loading}
-          className="px-3 py-1.5 rounded-lg bg-accent text-sm font-medium hover:bg-accent disabled:opacity-40 transition-colors"
-        >
-          {loading ? 'Loading…' : '↻ Refresh'}
-        </button>
-      </div>
-
       {error && (
         <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
           {error}
@@ -2456,118 +2461,166 @@ export default function AdminPanel() {
       <CarouselPanel authFetch={authFetch} />
       <EmailsPanel authFetch={authFetch} />
 
-      {/* Toolbar: search + filters */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, email, username, or ID…"
-            className="w-full pl-8 pr-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">🔍</span>
-          {search && (
+      {/* User Management */}
+      <div className="rounded-lg border border-border bg-card">
+        <button
+          onClick={() => setUsersOpen((o) => !o)}
+          className="w-full flex items-center justify-between px-4 py-3 text-left"
+        >
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-sm font-semibold">User Management</h3>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+              {users.length}
+            </span>
+            {promoStats && (
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${promoStats.count >= promoStats.limit ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'bg-primary/10 text-primary'}`}>
+                Promo: {promoStats.count} / {promoStats.limit}
+              </span>
+            )}
+            {filtered.length !== users.length && (
+              <span className="text-xs text-muted-foreground">{filtered.length} shown</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setSearch('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground text-xs"
-            >✕</button>
-          )}
-        </div>
-        <div className="flex gap-1 bg-muted p-0.5 rounded">
-          {([['all', 'All'], ['admin', 'Admins'], ['inactive', 'Inactive']] as const).map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => setFilterRole(val)}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${filterRole === val ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
+              onClick={(e) => { e.stopPropagation(); load() }}
+              disabled={loading}
+              className="px-2.5 py-1 rounded bg-accent text-xs font-medium hover:bg-accent/80 disabled:opacity-40 transition-colors"
             >
-              {label}
+              {loading ? 'Loading…' : '↻ Refresh'}
             </button>
-          ))}
-        </div>
-      </div>
+            <span className={`text-xs transition-transform inline-block ${usersOpen ? 'rotate-180' : ''}`}>▼</span>
+          </div>
+        </button>
 
-      {/* Bulk action bar */}
-      {selectedUserIds.size > 0 && (
-        <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-sm">
-          <span className="font-medium text-primary">
-            {selectedUserIds.size} user{selectedUserIds.size !== 1 ? 's' : ''} selected
-          </span>
-          <div className="flex-1" />
-          <button
-            onClick={() => setShowGrantModal(true)}
-            className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-400 transition-colors"
-          >
-            Grant access
-          </button>
-          <button
-            onClick={() => setShowRevokeModal(true)}
-            className="px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-semibold hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
-          >
-            Revoke access
-          </button>
-          <button
-            onClick={() => setSelectedUserIds(new Set())}
-            className="px-2 py-1.5 rounded-lg bg-accent text-xs text-muted-foreground hover:bg-accent/80 transition-colors"
-          >
-            Clear
-          </button>
-        </div>
-      )}
+        {usersOpen && (
+          <div className="px-4 pb-4 space-y-3 border-t border-border/60">
+            {/* Toolbar: search + filters */}
+            <div className="flex flex-wrap items-center gap-2 pt-3">
+              <div className="relative flex-1 min-w-[200px]">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by name, email, username, or ID…"
+                  className="w-full pl-8 pr-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">🔍</span>
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground text-xs"
+                  >✕</button>
+                )}
+              </div>
+              <div className="flex gap-1 bg-muted p-0.5 rounded">
+                {([['all', 'All'], ['admin', 'Admins'], ['inactive', 'Inactive']] as const).map(([val, label]) => (
+                  <button
+                    key={val}
+                    onClick={() => setFilterRole(val)}
+                    className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${filterRole === val ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-1 bg-muted p-0.5 rounded">
+                {([['all', 'All tiers'], ['registered', 'Free'], ['pro', 'Pro'], ['pro_plus', 'Pro Plus']] as const).map(([val, label]) => (
+                  <button
+                    key={val}
+                    onClick={() => setFilterTier(val)}
+                    className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${filterTier === val ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-      {/* Table */}
-      <div className="rounded-lg border border-border overflow-hidden">
-        <div className="overflow-auto max-h-[65vh]">
-          <table className="w-full table-auto text-sm">
-            <thead className="bg-muted sticky top-0 z-10">
-              <tr className="text-left text-xs text-muted-foreground uppercase tracking-wider">
-                <th className="p-2.5 w-8">
-                  <input
-                    type="checkbox"
-                    checked={filtered.length > 0 && selectedUserIds.size === filtered.length}
-                    onChange={toggleSelectAll}
-                    className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
-                  />
-                </th>
-                <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('name')}>
-                  User{sortIcon('name')}
-                </th>
-                <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('email')}>
-                  Email{sortIcon('email')}
-                </th>
-                <th className="p-2.5">Flags</th>
-                <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('lastLogin')}>
-                  Last Login{sortIcon('lastLogin')}
-                </th>
-                <th className="p-2.5 w-8"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="p-6 text-center text-muted-foreground">
-                    {loading ? 'Loading…' : search ? 'No users match your search.' : 'No users found.'}
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((u) => (
-                  <UserRow
-                    key={u.userId}
-                    user={u}
-                    products={products}
-                    authFetch={authFetch}
-                    onReload={load}
-                    onError={(msg) => setError(msg)}
-                    onDeleteUser={handleDeleteUser}
-                    onImpersonate={handleImpersonate}
-                    selected={selectedUserIds.has(u.userId)}
-                    onToggleSelect={toggleSelect}
-                  />
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+            {/* Bulk action bar */}
+            {selectedUserIds.size > 0 && (
+              <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-sm">
+                <span className="font-medium text-primary">
+                  {selectedUserIds.size} user{selectedUserIds.size !== 1 ? 's' : ''} selected
+                </span>
+                <div className="flex-1" />
+                <button
+                  onClick={() => setShowGrantModal(true)}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-400 transition-colors"
+                >
+                  Grant access
+                </button>
+                <button
+                  onClick={() => setShowRevokeModal(true)}
+                  className="px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-semibold hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                >
+                  Revoke access
+                </button>
+                <button
+                  onClick={() => setSelectedUserIds(new Set())}
+                  className="px-2 py-1.5 rounded-lg bg-accent text-xs text-muted-foreground hover:bg-accent/80 transition-colors"
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+
+            {/* Table */}
+            <div className="rounded-lg border border-border overflow-hidden">
+              <div className="overflow-auto max-h-[65vh]">
+                <table className="w-full table-auto text-sm">
+                  <thead className="bg-muted sticky top-0 z-10">
+                    <tr className="text-left text-xs text-muted-foreground uppercase tracking-wider">
+                      <th className="p-2.5 w-8">
+                        <input
+                          type="checkbox"
+                          checked={filtered.length > 0 && selectedUserIds.size === filtered.length}
+                          onChange={toggleSelectAll}
+                          className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
+                        />
+                      </th>
+                      <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('name')}>
+                        User{sortIcon('name')}
+                      </th>
+                      <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('email')}>
+                        Email{sortIcon('email')}
+                      </th>
+                      <th className="p-2.5">Activity</th>
+                      <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('lastLogin')}>
+                        Last Login{sortIcon('lastLogin')}
+                      </th>
+                      <th className="p-2.5 w-8"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-6 text-center text-muted-foreground">
+                          {loading ? 'Loading…' : search ? 'No users match your search.' : 'No users found.'}
+                        </td>
+                      </tr>
+                    ) : (
+                      filtered.map((u) => (
+                        <UserRow
+                          key={u.userId}
+                          user={u}
+                          products={products}
+                          authFetch={authFetch}
+                          onReload={load}
+                          onError={(msg) => setError(msg)}
+                          onDeleteUser={handleDeleteUser}
+                          onImpersonate={handleImpersonate}
+                          selected={selectedUserIds.has(u.userId)}
+                          onToggleSelect={toggleSelect}
+                        />
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {showGrantModal && (

@@ -15,6 +15,8 @@ import { listCognitoUsers, getCognitoUser, deleteCognitoUser, resendUserConfirma
 import { getCarouselSlides, saveCarouselSlides, getUploadPresignedUrl } from '../services/carouselStore.js'
 import { getTemplate, listTemplates, upsertTemplate, deleteTemplate } from '../services/emailTemplates.js'
 import { logEmailSend, listEmailLogs } from '../services/emailLogs.js'
+import { attemptsStore } from '../services/attemptsStore.js'
+import { skillLabAttemptsStore } from '../services/skillLabAttemptsStore.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // Require auth and admin flag
@@ -28,12 +30,22 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (!local || !local.isAdmin) return reply.code(403).send({ message: 'Forbidden' })
   })
 
-  // List users (simple scan with pagination)
+  // List users with tier derived from active subscription entitlements
   server.get('/users', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const q = request.query as any
     const limit = Math.min(Number(q.limit || 50), 200)
-    const res = await listUsers(limit, q.lastKey)
-    return { users: res.Items ?? [], lastKey: (res as any).LastEvaluatedKey ?? null }
+    const [res, proPlus, pro] = await Promise.all([
+      listUsers(limit, q.lastKey),
+      findUsersWithActiveEntitlement('sub:pro-plus'),
+      findUsersWithActiveEntitlement('sub:pro'),
+    ])
+    const proPlusIds = new Set(proPlus.map((e) => e.userId))
+    const proIds = new Set(pro.map((e) => e.userId))
+    const users = (res.Items ?? []).map((u: any) => ({
+      ...u,
+      tier: proPlusIds.has(u.userId) ? 'pro_plus' : proIds.has(u.userId) ? 'pro' : 'registered',
+    }))
+    return { users, lastKey: (res as any).LastEvaluatedKey ?? null }
   })
 
   // Get single user by sub
@@ -42,6 +54,19 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const user = await getUserBySub(sub)
     if (!user) return reply.code(404).send({ message: 'user not found' })
     return user
+  })
+
+  // Per-user completion stats
+  server.get('/users/:sub/stats', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { sub } = request.params as any
+    const [examAttempts, labAttempts] = await Promise.all([
+      attemptsStore.listByUser(sub),
+      skillLabAttemptsStore.listByUser(sub),
+    ])
+    const examsCompleted = examAttempts.filter((a: any) => a.finishedAt).length
+    const questionsAnswered = examAttempts.reduce((sum: number, a: any) => sum + (Array.isArray(a.answers) ? a.answers.length : 0), 0)
+    const labsCompleted = labAttempts.length
+    return { examsCompleted, labsCompleted, questionsAnswered }
   })
 
   // Toggle isAdmin or isActive

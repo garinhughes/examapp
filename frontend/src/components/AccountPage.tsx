@@ -25,7 +25,7 @@ export default function AccountPage() {
   const { state, toggleLeaderboard } = useGamification()
   const [tab, setTab] = useState<'overview' | 'badges' | 'certificates' | 'purchases'>('overview')
   const { level, currentXP, nextLevelXP, progress: levelProgress } = levelFromXP(state.xp)
-  const { tier, tierConfig, entitlements, entitlementDetails, products, loading: entLoading, refresh: refreshEntitlements } = useEntitlements()
+  const { tier, entitlements, entitlementDetails, products, loading: entLoading, refresh: refreshEntitlements } = useEntitlements()
 
   // ── Name state ──
   const [firstName, setFirstName] = useState('')
@@ -610,9 +610,13 @@ export default function AccountPage() {
                 {tier === 'pro_plus' ? 'Pro Plus' : tier === 'pro' ? 'Pro' : tier === 'registered' ? 'Free' : 'Visitor'}
               </span>
               <span className="text-sm text-muted-foreground">
-                {tierConfig.questionLimit === null
-                  ? 'Unlimited questions'
-                  : `Up to ${tierConfig.questionLimit} questions per exam`}
+                {tier === 'pro_plus'
+                  ? 'Full question banks · All 200+ skill labs'
+                  : tier === 'pro'
+                    ? 'Full question banks · 80+ skill labs'
+                    : tier === 'registered'
+                      ? '40 questions per exam · 40+ skill labs'
+                      : 'Guest access'}
               </span>
             </div>
             {!isPaidTier(tier) && (
