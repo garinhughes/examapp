@@ -2,7 +2,7 @@
  * Entitlement middleware — attaches tier info and entitlements to the request.
  *
  * After this plugin:
- *   request.tier       — 'visitor' | 'registered' | 'paying'
+ *   request.tier       — 'visitor' | 'registered' | 'pro' | 'pro_plus'
  *   request.tierConfig — full TierConfig object
  *   request.entitlements — list of active product IDs
  *

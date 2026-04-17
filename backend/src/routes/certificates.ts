@@ -1,11 +1,12 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { SignJWT, jwtVerify } from 'jose'
 import { createSecretKey, createHash } from 'crypto'
+import { isPaidTier } from '../catalog.js'
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   /**
    * POST /certificates/token — generate a signed certificate token
-   * Auth + paying tier required.
+   * Auth + Pro or Pro Plus tier required.
    */
   server.post(
     '/token',
@@ -14,8 +15,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       config: { rateLimit: { max: 100, timeWindow: '1 minute' } }, // codeql[js/missing-rate-limiting]
     },
     async (request, reply) => {
-      if (request.tier !== 'paying') {
-        return reply.status(403).send({ message: 'Certificates require a paid plan.' })
+      if (!isPaidTier(request.tier)) {
+        return reply.status(403).send({ message: 'Certificates require a Pro or Pro Plus plan.' })
       }
 
       const secret = process.env.CERTIFICATE_SECRET

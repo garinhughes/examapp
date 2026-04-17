@@ -9,7 +9,7 @@ import {
   listLabIndex,
 } from '../services/skillLabStore.js'
 import { updateMetricsOnLabAttempt } from '../services/metricsStore.js'
-import { TIERS, hasLabAccess } from '../catalog.js'
+import { TIERS, type Tier } from '../catalog.js'
 
 const LABS_DIR = path.join(process.cwd(), 'data', 'skill-labs')
 
@@ -98,13 +98,12 @@ async function findLabS3(id: string): Promise<any | null> {
 
 /**
  * How many showcase labs this tier can access **per provider/platform**.
- * null = all labs (paying).
+ * null = all labs (pro_plus).
  */
-function effectiveLabShowcaseCount(
-  tier: 'visitor' | 'registered' | 'paying',
-): number | null {
-  if (tier === 'paying') return null
-  if (tier === 'registered') return TIERS.registered.labShowcaseCount ?? 12
+function effectiveLabShowcaseCount(tier: Tier): number | null {
+  if (tier === 'pro_plus') return null
+  if (tier === 'pro') return 12
+  if (tier === 'registered') return TIERS.registered.labShowcaseCount ?? 6
   return TIERS.visitor.labShowcaseCount ?? 6
 }
 
@@ -183,13 +182,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       try { ownedProductIds = await getActiveProductIds(userId) } catch { /* ignore */ }
       const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds })
 
-      if (hasLabAccess(ownedProductIds)) {
-        // All labs unlocked — null means no lock filter
+      const showcaseCount = effectiveLabShowcaseCount(tier)
+      if (showcaseCount === null) {
+        // pro_plus: all labs unlocked
         return reply.send(withLocked(allLabs, null))
       }
-
-      const count = effectiveLabShowcaseCount('registered') ?? 12
-      return reply.send(withLocked(allLabs, unlockedShowcaseIds(allLabs, count)))
+      return reply.send(withLocked(allLabs, unlockedShowcaseIds(allLabs, showcaseCount)))
     }
 
     // Unauthenticated: visitor showcase unlocked (per provider)
@@ -222,10 +220,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       try { ownedProductIds = await getActiveProductIds(userId) } catch { /* ignore */ }
       const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds })
 
-      if (hasLabAccess(ownedProductIds)) return reply.send(lab)
+      const showCount = effectiveLabShowcaseCount(tier)
+      if (showCount === null) return reply.send(lab)
 
-      const count = effectiveLabShowcaseCount('registered') ?? 12
-      const registeredUnlocked = await buildUnlockedIdsForLab(lab, count)
+      const registeredUnlocked = await buildUnlockedIdsForLab(lab, showCount)
 
       if (!lab.showcase || !registeredUnlocked.has(lab.id)) {
         return reply.status(403).send({ message: 'Upgrade to access more labs.' })

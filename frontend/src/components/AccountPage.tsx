@@ -4,7 +4,7 @@ import { useAuthFetch } from '../auth/useAuthFetch'
 import { useGamification } from '../gamification/GamificationContext'
 import { levelFromXP } from '../gamification/types'
 import { BADGES } from '../gamification/badges'
-import { useEntitlements } from '../hooks/useEntitlements'
+import { useEntitlements, isPaidTier } from '../hooks/useEntitlements'
 import CertificatesTab from './CertificatesTab'
 import { BadgeIcon } from '../gamification/BadgeIcon'
 
@@ -521,14 +521,14 @@ export default function AccountPage() {
           <div className="p-4 rounded-lg border border-border bg-card">
             <h3 className="text-sm font-semibold mb-2 text-muted-foreground">Your Plan</h3>
             <div className="flex items-center gap-3">
-              <span className={`px-3 py-1 rounded-full text-sm font-bold capitalize ${
-                tier === 'paying'
+              <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                isPaidTier(tier)
                   ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
                   : tier === 'registered'
                     ? 'bg-primary/10 text-primary'
                     : 'bg-muted text-muted-foreground'
               }`}>
-                {tier}
+                {tier === 'pro_plus' ? 'Pro Plus' : tier === 'pro' ? 'Pro' : tier === 'registered' ? 'Free' : 'Visitor'}
               </span>
               <span className="text-sm text-muted-foreground">
                 {tierConfig.questionLimit === null
@@ -536,9 +536,9 @@ export default function AccountPage() {
                   : `Up to ${tierConfig.questionLimit} questions per exam`}
               </span>
             </div>
-            {tier !== 'paying' && (
+            {!isPaidTier(tier) && (
               <p className="text-xs text-muted-foreground mt-2">
-                Upgrade to unlock all questions, exports, leaderboard, and more.
+                Upgrade to Pro or Pro Plus to unlock all questions, leaderboard, certificates, and more.
               </p>
             )}
           </div>

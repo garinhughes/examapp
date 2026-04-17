@@ -184,16 +184,20 @@ module "ecs" {
 
   paypal_client_id          = "AbyHVazM-r_fPb1CgQa0j5nwTtdMawkxoHGa2Dxd9PavViGd1G4Z0qTiHONgx1hUMC7ONUYKLBbrU4wa"
   paypal_api_base           = "https://api-m.paypal.com"
-  paypal_plan_id_monthly    = "P-6YD57S96FT336305SNHG0NWY"
-  paypal_plan_id_annual     = "P-8NL966S2UY946S01NHGO0IY"
-  paypal_webhook_id         = "3B392581WH426842V"
-  paypal_client_secret_arn  = module.secretsmanager.paypal_client_secret_arn
-  stripe_secret_key_arn     = module.secretsmanager.stripe_secret_key_arn
-  stripe_webhook_secret_arn = module.secretsmanager.stripe_webhook_secret_arn
-  cron_secret               = module.secretsmanager.cron_secret_arn
-  unsubscribe_secret        = module.secretsmanager.unsubscribe_secret_arn
-  stripe_price_id_monthly   = "price_1THKKkRXOMjZneV7ptKVgxPT"
-  stripe_price_id_annual    = "price_1THKLCRXOMjZneV7bUdaFcDz"
+  paypal_plan_id_pro_monthly       = ""   # Set after creating PayPal billing plan for Pro
+  paypal_plan_id_pro_plus_monthly  = ""   # Set after creating PayPal billing plan for Pro Plus
+  paypal_plan_id_pro_discount      = ""   # Set when running a promotion (discounted Pro plan)
+  paypal_plan_id_pro_plus_discount = ""   # Set when running a promotion (discounted Pro Plus plan)
+  paypal_webhook_id                = "3B392581WH426842V"
+  paypal_client_secret_arn         = module.secretsmanager.paypal_client_secret_arn
+  stripe_secret_key_arn            = module.secretsmanager.stripe_secret_key_arn
+  stripe_webhook_secret_arn        = module.secretsmanager.stripe_webhook_secret_arn
+  cron_secret                      = module.secretsmanager.cron_secret_arn
+  unsubscribe_secret               = module.secretsmanager.unsubscribe_secret_arn
+  stripe_price_id_pro_monthly      = ""   # Set after creating Stripe recurring Price for Pro
+  stripe_price_id_pro_plus_monthly = ""   # Set after creating Stripe recurring Price for Pro Plus
+  discount_active                  = "false"
+  stripe_coupon_id_discount        = ""   # Set when running a promotion
 
   depends_on = [module.acm]
 }

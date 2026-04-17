@@ -156,17 +156,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
   /** List all products from catalog — annotate exam products with availability */
   server.get('/products', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, reply) => {
-    // Load available exam codes so we can flag which exam products exist
-    const availableExams = await loadAllExams()
-    const availableCodes = new Set(availableExams.map((e) => e.code))
-
-    const products = PRODUCTS.map((p) => {
-      if (p.kind === 'exam') {
-        const code = p.productId.replace('exam:', '')
-        return { ...p, available: availableCodes.has(code) }
-      }
-      return { ...p, available: true }
-    })
+    const products = PRODUCTS.map((p) => ({ ...p, available: true }))
 
     return { products }
   })
@@ -733,19 +723,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         const ents = await getUserEntitlements(u.userId)
         const productIds = ents.map((e: any) => e.productId)
 
-        if (provider) {
-          const providerProductIds = PRODUCTS
-            .filter((p) => p.provider?.toLowerCase() === provider.toLowerCase())
-            .map((p) => p.productId)
-          if (!productIds.some((pid: string) => providerProductIds.includes(pid))) return null
-        }
-
         if (examProductId) {
           if (!productIds.includes(examProductId)) return null
         }
 
         if (monthlyOnly) {
-          if (!productIds.includes('sub:all-access')) return null
+          if (!productIds.includes('sub:pro') && !productIds.includes('sub:pro-plus')) return null
         }
 
         return u

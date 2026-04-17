@@ -1,9 +1,7 @@
 /**
- * PayPal routes — Orders API v2 (one-time) and Subscriptions API (recurring).
+ * PayPal routes — Subscriptions API (recurring monthly).
  *
- * POST /payments/paypal/create-order        - create a PayPal Order (exam/bundle)
  * POST /payments/paypal/create-subscription - create a PayPal Subscription (sub:*)
- * POST /payments/paypal/capture-order       - capture an approved Order and grant entitlements
  * POST /payments/paypal/webhook             - handle PayPal webhook events
  *
  * Environment variables:
@@ -11,8 +9,11 @@
  *   PAYPAL_CLIENT_SECRET     - PayPal app client secret
  *   PAYPAL_WEBHOOK_ID        - Webhook ID from PayPal dashboard (for signature verification)
  *   PAYPAL_API_BASE          - Override API base (default: https://api-m.paypal.com)
- *   PAYPAL_PLAN_ID_MONTHLY   - Billing Plan ID for sub:all-access (monthly)
- *   PAYPAL_PLAN_ID_ANNUAL    - Billing Plan ID for sub:all-access-annual (annual)
+ *   PAYPAL_PLAN_ID_PRO_MONTHLY       - Billing Plan ID for sub:pro (monthly)
+ *   PAYPAL_PLAN_ID_PRO_PLUS_MONTHLY  - Billing Plan ID for sub:pro-plus (monthly)
+ *   DISCOUNT_ACTIVE                  - Set to "true" to apply discount prices
+ *   PAYPAL_PLAN_ID_PRO_DISCOUNT      - Billing Plan ID for discounted sub:pro
+ *   PAYPAL_PLAN_ID_PRO_PLUS_DISCOUNT - Billing Plan ID for discounted sub:pro-plus
  *   SESSIONS_TABLE           - DynamoDB table for sessions (default: examapp-sessions)
  */
 
@@ -71,31 +72,20 @@ async function _grantFromSession(
     server.log.warn({ pk, sk }, '[paypal] no session found')
     return
   }
-  let maxLabMonths = 0
   for (const pid of sess.productIds) {
     const prod = getProduct(pid)
     const isSubscription = prod?.kind === 'subscription'
+    // one-off products grant 30 days; subscriptions grant indefinitely
+    const expiresAt = isSubscription
+      ? null
+      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     await grantEntitlement({
       userId: sess.userId,
       productId: pid,
       kind: prod?.kind ?? 'extra',
-      expiresAt: isSubscription
-        ? null
-        : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+      expiresAt,
       stripeSubscriptionId: isSubscription ? sk : undefined,
       meta: { source: 'paypal', paypalId: sk },
-    })
-    if (prod?.labMonths && prod.labMonths > maxLabMonths) maxLabMonths = prod.labMonths
-  }
-  // Grant time-limited lab access if any purchased product includes lab months
-  if (maxLabMonths > 0) {
-    const labExpiresAt = new Date(Date.now() + maxLabMonths * 30 * 24 * 60 * 60 * 1000).toISOString()
-    await grantEntitlement({
-      userId: sess.userId,
-      productId: 'extra:lab-access',
-      kind: 'extra',
-      expiresAt: labExpiresAt,
-      meta: { source: 'paypal', paypalId: sk, labMonths: maxLabMonths },
     })
   }
   server.log.info(
@@ -106,18 +96,10 @@ async function _grantFromSession(
   try {
     const user = await getUserBySub(sess.userId)
     if (user?.email) {
-      const bundleExamCodesEmail = new Set(
-        (sess.productIds as string[])
-          .map((pid: string) => getProduct(pid))
-          .filter((p: any) => p?.kind === 'bundle')
-          .flatMap((p: any) => (p.examCodes ?? []).map((c: string) => `exam:${c}`))
-      )
-      const emailProducts = (sess.productIds as string[])
-        .filter((pid: string) => !bundleExamCodesEmail.has(pid))
-        .map((pid: string) => {
-          const p = getProduct(pid)
-          return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
-        })
+      const emailProducts = (sess.productIds as string[]).map((pid: string) => {
+        const p = getProduct(pid)
+        return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
+      })
       const totalPence: number = sess.amountPence
       sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId: sess.userId, products: emailProducts, totalPence, source: 'paypal' })
         .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'paypal-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your certshack order is confirmed', filters: { productIds: sess.productIds } }))
@@ -131,88 +113,7 @@ async function _grantFromSession(
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   /**
-   * Create a PayPal Order for one-time purchases (exams, bundles).
-   * Returns { orderId } — the PayPal JS SDK uses this directly to open the checkout modal.
-   */
-  server.post('/create-order', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request: any, reply) => {
-    const { productIds, successUrl, cancelUrl } = request.body as any
-    if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
-      return reply.status(400).send({ message: 'productIds array required' })
-    }
-
-    // Exams that are children of a bundle in the same order are entitlement-only;
-    // exclude them from the charge total to avoid double-counting.
-    const bundleExamCodes = new Set(
-      productIds
-        .map((pid: string) => getProduct(pid))
-        .filter((p: any) => p?.kind === 'bundle')
-        .flatMap((p: any) => (p.examCodes ?? []).map((c: string) => `exam:${c}`))
-    )
-    let amountPence = 0
-    for (const pid of productIds) {
-      const prod = getProduct(pid)
-      if (!prod) return reply.status(400).send({ message: `Unknown productId: ${pid}` })
-      if (prod.kind === 'subscription') {
-        return reply.status(400).send({ message: `Use /create-subscription for subscription products` })
-      }
-      if (!bundleExamCodes.has(pid)) amountPence += prod.priceGBP
-    }
-
-    const userId = request.user?.sub
-    const amountGBP = (amountPence / 100).toFixed(2)
-
-    try {
-      const token = await getPaypalToken()
-      const orderRes = await fetch(`${PP_BASE}/v2/checkout/orders`, {
-        method: 'POST',
-        headers: ppHeaders(token),
-        body: JSON.stringify({
-          intent: 'CAPTURE',
-          purchase_units: [
-            {
-              amount: { currency_code: 'GBP', value: amountGBP },
-              description: 'ExamApp purchase',
-            },
-          ],
-          payment_source: {
-            paypal: {
-              experience_context: {
-                brand_name: 'certshack',
-                landing_page: 'NO_PREFERENCE',
-                shipping_preference: 'NO_SHIPPING',
-                user_action: 'PAY_NOW',
-              },
-            },
-          },
-        }),
-      })
-
-      if (!orderRes.ok) {
-        const text = await orderRes.text()
-        server.log.warn({ status: orderRes.status, body: text }, '[paypal] create order failed')
-        return reply.status(502).send({ message: 'PayPal create order failed', details: text })
-      }
-
-      const order = (await orderRes.json()) as any
-      const orderId = order.id
-
-      await putPaypalSession('PAYPAL_ORDER', orderId, {
-        userId,
-        productIds,
-        amountPence,
-        successUrl,
-        cancelUrl,
-      })
-
-      return reply.send({ orderId })
-    } catch (err: any) {
-      server.log.error({ err }, '[paypal] create-order error')
-      return reply.status(500).send({ message: 'Internal error creating PayPal order' })
-    }
-  })
-
-  /**
-   * Create a PayPal Subscription for recurring products (sub:all-access, sub:all-access-annual).
+   * Create a PayPal Subscription for recurring monthly products (sub:pro, sub:pro-plus).
    * Returns { subscriptionId } — the PayPal JS SDK uses this in createSubscription callback.
    */
   server.post('/create-subscription', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request: any, reply) => {
@@ -227,14 +128,24 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       return reply.status(400).send({ message: 'productId must be a subscription product' })
     }
 
-    const planId =
-      prod.billingPeriod === 'annual'
-        ? process.env.PAYPAL_PLAN_ID_ANNUAL
-        : process.env.PAYPAL_PLAN_ID_MONTHLY
+    const discountActive = process.env.DISCOUNT_ACTIVE === 'true'
+    const planId = (() => {
+      if (productId === 'sub:pro') {
+        return discountActive
+          ? process.env.PAYPAL_PLAN_ID_PRO_DISCOUNT
+          : process.env.PAYPAL_PLAN_ID_PRO_MONTHLY
+      }
+      if (productId === 'sub:pro-plus') {
+        return discountActive
+          ? process.env.PAYPAL_PLAN_ID_PRO_PLUS_DISCOUNT
+          : process.env.PAYPAL_PLAN_ID_PRO_PLUS_MONTHLY
+      }
+      return undefined
+    })()
 
     if (!planId) {
       return reply.status(500).send({
-        message: `PayPal plan ID not configured for ${prod.billingPeriod ?? 'monthly'} billing`,
+        message: `PayPal plan ID not configured for ${productId}. Set PAYPAL_PLAN_ID_PRO_MONTHLY / PAYPAL_PLAN_ID_PRO_PLUS_MONTHLY.`,
       })
     }
 
@@ -278,43 +189,6 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err: any) {
       server.log.error({ err }, '[paypal] create-subscription error')
       return reply.status(500).send({ message: 'Internal error creating PayPal subscription' })
-    }
-  })
-
-  /**
-   * Capture an approved PayPal Order and immediately grant entitlements.
-   * Called by the frontend after PayPal's onApprove fires.
-   */
-  server.post('/capture-order', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request: any, reply) => {
-    const { orderId } = request.body as any
-    if (!orderId) return reply.status(400).send({ message: 'orderId required' })
-    if (!/^[A-Z0-9]{1,64}$/i.test(orderId)) return reply.status(400).send({ message: 'Invalid orderId' })
-
-    try {
-      const token = await getPaypalToken()
-      const captureRes = await fetch(`${PP_BASE}/v2/checkout/orders/${orderId}/capture`, {
-        method: 'POST',
-        headers: ppHeaders(token),
-        body: '{}',
-      })
-
-      if (!captureRes.ok) {
-        const text = await captureRes.text()
-        server.log.warn({ status: captureRes.status, body: text }, '[paypal] capture order failed')
-        return reply.status(502).send({ message: 'PayPal capture failed', details: text })
-      }
-
-      const captured = (await captureRes.json()) as any
-      if (captured.status !== 'COMPLETED') {
-        server.log.warn({ orderId, status: captured.status }, '[paypal] capture not COMPLETED')
-        return reply.status(400).send({ message: `Order status: ${captured.status}` })
-      }
-
-      await _grantFromSession('PAYPAL_ORDER', orderId, server)
-      return reply.send({ success: true })
-    } catch (err: any) {
-      server.log.error({ err }, '[paypal] capture-order error')
-      return reply.status(500).send({ message: 'Internal error capturing PayPal order' })
     }
   })
 

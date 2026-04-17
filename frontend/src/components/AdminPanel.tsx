@@ -1582,19 +1582,17 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
 
                     {/* Exam filter */}
                     <div className="p-3 rounded-lg border border-border bg-card space-y-1.5">
-                      <label className="text-xs font-medium block">By exam pass</label>
+                      <label className="text-xs font-medium block">By product</label>
                       <select
                         value={campaignExamProductId}
                         onChange={(e) => { setCampaignExamProductId(e.target.value); resetPreview() }}
                         className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                       >
-                        <option value="">Any exam</option>
-                        <option value="exam:SAA-C03">SAA-C03 — AWS Solutions Architect Associate</option>
-                        <option value="exam:AIF-C01">AIF-C01 — AWS AI Practitioner</option>
-                        <option value="exam:CLF-C02">CLF-C02 — AWS Cloud Practitioner</option>
-                        <option value="exam:SCS-C03">SCS-C03 — AWS Security Specialty</option>
-                        <option value="exam:CCA-F">CCA-F — Claude Certified Architect Foundations</option>
-                        <option value="exam:PT0-003">PT0-003 — CompTIA PenTest+</option>
+                        <option value="">Any product</option>
+                        <option value="sub:pro">Pro (subscription)</option>
+                        <option value="sub:pro-plus">Pro Plus (subscription)</option>
+                        <option value="sub:pro-oneoff">Pro (one-off)</option>
+                        <option value="sub:pro-plus-oneoff">Pro Plus (one-off)</option>
                       </select>
                     </div>
 

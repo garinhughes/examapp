@@ -1,3 +1,6 @@
+# Claude Code session checkpoint (ephemeral, personal)
+.claude/checkpoint.md
+
 ### Node
 node_modules/
 **/node_modules/

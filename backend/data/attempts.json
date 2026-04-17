@@ -58211,6 +58211,1061 @@
       "earlyComplete": true,
       "answeredCount": 1,
       "totalQuestions": 65
+    },
+    {
+      "attemptId": "eff4a5bd-e79c-4dd2-ba61-f661e359b18c",
+      "userId": "visitor:1c14e8f7-66bf-443c-9bef-1808e81ac10c",
+      "examCode": "AIF-C01",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-04-17T10:59:10.490Z",
+      "finishedAt": null,
+      "score": null,
+      "answers": [],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "AIF-C01-0018",
+          "type": "single-choice",
+          "question": "A healthcare organization is evaluating generative AI models for creating patient education materials. The organization requires models that can explain medical concepts accurately and safely without fabricating medical information.\n\nWhich capability is most critical when selecting a model for this healthcare use case?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "High accuracy and factual reliability without hallucinations",
+              "isCorrect": true,
+              "explanation": "Healthcare applications require models that provide accurate, factual information without generating false medical claims.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Model speed to generate content in seconds",
+              "isCorrect": false,
+              "explanation": "While speed is useful, accuracy and safety are paramount in healthcare applications."
+            },
+            {
+              "id": "c4",
+              "text": "Maximum model size for better general performance",
+              "isCorrect": false,
+              "explanation": "Larger models don't guarantee reduced hallucinations or medical accuracy."
+            },
+            {
+              "id": "c3",
+              "text": "Ability to generate creative content regardless of factuality",
+              "isCorrect": false,
+              "explanation": "Creative generation without factual constraints is inappropriate and dangerous for healthcare."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+          ],
+          "services": [
+            "Amazon Bedrock"
+          ],
+          "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html",
+          "tip": "Focus on what matters most when providing medical information to patients.",
+          "explanation": "High accuracy and factual reliability without hallucinations are critical for healthcare. Generative models can sometimes produce plausible-sounding but false information, which is particularly dangerous in medical contexts where incorrect information could harm patients.\n\n**Why it works:** Healthcare requires models with proven factual accuracy and minimal hallucination risk.\n\n**Why the others don't work:**\n- Model speed: Important but secondary to medical accuracy and safety\n- Creative generation: Inappropriate for healthcare where factuality is essential\n- Maximum model size: Doesn't guarantee accuracy or reduce hallucinations",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0015",
+          "type": "matching",
+          "question": "Match each use case to the appropriate generative AI capability that solves it.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Chatbots",
+              "isCorrect": false,
+              "explanation": "Chatbots provide conversational AI to answer questions and assist users interactively."
+            },
+            {
+              "id": "c1",
+              "text": "Summarization",
+              "isCorrect": false,
+              "explanation": "Summarization extracts key points and condenses lengthy documents into brief summaries."
+            },
+            {
+              "id": "c4",
+              "text": "Text generation",
+              "isCorrect": false,
+              "explanation": "Text generation produces natural language content including dialogue and narratives."
+            },
+            {
+              "id": "c3",
+              "text": "Image generation",
+              "isCorrect": false,
+              "explanation": "Image generation creates visual content from descriptions or prompts."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s3",
+              "label": "A designer needs AI to generate product images for e-commerce catalog",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "An organization needs to summarize lengthy research papers into key findings",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "A company needs an AI assistant to answer employee HR questions",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s4",
+              "label": "A game developer needs AI to generate dialogue for non-player characters",
+              "correctChoiceId": "c4"
+            }
+          ],
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+          ],
+          "services": [
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html",
+          "tip": "Consider the specific output type each generative AI capability produces.",
+          "explanation": "Each generative AI capability serves distinct purposes: summarization condenses text, chatbots provide interaction, image generation creates visuals, and text generation produces written content.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0009",
+          "type": "multiple-choice",
+          "question": "A manufacturing facility wants to improve operations by using AI in two ways. First, they want to predict when equipment is likely to fail so they can perform preventive maintenance. Second, they want to analyze images from quality control cameras to identify defects before products leave the factory.\n\nWhich TWO AI applications should the facility implement?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Forecasting to predict equipment failures and maintenance needs",
+              "isCorrect": true,
+              "explanation": "Forecasting predicts future events like equipment failures based on historical patterns, enabling proactive maintenance.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Speech recognition to communicate alerts to facility workers",
+              "isCorrect": false,
+              "explanation": "While useful for alerts, speech recognition is not a primary AI capability for the stated requirements."
+            },
+            {
+              "id": "c4",
+              "text": "Recommendation systems to suggest maintenance schedules",
+              "isCorrect": false,
+              "explanation": "Recommendation systems suggest items or content, not ideal for predictive failure analysis."
+            },
+            {
+              "id": "c5",
+              "text": "Natural language processing to generate maintenance reports",
+              "isCorrect": false,
+              "explanation": "NLP helps process text, but is not necessary for the core equipment failure prediction and defect detection needs."
+            },
+            {
+              "id": "c2",
+              "text": "Computer vision to analyze visual content and identify manufacturing defects",
+              "isCorrect": true,
+              "explanation": "Computer vision processes images to detect visual defects in products, enabling quality control automation.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+          ],
+          "services": [
+            "Amazon Lookout for Equipment",
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/lookout-for-equipment/latest/ug/what-is-lookoutequipment.html",
+          "tip": "Identify which AI applications directly address predictive maintenance and visual quality control.",
+          "explanation": "Forecasting and computer vision are the two AI applications that address the facility's stated needs. Forecasting can predict when equipment will fail, enabling preventive maintenance, while computer vision can analyze quality control camera images to detect manufacturing defects.\n\n**Why they work:** Forecasting excels at predicting future events based on historical patterns, while computer vision specializes in analyzing visual information.\n\n**Why the others don't work:**\n- Speech recognition: Enables communication but doesn't address prediction or visual analysis needs\n- Recommendation systems: Suggests items, not ideal for failure prediction\n- Natural language processing: Processes text, not essential for the core manufacturing requirements",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0007",
+          "type": "single-choice",
+          "question": "Phone call recordings from a customer service center need to be converted automatically into searchable text transcripts. The system must handle callers with various accents and speaking styles.\n\nWhich AI capability should be used?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Speech recognition",
+              "isCorrect": true,
+              "explanation": "Speech recognition technology converts spoken audio into text and can handle various accents and speaking patterns.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Computer vision",
+              "isCorrect": false,
+              "explanation": "Computer vision processes visual images, not audio or speech content."
+            },
+            {
+              "id": "c3",
+              "text": "Fraud detection",
+              "isCorrect": false,
+              "explanation": "Fraud detection identifies suspicious patterns and anomalies, not relevant to transcribing audio."
+            },
+            {
+              "id": "c4",
+              "text": "Forecasting",
+              "isCorrect": false,
+              "explanation": "Forecasting predicts future trends, not applicable to converting current speech to text."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+          ],
+          "services": [
+            "Amazon Transcribe"
+          ],
+          "docs": "https://docs.aws.amazon.com/transcribe/latest/dg/what-is.html",
+          "tip": "Focus on which AI application specifically converts spoken words into text format.",
+          "explanation": "Speech recognition is the AI application that converts spoken language into written text. This technology can handle various accents, speech patterns, and noise levels, making it ideal for transcribing customer service calls.\n\n**Why it works:** Speech recognition specializes in converting audio input to text, understanding natural speech variations.\n\n**Why the others don't work:**\n- Computer vision: Designed for image and video analysis, not audio processing\n- Fraud detection: Identifies suspicious patterns, not related to speech-to-text conversion\n- Forecasting: Predicts future values, not applicable to transcription tasks",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0001",
+          "type": "single-choice",
+          "question": "Defective products are slipping through a manufacturing assembly line. An engineer has trained a model on thousands of labeled images of both defective and normal products to catch them.\n\nWhich term best describes the process of using the trained model to identify defective products in real-time?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Tokenization",
+              "isCorrect": false,
+              "explanation": "Tokenization is a technique used in NLP to break text into smaller units, not relevant to image classification tasks."
+            },
+            {
+              "id": "c2",
+              "text": "Training",
+              "isCorrect": false,
+              "explanation": "Training is the initial process of teaching the model using historical data, not the process of making predictions on new data."
+            },
+            {
+              "id": "c1",
+              "text": "Inferencing",
+              "isCorrect": true,
+              "explanation": "This is the correct term for using a trained model to make predictions on new data.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Fine-tuning",
+              "isCorrect": false,
+              "explanation": "Fine-tuning is a technique to adapt a pre-trained model to a new task, not the process of making real-time predictions."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+          ],
+          "services": [
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model.html",
+          "tip": "Consider what happens when a trained model is used to make predictions on new data, not during the initial learning phase.",
+          "explanation": "Inferencing is the process of using a trained machine learning model to make predictions on new, unseen data. In this scenario, the engineer's model was trained on images during the training phase, and now it uses that learned knowledge to infer whether new products are defective.\n\n**Why it works:** Inferencing is the standard term for prediction or decision-making by a trained model in production environments.\n\n**Why the others don't work:**\n- Training: This refers to the initial phase of teaching the model, not making predictions\n- Tokenization: This is an NLP preprocessing technique, not applicable to image analysis\n- Fine-tuning: This is an optimization technique for transfer learning, not the prediction phase",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0017",
+          "type": "single-choice",
+          "question": "A real-time translation mobile app must deliver fast response times on devices with limited bandwidth and modest computational resources.\n\nWhich factors are most important in selecting a generative AI model for this use case?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Maximum accuracy regardless of model size or response time",
+              "isCorrect": false,
+              "explanation": "While accuracy matters, practical constraints of mobile devices and user experience must be balanced."
+            },
+            {
+              "id": "c3",
+              "text": "Highest cost to ensure premium model performance",
+              "isCorrect": false,
+              "explanation": "Cost is a factor for startups, and high cost doesn't guarantee the best fit for mobile constraints."
+            },
+            {
+              "id": "c4",
+              "text": "Model complexity and number of parameters for better results",
+              "isCorrect": false,
+              "explanation": "Larger, more complex models consume more resources and increase latency, unsuitable for mobile apps."
+            },
+            {
+              "id": "c1",
+              "text": "Low latency, small model size, and efficient resource usage",
+              "isCorrect": true,
+              "explanation": "Real-time mobile applications require fast response times, compact models, and efficient resource consumption.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+          ],
+          "services": [
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/neo.html",
+          "tip": "Consider the constraints of real-time mobile applications with limited computational resources.",
+          "explanation": "For real-time mobile applications, low latency, small model size, and efficient resource usage are critical factors. The model must respond quickly with minimal computational and memory overhead to provide a smooth user experience on resource-constrained devices.\n\n**Why it works:** Mobile and real-time applications require models optimized for speed and efficiency.\n\n**Why the others don't work:**\n- Maximum accuracy over performance: Mobile constraints require balancing accuracy with speed\n- Highest cost: Startups need cost-effective solutions, and high cost doesn't solve resource constraints\n- Model complexity: Larger models increase latency and resource usage on mobile devices",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0004",
+          "type": "multiple-choice",
+          "question": "An image database containing thousands of product photos needs to be automatically tagged. The tagging system must identify objects, recognize text on packaging, and understand scene composition.\n\nWhich TWO AI capabilities best address these requirements?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Machine learning algorithms to predict product prices based on image features",
+              "isCorrect": false,
+              "explanation": "Price prediction is outside the scope of the company's stated requirements for tagging and identification."
+            },
+            {
+              "id": "c2",
+              "text": "Natural language processing to extract and understand text from packaging",
+              "isCorrect": true,
+              "explanation": "NLP can process the recognized text from product packaging, enabling text understanding and metadata extraction.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Large language models to generate product descriptions from images",
+              "isCorrect": false,
+              "explanation": "LLMs are powerful for text generation, but they are not the primary tool for the visual recognition tasks required here."
+            },
+            {
+              "id": "c3",
+              "text": "Deep learning neural networks to compress image file sizes",
+              "isCorrect": false,
+              "explanation": "While deep learning is useful for image tasks, compressing file sizes is not relevant to the tagging and recognition requirements."
+            },
+            {
+              "id": "c1",
+              "text": "Computer vision to identify objects and understand visual scene composition",
+              "isCorrect": true,
+              "explanation": "Computer vision enables the system to recognize and classify objects in images, addressing the identification and scene understanding needs.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+          ],
+          "services": [
+            "Amazon Rekognition",
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html",
+          "tip": "Consider which AI capabilities directly address visual recognition and text understanding in images.",
+          "explanation": "Computer vision and natural language processing are the two AI capabilities that directly address the company's needs. Computer vision handles object identification and visual scene understanding, while NLP processes and understands the text found on product packaging.\n\n**Why they work:** Computer vision specializes in image analysis and object recognition, while NLP processes extracted text from images.\n\n**Why the others don't work:**\n- Deep learning for compression: Relevant to deep learning but not to the tagging requirements\n- LLMs for descriptions: Text generation is secondary to the primary need for visual and text recognition\n- ML for price prediction: Price prediction is not part of the tagging and recognition scope",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0006",
+          "type": "single-choice",
+          "question": "An e-commerce company is analyzing customer behavior to suggest products that buyers might be interested in based on their browsing history and purchase patterns.\n\nWhich AI application type is this company implementing?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Recommendation systems",
+              "isCorrect": true,
+              "explanation": "Recommendation systems analyze user preferences and behavior to suggest relevant products or content.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Speech recognition",
+              "isCorrect": false,
+              "explanation": "Speech recognition converts spoken audio into text, which is not relevant to analyzing customer behavior."
+            },
+            {
+              "id": "c4",
+              "text": "Forecasting",
+              "isCorrect": false,
+              "explanation": "Forecasting predicts future trends or values based on historical data, not analyzing individual customer behavior for suggestions."
+            },
+            {
+              "id": "c3",
+              "text": "Computer vision",
+              "isCorrect": false,
+              "explanation": "Computer vision processes images and videos to extract visual information, not analyzing purchasing patterns."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+          ],
+          "services": [
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/personalize/latest/dg/what-is-personalize.html",
+          "tip": "Consider which AI application is specifically designed to suggest items based on user preferences and behavior.",
+          "explanation": "Recommendation systems are AI applications that analyze user behavior, preferences, and patterns to suggest products or content that users might find valuable. This company's product suggestion feature is a classic recommendation system use case.\n\n**Why it works:** Recommendation systems excel at analyzing browsing and purchase history to predict user interests and preferences.\n\n**Why the others don't work:**\n- Speech recognition: Converts spoken words to text, not applicable to behavior analysis\n- Computer vision: Analyzes visual content, not customer behavior patterns\n- Forecasting: Predicts aggregate future values, not individual product recommendations",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0012",
+          "type": "single-choice",
+          "question": "Technical documentation exists in English and must be made available in Spanish, French, and Mandarin. As documentation is updated, translations must stay current automatically.\n\nWhich generative AI use case applies here?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Summarization to condense technical documentation",
+              "isCorrect": false,
+              "explanation": "Summarization creates brief versions of content, not translations into other languages."
+            },
+            {
+              "id": "c3",
+              "text": "Code generation to write software programs",
+              "isCorrect": false,
+              "explanation": "Code generation creates executable code, not language translations."
+            },
+            {
+              "id": "c4",
+              "text": "Image generation to create visual documentation",
+              "isCorrect": false,
+              "explanation": "Image generation creates visual content, not language translations."
+            },
+            {
+              "id": "c1",
+              "text": "Translation to convert documentation between languages",
+              "isCorrect": true,
+              "explanation": "Translation models can convert text between languages while maintaining meaning and context.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+          ],
+          "services": [
+            "Amazon Translate"
+          ],
+          "docs": "https://docs.aws.amazon.com/translate/latest/dg/what-is.html",
+          "tip": "Focus on which generative AI capability converts text from one language to another.",
+          "explanation": "Translation is the generative AI use case that automatically converts text from one language to another. This allows companies to maintain multilingual documentation efficiently as their products and documentation evolve.\n\n**Why it works:** Generative translation models understand semantic meaning and cultural context to produce accurate translations.\n\n**Why the others don't work:**\n- Summarization: Creates shorter versions of text, not language translations\n- Code generation: Produces executable code, not language translations\n- Image generation: Creates visual content, not translated text",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0020",
+          "type": "matching",
+          "question": "Match each selection factor to the organizational requirement it best addresses.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Domain expertise and model capabilities",
+              "isCorrect": false,
+              "explanation": "Specialized models provide the accuracy needed for expert-level knowledge domains."
+            },
+            {
+              "id": "c3",
+              "text": "Low latency and fast inference performance",
+              "isCorrect": false,
+              "explanation": "Speed is critical for real-time interactive applications."
+            },
+            {
+              "id": "c1",
+              "text": "Compliance requirements and deployment constraints",
+              "isCorrect": false,
+              "explanation": "These factors ensure regulatory adherence and data governance."
+            },
+            {
+              "id": "c2",
+              "text": "Model efficiency and inference cost",
+              "isCorrect": false,
+              "explanation": "Cost-effective models maximize value for resource-constrained organizations."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s3",
+              "label": "A real-time chatbot requires immediate user responses",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "A startup needs to minimize operating costs while maintaining quality",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s4",
+              "label": "A specialized domain needs expert-level knowledge and accuracy",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s1",
+              "label": "A regulated bank must meet GDPR and data residency requirements",
+              "correctChoiceId": "c1"
+            }
+          ],
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+          ],
+          "services": [
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html",
+          "tip": "Consider how each selection factor aligns with the specific organizational need.",
+          "explanation": "Different factors matter for different contexts: compliance for regulated industries, cost for budget-conscious organizations, latency for real-time applications, and specialized capabilities for domain-specific needs.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0002",
+          "type": "single-choice",
+          "question": "A financial institution is building a loan approval system. During testing, the data team discovers that the model approves loans at significantly higher rates for applicants from certain demographic groups compared to others, even though all other factors are equal.\n\nWhich concept is this situation demonstrating?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Regularization",
+              "isCorrect": false,
+              "explanation": "Regularization is a technique to prevent overfitting by adding constraints to the model, not a fairness concern."
+            },
+            {
+              "id": "c1",
+              "text": "Bias",
+              "isCorrect": true,
+              "explanation": "Bias refers to systematic prejudice or unfairness in how a model makes decisions across different groups.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Underfitting",
+              "isCorrect": false,
+              "explanation": "Underfitting means a model is too simple to capture the underlying patterns, not related to differential treatment of demographic groups."
+            },
+            {
+              "id": "c2",
+              "text": "Overfitting",
+              "isCorrect": false,
+              "explanation": "Overfitting occurs when a model learns the training data too well, including noise, but this doesn't explain disparate approval rates across demographic groups."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+          ],
+          "services": [
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-fairness-and-explainability.html",
+          "tip": "Focus on what term describes systematic unfair treatment of different groups by a model.",
+          "explanation": "Bias in machine learning refers to systematic prejudice or unfairness in the model's predictions across different groups or populations. The scenario describes disparate treatment based on demographic characteristics, which is a clear example of algorithmic bias.\n\n**Why it works:** Bias manifests when a model consistently treats certain groups differently, leading to unfair outcomes regardless of other factors.\n\n**Why the others don't work:**\n- Overfitting: Relates to model generalization on unseen data, not systematic unfairness across demographic groups\n- Underfitting: Refers to insufficient model complexity, not differential treatment of groups\n- Regularization: A technique to improve model performance, not a fairness issue",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0014",
+          "type": "multiple-choice",
+          "question": "A customer service team needs three capabilities: a conversational system to handle inquiries, the ability to condense long customer emails into brief summaries for agents, and responses generated in each customer's preferred language.\n\nWhich TWO generative AI use cases are essential for this solution?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Chatbots to provide conversational customer service interactions",
+              "isCorrect": true,
+              "explanation": "Chatbots enable natural conversation with customers to answer questions and resolve issues.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Image generation to create visual customer support materials",
+              "isCorrect": false,
+              "explanation": "Image generation creates visual content, not essential for text-based customer service."
+            },
+            {
+              "id": "c2",
+              "text": "Translation to respond to customers in their preferred language",
+              "isCorrect": true,
+              "explanation": "Translation models convert responses to match customer language preferences, enabling global support.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Summarization to condense long emails into brief agent summaries",
+              "isCorrect": false,
+              "explanation": "While helpful, summarization is secondary to the core chatbot and translation capabilities for this scenario."
+            },
+            {
+              "id": "c5",
+              "text": "Code generation to automate backend development",
+              "isCorrect": false,
+              "explanation": "Code generation supports application development but is not part of the customer service interaction layer."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+          ],
+          "services": [
+            "Amazon Bedrock",
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html",
+          "tip": "Focus on the generative AI capabilities that directly address conversational support and language preferences.",
+          "explanation": "Chatbots and translation are the two essential generative AI capabilities for this customer service solution. Chatbots handle the conversational interactions, while translation enables responses in the customer's preferred language for global support.\n\n**Why they work:** Chatbots provide interactive customer engagement, while translation ensures multilingual accessibility.\n\n**Why the others don't work:**\n- Summarization: Helpful for agent efficiency but not essential to the core requirement\n- Image generation: Supports content creation but not critical for text-based service\n- Code generation: Supports development, not customer-facing service delivery",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0003",
+          "type": "single-choice",
+          "question": "After testing multiple machine learning algorithms for predicting customer churn, a team selects the model that achieves the best accuracy without becoming overly complex.\n\nWhat concept does this selection demonstrate?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Supervised learning",
+              "isCorrect": false,
+              "explanation": "Supervised learning is a category of ML tasks with labeled data, but doesn't describe the balance between performance and complexity."
+            },
+            {
+              "id": "c2",
+              "text": "Deep learning",
+              "isCorrect": false,
+              "explanation": "Deep learning is a specific technique using neural networks with multiple layers, not a concept about model selection balance."
+            },
+            {
+              "id": "c3",
+              "text": "Natural language processing",
+              "isCorrect": false,
+              "explanation": "NLP is a specialized AI field for processing text, not relevant to selecting algorithms for churn prediction."
+            },
+            {
+              "id": "c1",
+              "text": "Good fit",
+              "isCorrect": true,
+              "explanation": "Good fit represents the balance between model accuracy and complexity, avoiding both underfitting and overfitting.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+          ],
+          "services": [
+            "Amazon SageMaker"
+          ],
+          "docs": "https://docs.aws.amazon.com/machine-learning/latest/dg/model-fit-underfitting-vs-overfitting.html",
+          "tip": "Consider the balance between model performance and simplicity when evaluating algorithms.",
+          "explanation": "Good fit refers to finding the right balance in a machine learning model where it captures important patterns in the data without being overly complex or too simple. The team selected an algorithm with strong accuracy while maintaining reasonable complexity, demonstrating the concept of good fit.\n\n**Why it works:** Good fit is achieved when a model generalizes well to new data with appropriate complexity.\n\n**Why the others don't work:**\n- Deep learning: A specific type of neural network architecture, not about algorithm selection balance\n- Natural language processing: A specialized field for text analysis, irrelevant to churn prediction\n- Supervised learning: A learning paradigm category, not about the fit quality of a specific algorithm",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0005",
+          "type": "matching",
+          "question": "Match each AI concept to its correct definition.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "The process of teaching a machine learning system using historical data and examples",
+              "isCorrect": false,
+              "explanation": "Training is the phase where the model learns from labeled or unlabeled data."
+            },
+            {
+              "id": "c1",
+              "text": "A step-by-step procedure or set of rules used to solve a problem or make decisions",
+              "isCorrect": false,
+              "explanation": "An algorithm is a sequence of computational steps or rules for processing data."
+            },
+            {
+              "id": "c2",
+              "text": "A mathematical representation learned from data that can make predictions or decisions",
+              "isCorrect": false,
+              "explanation": "A model is the trained artifact that applies learned patterns to new inputs."
+            },
+            {
+              "id": "c4",
+              "text": "The principle that an AI system should treat all groups equitably without discrimination",
+              "isCorrect": false,
+              "explanation": "Fairness in AI ensures that decisions are unbiased and equitable across different populations."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Algorithm",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s4",
+              "label": "Fairness",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s3",
+              "label": "Training",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "Model",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.1.1: Defining basic AI terms (for example, AI, ML, deep learning, neural networks, computer vision, natural language processing [NLP], model, algorithm, training and inferencing, bias, fairness, fit, large language model [LLM])."
+          ],
+          "services": [
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/machine-learning/latest/dg/amazon-machine-learning-key-concepts.html",
+          "tip": "Consider the distinction between the procedure (algorithm), the result (model), the process (training), and the principle (fairness).",
+          "explanation": "Each concept has a distinct role in machine learning. An algorithm is the procedure, a model is the trained artifact, training is the learning process, and fairness is an ethical principle ensuring equitable outcomes across groups.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0011",
+          "type": "single-choice",
+          "question": "Multiple variations of product descriptions are needed for A/B testing. The goal is to generate different versions quickly without manual rewriting.\n\nWhich generative AI capability would be most suitable for this use case?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Video generation to create marketing demonstrations",
+              "isCorrect": false,
+              "explanation": "Video generation produces video content, not written product descriptions."
+            },
+            {
+              "id": "c4",
+              "text": "Speech synthesis to create audio narration",
+              "isCorrect": false,
+              "explanation": "Speech synthesis creates audio content, not written descriptions."
+            },
+            {
+              "id": "c1",
+              "text": "Text generation to create product description variations",
+              "isCorrect": true,
+              "explanation": "Text generation can produce multiple natural language variations of descriptions efficiently.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Image generation to create product photography",
+              "isCorrect": false,
+              "explanation": "Image generation creates visual content, not written descriptions."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+          ],
+          "services": [
+            "Amazon Bedrock"
+          ],
+          "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html",
+          "tip": "Consider which generative capability creates written content variations.",
+          "explanation": "Text generation through large language models is the most suitable capability for creating multiple product description variations quickly. Generative AI models can produce natural, diverse text variations that maintain the core message while changing phrasing and emphasis.\n\n**Why it works:** Text generation excels at creating natural language variations efficiently at scale.\n\n**Why the others don't work:**\n- Image generation: Creates visual content, not written descriptions\n- Video generation: Produces video content, not text descriptions\n- Speech synthesis: Generates audio, not written product descriptions",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0010",
+          "type": "matching",
+          "question": "Match each real-world scenario to the appropriate AI application that solves it.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Speech recognition",
+              "isCorrect": false,
+              "explanation": "Speech recognition converts spoken commands into actionable instructions."
+            },
+            {
+              "id": "c2",
+              "text": "Computer vision",
+              "isCorrect": false,
+              "explanation": "Computer vision analyzes medical images to identify abnormalities and detect tumors."
+            },
+            {
+              "id": "c3",
+              "text": "Forecasting",
+              "isCorrect": false,
+              "explanation": "Forecasting predicts future values and demand based on historical patterns."
+            },
+            {
+              "id": "c1",
+              "text": "Recommendation systems",
+              "isCorrect": false,
+              "explanation": "Recommendation systems analyze user preferences and behavior to suggest relevant content."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s4",
+              "label": "A voice assistant understands and responds to spoken commands",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s3",
+              "label": "A retailer predicts customer demand for next season's inventory",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "A streaming service suggests movies based on viewing history",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "A hospital system detects tumors in medical imaging scans",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+          ],
+          "services": [
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html",
+          "tip": "Consider what each AI application does best: suggesting content, analyzing images, predicting futures, or processing speech.",
+          "explanation": "Each AI application addresses specific real-world needs. Recommendation systems personalize content suggestions, computer vision analyzes visual medical data, forecasting predicts demand, and speech recognition processes spoken language.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0016",
+          "type": "single-choice",
+          "question": "Document summarization for a regulated financial services company must be highly accurate and secure. Compliance with regulations like SOX is mandatory, and data must never leave the company's own infrastructure.\n\nWhich critical factors should be prioritized when selecting a model?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Compliance requirements and data residency constraints",
+              "isCorrect": true,
+              "explanation": "Compliance and data residency are critical factors for regulated industries like finance.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Model speed and cost per token regardless of compliance",
+              "isCorrect": false,
+              "explanation": "While speed and cost matter, compliance and security are non-negotiable for financial services."
+            },
+            {
+              "id": "c3",
+              "text": "Maximum model size to ensure best accuracy",
+              "isCorrect": false,
+              "explanation": "Larger models don't always meet specific compliance or performance requirements for use cases."
+            },
+            {
+              "id": "c4",
+              "text": "Popularity of the model among data scientists",
+              "isCorrect": false,
+              "explanation": "Model popularity is not a primary factor for regulatory compliance and data security."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+          ],
+          "services": [
+            "Amazon Bedrock"
+          ],
+          "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html",
+          "tip": "Consider which factors are non-negotiable for regulated financial institutions.",
+          "explanation": "For financial services, compliance requirements and data residency constraints are critical selection factors. The company must ensure the model meets regulatory standards like SOX and maintains data within secure, compliant infrastructure.\n\n**Why it works:** Regulated industries must prioritize compliance and data governance above other factors.\n\n**Why the others don't work:**\n- Speed and cost over compliance: Regulatory compliance cannot be sacrificed for cost savings\n- Maximum model size: Larger models don't guarantee regulatory compliance\n- Model popularity: Popularity is irrelevant to meeting compliance requirements",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0008",
+          "type": "single-choice",
+          "question": "A banking institution monitors credit card transactions in real-time to identify unusual patterns that might indicate unauthorized use or criminal activity. The system learns from historical transaction patterns to detect anomalies quickly.\n\nWhich real-world AI application is the bank implementing?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Fraud detection",
+              "isCorrect": true,
+              "explanation": "Fraud detection identifies suspicious transactions and unauthorized activities by analyzing patterns.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Natural language processing",
+              "isCorrect": false,
+              "explanation": "NLP processes text and language, not financial transaction patterns."
+            },
+            {
+              "id": "c4",
+              "text": "Forecasting",
+              "isCorrect": false,
+              "explanation": "Forecasting predicts future values or trends, not identifies suspicious current transactions."
+            },
+            {
+              "id": "c2",
+              "text": "Recommendation systems",
+              "isCorrect": false,
+              "explanation": "Recommendation systems suggest products or content, not detect fraudulent transactions."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of AI and ML",
+          "skills": [
+            "1.2.4: Identifying examples of real-world AI applications (for example, computer vision, NLP, speech recognition, recommendation systems, fraud detection, forecasting)."
+          ],
+          "services": [
+            "Amazon Lookout for Fraud"
+          ],
+          "docs": "https://docs.aws.amazon.com/frauddetector/latest/ug/what-is-frauddetector.html",
+          "tip": "Consider which AI application identifies suspicious or anomalous patterns in real-time activities.",
+          "explanation": "Fraud detection is an AI application that analyzes transaction patterns to identify suspicious activities and unauthorized use. By learning from historical legitimate transactions, the system can quickly detect anomalies that likely represent fraud.\n\n**Why it works:** Fraud detection systems excel at analyzing patterns and identifying deviations that suggest criminal activity.\n\n**Why the others don't work:**\n- Recommendation systems: Designed to suggest items, not detect fraudulent activity\n- Natural language processing: Processes text content, not transaction patterns\n- Forecasting: Predicts future values, not identifies current suspicious transactions",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0013",
+          "type": "single-choice",
+          "question": "Routine coding tasks (boilerplate generation and code completions based on comments and function signatures) are slowing down developer productivity.\n\nWhich generative AI capability would best address this?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Chatbots for code review assistance",
+              "isCorrect": false,
+              "explanation": "While chatbots can discuss code, they don't directly generate executable code."
+            },
+            {
+              "id": "c1",
+              "text": "Code generation to produce software code from descriptions",
+              "isCorrect": true,
+              "explanation": "Code generation models can suggest completions and generate code based on context and comments.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Summarization to create code documentation",
+              "isCorrect": false,
+              "explanation": "Summarization creates brief text summaries, not generates functional code."
+            },
+            {
+              "id": "c2",
+              "text": "Image generation to create UI mockups",
+              "isCorrect": false,
+              "explanation": "Image generation creates visual designs, not executable code."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.1.2: Identifying potential use cases for generative AI models (for example, image, video, and audio generation; summarization; chatbots; translation; code generation; customer service agents; search; recommendation engines)."
+          ],
+          "services": [
+            "AWS CodeWhisperer"
+          ],
+          "docs": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html",
+          "tip": "Consider which generative AI capability produces actual executable code from specifications.",
+          "explanation": "Code generation is the generative AI capability that produces executable code based on comments, function signatures, and natural language descriptions. This dramatically speeds up development by automating routine coding tasks.\n\n**Why it works:** Code generation models trained on large codebases can understand context and produce syntactically correct, functional code.\n\n**Why the others don't work:**\n- Image generation: Creates visual mockups, not executable code\n- Summarization: Produces text summaries, not functional code\n- Chatbots: Assist with discussion and questions, not code production",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "AIF-C01-0019",
+          "type": "multiple-choice",
+          "question": "An enterprise is deploying a generative AI solution for document analysis and must make critical decisions about model selection. The organization needs to balance high accuracy requirements with the need for data privacy compliance, reasonable inference costs, and acceptable response times for batch processing.\n\nWhich TWO selection factors are most important to address the organization's primary constraints?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Model popularity among academic researchers",
+              "isCorrect": false,
+              "explanation": "Research popularity is not relevant to business requirements or compliance."
+            },
+            {
+              "id": "c1",
+              "text": "Performance requirements and inference cost per request",
+              "isCorrect": true,
+              "explanation": "Balancing performance with cost efficiency is critical for scalable enterprise solutions.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Maximum latency requirements for real-time processing",
+              "isCorrect": false,
+              "explanation": "While the scenario mentions acceptable response times, real-time latency is less critical than stated batch processing needs."
+            },
+            {
+              "id": "c2",
+              "text": "Data privacy compliance and on-premises deployment capabilities",
+              "isCorrect": true,
+              "explanation": "Enterprise data governance requires models that meet compliance standards and can run within controlled environments.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Creative output capabilities for marketing content",
+              "isCorrect": false,
+              "explanation": "Creative generation is not relevant to document analysis and enterprise data processing."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Fundamentals of Generative AI",
+          "skills": [
+            "2.2.3: Understanding various factors to select appropriate generative AI models (for example, model types, performance requirements, capabilities, constraints, compliance)."
+          ],
+          "services": [
+            "Amazon Bedrock",
+            "AWS"
+          ],
+          "docs": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html",
+          "tip": "Identify the factors that directly address the stated enterprise constraints of accuracy, privacy, cost, and processing speed.",
+          "explanation": "Performance requirements and inference cost, along with data privacy compliance and deployment options, are the two most important factors. Enterprises must balance analytical capability with operational costs and ensure their data handling meets regulatory requirements.\n\n**Why they work:** Performance with cost efficiency ensures scalability, while compliance and deployment options ensure data governance.\n\n**Why the others don't work:**\n- Research popularity: Irrelevant to business and compliance requirements\n- Real-time latency: Less critical for batch processing workflows\n- Creative output: Not applicable to document analysis tasks",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        }
+      ]
     }
   ]
 }

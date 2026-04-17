@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import fs from 'fs/promises'
 import { getActiveProductIds } from '../services/entitlements.js'
-import { resolveUserTier, TIERS, hasExamAccess } from '../catalog.js'
+import { resolveUserTier, TIERS, isPaidTier } from '../catalog.js'
 import { computeDomainWeights, selectWeakestLinkQuestions, type DomainStats } from '../services/weakestLink.js'
 import { loadAllExams, loadExam, shuffleQuestions, getShowcaseQuestions } from '../examLoader.js'
 
@@ -45,9 +45,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   /**
    * Questions endpoint — applies tier-based question limits.
    *
-   * visitor  → 10 questions (sample)
-   * registered → 25 questions
-   * paying (owns exam / bundle / subscription) → full bank
+   * visitor    → 20 questions (showcase)
+   * registered → 40 questions (showcase)
+   * pro / pro_plus → full bank
    */
   server.get('/:examCode/questions', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const { examCode } = request.params as any
@@ -75,7 +75,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     const allQuestions = exam.questions as any[]
 
-    if (tier !== 'paying') {
+    if (!isPaidTier(tier)) {
       const showcaseCount = tierConfig.questionLimit ?? 20
       const showcase = getShowcaseQuestions(exam, showcaseCount)
       if (showcase) {
@@ -98,7 +98,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }
     }
 
-    // paying: full shuffled bank
+    // pro / pro_plus: full shuffled bank
     const questions = shuffleQuestions(allQuestions)
     return {
       questions,

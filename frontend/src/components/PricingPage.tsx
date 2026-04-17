@@ -1,37 +1,24 @@
 /**
- * PricingPage - plan comparison, product catalog, and recommendation wizard.
- *
- * Stripe checkout is stubbed; buy buttons show a preview until Stripe is configured.
+ * PricingPage - three plan cards (Free, Pro, Pro Plus) with billing toggle
+ * and optional discount display.
  */
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
-import { useEntitlements, type CatalogProduct } from '../hooks/useEntitlements'
-import { useAuthFetch } from '../auth/useAuthFetch'
+import { useEntitlements, isPaidTier, type CatalogProduct } from '../hooks/useEntitlements'
 import { useBasket } from '../basket/BasketContext'
 import { useExam } from '../exam/ExamContext'
-import { Check, Sparkles, ChevronRight, RotateCcw, Zap, Award, ChevronDown, ShoppingCart } from 'lucide-react'
+import { Check, X, ShoppingCart, Zap } from 'lucide-react'
 import { clarityEvent, clarityTag } from '../clarity'
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-const CHECK = '✓'
-const CROSS = '-'
-
 function formatPrice(pence: number): string {
   const pounds = pence / 100
   return pounds % 1 === 0 ? `£${pounds}` : `£${pounds.toFixed(2)}`
-}
-
-function ComingSoonBadge() {
-  return (
-    <span className="ml-1.5 inline-block text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
-      Coming soon
-    </span>
-  )
 }
 
 /* ------------------------------------------------------------------ */
@@ -40,363 +27,242 @@ function ComingSoonBadge() {
 
 interface FeatureDef {
   label: string
-  visitor: string
-  registered: string
-  paid: string
-  comingSoon?: boolean
+  free: string
+  pro: string
+  proPlus: string
 }
 
 const FEATURES: FeatureDef[] = [
-  { label: 'Practice exams',     visitor: '20 questions', registered: '40 questions per exam', paid: 'All (per exam)' },
-  { label: 'Skill labs',             visitor: '6 per provider',     registered: '12 per provider',               paid: 'All (per provider)' },
-  { label: 'Saved attempts',         visitor: 'Unlimited',       registered: 'Unlimited',            paid: 'Unlimited' },
-  { label: 'Review & explanations',  visitor: CHECK,       registered: CHECK,                  paid: CHECK },
-  { label: 'Analytics',              visitor: CROSS,       registered: CHECK,                  paid: CHECK },
-  { label: 'Rewards & badges',       visitor: CROSS,       registered: CHECK,                  paid: CHECK },
-  { label: 'Leaderboard',            visitor: CROSS,       registered: CROSS,                  paid: CHECK },
-  { label: 'Report issues',          visitor: CROSS,       registered: CROSS,                  paid: CHECK },
-  { label: 'Request content & features',       visitor: CROSS,       registered: CROSS,                  paid: CHECK },
-  { label: 'Certificates',           visitor: CROSS,       registered: CROSS,                  paid: CHECK },
+  { label: 'Practice exams',           free: '40 questions',    pro: 'Full question bank', proPlus: 'Full question bank' },
+  { label: 'Skill labs',               free: '12 per provider', pro: '12 per provider',   proPlus: 'All (full access)' },
+  { label: 'Saved attempts',           free: 'Unlimited',       pro: 'Unlimited',         proPlus: 'Unlimited' },
+  { label: 'Review & explanations',    free: '✓',               pro: '✓',                proPlus: '✓' },
+  { label: 'Analytics & badges',       free: '✓',               pro: '✓',                proPlus: '✓' },
+  { label: 'Leaderboard',              free: '-',               pro: '✓',                proPlus: '✓' },
+  { label: 'Certificates',             free: '-',               pro: '✓',                proPlus: '✓' },
+  { label: 'Report issues',            free: '-',               pro: '✓',                proPlus: '✓' },
+  { label: 'Request content',          free: '-',               pro: '✓',                proPlus: '✓' },
 ]
 
-function FeatureRow({ f }: { f: FeatureDef }) {
+function FeatureTable() {
   return (
-    <tr className="border-t border-border">
-      <td className="py-2.5 px-3 text-sm font-medium text-foreground">
-        {f.label}
-        {f.comingSoon && <ComingSoonBadge />}
-      </td>
-      <td className="py-2.5 px-3 text-sm text-center text-muted-foreground">{f.visitor}</td>
-      <td className="py-2.5 px-3 text-sm text-center text-muted-foreground">{f.registered}</td>
-      <td className="py-2.5 px-3 text-sm text-center font-semibold text-primary">{f.paid}</td>
-    </tr>
+    <div className="overflow-x-auto">
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="border-b-2 border-border">
+            <th className="py-3 px-3 text-sm font-semibold text-muted-foreground w-2/5">Feature</th>
+            <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">Free</th>
+            <th className="py-3 px-3 text-sm font-semibold text-center text-foreground">Pro</th>
+            <th className="py-3 px-3 text-sm font-semibold text-center text-primary">Pro Plus</th>
+          </tr>
+        </thead>
+        <tbody>
+          {FEATURES.map((f) => (
+            <tr key={f.label} className="border-t border-border">
+              <td className="py-2.5 px-3 text-sm font-medium text-foreground">{f.label}</td>
+              <td className="py-2.5 px-3 text-sm text-center text-muted-foreground">{f.free}</td>
+              <td className="py-2.5 px-3 text-sm text-center text-foreground">{f.pro}</td>
+              <td className="py-2.5 px-3 text-sm text-center font-semibold text-primary">{f.proPlus}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
 /* ------------------------------------------------------------------ */
-/*  Product card                                                       */
+/*  Plan definitions                                                   */
 /* ------------------------------------------------------------------ */
 
-function ProductCard({ product, onBuy, optionLabel, inBasket }: { product: CatalogProduct; onBuy: (p: CatalogProduct) => void; optionLabel?: string; inBasket?: boolean }) {
-  const kindLabels: Record<string, string> = {
-    exam: 'Exam Pass',
-    bundle: 'Exam Pack',
-    subscription: 'All-Access',
-  }
+interface PlanDef {
+  name: string
+  tier: 'registered' | 'pro' | 'pro_plus'
+  monthlyProductId: string | null
+  features: string[]
+  missingFeatures?: string[]
+  badge?: string
+}
+
+const PLAN_DEFS: PlanDef[] = [
+  {
+    name: 'Free',
+    tier: 'registered',
+    monthlyProductId: null,
+    features: [
+      '40 questions per exam',
+      '40+ skill labs',
+      'Review & explanations',
+      'Analytics & badges',
+      'Unlimited saved attempts',
+    ],
+    missingFeatures: ['Full question banks', 'Full skill lab access', 'Leaderboard', 'Certificates'],
+  },
+  {
+    name: 'Pro',
+    tier: 'pro',
+    monthlyProductId: 'sub:pro',
+    badge: 'Exam ready package',
+    features: [
+      'Full question banks (all exams)',
+      '80+ skill labs',
+      'Review & explanations',
+      'Analytics & badges',
+      'Leaderboard',
+      'Certificates',
+      'Request content & features',
+    ],
+    missingFeatures: ['Full skill lab access'],
+  },
+  {
+    name: 'Pro Plus',
+    tier: 'pro_plus',
+    monthlyProductId: 'sub:pro-plus',
+    badge: 'Job ready package',
+    features: [
+      'Full question banks (all exams)',
+      'All 200+ skill labs',
+      'Review & explanations',
+      'Analytics & badges',
+      'Leaderboard',
+      'Certificates',
+      'Request content & features',
+    ],
+  },
+]
+
+/* ------------------------------------------------------------------ */
+/*  Plan card                                                          */
+/* ------------------------------------------------------------------ */
+
+interface PlanCardProps {
+  plan: PlanDef
+  currentTier: string
+  products: CatalogProduct[]
+  discountActive: boolean
+  onBuy: (product: CatalogProduct) => void
+  inBasket: (productId: string) => boolean
+  onSignUp: () => void
+}
+
+function PlanCard({ plan, currentTier, products, discountActive, onBuy, inBasket, onSignUp }: PlanCardProps) {
+  const navigate = useNavigate()
+  const isCurrent = currentTier === plan.tier
+  const isHigherThanCurrent =
+    (plan.tier === 'pro' && (currentTier === 'registered' || currentTier === 'visitor')) ||
+    (plan.tier === 'pro_plus' && currentTier !== 'pro_plus')
+
+  const productId = plan.monthlyProductId
+  const product = productId ? products.find((p) => p.productId === productId) : null
+  const basePrice = product?.priceGBP ?? 0
+  const discountedPrice = discountActive ? product?.discountedPriceGBP : undefined
+  const effectivePrice = discountedPrice ?? basePrice
+  const productInBasket = productId ? inBasket(productId) : false
+
+  const isPopular = plan.tier === 'pro_plus'
+  const isFree = plan.monthlyProductId === null
 
   return (
-    <div className={`relative p-4 rounded-xl border transition-all flex flex-col ${
-      product.owned
-        ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-900/10'
-        : optionLabel
-          ? 'border-primary ring-2 ring-primary/30 bg-card'
-          : 'border-border bg-card hover:border-primary'
+    <div className={`relative flex flex-col rounded-2xl border transition-all ${
+      plan.badge ? 'pt-8 px-6 pb-6' : 'p-6'
+    } ${
+      isPopular
+        ? 'border-primary ring-2 ring-primary/30 bg-card'
+        : 'border-border bg-card hover:border-primary/50'
     }`}>
-      {optionLabel && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-primary text-primary-foreground">
-          {optionLabel}
-        </div>
-      )}
-      <div className="flex items-start justify-between">
-        <div>
-          <span className="inline-block text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground mb-2">
-            {kindLabels[product.kind] ?? product.kind}
-          </span>
-          <h3 className="font-semibold text-foreground leading-snug">{product.label}</h3>
-          <p className="text-sm text-muted-foreground mt-1.5 leading-snug">{product.description}</p>
-          {product.billingPeriod && (
-            <p className="text-xs text-muted-foreground mt-2">Billed {product.billingPeriod === 'annual' ? 'annually' : 'monthly'}</p>
-          )}
-        </div>
-        <div className="text-right ml-4 flex-shrink-0">
-          <div className="text-xl font-bold text-foreground">{formatPrice(product.priceGBP)}</div>
-          {product.billingPeriod === 'monthly' && <div className="text-xs text-muted-foreground">/month</div>}
-          {product.billingPeriod === 'annual' && <div className="text-xs text-muted-foreground">/year</div>}
-          {!product.billingPeriod && product.kind !== 'subscription' && <div className="text-xs text-muted-foreground">one-off</div>}
-        </div>
-      </div>
-
-      {product.examCodes && product.examCodes.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {product.examCodes.map((c) => (
-            <span key={c} className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">
-              {c}
-            </span>
-          ))}
+      {plan.badge && (
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider whitespace-nowrap bg-primary text-primary-foreground">
+          {plan.badge}
         </div>
       )}
 
-      <div className="mt-auto pt-3">
-        {product.owned ? (
-          <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-            <Check className="w-4 h-4" /> Owned
-          </span>
-        ) : inBasket ? (
-          <span className="inline-flex items-center gap-1 w-full justify-center text-sm font-medium text-primary">
-            <ShoppingCart className="w-4 h-4" /> In basket
-          </span>
+      {/* Name + price */}
+      <div className="mb-5">
+        <h3 className="text-xl font-bold text-foreground">
+          <span className="text-primary font-extrabold mr-1">//</span>{plan.name}
+        </h3>
+        {isFree ? (
+          <div className="mt-2">
+            <div>
+              <span className="text-3xl font-extrabold text-foreground">£0</span>
+              <span className="text-muted-foreground text-sm ml-1">forever</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Register free · no card required</p>
+          </div>
         ) : (
-          <button
-            onClick={() => onBuy(product)}
-            className="w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition-all inline-flex items-center justify-center gap-1.5"
-          >
-            <ShoppingCart className="w-4 h-4" /> Add to basket
-          </button>
+          <div className="mt-2 flex items-baseline gap-2 flex-wrap">
+            {discountedPrice !== undefined ? (
+              <>
+                <span className="text-3xl font-extrabold text-foreground">{formatPrice(discountedPrice)}</span>
+                <span className="text-lg line-through text-muted-foreground">{formatPrice(basePrice)}</span>
+              </>
+            ) : (
+              <span className="text-3xl font-extrabold text-foreground">{formatPrice(basePrice)}</span>
+            )}
+            <span className="text-muted-foreground text-sm">/month</span>
+          </div>
+        )}
+        {!isFree && (
+          <p className="text-xs text-muted-foreground mt-1">Auto-renews monthly · cancel anytime</p>
         )}
       </div>
-    </div>
-  )
-}
 
-/* ------------------------------------------------------------------ */
-/*  Recommendation wizard                                              */
-/* ------------------------------------------------------------------ */
+      {/* Features */}
+      <ul className="space-y-2 mb-6 flex-1">
+        {plan.features.map((f) => (
+          <li key={f} className="flex items-start gap-2 text-sm">
+            <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+            <span className="text-foreground">{f}</span>
+          </li>
+        ))}
+        {plan.missingFeatures?.map((f) => (
+          <li key={f} className="flex items-start gap-2 text-sm">
+            <X className="w-4 h-4 text-muted-foreground/50 flex-shrink-0 mt-0.5" />
+            <span className="text-muted-foreground">{f}</span>
+          </li>
+        ))}
+      </ul>
 
-type WizardStep = 'start' | 'how-many' | 'pick-exams' | 'result'
-
-function RecommendationWizard({ products, onBuy }: { products: CatalogProduct[]; onBuy: (p: CatalogProduct) => void }) {
-  const basket = useBasket()
-  const [step, setStep] = useState<WizardStep>('start')
-  const [wantLabs, setWantLabs] = useState(false)
-  const [examCount, setExamCount] = useState<'one' | 'two' | 'three-plus' | null>(null)
-  const [pickedExams, setPickedExams] = useState<string[]>([])
-
-  const examProducts = products.filter((p) => p.kind === 'exam')
-  const availableExams = examProducts.map((p) => ({
-    code: p.examCodes?.[0] ?? p.productId.replace('exam:', ''),
-    title: p.description.replace(/ - full question bank.*$/, ''),
-  }))
-
-  const recommendation = useMemo(() => {
-    if (step !== 'result') return null
-
-    const numExams = pickedExams.length || (examCount === 'one' ? 1 : examCount === 'two' ? 2 : 3)
-
-    // Compute actual total for picked exams (falls back to catalog price * count)
-    const pickedTotal = pickedExams.length > 0
-      ? pickedExams.reduce((sum, code) => {
-          const p = products.find((p) => p.productId === `exam:${code}`)
-          return sum + (p?.priceGBP ?? 900)
-        }, 0)
-      : numExams * (examProducts[0]?.priceGBP ?? 900)
-
-    // 4+ exams, or wants labs with multiple exams -> subscription
-    if (numExams > 3 || (numExams >= 2 && wantLabs)) {
-      const annual = products.find((p) => p.productId === 'sub:all-access-annual')
-      const monthly = products.find((p) => p.productId === 'sub:all-access')
-      return {
-        primary: annual,
-        alternative: monthly,
-        reason: `With ${numExams} exams${wantLabs ? ' + skill labs' : ''}, the All-Access Annual plan is your best value at £8/month.`,
-      }
-    }
-
-    // Exactly 3 exams -> bundle:pick-3
-    if (numExams === 3) {
-      const bundle = products.find((p) => p.productId === 'bundle:pick-3')
-      const saving = pickedTotal - (bundle?.priceGBP ?? 2500)
-      return {
-        primary: bundle,
-        alternative: products.find((p) => p.productId === 'sub:all-access'),
-        reason: saving > 0
-          ? `The 3-exam pack saves you ${formatPrice(saving)} compared to buying individually.`
-          : 'The 3-exam pack gives you 1 year of access to 3 exams and 1 month of skill labs.',
-      }
-    }
-
-    // 2 exams -> bundle:pick-2
-    if (numExams === 2) {
-      const bundle = products.find((p) => p.productId === 'bundle:pick-2')
-      const saving = pickedTotal - (bundle?.priceGBP ?? 1700)
-      return {
-        primary: bundle,
-        alternative: products.find((p) => p.productId === 'sub:all-access'),
-        reason: saving > 0
-          ? `The 2-exam pack saves you ${formatPrice(saving)} compared to buying individually.`
-          : 'The 2-exam pack gives you 1 year of access to 2 exams and 1 month of skill labs.',
-      }
-    }
-
-    // 1 exam -> single exam pass
-    const match = pickedExams.length > 0
-      ? products.find((p) => p.productId === `exam:${pickedExams[0]}`)
-      : examProducts[0]
-    return {
-      primary: match,
-      alternative: products.find((p) => p.productId === 'sub:all-access'),
-      reason: 'A single Exam Pass gives you 1 year of access to the full question bank and 1 month of all provider skill labs.',
-    }
-  }, [step, pickedExams, examCount, wantLabs, products, examProducts])
-
-  useEffect(() => {
-    if (step !== 'start') clarityEvent(`wizard_step_${step}`)
-  }, [step])
-
-  function reset() {
-    setStep('start')
-    setWantLabs(false)
-    setExamCount(null)
-    setPickedExams([])
-  }
-
-  function toggleExam(code: string) {
-    setPickedExams((prev) => prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code])
-  }
-
-  return (
-    <div className="p-5 rounded-xl border border-primary/30 bg-primary/5">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-primary font-extrabold text-lg leading-none">//</span>
-        <h3 className="text-lg font-bold text-foreground">Find your plan</h3>
-      </div>
-
-      {/* Step: start */}
-      {step === 'start' && (
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">What are you looking for?</p>
-          <div className="flex flex-wrap gap-2">
-            <button onClick={() => { setWantLabs(false); setStep('how-many') }} className="px-4 py-2 rounded-lg border border-border bg-card text-sm font-medium hover:border-primary transition">
-              Practice exams
-            </button>
-            <button onClick={() => { setWantLabs(true); setStep('how-many') }} className="px-4 py-2 rounded-lg border border-border bg-card text-sm font-medium hover:border-primary transition">
-              Exams + Skill Labs
-            </button>
-            <button onClick={() => { setWantLabs(true); setExamCount('three-plus'); setStep('result') }} className="px-4 py-2 rounded-lg border border-primary bg-primary/10 text-sm font-medium text-primary hover:bg-primary/20 transition">
-              Everything - unlimited access
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Step: how-many */}
-      {step === 'how-many' && (
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">How many exams are you preparing for?</p>
-          <div className="flex flex-wrap gap-2">
-            <button onClick={() => { setExamCount('one'); setStep('pick-exams') }} className="px-4 py-2 rounded-lg border border-border bg-card text-sm font-medium hover:border-primary transition">
-              1 exam
-            </button>
-            <button onClick={() => { setExamCount('two'); setStep('pick-exams') }} className="px-4 py-2 rounded-lg border border-border bg-card text-sm font-medium hover:border-primary transition">
-              2 exams
-            </button>
-            <button onClick={() => { setExamCount('three-plus'); setStep('result') }} className="px-4 py-2 rounded-lg border border-primary bg-primary/10 text-sm font-medium text-primary hover:bg-primary/20 transition">
-              3 or more
-            </button>
-          </div>
-          <button onClick={reset} className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 mt-1">
-            <RotateCcw className="w-3 h-3" /> Start over
-          </button>
-        </div>
-      )}
-
-      {/* Step: pick-exams */}
-      {step === 'pick-exams' && (
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Which exam{examCount === 'two' ? 's' : ''} are you studying for?
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {availableExams.map((ex) => {
-              const selected = pickedExams.includes(ex.code)
-              const max = examCount === 'one' ? 1 : examCount === 'two' ? 2 : 99
-              const disabled = !selected && pickedExams.length >= max
-              return (
-                <button
-                  key={ex.code}
-                  onClick={() => !disabled && toggleExam(ex.code)}
-                  disabled={disabled}
-                  className={`text-left p-3 rounded-lg border text-sm transition ${
-                    selected
-                      ? 'border-primary bg-primary/10 text-primary font-medium'
-                      : disabled
-                        ? 'border-border bg-muted/40 text-muted-foreground cursor-not-allowed'
-                        : 'border-border bg-card hover:border-primary'
-                  }`}
-                >
-                  <span className="font-medium">{ex.title}</span>
-                  <span className="block text-xs text-muted-foreground mt-0.5">{ex.code}</span>
-                </button>
-              )
-            })}
-          </div>
-          <div className="flex items-center gap-3 mt-2">
+      {/* CTA */}
+      {isFree ? (
+        <div className="mt-auto">
+          {isCurrent ? (
+            <span className="inline-flex w-full justify-center items-center py-2.5 rounded-lg text-sm font-semibold text-muted-foreground bg-muted">
+              Your current plan
+            </span>
+          ) : (
             <button
-              onClick={() => pickedExams.length > 0 && setStep('result')}
-              disabled={pickedExams.length === 0}
-              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1"
+              onClick={onSignUp}
+              className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center justify-center bg-foreground text-background hover:bg-foreground/80"
             >
-              See recommendation <ChevronRight className="w-4 h-4" />
+              Sign up free
             </button>
-            <button onClick={reset} className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
-              <RotateCcw className="w-3 h-3" /> Start over
-            </button>
-          </div>
+          )}
         </div>
-      )}
-
-      {/* Step: result */}
-      {step === 'result' && recommendation && (
-        <div className="space-y-4">
-          <div className="flex items-start gap-2">
-            <Award className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-foreground">{recommendation.reason}</p>
-          </div>
-
-          {recommendation.primary && (
-            <ProductCard product={recommendation.primary} onBuy={onBuy} optionLabel="Option 1" inBasket={basket.has(recommendation.primary.productId)} />
-          )}
-
-          {recommendation.alternative && recommendation.alternative.productId !== recommendation.primary?.productId && (
-            <div>
-              <ProductCard product={recommendation.alternative} onBuy={onBuy} optionLabel="Option 2" inBasket={basket.has(recommendation.alternative.productId)} />
-            </div>
-          )}
-
-          <button onClick={reset} className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
-            <RotateCcw className="w-3 h-3" /> Start over
+      ) : isCurrent ? (
+        <div className="mt-auto">
+          <span className="inline-flex w-full justify-center items-center py-2.5 rounded-lg text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+            <Check className="w-4 h-4 mr-1.5" /> Current plan
+          </span>
+        </div>
+      ) : productInBasket ? (
+        <div className="mt-auto">
+          <button
+            onClick={() => navigate('/basket')}
+            className="inline-flex w-full justify-center items-center gap-1.5 py-2.5 rounded-lg text-sm font-semibold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors"
+          >
+            <ShoppingCart className="w-4 h-4" /> View in basket
           </button>
         </div>
-      )}
-    </div>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-/*  Exam provider group (collapsible)                                 */
-/* ------------------------------------------------------------------ */
-
-function ExamProviderGroup({
-  provider,
-  products,
-  onBuy,
-}: {
-  provider: string
-  products: CatalogProduct[]
-  onBuy: (p: CatalogProduct) => void
-}) {
-  // collapsed by default
-  const [open, setOpen] = useState(false)
-  const basket = useBasket()
-  return (
-    <div>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary transition w-full text-left mb-3"
-      >
-        <ChevronDown
-          className={`w-4 h-4 transition-transform ${open ? '' : '-rotate-90'}`}
-          aria-hidden
-        />
-        {provider}
-        <span className="text-xs font-normal text-muted-foreground">({products.length})</span>
-      </button>
-      {open && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map((p) => (
-            <ProductCard key={p.productId} product={p} onBuy={onBuy} inBasket={basket.has(p.productId)} />
-          ))}
-        </div>
-      )}
+      ) : product ? (
+        <button
+          onClick={() => onBuy(product)}
+          className="mt-auto w-full py-2.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center justify-center gap-1.5 bg-primary text-primary-foreground hover:bg-primary/80"
+        >
+          <ShoppingCart className="w-4 h-4" />
+          {isHigherThanCurrent ? 'Get started' : 'Add to basket'}
+        </button>
+      ) : null}
     </div>
   )
 }
@@ -407,165 +273,101 @@ function ExamProviderGroup({
 
 export default function PricingPage() {
   const navigate = useNavigate()
-  const { user, login } = useAuth()
-  const { tier, products, loading } = useEntitlements()
-  const authFetch = useAuthFetch()
+  const { user } = useAuth()
+  const { tier, products, discountActive, loading } = useEntitlements()
   const basket = useBasket()
   const { showToast } = useExam()
   const [actionError, setActionError] = useState<string | null>(null)
 
-  // Tag this session as having visited pricing
   useEffect(() => {
     clarityTag('funnel_stage', 'pricing')
     clarityEvent('pricing_page_viewed')
   }, [])
-
-  // Load available exam codes from the server and use them to defensively
-  // filter any exam products that don't have a backing JSON file.
-  const [availableExamCodes, setAvailableExamCodes] = useState<Set<string> | null>(null)
-  useEffect(() => {
-    let mounted = true
-    ;(async () => {
-      try {
-        const res = await authFetch('/exams')
-        if (!res.ok) return
-        const json = await res.json()
-        const codes = new Set<string>(json.map((e: any) => String(e.code).toUpperCase()))
-        if (mounted) setAvailableExamCodes(codes)
-      } catch (err) {
-        // ignore - we'll fallback to backend /pricing filtering
-      }
-    })()
-    return () => { mounted = false }
-  }, [authFetch])
 
   const handleBuy = (product: CatalogProduct) => {
     clarityEvent('add_to_basket')
     clarityTag('product_added', `${product.kind}:${product.productId}`)
     clarityTag('funnel_stage', 'add_to_basket')
     const ok = basket.add(product)
-    if (ok) showToast(`${product.label} added to basket`, 'info')
-    else setActionError(basket.lastError)
+    if (ok) {
+      setActionError(null)
+      showToast(`${product.label} added to basket`, 'info')
+    } else {
+      setActionError(basket.lastError)
+    }
   }
 
-  let exams = products.filter((p) => p.kind === 'exam')
-  if (availableExamCodes) {
-    exams = exams.filter((p) => (p.examCodes ?? []).some((c) => availableExamCodes.has(String(c).toUpperCase())))
-  }
-  const bundles = products.filter((p) => p.kind === 'bundle')
-  const subs = products.filter((p) => p.kind === 'subscription')
+  const tierLabel =
+    tier === 'pro_plus' ? 'Pro Plus'
+    : tier === 'pro' ? 'Pro'
+    : tier === 'registered' ? 'Free'
+    : 'Visitor'
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       {/* Header */}
       <div className="text-center">
         <h2 className="text-3xl font-extrabold">Simple, fair pricing</h2>
         <p className="text-muted-foreground mt-2 max-w-lg mx-auto">
-          Start free, upgrade when you're ready. Pay per exam or go unlimited.
+          Start free. Upgrade for full access to all practice exams and skill labs.
         </p>
         {tier && (
-          <div className="mt-3 inline-block px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
-            Your plan: <span className="font-bold capitalize">{tier === 'paying' ? 'Paid' : tier}</span>
+          <div className="mt-3 flex flex-col items-center gap-1">
+            <div className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
+              Your plan: <span className="font-bold">{tierLabel}</span>
+            </div>
+            {tier === 'visitor' && (
+              <p className="text-xs text-muted-foreground">
+                20 questions per exam &amp; 6 labs per provider, always free, no registration required
+              </p>
+            )}
           </div>
         )}
       </div>
 
-      {/* ── Recommendation wizard ── */}
-      <RecommendationWizard products={[...exams, ...bundles, ...subs]} onBuy={handleBuy} />
+      {/* Discount banner */}
+      {discountActive && (
+        <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700">
+          <Zap className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+          <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+            Limited-time offer. Discounted prices applied automatically at checkout.
+          </p>
+        </div>
+      )}
 
       {actionError && (
         <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm">
           {actionError}
+          <button className="ml-2 underline text-xs" onClick={() => setActionError(null)}>Dismiss</button>
         </div>
       )}
 
-      {/* ── Tier comparison table ── */}
-      <section>
-        <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
-          <span className="text-primary font-extrabold">//</span> What's included
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b-2 border-border">
-                <th className="py-3 px-3 text-sm font-semibold text-muted-foreground w-1/3">Feature</th>
-                <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">Visitor</th>
-                <th className="py-3 px-3 text-sm font-semibold text-center text-muted-foreground">Registered (Free)</th>
-                <th className="py-3 px-3 text-sm font-semibold text-center text-primary">Paid</th>
-              </tr>
-            </thead>
-            <tbody>
-              {FEATURES.map((f) => <FeatureRow key={f.label} f={f} />)}
-            </tbody>
-          </table>
+      {/* Plan cards */}
+      {loading ? (
+        <div className="text-center text-sm text-muted-foreground py-8">Loading plans…</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+          {PLAN_DEFS.map((plan) => (
+            <PlanCard
+              key={plan.name}
+              plan={plan}
+              currentTier={tier}
+              products={products}
+              discountActive={discountActive}
+              onBuy={handleBuy}
+              inBasket={basket.has.bind(basket)}
+              onSignUp={() => navigate('/login')}
+            />
+          ))}
         </div>
-      </section>
-
-      {loading && (
-        <div className="text-center text-sm text-muted-foreground">Loading catalog…</div>
-      )}
-
-      {/* ── All-Access subscriptions ── */}
-      {subs.length > 0 && (
-        <section>
-          <h3 className="text-lg font-bold mb-3"><span className="text-primary font-extrabold">//</span> All-Access</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {subs.map((p, i) => (
-              <ProductCard
-                key={p.productId}
-                product={p}
-                onBuy={handleBuy}
-                optionLabel={`Option ${i + 1}`}
-                inBasket={basket.has(p.productId)}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ── Exam Packs (bundles) ── */}
-      {bundles.length > 0 && (
-        <section>
-          <h3 className="text-lg font-bold mb-3"><span className="text-primary font-extrabold">//</span> Exam Packs</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {bundles.map((p) => (
-              <ProductCard key={p.productId} product={p} onBuy={handleBuy} inBasket={basket.has(p.productId)} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ── Single exam passes ── */}
-      {exams.length > 0 && (
-        <section>
-          <h3 className="text-lg font-bold mb-2"><span className="text-primary font-extrabold">//</span> Exam Passes</h3>
-          <p className="text-sm text-muted-foreground mb-4">Expand any of the providers below to see individual exam pricing</p>
-          <div className="space-y-6">
-            {Object.entries(
-              exams.reduce<Record<string, CatalogProduct[]>>((acc, p) => {
-                const provRaw = (p.provider ?? '').toString().trim()
-                let prov = 'Other'
-                if (provRaw) {
-                  const up = provRaw.toLowerCase()
-                  if (up === 'aws' || up.includes('amazon')) prov = 'AWS'
-                  else if (up === 'azure') prov = 'Azure'
-                  else prov = provRaw
-                }
-                acc[prov] = acc[prov] ?? []
-                acc[prov].push(p)
-                return acc
-              }, {})
-            ).map(([prov, provProducts]) => (
-              <ExamProviderGroup key={prov} provider={prov} products={provProducts} onBuy={handleBuy} />
-            ))}
-          </div>
-        </section>
       )}
 
       {/* Not logged in CTA */}
       {!user && (
         <div className="text-center p-6 rounded-xl border border-dashed border-border bg-muted/40">
-          <p className="text-muted-foreground mb-3">Register for free to unlock more questions, labs, analytics, and unlimited saved attempts.</p>
+          <p className="text-muted-foreground mb-3">
+            Register for free to unlock 40 questions per exam, analytics, badges, and unlimited saved attempts.
+          </p>
           <button
             onClick={() => navigate('/login')}
             className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-semibold"
@@ -574,6 +376,7 @@ export default function PricingPage() {
           </button>
         </div>
       )}
+
     </div>
   )
 }

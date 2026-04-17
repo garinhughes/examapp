@@ -2,19 +2,20 @@
  * useEntitlements - hook to fetch the user's tier + entitlements from the backend.
  *
  * Returns:
- *   tier       - 'visitor' | 'registered' | 'paying'
- *   tierConfig - full tier feature flags
- *   entitlements - list of active product IDs
- *   products   - full catalog with `owned` flag per product
- *   loading    - true while fetching
- *   refresh()  - re-fetch entitlements
+ *   tier          - 'visitor' | 'registered' | 'pro' | 'pro_plus'
+ *   tierConfig    - full tier feature flags
+ *   entitlements  - list of active product IDs
+ *   products      - full catalog with `owned` and optional `discountedPriceGBP` per product
+ *   discountActive - true when a discount is currently active
+ *   loading       - true while fetching
+ *   refresh()     - re-fetch entitlements
  */
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { useAuthFetch } from '../auth/useAuthFetch'
 
-export type Tier = 'visitor' | 'registered' | 'paying'
+export type Tier = 'visitor' | 'registered' | 'pro' | 'pro_plus'
 
 export interface TierConfig {
   tier: Tier
@@ -31,13 +32,13 @@ export interface TierConfig {
 
 export interface CatalogProduct {
   productId: string
-  kind: 'exam' | 'bundle' | 'subscription' | 'extra'
+  kind: 'subscription' | 'one-off' | 'extra'
   label: string
   description: string
   priceGBP: number
-  billingPeriod?: 'monthly' | 'annual'
-  examCodes?: string[]
-  provider?: string
+  /** Set when a discount is active — the effective price to charge. */
+  discountedPriceGBP?: number
+  billingPeriod?: 'monthly'
   owned: boolean
 }
 
@@ -47,21 +48,27 @@ interface EntitlementState {
   entitlements: string[]
   products: CatalogProduct[]
   tiers: TierConfig[]
+  discountActive: boolean
   loading: boolean
   refresh: () => void
+}
+
+/** Returns true if the user is on a paid plan (Pro or Pro Plus). */
+export function isPaidTier(tier: Tier | null | undefined): boolean {
+  return tier === 'pro' || tier === 'pro_plus'
 }
 
 const DEFAULT_TIER_CONFIG: TierConfig = {
   tier: 'visitor',
   label: 'Free / Visitor',
-  questionLimit: 10,
+  questionLimit: 20,
   attemptLimit: 0,
   reviewEnabled: false,
   exportEnabled: false,
   leaderboardEnabled: false,
   domainMasteryEnabled: false,
   trialDays: null,
-  labShowcaseCount: 3,
+  labShowcaseCount: 6,
 }
 
 export function useEntitlements(): EntitlementState {
@@ -73,12 +80,14 @@ export function useEntitlements(): EntitlementState {
     entitlements: string[]
     products: CatalogProduct[]
     tiers: TierConfig[]
+    discountActive: boolean
   }>({
     tier: user ? 'registered' : 'visitor',
     tierConfig: DEFAULT_TIER_CONFIG,
     entitlements: [],
     products: [],
     tiers: [],
+    discountActive: false,
   })
   const [loading, setLoading] = useState(true)
 
@@ -94,6 +103,7 @@ export function useEntitlements(): EntitlementState {
           entitlements: json.entitlements ?? [],
           products: json.products ?? [],
           tiers: json.tiers ?? [],
+          discountActive: json.discountActive ?? false,
         })
       }
     } catch {

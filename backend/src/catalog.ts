@@ -7,7 +7,7 @@
 /*  Tiers                                                              */
 /* ------------------------------------------------------------------ */
 
-export type Tier = 'visitor' | 'registered' | 'paying'
+export type Tier = 'visitor' | 'registered' | 'pro' | 'pro_plus'
 
 export interface TierConfig {
   tier: Tier
@@ -45,7 +45,7 @@ export const TIERS: Record<Tier, TierConfig> = {
   },
   registered: {
     tier: 'registered',
-    label: 'Registered (Free)',
+    label: 'Free',
     questionLimit: 40,
     attemptLimit: null,
     reviewEnabled: true,
@@ -53,11 +53,23 @@ export const TIERS: Record<Tier, TierConfig> = {
     leaderboardEnabled: false,
     domainMasteryEnabled: false,
     trialDays: null,
+    labShowcaseCount: 6,
+  },
+  pro: {
+    tier: 'pro',
+    label: 'Pro',
+    questionLimit: null,
+    attemptLimit: null,
+    reviewEnabled: true,
+    exportEnabled: true,
+    leaderboardEnabled: true,
+    domainMasteryEnabled: true,
+    trialDays: null,
     labShowcaseCount: 12,
   },
-  paying: {
-    tier: 'paying',
-    label: 'Paid',
+  pro_plus: {
+    tier: 'pro_plus',
+    label: 'Pro Plus',
     questionLimit: null,
     attemptLimit: null,
     reviewEnabled: true,
@@ -69,129 +81,50 @@ export const TIERS: Record<Tier, TierConfig> = {
   },
 }
 
+/** Returns true if the tier has a paid plan (Pro or Pro Plus). */
+export function isPaidTier(tier: Tier): boolean {
+  return tier === 'pro' || tier === 'pro_plus'
+}
+
 /* ------------------------------------------------------------------ */
 /*  Products                                                           */
 /* ------------------------------------------------------------------ */
 
-export type ProductKind = 'exam' | 'bundle' | 'subscription' | 'extra'
+export type ProductKind = 'subscription' | 'one-off' | 'extra' // 'one-off' kept for backward-compat with existing entitlement records
 
 export interface Product {
-  /** e.g. "exam:SAA-C03", "bundle:aws", "sub:all-access" */
+  /** e.g. "sub:pro", "sub:pro-plus", "sub:pro-oneoff" */
   productId: string
   kind: ProductKind
   label: string
   description: string
-  /** Price in pence (GBP) - e.g. 300 = £3.00 */
+  /** Price in pence (GBP) - e.g. 800 = £8.00 */
   priceGBP: number
   /** If subscription, the billing period */
-  billingPeriod?: 'monthly' | 'annual'
-  /** If bundle, list of exam codes included */
-  examCodes?: string[]
-  /** Cloud provider — used to group exam passes in the UI */
-  provider?: string
-  /** Months of full skill lab access granted on purchase (null = none) */
-  labMonths?: number | null
+  billingPeriod?: 'monthly'
 }
 
 /**
- * Master product list.
+ * Master product list — subscriptions only.
+ *
+ * subscription  — recurring monthly payment (Stripe recurring / PayPal Billing Plan)
  */
 export const PRODUCTS: Product[] = [
-  // -- Single exams (Exam Pass - £9 each, 1 year question bank; AWS exams include 1 month skill labs) --
   {
-    productId: 'exam:SAA-C03',
-    kind: 'exam',
-    label: 'Exam Pass - SAA-C03',
-    description: 'AWS Solutions Architect Associate - full question bank for 1 year + all AWS skill labs for 1 month',
-    priceGBP: 900,
-    examCodes: ['SAA-C03'],
-    provider: 'AWS',
-    labMonths: 1,
-  },
-  {
-    productId: 'exam:AIF-C01',
-    kind: 'exam',
-    label: 'Exam Pass - AIF-C01',
-    description: 'AWS Certified AI Practitioner - full question bank for 1 year + all AWS skill labs for 1 month',
-    priceGBP: 900,
-    examCodes: ['AIF-C01'],
-    provider: 'AWS',
-    labMonths: 1,
-  },
-  {
-    productId: 'exam:CLF-C02',
-    kind: 'exam',
-    label: 'Exam Pass - CLF-C02',
-    description: 'AWS Cloud Practitioner - full question bank for 1 year + all AWS skill labs for 1 month',
-    priceGBP: 900,
-    examCodes: ['CLF-C02'],
-    provider: 'AWS',
-    labMonths: 1,
-  },
-  {
-    productId: 'exam:SCS-C03',
-    kind: 'exam',
-    label: 'Exam Pass - SCS-C03',
-    description: 'AWS Security Specialty - full question bank for 1 year + all AWS skill labs for 1 month',
-    priceGBP: 900,
-    examCodes: ['SCS-C03'],
-    provider: 'AWS',
-    labMonths: 1,
-  },
-  {
-    productId: 'exam:CCA-F',
-    kind: 'exam',
-    label: 'Exam Pass - CCA-F',
-    description: 'Claude Certified Architect - Foundations - full question bank for 1 year + all Anthropic skill labs for 1 month',
-    priceGBP: 900,
-    examCodes: ['CCA-F'],
-    provider: 'Anthropic',
-    labMonths: 1,
-  },
-  {
-    productId: 'exam:PT0-003',
-    kind: 'exam',
-    label: 'Exam Pass - PT0-003',
-    description: 'CompTIA PenTest+ - full question bank for 1 year',
-    priceGBP: 900,
-    examCodes: ['PT0-003'],
-    provider: 'CompTIA',
-  },
-
-  // -- Bundles (Exam Pack - pick 2 for £17, pick 3 for £25) --
-  {
-    productId: 'bundle:pick-2',
-    kind: 'bundle',
-    label: 'Exam Pack - Any 2 Exams',
-    description: 'Choose any 2 practice exams (1 year) + provider skill labs for 1 month (save over individual purchases)',
-    priceGBP: 1700,
-    labMonths: 1,
-  },
-  {
-    productId: 'bundle:pick-3',
-    kind: 'bundle',
-    label: 'Exam Pack - Any 3 Exams',
-    description: 'Choose any 3 practice exams (1 year) + provider skill labs for 1 month (best multi-exam value)',
-    priceGBP: 2500,
-    labMonths: 1,
-  },
-
-  // -- Subscription (All-Access) --
-  {
-    productId: 'sub:all-access',
+    productId: 'sub:pro',
     kind: 'subscription',
-    label: 'All-Access Monthly',
-    description: 'Unlimited access to every exam, all skill labs, certificates, leaderboard & more',
-    priceGBP: 1000,
+    label: 'Pro',
+    description: 'Full access to all practice exams and 80+ skill labs. Cancel anytime.',
+    priceGBP: 700,
     billingPeriod: 'monthly',
   },
   {
-    productId: 'sub:all-access-annual',
+    productId: 'sub:pro-plus',
     kind: 'subscription',
-    label: 'All-Access Annual',
-    description: 'Unlimited access - billed annually at £8/mo (save 20%)',
-    priceGBP: 9600,
-    billingPeriod: 'annual',
+    label: 'Pro Plus',
+    description: 'Full access to all practice exams and all skill labs. Cancel anytime.',
+    priceGBP: 900,
+    billingPeriod: 'monthly',
   },
 ]
 
@@ -203,46 +136,20 @@ export function getProduct(productId: string): Product | undefined {
   return PRODUCTS.find((p) => p.productId === productId)
 }
 
-/**
- * Returns true if the user currently has full skill lab access.
- * Active subscriptions grant unlimited lab access.
- * One-time exam/bundle purchases grant lab access via a time-limited extra:lab-access entitlement.
- */
-export function hasLabAccess(ownedProductIds: string[]): boolean {
-  if (ownedProductIds.some((id) => id.startsWith('sub:'))) return true
-  return ownedProductIds.includes('extra:lab-access')
-}
-
-/** Given a set of product IDs the user owns, does that grant access to the exam? */
-export function hasExamAccess(ownedProductIds: string[], examCode: string): boolean {
-  // Direct exam purchase
-  if (ownedProductIds.includes(`exam:${examCode}`)) return true
-
-  // Bundle that includes this exam
-  for (const pid of ownedProductIds) {
-    const prod = getProduct(pid)
-    if (prod?.kind === 'bundle' && prod.examCodes?.includes(examCode)) return true
-  }
-
-  // Active subscription (all-access)
-  if (ownedProductIds.some((id) => id.startsWith('sub:'))) return true
-
-  return false
-}
-
 /** Resolve the effective tier for a user */
 export function resolveUserTier(opts: {
   isAuthenticated: boolean
   ownedProductIds: string[]
+  /** @deprecated No longer used — kept for call-site compatibility */
   examCode?: string
 }): Tier {
   if (!opts.isAuthenticated) return 'visitor'
 
-  // If they have any active entitlement for the exam (or a subscription), they're 'paying' for that exam
-  if (opts.examCode && hasExamAccess(opts.ownedProductIds, opts.examCode)) return 'paying'
+  const ids = opts.ownedProductIds
 
-  // If they have any subscription at all they're paying-tier everywhere
-  if (opts.ownedProductIds.some((id) => id.startsWith('sub:'))) return 'paying'
+  // Pro Plus wins over Pro
+  if (ids.includes('sub:pro-plus') || ids.includes('sub:pro-plus-oneoff')) return 'pro_plus'
+  if (ids.includes('sub:pro') || ids.includes('sub:pro-oneoff')) return 'pro'
 
   return 'registered'
 }

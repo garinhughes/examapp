@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { useAuthFetch } from '../auth/useAuthFetch'
 import { useGamification } from '../gamification/GamificationContext'
-import { useEntitlements } from '../hooks/useEntitlements'
+import { useEntitlements, isPaidTier } from '../hooks/useEntitlements'
 import CertificateOptions from './CertificateOptions'
 import CertificatePreview, { type CertOptions } from './CertificatePreview'
 
@@ -47,13 +47,13 @@ export default function CertificatesTab() {
   }, [])
 
   // Paywall
-  if (tier !== 'paying') {
+  if (!isPaidTier(tier)) {
     return (
       <div className="p-6 rounded-xl border border-border bg-card text-center">
         <div className="text-4xl mb-3">🔒</div>
-        <h3 className="text-lg font-semibold mb-1">Certificates are a paid feature</h3>
+        <h3 className="text-lg font-semibold mb-1">Certificates are a Pro feature</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Upgrade to a paid plan to generate and download personalised achievement certificates.
+          Upgrade to Pro or Pro Plus to generate and download personalised achievement certificates.
         </p>
         <a
           href="/pricing"

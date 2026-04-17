@@ -2,19 +2,25 @@
  * Pricing routes — public endpoint that returns the product catalog
  * and the user's current tier/entitlements (if authenticated).
  *
- * GET /pricing          — returns catalog + tier info
+ * GET /pricing          — returns catalog + tier info + discount status
  * GET /pricing/my-tier  — returns current user's tier + entitlements (authed)
  */
 
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { PRODUCTS, TIERS, resolveUserTier, type Tier } from '../catalog.js'
 import { getActiveProductIds } from '../services/entitlements.js'
-import { loadAllExams } from '../examLoader.js'
+
+/** Returns discounted price in pence when DISCOUNT_ACTIVE=true, otherwise undefined. */
+function getDiscountedPrice(productId: string): number | undefined {
+  if (process.env.DISCOUNT_ACTIVE !== 'true') return undefined
+  if (productId === 'sub:pro') return 600           // £6/mo
+  if (productId === 'sub:pro-plus') return 700      // £7/mo
+  return undefined
+}
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   /** Public: return the full product catalog */
   server.get('/', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request) => { // codeql[js/missing-rate-limiting]
-    // optionalAuth + resolveEntitlements are registered globally or per-route
     await server.optionalAuth(request, {} as any)
 
     const isAuthenticated = !!request.user
@@ -26,35 +32,24 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     const tier: Tier = resolveUserTier({ isAuthenticated, ownedProductIds })
-
-    // Only surface exam products that have actual JSON data on disk
-    const allExams = await loadAllExams()
-    const availableExamCodes = new Set(allExams.map((e) => String((e as any).code).toUpperCase()))
-
-    const visibleProducts = PRODUCTS.filter((p) => {
-      if (p.kind === 'exam') {
-        const code = p.productId.replace('exam:', '').toUpperCase()
-        return availableExamCodes.has(code)
-      }
-      return true
-    })
+    const discountActive = process.env.DISCOUNT_ACTIVE === 'true'
 
     return {
       tier,
       tierConfig: TIERS[tier],
       entitlements: ownedProductIds,
-      products: visibleProducts.map((p) => ({
+      products: PRODUCTS.map((p) => ({
         productId: p.productId,
         kind: p.kind,
         label: p.label,
         description: p.description,
         priceGBP: p.priceGBP,
+        discountedPriceGBP: getDiscountedPrice(p.productId),
         billingPeriod: p.billingPeriod,
-        examCodes: p.examCodes,
-        provider: p.provider,
         owned: ownedProductIds.includes(p.productId),
       })),
       tiers: Object.values(TIERS),
+      discountActive,
     }
   })
 

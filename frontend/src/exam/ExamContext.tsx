@@ -959,7 +959,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     try { localStorage.setItem('theme', dark ? 'dark' : 'light') } catch {}
   }, [dark])
 
-  // Fetch global user tier (paying / registered / visitor) - independent of any exam
+  // Fetch global user tier (pro_plus / pro / registered / visitor) - independent of any exam
   useEffect(() => {
     if (!user) { setUserTier(null); setTrialDaysRemaining(null); return }
     authFetch('/auth/me')

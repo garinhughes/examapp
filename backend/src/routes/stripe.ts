@@ -1,5 +1,5 @@
 /**
- * Stripe routes — Checkout Sessions for one-time and subscription payments.
+ * Stripe routes — Checkout Sessions for subscription payments.
  *
  * POST /payments/create-checkout  - create a Stripe Checkout Session
  * POST /payments/webhook          - handle Stripe webhook events
@@ -7,10 +7,12 @@
  * GET  /payments/cancel           - post-payment cancel landing
  *
  * Environment variables:
- *   STRIPE_SECRET_KEY        - Stripe secret key (sk_test_... or sk_live_...)
- *   STRIPE_WEBHOOK_SECRET    - Stripe webhook signing secret (whsec_...)
- *   STRIPE_PRICE_ID_MONTHLY  - Stripe Price ID for All-Access Monthly subscription
- *   STRIPE_PRICE_ID_ANNUAL   - Stripe Price ID for All-Access Annual subscription
+ *   STRIPE_SECRET_KEY              - Stripe secret key (sk_test_... or sk_live_...)
+ *   STRIPE_WEBHOOK_SECRET          - Stripe webhook signing secret (whsec_...)
+ *   STRIPE_PRICE_ID_PRO_MONTHLY    - Stripe Price ID for Pro monthly subscription
+ *   STRIPE_PRICE_ID_PRO_PLUS_MONTHLY - Stripe Price ID for Pro Plus monthly subscription
+ *   DISCOUNT_ACTIVE                - Set to "true" to apply discount
+ *   STRIPE_COUPON_ID_DISCOUNT      - Stripe coupon ID to apply when DISCOUNT_ACTIVE=true
  */
 
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
@@ -92,9 +94,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
    * Create a Stripe Checkout Session.
    * Returns { url } — the hosted Stripe checkout page to redirect the customer to.
    *
-   * One-time items use mode=payment with inline price_data.
-   * Subscription items use mode=subscription with pre-created Stripe Price IDs.
-   * A basket cannot mix subscription and one-time items (Stripe limitation).
+   * Uses mode=subscription with pre-created Stripe Price IDs.
    */
   server.post(
     '/create-checkout',
@@ -120,73 +120,51 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       const successRedirect = successUrl || `${base}/payments/success`
       const cancelRedirect = cancelUrl || `${base}/payments/cancel`
 
-      const hasSubscription = products.some((p) => p.kind === 'subscription')
+      const subProduct = products.find((p) => p.kind === 'subscription')
+      if (!subProduct) {
+        return reply.status(400).send({ message: 'Only subscription products are supported' })
+      }
 
       try {
-        let session: any
+        const discountActive = process.env.DISCOUNT_ACTIVE === 'true'
 
-        if (hasSubscription) {
-          // Subscription mode — requires pre-created Stripe Price IDs
-          const subProduct = products.find((p) => p.kind === 'subscription')!
-          const priceId =
-            subProduct.productId === 'sub:all-access'
-              ? process.env.STRIPE_PRICE_ID_MONTHLY
-              : process.env.STRIPE_PRICE_ID_ANNUAL
+        const priceId =
+          subProduct.productId === 'sub:pro'
+            ? process.env.STRIPE_PRICE_ID_PRO_MONTHLY
+            : subProduct.productId === 'sub:pro-plus'
+            ? process.env.STRIPE_PRICE_ID_PRO_PLUS_MONTHLY
+            : undefined
 
-          if (!priceId) {
-            return reply.status(503).send({
-              message: `Stripe Price ID not configured for ${subProduct.productId}. Set STRIPE_PRICE_ID_MONTHLY or STRIPE_PRICE_ID_ANNUAL.`,
-            })
-          }
-
-          session = await stripePost('/checkout/sessions', {
-            mode: 'subscription',
-            line_items: [{ price: priceId, quantity: 1 }],
-            success_url: successRedirect,
-            cancel_url: cancelRedirect,
-            metadata: {
-              userId: userId ?? '',
-              productIds: JSON.stringify(productIds),
-            },
-            subscription_data: {
-              metadata: {
-                userId: userId ?? '',
-                productIds: JSON.stringify(productIds),
-              },
-            },
-          })
-        } else {
-          // One-time payment mode — inline price_data per product.
-          // Exams that are children of a bundle in the same order are
-          // entitlement-only (the bundle covers the charge), so exclude them.
-          const bundleExamCodes = new Set(
-            products
-              .filter((p) => p.kind === 'bundle')
-              .flatMap((p) => (p.examCodes ?? []).map((c) => `exam:${c}`))
-          )
-          const lineItems = products
-            .filter((prod) => !bundleExamCodes.has(prod.productId))
-            .map((prod) => ({
-              price_data: {
-                currency: 'gbp',
-                unit_amount: prod.priceGBP,
-                product_data: { name: prod.label },
-              },
-              quantity: 1,
-            }))
-
-          session = await stripePost('/checkout/sessions', {
-            mode: 'payment',
-            line_items: lineItems,
-            success_url: successRedirect,
-            cancel_url: cancelRedirect,
-            metadata: {
-              userId: userId ?? '',
-              productIds: JSON.stringify(productIds),
-            },
+        if (!priceId) {
+          return reply.status(503).send({
+            message: `Stripe Price ID not configured for ${subProduct.productId}. Set STRIPE_PRICE_ID_PRO_MONTHLY or STRIPE_PRICE_ID_PRO_PLUS_MONTHLY.`,
           })
         }
 
+        const sessionParams: Record<string, any> = {
+          mode: 'subscription',
+          line_items: [{ price: priceId, quantity: 1 }],
+          success_url: successRedirect,
+          cancel_url: cancelRedirect,
+          metadata: {
+            userId: userId ?? '',
+            productIds: JSON.stringify(productIds),
+          },
+          subscription_data: {
+            metadata: {
+              userId: userId ?? '',
+              productIds: JSON.stringify(productIds),
+            },
+          },
+        }
+
+        // Apply discount coupon if enabled
+        const couponId = discountActive ? process.env.STRIPE_COUPON_ID_DISCOUNT : undefined
+        if (couponId) {
+          sessionParams.discounts = [{ coupon: couponId }]
+        }
+
+        const session = await stripePost('/checkout/sessions', sessionParams)
         server.log.info({ sessionId: session.id, userId }, '[stripe] checkout session created')
         return { url: session.url }
       } catch (err: any) {
@@ -272,30 +250,18 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           const userId: string = metadata.userId
           const productIds: string[] = JSON.parse(metadata.productIds ?? '[]')
           if (userId && productIds.length > 0) {
-            let maxLabMonths = 0
             for (const pid of productIds) {
               const prod = getProduct(pid)
-              const isSubscription = prod?.kind === 'subscription'
+              // one-off products grant 30 days; subscriptions grant via invoice.payment_succeeded
+              const expiresAt = prod?.kind === 'one-off'
+                ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                : null
               await grantEntitlement({
                 userId,
                 productId: pid,
                 kind: prod?.kind ?? 'extra',
-                expiresAt: isSubscription
-                  ? null
-                  : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+                expiresAt,
                 meta: { source: 'stripe.checkout.session.completed', stripeSessionId: session.id },
-              })
-              if (prod?.labMonths && prod.labMonths > maxLabMonths) maxLabMonths = prod.labMonths
-            }
-            // Grant time-limited lab access if any purchased product includes lab months
-            if (maxLabMonths > 0) {
-              const labExpiresAt = new Date(Date.now() + maxLabMonths * 30 * 24 * 60 * 60 * 1000).toISOString()
-              await grantEntitlement({
-                userId,
-                productId: 'extra:lab-access',
-                kind: 'extra',
-                expiresAt: labExpiresAt,
-                meta: { source: 'stripe.checkout.session.completed', stripeSessionId: session.id, labMonths: maxLabMonths },
               })
             }
             server.log.info({ userId, productIds, sessionId: session.id }, '[stripe] entitlements granted')
@@ -303,18 +269,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             try {
               const user = await getUserBySub(userId)
               if (user?.email) {
-                const bundleExamCodesEmail = new Set(
-                  productIds
-                    .map((pid) => getProduct(pid))
-                    .filter((p) => p?.kind === 'bundle')
-                    .flatMap((p) => (p!.examCodes ?? []).map((c) => `exam:${c}`))
-                )
-                const emailProducts = productIds
-                  .filter((pid) => !bundleExamCodesEmail.has(pid))
-                  .map((pid) => {
-                    const p = getProduct(pid)
-                    return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
-                  })
+                const emailProducts = productIds.map((pid) => {
+                  const p = getProduct(pid)
+                  return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
+                })
                 const totalPence = session.amount_total ?? emailProducts.reduce((s, p) => s + p.priceGBP, 0)
                 sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId, products: emailProducts, totalPence, source: 'stripe' })
                   .then(() => logEmailSend({ type: 'payment-confirmed', sentBy: 'stripe-webhook', templateId: 'payment-confirmed', recipientCount: 1, subject: 'Your certshack order is confirmed', filters: { productIds } }))
