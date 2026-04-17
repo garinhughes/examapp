@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
+import { Flag } from 'lucide-react'
 import { Confetti, RewardModal } from '../components/Confetti'
 import { useExam } from './ExamContext'
 
-export function Modals() {
+export function Modals({ onReviewAnswers }: { onReviewAnswers?: () => void }) {
   const {
     paused, setPaused, examStarted, timed,
     showCancelConfirm, setShowCancelConfirm,
@@ -106,12 +107,12 @@ export function Modals() {
             </div>
             {displayQuestions.filter(q => flaggedQuestions.has(q.id)).length > 0 && (
               <div className="text-sm text-primary mb-2">
-                🚩 You have {displayQuestions.filter(q => flaggedQuestions.has(q.id)).length} flagged question(s). Review them before submitting?
+                <Flag className="w-3.5 h-3.5 inline-block mr-1" />You have {displayQuestions.filter(q => flaggedQuestions.has(q.id)).length} flagged question(s). Review them before submitting?
               </div>
             )}
             <div className="text-sm text-muted-foreground mb-4">Once submitted, you cannot change your answers.</div>
             <div className="flex items-center justify-end gap-3">
-              <button className="px-3 py-1 rounded bg-accent text-muted-foreground hover:bg-accent" onClick={() => setShowSubmitConfirm(false)}>Review answers</button>
+              <button className="px-3 py-1 rounded bg-accent text-muted-foreground hover:bg-accent" onClick={() => { setShowSubmitConfirm(false); if (displayQuestions.some(q => flaggedQuestions.has(q.id))) onReviewAnswers?.() }}>Review answers</button>
               <button className="px-4 py-1.5 rounded bg-primary text-white font-semibold hover:bg-primary/80" onClick={() => handleSubmitExam(false)}>Submit</button>
             </div>
           </div>
@@ -137,7 +138,7 @@ export function Modals() {
                   </div>
                   {flaggedCount > 0 && (
                     <div className="text-sm text-primary mb-2">
-                      🚩 You have {flaggedCount} flagged question{flaggedCount > 1 ? 's' : ''}. Review them before completing?
+                      <Flag className="w-3.5 h-3.5 inline-block mr-1" />You have {flaggedCount} flagged question{flaggedCount > 1 ? 's' : ''}. Review them before completing?
                     </div>
                   )}
                   <div className="text-sm text-muted-foreground mb-4">
@@ -147,7 +148,7 @@ export function Modals() {
               )
             })()}
             <div className="flex items-center justify-end gap-3">
-              <button className="px-3 py-1 rounded bg-accent text-muted-foreground hover:bg-accent" onClick={() => setShowCompleteEarlyConfirm(false)}>Keep going</button>
+              <button className="px-3 py-1 rounded bg-accent text-muted-foreground hover:bg-accent" onClick={() => { setShowCompleteEarlyConfirm(false); if (displayQuestions.some(q => flaggedQuestions.has(q.id))) onReviewAnswers?.() }}>{displayQuestions.some(q => flaggedQuestions.has(q.id)) ? 'Review Flagged' : 'Keep going'}</button>
               <button className="px-4 py-1.5 rounded bg-primary text-white font-semibold hover:bg-primary/80" onClick={() => handleSubmitExam(true)}>Complete &amp; Score</button>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { X, Check, ExternalLink, Lightbulb, Volume2, VolumeX } from 'lucide-react'
+import { X, Check, ExternalLink, Lightbulb, Volume2, VolumeX, Flag, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { clarityEvent } from '@/clarity'
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
@@ -11,12 +11,12 @@ import type { QuestionType } from './types'
 
 export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
   const {
-    displayQuestions, currentQuestionIndex, selectedAnswers, multiSelectPending, setMultiSelectPending,
+    displayQuestions, currentQuestionIndex, setCurrentQuestionIndex, selectedAnswers, multiSelectPending, setMultiSelectPending,
     matchingAnswers, setMatchingAnswers, orderingAnswers, setOrderingAnswers,
     flaggedQuestions, setFlaggedQuestions, revealedQuestions, setRevealedQuestions,
     stagedAnswer, setStagedAnswer, showTipMap, setShowTipMap,
     isFinished, revealAnswers, dndSensors, ttsEnabled,
-    submitAnswer, submitMatchingAnswer, submitOrderingAnswer, setCurrentQuestionIndex,
+    submitAnswer, submitMatchingAnswer, submitOrderingAnswer,
     setSelectedAnswers,
   } = useExam()
 
@@ -120,20 +120,22 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
                         })
                         if (!wasFlagged) {
                           clarityEvent('question_flagged')
-                          setCurrentQuestionIndex((idx) => Math.min(displayQuestions.length - 1, idx + 1))
                         }
                       }}
                       title={flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}
-                      className={`h-8 text-sm px-2 rounded font-medium transition-colors ${flaggedQuestions.has(q.id) ? 'bg-primary text-white' : 'bg-accent text-primary border border-border'}`}
+                      className={`h-8 text-sm px-2 rounded font-medium transition-colors inline-flex items-center gap-1.5 ${flaggedQuestions.has(q.id) ? 'bg-primary text-white' : 'bg-accent text-primary border border-border'}`}
                     >
-                      🚩{!focusMode && ` ${flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review'}`}
+                      <Flag className="w-3.5 h-3.5 shrink-0" />{!focusMode && (flaggedQuestions.has(q.id) ? 'Unflag' : 'Flag for Review')}
                     </button>
                   </>
                 )}
               </div>
               {q.tip && !isFinished && showTipMap[q.id] && (
-                <div className="mt-2 p-2.5 rounded-lg bg-muted/50 border border-border text-sm text-foreground">
-                  <strong>💡 Tip:</strong> {q.tip}
+                <div className="mt-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 text-sm">
+                  <div className="flex items-start gap-2">
+                    <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                    <p className="text-foreground"><span className="font-semibold text-amber-700 dark:text-amber-400">Tip:</span> {q.tip}</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -344,7 +346,7 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
                     else if (isSelected && !isCorrectChoice) bg = 'bg-red-50 dark:bg-red-900/25'
                   } else if (isStagedChoice) {
                     bg = 'bg-primary text-primary-foreground'
-                  } else if (answered && isSelected) {
+                  } else if (answered && isSelected && !hasStaged) {
                     bg = 'bg-primary text-primary-foreground'
                   } else if (isMultiSelect && isSelected) {
                     bg = 'bg-primary text-primary-foreground'
@@ -369,13 +371,9 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
                             })
                             return
                           }
-                          if (immediateMode && !answered) {
-                            setStagedAnswer((prev) => ({ ...prev, [q.id]: c.id }))
-                            return
-                          }
-                          submitAnswer(q, c.id)
+                          setStagedAnswer((prev) => ({ ...prev, [q.id]: c.id }))
                         }}
-                        className={`flex-1 text-left px-3 py-2.5 rounded-lg border ${showFeedback && answered ? (isCorrectChoice ? 'border-green-500/50 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-500/50 dark:border-red-500/30' : 'border-border/60 dark:border-border/60') : isStagedChoice ? 'border-primary dark:border-primary' : isSelected ? 'border-primary dark:border-primary' : 'border-border/60 dark:border-border/60'} ${bg} ${(isStagedChoice || isSelected) && !showFeedback ? 'hover:bg-primary/90' : 'hover:bg-muted'} flex items-start gap-2.5 transition-colors`}
+                        className={`flex-1 text-left px-3 py-2.5 rounded-lg border ${showFeedback && answered ? (isCorrectChoice ? 'border-green-500/50 dark:border-green-500/30' : isSelected && !isCorrectChoice ? 'border-red-500/50 dark:border-red-500/30' : 'border-border/60 dark:border-border/60') : isStagedChoice ? 'border-primary dark:border-primary' : (isSelected && !hasStaged) ? 'border-primary dark:border-primary' : 'border-border/60 dark:border-border/60'} ${bg} ${(isStagedChoice || (isSelected && !hasStaged)) && !showFeedback ? 'hover:bg-primary/90' : 'hover:bg-muted'} flex items-start gap-2.5 transition-colors`}
                       >
                         {showFeedback && answered ? (
                           <span className="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">
@@ -387,12 +385,12 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
                             }
                           </span>
                         ) : (
-                          <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold flex-shrink-0 mt-0.5 ${isStagedChoice ? 'bg-primary text-primary-foreground' : isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                          <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold flex-shrink-0 mt-0.5 ${isStagedChoice ? 'bg-primary text-primary-foreground' : (isSelected && !hasStaged) ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
                             {String.fromCharCode(65 + i)}
                           </span>
                         )}
                         <span className="flex-1 min-w-0 overflow-hidden">
-                          <span className={`block min-w-0 break-words ${isSelected ? 'font-semibold' : ''}`}>{renderChoiceContent(c, q, true)}</span>
+                          <span className={`block min-w-0 break-words ${(isSelected && !hasStaged) || isStagedChoice ? 'font-semibold' : ''}`}>{renderChoiceContent(c, q, true)}</span>
                           {showFeedback && answered && isSelected && !isCorrectChoice && <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">your answer</span>}
                           {showFeedback && answered && !isSelected && isCorrectChoice && <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">correct answer</span>}
                         </span>
@@ -429,15 +427,15 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
               </ol>
             )}
 
-            {/* Single-select Submit Answer button (immediate reveal mode) */}
-            {immediateMode && !isMultiSelect && qType !== 'matching' && qType !== 'ordering' && hasStaged && !answered && !isFinished && (
+            {/* Single-select Submit Answer button */}
+            {!isMultiSelect && qType !== 'matching' && qType !== 'ordering' && hasStaged && !isFinished && !questionLocked && (
               <div className="mt-3">
                 <button
                   className="px-4 py-2 rounded-md font-semibold text-sm bg-primary text-white hover:bg-primary/80 transition-colors"
                   onClick={async () => {
                     clarityEvent('answer_submitted')
                     await submitAnswer(q, staged!)
-                    setRevealedQuestions((prev) => new Set(prev).add(q.id))
+                    if (immediateMode) setRevealedQuestions((prev) => new Set(prev).add(q.id))
                     setStagedAnswer((prev) => { const next = { ...prev }; delete next[q.id]; return next })
                   }}
                 >
@@ -473,7 +471,7 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
                 {q.explanation && (
                   <div className="p-2 rounded bg-muted/50 dark:bg-card text-foreground">
                     {(q.domain || (q.skills && q.skills.length > 0)) && (
-                      <div className="mb-2 flex flex-col gap-0.5 text-xs">
+                      <div className="mb-2 flex flex-col gap-0.5 text-sm">
                         {q.domain && <span><span className="font-medium text-orange-500">Domain:</span> <span className="text-gray-600 dark:text-gray-400">{q.domain}</span></span>}
                         {q.skills && q.skills.length > 0 && <span><span className="font-medium text-orange-500">Skill:</span> <span className="text-gray-600 dark:text-gray-400">{q.skills.join(', ')}</span></span>}
                       </div>
@@ -506,6 +504,26 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
                     {q.image && <QuestionImage imageKey={q.image} />}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Bottom prev/next — shown after answer revealed in casual mode */}
+            {immediateMode && showFeedback && answered && !isFinished && (
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  onClick={() => setCurrentQuestionIndex((i) => Math.max(0, i - 1))}
+                  disabled={currentQuestionIndex <= 0}
+                  className={`rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 inline-flex items-center gap-1 ${focusMode ? 'p-1.5' : 'px-3 py-1'}`}
+                >
+                  <ChevronLeft className="w-4 h-4" />{!focusMode && 'Prev'}
+                </button>
+                <button
+                  onClick={() => setCurrentQuestionIndex((i) => Math.min(displayQuestions.length - 1, i + 1))}
+                  disabled={currentQuestionIndex >= displayQuestions.length - 1}
+                  className={`rounded-md bg-primary text-white text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors inline-flex items-center gap-1 ${focusMode ? 'p-1.5' : 'px-3 py-1'}`}
+                >
+                  {!focusMode && 'Next'}<ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             )}
           </article>

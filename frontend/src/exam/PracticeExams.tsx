@@ -1,13 +1,13 @@
 import { useExam } from './ExamContext'
-import { Play, Info, Activity, ChevronDown, ChevronRight, X, Search } from 'lucide-react'
+import { Info, Activity, ChevronDown, ChevronRight, Search } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTourContext } from '@/components/TourProvider'
 
 export function PracticeExams() {
   const {
     providers, examStarted, anySavedExam, selected, savedProgress,
-    setupExamFromMeta, resumeExam, setSelected, setRoute,
-    user, authLoading, setShowCancelConfirm, showToast,
+    setupExamFromMeta, setSelected, setRoute,
+    user, authLoading,
   } = useExam()
   const tour = useTourContext()
   const [collapsedProviders, setCollapsedProviders] = useState<Set<string>>(new Set())
@@ -34,29 +34,6 @@ export function PracticeExams() {
 
   return (
     <div className="mb-6">
-      {/* Resume banner */}
-      {anySavedExam && !examStarted && (
-        <div className="mb-4 p-4 rounded-lg bg-card border border-border shadow-sm flex items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-md flex items-center justify-center bg-primary/10 text-primary text-lg flex-shrink-0">
-              <Play className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="font-semibold text-foreground">Exam in progress</div>
-              <div className="text-sm text-muted-foreground">{anySavedExam.title} - {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition" onClick={() => resumeExam(anySavedExam.code)}>
-              <Play className="w-4 h-4" /> Resume
-            </button>
-            <button className="px-3 py-1 rounded-md bg-muted text-muted-foreground border border-border text-sm inline-flex items-center gap-1.5 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition" onClick={() => setShowCancelConfirm(true)}>
-              <X className="w-4 h-4" /> Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="space-y-6">
         <div className="relative mb-1">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />

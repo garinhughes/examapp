@@ -26,6 +26,31 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const userId = extractUserId(request)
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
 
+    // Idempotent start: if the user already has an in-progress attempt for this exam, return it.
+    // Cross-device resume relies on this — opening "Start Exam" on a second device picks up where they left off.
+    // If the user has an in-progress attempt for a DIFFERENT exam, block with 409 so the client can prompt
+    // to resume or cancel (belt-and-braces: UI already disables the Setup button in this state).
+    if (!userId.startsWith('visitor:')) {
+      try {
+        const existing = await attemptsStore.listInProgressByUser(userId)
+        const match = existing.find((a: any) => a.examCode === examCode)
+        if (match) return { attemptId: match.attemptId, startedAt: match.startedAt, resumed: true }
+        const other = existing.find((a: any) => a.examCode && a.examCode !== examCode)
+        if (other) {
+          request.log.info({ userId, requestedExam: examCode, inProgressExam: other.examCode, inProgressAttemptId: other.attemptId }, '[attempts] 409 — blocked new exam start; another is in progress')
+          return reply.status(409).send({
+            error: 'exam-in-progress',
+            message: 'You already have an exam in progress. Resume or cancel it before starting another.',
+            attemptId: other.attemptId,
+            examCode: other.examCode,
+          })
+        }
+      } catch (err) {
+        // GSI may not be populated yet during rollout — don't block attempt creation
+        console.warn('[attempts] listInProgressByUser failed, continuing:', err)
+      }
+    }
+
     const id = randomUUID()
     const now = new Date().toISOString()
     // build per-attempt question set if metadata.filterKeywords provided
@@ -42,8 +67,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         const userAttempts = await attemptsStore.listByUser(userId)
         const finishedForExam = userAttempts.filter((a: any) => a.examCode === examCode && a.finishedAt)
         if (finishedForExam.length >= tierConfig.attemptLimit) {
+          request.log.info({ userId, examCode, tier, limit: tierConfig.attemptLimit, used: finishedForExam.length }, '[attempts] 403 — attempt limit reached')
           return reply.status(403).send({
-            message: `Attempt limit reached. You can save up to ${tierConfig.attemptLimit} attempt${tierConfig.attemptLimit === 1 ? '' : 's'} per exam on your current plan.`
+            error: 'attempt-limit-reached',
+            message: `Attempt limit reached. You can save up to ${tierConfig.attemptLimit} attempt${tierConfig.attemptLimit === 1 ? '' : 's'} per exam on your current plan.`,
+            limit: tierConfig.attemptLimit,
+            tier,
           })
         }
       }
@@ -137,7 +166,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       s3VersionId: (exam as any)?.s3VersionId ?? null,
       attemptSchemaVersion: 1,
       startedAt: now,
+      updatedAt: now,
       finishedAt: null,
+      status: 'in-progress',
       score: null,
       answers: [] as any[],
       metadata: body?.metadata ?? null,
@@ -146,8 +177,60 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     await attemptsStore.put(attempt)
+    request.log.info({ userId, examCode, attemptId: id, questionCount: shuffled.length, mode: body?.metadata?.mode ?? 'standard' }, '[attempts] started')
 
     return { attemptId: id, startedAt: now }
+  })
+
+  // List in-progress attempts for the current user (used by the "Exam in progress" top bar)
+  server.get('/in-progress', { preHandler: [server.authenticate], config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const userId = request.user?.sub
+    if (!userId) return { attempts: [] }
+    try {
+      const items = await attemptsStore.listInProgressByUser(userId)
+      const attempts = items.map((a: any) => ({
+        attemptId: a.attemptId,
+        examCode: a.examCode,
+        answeredCount: Array.isArray(a.answers) ? a.answers.length : 0,
+        total: Array.isArray(a.questions) ? a.questions.length : (a.numQuestions ?? 0),
+        updatedAt: a.updatedAt ?? a.startedAt ?? null,
+        examMode: a.examMode ?? null,
+        timed: a.timed ?? null,
+      }))
+      return { attempts }
+    } catch (err) {
+      console.error('[attempts] /in-progress failed', err)
+      return reply.status(500).send({ message: 'failed to list in-progress attempts' })
+    }
+  })
+
+  // Patch UI/progress fields on an in-progress attempt (cross-device resume)
+  server.patch('/:id/progress', { preHandler: [server.optionalAuth], config: { rateLimit: { max: 240, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { id } = request.params as any
+    const userId = extractUserId(request)
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
+    const attempt = await attemptsStore.get(userId, id)
+    if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
+    if (attempt.userId !== userId) return reply.status(403).send({ message: 'forbidden' })
+    if (attempt.finishedAt) return reply.status(400).send({ message: 'attempt already finished' })
+
+    const body = (request.body as any) ?? {}
+    // Whitelisted, typed fields only
+    const allowed: Record<string, any> = {}
+    if (typeof body.currentIndex === 'number') allowed.currentIndex = body.currentIndex
+    if (Array.isArray(body.flags)) allowed.flags = body.flags.map((x: any) => String(x))
+    if (typeof body.timeLeft === 'number' || body.timeLeft === null) allowed.timeLeft = body.timeLeft
+    if (typeof body.timed === 'boolean') allowed.timed = body.timed
+    if (typeof body.durationMinutes === 'number') allowed.durationMinutes = body.durationMinutes
+    if (typeof body.numQuestions === 'number') allowed.numQuestions = body.numQuestions
+    if (['casual', 'timed', 'weakest-link', 'weakest-link-timed'].includes(body.examMode)) allowed.examMode = body.examMode
+    if (['immediately', 'on-completion'].includes(body.revealAnswers)) allowed.revealAnswers = body.revealAnswers
+    allowed.updatedAt = new Date().toISOString()
+    // Ensure status is set (covers legacy rows written before this field existed)
+    if (!attempt.status) allowed.status = 'in-progress'
+
+    await attemptsStore.updateProgress(userId, id, allowed)
+    return { updated: true, updatedAt: allowed.updatedAt }
   })
 
   // List all attempts (filtered to current user)
@@ -289,6 +372,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } else {
       attempt.answers.push(answerRecord)
     }
+    attempt.updatedAt = new Date().toISOString()
+    if (!attempt.status) attempt.status = 'in-progress'
     await attemptsStore.put(attempt)
 
     return { answer: answerRecord, correct: !!isCorrect }
@@ -358,6 +443,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     attempt.finishedAt = new Date().toISOString()
+    attempt.updatedAt = attempt.finishedAt
+    attempt.status = 'finished'
     attempt.score = score
     attempt.perDomain = perDomain
     if (earlyComplete) {
@@ -367,6 +454,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     await attemptsStore.put(attempt)
+    request.log.info({ userId, examCode: attempt.examCode, attemptId: attempt.attemptId, score, answeredCount, totalQuestions, earlyComplete }, '[attempts] finished')
 
     // Fire-and-forget metrics aggregation — failures must not break the attempt response
     updateMetricsOnAttemptFinish({

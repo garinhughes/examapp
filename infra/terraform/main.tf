@@ -66,8 +66,15 @@ module "dynamodb" {
   source  = "./modules/dynamodb"
   project = var.project
   tables = {
-    users              = { table_name = "${var.project}-users", hash_key = "userId" }
-    attempts           = { table_name = "${var.project}-attempts", hash_key = "userId", range_key = "attemptId" }
+    users = { table_name = "${var.project}-users", hash_key = "userId" }
+    attempts = {
+      table_name = "${var.project}-attempts"
+      hash_key   = "userId"
+      range_key  = "attemptId"
+      gsis = [
+        { name = "status-index", hash_key = "userId", range_key = "status", projection_type = "ALL" }
+      ]
+    }
     gamification       = { table_name = "${var.project}-gamification", hash_key = "userId", range_key = "SK" }
     exams_index        = { table_name = "${var.project}-exams-index", hash_key = "examCode" }
     entitlements       = { table_name = "${var.project}-entitlements", hash_key = "userId", range_key = "productId" }
@@ -182,22 +189,22 @@ module "ecs" {
   email_templates_table  = module.dynamodb.table_names["email_templates"]
   email_logs_table       = module.dynamodb.table_names["email_logs"]
 
-  paypal_client_id          = "AbyHVazM-r_fPb1CgQa0j5nwTtdMawkxoHGa2Dxd9PavViGd1G4Z0qTiHONgx1hUMC7ONUYKLBbrU4wa"
-  paypal_api_base           = "https://api-m.paypal.com"
-  paypal_plan_id_pro_monthly       = ""   # Set after creating PayPal billing plan for Pro
-  paypal_plan_id_pro_plus_monthly  = ""   # Set after creating PayPal billing plan for Pro Plus
-  paypal_plan_id_pro_discount      = ""   # Set when running a promotion (discounted Pro plan)
-  paypal_plan_id_pro_plus_discount = ""   # Set when running a promotion (discounted Pro Plus plan)
+  paypal_client_id                 = "AbyHVazM-r_fPb1CgQa0j5nwTtdMawkxoHGa2Dxd9PavViGd1G4Z0qTiHONgx1hUMC7ONUYKLBbrU4wa"
+  paypal_api_base                  = "https://api-m.paypal.com"
+  paypal_plan_id_pro_monthly       = "" # Set after creating PayPal billing plan for Pro
+  paypal_plan_id_pro_plus_monthly  = "" # Set after creating PayPal billing plan for Pro Plus
+  paypal_plan_id_pro_discount      = "" # Set when running a promotion (discounted Pro plan)
+  paypal_plan_id_pro_plus_discount = "" # Set when running a promotion (discounted Pro Plus plan)
   paypal_webhook_id                = "3B392581WH426842V"
   paypal_client_secret_arn         = module.secretsmanager.paypal_client_secret_arn
   stripe_secret_key_arn            = module.secretsmanager.stripe_secret_key_arn
   stripe_webhook_secret_arn        = module.secretsmanager.stripe_webhook_secret_arn
   cron_secret                      = module.secretsmanager.cron_secret_arn
   unsubscribe_secret               = module.secretsmanager.unsubscribe_secret_arn
-  stripe_price_id_pro_monthly      = ""   # Set after creating Stripe recurring Price for Pro
-  stripe_price_id_pro_plus_monthly = ""   # Set after creating Stripe recurring Price for Pro Plus
+  stripe_price_id_pro_monthly      = "" # Set after creating Stripe recurring Price for Pro
+  stripe_price_id_pro_plus_monthly = "" # Set after creating Stripe recurring Price for Pro Plus
   discount_active                  = "false"
-  stripe_coupon_id_discount        = ""   # Set when running a promotion
+  stripe_coupon_id_discount        = "" # Set when running a promotion
 
   depends_on = [module.acm]
 }
@@ -282,22 +289,6 @@ module "route53" {
     "zoho-verification=zb15270861.zmverify.zoho.eu",
   ]
 }
-
-# ==========================================================================
-# PayPal / Apple Pay: domain verification file served via CloudFront + S3
-# ==========================================================================
-# Upload the domain association file that Apple requires for Apple Pay.
-# Content is sourced from infra/terraform/apple-developer-merchantid-domain-association
-# (no file extension). Obtain this file from the PayPal dashboard after
-# registering your domain for Apple Pay under Payment Methods → Apple Pay.
-resource "aws_s3_object" "apple_pay_domain_association" {
-  bucket       = module.s3.bucket_name
-  key          = ".well-known/apple-developer-merchantid-domain-association"
-  source       = "${path.module}/apple-developer-merchantid-domain-association"
-  content_type = "application/json"
-  etag         = filemd5("${path.module}/apple-developer-merchantid-domain-association")
-}
-
 
 module "ses" {
   source  = "./modules/ses"

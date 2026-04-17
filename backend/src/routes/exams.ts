@@ -3,7 +3,7 @@ import fs from 'fs/promises'
 import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS, isPaidTier } from '../catalog.js'
 import { computeDomainWeights, selectWeakestLinkQuestions, type DomainStats } from '../services/weakestLink.js'
-import { loadAllExams, loadExam, shuffleQuestions, getShowcaseQuestions } from '../examLoader.js'
+import { loadAllExams, loadExam, shuffleQuestions, getShowcaseQuestions, getDomainBalancedQuestions } from '../examLoader.js'
 
 const attemptsFile = new URL('../../data/attempts.json', import.meta.url)
 
@@ -87,8 +87,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           showcase: true,
         }
       }
-      // fallback: random slice (exam has no showcaseQuestionIds)
-      const pool = allQuestions.slice(0, showcaseCount)
+      // fallback: domain-balanced selection so visitors/free users see variety across all domains
+      const pool = getDomainBalancedQuestions(allQuestions, showcaseCount)
       return {
         questions: shuffleQuestions(pool),
         tier,

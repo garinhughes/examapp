@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ChevronLeft, Clock, Timer, Coffee, Lock, ArrowRight, X, Play } from 'lucide-react'
+import { ChevronLeft, Clock, Hourglass, Coffee, Lock, ArrowRight, X, Play } from 'lucide-react'
 import Loader from '@/components/Loader'
 import { useExam } from '@/exam/ExamContext'
 import { clarityEvent, clarityTag } from '@/clarity'
@@ -98,13 +98,15 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
   return (
     <div className="max-w-2xl space-y-4">
       {/* Back link */}
-      <button
-        onClick={() => setRoute('skill-labs')}
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
-      >
-        <ChevronLeft className="w-4 h-4" />
-        Skill Labs
-      </button>
+      <div className="flex justify-end">
+        <button
+          onClick={() => setRoute('skill-labs')}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Skill Labs
+        </button>
+      </div>
 
       {/* Lab info card */}
       <div className="p-5 rounded-lg border border-border bg-card shadow-sm space-y-4">
@@ -187,7 +189,7 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
                     timed ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  <Timer className="w-3.5 h-3.5" />
+                  <Hourglass className="w-3.5 h-3.5" />
                   Timed
                 </button>
               </div>

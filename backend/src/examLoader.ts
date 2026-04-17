@@ -295,8 +295,38 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
+ * Pick `count` questions spread evenly across domains via round-robin.
+ * Handles exams where questions were added incrementally by skill/domain,
+ * preventing the first N questions from all belonging to the same domain.
+ */
+export function getDomainBalancedQuestions(questions: any[], count: number): any[] {
+  const byDomain = new Map<string, any[]>()
+  for (const q of questions) {
+    const domain = String(q.domain ?? 'unknown')
+    if (!byDomain.has(domain)) byDomain.set(domain, [])
+    byDomain.get(domain)!.push(q)
+  }
+  // Keep natural file order within each domain — pool is deterministic, shuffleQuestions handles per-session order
+  const buckets = Array.from(byDomain.values())
+  const result: any[] = []
+  const cursors = new Array(buckets.length).fill(0)
+  outer: while (result.length < count) {
+    let added = false
+    for (let i = 0; i < buckets.length; i++) {
+      if (result.length >= count) break outer
+      if (cursors[i] < buckets[i].length) {
+        result.push(buckets[i][cursors[i]++])
+        added = true
+      }
+    }
+    if (!added) break // all buckets exhausted
+  }
+  return result
+}
+
+/**
  * Return a fixed, ordered slice of hand-picked showcase questions for non-paying tiers.
- * Returns null if the exam has no showcaseQuestionIds (caller falls back to random slice).
+ * Returns null if the exam has no showcaseQuestionIds (caller falls back to balanced selection).
  */
 export function getShowcaseQuestions(exam: any, count: number): any[] | null {
   const ids: (number | string)[] | undefined = exam.showcaseQuestionIds

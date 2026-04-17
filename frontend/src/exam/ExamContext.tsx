@@ -152,6 +152,8 @@ export interface ExamContextType {
   setTimeLeft: React.Dispatch<React.SetStateAction<number | null>>
   numQuestions: number
   setNumQuestions: React.Dispatch<React.SetStateAction<number>>
+  visitedQuestions: Set<string>
+  setVisitedQuestions: React.Dispatch<React.SetStateAction<Set<string>>>
 
   // Filters
   serviceFilterText: string
@@ -192,7 +194,8 @@ export interface ExamContextType {
   submitOrderingAnswer: (q: Question, order: string[]) => Promise<void>
   finishAttempt: (aid: string) => Promise<void>
   handleSubmitExam: (earlyComplete?: boolean) => Promise<void>
-  resumeExam: (examCode?: string) => void
+  resumeExam: (examCode?: string) => Promise<void>
+  serverInProgress: Array<{ attemptId: string; examCode: string; answeredCount: number; total: number; updatedAt: string | null }>
   saveExamProgress: () => void
   downloadAttemptCSV: () => void
   downloadAttemptPDF: () => void
@@ -384,6 +387,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const [loadingWeakestLink, setLoadingWeakestLink] = useState<boolean>(false)
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [numQuestions, setNumQuestions] = useState<number>(0)
+  const [visitedQuestions, setVisitedQuestions] = useState<Set<string>>(new Set())
   const [showCancelConfirm, setShowCancelConfirm] = useState<boolean>(false)
   const [savedExamVersion, setSavedExamVersion] = useState<number>(0)
 
@@ -397,6 +401,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const serviceDropRef = useRef<HTMLDivElement>(null)
   const serviceDropToggleRef = useRef<HTMLButtonElement>(null)
   const resumingRef = useRef<boolean>(false)
+  const serverSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (!serviceDropOpen) return
@@ -475,7 +480,14 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     } catch { return null }
   }, [selected, examStarted, savedExamVersion])
 
+  // Server-side in-progress attempts (populated via useEffect below).
+  // Enables cross-device resume: even if localStorage is empty on this device, the banner still appears.
+  const [serverInProgress, setServerInProgress] = useState<Array<{ attemptId: string; examCode: string; answeredCount: number; total: number; updatedAt: string | null }>>([])
+
   const anySavedExam = useMemo(() => {
+    type Candidate = { code: string; title: string; answeredCount: number; total: number; ts: number }
+    const candidates: Candidate[] = []
+    // Local (works offline, covers visitors)
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i)
@@ -490,11 +502,28 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         const age = Date.now() - (saved.timestamp || 0)
         if (age > 24 * 60 * 60 * 1000) { localStorage.removeItem(key); continue }
         const meta = exams.find((e: any) => e.code === code)
-        return { code, title: meta?.title ?? code, answeredCount, total }
+        candidates.push({ code, title: meta?.title ?? code, answeredCount, total, ts: saved.timestamp || 0 })
       }
     } catch {}
-    return null
-  }, [selected, examStarted, savedProgress, exams, savedExamVersion])
+    // Server (cross-device)
+    for (const s of serverInProgress) {
+      const meta = exams.find((e: any) => e.code === s.examCode)
+      const ts = s.updatedAt ? Date.parse(s.updatedAt) : 0
+      // Merge: if local already has this exam, prefer whichever is newer
+      const existingIdx = candidates.findIndex((c) => c.code === s.examCode)
+      if (existingIdx >= 0) {
+        if (ts > candidates[existingIdx].ts) {
+          candidates[existingIdx] = { code: s.examCode, title: meta?.title ?? s.examCode, answeredCount: s.answeredCount, total: s.total, ts }
+        }
+      } else {
+        candidates.push({ code: s.examCode, title: meta?.title ?? s.examCode, answeredCount: s.answeredCount, total: s.total, ts })
+      }
+    }
+    if (candidates.length === 0) return null
+    candidates.sort((a, b) => b.ts - a.ts)
+    const top = candidates[0]
+    return { code: top.code, title: top.title, answeredCount: top.answeredCount, total: top.total }
+  }, [selected, examStarted, savedProgress, exams, savedExamVersion, serverInProgress])
 
   const providers = useMemo(() => {
     const byProvider: Record<string, any[]> = {}
@@ -533,14 +562,19 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       })
       result.push({ provider: prov, exams: cards })
     }
-    const levelOrder: Record<string, number> = {
+    const levelOrderStr: Record<string, number> = {
       Foundational: 0, Fundamentals: 0,
       Associate: 1,
       Professional: 2, Expert: 2,
       Specialty: 3,
     }
+    const getLevel = (ex: any): number => {
+      if (typeof ex.level === 'number') return ex.level
+      if (typeof ex.level === 'string') return levelOrderStr[ex.level] ?? 99
+      return 99
+    }
     for (const p of result) {
-      p.exams.sort((a: any, b: any) => (levelOrder[a.level] ?? 99) - (levelOrder[b.level] ?? 99))
+      p.exams.sort((a: any, b: any) => getLevel(a) - getLevel(b))
     }
     return result
   }, [exams])
@@ -557,6 +591,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     setExamMode('casual')
     setRevealAnswers('immediately')
     setRevealedQuestions(new Set<string>())
+    setVisitedQuestions(new Set<string>())
     setStagedAnswer({})
     try {
       const def = ex.defaultQuestions ?? ex.defaultQuestionCount ?? (ex.provider === 'AWS' ? 65 : (ex.questions?.length || 10))
@@ -614,6 +649,26 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     } catch { return fallback }
   }
 
+  async function handleInProgressConflict(res: Response) {
+    try {
+      const data = await res.json()
+      if (data?.error === 'exam-in-progress' && data.examCode) {
+        setLastError(`You already have ${data.examCode} in progress. Resume or cancel it before starting another exam.`)
+      } else {
+        setLastError('You already have an exam in progress. Resume or cancel it before starting another.')
+      }
+    } catch {
+      setLastError('You already have an exam in progress. Resume or cancel it before starting another.')
+    }
+    try {
+      const r = await authFetch('/attempts/in-progress')
+      if (r.ok) {
+        const d = await r.json()
+        setServerInProgress(Array.isArray(d?.attempts) ? d.attempts : [])
+      }
+    } catch {}
+  }
+
   async function createAttempt() {
     if (!selected) return
     setSelectedAnswers({})
@@ -624,16 +679,18 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     setShowSubmitConfirm(false)
     setShowCompleteEarlyConfirm(false)
     setRevealedQuestions(new Set<string>())
+    setVisitedQuestions(new Set<string>())
     setStagedAnswer({})
     try { localStorage.removeItem(`examProgress:${selected}`) } catch {}
     const key = `attempt:${selected}`
 
     // Visitor mode still uses the server API (answers stored under visitor UUID)
-    if (!user && examMode === 'weakest-link') { setLastError('Sign in to use Weakest Link mode - it needs your attempt history.'); return }
+    const isWL = examMode === 'weakest-link' || examMode === 'weakest-link-timed'
+    if (!user && isWL) { setLastError('Sign in to use Weakest Link mode - it needs your attempt history.'); return }
 
     try {
       // Weakest Link mode
-      if (examMode === 'weakest-link') {
+      if (isWL) {
         setLoadingWeakestLink(true)
         try {
           const wlRes = await authFetch(`/exams/${encodeURIComponent(selected)}/weakest-link?count=${numQuestions}`)
@@ -649,6 +706,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
               metadata: { mode: 'weakest-link', domainWeights: wlData.domainWeights, wrongQuestionCount: wlData.wrongQuestionCount }
             })
           })
+          if (res.status === 409) { await handleInProgressConflict(res); return }
           if (!res.ok) { setLastError(await extractErrorMessage(res, 'create attempt failed')); return }
           const data = await res.json()
           if (data?.attemptId) {
@@ -663,6 +721,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
                 setAttemptData(attemptFull)
                 setNumQuestions((attemptFull.questions || wlQuestions).length)
                 setExamStarted(true)
+                if (examMode === 'weakest-link-timed') setTimeLeft(durationMinutes * 60)
                 return
               }
             } catch {}
@@ -672,6 +731,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
             setAttemptData({ questions: wlQuestions, attemptId: data.attemptId, examCode: selected })
             setNumQuestions(wlQuestions.length)
             setExamStarted(true)
+            if (examMode === 'weakest-link-timed') setTimeLeft(durationMinutes * 60)
           }
         } finally { setLoadingWeakestLink(false) }
         return
@@ -893,34 +953,77 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }
 
-  function resumeExam(examCode?: string) {
+  async function resumeExam(examCode?: string) {
     const code = examCode ?? selected
     if (!code) return
     const key = `examProgress:${code}`
     try {
-      const raw = localStorage.getItem(key)
-      if (!raw) return
-      const saved = JSON.parse(raw)
+      const raw = (() => { try { return localStorage.getItem(key) } catch { return null } })()
+      const localSaved = raw ? JSON.parse(raw) : null
+
+      // If logged in, check whether the server has a newer copy (cross-device resume).
+      let serverAttempt: any = null
+      if (user) {
+        const match = serverInProgress.find((s) => s.examCode === code)
+        if (match) {
+          const serverTs = match.updatedAt ? Date.parse(match.updatedAt) : 0
+          const localTs = localSaved?.timestamp ?? 0
+          if (!localSaved || serverTs > localTs) {
+            try {
+              const r = await authFetch(`/attempts/${match.attemptId}`)
+              if (r.ok) serverAttempt = await r.json()
+            } catch {}
+          }
+        }
+      }
+
+      // Nothing to resume from either source
+      if (!localSaved && !serverAttempt) return
+
       resumingRef.current = true
       if (code !== selected) setSelected(code)
       setRoute('home')
-      setSelectedAnswers(saved.answers || {})
-      setFlaggedQuestions(new Set(saved.flagged || []))
-      setCurrentQuestionIndex(saved.currentIndex || 0)
-      if (typeof saved.numQuestions === 'number') setNumQuestions(saved.numQuestions)
-      if (typeof saved.timed === 'boolean') setTimed(saved.timed)
-      if (typeof saved.durationMinutes === 'number') setDurationMinutes(saved.durationMinutes)
-      if (saved.timed && typeof saved.timeLeft === 'number') setTimeLeft(saved.timeLeft)
-      if (saved.examMode) setExamMode(saved.examMode)
-      if (saved.revealAnswers) setRevealAnswers(saved.revealAnswers)
-      if (saved.attemptId) { setAttemptId(saved.attemptId) }
-      else if (!user) { setAttemptId(`visitor-${Date.now()}`) }
-      // Restore question order — re-sort the loaded questions to match the saved sequence
-      if (Array.isArray(saved.questionIds) && saved.questionIds.length > 0 && questions.length > 0) {
-        const qMap = new Map(questions.map((q) => [String(q.id), q]))
-        const ordered = (saved.questionIds as string[]).map((id) => qMap.get(id)).filter(Boolean) as Question[]
-        if (ordered.length > 0) setQuestions(ordered)
+
+      if (serverAttempt) {
+        // Rehydrate from server snapshot
+        const ans: Record<string, string | string[]> = {}
+        for (const a of (serverAttempt.answers || [])) {
+          if (a.selectedChoiceIds && Array.isArray(a.selectedChoiceIds)) ans[a.questionId] = a.selectedChoiceIds
+          else if (a.selectedChoiceId) ans[a.questionId] = a.selectedChoiceId
+        }
+        setSelectedAnswers(ans)
+        setFlaggedQuestions(new Set(serverAttempt.flags ?? []))
+        setCurrentQuestionIndex(typeof serverAttempt.currentIndex === 'number' ? serverAttempt.currentIndex : 0)
+        if (typeof serverAttempt.numQuestions === 'number') setNumQuestions(serverAttempt.numQuestions)
+        else if (Array.isArray(serverAttempt.questions)) setNumQuestions(serverAttempt.questions.length)
+        if (typeof serverAttempt.timed === 'boolean') setTimed(serverAttempt.timed)
+        if (typeof serverAttempt.durationMinutes === 'number') setDurationMinutes(serverAttempt.durationMinutes)
+        if (serverAttempt.timed && typeof serverAttempt.timeLeft === 'number') setTimeLeft(serverAttempt.timeLeft)
+        if (serverAttempt.examMode) setExamMode(serverAttempt.examMode)
+        if (serverAttempt.revealAnswers) setRevealAnswers(serverAttempt.revealAnswers)
+        setAttemptId(serverAttempt.attemptId)
+        if (Array.isArray(serverAttempt.questions) && serverAttempt.questions.length > 0) {
+          setQuestions(serverAttempt.questions as Question[])
+        }
+      } else if (localSaved) {
+        setSelectedAnswers(localSaved.answers || {})
+        setFlaggedQuestions(new Set(localSaved.flagged || []))
+        setCurrentQuestionIndex(localSaved.currentIndex || 0)
+        if (typeof localSaved.numQuestions === 'number') setNumQuestions(localSaved.numQuestions)
+        if (typeof localSaved.timed === 'boolean') setTimed(localSaved.timed)
+        if (typeof localSaved.durationMinutes === 'number') setDurationMinutes(localSaved.durationMinutes)
+        if (localSaved.timed && typeof localSaved.timeLeft === 'number') setTimeLeft(localSaved.timeLeft)
+        if (localSaved.examMode) setExamMode(localSaved.examMode)
+        if (localSaved.revealAnswers) setRevealAnswers(localSaved.revealAnswers)
+        if (localSaved.attemptId) { setAttemptId(localSaved.attemptId) }
+        else if (!user) { setAttemptId(`visitor-${Date.now()}`) }
+        if (Array.isArray(localSaved.questionIds) && localSaved.questionIds.length > 0 && questions.length > 0) {
+          const qMap = new Map(questions.map((q) => [String(q.id), q]))
+          const ordered = (localSaved.questionIds as string[]).map((id) => qMap.get(id)).filter(Boolean) as Question[]
+          if (ordered.length > 0) setQuestions(ordered)
+        }
       }
+
       setExamStarted(true)
       setTimeout(() => { resumingRef.current = false }, 100)
     } catch (err) { console.error('resumeExam error', err); resumingRef.current = false }
@@ -1054,7 +1157,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
 
   // Timer
   useEffect(() => {
-    if (!examStarted || examMode !== 'timed') return
+    if (!examStarted || (examMode !== 'timed' && examMode !== 'weakest-link-timed')) return
     if (timeLeft === null) return
     if (paused) return
     const id = setInterval(() => {
@@ -1065,6 +1168,13 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     }, 1000)
     return () => clearInterval(id)
   }, [examStarted, examMode, timeLeft, attemptId, paused])
+
+  // Track visited questions as user navigates
+  useEffect(() => {
+    if (!examStarted || isFinished || displayQuestions.length === 0) return
+    const q = displayQuestions[currentQuestionIndex]
+    if (q) setVisitedQuestions(prev => prev.has(q.id) ? prev : new Set(prev).add(q.id))
+  }, [currentQuestionIndex, examStarted, isFinished, displayQuestions])
 
   // Auto-save progress
   useEffect(() => {
@@ -1080,13 +1190,85 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         questionIds: displayQuestions.map((q) => String(q.id)),
       }))
     } catch {}
+    // Server sync for cross-device resume — debounced. Only for authenticated users with a real server attempt.
+    if (user && attemptId && !attemptId.startsWith('visitor-')) {
+      if (serverSaveTimerRef.current) clearTimeout(serverSaveTimerRef.current)
+      serverSaveTimerRef.current = setTimeout(() => {
+        authFetch(`/attempts/${attemptId}/progress`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            currentIndex: currentQuestionIndex,
+            flags: Array.from(flaggedQuestions),
+            timeLeft: timed ? timeLeft : null,
+            timed,
+            durationMinutes,
+            numQuestions: displayQuestions.length,
+            examMode: examMode ?? 'casual',
+            revealAnswers: revealAnswers ?? 'immediately',
+          }),
+        }).catch((err) => console.warn('[progress sync] failed', err))
+      }, 5000)
+    }
   }, [selectedAnswers, flaggedQuestions, currentQuestionIndex, examStarted, selected, isFinished, timeLeft, displayQuestions])
+
+  // Flush pending server progress sync on unmount / tab hide so we don't lose the last few seconds
+  useEffect(() => {
+    const flush = () => {
+      if (serverSaveTimerRef.current) { clearTimeout(serverSaveTimerRef.current); serverSaveTimerRef.current = null }
+      if (!user || !attemptId || attemptId.startsWith('visitor-') || !examStarted || isFinished) return
+      // Use keepalive fetch so the request survives tab close
+      try {
+        const body = JSON.stringify({
+          currentIndex: currentQuestionIndex,
+          flags: Array.from(flaggedQuestions),
+          timeLeft: timed ? timeLeft : null,
+          timed,
+          durationMinutes,
+          numQuestions: displayQuestions.length,
+          examMode: examMode ?? 'casual',
+          revealAnswers: revealAnswers ?? 'immediately',
+        })
+        authFetch(`/attempts/${attemptId}/progress`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+          keepalive: true,
+        } as any).catch(() => {})
+      } catch {}
+    }
+    const onHide = () => { if (document.visibilityState === 'hidden') flush() }
+    document.addEventListener('visibilitychange', onHide)
+    window.addEventListener('pagehide', flush)
+    return () => {
+      document.removeEventListener('visibilitychange', onHide)
+      window.removeEventListener('pagehide', flush)
+    }
+  }, [user, attemptId, examStarted, isFinished, currentQuestionIndex, flaggedQuestions, timeLeft, timed, durationMinutes, displayQuestions, examMode, revealAnswers])
+
+  // Fetch server-side in-progress attempts so the "Exam in progress" banner appears on any device.
+  // Refreshes when user logs in/out, or when navigating to a page that shows the banner.
+  useEffect(() => {
+    if (!user) { setServerInProgress([]); return }
+    let cancelled = false
+    authFetch('/attempts/in-progress')
+      .then((r) => r.ok ? r.json() : { attempts: [] })
+      .then((d) => { if (!cancelled) setServerInProgress(Array.isArray(d?.attempts) ? d.attempts : []) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [user, route, examStarted, isFinished])
 
   // Auto-cap numQuestions
   useEffect(() => {
     if (examStarted || isFinished) return
     if (availableFilteredCount > 0 && numQuestions > availableFilteredCount) setNumQuestions(availableFilteredCount)
-  }, [availableFilteredCount, examStarted, isFinished])
+    // Recover from invalid 0/negative state (can occur if a filter briefly zeroed availableFilteredCount when a default was applied)
+    if (numQuestions < 1 && availableFilteredCount > 0) {
+      const meta = exams.find((e: any) => e.code === selected)
+      const def = meta?.defaultQuestions ?? meta?.defaultQuestionCount ?? (meta?.provider === 'AWS' ? 65 : availableFilteredCount)
+      setNumQuestions(Math.min(def, availableFilteredCount))
+    }
+  }, [availableFilteredCount, examStarted, isFinished, numQuestions, selected, exams])
 
   // Validate existing attempt
   useEffect(() => {
@@ -1179,10 +1361,10 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     showSubmitConfirm, setShowSubmitConfirm, showCompleteEarlyConfirm, setShowCompleteEarlyConfirm, showCancelConfirm, setShowCancelConfirm, setSavedExamVersion, showTipMap, setShowTipMap, paused, setPaused, lastError, setLastError, toasts, setToasts, showToast, showConfetti, setShowConfetti, rewardModal, setRewardModal, mobileOpen, setMobileOpen, ratingTarget, setRatingTarget,
     attemptId, setAttemptId, attemptData, setAttemptData, showAttempts, setShowAttempts, attemptsList, setAttemptsList, isFinished,
     reviewDomains, setReviewDomains, reviewDomainOpen, setReviewDomainOpen, reviewIndex, setReviewIndex, incorrectOnly, setIncorrectOnly, reviewDomainRef, reviewDomainToggleRef,
-    takeDomains, setTakeDomains, domainOpen, setDomainOpen, domainRef, domainToggleRef, examStarted, setExamStarted, timed, setTimed, durationMinutes, setDurationMinutes, examMode, setExamMode, revealAnswers, setRevealAnswers, ttsEnabled, setTtsEnabled, revealedQuestions, setRevealedQuestions, stagedAnswer, setStagedAnswer, weakestLinkInfo, setWeakestLinkInfo, loadingWeakestLink, timeLeft, setTimeLeft, numQuestions, setNumQuestions,
+    takeDomains, setTakeDomains, domainOpen, setDomainOpen, domainRef, domainToggleRef, examStarted, setExamStarted, timed, setTimed, durationMinutes, setDurationMinutes, examMode, setExamMode, revealAnswers, setRevealAnswers, ttsEnabled, setTtsEnabled, revealedQuestions, setRevealedQuestions, stagedAnswer, setStagedAnswer, weakestLinkInfo, setWeakestLinkInfo, loadingWeakestLink, timeLeft, setTimeLeft, numQuestions, setNumQuestions, visitedQuestions, setVisitedQuestions,
     serviceFilterText, setServiceFilterText, homeExamFilter, setHomeExamFilter, selectedServices, setSelectedServices, availableServices, serviceDropOpen, setServiceDropOpen, serviceSearchText, setServiceSearchText, serviceDropRef, serviceDropToggleRef,
     scoreHistory, loadingScoreHistory, analyticsAttempts, analyticsDomains, deletingAttemptId, setDeletingAttemptId,
-    filteredByDomain, availableFilteredCount, displayQuestions, savedProgress, anySavedExam,
+    filteredByDomain, availableFilteredCount, displayQuestions, savedProgress, anySavedExam, serverInProgress,
     setupExamFromMeta, fetchScoreHistory, createAttempt, submitAnswer, submitMatchingAnswer, submitOrderingAnswer, finishAttempt, handleSubmitExam, resumeExam, saveExamProgress,
     downloadAttemptCSV, downloadAttemptPDF, downloadAnalyticsCSV,
   }

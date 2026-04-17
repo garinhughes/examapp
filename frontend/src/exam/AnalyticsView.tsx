@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Trash2, ChevronDown, ChevronRight, Search } from 'lucide-react'
+import { Trash2, ChevronDown, ChevronRight, Search, ChevronLeft, Eye, CalendarDays } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
 import { ScoreHistoryChart } from './ScoreHistoryChart'
@@ -18,6 +18,10 @@ export function AnalyticsView() {
 
   const [collapsedProviders, setCollapsedProviders] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState('')
+  const [showScores, setShowScores] = useState(false)
+  const [scoresPage, setScoresPage] = useState(0)
+  const [deleteTarget, setDeleteTarget] = useState<{ attemptId: string; label: string } | null>(null)
+  const SCORES_PAGE_SIZE = 20
 
   function toggleProvider(name: string) {
     setCollapsedProviders(prev => {
@@ -165,17 +169,15 @@ export function AnalyticsView() {
                     {filteredExams.map((ex: any) => (
                       <div
                         key={ex.code}
-                        className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm relative flex flex-col cursor-pointer hover:border-primary transition-colors"
+                        className="relative p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm cursor-pointer hover:border-primary transition-colors"
                         onClick={() => {
                           setSelected(ex.code)
                           void fetchScoreHistory(ex.code)
                         }}
                       >
-                        <div className="flex-1">
-                          <div className="font-medium">{ex.title ?? ex.code}</div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-muted-foreground">{ex.code}</span>
-                          </div>
+                        <div className={ex.logo ? 'pr-10' : ''}>
+                          <div className="font-medium leading-snug">{ex.title ?? ex.code}</div>
+                          <div className="text-xs text-muted-foreground mt-1">{ex.code}</div>
                         </div>
                         {ex.logo && (
                           ex.logoHref ? (
@@ -374,107 +376,236 @@ export function AnalyticsView() {
             </div>
           )}
 
-          {/* Attempts list */}
-          <div className="p-4 rounded bg-card/60 dark:bg-card">
-            <div className="font-semibold mb-2">Attempts</div>
-            {analyticsAttempts === null ? (
-              <div className="text-sm text-muted-foreground">Loading…</div>
-            ) : analyticsAttempts.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No attempts yet for this exam.</div>
-            ) : (
-              <ul className="space-y-2 text-sm">
-                {analyticsAttempts
-                  .slice()
-                  .sort((a: any, b: any) => {
+          {/* Previous Scores — collapsible */}
+          <div className="rounded bg-card/60 dark:bg-card overflow-hidden">
+            <button
+              className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-muted/20 transition-colors"
+              onClick={() => setShowScores(s => !s)}
+              aria-expanded={showScores}
+            >
+              <span className="font-semibold text-sm">Previous Scores</span>
+              <div className="flex items-center gap-2">
+                {analyticsAttempts !== null && analyticsAttempts.length > 0 && (
+                  <span className="text-xs text-muted-foreground">{analyticsAttempts.length} attempt{analyticsAttempts.length !== 1 ? 's' : ''} — click to {showScores ? 'hide' : 'expand'}</span>
+                )}
+                {showScores ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+              </div>
+            </button>
+            {showScores && (
+              <div className="px-4 pb-4">
+                {analyticsAttempts === null ? (
+                  <div className="text-sm text-muted-foreground">Loading…</div>
+                ) : analyticsAttempts.length === 0 ? (
+                  <div className="text-sm text-muted-foreground">No attempts yet for this exam.</div>
+                ) : (() => {
+                  const sorted = analyticsAttempts.slice().sort((a: any, b: any) => {
                     const ta = a.finishedAt || a.startedAt || ''
                     const tb = b.finishedAt || b.startedAt || ''
                     return String(tb).localeCompare(String(ta))
                   })
-                  .map((a: any) => (
-                    <li key={a.attemptId} className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="font-medium truncate">
-                          {a.finishedAt
-                            ? `Finished: ${new Date(a.finishedAt).toLocaleString()}`
-                            : `Started: ${a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}`}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {typeof a.score === 'number'
-                            ? (() => {
-                              const ratio = (typeof a.correctCount === 'number' && typeof a.total === 'number') ? ` (${a.correctCount}/${a.total})` : ''
-                              const pass = a.score >= passMark
-                              return `${a.score}%${ratio} - ${pass ? 'pass' : 'fail'}`
-                            })()
-                            : (a.finishedAt ? '-' : `${a.answersCount ?? 0} answers`)}
-                        </div>
+                  const totalPages = Math.ceil(sorted.length / SCORES_PAGE_SIZE)
+                  const page = Math.min(scoresPage, totalPages - 1)
+                  const pageItems = sorted.slice(page * SCORES_PAGE_SIZE, (page + 1) * SCORES_PAGE_SIZE)
+                  const gridCols = '5rem minmax(0,1fr) 3.5rem 2rem 4.5rem'
+                  return (
+                    <>
+                      {/* Desktop header — hidden on mobile */}
+                      <div
+                        className="hidden sm:grid items-center gap-x-3 pb-1.5 mb-1 border-b border-border text-[11px] font-medium text-muted-foreground uppercase tracking-wide"
+                        style={{ gridTemplateColumns: gridCols }}
+                      >
+                        <span>Result</span>
+                        <span>Date</span>
+                        <span className="text-center">Correct</span>
+                        <span className="text-center">Del</span>
+                        <span className="text-center">View</span>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {(Number(a.answersCount) === 0) && (
+                      <ul className="divide-y divide-border">
+                        {pageItems.map((a: any) => {
+                          const finished = !!a.finishedAt
+                          const hasScore = typeof a.score === 'number'
+                          const pass = hasScore && a.score >= passMark
+                          const ratio = (hasScore && typeof a.correctCount === 'number' && typeof a.total === 'number')
+                            ? `${a.correctCount}/${a.total}`
+                            : null
+                          const dateStr = finished
+                            ? new Date(a.finishedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+                            : a.startedAt
+                              ? new Date(a.startedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+                              : '-'
+
+                          const canDelete = Number(a.answersCount) === 0
+
+                          const scorePill = hasScore ? (
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold tabular-nums whitespace-nowrap w-fit
+                              ${pass ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
+                              {a.score}% <span className="opacity-70">{pass ? 'pass' : 'fail'}</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground whitespace-nowrap w-fit">
+                              {finished ? '—' : 'in progress'}
+                            </span>
+                          )
+
+                          const dateEl = (
+                            <span className="min-w-0 text-sm text-foreground truncate flex items-center gap-1.5">
+                              <CalendarDays className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              <span className="truncate">{dateStr}</span>
+                            </span>
+                          )
+
+                          const ratioEl = (
+                            <span className="text-xs text-muted-foreground tabular-nums text-center">{ratio ?? '—'}</span>
+                          )
+
+                          const deleteBtn = (
+                            <button
+                              className={`p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-40 justify-self-center ${canDelete ? '' : 'invisible'}`}
+                              disabled={!canDelete || deletingAttemptId === a.attemptId}
+                              title="Delete attempt"
+                              onClick={() => {
+                                if (!canDelete) return
+                                const label = finished
+                                  ? `Finished ${new Date(a.finishedAt).toLocaleString()}`
+                                  : `Started ${a.startedAt ? new Date(a.startedAt).toLocaleString() : ''}`
+                                setDeleteTarget({ attemptId: a.attemptId, label })
+                              }}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )
+
+                          const viewBtn = (
+                            <button
+                              className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-md bg-primary text-white text-xs font-semibold hover:bg-primary/80 transition-colors justify-self-center w-full"
+                              title="View attempt"
+                              onClick={async () => {
+                                try {
+                                  const res = await authFetch(`/attempts/${a.attemptId}`)
+                                  if (res.ok) {
+                                    const d = await res.json()
+                                    const computed = computeDerivedAttempt(d, Array.isArray(d.questions) ? d.questions : questions)
+                                    setAttemptData(computed)
+                                    if (Array.isArray(computed.questions)) setQuestions(computed.questions)
+                                    setSelected(d.examCode)
+                                    setRoute('home')
+                                  } else {
+                                    const t = await res.text()
+                                    showToast(t, 'error')
+                                  }
+                                } catch (err) {
+                                  console.error(err)
+                                  showToast(String(err), 'error')
+                                }
+                              }}
+                            >
+                              <Eye className="w-3.5 h-3.5" />View
+                            </button>
+                          )
+
+                          return (
+                            <li key={a.attemptId} className="py-2.5 first:pt-0">
+                              {/* Desktop row */}
+                              <div className="hidden sm:grid items-center gap-x-3" style={{ gridTemplateColumns: gridCols }}>
+                                {scorePill}
+                                {dateEl}
+                                {ratioEl}
+                                {deleteBtn}
+                                {viewBtn}
+                              </div>
+                              {/* Mobile row — two rows stacked */}
+                              <div className="sm:hidden flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  {scorePill}
+                                  {dateEl}
+                                </div>
+                                <div className="flex items-center gap-1 shrink-0">
+                                  <span className="text-xs text-muted-foreground tabular-nums mr-1">{ratio ?? ''}</span>
+                                  {deleteBtn}
+                                  {viewBtn}
+                                </div>
+                              </div>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                      {totalPages > 1 && (
+                        <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
                           <button
-                            className="px-2 py-1 rounded bg-red-600 text-white text-sm disabled:opacity-50 inline-flex items-center gap-2"
-                            disabled={deletingAttemptId === a.attemptId}
-                            title="Delete attempt"
-                            onClick={async () => {
-                              if (!selected) return
-                              const ok = window.confirm('Delete this attempt? It has 0 answers and cannot be recovered.')
-                              if (!ok) return
-                              setDeletingAttemptId(a.attemptId)
-                              try {
-                                const res = await authFetch(`/attempts/${a.attemptId}`, { method: 'DELETE' })
-                                if (!res.ok) {
-                                  const t = await res.text().catch(() => 'delete failed')
-                                  if (res.status === 404) { await fetchScoreHistory(selected); return }
-                                  showToast(t, 'error')
-                                  return
-                                }
-                                if (attemptId === a.attemptId) {
-                                  try { localStorage.removeItem(`attempt:${selected}`) } catch {}
-                                  setAttemptId(null)
-                                  setAttemptData(null)
-                                  setExamStarted(false)
-                                }
-                                await fetchScoreHistory(selected)
-                              } catch (err) {
-                                console.error(err)
-                                showToast(String(err), 'error')
-                              } finally {
-                                setDeletingAttemptId(null)
-                              }
-                            }}
+                            onClick={() => setScoresPage(p => Math.max(0, p - 1))}
+                            disabled={page === 0}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border hover:bg-muted/40 disabled:opacity-30"
                           >
-                            <Trash2 className="w-4 h-4" aria-hidden />
-                            <span className="sr-only">Delete</span>
+                            <ChevronLeft className="w-3.5 h-3.5" />Prev
                           </button>
-                        )}
-                        <button
-                          className="px-2 py-1 rounded bg-accent text-sm"
-                          onClick={async () => {
-                            try {
-                              const res = await authFetch(`/attempts/${a.attemptId}`)
-                              if (res.ok) {
-                                const d = await res.json()
-                                const computed = computeDerivedAttempt(d, Array.isArray(d.questions) ? d.questions : questions)
-                                setAttemptData(computed)
-                                if (Array.isArray(computed.questions)) setQuestions(computed.questions)
-                                setSelected(d.examCode)
-                                setRoute('home')
-                              } else {
-                                const t = await res.text()
-                                showToast(t, 'error')
-                              }
-                            } catch (err) {
-                              console.error(err)
-                              showToast(String(err), 'error')
-                            }
-                          }}
-                        >
-                          View
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-              </ul>
+                          <span>{page + 1} / {totalPages}</span>
+                          <button
+                            onClick={() => setScoresPage(p => Math.min(totalPages - 1, p + 1))}
+                            disabled={page === totalPages - 1}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border hover:bg-muted/40 disabled:opacity-30"
+                          >
+                            Next<ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )
+                })()}
+              </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Delete attempt confirmation modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setDeleteTarget(null)} />
+          <div className="relative bg-card p-6 rounded max-w-sm w-full mx-4 shadow-lg">
+            <h3 className="text-lg font-semibold mb-2">Delete attempt?</h3>
+            <p className="text-sm text-muted-foreground mb-1">{deleteTarget.label}</p>
+            <p className="text-sm text-muted-foreground mb-4">This attempt has 0 answers and cannot be recovered.</p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                className="px-3 py-1 rounded bg-accent text-muted-foreground hover:bg-accent transition"
+                onClick={() => setDeleteTarget(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 transition inline-flex items-center gap-2"
+                disabled={deletingAttemptId === deleteTarget.attemptId}
+                onClick={async () => {
+                  if (!selected) return
+                  const { attemptId: aid } = deleteTarget
+                  setDeleteTarget(null)
+                  setDeletingAttemptId(aid)
+                  try {
+                    const res = await authFetch(`/attempts/${aid}`, { method: 'DELETE' })
+                    if (!res.ok) {
+                      const t = await res.text().catch(() => 'delete failed')
+                      if (res.status === 404) { await fetchScoreHistory(selected); return }
+                      showToast(t, 'error')
+                      return
+                    }
+                    if (attemptId === aid) {
+                      try { localStorage.removeItem(`attempt:${selected}`) } catch {}
+                      setAttemptId(null)
+                      setAttemptData(null)
+                      setExamStarted(false)
+                    }
+                    await fetchScoreHistory(selected)
+                  } catch (err) {
+                    console.error(err)
+                    showToast(String(err), 'error')
+                  } finally {
+                    setDeletingAttemptId(null)
+                  }
+                }}
+              >
+                <Trash2 className="w-4 h-4" />Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

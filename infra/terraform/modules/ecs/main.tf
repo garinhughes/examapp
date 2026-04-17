@@ -474,7 +474,7 @@ locals {
     { name = "COGNITO_USER_POOL_ID", value = var.cognito_user_pool_id },
     { name = "COGNITO_REDIRECT_URI", value = var.cognito_redirect_uri },
     { name = "FRONTEND_ORIGIN", value = var.frontend_origin },
-    { name = "BACKEND_ORIGIN",  value = var.backend_origin },
+    { name = "BACKEND_ORIGIN", value = var.backend_origin },
     { name = "SES_FROM_ADDRESS", value = var.ses_from_address },
     { name = "SES_SUPPORT_ADDRESS", value = var.ses_support_address },
     { name = "SES_OUTREACH_ADDRESS", value = var.ses_outreach_address },

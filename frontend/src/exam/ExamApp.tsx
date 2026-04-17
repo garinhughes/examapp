@@ -1,4 +1,4 @@
-import { Save, X, Play, Pause, Info, BarChart3, BookOpen, Terminal, Minimize2, Maximize2 } from 'lucide-react'
+import { Save, X, Play, Pause, Info, BarChart3, BookOpen, Terminal, Minimize2, Maximize2, Flag } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useRef, useEffect, useState } from 'react'
 import { clarityEvent, clarityTag } from '@/clarity'
@@ -8,7 +8,6 @@ import { TourBubble } from '@/components/TourBubble'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PageMeta } from '@/components/PageMeta'
 import { CookieConsent } from '@/components/CookieConsent'
-import Loader from '@/components/Loader'
 import { useRouteSync } from '@/hooks/useRouteSync'
 import AccountPage from '../components/AccountPage'
 import Leaderboard from '../components/Leaderboard'
@@ -25,7 +24,6 @@ import { PollWidget } from '../components/PollWidget'
 import { FeedbackPage } from '../feedback/FeedbackPage'
 import { UserFeedbackPage } from '../feedback/UserFeedbackPage'
 import { useExam } from './ExamContext'
-import { computeDerivedAttempt } from './utils'
 import { PracticeExams } from './PracticeExams'
 import { AnalyticsView } from './AnalyticsView'
 import { ExamReview } from './ExamReview'
@@ -55,10 +53,10 @@ function ExamAppInner() {
   const {
     route, setRoute, selected, setSelected, selectedMeta, exams, questions, setQuestions,
     examTier, examStarted, setExamStarted, isFinished, attemptId, attemptData, setAttemptData,
-    setAttemptId, showAttempts, setShowAttempts, attemptsList, setAttemptsList,
-    paused, setPaused, timed, timeLeft, displayQuestions,
-    anySavedExam, savedProgress, lastError, setLastError,
-    selectedAnswers, flaggedQuestions,
+    setAttemptId, setShowAttempts, setAttemptsList,
+    paused, setPaused, timed, timeLeft, displayQuestions, currentQuestionIndex,
+    anySavedExam, savedProgress,
+    selectedAnswers, flaggedQuestions, setReviewIndex, setIncorrectOnly, setReviewDomains, setCurrentQuestionIndex,
     user, login, logout, gamState, gamLevel,
     authFetch, showToast, resumeExam, setupExamFromMeta, saveExamProgress,
     setShowCancelConfirm, isAdmin,
@@ -67,13 +65,14 @@ function ExamAppInner() {
   const userIsAdmin = isAdmin()
 
   const [focusMode, setFocusMode] = useState(false)
+  const [reviewGrid, setReviewGrid] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try { return localStorage.getItem('sidebar-collapsed') === 'true' } catch { return false }
   })
 
-  // Exit focus mode when the exam ends
+  // Exit focus mode / review grid when the exam ends
   useEffect(() => {
-    if (!examStarted || isFinished) setFocusMode(false)
+    if (!examStarted || isFinished) { setFocusMode(false); setReviewGrid(false) }
   }, [examStarted, isFinished])
 
   // Auto-advance tour from "click Setup Exam" step when visitor navigates to exam setup
@@ -138,6 +137,25 @@ function ExamAppInner() {
       )}
 
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
+        {/* Exam in progress top bar — shown on Overview, Analytics, Exams when exam is saved */}
+        {anySavedExam && !examStarted && (route === 'home' || route === 'analytics' || route === 'practice') && (
+          <div className="flex items-center px-4 py-3 border-b border-border bg-card/80 backdrop-blur-sm shrink-0 z-10">
+            <div className="flex-1" />
+            <div className="flex items-center gap-3">
+              <button
+                className="px-3 py-1.5 rounded-md bg-primary text-white text-sm inline-flex items-center gap-1.5 shadow-sm hover:bg-primary/90 transition whitespace-nowrap"
+                onClick={() => resumeExam(anySavedExam.code)}
+              >
+                <Play className="w-3.5 h-3.5" aria-hidden />
+                Resume
+              </button>
+              <span className="font-semibold text-base text-foreground whitespace-nowrap">Exam in progress</span>
+              <span className="hidden sm:inline text-sm text-muted-foreground truncate">{anySavedExam.title} · {anySavedExam.answeredCount}/{anySavedExam.total} answered</span>
+            </div>
+            <div className="flex-1 md:pr-10" />
+          </div>
+        )}
+
         {/* Focus mode compact toolbar */}
         {focusMode && examStarted && !isFinished && (
           <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-border bg-background/95 backdrop-blur-sm z-20 shrink-0">
@@ -297,37 +315,13 @@ function ExamAppInner() {
             {route === 'terms' && <TermsOfService />}
             {route === 'refund' && <RefundPolicy />}
 
-            {/* Resume banner on homepage when no exam selected */}
-            {route === 'home' && !selected && anySavedExam && (
-              <div className="mb-4 p-4 rounded-md bg-muted/40 border border-border shadow-sm flex items-center justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-md flex items-center justify-center bg-primary/10 text-primary flex-shrink-0">
-                    <Play className="w-5 h-5" aria-hidden />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-foreground">Exam in progress</div>
-                    <div className="text-sm text-muted-foreground">{anySavedExam.title} - {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
-                  </div>
-                </div>
-                <div>
-                  <button
-                    className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition"
-                    onClick={() => resumeExam(anySavedExam.code)}
-                  >
-                    <Play className="w-4 h-4" aria-hidden />
-                    Resume
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Homepage when no exam selected */}
             {route === 'home' && !selected && <HomePage />}
 
             {/* ExamHeader bar */}
             {route === 'home' && selected && !focusMode ? (
               <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <h2 className="text-lg font-semibold flex items-center gap-2"><span className="text-primary font-extrabold">//</span>{examStarted && !isFinished ? 'Questions' : 'Practice Exam'}</h2>
+                <h2 className="text-lg font-semibold flex items-center gap-2"><span className="text-primary font-extrabold">//</span>{'Practice Exam'}</h2>
                 <div className="flex min-w-0 flex-1 flex-col gap-2 lg:items-end">
                   <div className="text-sm text-muted-foreground break-words lg:text-right">{selected}{selectedMeta?.title ? ` - ${selectedMeta.title}` : ''}</div>
                   <div className="flex flex-col items-stretch gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
@@ -344,26 +338,8 @@ function ExamAppInner() {
                         </button>
                       </div>
                     )}
-                    {/* Attempts / Save / Cancel: always one row */}
+                    {/* Save / Cancel: always one row */}
                     <div className="flex flex-nowrap justify-center items-center gap-2 lg:justify-end">
-                      <button
-                        className="px-3 py-1 rounded-md bg-muted-foreground text-white text-sm whitespace-nowrap"
-                        onClick={async () => {
-                          setShowAttempts((s) => !s)
-                          if (!attemptsList) {
-                            try {
-                              const res = await authFetch('/attempts')
-                              const d = await res.json()
-                              setAttemptsList(d.attempts ?? [])
-                            } catch (err) {
-                              console.error(err)
-                              setLastError(String(err))
-                            }
-                          }
-                        }}
-                      >
-                        Attempts
-                      </button>
                       {attemptId && !isFinished && examStarted && (
                         <>
                           <button
@@ -390,7 +366,7 @@ function ExamAppInner() {
                       )}
                     </div>
                     {examStarted && timed && timeLeft !== null && (
-                      <div className="flex items-center gap-2 rounded-md bg-muted/40 px-2 py-1">
+                      <div className="hidden sm:flex items-center gap-2 rounded-md bg-muted/40 px-2 py-1">
                         <button
                           className={`px-2 py-1 rounded text-sm ${paused ? 'bg-primary/90 text-white' : 'bg-accent'}`}
                           onClick={() => setPaused((p) => !p)}
@@ -407,75 +383,6 @@ function ExamAppInner() {
                 </div>
               </div>
             ) : null}
-
-            {/* Attempts list panel */}
-            {showAttempts && selected && !focusMode && (
-              <div className="mb-4 p-3 rounded bg-card/60 dark:bg-card">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold mb-2">Attempts</h3>
-                  <div>
-                    <button
-                      className="px-2 py-1 rounded bg-red-600 text-white text-sm"
-                      onClick={async () => {
-                        if (!attemptsList) return
-                        if (!confirm('Delete ALL attempts? This will remove all attempts permanently.')) return
-                        try {
-                          const r = await authFetch('/attempts/all', { method: 'DELETE' })
-                          if (r.ok) {
-                            const d = await r.json()
-                            setAttemptsList([])
-                            showToast(`Deleted ${d.deleted || 0} attempts`, 'info')
-                          } else {
-                            const txt = await r.text().catch(() => '')
-                            showToast(`Delete failed: ${r.status} ${txt}`, 'error')
-                          }
-                        } catch (e) {
-                          showToast(String(e), 'error')
-                        }
-                      }}
-                    >
-                      Delete all attempts
-                    </button>
-                  </div>
-                </div>
-                {attemptsList ? (
-                  <ul className="space-y-2 text-sm">
-                    {attemptsList.map((a) => (
-                      <li key={a.attemptId} className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium">{a.examCode}</div>
-                          <div className="text-xs text-muted-foreground">{a.attemptId} - {a.startedAt ? new Date(a.startedAt).toLocaleString() : '-'}</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {a.score !== null && <div className="text-sm font-semibold">{a.score}%</div>}
-                          <button
-                            className="px-2 py-1 rounded bg-accent text-sm"
-                            onClick={async () => {
-                              try {
-                                const res = await authFetch(`/attempts/${a.attemptId}`)
-                                const d = await res.json()
-                                const computed = computeDerivedAttempt(d, Array.isArray(d.questions) ? d.questions : undefined)
-                                setAttemptData(computed)
-                                if (Array.isArray(computed.questions)) setQuestions(computed.questions)
-                                setSelected(d.examCode)
-                                setShowAttempts(false)
-                              } catch (err) {
-                                console.error(err)
-                                setLastError(String(err))
-                              }
-                            }}
-                          >
-                            View
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <Loader />
-                )}
-              </div>
-            )}
 
             {/* Results */}
             {attemptData && typeof attemptData.score === 'number' && route === 'home' && !focusMode && (
@@ -548,14 +455,49 @@ function ExamAppInner() {
               </div>
             )}
 
+            {/* Flagged questions panel (after exam finished) */}
+            {isFinished && route === 'home' && flaggedQuestions.size > 0 && (() => {
+              const flaggedList = displayQuestions
+                .map((q, idx) => ({ q, idx }))
+                .filter(({ q }) => flaggedQuestions.has(q.id))
+              return (
+                <div className="mb-4 p-4 rounded-lg border border-primary/30 bg-card shadow-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Flag className="w-4 h-4 text-primary shrink-0" />
+                    <h3 className="font-semibold text-sm">Flagged questions</h3>
+                    <span className="ml-auto text-xs text-muted-foreground">{flaggedList.length} question{flaggedList.length !== 1 ? 's' : ''} to review</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {flaggedList.map(({ q, idx }) => (
+                      <button
+                        key={q.id}
+                        onClick={() => {
+                          setIncorrectOnly(false)
+                          setReviewDomains(['All'])
+                          const qIdx = questions.findIndex((qq: any) => String(qq.id) === String(q.id))
+                          setReviewIndex(qIdx >= 0 ? qIdx : idx)
+                          document.getElementById('exam-review-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary text-sm font-medium transition-colors"
+                      >
+                        <Flag className="w-3 h-3" />
+                        Q{idx + 1}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">Click a question to jump to it in the review below.</p>
+                </div>
+              )
+            })()}
+
             {/* Review mode (after exam finished) */}
-            {isFinished && route === 'home' ? <ExamReview /> : null}
+            {isFinished && route === 'home' ? <div id="exam-review-section"><ExamReview /></div> : null}
 
             {/* Pre-start form (when exam selected but not started and not finished) */}
             {!examStarted && selected && !isFinished && route === 'home' && <ExamSetup />}
 
             {/* Question navigation (during exam) */}
-            {!isFinished && examStarted && displayQuestions.length > 0 && route === 'home' && <QuestionNav focusMode={focusMode} />}
+            {!isFinished && examStarted && displayQuestions.length > 0 && route === 'home' && <QuestionNav focusMode={focusMode} showGrid={reviewGrid} reviewingFlagged={reviewGrid} />}
 
             {/* Question card (during exam) */}
             {!isFinished && examStarted && route === 'home' && <QuestionCard focusMode={focusMode} />}
@@ -567,7 +509,11 @@ function ExamAppInner() {
         </div>
 
         {/* Modals, toasts, confetti, etc. */}
-        <Modals />
+        <Modals onReviewAnswers={() => {
+          setReviewGrid(true)
+          const firstFlagged = displayQuestions.findIndex(q => flaggedQuestions.has(q.id))
+          if (firstFlagged >= 0) setCurrentQuestionIndex(firstFlagged)
+        }} />
       </main>
       </div>
     </div>

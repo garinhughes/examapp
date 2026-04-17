@@ -5,8 +5,10 @@
  * PK: "PAYPAL_ORDER" | "PAYPAL_SUB"
  * SK: <orderId> | <subscriptionId>
  *
- * TTL is set to 24 hours from creation; enable TTL on the `ttl` attribute
- * in the DynamoDB table to auto-expire abandoned sessions.
+ * TTL is set to 7 days from creation; enable TTL on the `ttl` attribute
+ * in the DynamoDB table to auto-expire abandoned sessions. 7 days covers the
+ * window where a user starts checkout then lets PayPal approve the subscription
+ * async (email confirmation flow, delayed BILLING.SUBSCRIPTION.ACTIVATED webhook).
  */
 
 import { PutCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb'
@@ -34,7 +36,7 @@ export async function putPaypalSession(
     SK: sk,
     ...data,
     createdAt: new Date().toISOString(),
-    ttl: Math.floor(Date.now() / 1000) + 60 * 60 * 24, // 24 hours
+    ttl: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 days
   }
   await ddb.send(new PutCommand({ TableName: SESSIONS_TABLE, Item: item }))
 }

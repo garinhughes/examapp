@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import Loader from '@/components/Loader'
 import { useExam } from '@/exam/ExamContext'
-import { Clock, Timer, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight, X, Lock, ExternalLink, Play } from 'lucide-react'
+import { Clock, Hourglass, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight, X, Lock, ExternalLink, Play } from 'lucide-react'
 import { clarityEvent, clarityTag } from '@/clarity'
 import type { LabSummary, SkillLevel } from './types'
 import { apiUrl } from '@/apiBase'
@@ -276,7 +276,7 @@ export function SkillLabsPage() {
                     timed ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  <Timer className="w-3.5 h-3.5" />
+                  <Hourglass className="w-3.5 h-3.5" />
                   Timed
                 </button>
               </div>

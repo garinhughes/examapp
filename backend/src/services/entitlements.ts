@@ -13,7 +13,7 @@
  *   meta: Record<string, any>
  */
 
-import { QueryCommand, PutCommand, UpdateCommand, DeleteCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
+import { QueryCommand, UpdateCommand, DeleteCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
 import { ddb, ENTITLEMENTS_TABLE } from './dynamo.js'
 
 export interface Entitlement {
@@ -77,18 +77,50 @@ export async function grantEntitlement(params: {
   stripeSubscriptionId?: string
   meta?: Record<string, any>
 }): Promise<Entitlement> {
-  const item: Entitlement = {
+  const now = new Date().toISOString()
+  // Use UpdateCommand with if_not_exists on purchasedAt so webhook retries don't
+  // reset the original purchase timestamp. expiresAt / status / meta are refreshed
+  // every call (needed for subscription renewals pushing period_end forward).
+  const sets = [
+    'purchasedAt = if_not_exists(purchasedAt, :now)',
+    'kind = :kind',
+    'expiresAt = :expiresAt',
+    '#s = :status',
+    'meta = :meta',
+  ]
+  const names: Record<string, string> = { '#s': 'status' }
+  const values: Record<string, any> = {
+    ':now': now,
+    ':kind': params.kind,
+    ':expiresAt': params.expiresAt ?? null,
+    ':status': 'active',
+    ':meta': params.meta ?? {},
+  }
+  if (params.stripeSubscriptionId) {
+    sets.push('stripeSubscriptionId = :subId')
+    values[':subId'] = params.stripeSubscriptionId
+  }
+
+  const res = await ddb.send(
+    new UpdateCommand({
+      TableName: ENTITLEMENTS_TABLE,
+      Key: { userId: params.userId, productId: params.productId },
+      UpdateExpression: `SET ${sets.join(', ')}`,
+      ExpressionAttributeNames: names,
+      ExpressionAttributeValues: values,
+      ReturnValues: 'ALL_NEW',
+    })
+  )
+  const item = res.Attributes as Entitlement
+  console.log('[entitlements] grant', JSON.stringify({
     userId: params.userId,
     productId: params.productId,
     kind: params.kind,
-    purchasedAt: new Date().toISOString(),
-    expiresAt: params.expiresAt ?? null,
-    status: 'active',
-    stripeSubscriptionId: params.stripeSubscriptionId,
-    meta: params.meta ?? {},
-  }
-
-  await ddb.send(new PutCommand({ TableName: ENTITLEMENTS_TABLE, Item: item }))
+    expiresAt: item.expiresAt,
+    source: (params.meta as any)?.source ?? null,
+    subId: params.stripeSubscriptionId ?? null,
+    purchasedAt: item.purchasedAt,
+  }))
   return item
 }
 

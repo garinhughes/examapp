@@ -17,6 +17,7 @@ import {
   GetCommand,
   QueryCommand,
   DeleteCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
 /* ------------------------------------------------------------------ */
@@ -35,11 +36,17 @@ export interface AttemptsStore {
   /** Get all attempts for a given userId */
   listByUser(userId: string): Promise<any[]>
 
+  /** List in-progress attempts for a user (status = 'in-progress') */
+  listInProgressByUser(userId: string): Promise<any[]>
+
   /** Get a single attempt by userId + attemptId */
   get(userId: string, attemptId: string): Promise<any | null>
 
   /** Create / overwrite an attempt */
   put(attempt: any): Promise<void>
+
+  /** Patch UI/progress fields on an existing attempt without overwriting answers */
+  updateProgress(userId: string, attemptId: string, fields: Record<string, any>): Promise<void>
 
   /** Delete a single attempt */
   delete(userId: string, attemptId: string): Promise<void>
@@ -66,6 +73,44 @@ function createDynamoStore(): AttemptsStore {
         }),
       )
       return (res.Items as any[]) ?? []
+    },
+
+    async listInProgressByUser(userId: string) {
+      const res = await ddb.send(
+        new QueryCommand({
+          TableName: ATTEMPTS_TABLE,
+          IndexName: 'status-index',
+          KeyConditionExpression: 'userId = :uid AND #s = :ip',
+          ExpressionAttributeNames: { '#s': 'status' },
+          ExpressionAttributeValues: { ':uid': userId, ':ip': 'in-progress' },
+        }),
+      )
+      return (res.Items as any[]) ?? []
+    },
+
+    async updateProgress(userId: string, attemptId: string, fields: Record<string, any>) {
+      const keys = Object.keys(fields)
+      if (keys.length === 0) return
+      const names: Record<string, string> = {}
+      const values: Record<string, any> = {}
+      const sets: string[] = []
+      keys.forEach((k, i) => {
+        const nk = `#f${i}`
+        const vk = `:v${i}`
+        names[nk] = k
+        values[vk] = fields[k]
+        sets.push(`${nk} = ${vk}`)
+      })
+      await ddb.send(
+        new UpdateCommand({
+          TableName: ATTEMPTS_TABLE,
+          Key: { userId, attemptId },
+          UpdateExpression: `SET ${sets.join(', ')}`,
+          ExpressionAttributeNames: names,
+          ExpressionAttributeValues: values,
+          ConditionExpression: 'attribute_exists(attemptId)',
+        }),
+      )
     },
 
     async get(userId: string, attemptId: string) {
@@ -138,6 +183,19 @@ function createLocalStore(): AttemptsStore {
     async listByUser(userId: string) {
       const all = await loadAll()
       return all.filter((a: any) => a.userId === userId)
+    },
+
+    async listInProgressByUser(userId: string) {
+      const all = await loadAll()
+      return all.filter((a: any) => a.userId === userId && a.status === 'in-progress')
+    },
+
+    async updateProgress(userId: string, attemptId: string, fields: Record<string, any>) {
+      const all = await loadAll()
+      const idx = all.findIndex((a: any) => a.userId === userId && a.attemptId === attemptId)
+      if (idx < 0) return
+      all[idx] = { ...all[idx], ...fields }
+      await saveAll(all)
     },
 
     async get(_userId: string, attemptId: string) {

@@ -400,6 +400,79 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           break
         }
 
+        case 'charge.refunded': {
+          // Triggered on full or partial refunds. Revoke entitlements linked to the refunded
+          // charge's payment_intent → subscription (if it was a subscription) or session (one-off).
+          const charge = event.data.object
+          const paymentIntentId: string | undefined = charge.payment_intent
+          const refundedFully = charge.amount_refunded === charge.amount
+          if (!refundedFully) {
+            // Partial refunds don't revoke — just log. Manual review via admin.
+            server.log.warn({ chargeId: charge.id, amountRefunded: charge.amount_refunded, amount: charge.amount }, '[stripe] partial refund — no entitlement change')
+            break
+          }
+          // Look up subscription associated with this charge via PI (subscription invoices set invoice.subscription)
+          let subscriptionId: string | null = null
+          let userId: string | null = null
+          let productIds: string[] = []
+          try {
+            if (paymentIntentId) {
+              const pi = await stripeGet(`/payment_intents/${paymentIntentId}`)
+              const invoiceId = pi?.invoice
+              if (invoiceId) {
+                const invoice = await stripeGet(`/invoices/${invoiceId}`)
+                subscriptionId = invoice?.subscription ?? null
+                if (subscriptionId) {
+                  const sub = await stripeGet(`/subscriptions/${subscriptionId}`)
+                  userId = sub?.metadata?.userId ?? null
+                  productIds = JSON.parse(sub?.metadata?.productIds ?? '[]')
+                }
+              }
+              // Fall back to PI metadata for one-offs
+              if (!userId) {
+                userId = pi?.metadata?.userId ?? null
+                productIds = JSON.parse(pi?.metadata?.productIds ?? '[]')
+              }
+            }
+          } catch (e: any) {
+            server.log.warn({ err: e?.message, chargeId: charge.id }, '[stripe] refund — PI/invoice lookup failed')
+          }
+          if (userId && subscriptionId) {
+            const ents = await getUserEntitlements(userId, true)
+            const toRevoke = ents.filter((e) => e.stripeSubscriptionId === subscriptionId)
+            for (const ent of toRevoke) await revokeEntitlement(userId, ent.productId)
+            server.log.info({ userId, subscriptionId, productIds: toRevoke.map((e) => e.productId), chargeId: charge.id }, '[stripe] refund — subscription entitlements revoked')
+          } else if (userId && productIds.length > 0) {
+            for (const pid of productIds) await revokeEntitlement(userId, pid)
+            server.log.info({ userId, productIds, chargeId: charge.id }, '[stripe] refund — one-off entitlements revoked')
+          } else {
+            server.log.warn({ chargeId: charge.id, paymentIntentId }, '[stripe] refund — could not resolve userId, skipping revocation')
+            sendInternalAlert({ subject: '[stripe] refund could not be processed', lines: [`Charge ${charge.id} refunded but userId could not be resolved.`, 'Manual review needed.'] })
+          }
+          break
+        }
+
+        case 'invoice.payment_failed': {
+          // Stripe will retry based on dunning settings. We don't revoke immediately — the existing
+          // expiresAt (period_end + 1d grace) self-expires access if retries are exhausted.
+          // Log + alert so we can see the user before access lapses.
+          const invoice = event.data.object
+          const subscriptionId: string | undefined = invoice.subscription
+          let userId: string | null = null
+          let productIds: string[] = []
+          if (subscriptionId) {
+            try {
+              const sub = await stripeGet(`/subscriptions/${subscriptionId}`)
+              userId = sub?.metadata?.userId ?? null
+              productIds = JSON.parse(sub?.metadata?.productIds ?? '[]')
+            } catch (e: any) {
+              server.log.warn({ err: e?.message, subscriptionId }, '[stripe] payment_failed — subscription lookup failed')
+            }
+          }
+          server.log.warn({ userId, subscriptionId, productIds, invoiceId: invoice.id, attemptCount: invoice.attempt_count, nextAttempt: invoice.next_payment_attempt }, '[stripe] invoice.payment_failed — access will lapse at period_end + 1d grace if not resolved')
+          break
+        }
+
         default:
           server.log.info({ type: event.type }, '[stripe] unhandled event type')
       }

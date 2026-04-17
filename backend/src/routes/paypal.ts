@@ -70,7 +70,9 @@ async function _grantFromSession(
 ): Promise<void> {
   const sess = await getPaypalSession(pk, sk)
   if (!sess) {
-    server.log.warn({ pk, sk }, '[paypal] no session found')
+    // This is load-bearing: session TTL is 24h. If a user activates a subscription after
+    // the session expired, we silently drop the grant. Elevate to error so it's alertable.
+    server.log.error({ pk, sk }, '[paypal] no session found — entitlement NOT granted (session likely expired)')
     return
   }
   for (const pid of sess.productIds) {
@@ -283,8 +285,41 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         if (subscriptionId) {
           await _revokeSubscription(subscriptionId, server)
         }
+      } else if (eventType === 'PAYMENT.SALE.REFUNDED') {
+        // Refund on a subscription sale — revoke entitlements tied to the subscription.
+        const subscriptionId: string | undefined = resource?.billing_agreement_id
+        if (subscriptionId) {
+          try {
+            const scan = await ddb.send(new ScanCommand({
+              TableName: ENTITLEMENTS_TABLE,
+              FilterExpression: 'stripeSubscriptionId = :sid',
+              ExpressionAttributeValues: { ':sid': subscriptionId },
+            }))
+            const items = scan.Items ?? []
+            for (const item of items) {
+              await revokeEntitlement(item.userId, item.productId)
+            }
+            server.log.info({ subscriptionId, saleId: resource?.id, revokedCount: items.length }, '[paypal] refund — entitlements revoked')
+            if (items.length === 0) {
+              server.log.warn({ subscriptionId, saleId: resource?.id }, '[paypal] refund — no entitlements found for subscription')
+            }
+          } catch (err) {
+            server.log.error({ err, subscriptionId }, '[paypal] PAYMENT.SALE.REFUNDED handling failed')
+          }
+        } else {
+          server.log.warn({ saleId: resource?.id }, '[paypal] refund — no billing_agreement_id; manual review needed (likely one-off order refund)')
+          sendInternalAlert({
+            subject: '[paypal] one-off refund received — manual review',
+            lines: [`Sale ${resource?.id} refunded but no subscription link.`, 'Find the related order and revoke entitlement manually.'],
+          })
+        }
+      } else if (eventType === 'BILLING.SUBSCRIPTION.PAYMENT.FAILED') {
+        // PayPal will retry per dunning config. Don't revoke here — expiresAt grace handles
+        // eventual access loss if retries are exhausted. Log + alert so the customer can be contacted.
+        const subscriptionId: string | undefined = resource?.id
+        const retries = resource?.billing_info?.failed_payments_count ?? 'unknown'
+        server.log.warn({ subscriptionId, retries }, '[paypal] subscription payment failed — access will lapse at period_end + 1d grace if not resolved')
       }
-      // PAYMENT.SALE.COMPLETED — recurring payment collected; entitlements already active, just log
     } catch (err) {
       server.log.error({ err, eventType }, '[paypal] webhook event processing failed')
     }
