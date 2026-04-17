@@ -123,13 +123,17 @@ function interpolate(template: string, vars: Record<string, string>): string {
 async function sendHtml(opts: {
   from: string
   to: string
+  cc?: string[]
   subject: string
   html: string
   text: string
 }): Promise<void> {
   await ses.send(new SendEmailCommand({
     Source: opts.from,
-    Destination: { ToAddresses: [opts.to] },
+    Destination: {
+      ToAddresses: [opts.to],
+      ...(opts.cc?.length ? { CcAddresses: opts.cc } : {}),
+    },
     Message: {
       Subject: { Data: opts.subject, Charset: 'UTF-8' },
       Body: {
@@ -179,7 +183,7 @@ export async function sendPaymentConfirmedEmail(params: {
   to: string
   name: string
   userId: string
-  products: Array<{ label: string; priceGBP: number }>
+  products: Array<{ productId?: string; label: string; priceGBP: number }>
   totalPence: number
   source: 'stripe' | 'paypal'
 }): Promise<void> {
@@ -196,9 +200,12 @@ export async function sendPaymentConfirmedEmail(params: {
       .map(
         (p) =>
           `<tr>
-            <td style="padding:8px 0;border-bottom:1px solid #eee;color:#333;">${p.label}</td>
+            <td style="padding:8px 0;border-bottom:1px solid #eee;color:#333;">
+              ${p.label}
+              ${p.productId ? `<br><span style="font-size:11px;font-family:monospace;color:#999;">${p.productId}</span>` : ''}
+            </td>
             <td style="padding:8px 0;border-bottom:1px solid #eee;color:#333;text-align:right;">
-              £${(p.priceGBP / 100).toFixed(2)}
+              £${(p.priceGBP / 100).toFixed(2)}/mo
             </td>
           </tr>`
       )
@@ -206,10 +213,10 @@ export async function sendPaymentConfirmedEmail(params: {
 
     bodyHtml = `
       <p style="font-size:16px;color:#333;">Hi ${vars.name},</p>
-      <p style="color:#555;">Thanks for your purchase - your access is now active.</p>
+      <p style="color:#555;">Thanks for your purchase — your access is now active.</p>
       <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
         <tr>
-          <th style="text-align:left;padding:8px 0;border-bottom:2px solid #FF6B35;color:#333;">Item</th>
+          <th style="text-align:left;padding:8px 0;border-bottom:2px solid #FF6B35;color:#333;">Plan</th>
           <th style="text-align:right;padding:8px 0;border-bottom:2px solid #FF6B35;color:#333;">Price</th>
         </tr>
         ${rows}
@@ -220,6 +227,7 @@ export async function sendPaymentConfirmedEmail(params: {
           </td>
         </tr>
       </table>
+      <p style="color:#555;font-size:13px;">Payment processed via ${params.source === 'stripe' ? 'card' : 'PayPal'}.</p>
       <p style="margin:32px 0;">
         <a href="${FRONTEND}" style="background:${BRAND};color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:bold;">
           Start learning
@@ -228,7 +236,7 @@ export async function sendPaymentConfirmedEmail(params: {
   }
 
   const { html, text } = await renderEmail({ title: 'Order confirmed', body: bodyHtml })
-  await sendHtml({ from: FROM, to: params.to, subject, html, text })
+  await sendHtml({ from: FROM, to: params.to, cc: [TO], subject, html, text })
 }
 
 /**
@@ -267,6 +275,158 @@ export async function sendExpiryReminderEmail(params: {
 
   const { html, text } = await renderEmail({ title: 'Your access is expiring soon', body: bodyHtml })
   await sendHtml({ from: FROM, to: params.to, subject, html, text })
+}
+
+/**
+ * Subscription cancelled — sent immediately when the customer requests cancellation.
+ * Access-until date is included so the customer knows how long they retain access.
+ */
+export async function sendSubscriptionCancelledEmail(params: {
+  to: string
+  name: string
+  userId: string
+  productLabel: string
+  productId: string
+  accessUntil: string | null
+  source: 'stripe' | 'paypal'
+}): Promise<void> {
+  const stored = await getTemplate('subscription-cancelled')
+  let subject = stored?.subject || 'Your certshack subscription has been cancelled'
+  const vars = { name: params.name || 'there', frontendUrl: FRONTEND, productLabel: params.productLabel, productId: params.productId }
+  let bodyHtml: string
+
+  if (stored?.htmlBody) {
+    bodyHtml = interpolate(stored.htmlBody, vars)
+    subject = interpolate(subject, vars)
+  } else {
+    const accessLine = params.accessUntil
+      ? `<p style="color:#555;">You'll continue to have full access until <strong>${new Date(params.accessUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>. No further charges will be made.</p>`
+      : `<p style="color:#555;">Your access has been revoked. No further charges will be made.</p>`
+    bodyHtml = `
+      <p style="font-size:16px;color:#333;">Hi ${vars.name},</p>
+      <p style="color:#555;">We've confirmed your cancellation request.</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0;border:1px solid #eee;border-radius:6px;">
+        <tr>
+          <td style="padding:12px 16px;background:#f9f9f9;border-radius:6px;">
+            <span style="color:#333;font-weight:bold;">${params.productLabel}</span>
+            <span style="font-size:11px;font-family:monospace;color:#999;margin-left:8px;">${params.productId}</span>
+          </td>
+        </tr>
+      </table>
+      ${accessLine}
+      <p style="color:#555;">Changed your mind? You can resubscribe at any time.</p>
+      <p style="margin:32px 0;">
+        <a href="${FRONTEND}/pricing" style="background:${BRAND};color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:bold;">
+          Resubscribe
+        </a>
+      </p>`
+  }
+
+  const { html, text } = await renderEmail({ title: 'Subscription cancelled', body: bodyHtml })
+  await sendHtml({ from: FROM, to: params.to, cc: [TO], subject, html, text })
+}
+
+/**
+ * Subscription changed — sent when the customer upgrades or downgrades their plan.
+ */
+export async function sendSubscriptionChangedEmail(params: {
+  to: string
+  name: string
+  userId: string
+  fromLabel: string
+  fromId: string
+  toLabel: string
+  toId: string
+  isUpgrade: boolean
+  effectiveDate?: string | null
+}): Promise<void> {
+  const stored = await getTemplate('subscription-changed')
+  let subject = stored?.subject || `Your certshack plan has been ${params.isUpgrade ? 'upgraded' : 'downgraded'}`
+  const vars = { name: params.name || 'there', frontendUrl: FRONTEND, fromLabel: params.fromLabel, toLabel: params.toLabel }
+  let bodyHtml: string
+
+  if (stored?.htmlBody) {
+    bodyHtml = interpolate(stored.htmlBody, vars)
+    subject = interpolate(subject, vars)
+  } else {
+    const effectiveLine = params.isUpgrade
+      ? `<p style="color:#555;">Your new plan is active immediately.</p>`
+      : params.effectiveDate
+        ? `<p style="color:#555;">Your plan will change on <strong>${new Date(params.effectiveDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>. You retain <strong>${params.fromLabel}</strong> access until then.</p>`
+        : `<p style="color:#555;">Your plan change will take effect at the next billing cycle.</p>`
+    bodyHtml = `
+      <p style="font-size:16px;color:#333;">Hi ${vars.name},</p>
+      <p style="color:#555;">Your subscription plan has been ${params.isUpgrade ? 'upgraded' : 'downgraded'}.</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+        <tr>
+          <th style="text-align:left;padding:8px 0;border-bottom:2px solid #FF6B35;color:#333;width:80px;"></th>
+          <th style="text-align:left;padding:8px 0;border-bottom:2px solid #FF6B35;color:#333;">Plan</th>
+          <th style="text-align:left;padding:8px 0;border-bottom:2px solid #FF6B35;color:#333;">Code</th>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;border-bottom:1px solid #eee;color:#999;font-size:13px;">Previous</td>
+          <td style="padding:8px 0;border-bottom:1px solid #eee;color:#555;">${params.fromLabel}</td>
+          <td style="padding:8px 0;border-bottom:1px solid #eee;font-family:monospace;font-size:11px;color:#999;">${params.fromId}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;color:#999;font-size:13px;">New</td>
+          <td style="padding:8px 0;color:#333;font-weight:bold;">${params.toLabel}</td>
+          <td style="padding:8px 0;font-family:monospace;font-size:11px;color:#999;">${params.toId}</td>
+        </tr>
+      </table>
+      ${effectiveLine}
+      <p style="margin:32px 0;">
+        <a href="${FRONTEND}" style="background:${BRAND};color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:bold;">
+          Start learning
+        </a>
+      </p>`
+  }
+
+  const { html, text } = await renderEmail({ title: `Plan ${params.isUpgrade ? 'upgraded' : 'downgraded'}`, body: bodyHtml })
+  await sendHtml({ from: FROM, to: params.to, cc: [TO], subject, html, text })
+}
+
+/**
+ * Subscription ended — sent when a subscription is deleted (period end or payment failure).
+ * Distinct from "cancelled" which is the immediate confirmation; this fires when access is revoked.
+ */
+export async function sendSubscriptionEndedEmail(params: {
+  to: string
+  name: string
+  userId: string
+  productLabel: string
+  productId: string
+}): Promise<void> {
+  const stored = await getTemplate('subscription-ended')
+  let subject = stored?.subject || 'Your certshack subscription has ended'
+  const vars = { name: params.name || 'there', frontendUrl: FRONTEND, productLabel: params.productLabel, productId: params.productId }
+  let bodyHtml: string
+
+  if (stored?.htmlBody) {
+    bodyHtml = interpolate(stored.htmlBody, vars)
+    subject = interpolate(subject, vars)
+  } else {
+    bodyHtml = `
+      <p style="font-size:16px;color:#333;">Hi ${vars.name},</p>
+      <p style="color:#555;">Your <strong>${params.productLabel}</strong> subscription has now ended and your access has been removed.</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0;border:1px solid #eee;border-radius:6px;">
+        <tr>
+          <td style="padding:12px 16px;background:#f9f9f9;border-radius:6px;">
+            <span style="color:#333;font-weight:bold;">${params.productLabel}</span>
+            <span style="font-size:11px;font-family:monospace;color:#999;margin-left:8px;">${params.productId}</span>
+          </td>
+        </tr>
+      </table>
+      <p style="color:#555;">We hope certshack has been valuable. You can resubscribe at any time to regain full access to all practice exams and skill labs.</p>
+      <p style="margin:32px 0;">
+        <a href="${FRONTEND}/pricing" style="background:${BRAND};color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:bold;">
+          Resubscribe
+        </a>
+      </p>`
+  }
+
+  const { html, text } = await renderEmail({ title: 'Subscription ended', body: bodyHtml })
+  await sendHtml({ from: FROM, to: params.to, cc: [TO], subject, html, text })
 }
 
 /**
@@ -400,6 +560,25 @@ export async function sendErasureReceiptEmail(r: ErasureReceiptPayload): Promise
       Body: { Text: { Data: body, Charset: 'UTF-8' } },
     },
   }))
+}
+
+/**
+ * Internal ops alert — plain-text notification from noreply to support@certshack.com.
+ * Fire-and-forget: never throws so it can't break the main request path.
+ */
+export async function sendInternalAlert(params: {
+  subject: string
+  lines: string[]
+}): Promise<void> {
+  const body = params.lines.join('\n')
+  ses.send(new SendEmailCommand({
+    Source: FROM,
+    Destination: { ToAddresses: [TO] },
+    Message: {
+      Subject: { Data: params.subject, Charset: 'UTF-8' },
+      Body: { Text: { Data: body, Charset: 'UTF-8' } },
+    },
+  })).catch((err: any) => console.warn('[ses] sendInternalAlert failed', err?.message))
 }
 
 // Future: auto-raise GitHub issue

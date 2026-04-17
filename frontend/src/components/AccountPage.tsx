@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { User, Trophy, Award, CreditCard, Flame } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { useAuthFetch } from '../auth/useAuthFetch'
 import { useGamification } from '../gamification/GamificationContext'
@@ -24,7 +25,7 @@ export default function AccountPage() {
   const { state, toggleLeaderboard } = useGamification()
   const [tab, setTab] = useState<'overview' | 'badges' | 'certificates' | 'purchases'>('overview')
   const { level, currentXP, nextLevelXP, progress: levelProgress } = levelFromXP(state.xp)
-  const { tier, tierConfig, entitlements, products, loading: entLoading } = useEntitlements()
+  const { tier, tierConfig, entitlements, entitlementDetails, products, loading: entLoading, refresh: refreshEntitlements } = useEntitlements()
 
   // ── Name state ──
   const [firstName, setFirstName] = useState('')
@@ -35,6 +36,81 @@ export default function AccountPage() {
   // ── Email opt-in state ──
   const [emailOptIn, setEmailOptIn] = useState(true)
   const [emailOptInSaving, setEmailOptInSaving] = useState(false)
+
+  // ── Cancel subscription state ──
+  const [cancelConfirm, setCancelConfirm] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState<string | null>(null)
+  const [cancelDone, setCancelDone] = useState(false)
+  const [cancelAccessUntil, setCancelAccessUntil] = useState<string | null>(null)
+
+  // ── Change plan state ──
+  const [changePlanConfirm, setChangePlanConfirm] = useState<'up' | 'down' | null>(null)
+  const [changingPlan, setChangingPlan] = useState(false)
+  const [changePlanError, setChangePlanError] = useState<string | null>(null)
+  const [changePlanDone, setChangePlanDone] = useState<'up' | 'down' | null>(null)
+  const [changePlanIsPayPal, setChangePlanIsPayPal] = useState(false)
+
+  const changePlan = useCallback(async (targetProductId: 'sub:pro' | 'sub:pro-plus') => {
+    setChangingPlan(true)
+    setChangePlanError(null)
+    try {
+      const res = await authFetch('/payments/upgrade-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetProductId }),
+      })
+      if (res.ok) {
+        const data = await res.json() as any
+        setChangePlanDone(data.isUpgrade ? 'up' : 'down')
+        setChangePlanConfirm(null)
+        refreshEntitlements()
+        return
+      }
+      const data = await res.json().catch(() => ({}))
+      if (res.status === 404 && (data as any).message?.includes('No active Stripe')) {
+        setChangePlanIsPayPal(true)
+      } else {
+        setChangePlanError((data as any).message ?? 'Could not change plan')
+      }
+    } catch {
+      setChangePlanError('Network error — please try again')
+    } finally {
+      setChangingPlan(false)
+    }
+  }, [authFetch, refreshEntitlements])
+
+  const cancelSubscription = useCallback(async () => {
+    setCancelling(true)
+    setCancelError(null)
+    // Try Stripe first, fall back to PayPal
+    try {
+      const res = await authFetch('/payments/cancel-subscription', { method: 'POST' })
+      if (res.ok) {
+        const data = await res.json().catch(() => ({})) as any
+        setCancelAccessUntil(data.accessUntil ?? null)
+        setCancelDone(true); setCancelConfirm(false); return
+      }
+      const data = await res.json().catch(() => ({}))
+      if ((data as any).message?.includes('No active Stripe')) {
+        // No Stripe sub — try PayPal
+        const ppRes = await authFetch('/payments/paypal/cancel-subscription', { method: 'POST' })
+        if (ppRes.ok) {
+          const ppData = await ppRes.json().catch(() => ({})) as any
+          setCancelAccessUntil(ppData.accessUntil ?? null)
+          setCancelDone(true); setCancelConfirm(false); return
+        }
+        const ppData = await ppRes.json().catch(() => ({}))
+        setCancelError((ppData as any).message ?? 'Could not cancel subscription')
+      } else {
+        setCancelError((data as any).message ?? 'Could not cancel subscription')
+      }
+    } catch {
+      setCancelError('Network error — please try again')
+    } finally {
+      setCancelling(false)
+    }
+  }, [authFetch])
 
   useEffect(() => {
     authFetch('/auth/me')
@@ -219,8 +295,8 @@ export default function AccountPage() {
               <p className="text-xs text-muted-foreground mt-0.5">@{currentUsername}</p>
             )}
           </div>
-          <div className="text-right">
-            <div className="text-2xl font-extrabold text-primary">Level {level}</div>
+          <div className="text-right shrink-0">
+            <div className="text-xl sm:text-2xl font-extrabold text-primary leading-tight">Level {level}</div>
             <div className="text-xs text-muted-foreground">{state.xp.toLocaleString()} XP total</div>
           </div>
         </div>
@@ -243,7 +319,9 @@ export default function AccountPage() {
         {/* Quick stats row */}
         <div className="mt-4 grid grid-cols-3 gap-3">
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <div className="text-xl font-bold text-primary">🔥 {state.streak}</div>
+            <div className="flex items-center justify-center gap-1 text-xl font-bold text-primary">
+              <Flame className="w-5 h-5 text-orange-500" />{state.streak}
+            </div>
             <div className="text-xs text-muted-foreground">Day Streak</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
@@ -254,24 +332,25 @@ export default function AccountPage() {
             <div className="text-xl font-bold text-purple-500">
               {Object.values(state.domainMastery).filter((d) => d.tier !== 'none').length}
             </div>
-            <div className="text-xs text-muted-foreground">Domains Mastered</div>
+            <div className="text-[10px] leading-tight text-muted-foreground">Domains<br/>Mastered</div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 bg-muted p-1 rounded-lg">
-        {(['overview', 'badges', 'certificates', 'purchases'] as const).map((t) => (
+        {([['overview', 'Overview', User], ['badges', 'Achievements', Trophy], ['certificates', 'Certificates', Award], ['purchases', 'Purchases', CreditCard]] as const).map(([t, label, Icon]) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`flex-1 px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors ${
               tab === t
                 ? 'bg-card shadow-sm text-foreground'
                 : 'text-muted-foreground hover:text-foreground dark:hover:text-foreground'
             }`}
           >
-            {{ overview: 'Overview', badges: 'Achievements', certificates: 'Certificates', purchases: 'Purchases' }[t]}
+            <Icon className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline">{label}</span>
           </button>
         ))}
       </div>
@@ -283,7 +362,7 @@ export default function AccountPage() {
           <div className="p-4 rounded-lg border border-border bg-card">
             <h3 className="text-sm font-semibold text-muted-foreground mb-3">Name</h3>
             <div className="space-y-2">
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   required
@@ -545,30 +624,161 @@ export default function AccountPage() {
 
           {/* Active entitlements */}
           <div className="p-4 rounded-lg border border-border bg-card">
-            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Purchases</h3>
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Active plan</h3>
             {entLoading ? (
               <p className="text-sm text-muted-foreground">Loading…</p>
             ) : entitlements.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No purchases yet.</p>
+              <p className="text-sm text-muted-foreground">No active subscription.</p>
             ) : (
               <div className="space-y-2">
                 {entitlements.map((pid) => {
                   const prod = products.find((p) => p.productId === pid)
+                  const detail = entitlementDetails.find((d) => d.productId === pid)
+                  const renewsAt = detail?.expiresAt
+                    ? new Date(detail.expiresAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                    : null
+                  const sourceLabel = detail?.source === 'paypal' ? 'PayPal' : detail?.source === 'admin' ? 'Admin grant' : 'Card'
                   return (
-                    <div key={pid} className="flex items-center justify-between p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-900/10">
-                      <div>
-                        <div className="text-sm font-medium">{prod?.label ?? pid}</div>
-                        {prod?.description && (
-                          <div className="text-xs text-muted-foreground">{prod.description}</div>
-                        )}
+                    <div key={pid} className="p-3 rounded-lg border border-emerald-200 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-900/10 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-semibold">{prod?.label ?? pid}</div>
+                        <span className="text-emerald-500 text-xs font-semibold uppercase tracking-wide">Active</span>
                       </div>
-                      <span className="text-emerald-500 text-sm font-semibold">Active</span>
+                      <div className="text-xs font-mono text-muted-foreground">{pid}</div>
+                      {renewsAt && (
+                        <div className="text-xs text-muted-foreground">
+                          {detail?.status === 'cancelled' ? 'Access until' : 'Renews on'}: <span className="font-medium text-foreground">{renewsAt}</span>
+                        </div>
+                      )}
+                      <div className="text-xs text-muted-foreground">Via {sourceLabel}</div>
                     </div>
                   )
                 })}
               </div>
             )}
           </div>
+
+          {/* Change plan */}
+          {isPaidTier(tier) && !cancelDone && (
+            <div className="p-4 rounded-lg border border-border bg-card">
+              <h3 className="text-sm font-semibold mb-1 text-muted-foreground">Change plan</h3>
+              {changePlanDone ? (
+                <p className="text-sm text-muted-foreground">
+                  {changePlanDone === 'up'
+                    ? 'Upgraded to Pro Plus — your new plan is now active.'
+                    : 'Downgrade scheduled. Your Pro Plus access continues until the end of your current billing period, then switches to Pro.'}
+                </p>
+              ) : changePlanIsPayPal ? (
+                <p className="text-sm text-muted-foreground">
+                  PayPal subscribers can't swap plans inline. Cancel your current plan first, then re-subscribe from the{' '}
+                  <a href="/pricing" className="text-primary underline">pricing page</a>.
+                </p>
+              ) : changePlanConfirm ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-amber-600 dark:text-amber-400">
+                    {changePlanConfirm === 'up'
+                      ? "Upgrade to Pro Plus? You'll be charged the prorated difference immediately."
+                      : "Downgrade to Pro? Your Pro Plus access continues until the end of your billing period."}
+                  </p>
+                  {changePlanError && <p className="text-xs text-red-500">{changePlanError}</p>}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => changePlan(changePlanConfirm === 'up' ? 'sub:pro-plus' : 'sub:pro')}
+                      disabled={changingPlan}
+                      className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors"
+                    >
+                      {changingPlan ? 'Processing…' : 'Confirm'}
+                    </button>
+                    <button
+                      onClick={() => { setChangePlanConfirm(null); setChangePlanError(null) }}
+                      disabled={changingPlan}
+                      className="px-4 py-2 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-colors"
+                    >
+                      Back
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {tier === 'pro' && (
+                    <>
+                      <p className="text-xs text-muted-foreground mb-2">Unlock all skill labs. Charged prorated immediately.</p>
+                      <button
+                        onClick={() => setChangePlanConfirm('up')}
+                        className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition-colors"
+                      >
+                        Upgrade to Pro Plus
+                      </button>
+                    </>
+                  )}
+                  {tier === 'pro_plus' && (
+                    <>
+                      <p className="text-xs text-muted-foreground mb-2">Downgrade takes effect at your next billing cycle.</p>
+                      <button
+                        onClick={() => setChangePlanConfirm('down')}
+                        className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition-colors"
+                      >
+                        Downgrade to Pro
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Cancel subscription */}
+          {isPaidTier(tier) && (
+            <div className="p-4 rounded-lg border border-border bg-card">
+              <h3 className="text-sm font-semibold mb-1 text-muted-foreground">Cancel subscription</h3>
+              {cancelDone ? (
+                <p className="text-sm text-muted-foreground">
+                  Your subscription has been cancelled.{' '}
+                  {cancelAccessUntil
+                    ? <>You'll retain access until <strong>{new Date(cancelAccessUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.</>
+                    : "You'll retain access until the end of your current billing period."
+                  }
+                </p>
+              ) : cancelConfirm ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-amber-600 dark:text-amber-400">
+                    Are you sure? You'll lose access to Pro features at the end of your billing period.
+                  </p>
+                  {cancelError && (
+                    <p className="text-xs text-red-500">{cancelError}</p>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={cancelSubscription}
+                      disabled={cancelling}
+                      className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-semibold disabled:opacity-40 hover:bg-red-600 transition-colors"
+                    >
+                      {cancelling ? 'Cancelling…' : 'Yes, cancel'}
+                    </button>
+                    <button
+                      onClick={() => { setCancelConfirm(false); setCancelError(null) }}
+                      disabled={cancelling}
+                      className="px-4 py-2 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-colors"
+                    >
+                      Keep subscription
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    You can cancel at any time. Access continues until your billing period ends.
+                  </p>
+                  <button
+                    onClick={() => setCancelConfirm(true)}
+                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition-colors"
+                  >
+                    Cancel subscription
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
         </div>
       )}

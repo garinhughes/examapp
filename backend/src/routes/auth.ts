@@ -10,7 +10,7 @@ import { createHmac } from 'crypto'
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { jwtVerify, createRemoteJWKSet, decodeProtectedHeader } from 'jose'
 import { upsertUserFromCognito, getUserBySub, setRegisteredAtIfNew, updateUserFields, setEmailOptIn, setWelcomeEmailSent } from '../services/dynamo.js'
-import { sendWelcomeEmail } from '../services/ses.js'
+import { sendWelcomeEmail, sendInternalAlert } from '../services/ses.js'
 import {
   CognitoIdentityProviderClient,
   SignUpCommand,
@@ -350,6 +350,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (AUTH_MODE === 'dev') return { message: 'dev mode — no real signup' }
     const { email, password, firstName, lastName } = request.body as any
     if (!email || !password) return reply.status(400).send({ message: 'email and password required' })
+    sendInternalAlert({
+      subject: '[certshack] New user sign-up',
+      lines: [
+        `Email:      ${email}`,
+        `Name:       ${[firstName, lastName].filter(Boolean).join(' ') || '(not provided)'}`,
+        `Timestamp:  ${new Date().toISOString()}`,
+      ],
+    })
     try {
       const userAttributes: { Name: string; Value: string }[] = [{ Name: 'email', Value: email }]
       if (firstName) userAttributes.push({ Name: 'given_name', Value: String(firstName) })

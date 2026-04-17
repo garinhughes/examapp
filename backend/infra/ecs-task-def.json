@@ -44,7 +44,7 @@
         { "name": "SES_SUPPORT_ADDRESS", "value": "support@certshack.com" },
         { "name": "STRIPE_PRICE_ID_PRO_MONTHLY",      "value": "price_1TNALiRXOMjZneV7QkRQbcMc" },
         { "name": "STRIPE_PRICE_ID_PRO_PLUS_MONTHLY", "value": "price_1TNAMHRXOMjZneV7fVP3dmwu" },
-        { "name": "DISCOUNT_ACTIVE",                       "value": "false" },
+        { "name": "DISCOUNT_ACTIVE",                       "value": "true" },
         { "name": "STRIPE_COUPON_ID_DISCOUNT",             "value": "DIdN6M9J" },
         { "name": "PAYPAL_CLIENT_ID", "value": "AbyHVazM-r_fPb1CgQa0j5nwTtdMawkxoHGa2Dxd9PavViGd1G4Z0qTiHONgx1hUMC7ONUYKLBbrU4wa" },
         { "name": "PAYPAL_API_BASE", "value": "https://api-m.paypal.com" },

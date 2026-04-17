@@ -49,7 +49,10 @@ export async function getUserEntitlements(
 
     const now = new Date().toISOString()
     return items.filter((e) => {
-      if (e.status === 'expired' || e.status === 'cancelled') return false
+      if (e.status === 'expired') return false
+      // A cancelled entitlement with a future expiresAt still grants access until that date
+      // (e.g. PayPal subscription cancelled mid-period — user paid for the rest of the cycle)
+      if (e.status === 'cancelled' && (!e.expiresAt || e.expiresAt < now)) return false
       if (e.expiresAt && e.expiresAt < now) return false
       return true
     })
@@ -87,6 +90,23 @@ export async function grantEntitlement(params: {
 
   await ddb.send(new PutCommand({ TableName: ENTITLEMENTS_TABLE, Item: item }))
   return item
+}
+
+/** Set expiresAt on an existing entitlement (e.g. scheduled downgrade at period end) */
+export async function setEntitlementExpiresAt(userId: string, productId: string, expiresAt: string): Promise<void> {
+  try {
+    await ddb.send(
+      new UpdateCommand({
+        TableName: ENTITLEMENTS_TABLE,
+        Key: { userId, productId },
+        UpdateExpression: 'SET expiresAt = :exp',
+        ExpressionAttributeValues: { ':exp': expiresAt },
+      })
+    )
+  } catch (err) {
+    console.warn('[entitlements] setEntitlementExpiresAt failed', err)
+    throw err
+  }
 }
 
 /** Revoke / cancel an entitlement */

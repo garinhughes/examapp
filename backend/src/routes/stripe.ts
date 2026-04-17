@@ -18,9 +18,9 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import crypto from 'crypto'
 import { getProduct } from '../catalog.js'
-import { grantEntitlement, revokeEntitlement } from '../services/entitlements.js'
+import { grantEntitlement, revokeEntitlement, getUserEntitlements, setEntitlementExpiresAt } from '../services/entitlements.js'
 import { getUserBySub } from '../services/dynamo.js'
-import { sendPaymentConfirmedEmail } from '../services/ses.js'
+import { sendPaymentConfirmedEmail, sendInternalAlert, sendSubscriptionCancelledEmail, sendSubscriptionChangedEmail, sendSubscriptionEndedEmail } from '../services/ses.js'
 import { logEmailSend } from '../services/emailLogs.js'
 
 const STRIPE_API = 'https://api.stripe.com/v1'
@@ -271,7 +271,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
               if (user?.email) {
                 const emailProducts = productIds.map((pid) => {
                   const p = getProduct(pid)
-                  return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
+                  return { productId: pid, label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
                 })
                 const totalPence = session.amount_total ?? emailProducts.reduce((s, p) => s + p.priceGBP, 0)
                 sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId, products: emailProducts, totalPence, source: 'stripe' })
@@ -301,11 +301,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
               if (userId && productIds.length > 0) {
                 for (const pid of productIds) {
                   const prod = getProduct(pid)
+                  // Set expiresAt to period_end + 1 day grace so access self-expires if billing stops.
+                  // Each successful renewal pushes this forward.
+                  const expiresAt = new Date(((invoice.period_end as number) + 86400) * 1000).toISOString()
                   await grantEntitlement({
                     userId,
                     productId: pid,
                     kind: prod?.kind ?? 'subscription',
-                    expiresAt: null,
+                    expiresAt,
                     stripeSubscriptionId: invoice.subscription,
                     meta: { source: 'stripe.invoice.payment_succeeded', invoiceId: invoice.id, billingReason: invoice.billing_reason },
                   })
@@ -318,7 +321,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
                     if (user?.email) {
                       const emailProducts = productIds.map((pid) => {
                         const p = getProduct(pid)
-                        return { label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
+                        return { productId: pid, label: p?.label ?? pid, priceGBP: p?.priceGBP ?? 0 }
                       })
                       const totalPence = invoice.amount_paid ?? emailProducts.reduce((s, p) => s + p.priceGBP, 0)
                       sendPaymentConfirmedEmail({ to: user.email, name: user.name ?? user.email, userId, products: emailProducts, totalPence, source: 'stripe' })
@@ -344,13 +347,55 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           const metadata = subscription.metadata ?? {}
           const userId: string = metadata.userId
           const productIds: string[] = JSON.parse(metadata.productIds ?? '[]')
+
+          // Primary: revoke by subscriptionId (catches plan changes where metadata may differ from
+          // the currently-active entitlement, e.g. after a downgrade stamps sub:pro in metadata
+          // while the entitlement is still sub:pro-plus with a future expiresAt)
+          const revokedPids = new Set<string>()
+          if (userId) {
+            const allEnts = await getUserEntitlements(userId, true)
+            const subEnts = allEnts.filter((e) => e.stripeSubscriptionId === subscription.id)
+            for (const ent of subEnts) {
+              await revokeEntitlement(userId, ent.productId)
+              revokedPids.add(ent.productId)
+            }
+            if (subEnts.length > 0) {
+              server.log.info({ userId, revokedPids: [...revokedPids], subscriptionId: subscription.id }, '[stripe] subscription entitlements revoked by subscriptionId')
+            }
+          }
+
+          // Fallback: metadata-based revoke for any products not caught above
           if (userId && productIds.length > 0) {
             for (const pid of productIds) {
-              await revokeEntitlement(userId, pid)
+              if (!revokedPids.has(pid)) {
+                await revokeEntitlement(userId, pid)
+                revokedPids.add(pid)
+              }
             }
-            server.log.info({ userId, productIds, subscriptionId: subscription.id }, '[stripe] subscription entitlements revoked')
-          } else {
-            server.log.warn({ subscriptionId: subscription.id }, '[stripe] subscription.deleted — no userId/productIds in metadata, skipping revocation')
+            server.log.info({ userId, productIds, subscriptionId: subscription.id }, '[stripe] subscription entitlements revoked by metadata')
+          } else if (!userId) {
+            server.log.warn({ subscriptionId: subscription.id }, '[stripe] subscription.deleted — no userId in metadata, skipping revocation')
+          }
+
+          // Notify the customer that their subscription has now ended
+          if (userId && revokedPids.size > 0) {
+            try {
+              const user = await getUserBySub(userId)
+              if (user?.email) {
+                for (const pid of revokedPids) {
+                  const prod = getProduct(pid)
+                  sendSubscriptionEndedEmail({
+                    to: user.email,
+                    name: user.name ?? user.email,
+                    userId,
+                    productLabel: prod?.label ?? pid,
+                    productId: pid,
+                  }).catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] subscription ended email failed'))
+                }
+              }
+            } catch (e: any) {
+              server.log.warn({ err: e?.message }, '[stripe] subscription ended email lookup failed')
+            }
           }
           break
         }
@@ -366,6 +411,187 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     return reply.status(200).send({ received: true })
   })
+
+  /**
+   * Cancel the authenticated user's active Stripe subscription.
+   * Cancels at period end so the user retains access until the billing cycle ends.
+   * The webhook (customer.subscription.deleted) will revoke the entitlement automatically.
+   */
+  server.post(
+    '/cancel-subscription',
+    { preHandler: [server.authenticate], config: { rateLimit: { max: 10, timeWindow: '1 minute' } } },
+    async (request: any, reply) => {
+      const userId = request.user?.sub as string
+      const ents = await getUserEntitlements(userId)
+      const subEnt = ents.find((e) => e.stripeSubscriptionId && e.meta?.source !== 'paypal')
+      if (!subEnt?.stripeSubscriptionId) {
+        return reply.status(404).send({ message: 'No active Stripe subscription found' })
+      }
+      sendInternalAlert({
+        subject: '[certshack] Subscription cancellation requested (Stripe)',
+        lines: [
+          `User ID:        ${userId}`,
+          `Product:        ${subEnt.productId}`,
+          `Subscription:   ${subEnt.stripeSubscriptionId}`,
+          `Timestamp:      ${new Date().toISOString()}`,
+          `Note:           cancel_at_period_end=true — access retained until billing cycle ends`,
+        ],
+      })
+      try {
+        const updatedSub = await stripePost(`/subscriptions/${subEnt.stripeSubscriptionId}`, {
+          cancel_at_period_end: 'true',
+        })
+        const accessUntil = updatedSub?.current_period_end
+          ? new Date((updatedSub.current_period_end as number) * 1000).toISOString()
+          : null
+        server.log.info({ userId, subscriptionId: subEnt.stripeSubscriptionId, accessUntil }, '[stripe] subscription set to cancel at period end')
+
+        // Send cancellation confirmation to the customer
+        try {
+          const user = await getUserBySub(userId)
+          if (user?.email) {
+            const prod = getProduct(subEnt.productId)
+            sendSubscriptionCancelledEmail({
+              to: user.email,
+              name: user.name ?? user.email,
+              userId,
+              productLabel: prod?.label ?? subEnt.productId,
+              productId: subEnt.productId,
+              accessUntil,
+              source: 'stripe',
+            }).catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] cancellation email failed'))
+          }
+        } catch (e: any) {
+          server.log.warn({ err: e?.message }, '[stripe] cancellation email lookup failed')
+        }
+
+        return { ok: true, cancelAtPeriodEnd: true, accessUntil }
+      } catch (err: any) {
+        server.log.error({ err }, '[stripe] cancel-subscription error')
+        return reply.status(502).send({ message: 'Failed to cancel subscription', details: err.stripeError })
+      }
+    }
+  )
+
+  /**
+   * Upgrade or downgrade the authenticated user's active Stripe subscription.
+   *
+   * Upgrade (pro → pro-plus): proration charged immediately, DynamoDB updated now.
+   * Downgrade (pro-plus → pro): price change scheduled for next cycle (proration_behavior=none),
+   *   expiresAt set on the current entitlement so access continues to period end,
+   *   the invoice.payment_succeeded webhook grants sub:pro on the next renewal.
+   */
+  server.post(
+    '/upgrade-subscription',
+    { preHandler: [server.authenticate], config: { rateLimit: { max: 10, timeWindow: '1 minute' } } },
+    async (request: any, reply) => {
+      const userId = request.user?.sub as string
+      const { targetProductId } = request.body as any
+
+      if (targetProductId !== 'sub:pro' && targetProductId !== 'sub:pro-plus') {
+        return reply.status(400).send({ message: 'targetProductId must be sub:pro or sub:pro-plus' })
+      }
+
+      const ents = await getUserEntitlements(userId)
+      const subEnt = ents.find((e) => e.stripeSubscriptionId && e.meta?.source !== 'paypal')
+      if (!subEnt?.stripeSubscriptionId) {
+        return reply.status(404).send({ message: 'No active Stripe subscription found' })
+      }
+      if (subEnt.productId === targetProductId) {
+        return reply.status(400).send({ message: 'Already on that plan' })
+      }
+
+      const isUpgrade = targetProductId === 'sub:pro-plus'
+      const newPriceId = targetProductId === 'sub:pro'
+        ? process.env.STRIPE_PRICE_ID_PRO_MONTHLY
+        : process.env.STRIPE_PRICE_ID_PRO_PLUS_MONTHLY
+
+      if (!newPriceId) {
+        return reply.status(503).send({ message: `Price ID not configured for ${targetProductId}` })
+      }
+
+      try {
+        // Fetch current subscription to get the item ID and current period end
+        const sub = await stripeGet(`/subscriptions/${subEnt.stripeSubscriptionId}`)
+        const itemId: string | undefined = sub.items?.data?.[0]?.id
+        if (!itemId) {
+          return reply.status(502).send({ message: 'Could not determine current subscription item' })
+        }
+        const periodEnd: string = new Date((sub.current_period_end as number) * 1000).toISOString()
+
+        // Switch the Stripe plan
+        await stripePost(`/subscriptions/${subEnt.stripeSubscriptionId}`, {
+          items: [{ id: itemId, price: newPriceId }],
+          proration_behavior: isUpgrade ? 'create_prorations' : 'none',
+          // Update metadata so the deleted/invoice webhooks revoke/grant the right productId
+          metadata: { productIds: JSON.stringify([targetProductId]), userId },
+        })
+
+        if (isUpgrade) {
+          // Grant new tier, revoke old — effective immediately
+          const prod = getProduct(targetProductId)
+          await grantEntitlement({
+            userId,
+            productId: targetProductId,
+            kind: prod?.kind ?? 'subscription',
+            expiresAt: new Date((sub.current_period_end as number + 86400) * 1000).toISOString(),
+            stripeSubscriptionId: subEnt.stripeSubscriptionId,
+            meta: { source: 'stripe.invoice.payment_succeeded', billingReason: 'upgrade' },
+          })
+          await revokeEntitlement(userId, subEnt.productId)
+        } else {
+          // Downgrade: stamp period end on current entitlement so it expires naturally.
+          // sub:pro will be granted by invoice.payment_succeeded on the next billing cycle.
+          await setEntitlementExpiresAt(userId, subEnt.productId, periodEnd)
+        }
+
+        sendInternalAlert({
+          subject: `[certshack] Subscription ${isUpgrade ? 'upgraded' : 'downgraded'} (Stripe)`,
+          lines: [
+            `User ID:    ${userId}`,
+            `From:       ${subEnt.productId}`,
+            `To:         ${targetProductId}`,
+            `Timestamp:  ${new Date().toISOString()}`,
+            isUpgrade
+              ? 'Effect:     immediate, prorated charge applied'
+              : `Effect:     downgrade at next cycle (${periodEnd})`,
+          ],
+        })
+
+        // Send plan change confirmation to the customer
+        try {
+          const user = await getUserBySub(userId)
+          if (user?.email) {
+            const fromProd = getProduct(subEnt.productId)
+            const toProd = getProduct(targetProductId)
+            sendSubscriptionChangedEmail({
+              to: user.email,
+              name: user.name ?? user.email,
+              userId,
+              fromLabel: fromProd?.label ?? subEnt.productId,
+              fromId: subEnt.productId,
+              toLabel: toProd?.label ?? targetProductId,
+              toId: targetProductId,
+              isUpgrade,
+              effectiveDate: isUpgrade ? null : periodEnd,
+            }).catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] plan change email failed'))
+          }
+        } catch (e: any) {
+          server.log.warn({ err: e?.message }, '[stripe] plan change email lookup failed')
+        }
+
+        server.log.info({ userId, from: subEnt.productId, to: targetProductId, isUpgrade }, '[stripe] subscription plan changed')
+        return {
+          ok: true,
+          isUpgrade,
+          accessUntil: isUpgrade ? null : periodEnd,
+        }
+      } catch (err: any) {
+        server.log.error({ err }, '[stripe] upgrade-subscription error')
+        return reply.status(502).send({ message: 'Failed to change subscription plan', details: err.stripeError })
+      }
+    }
+  )
 
   /** Post-payment landing pages (Stripe redirects here after checkout) */
   server.get('/success', async (_req, reply) => {

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { Lock } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { useAuthFetch } from '../auth/useAuthFetch'
 import { useGamification } from '../gamification/GamificationContext'
@@ -50,7 +51,9 @@ export default function CertificatesTab() {
   if (!isPaidTier(tier)) {
     return (
       <div className="p-6 rounded-xl border border-border bg-card text-center">
-        <div className="text-4xl mb-3">🔒</div>
+        <div className="flex justify-center mb-3">
+          <Lock className="w-10 h-10 text-muted-foreground" />
+        </div>
         <h3 className="text-lg font-semibold mb-1">Certificates are a Pro feature</h3>
         <p className="text-sm text-muted-foreground mb-4">
           Upgrade to Pro or Pro Plus to generate and download personalised achievement certificates.

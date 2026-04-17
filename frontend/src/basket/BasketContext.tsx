@@ -106,7 +106,7 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     // Suggest upgrading to Pro Plus for just £2 more
     if (hasPro) {
       result.push({
-        message: 'Upgrade to Pro Plus for just £2/month more — unlock full access to all skill labs.',
+        message: 'Upgrade to Pro Plus for just £2/month more - unlock full access to all skill labs.',
         suggestedProductId: 'sub:pro-plus',
         saving: 0,
       })

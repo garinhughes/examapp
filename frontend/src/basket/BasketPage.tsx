@@ -6,7 +6,7 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
-import { Trash2, ShoppingCart, ArrowRight, Sparkles, X } from 'lucide-react'
+import { Trash2, ShoppingCart, ArrowRight, ArrowUp } from 'lucide-react'
 import { clarityEvent, clarityTag } from '../clarity'
 
 const PayPalCheckout = lazy(() => import('./PayPalCheckout'))
@@ -138,7 +138,7 @@ export default function BasketPage() {
                 className="text-muted-foreground hover:text-destructive transition p-1"
                 title="Remove from basket"
               >
-                <X className="w-4 h-4" />
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -214,7 +214,7 @@ function SuggestionBanner({ suggestion, products }: { suggestion: { message: str
 
   return (
     <div className="p-3 rounded-lg border border-primary/30 bg-primary/5 flex items-start gap-3">
-      <Sparkles className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+      <ArrowUp className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
         <p className="text-sm text-foreground">{suggestion.message}</p>
         {suggestion.saving > 0 && (

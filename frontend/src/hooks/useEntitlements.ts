@@ -42,10 +42,20 @@ export interface CatalogProduct {
   owned: boolean
 }
 
+export interface EntitlementDetail {
+  productId: string
+  kind: string
+  purchasedAt: string
+  expiresAt: string | null
+  status: 'active' | 'cancelled' | 'expired'
+  source: 'stripe' | 'paypal' | 'admin'
+}
+
 interface EntitlementState {
   tier: Tier
   tierConfig: TierConfig
   entitlements: string[]
+  entitlementDetails: EntitlementDetail[]
   products: CatalogProduct[]
   tiers: TierConfig[]
   discountActive: boolean
@@ -78,6 +88,7 @@ export function useEntitlements(): EntitlementState {
     tier: Tier
     tierConfig: TierConfig
     entitlements: string[]
+    entitlementDetails: EntitlementDetail[]
     products: CatalogProduct[]
     tiers: TierConfig[]
     discountActive: boolean
@@ -85,6 +96,7 @@ export function useEntitlements(): EntitlementState {
     tier: user ? 'registered' : 'visitor',
     tierConfig: DEFAULT_TIER_CONFIG,
     entitlements: [],
+    entitlementDetails: [],
     products: [],
     tiers: [],
     discountActive: false,
@@ -101,6 +113,7 @@ export function useEntitlements(): EntitlementState {
           tier: json.tier ?? (user ? 'registered' : 'visitor'),
           tierConfig: json.tierConfig ?? DEFAULT_TIER_CONFIG,
           entitlements: json.entitlements ?? [],
+          entitlementDetails: json.entitlementDetails ?? [],
           products: json.products ?? [],
           tiers: json.tiers ?? [],
           discountActive: json.discountActive ?? false,
