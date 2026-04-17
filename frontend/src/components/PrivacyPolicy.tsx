@@ -10,7 +10,7 @@ export default function PrivacyPolicy() {
       </Helmet>
       <div className="max-w-3xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-extrabold mb-2">Privacy Policy</h1>
-        <p className="text-sm text-muted-foreground mb-8">Last updated: March 2026</p>
+        <p className="text-sm text-muted-foreground mb-8">Last updated: April 2026</p>
 
         <div className="prose prose-sm max-w-none space-y-8 text-foreground">
 
@@ -118,8 +118,8 @@ export default function PrivacyPolicy() {
                 privacy policy applies to that interaction.</li>
               <li><strong>Stripe</strong> - card payment processing (including Apple Pay and Google Pay). Stripe is a PCI DSS Level 1 certified payment provider.
                 Their privacy policy is available at stripe.com/privacy.</li>
-              <li><strong>PayPal</strong> - payment processing for one-time purchases and subscriptions. PayPal's
-                privacy policy applies to data you submit to PayPal.</li>
+              <li><strong>PayPal</strong> - payment processing for subscriptions. PayPal's privacy policy applies
+                to data you submit to PayPal.</li>
               <li><strong>Microsoft</strong> - we use Microsoft Clarity for session recording and heatmaps (consent-based).
                 Microsoft may collect usage data in accordance with the{' '}
                 <a href="https://www.microsoft.com/privacy/privacystatement" target="_blank" rel="noopener noreferrer" className="text-primary underline">

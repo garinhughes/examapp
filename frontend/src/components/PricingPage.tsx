@@ -389,7 +389,7 @@ export default function PricingPage() {
             },
             {
               q: 'Do prices include VAT?',
-              a: 'Prices shown are exclusive of VAT. VAT may be added at checkout depending on your location.',
+              a: 'certshack is run by a sole trader and is not VAT registered. The price shown is the exact amount you will be charged. No VAT is added.',
             },
             {
               q: 'Which payment methods are accepted?',

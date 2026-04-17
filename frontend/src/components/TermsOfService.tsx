@@ -10,7 +10,7 @@ export default function TermsOfService() {
       </Helmet>
       <div className="max-w-3xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-extrabold mb-2">Terms of Service</h1>
-        <p className="text-sm text-muted-foreground mb-8">Last updated: March 2025</p>
+        <p className="text-sm text-muted-foreground mb-8">Last updated: April 2026</p>
 
         <div className="space-y-8 text-foreground">
 
@@ -44,9 +44,8 @@ export default function TermsOfService() {
               platform are original practice material and are not leaked, stolen, or copied from official exam banks.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-2">
-              The Service is provided on a "work in progress" basis. Features may change, be removed, or be temporarily
-              unavailable without notice. We will not be liable for any disruption caused by planned or unplanned
-              maintenance.
+              Features may change or be temporarily unavailable without notice. We will not be liable for any
+              disruption caused by planned or unplanned maintenance.
             </p>
           </section>
 
@@ -64,21 +63,19 @@ export default function TermsOfService() {
             <h2 className="text-lg font-bold mb-2">5. Purchases and access</h2>
             <div className="space-y-3 text-muted-foreground">
               <p className="leading-relaxed">
-                We offer the following paid products, all priced in GBP:
+                We offer the following paid subscriptions, all priced in GBP and billed monthly:
               </p>
               <ul className="list-disc list-inside space-y-1">
-                <li><strong>Exam Passes</strong> - 12 months' access to a single exam's question bank</li>
-                <li><strong>Exam Packs</strong> - bundled access to 2 or more exams for 12 months</li>
-                <li><strong>All-Access Monthly</strong> - access to all exams and skill labs, billed monthly</li>
-                <li><strong>All-Access Annual</strong> - access to all exams and skill labs, billed annually</li>
+                <li><strong>Pro</strong> - access to all exam question banks and skill labs</li>
+                <li><strong>Pro Plus</strong> - everything in Pro, plus additional AI-assisted features</li>
               </ul>
               <p className="leading-relaxed">
-                Prices are inclusive of any applicable VAT. Access is granted to your account immediately upon successful
-                payment confirmation.
+                certshack is not VAT registered. The price shown is the exact amount charged. No VAT is added.
+                Access is granted to your account immediately upon successful payment confirmation.
               </p>
               <p className="leading-relaxed">
-                Payments are processed by Stripe (card / Apple Pay / Google Pay) or PayPal. By completing a purchase, you agree to
-                the respective payment provider's terms.
+                Payments are processed by Stripe (card / Apple Pay / Google Pay) or PayPal. By completing a purchase,
+                you agree to the respective payment provider's terms.
               </p>
             </div>
           </section>
@@ -86,15 +83,12 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-lg font-bold mb-2">6. Subscriptions and cancellation</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Monthly and annual subscriptions renew automatically at the end of each billing period. You will be
-              charged the same amount unless pricing has changed, in which case we will notify you at least 14 days
-              in advance.
+              Subscriptions renew automatically each month. You will be charged the same amount unless pricing has
+              changed, in which case we will notify you at least 14 days in advance.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-2">
-              You may cancel your subscription at any time. Cancellation stops future billing; you retain access until
-              the end of your current paid period. Cancellations and subscription management must be requested via{' '}
-              <a href="mailto:support@certshack.com" className="text-primary underline">support@certshack.com</a> or
-              via your payment provider's account portal.
+              You may cancel at any time from your account page. Cancellation stops future billing and takes effect
+              at the end of the current billing period. You retain full access until then.
             </p>
           </section>
 
