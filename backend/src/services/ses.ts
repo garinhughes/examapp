@@ -563,6 +563,51 @@ export async function sendErasureReceiptEmail(r: ErasureReceiptPayload): Promise
 }
 
 /**
+ * Refund processed — sent when an entitlement is revoked following a refund.
+ */
+export async function sendRefundedEmail(params: {
+  to: string
+  name: string
+  userId: string
+  productLabel: string
+  productId: string
+  source: 'stripe' | 'paypal'
+}): Promise<void> {
+  const stored = await getTemplate('refund-processed')
+  let subject = stored?.subject || 'Your certshack refund has been processed'
+  const vars = { name: params.name || 'there', frontendUrl: FRONTEND, productLabel: params.productLabel, productId: params.productId }
+  let bodyHtml: string
+
+  if (stored?.htmlBody) {
+    bodyHtml = interpolate(stored.htmlBody, vars)
+    subject = interpolate(subject, vars)
+  } else {
+    bodyHtml = `
+      <p style="font-size:16px;color:#333;">Hi ${vars.name},</p>
+      <p style="color:#555;">We've processed your refund. Your access to the following has been removed:</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0;border:1px solid #eee;border-radius:6px;">
+        <tr>
+          <td style="padding:12px 16px;background:#f9f9f9;border-radius:6px;">
+            <span style="color:#333;font-weight:bold;">${params.productLabel}</span>
+            <span style="font-size:11px;font-family:monospace;color:#999;margin-left:8px;">${params.productId}</span>
+          </td>
+        </tr>
+      </table>
+      <p style="color:#555;">The refund will return to your original payment method within 5–10 business days depending on your bank or payment provider.</p>
+      <p style="color:#555;">If you have any questions or believe this is an error, please reply to this email or contact us at <a href="mailto:support@certshack.com" style="color:${BRAND};">support@certshack.com</a>.</p>
+      <p style="color:#555;">You're welcome back any time.</p>
+      <p style="margin:32px 0;">
+        <a href="${FRONTEND}/pricing" style="background:${BRAND};color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:bold;">
+          View plans
+        </a>
+      </p>`
+  }
+
+  const { html, text } = await renderEmail({ title: 'Refund processed', body: bodyHtml })
+  await sendHtml({ from: FROM, to: params.to, cc: [TO], subject, html, text })
+}
+
+/**
  * Internal ops alert — plain-text notification from noreply to support@certshack.com.
  * Fire-and-forget: never throws so it can't break the main request path.
  */

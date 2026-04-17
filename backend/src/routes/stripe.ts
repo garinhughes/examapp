@@ -20,7 +20,7 @@ import crypto from 'crypto'
 import { getProduct } from '../catalog.js'
 import { grantEntitlement, revokeEntitlement, getUserEntitlements, setEntitlementExpiresAt } from '../services/entitlements.js'
 import { getUserBySub } from '../services/dynamo.js'
-import { sendPaymentConfirmedEmail, sendInternalAlert, sendSubscriptionCancelledEmail, sendSubscriptionChangedEmail, sendSubscriptionEndedEmail } from '../services/ses.js'
+import { sendPaymentConfirmedEmail, sendInternalAlert, sendRefundedEmail, sendSubscriptionCancelledEmail, sendSubscriptionChangedEmail, sendSubscriptionEndedEmail } from '../services/ses.js'
 import { logEmailSend } from '../services/emailLogs.js'
 
 const STRIPE_API = 'https://api.stripe.com/v1'
@@ -442,9 +442,29 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             const toRevoke = ents.filter((e) => e.stripeSubscriptionId === subscriptionId)
             for (const ent of toRevoke) await revokeEntitlement(userId, ent.productId)
             server.log.info({ userId, subscriptionId, productIds: toRevoke.map((e) => e.productId), chargeId: charge.id }, '[stripe] refund — subscription entitlements revoked')
+            try {
+              const user = await getUserBySub(userId)
+              if (user?.email) {
+                for (const ent of toRevoke) {
+                  const prod = getProduct(ent.productId)
+                  sendRefundedEmail({ to: user.email, name: user.name ?? user.email, userId, productLabel: prod?.label ?? ent.productId, productId: ent.productId, source: 'stripe' })
+                    .catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] refund email failed'))
+                }
+              }
+            } catch (e: any) { server.log.warn({ err: e?.message }, '[stripe] refund email lookup failed') }
           } else if (userId && productIds.length > 0) {
             for (const pid of productIds) await revokeEntitlement(userId, pid)
             server.log.info({ userId, productIds, chargeId: charge.id }, '[stripe] refund — one-off entitlements revoked')
+            try {
+              const user = await getUserBySub(userId)
+              if (user?.email) {
+                for (const pid of productIds) {
+                  const prod = getProduct(pid)
+                  sendRefundedEmail({ to: user.email, name: user.name ?? user.email, userId, productLabel: prod?.label ?? pid, productId: pid, source: 'stripe' })
+                    .catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] refund email failed'))
+                }
+              }
+            } catch (e: any) { server.log.warn({ err: e?.message }, '[stripe] refund email lookup failed') }
           } else {
             server.log.warn({ chargeId: charge.id, paymentIntentId }, '[stripe] refund — could not resolve userId, skipping revocation')
             sendInternalAlert({ subject: '[stripe] refund could not be processed', lines: [`Charge ${charge.id} refunded but userId could not be resolved.`, 'Manual review needed.'] })

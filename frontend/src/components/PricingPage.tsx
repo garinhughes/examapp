@@ -9,7 +9,7 @@ import { useAuth } from '../auth/AuthContext'
 import { useEntitlements, isPaidTier, type CatalogProduct } from '../hooks/useEntitlements'
 import { useBasket } from '../basket/BasketContext'
 import { useExam } from '../exam/ExamContext'
-import { Check, X, ShoppingCart, Hourglass } from 'lucide-react'
+import { Check, X, ShoppingCart, Hourglass, ChevronRight } from 'lucide-react'
 import { clarityEvent, clarityTag } from '../clarity'
 
 /* ------------------------------------------------------------------ */
@@ -361,6 +361,51 @@ export default function PricingPage() {
           ))}
         </div>
       )}
+
+      {/* FAQ */}
+      <section className="p-6 md:p-10 rounded-xl bg-card border border-border shadow-sm">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+        <div className="max-w-3xl mx-auto space-y-6">
+          {[
+            {
+              q: 'Can I try certshack before paying?',
+              a: 'Yes. You can browse exams and skill labs as a visitor with no account required. Creating a free account unlocks more content: up to 40 questions per exam, analytics, badges, and unlimited saved attempts. No credit card needed.',
+            },
+            {
+              q: 'What does Pro include that Free doesn\'t?',
+              a: 'Pro unlocks the full question bank for all exams and a wider selection of skill labs. You also get unlimited attempts per exam and access to new content as soon as it\'s published.',
+            },
+            {
+              q: 'What does Pro Plus add on top of Pro?',
+              a: 'Pro Plus includes everything in Pro plus full access to all skill labs, including the most advanced lab types. It\'s the best option if you want to build hands-on practical skills alongside your exam preparation.',
+            },
+            {
+              q: 'Can I cancel my subscription at any time?',
+              a: 'Yes, you can cancel at any time from your account page. Your access continues until the end of the billing period you\'ve already paid for. You won\'t be charged again after cancelling.',
+            },
+            {
+              q: 'What is your refund policy?',
+              a: 'We offer refunds within 7 days of purchase if you\'re not satisfied. To request a refund, email support@certshack.com with your order details and we\'ll process it promptly. Refund requests are handled manually to prevent abuse. We don\'t offer in-app self-service refunds.',
+            },
+            {
+              q: 'Do prices include VAT?',
+              a: 'Prices shown are exclusive of VAT. VAT may be added at checkout depending on your location.',
+            },
+            {
+              q: 'Which payment methods are accepted?',
+              a: 'We accept all major credit and debit cards via Stripe, as well as PayPal, Apple Pay, and Google Pay.',
+            },
+          ].map(({ q, a }) => (
+            <details key={q} className="group">
+              <summary className="cursor-pointer font-semibold text-foreground hover:text-primary transition-colors list-none flex items-center justify-between">
+                <span>{q}</span>
+                <ChevronRight className="w-4 h-4 transition-transform group-open:rotate-90 shrink-0 ml-2" />
+              </summary>
+              <p className="mt-2 text-sm text-muted-foreground">{a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
 
       {/* Not logged in CTA */}
       {!user && (

@@ -105,11 +105,11 @@ export function PracticeExams() {
                   </div>
                   {ex.logo && (
                     ex.logoHref ? (
-                      <a href={ex.logoHref} title="Amazon.com Inc., Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>, via Wikimedia Commons" target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-background rounded-full p-1 shadow-sm" aria-label={`${ex.provider ?? 'Provider'} logo link`}>
+                      <a href={ex.logoHref} title="Amazon.com Inc., Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>, via Wikimedia Commons" target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-white rounded-full p-1 shadow-sm" aria-label={`${ex.provider ?? 'Provider'} logo link`}>
                         <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
                       </a>
                     ) : (
-                      <div className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-background rounded-full p-1 shadow-sm" aria-hidden>
+                      <div className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-white rounded-full p-1 shadow-sm" aria-hidden>
                         <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
                       </div>
                     )

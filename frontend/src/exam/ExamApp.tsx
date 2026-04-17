@@ -139,20 +139,29 @@ function ExamAppInner() {
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Exam in progress top bar — shown on Overview, Analytics, Exams when exam is saved */}
         {anySavedExam && !examStarted && (route === 'home' || route === 'analytics' || route === 'practice') && (
-          <div className="flex items-center px-4 py-3 border-b border-border bg-card/80 backdrop-blur-sm shrink-0 z-10">
-            <div className="flex-1" />
-            <div className="flex items-center gap-3">
-              <button
-                className="px-3 py-1.5 rounded-md bg-primary text-white text-sm inline-flex items-center gap-1.5 shadow-sm hover:bg-primary/90 transition whitespace-nowrap"
-                onClick={() => resumeExam(anySavedExam.code)}
-              >
-                <Play className="w-3.5 h-3.5" aria-hidden />
-                Resume
-              </button>
-              <span className="font-semibold text-base text-foreground whitespace-nowrap">Exam in progress</span>
-              <span className="hidden sm:inline text-sm text-muted-foreground truncate">{anySavedExam.title} · {anySavedExam.answeredCount}/{anySavedExam.total} answered</span>
+          <div className="flex justify-center px-4 py-2.5 border-b border-border bg-card/80 backdrop-blur-sm shrink-0 z-10">
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-sm text-foreground whitespace-nowrap">Exam in progress</span>
+                <span className="hidden sm:inline text-xs text-muted-foreground truncate">{anySavedExam.title} · {anySavedExam.answeredCount}/{anySavedExam.total} answered</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  className="px-3 py-1 rounded-md bg-primary text-white text-xs inline-flex items-center gap-1.5 shadow-sm hover:bg-primary/90 transition whitespace-nowrap"
+                  onClick={() => resumeExam(anySavedExam.code)}
+                >
+                  <Play className="w-3 h-3" aria-hidden />
+                  Resume
+                </button>
+                <button
+                  className="px-3 py-1 rounded-md bg-muted text-muted-foreground border border-border text-xs inline-flex items-center gap-1.5 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition whitespace-nowrap"
+                  onClick={() => setShowCancelConfirm(true)}
+                >
+                  <X className="w-3 h-3" aria-hidden />
+                  Cancel
+                </button>
+              </div>
             </div>
-            <div className="flex-1 md:pr-10" />
           </div>
         )}
 

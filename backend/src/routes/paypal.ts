@@ -21,7 +21,7 @@ import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { getProduct } from '../catalog.js'
 import { grantEntitlement, revokeEntitlement, getUserEntitlements, setEntitlementExpiresAt } from '../services/entitlements.js'
-import { sendInternalAlert, sendPaymentConfirmedEmail, sendSubscriptionCancelledEmail } from '../services/ses.js'
+import { sendInternalAlert, sendPaymentConfirmedEmail, sendRefundedEmail, sendSubscriptionCancelledEmail } from '../services/ses.js'
 import { putPaypalSession, getPaypalSession, deletePaypalSession } from '../services/paypalSessions.js'
 import { ddb, ENTITLEMENTS_TABLE, getUserBySub } from '../services/dynamo.js'
 import { logEmailSend } from '../services/emailLogs.js'
@@ -302,6 +302,20 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             server.log.info({ subscriptionId, saleId: resource?.id, revokedCount: items.length }, '[paypal] refund — entitlements revoked')
             if (items.length === 0) {
               server.log.warn({ subscriptionId, saleId: resource?.id }, '[paypal] refund — no entitlements found for subscription')
+            }
+            // Email each affected user
+            const notified = new Set<string>()
+            for (const item of items) {
+              if (notified.has(item.userId)) continue
+              notified.add(item.userId)
+              try {
+                const user = await getUserBySub(item.userId)
+                if (user?.email) {
+                  const prod = getProduct(item.productId)
+                  sendRefundedEmail({ to: user.email, name: user.name ?? user.email, userId: item.userId, productLabel: prod?.label ?? item.productId, productId: item.productId, source: 'paypal' })
+                    .catch((e: any) => server.log.warn({ err: e?.message }, '[paypal] refund email failed'))
+                }
+              } catch (e: any) { server.log.warn({ err: e?.message }, '[paypal] refund email lookup failed') }
             }
           } catch (err) {
             server.log.error({ err, subscriptionId }, '[paypal] PAYMENT.SALE.REFUNDED handling failed')
