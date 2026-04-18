@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Flag, Star, ChevronLeft, ChevronRight, CircleCheck, Pause, Play } from 'lucide-react'
+import { Flag, Star, ChevronLeft, ChevronRight, CircleCheck } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { ReportIssueModal } from '../components/ReportIssueModal'
 import { RatingModal } from '@/feedback/RatingModal'
@@ -108,7 +108,7 @@ export function QuestionNav({ focusMode = false, reviewingFlagged = false }: { f
     displayQuestions, selectedAnswers, flaggedQuestions, currentQuestionIndex,
     setCurrentQuestionIndex, setFlaggedQuestions, isFinished, revealAnswers,
     revealedQuestions, setShowSubmitConfirm, setShowCompleteEarlyConfirm,
-    userTier, timed, timeLeft, paused, setPaused, selected, selectedMeta, ratingTarget, setRatingTarget,
+    userTier, timed, setPaused, selected, selectedMeta, ratingTarget, setRatingTarget,
   } = useExam()
 
   const canReport = userTier !== 'visitor'
@@ -145,23 +145,6 @@ export function QuestionNav({ focusMode = false, reviewingFlagged = false }: { f
   return (
     <>
     <div className="mb-2 space-y-2">
-      {/* Mobile-only timer strip */}
-      {timed && timeLeft !== null && (
-        <div className="flex sm:hidden items-center gap-2 py-0.5 justify-end">
-          <button
-            onClick={() => setPaused(p => !p)}
-            className={`p-1 rounded transition-colors ${paused ? 'bg-primary/10 text-primary' : 'hover:bg-muted/40 text-muted-foreground'}`}
-            title={paused ? 'Resume' : 'Pause'}
-          >
-            {paused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
-          </button>
-          <span className={`text-sm tabular-nums font-medium ${paused ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`}>
-            {Math.floor(timeLeft / 60).toString().padStart(2, '0')}:{(timeLeft % 60).toString().padStart(2, '0')}
-            {paused && <span className="ml-1 text-xs">(paused)</span>}
-          </span>
-        </div>
-      )}
-
       {/* Modern progress bar — position, flags, answered state; no per-cell numbers */}
       {(() => {
         const total = displayQuestions.length

@@ -186,7 +186,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
   return (
     <>
       {/* ─── Mobile: hamburger + overlay drawer ─── */}
-      <div className="md:hidden fixed top-4 right-4 z-50">
+      <div className="md:hidden fixed top-4 right-1 z-50">
         <Button variant="outline" size="icon" onClick={() => setMobileOpen(o => !o)}>
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>

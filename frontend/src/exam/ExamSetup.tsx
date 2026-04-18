@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Brain, Eye, Lock, ChevronDown, ChevronLeft, Volume2, Settings2, Coffee, Hourglass } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useExam } from './ExamContext'
@@ -30,6 +30,12 @@ export function ExamSetup() {
   const tour = useTourContext()
   const locked = !!attemptId && !isFinished
   const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [qInputVal, setQInputVal] = useState(String(numQuestions))
+  const [durInputVal, setDurInputVal] = useState(String(durationMinutes))
+
+  // Keep local string inputs in sync when slider or external state changes
+  useEffect(() => { setQInputVal(String(numQuestions)) }, [numQuestions])
+  useEffect(() => { setDurInputVal(String(durationMinutes)) }, [durationMinutes])
 
   const domainsList: string[] = attemptData?.perDomain
     ? Object.keys(attemptData.perDomain)
@@ -38,7 +44,7 @@ export function ExamSetup() {
 
   const PRACTICE_DEFAULT_QUESTIONS = 40
   const defaultQuestions = selectedMeta?.defaultQuestions ?? selectedMeta?.defaultQuestionCount ?? questions.length
-  const defaultDuration: number | null = typeof selectedMeta?.defaultDuration === 'number' ? selectedMeta.defaultDuration : null
+
   const passMark: number | null = typeof selectedMeta?.passMark === 'number' ? selectedMeta.passMark : null
 
   // Card stat counts: show user's custom numQuestions if set, otherwise show mode defaults
@@ -221,7 +227,7 @@ export function ExamSetup() {
               </div>
               <div>
                 <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">Duration</div>
-                <div className="text-sm font-semibold">{formatDuration(defaultDuration)}</div>
+                <div className="text-sm font-semibold">{formatDuration(durationMinutes)}</div>
               </div>
               <div>
                 <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">Passing score</div>
@@ -264,7 +270,7 @@ export function ExamSetup() {
                   const clampedVal = Math.min(numQuestions, maxQ)
                   return <>
                     <input type="range" min={1} max={maxQ} step={1} value={clampedVal} onChange={(e) => setNumQuestions(Math.min(Number(e.target.value) || 1, maxQ))} className="flex-1" disabled={locked} />
-                    <input type="number" min={1} max={maxQ} step={1} value={clampedVal} onChange={(e) => setNumQuestions(Math.min(Math.max(1, Number(e.target.value) || 1), maxQ))} className="w-28 px-2 py-1 rounded bg-muted/40 text-foreground border border-border dark:border-transparent" disabled={locked} />
+                    <input type="number" min={1} max={maxQ} step={1} value={qInputVal} onChange={(e) => { setQInputVal(e.target.value); const n = parseInt(e.target.value); if (!isNaN(n) && n >= 1) setNumQuestions(Math.min(n, maxQ)) }} onBlur={(e) => { const n = parseInt(e.target.value); const v = isNaN(n) ? 1 : Math.min(Math.max(1, n), maxQ); setNumQuestions(v); setQInputVal(String(v)) }} className="w-28 px-2 py-1 rounded bg-muted/40 text-foreground border border-border dark:border-transparent" disabled={locked} />
                     {clampedVal >= maxQ && <span className="text-xs font-semibold text-orange-500">max</span>}
                   </>
                 })()}
@@ -277,7 +283,7 @@ export function ExamSetup() {
                 <label className="block text-sm font-medium mb-1">Duration (mins)</label>
                 <div className="flex items-center gap-3">
                   <input type="range" min={1} max={300} step={5} value={durationMinutes} onChange={(e) => setDurationMinutes(Number(e.target.value) || 1)} className="flex-1" disabled={locked} />
-                  <input type="number" min={1} step={5} value={durationMinutes} onChange={(e) => setDurationMinutes(Number(e.target.value) || 1)} className="w-28 px-2 py-1 rounded bg-muted/40 text-foreground border border-border dark:border-transparent" disabled={locked} />
+                  <input type="number" min={1} step={5} value={durInputVal} onChange={(e) => { setDurInputVal(e.target.value); const n = parseInt(e.target.value); if (!isNaN(n) && n >= 1) setDurationMinutes(n) }} onBlur={(e) => { const n = parseInt(e.target.value); const v = isNaN(n) ? 1 : Math.max(1, n); setDurationMinutes(v); setDurInputVal(String(v)) }} className="w-28 px-2 py-1 rounded bg-muted/40 text-foreground border border-border dark:border-transparent" disabled={locked} />
                 </div>
               </div>
             )}

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Flag } from 'lucide-react'
+import { Flag, PauseCircle } from 'lucide-react'
 import { Confetti, RewardModal } from '../components/Confetti'
 import { useExam } from './ExamContext'
 
@@ -39,10 +39,11 @@ export function Modals({ onReviewAnswers }: { onReviewAnswers?: () => void }) {
         <div className="fixed inset-0 z-40 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
           <div className="relative text-center">
-            <div className="text-4xl font-bold mb-4">⏸ Paused</div>
-            <div className="text-sm text-muted-foreground mb-6">Questions are hidden while paused</div>
+            <PauseCircle className="w-16 h-16 text-primary mx-auto mb-3" />
+            <div className="text-2xl font-bold text-primary mb-1">Paused</div>
+            <div className="text-sm text-white/70 mb-6">Questions are hidden while paused</div>
             <button
-              className="px-6 py-2 rounded-lg bg-primary/90 text-white text-lg font-semibold hover:bg-primary transition-colors"
+              className="px-6 py-2 rounded-lg bg-primary text-white text-base font-semibold hover:bg-primary/80 transition-colors"
               onClick={() => setPaused(false)}
             >
               Resume

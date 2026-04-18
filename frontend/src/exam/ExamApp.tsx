@@ -212,7 +212,7 @@ function ExamAppInner() {
         )}
 
         {!focusMode && (
-          <div className="absolute top-4 right-4 z-10 hidden md:flex gap-2">
+          <div className="absolute top-4 right-4 z-10 hidden lg:flex gap-2">
             <ThemeToggle />
           </div>
         )}
