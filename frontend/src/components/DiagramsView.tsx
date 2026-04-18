@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useTheme } from 'next-themes'
 import mermaid from 'mermaid'
 import { icons as logosIcons } from '@iconify-json/logos'
 
@@ -61,7 +60,12 @@ function ensureIconPacks() {
 }
 
 export function DiagramsView() {
-  const { resolvedTheme } = useTheme()
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const obs = new MutationObserver(() => setIsDark(document.documentElement.classList.contains('dark')))
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
   const [code, setCode] = useState(SAMPLE_DIAGRAM)
   const [svg, setSvg] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
@@ -153,10 +157,10 @@ export function DiagramsView() {
   }, [ensureViewBox])
 
   useEffect(() => {
-    const theme = resolvedTheme ?? 'dark'
+    const theme = isDark ? 'dark' : 'light'
     const timer = setTimeout(() => renderDiagram(code, theme), 300)
     return () => clearTimeout(timer)
-  }, [code, resolvedTheme, renderDiagram])
+  }, [code, isDark, renderDiagram])
 
   return (
     <div className="space-y-6">

@@ -1,19 +1,18 @@
-import { useTheme } from "next-themes";
+import { useExam } from "@/exam/ExamContext";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon } from "lucide-react";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
+  const { dark, setDark } = useExam();
 
   return (
     <Button
       variant="outline"
       size="icon"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      onClick={() => setDark(!dark)}
+      title={dark ? "Switch to Light Mode" : "Switch to Dark Mode"}
     >
-      {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
     </Button>
   );
 }

@@ -577,6 +577,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     for (const p of result) {
       p.exams.sort((a: any, b: any) => getLevel(a) - getLevel(b))
     }
+    result.sort((a, b) => a.provider.localeCompare(b.provider))
     return result
   }, [exams])
 
