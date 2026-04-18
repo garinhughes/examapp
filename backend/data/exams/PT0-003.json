@@ -44,7 +44,8 @@
       "explanation": "When a tester discovers a host outside the authorized scope, the correct action is to stop and seek written clarification from the client before taking any further action. Proceeding without authorization, even via passive techniques, risks legal exposure and violates the contractual terms of the engagement.\n\n**Why it works:** Rules of engagement define the authorized boundary. Any system outside that boundary requires explicit written approval before the tester may interact with it.\n\n**Why the others don't work:**\n- Continuing passively still constitutes interaction with an unauthorized system and creates legal liability regardless of the technique's passivity.\n- Assuming network range ownership implies blanket authorization ignores the reality that co-located or third-party assets are common and require separate consent.\n- Silently excluding the host without notifying the client fails to provide useful asset intelligence and removes the client's ability to resolve the authorization gap.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0002",
@@ -82,7 +83,8 @@
       "explanation": "Rules of engagement must explicitly authorize each category of testing activity. When exploitation is not mentioned, the tester cannot infer permission from the existence of a maintenance window. The correct action is to immediately contact the designated point of contact to seek written clarification while the window is still available.\n\n**Why it works:** Express authorization is required for each escalation of activity. Contacting the client in real time resolves the ambiguity without wasting the remaining testing window.\n\n**Why the others don't work:**\n- Inferring authorization from the purpose of the maintenance window substitutes assumption for consent, which is contractually and legally insufficient.\n- Waiting until the end of the engagement to amend the RoE is overly rigid and wastes available testing time when the client contact is reachable.\n- Logging the gap without seeking clarification deprives the client of the chance to authorize useful work during an already-booked testing window.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0003",
@@ -120,7 +122,8 @@
       "explanation": "When a client-listed domain resolves to shared third-party infrastructure such as a CDN, the tester requires authorization not just from the client but from the infrastructure owner. Testing shared IPs without the provider's authorization risks collateral impact on other tenants and violates the provider's terms of service.\n\n**Why it works:** Written confirmation from the CDN provider ensures the tester is legally covered and prevents unauthorized interaction with infrastructure shared by other customers.\n\n**Why the others don't work:**\n- Treating a domain name listing as implicit infrastructure authorization conflates application-layer permission with infrastructure-level permission.\n- Classifying active DNS queries as pre-authorization intelligence gathering to bypass consent requirements misuses a technical distinction to avoid a contractual requirement.\n- Silently removing domains without informing the client reduces assessment coverage without giving the client a chance to resolve the authorization gap with the CDN provider.",
       "domain": "Engagement Management",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0004",
@@ -165,7 +168,8 @@
       "explanation": "Two categories of signed documentation are mandatory before active penetration testing begins: a scoping agreement that defines what is authorized, and rules of engagement that define how testing may be conducted. Both protect the tester legally and ensure the client understands the boundaries of the assessment.\n\n**Why the others don't qualify:**\n- A pre-populated remediation roadmap is a findings-based post-engagement deliverable, not an authorization instrument.\n- The client's vulnerability management policy is useful context but is not a substitute for a signed authorization document.\n- Verbal authorization, even when recorded in writing informally, is legally insufficient and does not replace a signed contract in any jurisdiction.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0005",
@@ -205,7 +209,8 @@
       "explanation": "Pre-engagement planning follows a logical dependency chain: understanding the client's context and assets comes first, which informs target selection, which informs the rules of engagement, and all of this must be formally countersigned before active testing is authorized. Each step depends on the output of the one before it.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0006",
@@ -243,7 +248,8 @@
       "explanation": "Written authorization is a non-negotiable prerequisite for all engagement activities. Verbal approval provides no legal protection if the client later disputes the engagement or if disruption occurs.\n\n**Why it works:** A signed rules of engagement document establishes explicit scope, boundaries, and consent, protecting the tester and the firm from legal liability for every action taken during the assessment.\n\n**Why the others don't work:**\n- Passive reconnaissance is not exempted from the written authorization requirement; all engagement activities require documented prior consent.\n- A follow-up email sent after testing has started does not satisfy the requirement for prior written authorization.\n- Retroactive authorization obtained after unauthorized testing has occurred does not protect against liability for actions already taken.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0007",
@@ -281,7 +287,8 @@
       "explanation": "The discovery of an active, pre-existing compromise during a penetration test creates an immediate reporting obligation. This is distinct from documenting a hypothetical vulnerability — an unauthorized web shell represents a live breach requiring the client to act without delay.\n\n**Why it works:** Immediately notifying the emergency escalation contact allows the client to initiate incident response while the tester retains first-hand knowledge of the finding's evidence and location.\n\n**Why the others don't work:**\n- Including the finding in the final report delays client action by the remaining engagement period, allowing the breach to persist.\n- Raising it in two days at the scheduled update treats an active breach as routine status information.\n- Internally deliberating over whether to notify the client is the client's decision, not the tester's — escalation is not optional.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0008",
@@ -326,7 +333,8 @@
       "explanation": "`PCI DSS` Requirement 11.4 mandates penetration testing that covers all cardholder data environment components and includes both internal and external testing vectors. These two requirements define the minimum scope and methodology the assessment must satisfy.\n\n**Why the others don't work:**\n- Restricting techniques to read-only methods is not a `PCI DSS` requirement and unnecessarily limits assessment effectiveness.\n- Severity filtering to critical and high is not mandated; all exploitable findings must be reported.\n- Card brand written approval is not a prerequisite stipulated by `PCI DSS` for penetration tests.",
       "domain": "Engagement Management",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0009",
@@ -364,7 +372,8 @@
       "explanation": "IP addresses in a shared cloud environment may serve systems belonging to multiple tenants. Testing an in-scope IP without confirming the instance is exclusively the client's introduces the risk of unauthorized access to third-party systems, which may constitute a criminal offense regardless of the IP appearing in the agreed scope.\n\n**Why it works:** Client confirmation of dedicated tenancy eliminates the legal ambiguity before any active engagement activity begins, ensuring authorization genuinely covers the target.\n\n**Why the others don't work:**\n- Scope inclusion does not transfer liability to the cloud provider when the tester actively tests a system that may serve third parties.\n- Restricting the technique to port scanning removes neither the legal risk nor the obligation to confirm ownership.\n- Cloud provider `AUP` compliance does not address whether the specific instance is exclusively the client's.",
       "domain": "Engagement Management",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0010",
@@ -410,7 +419,8 @@
       "explanation": "Legal authorization follows a dependency chain: regulatory understanding informs scope, scope drives the content of authorization documents, those documents must be signed before testing, and testing only begins once authorization is confirmed in hand. Each step provides the foundation for the next.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0011",
@@ -448,7 +458,8 @@
       "explanation": "Critical vulnerabilities on internet-facing systems present an immediate risk that cannot be managed through a delayed reporting cycle. Most rules of engagement implicitly — and best practice explicitly — require real-time escalation of critical findings via a designated emergency contact.\n\n**Why it works:** Directly notifying the designated contact immediately allows the client to begin emergency patching or compensating controls while the engagement continues, limiting the window of exposure.\n\n**Why the others don't work:**\n- Routing the finding through a weekly status summary introduces avoidable days of delay while a critical vulnerability remains exploitable.\n- Waiting for the next scheduled update treats a critical active risk the same as a routine low-severity finding.\n- Requiring internal consensus before notification delays disclosure of an urgent finding and prioritizes process over client safety.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0012",
@@ -486,7 +497,8 @@
       "explanation": "Effective risk articulation means providing the board with an accurate picture of business risk — which requires explaining not just severity ratings but the conditions under which a vulnerability could be exploited. `CVSS` base scores are designed for technical comparison, not executive decision-making.\n\n**Why it works:** Describing the attacker prerequisites in plain language allows a non-technical board to correctly calibrate risk against their threat model without misinterpreting a critical `CVSS` score as an emergency when exploitation requires privileged internal access.\n\n**Why the others don't work:**\n- Unmodified `CVSS` base scores without context overstate risk for findings that require internal privileged access for a purely external threat landscape.\n- Omitting findings from the executive summary deprives the board of information relevant to risk governance decisions.\n- Speculative financial loss estimates without an actuarial basis can mislead rather than inform.",
       "domain": "Engagement Management",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0013",
@@ -524,7 +536,8 @@
       "explanation": "Peer review is a quality assurance mechanism designed to catch errors and ensure defensible severity ratings through structured technical discussion. When a disagreement arises, the correct approach is to return to a shared severity framework and work toward a documented consensus.\n\n**Why it works:** Evaluating both positions against `CVSS` criteria or an equivalent rubric grounds the disagreement in observable technical factors — exploitability conditions, scope, and impact — rather than seniority or opinion.\n\n**Why the others don't work:**\n- Accepting the senior rating without technical discussion does not validate which assessment is correct.\n- Delivering a report with an unresolved internal disagreement documented transfers the decision to the client, which is not appropriate.\n- Escalating to management without attempting resolution at the technical level skips the primary purpose of the peer review process.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0014",
@@ -569,7 +582,8 @@
       "explanation": "A mid-engagement scope expansion requires the same authorization rigor as the original statement of work. Both a formal written amendment and a verification that the added systems are exclusively client-owned are necessary before any testing on the new subnets begins.\n\n**Why the others don't work:**\n- Verbal approval from a single team contact is not equivalent to a signed scope amendment and creates the same legal exposure as operating without authorization.\n- Full legal department review before any action is a disproportionate escalation path for routine scope amendments.\n- Internal working notes updated by the tester carry no authorization weight for expanding the legal scope of the engagement.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0015",
@@ -627,7 +641,8 @@
       "explanation": "Effective engagement communication depends on matching the nature of the information to the appropriate channel. Critical findings require immediate escalation, scope changes require formal written authorization, routine progress belongs in scheduled reports, and sensitive evidence must be protected with encryption in transit.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0016",
@@ -665,7 +680,8 @@
       "explanation": "The executive summary must serve a non-technical audience making business and governance decisions. This requires translating technical findings into the language of business consequence — data exposure, regulatory penalties, and operational impact — rather than presenting severity scores or vulnerability details.\n\n**Why it works:** Business consequence language allows board members to understand the relevance of findings to organizational risk and resource allocation without requiring them to interpret `CVSS` scores or security taxonomies.\n\n**Why the others don't work:**\n- A `CVE`/`CVSS` listing with a one-paragraph summary still requires technical literacy to interpret the severity table correctly.\n- Payload strings and parameter names are evidence artifacts appropriate for the technical findings section, not board-level communication.\n- Reproducing the technical section verbatim is the opposite of an executive summary and transfers the interpretation burden to the audience.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0017",
@@ -703,7 +719,8 @@
       "explanation": "A technically sound finding requires enough evidence for the remediation team to reproduce the vulnerability independently, understand its exact scope, implement a targeted fix, and verify the remediation is effective. All four evidence components serve distinct functions that cannot be replaced by a severity score or a generic reference.\n\n**Why it works:** The payload, parameter name, screenshot, and reproduction steps together form a self-contained, verifiable record of the vulnerability that the client's team can act on without further input from the tester.\n\n**Why the others don't work:**\n- A generic vulnerability definition does not document that this specific instance exists in the client's specific application.\n- `CVSS` scores classify severity but do not provide any information about where or how to find or fix the issue.\n- Omitting evidence components to prevent misuse creates a finding that cannot be properly remediated; distribution controls are the appropriate safeguard.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0018",
@@ -748,7 +765,8 @@
       "explanation": "High-quality remediation guidance is specific to what the tester observed and helps the client sequence corrective actions effectively. Recommendations that are generic or fail to prioritize leave the remediation team without a clear path to reducing risk in order of impact.\n\n**Why the others don't work:**\n- Monetary cost estimates introduce speculation and are outside the scope of penetration test remediation guidance.\n- Reproducing exploit payloads in the remediation section conflates evidence documentation with corrective action guidance.\n- Instructing universal service disablement ignores operational constraints and is disproportionate as a general remediation approach.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0019",
@@ -786,7 +804,8 @@
       "explanation": "A penetration test report serving both executive and technical audiences is most effective when structured into clearly separated sections, each calibrated to its audience. A single middle-depth document typically fails both: too technical for the CFO, too abstract for the DevSecOps team.\n\n**Why it works:** A dedicated executive summary section provides the CFO with business consequence language and strategic risk findings, while the technical findings section gives the DevSecOps team the reproduction steps, evidence, and remediation detail needed to implement fixes.\n\n**Why the others don't work:**\n- A middle-depth unified document fails to meet the specific depth requirement of either audience.\n- A cover letter attached to a technical report is not an adequate substitute for a structured executive summary.\n- Verbal briefings are supplementary; the CFO should have a written record to reference for budget justification and governance accountability.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0020",
@@ -838,7 +857,8 @@
       "explanation": "Penetration test report production follows a dependency chain: evidence must be compiled before it can be rated, ratings must exist before the technical section can be written, findings must be documented before remediation can be recommended, and all sections must be complete before an executive summary can accurately synthesize them. Peer review is the final gate before client delivery.",
       "domain": "Engagement Management",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0021",
@@ -879,7 +899,8 @@
       "explanation": "Querying certificate transparency logs, `WHOIS` records, and `DNS` infrastructure data via public registries falls within `OSINT` and does not generate any traffic toward the client's systems, making it the only option that satisfies the pre-authorization passive restriction.\n\n**Why it works:** Certificate transparency logs, `WHOIS` databases, and `MX`/`SPF` records are maintained by third-party public registries. Querying them does not contact the client's infrastructure and leaves no trace on client-owned systems.\n\n**Why the others don't work:**\n- Running `nmap` against the client's `ASN`: Actively transmits packets to client-owned IP space before authorization is received.\n- Deploying `wireshark` on an adjacent segment: Requires unauthorized network access that is outside the tester's current scope.\n- Sending `DNS` zone transfer requests: Directly contacts the client's authoritative name servers, constituting active reconnaissance against client-owned infrastructure.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nmap.org/book/man.html"
     },
     {
       "id": "PT0-003-0022",
@@ -920,7 +941,8 @@
       "explanation": "Sending gratuitous `ARP` replies to poison the target's gateway mapping causes immediate traffic redirection on a switched network without requiring any action from the target host.\n\n**Why it works:** `ARP` poisoning overwrites the cached `MAC` address for the gateway in the target's `ARP` table, causing all routed packets to be forwarded to the attacker's interface instead. `wireshark` can then capture the plaintext `HTTP` credentials in the intercepted session.\n\n**Why the others don't work:**\n- Forged `DHCP` offers: Only take effect on lease renewal, which may not occur during the testing window.\n- `ICMP` redirect messages: Ignored by most modern operating systems as a standard security hardening measure.\n- `DNS` cache poisoning: Affects only new connections initiated after poisoning and cannot redirect an existing `TCP` session.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://www.wireshark.org/docs/wsug_html_chunked/"
     },
     {
       "id": "PT0-003-0023",
@@ -960,7 +982,8 @@
       "explanation": "Using `-sS --randomize-hosts` with a reduced timing template disrupts the sequential scanning pattern that the `IDS` is configured to detect, enabling full port coverage without triggering signature-based alerts.\n\n**Why it works:** Randomizing host order and slowing the timing template distributes probe packets across the window in a non-sequential pattern, avoiding the sustained burst that `IDS` rules typically match. `-sS` avoids completing the `TCP` handshake, reducing log entries on the target.\n\n**Why the others don't work:**\n- `-sT -T5` sequential scan: Produces exactly the sequential pattern the `IDS` is configured to detect and generates more-visible completed `TCP` connections.\n- `-sU` `UDP`-only: Does not cover `TCP` ports and fails the full non-standard port coverage requirement.\n- `--script vuln` against top-1000 ports: Misses non-standard ports entirely and adds script-generated noise that increases detection risk.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nmap.org/book/man.html"
     },
     {
       "id": "PT0-003-0024",
@@ -1009,7 +1032,8 @@
       "explanation": "Reviewing job postings and querying `Shodan` are both passive techniques that rely on publicly available data without contacting client-owned systems.\n\nJob postings are public information that reveals technology stack and tooling choices without any interaction with the client's infrastructure. `Shodan` provides pre-indexed banner and certificate data gathered by its own crawlers, so querying it generates no traffic toward the client.\n\n**Why the others don't work:**\n- `DNS` brute-force: Sends query packets directly to client authoritative name servers, violating the passive constraint.\n- `nmap` version detection: Actively probes the client's IP ranges, which is prohibited during the passive-only phase.\n- `nikto` crawling: Issues `HTTP` requests directly to the client's web application, constituting active contact with client-owned infrastructure.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://help.shodan.io/"
     },
     {
       "id": "PT0-003-0025",
@@ -1067,7 +1091,8 @@
       "explanation": "Each reconnaissance category is distinguished by its level of interaction with the target's infrastructure and the resulting detection risk.\n\n`OSINT` specifically leverages named third-party public sources such as certificate logs and `WHOIS` registries. Network sniffing captures packets on a segment the tester already has access to, without probing the target directly. Passive reconnaissance is the umbrella category covering all techniques that avoid contacting the target, including `OSINT` and traffic observation. Protocol scanning actively sends crafted `TCP` and `UDP` probes to enumerate services on target hosts.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/tactics/TA0043/"
     },
     {
       "id": "PT0-003-0026",
@@ -1107,7 +1132,8 @@
       "explanation": "Requesting a `zone transfer` with `dig` `@ns1.target.com` `target.com` `AXFR` is the correct approach for retrieving all `DNS` records from a misconfigured authoritative server in a single operation.\n\n**Why it works:** The `AXFR` query type is the standard mechanism for `DNS` zone replication. When a server is improperly configured, it responds to this request from unauthorized clients, disclosing all hostnames, IP addresses, and record types in the zone.\n\n**Why the others don't work:**\n- Distractor B: `dnsenum` performs incremental brute-force enumeration rather than a direct `zone transfer` request - it is slower and less complete for this specific scenario.\n- Distractor C: A `dig` `ANY` query targets a recursive resolver and returns only cached or advertised records - modern resolvers restrict this response type and it does not replicate the full zone.\n- Distractor D: Querying `MX` records is scoped to mail infrastructure only and provides no mechanism for retrieving the complete `DNS` zone.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://linux.die.net/man/1/dig"
     },
     {
       "id": "PT0-003-0027",
@@ -1146,7 +1172,8 @@
       "explanation": "`nmap` `-sV` `-T4` `-p` `1-1024` is the most efficient choice for service version detection while managing scan noise.\n\n**Why it works:** The `-sV` flag sends service probes to each open port and matches responses against a database of known banners, returning the service name and version. Limiting the scan to ports `1-1024` covers the well-known service range and the `-T4` template keeps scan duration reasonable without flooding the network.\n\n**Why the others don't work:**\n- Distractor B: `-A` `-p-` enables OS detection, scripting, and traceroute across all ports - this produces far more traffic and noise than permitted under the rules of engagement.\n- Distractor C: `-sn` is a ping sweep for host discovery only and performs no port or service probing at all.\n- Distractor D: The `banner` NSE script on two ports returns only raw banners from web ports and does not perform structured version detection across the full common-port range.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nmap.org/book/man.html"
     },
     {
       "id": "PT0-003-0028",
@@ -1187,7 +1214,8 @@
       "explanation": "Using `gobuster dir` with `--exclude-length` set to the wildcard response size is the correct approach for suppressing false positives caused by universal 200 responses.\n\n**Why it works:** Wildcard pages typically return a fixed content length because the same error or redirect page is served for every unknown path. By identifying that length from an initial test request and passing it to `--exclude-length`, `gobuster` discards matching responses and surfaces only paths with distinct content.\n\n**Why the others don't work:**\n- Distractor A: Switching to `dirb` without explicit wildcard filtering does not reliably solve the problem - the tool requires its own calibration against the wildcard response.\n- Distractor B: The `--wildcard` flag only prevents `gobuster` from aborting - it does not filter the false-positive responses from output.\n- Distractor C: Throttling threads with `-t` `5` slows the scan but has no effect on the server's wildcard behavior - every path still returns 200 regardless of request rate.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/OJ/gobuster"
     },
     {
       "id": "PT0-003-0029",
@@ -1235,7 +1263,8 @@
       "explanation": "Running `fierce` for subdomain discovery and `nmap` `-sV` for service version detection together satisfy both reconnaissance objectives.\n\n**Why it works:** `fierce` uses `DNS brute-forcing` and `AXFR` attempts to uncover subdomains and their IPs, expanding the attack surface. `nmap` `-sV` then probes those discovered hosts on targeted ports to return service banners and version strings, enabling informed exploitation planning.\n\n**Why the others don't work:**\n- Distractor C: `nmap` `-sn` discovers live hosts via ping but does not identify services - it is a preliminary step, not a service enumeration technique.\n- Distractor D: A single `dig` `A` query resolves only the apex domain and provides no breadth of subdomain or service information.\n- Distractor E: The `http-robots.txt` script targets one web host on one port - it is scoped to directory hints rather than broad service identification.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/mschwager/fierce"
     },
     {
       "id": "PT0-003-0030",
@@ -1299,7 +1328,8 @@
       "explanation": "Each enumeration technique targets a different layer of the attack surface and uses a specific mechanism to gather intelligence.\n\n**Why it works:** A `zone transfer` (`AXFR`) via `dig` exploits misconfigured authoritative servers to retrieve the full zone in one request. `gobuster` brute-forces web paths to surface hidden content. `nmap` `-sV` probes open ports to identify service versions. `fierce` combines `DNS brute-forcing` with `AXFR` attempts to enumerate subdomains. Mapping each tool to its mechanism helps testers select the right technique for each objective without overlap or wasted effort.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/OJ/gobuster"
     },
     {
       "id": "PT0-003-0031",
@@ -1339,7 +1369,8 @@
       "explanation": "`nmap -Pn -sV` skips the ping-based host discovery phase and proceeds directly to port scanning with `version detection` enabled, which is the correct approach when a target is known to filter `ICMP`.\n\n**Why it works:** `-Pn` instructs `nmap` to treat the host as live and skip `ICMP`/`TCP` discovery probes. `-sV` then fingerprints service banners on discovered open ports, satisfying the service identification requirement.\n\n**Why the others don't work:**\n- `-sS -sV -T4` without `-Pn` still relies on default host discovery; a firewall dropping `ICMP` will cause `nmap` to mark the host as down and skip the scan entirely.\n- `-sU -sV` targets `UDP` services but also does not disable host discovery, and `UDP` is frequently filtered too - this does not solve the stated problem.\n- `-A` enables aggressive enumeration but does not skip host discovery; the host would still appear unreachable without `-Pn`.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nmap.org/book/man.html"
     },
     {
       "id": "PT0-003-0032",
@@ -1379,7 +1410,8 @@
       "explanation": "Setting a capture filter of `tcp port 21 or tcp port 80` before the capture begins ensures only `FTP` and `HTTP` traffic enters the buffer, which reduces disk usage and focuses collection on the cleartext protocols most likely to carry credentials.\n\n**Why it works:** Capture filters use BPF syntax and are evaluated by the OS kernel before packets reach `wireshark`. This is far more efficient than post-capture filtering and directly targets the protocols of interest.\n\n**Why the others don't work:**\n- Saving all traffic first and filtering afterward wastes disk space and risks losing packets under high-volume conditions.\n- The credentials harvesting plugin is a post-processing convenience and does not reduce the volume of traffic captured at the source.\n- Display filters like `ftp.request.command == USER` are applied to the in-memory buffer after capture and do not reduce the capture overhead - they are evaluation tools, not collection filters.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://www.wireshark.org/docs/wsug_html_chunked/"
     },
     {
       "id": "PT0-003-0033",
@@ -1419,7 +1451,8 @@
       "explanation": "Querying `shodan` with `hostname:example.com` retrieves data that `shodan` collected independently using its own scanning infrastructure. The tester receives port, banner, and software version information without ever contacting the target.\n\n**Why it works:** `shodan` continuously indexes internet-facing services and stores the results. A passive query against this index returns rich asset data including open ports, service versions, and `SSL` certificate details without the tester generating any traffic toward the target.\n\n**Why the others don't work:**\n- The on-demand scan API triggers fresh probes from `shodan`'s systems on the requester's behalf, which constitutes active interaction with the target.\n- Running `nmap` before authorization is an active technique that violates pre-authorization constraints regardless of where results are stored afterward.\n- Adding `banner grabbing` verification to the workflow introduces active probing and violates the passive-only requirement.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://help.shodan.io/"
     },
     {
       "id": "PT0-003-0034",
@@ -1468,7 +1501,8 @@
       "explanation": "`nmap -sV` is correct for active service enumeration on known reachable hosts, and `wireshark` in promiscuous mode is correct for passive token capture on an internal segment.\n\n**Why they work:** `nmap -sV` uses `version detection` probes to fingerprint services on open ports. `wireshark` records all packets passing the interface without generating traffic, making it ideal for passive credential and token collection.\n\n**Why the others don't work:**\n- `shodan` indexes internet-facing hosts and does not have meaningful coverage of internal RFC-1918 ranges, making it unsuitable for internal enumeration.\n- `wireshark` cannot inject packets; it is a read-only capture tool and cannot perform active `version detection` equivalent to `nmap`.\n- `nmap` does not have a passive sniffing mode comparable to `wireshark`; all `nmap` enumeration involves sending packets to targets.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nmap.org/book/man.html"
     },
     {
       "id": "PT0-003-0035",
@@ -1521,7 +1555,8 @@
       "explanation": "`nmap` matches port and service enumeration because it actively probes targets. `wireshark` matches live traffic inspection because it passively captures and decodes packets on a network segment. `shodan` matches pre-authorization asset discovery because it queries an existing index of internet-facing services without the tester sending any packets to the target.\n\n**Why it works:** Each tool occupies a distinct role in the reconnaissance workflow - active probing (`nmap`), passive capture (`wireshark`), and passive external indexing (`shodan`). Mapping each to the correct task requires understanding the underlying data collection mechanism rather than just recognizing tool names.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nmap.org/book/man.html"
     },
     {
       "id": "PT0-003-0036",
@@ -1559,7 +1594,8 @@
       "explanation": "Inserting a randomized sleep interval between connection attempts directly reduces the request rate and makes the traffic pattern less regular, both of which reduce IDS detection likelihood.\n\n**Why it works:** A randomized delay breaks the tight-loop pattern by introducing variable timing, which lowers the requests-per-second metric that triggered the IDS alert and mimics more organic traffic.\n\n**Why the others don't work:**\n- c1: Try-except with immediate retry keeps the high request rate and adds retry volume, worsening the detection problem.\n- c2: Delegating to `nmap` per host adds process-launch overhead but does not reduce the connection rate and may produce louder signatures.\n- c4: Adding threading increases parallelism and raises the total connection rate, making detection more likely rather than less.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1059/006/"
     },
     {
       "id": "PT0-003-0037",
@@ -1600,7 +1636,8 @@
       "explanation": "Piping `Get-ADUser` results through Select-Object to extract SamAccountName, MemberOf, and Enabled, then exporting to CSV, produces structured output that directly answers the question of which accounts are privileged.\n\n**Why it works:** Selecting only relevant fields eliminates noise, and CSV export allows sorting and filtering offline without leaving interactive console output in logs.\n\n**Why the others don't work:**\n- c2: Sending credentials to a remote endpoint is operationally dangerous and does not reflect how `BloodHound` collection actually works.\n- c3: One-file-per-user creates a sprawling artifact set and removes the ability to quickly compare or sort accounts.\n- c4: Filtering on PasswordNeverExpires captures a useful but narrow attribute and omits group membership, which is the primary indicator of privilege.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://bloodhound.readthedocs.io/en/latest/"
     },
     {
       "id": "PT0-003-0038",
@@ -1648,7 +1685,8 @@
       "explanation": "Backgrounding `enum4linux` calls with concurrent execution and redirecting each tool's output to separate files addresses both the speed problem and the output usability problem.\n\n**Why it works:** Parallelizing `enum4linux` per host reduces wall-clock time by removing sequential blocking. Separate output files allow independent analysis of `nmap` host data and `enum4linux` `SMB` findings without cross-contamination.\n\n**Why the others don't work:**\n- c3: `curl` is not a port scanner and does not replace `nmap`'s host discovery or service detection capabilities.\n- c4: Maximum timing flags risk accuracy loss on engagement networks and are not a reliable substitute for architectural improvements.\n- c5: Base64 encoding output adds overhead and complexity without improving speed or analytical usability.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/CiscoCXSecurity/enum4linux"
     },
     {
       "id": "PT0-003-0039",
@@ -1688,7 +1726,8 @@
       "explanation": "Adding `HTTP` requests after `DNS` resolution to capture status codes and Server headers directly enriches the output with service-level context needed to prioritize targets.\n\n**Why it works:** A subdomain that resolves in `DNS` may not host a live web service. Status codes (200, 403, 301) and Server headers distinguish active applications from parked domains and reveal technology stack details for follow-on enumeration.\n\n**Why the others don't work:**\n- c2: Aggressive `nmap` scanning per resolved subdomain is disproportionate, slow, and significantly raises the detection profile beyond what is needed.\n- c3: Zone transfer is a separate technique that does not enrich the current script's output with HTTP service data.\n- c4: JSON formatting of DNS-only data improves presentation but provides no additional service context for target prioritization.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nmap.org/book/nse.html"
     },
     {
       "id": "PT0-003-0040",
@@ -1735,7 +1774,8 @@
       "explanation": "The correct sequence is: review the existing code, compare against the rules of engagement, make targeted modifications, test in a controlled environment, then deploy to the live target with active monitoring.\n\n**Why this order matters:** Each step depends on the one before it. You cannot identify needed modifications without first reviewing the code and understanding scope. You cannot safely deploy without testing modifications. Reversing any step risks running unauthorized actions against the target or deploying a script that does not behave as expected.",
       "domain": "Reconnaissance and Enumeration",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1059/004/"
     },
     {
       "id": "PT0-003-0041",
@@ -1774,7 +1814,8 @@
       "explanation": "Confirming `SMB` session establishment and `HKLM` registry read access directly validates that the service account has the privilege level required for host-based enumeration.\n\n**Why it works:** `nessus` authenticated scans on Windows use `SMB` to connect to the target and read registry hives, WMI, and file system metadata. If the account cannot open `HKLM` keys, the scan will silently fall back to unauthenticated checks.\n\n**Why the others don't work:**\n- Distractor A: smb-brute is an attack plugin, not a credential verification method, and introduces unintended risk.\n- Distractor B: Running a baseline unauthenticated scan validates nothing about credential configuration before the authenticated scan runs.\n- Distractor C: Port 445 reachability is a network-layer check; it cannot confirm that the provided credentials carry sufficient privilege for deep inspection.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://docs.tenable.com/nessus/"
     },
     {
       "id": "PT0-003-0042",
@@ -1813,7 +1854,8 @@
       "explanation": "`-sV` with `--version-intensity 3` limits probes to banner-level service identification, avoiding the authentication attempts that NSE default scripts generate.\n\n**Why it works:** Version detection at reduced intensity reads service banners and lightweight probes only. No credential payloads are sent, so no authentication failures are recorded on the target.\n\n**Why the others don't work:**\n- Distractor A: `-A` enables the default script set, which includes auth-attempting scripts against `SMB`, `FTP`, and other services, producing the log noise the client prohibits.\n- Distractor B: The banner and http-title script combination still leaves other NSE scripts uninhibited and does not universally suppress credential probes.\n- Distractor C: `-sC` runs the default NSE category, which includes scripts that attempt logins against discovered services, directly violating the client's constraint.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nmap.org/book/man.html"
     },
     {
       "id": "PT0-003-0043",
@@ -1858,7 +1900,8 @@
       "explanation": "Dependency auditing and taint analysis directly address the two stated risk factors: outdated libraries with known CVEs and unvalidated user input reaching dangerous sinks.\n\n**Why it works:** A CVE-aware dependency audit catches exploitable vulnerabilities introduced through pinned outdated packages. Taint analysis traces user-controlled data through the application's logic, identifying exploitable paths that parameterized queries alone do not eliminate.\n\n**Why the others don't work:**\n- Distractor A: Limiting analysis to ORM `SQL injection` patterns ignores the broader attack surface present in a financial API with aged dependencies.\n- Distractor B: Cyclomatic complexity is a maintainability metric, not a security vulnerability indicator.\n- Distractor C: Absence of type annotations is not a reliable proxy for exploitable vulnerabilities and would flood findings with irrelevant noise.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://owasp.org/www-project-web-security-testing-guide/"
     },
     {
       "id": "PT0-003-0044",
@@ -1915,7 +1958,8 @@
       "explanation": "Each observed behavior corresponds to a distinct DAST finding class identifiable through response analysis in `burpsuite`.\n\n**Why it works:** Reflected unsanitized input in markup signals reflected `XSS`; a sequential integer returning another user's record is a textbook IDOR; a missing Secure/HttpOnly flag on a session cookie is a cookie misconfiguration; an absolute path parameter returning `/etc/passwd` is a path traversal.\n\n**Why the others don't work:**\n- Matching reflected input to path traversal ignores that traversal requires filesystem path manipulation, not markup injection.\n- Matching sequential IDs to `XSS` confuses access control failure with client-side injection.\n- Matching cookie flags to IDOR conflates transport/storage security with authorization logic flaws.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://portswigger.net/burp/documentation/desktop"
     },
     {
       "id": "PT0-003-0045",
@@ -1954,7 +1998,8 @@
       "explanation": "Configuring `sudo` escalation in the `nessus` credential profile allows the non-root account to execute privileged commands, enabling kernel-level plugin checks to run.\n\n**Why it works:** `nessus` kernel checks read `/proc/version`, kernel module lists, and run commands requiring elevated privilege. A `sudo` rule scoped to `nessus` plugins bridges the gap between a non-root `SSH` session and the access level needed for full host-based coverage.\n\n**Why the others don't work:**\n- Distractor A: `ICMP` and port range changes are network-layer adjustments that do not affect on-host privilege for authenticated checks.\n- Distractor B: Local check plugins still require the privilege level to read protected paths; enabling them without escalation yields the same incomplete results.\n- Distractor C: `nmap` OS fingerprinting operates from the network and cannot enumerate specific CVEs tied to the kernel version running on the host.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://docs.tenable.com/nessus/"
     },
     {
       "id": "PT0-003-0046",
@@ -1993,7 +2038,8 @@
       "explanation": "A full TCP connect scan (`-sT`) confirms whether the operating system can complete a three-way handshake to the target port, which a SYN scan alone does not guarantee. If the connect scan returns a refused or filtered result where the SYN scan showed open, it points to host-based filtering as the cause of the enumeration failure, preventing a false positive from driving exploitation.\n\n**Why it works:** The connect scan completes the handshake, so a mismatch with the SYN result isolates the variable (endpoint agent/firewall) and provides evidence to either confirm or invalidate the finding.\n\n**Why the others don't work:**\n- Distractor A: Moving directly to exploitation ignores an unresolved inconsistency and risks wasted effort or detection.\n- Distractor B: Aggressive scanning adds detail but does not address the reachability discrepancy between port state and application response.\n- Distractor C: Pivoting is a valid follow-up step but should not precede basic local validation methods that are faster and less disruptive.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nmap.org/book/man.html"
     },
     {
       "id": "PT0-003-0047",
@@ -2032,7 +2078,8 @@
       "explanation": "Running `wmic qfe list` with valid credentials directly queries the Windows patch database, providing authoritative confirmation of whether the relevant hotfix (KB4012212) is installed. This resolves the ambiguity introduced by unauthenticated banner-based detection.\n\n**Why it works:** Authenticated patch enumeration bypasses the inference limitations of unauthenticated plugin checks and provides the definitive patch state needed to classify the finding.\n\n**Why the others don't work:**\n- Distractor A: The `smb-vuln-ms17-010` script is another unauthenticated check that shares the same limitation as the original scan -- it cannot confirm patch state on its own.\n- Distractor B: Extending timeouts does not grant the credentials required for registry-level patch inspection.\n- Distractor C: Marking the finding as confirmed without validation violates responsible reporting practices and could result in unnecessary remediation work or stakeholder alarm.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://docs.tenable.com/nessus/"
     },
     {
       "id": "PT0-003-0048",
@@ -2080,7 +2127,8 @@
       "explanation": "The discrepancy between a `\"filtered\"` scanner result and a working browser connection points to the WAF or load balancer selectively dropping TCP probes based on their characteristics (e.g., SYN-only vs. full handshake). Packet capture and a connect-scan comparison are the two most direct methods to isolate this behavior.\n\n**Why it works:** `wireshark` reveals exactly what the network sees at the packet level, and `-sT` mimics browser TCP behavior -- together they confirm whether the filtering is probe-type-specific.\n\n**Why the others don't work:**\n- Distractor A: T5 timing increases scan aggression but does not expose WAF rule logic and risks false negatives from packet loss.\n- Distractor B: Scanning different ports does not address the specific 443 discrepancy.\n- Distractor C: TLS certificate validation affects application-layer behavior, not TCP port state detection.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://www.wireshark.org/docs/wsug_html_chunked/"
     },
     {
       "id": "PT0-003-0049",
@@ -2119,7 +2167,8 @@
       "explanation": "When a scanner's only evidence for `SQL injection` is a timing anomaly, the appropriate validation path is controlled time-based blind injection testing. By crafting payloads with measurable conditional delays, the tester can confirm whether the database is actually processing injected logic.\n\n**Why it works:** Time-based blind injection bypasses the need for visible error output and provides reproducible, quantifiable evidence of SQL execution -- directly validating the scanner's timing-based signal.\n\n**Why the others don't work:**\n- Distractor A: Reporting as confirmed without reproducible evidence introduces a false positive.\n- Distractor B: Dismissing without blind testing risks a false negative on a genuinely vulnerable parameter.\n- Distractor C: Re-running the automated scan defers the validation responsibility to the tool rather than applying manual judgment.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://portswigger.net/burp/documentation/desktop"
     },
     {
       "id": "PT0-003-0050",
@@ -2171,7 +2220,8 @@
       "explanation": "Each scenario represents a distinct result analysis challenge: a potential false positive from unauthenticated scanning, a configuration-level finding from a network discrepancy, and a scope accuracy issue. The correct actions address the specific root cause of each rather than applying a uniform response.\n\n- Slot 1 maps to authenticated patch verification because the discrepancy is between scanner inference and actual patch state.\n- Slot 2 maps to documenting the filtering discrepancy as a configuration finding because the perimeter/internal difference reveals a network architecture issue.\n- Slot 3 maps to scope reconciliation because the host should not be in the active findings set regardless of its vulnerability state.",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://docs.tenable.com/nessus/"
     },
     {
       "id": "PT0-003-0051",
@@ -2211,7 +2261,8 @@
       "explanation": "Using the `Exploit Available` filter in `nessus` narrows results to vulnerabilities with confirmed public exploits, which is the most direct way to separate them from misconfigurations or theoretical findings.\n\n**Why it works:** `nessus` cross-references its plugin database against known exploit availability (Metasploit, ExploitDB, etc.) and tags matching findings, giving prioritization based on actual attack feasibility.\n\n**Why the others don't work:**\n- Credentialed scanning: improves coverage uniformly across both categories, not classification between them\n- `Advanced Scan` + CVE filter: changes the UI view, not the exploit-vs-misconfiguration distinction\n- `Safe Checks`: limits intrusive probes to protect availability, which reduces verification depth rather than improving accuracy",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://docs.tenable.com/nessus/"
     },
     {
       "id": "PT0-003-0052",
@@ -2251,7 +2302,8 @@
       "explanation": "When a `nikto` scan underperforms on a virtual-hosted application, specifying `-vhost` ensures the correct `Host:` header is sent so the server responds with application-specific content rather than a default page.\n\n**Why it works:** Virtual-host-aware web servers serve different content based on the `Host:` header; without it `nikto` may scan the default vhost, missing application-specific paths. Adding `-root /` anchors the crawl correctly.\n\n**Why the others don't work:**\n- `-Plugins all`: loads more checks but does not resolve virtual host routing gaps\n- `-evasion 1`: targets WAF/IDS avoidance, irrelevant when the issue is incomplete surface coverage\n- `-timeout 30`: addresses slow response handling, not missing scan scope",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/sullo/nikto/wiki"
     },
     {
       "id": "PT0-003-0053",
@@ -2291,7 +2343,8 @@
       "explanation": "When `openvas` returns no findings at all on newly deployed hosts, the most likely root cause is that the hosts were never included in the scan target rather than a detection or feed failure.\n\n**Why it works:** `openvas` scan tasks require an explicit target object defining the IP ranges in scope; hosts outside that definition are silently excluded, producing a clean report by omission.\n\n**Why the others don't work:**\n- `Full and Fast` config: does include `SSH` detection, so this is a false premise\n- Outdated feed: would cause a single NVT to be missing, not zero findings across an entire new segment\n- Missing credentials: reduces accuracy for authenticated checks but unauthenticated `SSH` banner detection still functions",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://greenbone.github.io/docs/"
     },
     {
       "id": "PT0-003-0054",
@@ -2340,7 +2393,8 @@
       "explanation": "`nikto` is purpose-built for web server and application scanning with output that aligns to OWASP categories, while `nessus` credentialed scanning is the standard approach for OS-level patch auditing on heterogeneous infrastructure.\n\n**Why it works:** Each tool is matched to its primary design target: `nikto` for HTTP/HTTPS surfaces and `nessus` for network host patch compliance via authenticated local checks.\n\n**Why the others don't work:**\n- `openvas` for web + OWASP: `openvas` lacks structured OWASP Top 10 reporting and is not the preferred web application scanner\n- `nikto` for `SMB` patch auditing: `nikto` has no `SMB` or OS patch audit capability whatsoever\n- `nessus` default OWASP output: `nessus` web templates do not produce OWASP-categorized reports by default",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://docs.tenable.com/nessus/"
     },
     {
       "id": "PT0-003-0055",
@@ -2385,7 +2439,8 @@
       "explanation": "A structured vulnerability discovery workflow moves from broad host and service enumeration to targeted tool deployment, then to cross-tool correlation, and finally to manual validation of critical findings.\n\n**Why it works:** Each step produces the input required by the next: network scanning reveals live hosts and services, which directs `nikto` to web endpoints, which (combined with network scan output) produces a raw finding set ready for correlation and prioritization, which then feeds manual validation.\n\n**Why the others don't work:**\n- Running `nikto` before network enumeration risks missing endpoints and wastes time scanning non-web ports\n- Correlating findings before both scans complete produces an incomplete dataset\n- Validating findings before correlation may result in wasted effort on duplicates or low-priority items",
       "domain": "Vulnerability Discovery and Analysis",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://docs.tenable.com/nessus/"
     },
     {
       "id": "PT0-003-0056",
@@ -2423,7 +2478,8 @@
       "explanation": "Double-tagging is the correct method for `VLAN hopping` when the native VLAN is untagged on a trunk.\n\n**Why it works:** The ingress switch strips the outer 802.1Q tag matching the native VLAN and forwards the frame with the inner VLAN 20 tag still attached. The next switch then treats the inner tag as the destination VLAN, delivering the frame to VLAN 20 without the attacker holding a trunk port.\n\n**Why the others don't work:**\n- Distractor A (`DTP`): `DTP` trunking requires the port to be in a dynamic negotiation mode; a hardened access port would reject this, and the question seeks a method that bypasses needing a trunk assignment.\n- Distractor B (`VTP`): `VTP` propagates VLAN definitions between switches but does not forward arbitrary traffic into a target VLAN.\n- Distractor C (`ICMP` redirect): `ICMP` redirects operate at Layer 3 and cannot cross VLAN boundaries, which are a Layer 2 construct.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1557/"
     },
     {
       "id": "PT0-003-0057",
@@ -2463,7 +2519,8 @@
       "explanation": "Bidirectional `ARP` poisoning with `arpspoof` is the standard method for positioning an attacker inline during an on-path attack.\n\n**Why it works:** Running `arpspoof` targeting both the workstation and the gateway causes each endpoint to send its traffic to the attacker's MAC. With IP forwarding enabled, the attacker silently relays packets, maintaining connectivity while capturing the full session.\n\n**Why the others don't work:**\n- Distractor A (CAM flooding): Causes indiscriminate traffic flooding to all ports rather than creating a controlled inline position; easily detected and unreliable.\n- Distractor C (one-way poison): Poisoning only the workstation captures only outbound traffic; return traffic from the gateway still reaches the workstation directly.\n- Distractor D (broadcast address): Associating a MAC with the broadcast address does not intercept unicast flows and provides no inline forwarding path.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1557/002/"
     },
     {
       "id": "PT0-003-0058",
@@ -2504,7 +2561,8 @@
       "explanation": "The correct path is confirming `MS17-010` exposure with the scanner module and then running `exploit/windows/smb/ms17_010_eternalblue`.\n\n**Why it works:** EternalBlue exploits a buffer overflow in the `SMBv1` implementation patched in March 2017. A Server 2008 R2 host unpatched since 2017 is almost certainly still running vulnerable `SMBv1`, making this the highest-probability unauthenticated RCE path.\n\n**Why the others don't work:**\n- Distractor A (`ms08_067_netapi`): Targets Windows XP/2003 era systems; Server 2008 R2 is not a reliable target and the exploit would likely fail.\n- Distractor C (`psexec`): Requires authenticated access via credentials or hashes, which the scenario does not provide.\n- Distractor D (`multi/handler`): Is a payload handler, not an active exploit; it cannot initiate an attack against a remote host.",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://docs.metasploit.com/"
     },
     {
       "id": "PT0-003-0059",
@@ -2552,7 +2610,8 @@
       "explanation": "Using `ettercap`'s `HTTP` filter plugin and `wireshark`'s `ftp` display filter are the two passive inline capture methods that harvest credentials without disrupting sessions.\n\n**Why it works:** Both methods operate on traffic already flowing through the attacker's inline position. `ettercap` parses `HTTP POST` bodies transparently, and `wireshark` reads the `FTP` control channel commands without modifying any packets.\n\n**Why the others don't work:**\n- Distractor C (`HTTPS` downgrade): The site already uses `HTTP`; dropping responses would disrupt connectivity rather than enabling passive capture.\n- Distractor D (`DNS` stream): `DNS` frames carry name resolution data, not authentication credentials, making this approach irrelevant.\n- Distractor E (JavaScript injection): Modifies response payloads, risking broken pages and detection rather than achieving clean passive capture.",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://www.ettercap-project.org/"
     },
     {
       "id": "PT0-003-0060",
@@ -2599,7 +2658,8 @@
       "explanation": "The correct order follows the logical dependency chain from reconnaissance through exploitation to validation.\n\n**Why it works:** Each step depends on the previous: you must confirm `DTP` is active before negotiating, negotiate the trunk before tagging traffic, create the sub-interface before assigning an address, and have a valid IP before attempting connectivity tests.\n\n**Why the others don't work:**\n- Assigning an IP before creating the sub-interface would have no interface to bind to.\n- Attempting to ping VLAN 50 hosts before establishing the trunk would result in traffic being dropped at the switch.\n- Creating a tagged sub-interface before the trunk is negotiated would produce frames that the switch discards as unauthorized tagged traffic on an access port.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1557/"
     },
     {
       "id": "PT0-003-0061",
@@ -2639,7 +2699,8 @@
       "explanation": "The `-c 5` flag in `hydra` inserts a wait interval (in seconds) between each connection attempt per thread, directly addressing per-account lockout policies that count rapid sequential failures.\n\n**Why it works:** By spacing attempts 5 seconds apart, the attacker stays below the threshold that triggers lockout after three rapid failed logins.\n\n**Why the others don't work:**\n- `-t 1` reduces parallelism to a single thread but does not slow the rate of attempts within that thread.\n- `-W 3` applies a general wait between connection retries on error, not between normal sequential attempts.\n- `-f` stops the tool after success but does not influence the attempt rate before a lockout occurs.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/vanhauser-thc/thc-hydra"
     },
     {
       "id": "PT0-003-0062",
@@ -2679,7 +2740,8 @@
       "explanation": "`sekurlsa::pth` (pass-the-hash) injects an `NTLM` hash directly into the security context of a spawned process, allowing authentication to remote `SMB` services without the plaintext password.\n\n**Why it works:** Windows `NTLM` authentication transmits a hash-based challenge response; injecting the hash into the process token satisfies that challenge without ever cracking the password.\n\n**Why the others don't work:**\n- `lsadump::sam` dumps local hashes for offline analysis and does not create an authenticated session.\n- The `token::elevate` + `sekurlsa::wdigest` path seeks cleartext credentials, not hash-based lateral movement.\n- `/aes256` expects a Kerberos key type incompatible with a recovered `NTLM` hash.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/gentilkiwi/mimikatz/wiki"
     },
     {
       "id": "PT0-003-0063",
@@ -2717,7 +2779,8 @@
       "explanation": "`Credential stuffing` is the correct technique because it directly applies known breach pairs, and a one-attempt-per-account rotation strategy avoids triggering the five-attempt lockout window.\n\n**Why it works:** The value of a leaked database is that real users often reuse passwords; testing each pair once per account maximizes coverage while evading lockout policies.\n\n**Why the others don't work:**\n- `Brute-force` generates unknown passwords algorithmically, ignoring the intelligence value of the breach data and causing rapid lockouts.\n- Password spraying uses a single guessed password rather than the breach pairs, wasting the acquired dataset.\n- `hashcat` is an offline tool, and testing multiple mutations per account immediately triggers lockout.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1110/004/"
     },
     {
       "id": "PT0-003-0064",
@@ -2764,7 +2827,8 @@
       "explanation": "Using `-a 0` with a targeted wordlist and `-a 6` with a mask together provides a focused, layered approach against predictable service account passwords before resorting to full brute-force.\n\n**Why it works:** Dictionary mode exploits known terms, and hybrid mode extends those terms with common suffixes (years, symbols) that align with naming conventions -- both are faster and more targeted than exhaustive enumeration.\n\n**Why the others don't work:**\n- Full keyspace brute-force (`-a 3 ?a?a?a?a?a?a?a?a`) is computationally expensive and should be the last resort.\n- `--show` only reads the potfile and performs no cracking.\n- Combinator mode (`-a 1`) without rules generates an enormous search space that is poorly tuned to predictable naming patterns.",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://hashcat.net/wiki/"
     },
     {
       "id": "PT0-003-0065",
@@ -2814,7 +2878,8 @@
       "explanation": "A successful `pass-the-hash` attack follows a strict dependency chain: privilege escalation enables memory access, memory access yields hashes, hash identification targets the right account, hash injection creates the remote session, and the session enables data access.\n\n**Why it works:** Each step produces the prerequisite for the next; skipping or reordering any step breaks the chain -- for example, attempting `sekurlsa::logonpasswords` without elevation returns an access-denied error, and attempting `psexec` without a valid hash produces authentication failures.\n\n**Why the others don't work:**\n- Starting with hash extraction before escalation fails because `LSASS` memory is protected from unprivileged processes.\n- Attempting lateral movement before identifying the correct privileged hash would result in authenticating as a low-privilege user with no access to sensitive shares.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1550/002/"
     },
     {
       "id": "PT0-003-0066",
@@ -2854,7 +2919,8 @@
       "explanation": "`PATH` hijacking exploits the fact that the SUID binary resolves `tar` through the shell's `PATH` search order. By placing a malicious executable named `tar` in a directory that appears earlier in `PATH`, the root-privileged SUID process executes the attacker-controlled binary.\n\n**Why it works:** SUID binaries run with the file owner's privileges (root), so when the binary spawns a subprocess using a relative command name, the attacker-controlled `PATH` directs execution to the malicious file with elevated rights.\n\n**Why the others don't work:**\n- Distractor A (cron): Requires write access to `/etc/cron.d`, which is restricted to root.\n- Distractor B (LD_PRELOAD): The dynamic linker strips `LD_PRELOAD` for SUID executables to prevent exactly this kind of attack.\n- Distractor C (overwrite binary): Replacing the binary requires write permission on the file or its parent directory, not just read permission.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/peass-ng/PEASS-ng"
     },
     {
       "id": "PT0-003-0067",
@@ -2894,7 +2960,8 @@
       "explanation": "Loading a kernel-mode driver to strip the `PPL` flag from `LSASS`'s `EPROCESS` structure removes the process protection that prevents standard tools from opening a handle to `LSASS`. This is the most direct path to credential material still present in normal `LSASS` memory when Credential Guard is enabled.\n\n**Why it works:** `RunAsPPL` blocks user-mode handles to `LSASS`, but a kernel driver operates above this restriction and can modify the protection level in the kernel data structure directly.\n\n**Why the others don't work:**\n- Distractor A (procdump minidump): Credential Guard moves sensitive secrets into a `VSM` enclave, so even a complete minidump of `LSASS` will not contain them.\n- Distractor B (DCSync): Valid approach for domain credentials but requires domain replication privileges (`DS-Replication-Get-Changes-All`), which SYSTEM on a workstation does not inherently possess.\n- Distractor C (SAM export): Yields only local account hashes, which are insufficient for domain lateral movement.",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/gentilkiwi/mimikatz/wiki"
     },
     {
       "id": "PT0-003-0068",
@@ -2941,7 +3008,8 @@
       "explanation": "`CreateRemoteThread`-based reflective DLL injection and APC injection (`NtQueueApcThread`) both achieve execution inside a running process entirely in memory, satisfying the fileless and no-new-process requirements.\n\n**Why it works:** Both techniques manipulate the memory and thread state of an existing process rather than creating a new one, reducing process-creation telemetry and avoiding on-disk indicators.\n\n**Why the others don't work:**\n- Distractor A (process hollowing): Spawns a new suspended process, generating a process-creation event and failing the 'existing process' requirement.\n- Distractor B (regsvr32 + temp DLL): Writes a file to disk, violating the fileless constraint.\n- Distractor C (WMI Win32_Process): Creates a new process via WMI, which is both detectable and not an injection into an existing trusted process.",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://docs.metasploit.com/"
     },
     {
       "id": "PT0-003-0069",
@@ -2990,7 +3058,8 @@
       "explanation": "The correct sequence starts with enumerating domain controllers, then moving laterally with elevated rights to a DC, then exporting both the `NTDS.dit` database and the required registry hives, and finally performing offline extraction with `mimikatz` or `secretsdump.py`.\n\n**Why it works:** Each step is a hard prerequisite for the next: DC enumeration targets lateral movement, SYSTEM access enables VSS-based file copying, and the registry hives supply the boot key needed to decrypt credential data in `NTDS.dit`.\n\n**Why the others don't work:**\n- Attempting offline extraction before exfiltrating the files yields nothing to parse.\n- Trying to copy `NTDS.dit` without SYSTEM rights fails because the file is locked by the AD DS service.\n- Moving laterally without first knowing the DC's hostname requires guesswork and may waste time or trigger alerts on wrong targets.",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/gentilkiwi/mimikatz/wiki"
     },
     {
       "id": "PT0-003-0070",
@@ -3028,7 +3097,8 @@
       "explanation": "`SeBackupPrivilege` is the key right granted to `Backup Operators` members. It allows reading any file by bypassing DACL checks under the guise of backup operations. Reading `NTDS.dit` from a DC volume shadow copy and pairing it with the `SYSTEM` registry hive enables completely offline `credential dumping` that never opens a handle to `LSASS`.\n\n**Why it works:** The `Backup Operators` group is a deliberate Windows design feature; `SeBackupPrivilege` bypasses file ACLs, and `NTDS.dit` plus the boot key in the `SYSTEM` hive is sufficient for full offline hash extraction.\n\n**Why the others don't work:**\n- Distractor A (utilman overwrite): Requires physical or RDP lock-screen access and is a noisier, less reliable path in an enterprise environment.\n- Distractor B (SAM hashes): The `SAM` database holds only local hashes, which are insufficient for authenticated domain lateral movement unless a matching account exists.\n- Distractor C (scheduled task XML): Writing a file to the Tasks directory via backup path does not automatically create a valid, trusted scheduled task with SYSTEM execution rights.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1003/"
     },
     {
       "id": "PT0-003-0071",
@@ -3068,7 +3138,8 @@
       "explanation": "Boolean-based blind `SQL injection` is the technique being exploited here.\n\n**Why it works:** The application returns observably different responses (login success vs. failure) based on whether the injected boolean condition evaluates to true or false, allowing an attacker to infer database state one bit at a time.\n\n**Why the others don't work:**\n- Time-based blind: relies on database sleep functions to introduce measurable delays, not on response content differences\n- Out-of-band: uses secondary communication channels (DNS, HTTP) to extract data rather than reading application responses\n- Error-based: requires the database to surface detailed error messages containing schema or data fragments",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/sqlmapproject/sqlmap/wiki"
     },
     {
       "id": "PT0-003-0072",
@@ -3108,7 +3179,8 @@
       "explanation": "The payload `\" onmouseover=\"alert(1)` closes the current double-quoted attribute with `\"`, then injects an event handler that executes JavaScript without using `<script>` tags.\n\n**Why it works:** Breaking out of the attribute value with a closing double-quote allows injection of arbitrary HTML attributes. Event handlers like `onmouseover` execute JavaScript inline and are not blocked by the WAF rule targeting `<script>`.\n\n**Why the others don't work:**\n- `<script>alert(1)</script>`: contains the exact string blocked by the WAF\n- `javascript:alert(1)` in value attribute: `javascript:` URIs only execute when used in navigable attributes such as `href`\n- `'; alert(1); //`: single-quote escape is mismatched for a double-quote-delimited attribute and produces broken HTML",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://portswigger.net/burp/documentation/desktop"
     },
     {
       "id": "PT0-003-0073",
@@ -3155,7 +3227,8 @@
       "explanation": "Receiving file contents from outside the web root -- whether via literal or encoded traversal sequences -- directly confirms `directory traversal` exploitation.\n\n**Why it works:** Both indicators demonstrate that the server resolves the supplied path against the filesystem without adequately stripping or blocking `../` sequences, allowing access to arbitrary files.\n\n**Why the others don't work:**\n- 403 Forbidden: access is being denied, indicating controls are working\n- PHP stack trace: reveals path disclosure via error handling, not a traversal bypass\n- CDN redirect: the parameter is not being used to serve local files, eliminating the attack surface",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://portswigger.net/burp/documentation/desktop"
     },
     {
       "id": "PT0-003-0074",
@@ -3199,7 +3272,8 @@
       "explanation": "Effective `SQL injection` database extraction follows the natural hierarchy of a relational database: server -> databases -> tables -> columns -> data.\n\n**Why it works:** Each `sqlmap` flag depends on output from the previous step. You cannot specify a target database until you know its name, cannot target a table until you know which database contains it, and cannot dump specific columns until you have enumerated them.\n\n**Why the others don't work:** Skipping steps -- such as attempting `--dump` before identifying the target table and columns -- either produces errors or causes `sqlmap` to dump entire databases noisily, increasing detection risk and producing unmanageable output.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/sqlmapproject/sqlmap/wiki"
     },
     {
       "id": "PT0-003-0075",
@@ -3239,7 +3313,8 @@
       "explanation": "This is a stored (persistent) `XSS` vulnerability with a session hijacking risk affecting all users who view the post.\n\n**Why it works:** The payload is saved in the application's database and served back as unsanitized HTML to every subsequent visitor, causing their browsers to execute the script and exfiltrate their session cookies to the attacker.\n\n**Why the others don't work:**\n- Reflected `XSS`: requires the payload in each request URL; it is not stored and does not affect all visitors automatically\n- DOM-based `XSS`: execution is driven entirely by client-side script parsing, not by server storage and retrieval\n- Stored `XSS` admin-only variant: misidentifies the victim population; any user viewing the comment is affected, not only admins",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://portswigger.net/burp/documentation/desktop"
     },
     {
       "id": "PT0-003-0076",
@@ -3277,7 +3352,8 @@
       "explanation": "`nsenter` targeting PID 1 is the direct exploitation path when `hostPID: true` is set because it uses the already-visible host process to re-enter all host namespaces.\n\n**Why it works:** With the host PID namespace shared, PID 1 (the host's init process) is visible inside the pod. `nsenter` attaches to its mount, UTS, IPC, network, and PID namespaces, producing an interactive shell with host-level scope.\n\n**Why the others don't work:**\n- Distractor A (cron job): The container filesystem is isolated; writing to `/etc/cron.d/` inside does not affect the host's cron scheduler without a host volume mount.\n- Distractor B (sidecar): Creating new workloads via `kubectl apply` requires API server RBAC permissions that are separate from `hostPID` and does not itself escape the pod boundary.\n- Distractor C (kernel exploit): Kernel exploits are a generic escape technique that does not exploit the specific `hostPID` misconfiguration and introduces unnecessary complexity.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1611/"
     },
     {
       "id": "PT0-003-0077",
@@ -3315,7 +3391,8 @@
       "explanation": "A plain GET to the `iam/security-credentials/<role-name>` path is sufficient under `IMDSv1` because no session token is required.\n\n**Why it works:** `IMDSv1` permits unauthenticated HTTP GET requests to the link-local IMDS IP. The `iam/security-credentials/` path lists the attached role, and appending the role name returns `AccessKeyId`, `SecretAccessKey`, and `Token` directly.\n\n**Why the others don't work:**\n- Distractor A (PUT token flow): This describes the `IMDSv2` session-oriented approach, which is unnecessary when the instance still accepts `IMDSv1`.\n- Distractor B (identity document): The instance identity document contains metadata about the instance but never exposes credentials.\n- Distractor C (assume-role): `sts assume-role` is an API call that requires pre-existing authenticated credentials and appropriate trust relationships; it does not retrieve instance profile credentials.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1552/005/"
     },
     {
       "id": "PT0-003-0078",
@@ -3355,7 +3432,8 @@
       "explanation": "Running `iam__enum_permissions` before `iam__privesc_scan` follows the reconnaissance-before-exploitation principle and limits unnecessary API noise.\n\n**Why it works:** `iam__enum_permissions` uses read-only IAM calls to build a complete picture of the user's effective permissions. `iam__privesc_scan` then compares those permissions against a database of known escalation techniques (such as `iam:AttachUserPolicy` or `iam:PassRole`) to surface actionable paths without attempting them.\n\n**Why the others don't work:**\n- Distractor A (backdoor keys first): Write operations before understanding permissions risk detection and failure; persistence should follow confirmed escalation, not precede enumeration.\n- Distractor B (lambda__enum first): Jumping to Lambda enumeration skips foundational IAM analysis and may miss direct privilege escalation paths that are faster and lower risk.\n- Distractor C (manual console): Manual console review is slow, may not be accessible with programmatic-only keys, and is not a structured `pacu`-based approach.",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/RhinoSecurityLabs/pacu"
     },
     {
       "id": "PT0-003-0079",
@@ -3400,7 +3478,8 @@
       "explanation": "Querying the ECS container credentials endpoint via `SSRF` and then validating the resulting credentials against S3 are the two targeted actions that exploit the vulnerability and confirm its real-world impact.\n\n**Why it works:** The ECS task credentials endpoint at `http://169.254.170.2/v2/credentials/<UUID>` is the correct target for task-level IAM credentials in ECS, distinct from the EC2 IMDS. Once credentials are retrieved, `aws s3 ls` immediately validates the S3 read permission and scopes the finding.\n\n**Why the others don't work:**\n- Distractor A (EC2 IMDS path): ECS tasks do not expose credentials through `169.254.169.254`; querying that path from an ECS container returns nothing useful for task role credentials.\n- Distractor B (exfiltrate /etc/passwd): `SSRF` operates at the HTTP layer and cannot read arbitrary local files; this is a different attack class.\n- Distractor C (scout-suite first): Broad account scanning with existing tester credentials does not exploit the discovered `SSRF` and delays demonstrating the actual credential theft path.",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1611/"
     },
     {
       "id": "PT0-003-0080",
@@ -3441,7 +3520,8 @@
       "explanation": "The correct sequence follows a logical dependency chain: identify the disk, create a mount point, mount the device, then write to the host filesystem.\n\n**Why it works:** A `--privileged` container with `/dev` mounted has direct access to host block devices. By identifying the root device with `fdisk -l`, creating a mount directory, and mounting the partition, the attacker gains read-write access to the full host filesystem from within the container, making cron-based persistence straightforward.\n\n**Why the others don't work:**\n- Mounting before creating the mount point would fail with a 'mount point does not exist' error.\n- Writing to the cron path before mounting would write to the container's own filesystem, not the host's.\n- Attempting to mount without first identifying the correct device node would require guessing, risking mounting the wrong partition.",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1611/"
     },
     {
       "id": "PT0-003-0081",
@@ -3478,7 +3558,8 @@
       "explanation": "Injecting a natural-language override instruction directly into the user turn exploits `direct prompt injection`, where unsanitized user input is concatenated with the system prompt and the model treats the attacker's directive as authoritative.\n\n**Why it works:** Large language models follow instructions in order of apparent authority; when user input reaches the same context window as system instructions without a hard separator, a well-crafted override can supersede the original directives.\n\n**Why the others don't work:**\n- Adversarial image noise: targets vision classifiers, irrelevant to text-based prompt handling\n- Malformed `JSON` body: a server-side parsing exploit that never reaches the model's instruction context\n- Timing side-channel: a passive reconnaissance method that does not manipulate model behavior",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
     },
     {
       "id": "PT0-003-0082",
@@ -3516,7 +3597,8 @@
       "explanation": "`Indirect prompt injection` occurs when attacker-controlled content in an external resource (a webpage, document, or API response) is retrieved by the AI system and interpreted as instructions, bypassing the need to interact with the model directly.\n\n**Why it works:** The summarization service blindly passes fetched content into the model's context; the model cannot distinguish legitimate document text from embedded adversarial instructions.\n\n**Why the others don't work:**\n- Supply-chain poisoning: requires tampering with training data or model weights, not runtime content retrieval\n- `SSRF`: describes the network-layer fetch behavior, not the prompt-level instruction hijacking\n- `Model inversion`: a training-data reconstruction attack unrelated to injecting runtime instructions",
       "domain": "Attacks and Exploits",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
     },
     {
       "id": "PT0-003-0083",
@@ -3554,7 +3636,8 @@
       "explanation": "White-box adversarial input generation using `gradient-based perturbation` (e.g., `PGD` or `FGSM`) leverages access to model weights to compute which pixel changes most increase the target class score, producing an image the model misclassifies with high confidence.\n\n**Why it works:** With full model access, the attacker back-propagates through the classification head to find the perturbation direction that pushes the input across the decision boundary toward the desired class.\n\n**Why the others don't work:**\n- Data poisoning: targets the training pipeline, not the deployed model's current inference behavior\n- `Steganography`: manipulates file encoding, not the model's perception of pixel values\n- `HTTP` header manipulation: an API-layer trick that never interacts with the neural network's classification logic",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://atlas.mitre.org/"
     },
     {
       "id": "PT0-003-0084",
@@ -3599,7 +3682,8 @@
       "explanation": "The vector-database retrieval pipeline and the plugin tool-call interface are AI-specific attack surfaces because they exist solely to support the model's inference-time behavior -- document retrieval shaping model context and autonomous function execution based on model output.\n\n**Why it works:** Both surfaces can be influenced by attacker-controlled content or prompts that cause the model to retrieve malicious chunks or generate dangerous tool arguments, exploiting trust relationships unique to AI orchestration.\n\n**Why the others don't work:**\n- `TLS` certificate chain: a transport-layer concern present in any `HTTPS` application\n- `OAuth 2.0` redirect-URI flaw: a standard authorization vulnerability unrelated to AI inference\n- `SQL injection` via assistant queries: a classic injection class; the AI is merely a delivery mechanism, not an AI-specific surface",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
     },
     {
       "id": "PT0-003-0085",
@@ -3640,7 +3724,8 @@
       "explanation": "A successful `indirect prompt injection` exfiltration attack follows the retrieval-augmented generation data flow: plant the payload, let the pipeline ingest it, verify retrieval, then confirm exploitation.\n\n**Why it works:** The assistant trusts retrieved document content as part of its instruction context; once the adversarial chunk is indexed and retrieved, the model executes the embedded directive without knowing it originated from an attacker.\n\n**Why the others don't work:**\n- Attempting to verify retrieval before indexing completes would confirm nothing -- the chunk is not yet in the vector store\n- Waiting for exfiltration before confirming chunk retrieval skips a critical validation step and makes the attack non-repeatable\n- Reversing any earlier steps breaks the causal chain required for the payload to reach the model's context",
       "domain": "Attacks and Exploits",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
     },
     {
       "id": "PT0-003-0086",
@@ -3678,7 +3763,8 @@
       "explanation": "Adding a value to the `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run` key is a persistence technique that does not require elevated privileges because each user has full write access to their own `HKCU` hive.\n\n**Why it works:** Windows processes Run keys in `HKCU` at user logon using the session's own access token, so no elevation is needed to write or execute from this location.\n\n**Why the others don't work:**\n- Service creation: Registering a Windows service requires local administrator privileges to interact with the Service Control Manager.\n- `HKLM\\Winlogon\\Userinit`: Modifying `HKLM` keys requires administrator or SYSTEM privileges, which this account lacks.\n- SYSTEM scheduled task: Configuring a task to run as SYSTEM requires local admin rights that are unavailable to a standard user.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/tactics/TA0003/"
     },
     {
       "id": "PT0-003-0087",
@@ -3718,7 +3804,8 @@
       "explanation": "`Pass-the-hash` is the correct technique when an NTLM hash is available and `Kerberos` authentication is not reachable for the target host.\n\n**Why it works:** `NTLM` authentication uses the password hash directly as the credential. By injecting the hash into the authentication context, a valid `SMB` session can be established without ever recovering the plaintext password.\n\n**Why the others don't work:**\n- Golden Ticket: Requires the domain `krbtgt` hash, not a local account hash, and `Kerberos` is unavailable for this target anyway.\n- `NTLM` relay: Requires intercepting live authentication traffic from a victim. You already hold the hash directly, so relay is unnecessary.\n- TGT conversion via replication: NTLM hashes cannot be converted into `Kerberos` tickets this way; `DCSync` produces account hashes, not TGTs from arbitrary NTLM hashes.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://github.com/gentilkiwi/mimikatz/wiki"
     },
     {
       "id": "PT0-003-0088",
@@ -3758,7 +3845,8 @@
       "explanation": "Removing tools and temporary files while leaving system logs intact is the only approach that satisfies both requirements simultaneously.\n\n**Why it works:** The rules of engagement specifically require removal of tester-installed tools and files, not log sanitization. Preserving logs serves the client's incident response and detection-validation objectives.\n\n**Why the others don't work:**\n- Truncating auth.log and syslog: Destroys the log evidence the client requires for their incident response review.\n- Overwriting `/var/log/`: Eliminates all log evidence, directly contradicting the client's retention requirement.\n- Clearing `HISTFILE` and all traces: Although tools are removed, wiping forensic history violates the log retention requirement.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://man7.org/linux/man-pages/man1/shred.1.html"
     },
     {
       "id": "PT0-003-0089",
@@ -3805,7 +3893,8 @@
       "explanation": "Injecting an extracted TGT using `pass-the-ticket` and executing commands remotely using `WMI` are both lateral movement techniques that establish access or code execution on additional hosts.\n\n**Why they work:** `Pass-the-ticket` leverages the extracted TGT to authenticate as the service account to domain resources. `WMI` remote execution uses existing local admin credentials to spawn a process on a remote host - both achieve the goal of pivoting to new systems.\n\n**Why the others don't qualify:**\n- `Kerberoasting`: Harvests service ticket hashes for offline cracking. It is a credential theft technique, not movement to a new host.\n- `DCSync`: Requires Domain Admin replication rights that a standard service account TGT typically does not carry, and it harvests hashes rather than moving laterally.\n- `LDAP` enumeration: Is reconnaissance that informs target selection but does not establish access on a new host.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1047/"
     },
     {
       "id": "PT0-003-0090",
@@ -3846,7 +3935,8 @@
       "explanation": "Post-exploitation follows a logical dependency chain: persistence protects the foothold, enumeration maps the environment, lateral movement expands access, and cleanup concludes the engagement responsibly.\n\nEstablishing persistence first protects the initial foothold from interruption. Enumeration then maps the internal environment to inform targeting decisions. Lateral movement uses that intelligence to pivot to additional systems. Finally, artifact cleanup removes evidence of tester activity in line with the rules of engagement.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://attack.mitre.org/techniques/T1070/"
     },
     {
       "id": "PT0-003-0091",
@@ -3884,7 +3974,8 @@
       "explanation": "A sequential, timestamped attack narrative is the correct format because it shows the causal chain from initial access to the final objective, enabling the client to identify each point where detection or prevention should have occurred.\n\n**Why it works:** By documenting each step in order with timestamps and showing how it enabled the next, the narrative makes the attack chain fully traceable. The client can identify which defensive controls failed at each stage.\n\n**Why the others don't work:**\n- CVSS-ordered vulnerability list: This is a findings inventory, not a narrative. It does not show how vulnerabilities were chained or how the attack progressed.\n- Single-paragraph summary: Describes the outcome but omits the exploitation chain the client needs to understand their detection failures.\n- Raw command log appendix: Providing uncontextualized command history does not help the client understand attack progression or the significance of each step.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0092",
@@ -3922,7 +4013,8 @@
       "explanation": "Prioritizing recommendations by business impact and grouping them by remediation effort is the most effective approach for a resource-constrained client.\n\n**Why it works:** Business impact prioritization ensures the client addresses the findings that pose the greatest real-world risk first. Separating quick wins from complex changes allows the team to achieve meaningful risk reduction immediately while scheduling larger architectural projects appropriately.\n\n**Why the others don't work:**\n- CVSS with patch references only: Provides severity ranking but no guidance on sequencing relative to available resources or the effort each fix requires.\n- Fixed CVSS-order sequence: Forces a rigid sequence that may block low-effort improvements behind high-effort architectural projects, wasting the benefit of easily addressed findings.\n- System-grouped uniform template: Offers no prioritization signal, leaving the client without the information needed to decide where their limited staff should begin.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0093",
@@ -3960,7 +4052,8 @@
       "explanation": "A report with a concise executive summary followed by detailed technical sections is the established format for serving both executive and technical audiences within a single deliverable.\n\n**Why it works:** The executive summary frames the engagement outcome in business-risk terms, allowing board members to understand exposure without reading technical content. The technical sections that follow give the security team the specifics they need to remediate findings.\n\n**Why the others don't work:**\n- Fully technical report with risk summary header: Non-technical readers cannot use a document written for engineers, regardless of a brief summary at the start.\n- Two separate documents: Adds unnecessary delivery complexity and is non-standard for most engagements where a structured single report suffices.\n- CVSS-ordered report with glossary: CVSS scores are not interpretable as business risk even with a glossary; the framing itself needs to change for a non-technical audience.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0094",
@@ -4005,7 +4098,8 @@
       "explanation": "A timestamped action sequence and identification of detection gaps are the two elements most essential for an attack narrative used to evaluate detection coverage.\n\n**Why they work:** The timestamped action sequence gives the incident response team the full record of attacker behavior to compare against their detection logs. Documenting where defenses were present but failed to trigger tells them exactly which controls need tuning or replacement.\n\n**Why the others don't qualify:**\n- Full reconnaissance inventory: Useful supplementary data but does not trace the attack chain or reveal detection failures.\n- CVSS scores and CVE identifiers: These belong in the vulnerability findings section and do not address attack chain progression or detection gaps.\n- Remediation cost estimates: Financial planning data for the recommendations section that is not part of the attack narrative.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 3,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     },
     {
       "id": "PT0-003-0095",
@@ -4052,7 +4146,8 @@
       "explanation": "Report production follows a dependency chain: evidence must be organized before findings can be documented, findings must be documented before the narrative can be written, the narrative must be complete before the executive summary can be drafted, and all content must be reviewed before delivery.\n\nThe evidence repository underpins the findings, the findings underpin the narrative, the narrative informs the executive summary, and the review ensures the final deliverable is accurate and safe to distribute to the client.",
       "domain": "Post-Exploitation and Lateral Movement",
       "difficulty": 2,
-      "lastReviewed": "2026-04-15"
+      "lastReviewed": "2026-04-15",
+      "docs": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf"
     }
   ]
 }
