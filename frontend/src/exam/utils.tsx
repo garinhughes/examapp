@@ -82,6 +82,11 @@ export function computeDerivedAttempt(attemptObj: any, fallbackQuestions: Questi
   }
 }
 
+/** Remove full stops that immediately follow an inline code span at a sentence boundary. */
+function stripPeriodAfterCode(text: string): string {
+  return text.replace(/`\.(?=\s|$)/gm, '`')
+}
+
 /** Inline markdown renderer - safe inside <button> (no block elements) */
 function MarkdownInline({ text }: { text: string }) {
   return (
@@ -90,10 +95,10 @@ function MarkdownInline({ text }: { text: string }) {
       components={{
         p: ({ children }) => <span>{children}</span>,
         strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
-        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700 break-all">{children}</code>,
+        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700 break-words">{children}</code>,
       }}
     >
-      {text}
+      {stripPeriodAfterCode(text)}
     </ReactMarkdown>
   )
 }
@@ -136,10 +141,10 @@ export function MarkdownText({ text, className }: { text: string; className?: st
         ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-2">{children}</ol>,
         li: ({ children }) => <li className="ml-2">{children}</li>,
         strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
-        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700 break-all">{children}</code>,
+        code: ({ children }) => <code className="text-[0.85em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded font-mono border border-zinc-200 dark:border-zinc-700 break-words">{children}</code>,
       }}
     >
-      {text}
+      {stripPeriodAfterCode(text)}
     </ReactMarkdown>
     </div>
   )
