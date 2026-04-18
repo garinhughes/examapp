@@ -60,11 +60,19 @@ export function Modals({ onReviewAnswers }: { onReviewAnswers?: () => void }) {
             <div className="flex items-center justify-end gap-3">
               <button className="px-3 py-1 rounded-md bg-accent text-muted-foreground inline-flex items-center gap-2 hover:bg-accent transition" onClick={() => setShowCancelConfirm(false)}>No, keep</button>
               <button className="px-3 py-1 rounded-md bg-red-600 text-white inline-flex items-center gap-2 hover:bg-red-700 transition" onClick={async () => {
-                try {
-                  if (attemptId) {
-                    await authFetch(`/attempts/${attemptId}`, { method: 'DELETE' })
+                if (attemptId) {
+                  try {
+                    const res = await authFetch(`/attempts/${attemptId}`, { method: 'DELETE' })
+                    if (!res.ok && res.status !== 404) {
+                      const msg = await res.text().catch(() => 'Could not cancel attempt')
+                      alert(msg || 'Could not cancel attempt')
+                      return
+                    }
+                  } catch {
+                    alert('Could not cancel attempt — check your connection and try again.')
+                    return
                   }
-                } catch {}
+                }
                 const codeToRemove = anySavedExam?.code ?? selected
                 try { if (codeToRemove) localStorage.removeItem(`attempt:${codeToRemove}`) } catch {}
                 try { if (codeToRemove) localStorage.removeItem(`examProgress:${codeToRemove}`) } catch {}

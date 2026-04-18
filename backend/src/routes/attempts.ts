@@ -249,7 +249,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     return { deleted: count }
   })
 
-  // Delete an attempt (only allowed when it has 0 answers, owned by user)
+  // Delete an attempt (owner only). In-progress attempts can always be cancelled;
+  // finished attempts may only be deleted when they have 0 answers.
   server.delete('/:id', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
     const userId = request.user?.sub
@@ -258,7 +259,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
     if (attempt.userId !== userId) return reply.status(403).send({ message: 'forbidden' })
     const answersCount = Array.isArray(attempt.answers) ? attempt.answers.length : 0
-    if (answersCount > 0) {
+    if (attempt.finishedAt && answersCount > 0) {
       return reply.status(400).send({ message: 'Only attempts with 0 answers can be deleted' })
     }
     await attemptsStore.delete(userId, id)

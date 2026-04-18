@@ -143,6 +143,7 @@ function ExamAppInner() {
             <div className="flex flex-col items-center gap-1.5">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-sm text-foreground whitespace-nowrap">Exam in progress</span>
+                <span className="sm:hidden text-xs font-medium text-muted-foreground whitespace-nowrap">{anySavedExam.code}</span>
                 <span className="hidden sm:inline text-xs text-muted-foreground truncate">{anySavedExam.title} · {anySavedExam.answeredCount}/{anySavedExam.total} answered</span>
               </div>
               <div className="flex items-center gap-2">
