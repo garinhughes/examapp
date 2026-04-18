@@ -105,6 +105,29 @@ export async function listUsers(limit = 50, lastKey?: any) {
   }
 }
 
+/**
+ * Best-effort update of the user's lastActivity timestamp.
+ * Called from hot paths (answer submit, finish, skill-lab attempt) so it
+ * never throws and never blocks the response on failure. Skipped for
+ * visitor (anonymous) userIds.
+ */
+export async function touchUserActivity(userId: string | undefined | null): Promise<void> {
+  if (!userId || userId.startsWith('visitor:')) return
+  try {
+    await ddb.send(new UpdateCommand({
+      TableName: USERS_TABLE,
+      Key: { userId },
+      UpdateExpression: 'SET lastActivity = :now',
+      ConditionExpression: 'attribute_exists(userId)',
+      ExpressionAttributeValues: { ':now': new Date().toISOString() },
+    } as any))
+  } catch (err: any) {
+    if (err?.name !== 'ConditionalCheckFailedException') {
+      console.warn('[dynamo] touchUserActivity failed', err)
+    }
+  }
+}
+
 export async function recordAdminAudit(adminId: string, targetUserId: string | null, action: string, detail: any = {}) {
   const createdAt = new Date().toISOString()
   const item = { adminId, createdAt, targetUserId, action, detail }

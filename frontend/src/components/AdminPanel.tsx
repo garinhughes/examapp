@@ -16,6 +16,7 @@ interface UserRecord {
   isActive?: boolean
   provider?: string
   lastLogin?: string
+  lastActivity?: string
   createdAt?: string
   tier?: 'visitor' | 'registered' | 'pro' | 'pro_plus'
 }
@@ -320,7 +321,7 @@ function UserRow({
             <span className="text-muted-foreground/50">—</span>
           )}
         </td>
-        <td className="p-2.5 text-xs text-muted-foreground">{fmtDateTime(user.lastLogin)}</td>
+        <td className="p-2.5 text-xs text-muted-foreground" title={user.lastActivity ? `Last login: ${fmtDateTime(user.lastLogin)}` : undefined}>{fmtDateTime(user.lastActivity ?? user.lastLogin)}</td>
         <td className="p-2.5 text-right">
           <span className={`text-xs transition-transform inline-block ${expanded ? 'rotate-180' : ''}`}>▼</span>
         </td>
@@ -2063,7 +2064,7 @@ function ErasurePanel({
                         <span className="font-medium">{u.name ?? '(no name)'}</span>
                         <span className="text-muted-foreground ml-2 text-xs">{u.email}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground">{fmtDate(u.lastLogin)}</span>
+                      <span className="text-xs text-muted-foreground">{fmtDate(u.lastActivity ?? u.lastLogin)}</span>
                     </button>
                   ))}
                 </div>
@@ -2341,7 +2342,7 @@ export default function AdminPanel() {
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'inactive'>('all')
   const [filterTier, setFilterTier] = useState<'all' | 'visitor' | 'registered' | 'pro' | 'pro_plus'>('all')
   const [usersOpen, setUsersOpen] = useState(true)
-  const [sortBy, setSortBy] = useState<'name' | 'email' | 'lastLogin'>('lastLogin')
+  const [sortBy, setSortBy] = useState<'name' | 'email' | 'lastActivity'>('lastActivity')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set())
   const [promoStats, setPromoStats] = useState<{ count: number; limit: number } | null>(null)
@@ -2412,7 +2413,7 @@ export default function AdminPanel() {
       let va = '', vb = ''
       if (sortBy === 'name') { va = a.name?.toLowerCase() ?? ''; vb = b.name?.toLowerCase() ?? '' }
       else if (sortBy === 'email') { va = a.email?.toLowerCase() ?? ''; vb = b.email?.toLowerCase() ?? '' }
-      else { va = a.lastLogin ?? ''; vb = b.lastLogin ?? '' }
+      else { va = (a.lastActivity ?? a.lastLogin) ?? ''; vb = (b.lastActivity ?? b.lastLogin) ?? '' }
       const cmp = va < vb ? -1 : va > vb ? 1 : 0
       return sortDir === 'asc' ? cmp : -cmp
     })
@@ -2586,8 +2587,8 @@ export default function AdminPanel() {
                         Email{sortIcon('email')}
                       </th>
                       <th className="p-2.5">Activity</th>
-                      <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('lastLogin')}>
-                        Last Login{sortIcon('lastLogin')}
+                      <th className="p-2.5 cursor-pointer hover:text-foreground dark:hover:text-foreground" onClick={() => toggleSort('lastActivity')}>
+                        Last Activity{sortIcon('lastActivity')}
                       </th>
                       <th className="p-2.5 w-8"></th>
                     </tr>

@@ -5,6 +5,7 @@ import { attemptsStore } from '../services/attemptsStore.js'
 import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS } from '../catalog.js'
 import { updateMetricsOnAttemptFinish } from '../services/metricsStore.js'
+import { touchUserActivity } from '../services/dynamo.js'
 
 /** Extract userId from a JWT-authenticated user or a visitor ID header. */
 function extractUserId(request: any): string | null {
@@ -376,6 +377,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     attempt.updatedAt = new Date().toISOString()
     if (!attempt.status) attempt.status = 'in-progress'
     await attemptsStore.put(attempt)
+    void touchUserActivity(userId)
 
     return { answer: answerRecord, correct: !!isCorrect }
   })
@@ -455,6 +457,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     await attemptsStore.put(attempt)
+    void touchUserActivity(userId)
     request.log.info({ userId, examCode: attempt.examCode, attemptId: attempt.attemptId, score, answeredCount, totalQuestions, earlyComplete }, '[attempts] finished')
 
     // Fire-and-forget metrics aggregation — failures must not break the attempt response

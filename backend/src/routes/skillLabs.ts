@@ -9,6 +9,7 @@ import {
   listLabIndex,
 } from '../services/skillLabStore.js'
 import { updateMetricsOnLabAttempt } from '../services/metricsStore.js'
+import { touchUserActivity } from '../services/dynamo.js'
 import { TIERS, type Tier } from '../catalog.js'
 
 const LABS_DIR = path.join(process.cwd(), 'data', 'skill-labs')
@@ -350,6 +351,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
 
     await skillLabAttemptsStore.put(attempt)
+    void touchUserActivity(userId)
 
     updateMetricsOnLabAttempt({ labId, labType: attempt.labType, correct, timeTaken })
       .catch((err) => console.error('[metrics] updateMetricsOnLabAttempt failed', err))

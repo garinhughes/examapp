@@ -264,7 +264,6 @@ function ExamAppInner() {
             {/* Account / Achievements page */}
             {route === 'account' && (
               <div className="mb-6">
-                <ResumeBanner />
                 <AccountPage />
                 <div className="mt-6">
                   <Leaderboard />
@@ -310,7 +309,6 @@ function ExamAppInner() {
 
             {route === 'pricing' && (
               <div className="mb-6">
-                <ResumeBanner />
                 <PricingPage />
               </div>
             )}
@@ -532,30 +530,3 @@ function ExamAppInner() {
   )
 }
 
-/** Shared resume banner used on account, pricing pages */
-function ResumeBanner() {
-  const { anySavedExam, examStarted, resumeExam } = useExam()
-  if (!anySavedExam || examStarted) return null
-  return (
-    <div className="mb-4 p-4 rounded-md bg-muted/40 border border-border shadow-sm flex items-center justify-between gap-4">
-      <div className="flex items-start gap-3">
-        <div className="w-9 h-9 rounded-md flex items-center justify-center bg-primary/10 text-primary flex-shrink-0">
-          <Play className="w-5 h-5" aria-hidden />
-        </div>
-        <div>
-          <div className="font-semibold text-foreground">Exam in progress</div>
-          <div className="text-sm text-muted-foreground">{anySavedExam.title} - {anySavedExam.answeredCount}/{anySavedExam.total} answered</div>
-        </div>
-      </div>
-      <div>
-        <button
-          className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition"
-          onClick={() => resumeExam(anySavedExam.code)}
-        >
-          <Play className="w-4 h-4" aria-hidden />
-          Resume
-        </button>
-      </div>
-    </div>
-  )
-}
