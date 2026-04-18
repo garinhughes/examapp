@@ -1143,7 +1143,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         setQuestions(raw); setExamTier(tier); setExamTotalAvailable(totalAvailable); setExamLimited(limited); setExamShowcase(showcase)
       })
       .catch((e) => { console.error(e); setLastError(String(e)) })
-  }, [selected, user])
+  }, [selected, user, attemptId])
 
   // Pre-start defaults
   useEffect(() => {
@@ -1180,7 +1180,11 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
 
   // Auto-save progress
   useEffect(() => {
-    if (!examStarted || !selected || isFinished) return
+    if (!examStarted || !selected || isFinished) {
+      // Cancel any pending server sync — attempt may have been deleted
+      if (serverSaveTimerRef.current) { clearTimeout(serverSaveTimerRef.current); serverSaveTimerRef.current = null }
+      return
+    }
     // Don't overwrite a valid saved state with empty questions — wait until questions are loaded
     if (displayQuestions.length === 0) return
     const key = `examProgress:${selected}`

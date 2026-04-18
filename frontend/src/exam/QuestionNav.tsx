@@ -1,43 +1,121 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Flag, Star, ChevronLeft, ChevronRight, CircleCheck, Pause, Play } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { ReportIssueModal } from '../components/ReportIssueModal'
 import { RatingModal } from '@/feedback/RatingModal'
 import { clarityEvent } from '@/clarity'
 
-const PAGE_SIZE = 20
+function ProgressTrack({
+  displayQuestions, selectedAnswers, flaggedQuestions, currentQuestionIndex, onSelectQuestion,
+}: {
+  displayQuestions: any[]
+  selectedAnswers: Record<string, any>
+  flaggedQuestions: Set<string>
+  currentQuestionIndex: number
+  onSelectQuestion: (idx: number) => void
+}) {
+  const total = displayQuestions.length
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const cellRef = useRef<HTMLButtonElement>(null)
+  const dragged = useRef(false)
 
-export function QuestionNav({ focusMode = false, showGrid = true, reviewingFlagged = false }: { focusMode?: boolean; showGrid?: boolean; reviewingFlagged?: boolean }) {
+  useEffect(() => {
+    if (scrollRef.current && cellRef.current) {
+      const c = scrollRef.current
+      const cell = cellRef.current
+      const target = cell.offsetLeft + cell.offsetWidth / 2 - c.clientWidth / 2
+      c.scrollTo({ left: target, behavior: 'smooth' })
+    }
+  }, [currentQuestionIndex])
+
+  function onMouseDown(e: React.MouseEvent<HTMLDivElement>) {
+    const el = scrollRef.current
+    if (!el || e.button !== 0) return
+    const startX = e.clientX
+    const startScroll = el.scrollLeft
+    dragged.current = false
+
+    function onMove(ev: MouseEvent) {
+      const dx = ev.clientX - startX
+      if (Math.abs(dx) > 4) {
+        dragged.current = true
+        el!.scrollLeft = startScroll - dx
+        el!.style.cursor = 'grabbing'
+      }
+    }
+    function onUp() {
+      el!.style.cursor = ''
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+      // reset after click fires
+      setTimeout(() => { dragged.current = false }, 0)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
+
+  const MIN_CELL = 16
+  const GAP = 3
+
+  return (
+    <div
+      ref={scrollRef}
+      className="overflow-x-auto -mx-1 px-1 cursor-grab select-none"
+      style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+      onMouseDown={onMouseDown}
+    >
+      <div
+        className="flex items-stretch py-1.5"
+        style={{ gap: `${GAP}px`, minWidth: `${total * (MIN_CELL + GAP)}px` }}
+      >
+        {displayQuestions.map((qq, idx) => {
+          const isAnswered = selectedAnswers[qq.id] !== undefined
+          const isFlagged = flaggedQuestions.has(qq.id)
+          const isCurrent = idx === currentQuestionIndex
+
+          return (
+            <button
+              key={qq.id}
+              ref={isCurrent ? cellRef : undefined}
+              onClick={() => { if (!dragged.current) onSelectQuestion(idx) }}
+              title={`Q${idx + 1}${isFlagged ? ' · flagged' : ''}${isAnswered ? ' · answered' : ''}`}
+              aria-label={`Question ${idx + 1}${isFlagged ? ', flagged' : ''}${isAnswered ? ', answered' : ''}${isCurrent ? ', current' : ''}`}
+              aria-current={isCurrent ? 'step' : undefined}
+              className={[
+                'relative flex-1 h-5 rounded-sm shrink-0 transition-colors duration-150',
+                isCurrent ? 'ring-2 ring-primary ring-offset-1 ring-offset-background z-10' : '',
+                isFlagged
+                  ? 'bg-amber-400 hover:bg-amber-300'
+                  : isAnswered
+                    ? 'bg-primary hover:bg-primary/80'
+                    : 'bg-muted border border-border hover:bg-muted-foreground/20',
+              ].join(' ')}
+              style={{ minWidth: `${MIN_CELL}px` }}
+            >
+              {isFlagged && (
+                <Flag className="absolute inset-0 m-auto w-2.5 h-2.5 pointer-events-none text-red-700 fill-red-700" />
+              )}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+export function QuestionNav({ focusMode = false, reviewingFlagged = false }: { focusMode?: boolean; showGrid?: boolean; reviewingFlagged?: boolean }) {
   const {
     displayQuestions, selectedAnswers, flaggedQuestions, currentQuestionIndex,
     setCurrentQuestionIndex, setFlaggedQuestions, isFinished, revealAnswers,
     revealedQuestions, setShowSubmitConfirm, setShowCompleteEarlyConfirm,
     userTier, timed, timeLeft, paused, setPaused, selected, selectedMeta, ratingTarget, setRatingTarget,
-    visitedQuestions,
   } = useExam()
 
   const canReport = userTier !== 'visitor'
   const [reporting, setReporting] = useState(false)
-  const [bankPage, setBankPage] = useState(0)
-
-  const totalPages = Math.ceil(displayQuestions.length / PAGE_SIZE)
-  const usePaging = totalPages > 1
-
-  // Auto-follow the current question's bank when navigating
-  useEffect(() => {
-    const page = Math.floor(Math.min(currentQuestionIndex, displayQuestions.length - 1) / PAGE_SIZE)
-    setBankPage(page)
-  }, [currentQuestionIndex, displayQuestions.length])
-
-  const visibleStart = bankPage * PAGE_SIZE
-  const visibleQuestions = usePaging
-    ? displayQuestions.slice(visibleStart, visibleStart + PAGE_SIZE)
-    : displayQuestions
 
   const answeredCount = Object.keys(selectedAnswers).filter(id => displayQuestions.some(q => q.id === id)).length
-  const visitedCount = displayQuestions.filter(q => visitedQuestions.has(q.id)).length
   const pct = Math.round((answeredCount / Math.max(1, displayQuestions.length)) * 100)
-  const visitedPct = Math.round((visitedCount / Math.max(1, displayQuestions.length)) * 100)
   const allAnswered = answeredCount >= displayQuestions.length
   const flaggedCount = displayQuestions.filter(q => flaggedQuestions.has(q.id)).length
   const curQ = displayQuestions[Math.min(currentQuestionIndex, displayQuestions.length - 1)]
@@ -84,105 +162,54 @@ export function QuestionNav({ focusMode = false, showGrid = true, reviewingFlagg
         </div>
       )}
 
-      {/* Bank carousel controls + question grid — hidden when progress bar strip replaces them */}
-      {showGrid && (
-        <>
-          {usePaging && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <button
-                onClick={() => setBankPage(p => Math.max(0, p - 1))}
-                disabled={bankPage === 0}
-                className="px-2.5 py-0.5 rounded border border-border hover:bg-muted/40 disabled:opacity-30 text-base leading-none"
-              >‹</button>
-              <span className="flex-1 text-center">
-                Q{visibleStart + 1}–{Math.min(visibleStart + PAGE_SIZE, displayQuestions.length)} of {displayQuestions.length}
-              </span>
-              <button
-                onClick={() => setBankPage(p => Math.min(totalPages - 1, p + 1))}
-                disabled={bankPage === totalPages - 1}
-                className="px-2.5 py-0.5 rounded border border-border hover:bg-muted/40 disabled:opacity-30 text-base leading-none"
-              >›</button>
-            </div>
-          )}
-          <div className="flex flex-wrap gap-2">
-            {visibleQuestions.map((qq, i) => {
-              const idx = visibleStart + i
-              const isAnswered = selectedAnswers[qq.id] !== undefined
-              const isFlagged = flaggedQuestions.has(qq.id)
-              const isCurrent = idx === Math.min(currentQuestionIndex, displayQuestions.length - 1)
-              return (
-                <button
-                  key={qq.id}
-                  onClick={() => setCurrentQuestionIndex(idx)}
-                  title={`Q${idx + 1}${isFlagged ? ' (flagged)' : ''}${isAnswered ? ' (answered)' : ''}`}
-                  className={`relative w-7 h-7 sm:w-9 sm:h-9 rounded-md text-xs sm:text-sm font-bold flex items-center justify-center transition-all focus:outline-none
-                    ${isCurrent ? 'ring-2 ring-primary ring-offset-2 ring-offset-background bg-primary text-white shadow' : ''}
-                    ${isAnswered && !isCurrent ? 'bg-primary text-white shadow-sm' : ''}
-                    ${!isAnswered && !isCurrent ? 'bg-card text-muted-foreground border border-border hover:bg-muted/40' : ''}`}
-                >
-                  <span className="select-none">{idx + 1}</span>
-                  {isFlagged && (
-                    <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 rounded-full bg-white dark:bg-card border border-primary/50 shadow-sm">
-                      <Flag className="w-2.5 h-2.5 text-primary" />
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-          <div>
-            <div className="mb-1 flex items-center justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
-                <span className="text-xs text-muted-foreground whitespace-nowrap">{answeredCount} answered · {pct}%</span>
-                {flaggedCount > 0 && <span className="text-xs text-primary flex items-center gap-1 whitespace-nowrap"><Flag className="w-3 h-3" />{flaggedCount} flagged</span>}
+      {/* Modern progress bar — position, flags, answered state; no per-cell numbers */}
+      {(() => {
+        const total = displayQuestions.length
+        const curIdx = Math.min(currentQuestionIndex, total - 1)
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-2 text-xs min-w-0">
+                <span className="font-semibold text-foreground tabular-nums whitespace-nowrap">
+                  Q{curIdx + 1}<span className="text-muted-foreground">/{total}</span>
+                </span>
+                <span className="text-muted-foreground whitespace-nowrap">
+                  {answeredCount} answered · {pct}%
+                </span>
+                {flaggedCount > 0 && (
+                  <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 whitespace-nowrap font-medium">
+                    <Flag className="w-3 h-3 fill-current" />{flaggedCount}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
                 {flaggedCount > 0 && (
-                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-primary/30 bg-primary/5 text-primary text-xs font-medium hover:bg-primary/15 transition-colors whitespace-nowrap" onClick={() => setFlaggedQuestions(new Set())}>
+                  <button
+                    onClick={() => setFlaggedQuestions(new Set())}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-primary/30 bg-primary/5 text-primary text-xs font-medium hover:bg-primary/15 transition-colors whitespace-nowrap"
+                  >
                     <Flag className="w-3 h-3" /><span className="hidden sm:inline">Unflag All</span>
                   </button>
                 )}
                 <button
                   onClick={() => allAnswered ? setShowSubmitConfirm(true) : setShowCompleteEarlyConfirm(true)}
                   title="Finish Exam"
-                  className={`rounded bg-primary text-white font-semibold inline-flex items-center justify-center ${focusMode ? 'p-1.5' : 'px-2.5 py-1 text-xs whitespace-nowrap'}`}
+                  className={`rounded-md bg-primary text-white font-semibold hover:bg-primary/90 transition-colors inline-flex items-center justify-center ${focusMode ? 'p-1.5' : 'px-3 py-1 text-xs whitespace-nowrap'}`}
                 >
                   {focusMode ? <CircleCheck className="w-4 h-4" /> : 'Finish Exam'}
                 </button>
               </div>
             </div>
-            <div className="w-full h-2 bg-accent/60 rounded overflow-hidden relative">
-              <div className="absolute inset-y-0 left-0 bg-primary/20 transition-all duration-300" style={{ width: `${visitedPct}%` }} />
-              <div className="absolute inset-y-0 left-0 bg-primary transition-all duration-300" style={{ width: `${pct}%` }} />
-            </div>
+            <ProgressTrack
+              displayQuestions={displayQuestions}
+              selectedAnswers={selectedAnswers}
+              flaggedQuestions={flaggedQuestions}
+              currentQuestionIndex={curIdx}
+              onSelectQuestion={setCurrentQuestionIndex}
+            />
           </div>
-        </>
-      )}
-
-      {/* Compact progress bar — shown when grid is hidden */}
-      {!showGrid && (
-        <div className="flex items-center gap-3 py-1">
-          <span className="text-sm font-medium tabular-nums text-foreground whitespace-nowrap">
-            {answeredCount}<span className="text-muted-foreground">/{displayQuestions.length}</span>
-          </span>
-          <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden relative">
-            <div className="absolute inset-y-0 left-0 bg-primary/20 rounded-full transition-all duration-300" style={{ width: `${visitedPct}%` }} />
-            <div className="absolute inset-y-0 left-0 bg-primary rounded-full transition-all duration-300" style={{ width: `${pct}%` }} />
-          </div>
-          {flaggedCount > 0 && (
-            <span className="text-xs text-primary flex items-center gap-1 whitespace-nowrap">
-              <Flag className="w-3 h-3" />{flaggedCount}
-            </span>
-          )}
-          <button
-            onClick={() => allAnswered ? setShowSubmitConfirm(true) : setShowCompleteEarlyConfirm(true)}
-            title="Finish Exam"
-            className={`shrink-0 rounded-lg border border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-colors ${focusMode ? 'p-1.5' : 'px-3 py-1.5 text-xs whitespace-nowrap'}`}
-          >
-            {focusMode ? <CircleCheck className="w-4 h-4" /> : 'Finish Exam'}
-          </button>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Prev / Next navigation */}
       <div className="flex flex-wrap items-center gap-2 justify-end w-full">

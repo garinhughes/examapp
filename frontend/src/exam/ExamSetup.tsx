@@ -41,10 +41,10 @@ export function ExamSetup() {
   const defaultDuration: number | null = typeof selectedMeta?.defaultDuration === 'number' ? selectedMeta.defaultDuration : null
   const passMark: number | null = typeof selectedMeta?.passMark === 'number' ? selectedMeta.passMark : null
 
-  // Card stat counts: capped to what the user can actually access
+  // Card stat counts: show user's custom numQuestions if set, otherwise show mode defaults
   const accessibleCount = questions.length
-  const practiceCardQuestions = Math.min(PRACTICE_DEFAULT_QUESTIONS, accessibleCount || PRACTICE_DEFAULT_QUESTIONS)
-  const examCardQuestions = Math.min(defaultQuestions || accessibleCount, accessibleCount || defaultQuestions)
+  const practiceCardQuestions = numQuestions > 0 ? numQuestions : Math.min(PRACTICE_DEFAULT_QUESTIONS, accessibleCount || PRACTICE_DEFAULT_QUESTIONS)
+  const examCardQuestions = numQuestions > 0 ? numQuestions : Math.min(defaultQuestions || accessibleCount, accessibleCount || defaultQuestions)
 
   const formatDuration = (mins: number | null) => {
     if (!mins) return 'None'
@@ -232,15 +232,22 @@ export function ExamSetup() {
         </div>
 
         {/* Advanced options toggle */}
-        <button
-          type="button"
-          onClick={() => setAdvancedOpen((v) => !v)}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition"
-        >
-          <Settings2 className="w-4 h-4" />
-          Advanced options
-          <ChevronDown className={`w-4 h-4 transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
-        </button>
+        <div>
+          <button
+            type="button"
+            onClick={() => setAdvancedOpen((v) => !v)}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition"
+          >
+            <Settings2 className="w-4 h-4" />
+            Advanced options
+            <ChevronDown className={`w-4 h-4 transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {!advancedOpen && (
+            <p className="mt-1 text-[11px] text-orange-500">
+              Change question limit, target specific domains &amp; more.
+            </p>
+          )}
+        </div>
 
         {advancedOpen && (
           <div className="mt-4 space-y-4 pt-4 border-t border-border/40">
