@@ -18,7 +18,7 @@ export function Modals({ onReviewAnswers }: { onReviewAnswers?: () => void }) {
     setSelectedAnswers, setMultiSelectPending,
     setFlaggedQuestions, setCurrentQuestionIndex,
     setTimeLeft, setServiceFilterText, setSelectedServices,
-    setServerInProgress,
+    setServerInProgress, serverInProgress,
   } = useExam()
 
   useEffect(() => {
@@ -61,9 +61,16 @@ export function Modals({ onReviewAnswers }: { onReviewAnswers?: () => void }) {
             <div className="flex items-center justify-end gap-3">
               <button className="px-3 py-1 rounded-md bg-accent text-muted-foreground inline-flex items-center gap-2 hover:bg-accent transition" onClick={() => setShowCancelConfirm(false)}>No, keep</button>
               <button className="px-3 py-1 rounded-md bg-red-600 text-white inline-flex items-center gap-2 hover:bg-red-700 transition" onClick={async () => {
-                if (attemptId) {
+                const bannerCode = anySavedExam?.code ?? selected
+                // attemptId may be null when the banner is rendered purely from cross-device
+                // serverInProgress (user hasn't resumed on this device yet) — fall back to that.
+                const fallbackIds = serverInProgress
+                  .filter(s => !bannerCode || s.examCode === bannerCode)
+                  .map(s => s.attemptId)
+                const idsToDelete = Array.from(new Set([attemptId, ...fallbackIds].filter(Boolean) as string[]))
+                for (const id of idsToDelete) {
                   try {
-                    const res = await authFetch(`/attempts/${attemptId}`, { method: 'DELETE' })
+                    const res = await authFetch(`/attempts/${id}`, { method: 'DELETE' })
                     if (!res.ok && res.status !== 404) {
                       const msg = await res.text().catch(() => 'Could not cancel attempt')
                       alert(msg || 'Could not cancel attempt')
@@ -74,10 +81,10 @@ export function Modals({ onReviewAnswers }: { onReviewAnswers?: () => void }) {
                     return
                   }
                 }
-                const codeToRemove = anySavedExam?.code ?? selected
+                const codeToRemove = bannerCode
                 try { if (codeToRemove) localStorage.removeItem(`attempt:${codeToRemove}`) } catch {}
                 try { if (codeToRemove) localStorage.removeItem(`examProgress:${codeToRemove}`) } catch {}
-                setServerInProgress(prev => prev.filter(s => s.attemptId !== attemptId && s.examCode !== codeToRemove))
+                setServerInProgress(prev => prev.filter(s => !idsToDelete.includes(s.attemptId) && s.examCode !== codeToRemove))
                 setSavedExamVersion(v => v + 1)
                 setAttemptId(null)
                 setAttemptData(null)
