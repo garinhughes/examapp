@@ -127,7 +127,7 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     saveToStorage(currentKey, next)
     setLastError(null)
     return true
-  }, [items])
+  }, [items, currentKey])
 
   const remove = useCallback((productId: string) => {
     setItems((prev) => {
@@ -136,7 +136,7 @@ export function BasketProvider({ children }: { children: ReactNode }) {
       setLastError(null)
       return next
     })
-  }, [])
+  }, [currentKey])
 
   const clear = useCallback(() => {
     setItems([])
@@ -174,7 +174,7 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     setItems(next)
     saveToStorage(currentKey, next)
     setLastError(null)
-  }, [])
+  }, [currentKey])
 
   const clearError = useCallback(() => setLastError(null), [])
 
