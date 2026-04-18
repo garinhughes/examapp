@@ -104,7 +104,7 @@
       "skills": [
         "1.1.1: Analyze workloads to determine monitoring requirements."
       ],
-      "question": "The engineering team is evaluating monitoring requirements for a newly acquired SaaS product that will run in a dedicated AWS Organizations OU. Leadership wants documentation that ties each detection control to a business or regulatory driver so that unnecessary logging can be avoided.\n\nWhich TWO inputs are MOST important when determining the workload's monitoring requirements? (Select TWO)",
+      "question": "The engineering team is evaluating monitoring requirements for a newly acquired SaaS product that will run in a dedicated AWS Organizations OU. Leadership wants documentation that ties each detection control to a business or regulatory driver so that unnecessary logging can be avoided.\n\nWhich TWO inputs are MOST important when determining the workload's monitoring requirements?",
       "choices": [
         {
           "id": "c1",
@@ -281,7 +281,7 @@
       "skills": [
         "1.1.2: Design and implement workload monitoring strategies (for example, by configuring resource health checks)."
       ],
-      "question": "Following a board decision to improve observability of a public API built on Amazon API Gateway and AWS Lambda, the platform team is designing a monitoring strategy that tracks error rate, latency, and throttling without modifying application code.\n\nWhich TWO steps should the team take to establish this monitoring? (Select TWO)",
+      "question": "Following a board decision to improve observability of a public API built on Amazon API Gateway and AWS Lambda, the platform team is designing a monitoring strategy that tracks error rate, latency, and throttling without modifying application code.\n\nWhich TWO steps should the team take to establish this monitoring?",
       "choices": [
         {
           "id": "c1",
@@ -479,7 +479,7 @@
       "skills": [
         "1.1.3: Aggregate security and monitoring events."
       ],
-      "question": "The security operations team aggregates findings into AWS Security Hub in a central Region. Analysts want high-severity findings from any partner integration to appear in their Slack channel in near real time so they can triage without logging into the console.\n\nWhich TWO steps are required to deliver this workflow? (Select TWO)",
+      "question": "The security operations team aggregates findings into AWS Security Hub in a central Region. Analysts want high-severity findings from any partner integration to appear in their Slack channel in near real time so they can triage without logging into the console.\n\nWhich TWO steps are required to deliver this workflow?",
       "choices": [
         {
           "id": "c1",
@@ -677,7 +677,7 @@
       "skills": [
         "1.1.4: Create metrics, alerts, and dashboards to detect anomalous data and events (for example, Amazon GuardDuty, Amazon Security Lake, AWS Security Hub, Amazon Macie)."
       ],
-      "question": "After reviewing quarterly spending, the security team wants to detect anomalous IAM API usage that may indicate credential compromise. They already stream AWS CloudTrail to Amazon CloudWatch Logs.\n\nWhich TWO configurations together deliver actionable alerting? (Select TWO)",
+      "question": "After reviewing quarterly spending, the security team wants to detect anomalous IAM API usage that may indicate credential compromise. They already stream AWS CloudTrail to Amazon CloudWatch Logs.\n\nWhich TWO configurations together deliver actionable alerting?",
       "choices": [
         {
           "id": "c1",
@@ -875,7 +875,7 @@
       "skills": [
         "1.1.5: Create and manage automations to perform regular assessments and investigations (for example, by deploying AWS Config conformance packs, Security Hub, AWS Systems Manager State Manager)."
       ],
-      "question": "The SOC wants to automate investigation steps whenever AWS Security Hub receives a finding of type `Software and Configuration Checks/Vulnerabilities/CVE` with severity CRITICAL on an EC2 instance. The playbook should tag the instance, snapshot its EBS volumes, and attach a forensic security group.\n\nWhich TWO building blocks are required to implement this automation? (Select TWO)",
+      "question": "The SOC wants to automate investigation steps whenever AWS Security Hub receives a finding of type `Software and Configuration Checks/Vulnerabilities/CVE` with severity CRITICAL on an EC2 instance. The playbook should tag the instance, snapshot its EBS volumes, and attach a forensic security group.\n\nWhich TWO building blocks are required to implement this automation?",
       "choices": [
         {
           "id": "c1",
@@ -1054,7 +1054,7 @@
       "skills": [
         "1.2.1: Identify sources for log ingestion and storage based on requirements."
       ],
-      "question": "You are designing log ingestion for a public web application fronted by Amazon CloudFront and AWS WAF, with backends on an Application Load Balancer. The security team needs evidence of each HTTP request (method, URI, source IP) and of each AWS WAF rule evaluation.\n\nWhich TWO log sources should the team enable? (Select TWO)",
+      "question": "You are designing log ingestion for a public web application fronted by Amazon CloudFront and AWS WAF, with backends on an Application Load Balancer. The security team needs evidence of each HTTP request (method, URI, source IP) and of each AWS WAF rule evaluation.\n\nWhich TWO log sources should the team enable?",
       "choices": [
         {
           "id": "c1",
@@ -1251,7 +1251,7 @@
       "skills": [
         "1.2.2: Configure logging for AWS services and applications (for example, by configuring an AWS CloudTrail trail for an organization, by creating a dedicated Amazon CloudWatch logging account, by configuring the Amazon CloudWatch Logs agent)."
       ],
-      "question": "You are rolling out the Amazon CloudWatch Agent to a mixed fleet of Amazon EC2 Linux and Windows instances and want deployment to scale without embedding credentials.\n\nWhich TWO actions together establish a secure, manageable agent deployment? (Select TWO)",
+      "question": "You are rolling out the Amazon CloudWatch Agent to a mixed fleet of Amazon EC2 Linux and Windows instances and want deployment to scale without embedding credentials.\n\nWhich TWO actions together establish a secure, manageable agent deployment?",
       "choices": [
         {
           "id": "c1",
@@ -1429,7 +1429,7 @@
       "skills": [
         "1.2.3: Implement log storage and log data lakes (for example, Security Lake) and integrate with third-party security tools."
       ],
-      "question": "The engineering team is evaluating how to onboard a third-party firewall's JSON logs as a custom source in Amazon Security Lake so they appear alongside native AWS sources.\n\nWhich TWO requirements must be satisfied for the custom source to be usable? (Select TWO)",
+      "question": "The engineering team is evaluating how to onboard a third-party firewall's JSON logs as a custom source in Amazon Security Lake so they appear alongside native AWS sources.\n\nWhich TWO requirements must be satisfied for the custom source to be usable?",
       "choices": [
         {
           "id": "c1",
@@ -1622,7 +1622,7 @@
       "skills": [
         "1.2.4: Use AWS services to analyze logs (for example, CloudWatch Logs Insights, Amazon Athena, Security Hub findings)."
       ],
-      "question": "You are reviewing AWS Security Hub findings to identify resources accumulating multiple related issues. Leadership wants analysts to visualize groups of findings by resource and severity without extracting data.\n\nWhich TWO Security Hub features should analysts use? (Select TWO)",
+      "question": "You are reviewing AWS Security Hub findings to identify resources accumulating multiple related issues. Leadership wants analysts to visualize groups of findings by resource and severity without extracting data.\n\nWhich TWO Security Hub features should analysts use?",
       "choices": [
         {
           "id": "c1",
@@ -1810,7 +1810,7 @@
       "skills": [
         "1.2.5: Use AWS services to normalize, parse, and correlate logs (for example, Amazon OpenSearch Service, AWS Lambda, Amazon Managed Grafana)."
       ],
-      "question": "The security team is evaluating how to correlate authentication events from multiple applications in Amazon OpenSearch Service to detect impossible-travel patterns. They need to normalize field names across sources and run correlation rules.\n\nWhich TWO capabilities should the team use? (Select TWO)",
+      "question": "The security team is evaluating how to correlate authentication events from multiple applications in Amazon OpenSearch Service to detect impossible-travel patterns. They need to normalize field names across sources and run correlation rules.\n\nWhich TWO capabilities should the team use?",
       "choices": [
         {
           "id": "c1",
@@ -1997,7 +1997,7 @@
       "skills": [
         "1.2.6: Determine and configure appropriate log sources based on network design, threats, and attacks (for example, VPC Flow Logs, transit gateway flow logs, Amazon Route 53 Resolver logs)."
       ],
-      "question": "After reviewing quarterly spending, the security team plans to rationalize network log sources for a VPC that hosts regulated workloads. Requirements are: detect port-scanning attempts, identify DNS exfiltration patterns, and retain evidence of allowed and blocked flows through the VPC firewall.\n\nWhich TWO log sources cover these three requirements? (Select TWO)",
+      "question": "After reviewing quarterly spending, the security team plans to rationalize network log sources for a VPC that hosts regulated workloads. Requirements are: detect port-scanning attempts, identify DNS exfiltration patterns, and retain evidence of allowed and blocked flows through the VPC firewall.\n\nWhich TWO log sources cover these three requirements?",
       "choices": [
         {
           "id": "c1",
@@ -2196,7 +2196,7 @@
       "skills": [
         "1.3.1: Analyze the functionality, permissions, and configuration of resources (for example, Lambda function logging, Amazon API Gateway logging, health checks, Amazon CloudFront logging)."
       ],
-      "question": "The engineering team is evaluating logging options for an Amazon CloudFront distribution fronting a media site. They need near real-time signals for ongoing abuse detection and a durable historical record for quarterly audits.\n\nWhich TWO logging configurations together meet these needs? (Select TWO)",
+      "question": "The engineering team is evaluating logging options for an Amazon CloudFront distribution fronting a media site. They need near real-time signals for ongoing abuse detection and a durable historical record for quarterly audits.\n\nWhich TWO logging configurations together meet these needs?",
       "choices": [
         {
           "id": "c1",
@@ -2395,7 +2395,7 @@
       "skills": [
         "1.3.2: Remediate misconfiguration of resources (for example, by troubleshooting CloudWatch Agent configurations, troubleshooting missing logs)."
       ],
-      "question": "During a security audit, engineers find a subset of Amazon EC2 Linux instances where the CloudWatch Agent writes metrics but not the application log file specified in its configuration. The instances run in a private subnet with a NAT gateway.\n\nWhich TWO checks are MOST likely to identify the misconfiguration? (Select TWO)",
+      "question": "During a security audit, engineers find a subset of Amazon EC2 Linux instances where the CloudWatch Agent writes metrics but not the application log file specified in its configuration. The instances run in a private subnet with a NAT gateway.\n\nWhich TWO checks are MOST likely to identify the misconfiguration?",
       "choices": [
         {
           "id": "c1",
@@ -2575,7 +2575,7 @@
       "skills": [
         "2.1.1: Design and implement response plans and runbooks to respond to security incidents (for example, Systems Manager OpsCenter, Amazon SageMaker AI notebooks)."
       ],
-      "question": "Management has decided that every automated response runbook must have a human approval gate and clear audit trail before it can modify production resources.\n\nWhich TWO Systems Manager Automation features implement these controls? (Select TWO)",
+      "question": "Management has decided that every automated response runbook must have a human approval gate and clear audit trail before it can modify production resources.\n\nWhich TWO Systems Manager Automation features implement these controls?",
       "choices": [
         {
           "id": "c1",
@@ -2773,7 +2773,7 @@
       "skills": [
         "2.1.2: Use AWS service features and capabilities to configure services to be prepared for incidents (for example, by provisioning access, deploying security tools, minimizing the blast radius, configuring AWS Shield Advanced protections)."
       ],
-      "question": "The engineering team is evaluating how to minimize blast radius across dozens of AWS accounts before a suspected breach is investigated.\n\nWhich TWO preparatory controls BEST reduce blast radius ahead of incidents? (Select TWO)",
+      "question": "The engineering team is evaluating how to minimize blast radius across dozens of AWS accounts before a suspected breach is investigated.\n\nWhich TWO preparatory controls BEST reduce blast radius ahead of incidents?",
       "choices": [
         {
           "id": "c1",
@@ -2967,7 +2967,7 @@
       "skills": [
         "2.1.3: Recommend procedures to test and validate the effectiveness of an incident response plan (for example, AWS Fault Injection Service, AWS Resilience Hub)."
       ],
-      "question": "The engineering team is planning an AWS Fault Injection Service experiment to validate that the incident response plan detects and recovers from database failover events.\n\nWhich TWO safeguards should be built into the experiment? (Select TWO)",
+      "question": "The engineering team is planning an AWS Fault Injection Service experiment to validate that the incident response plan detects and recovers from database failover events.\n\nWhich TWO safeguards should be built into the experiment?",
       "choices": [
         {
           "id": "c1",
@@ -3146,7 +3146,7 @@
       "skills": [
         "2.1.4: Use AWS services to automatically remediate incidents (for example, Systems Manager, Automated Forensics Orchestrator for Amazon EC2, AWS Step Functions, Amazon Application Recovery Controller, Lambda functions)."
       ],
-      "question": "To reduce infrastructure costs while still enabling fast regional failover, the engineering team is considering Amazon Application Recovery Controller for a mission-critical application.\n\nWhich TWO capabilities does ARC provide that support automated incident recovery? (Select TWO)",
+      "question": "To reduce infrastructure costs while still enabling fast regional failover, the engineering team is considering Amazon Application Recovery Controller for a mission-critical application.\n\nWhich TWO capabilities does ARC provide that support automated incident recovery?",
       "choices": [
         {
           "id": "c1",
@@ -3345,7 +3345,7 @@
       "skills": [
         "2.2.1: Capture and store relevant system and application logs as forensic artifacts."
       ],
-      "question": "The security team is preparing to acquire disk evidence from a compromised Amazon EC2 instance. The process must preserve the original volume and maintain chain of custody.\n\nWhich TWO actions BEST support forensic acquisition? (Select TWO)",
+      "question": "The security team is preparing to acquire disk evidence from a compromised Amazon EC2 instance. The process must preserve the original volume and maintain chain of custody.\n\nWhich TWO actions BEST support forensic acquisition?",
       "choices": [
         {
           "id": "c1",
@@ -3522,7 +3522,7 @@
       "skills": [
         "2.2.2: Search and correlate logs for security events across applications and AWS services."
       ],
-      "question": "The security team wants a managed, graph-based way to pivot from a GuardDuty finding to related IP addresses, IAM principals, and Amazon EC2 instances during investigations.\n\nWhich TWO statements about Amazon Detective support this requirement? (Select TWO)",
+      "question": "The security team wants a managed, graph-based way to pivot from a GuardDuty finding to related IP addresses, IAM principals, and Amazon EC2 instances during investigations.\n\nWhich TWO statements about Amazon Detective support this requirement?",
       "choices": [
         {
           "id": "c1",
@@ -3721,7 +3721,7 @@
       "skills": [
         "2.2.3: Validate findings from AWS security services to assess the scope and impact of an event."
       ],
-      "question": "The operations team wants to validate and scope findings from multiple AWS security services during an active incident without switching consoles.\n\nWhich TWO AWS Security Hub behaviors help them do this? (Select TWO)",
+      "question": "The operations team wants to validate and scope findings from multiple AWS security services during an active incident without switching consoles.\n\nWhich TWO AWS Security Hub behaviors help them do this?",
       "choices": [
         {
           "id": "c1",
@@ -3918,7 +3918,7 @@
       "skills": [
         "2.2.4: Respond to affected resources by containing and eradicating threats, and recover resources (for example, by implementing network containment controls, restoring backups)."
       ],
-      "question": "A compromised IAM access key has been observed performing unauthorized API calls. The security team must contain the threat and eradicate the attacker's ability to continue.\n\nWhich TWO actions together deliver effective containment and eradication? (Select TWO)",
+      "question": "A compromised IAM access key has been observed performing unauthorized API calls. The security team must contain the threat and eradicate the attacker's ability to continue.\n\nWhich TWO actions together deliver effective containment and eradication?",
       "choices": [
         {
           "id": "c1",
@@ -4096,7 +4096,7 @@
       "skills": [
         "2.2.5: Describe methods to conduct root cause analysis (for example, Amazon Detective). services."
       ],
-      "question": "The engineering team is evaluating how to combine AWS services to perform thorough root cause analysis after incidents.\n\nWhich TWO combinations are MOST effective? (Select TWO)",
+      "question": "The engineering team is evaluating how to combine AWS services to perform thorough root cause analysis after incidents.\n\nWhich TWO combinations are MOST effective?",
       "choices": [
         {
           "id": "c1",
@@ -4295,7 +4295,7 @@
       "skills": [
         "3.1.1: Define and select edge security strategies based on anticipated threats and attacks."
       ],
-      "question": "The engineering team is evaluating edge security strategies for a new public REST API that anticipates OWASP Top 10 threats and bot traffic.\n\nWhich TWO strategies BEST address these threats at the edge? (Select TWO)",
+      "question": "The engineering team is evaluating edge security strategies for a new public REST API that anticipates OWASP Top 10 threats and bot traffic.\n\nWhich TWO strategies BEST address these threats at the edge?",
       "choices": [
         {
           "id": "c1",
@@ -4490,7 +4490,7 @@
       "skills": [
         "3.1.2: Implement appropriate network edge protection (for example, CloudFront headers, AWS WAF, AWS IoT policies, protecting against OWASP Top 10 threats, Amazon S3 cross-origin resource sharing [CORS], Shield Advanced)."
       ],
-      "question": "A single-page application at `app.example.com` must fetch assets from an Amazon S3 bucket using cross-origin requests. The browser is rejecting the requests due to CORS.\n\nWhich TWO configuration elements are required to resolve the issue? (Select TWO)",
+      "question": "A single-page application at `app.example.com` must fetch assets from an Amazon S3 bucket using cross-origin requests. The browser is rejecting the requests due to CORS.\n\nWhich TWO configuration elements are required to resolve the issue?",
       "choices": [
         {
           "id": "c1",
@@ -4685,7 +4685,7 @@
       "skills": [
         "3.1.3: Design and implement AWS edge controls and rules based on requirements (for example, geography, geolocation, rate limiting, client fingerprinting)."
       ],
-      "question": "The engineering team is evaluating AWS WAF features to mitigate credential-stuffing bots that rotate IP addresses and user agents.\n\nWhich TWO capabilities BEST address this threat? (Select TWO)",
+      "question": "The engineering team is evaluating AWS WAF features to mitigate credential-stuffing bots that rotate IP addresses and user agents.\n\nWhich TWO capabilities BEST address this threat?",
       "choices": [
         {
           "id": "c1",
@@ -4878,7 +4878,7 @@
       "skills": [
         "3.1.4: Configure integrations with AWS edge services and third-party services (for example, by ingesting data in Open Cybersecurity Schema Framework [OCSF] format, by using third-party WAF rules). workloads."
       ],
-      "question": "To reduce integration overhead, the organization wants analytics partners to consume edge and security data from Amazon Security Lake without building bespoke pipelines.\n\nWhich TWO Security Lake capabilities support this integration model? (Select TWO)",
+      "question": "To reduce integration overhead, the organization wants analytics partners to consume edge and security data from Amazon Security Lake without building bespoke pipelines.\n\nWhich TWO Security Lake capabilities support this integration model?",
       "choices": [
         {
           "id": "c1",
@@ -5056,7 +5056,7 @@
       "skills": [
         "3.2.1: Design and implement hardened Amazon EC2 AMIs and container images to secure compute workloads and embed security controls (for example, Systems Manager, EC2 Image Builder)."
       ],
-      "question": "Following a board decision to embed security controls in EC2 golden images, the team must ensure each produced AMI has both configuration hardening and vulnerability validation before publication.\n\nWhich TWO actions achieve this? (Select TWO)",
+      "question": "Following a board decision to embed security controls in EC2 golden images, the team must ensure each produced AMI has both configuration hardening and vulnerability validation before publication.\n\nWhich TWO actions achieve this?",
       "choices": [
         {
           "id": "c1",
@@ -5254,7 +5254,7 @@
       "skills": [
         "3.2.2: Apply instance profiles, service roles, and execution roles appropriately to authorize compute workloads."
       ],
-      "question": "The operations team is hardening ECS tasks on Fargate. Containers in the same task must use different permissions to AWS services.\n\nWhich TWO configurations deliver that outcome? (Select TWO)",
+      "question": "The operations team is hardening ECS tasks on Fargate. Containers in the same task must use different permissions to AWS services.\n\nWhich TWO configurations deliver that outcome?",
       "choices": [
         {
           "id": "c1",
@@ -5452,7 +5452,7 @@
       "skills": [
         "3.2.3: Scan compute resources for known vulnerabilities (for example, scan container images and Lambda functions by using Amazon Inspector, monitor compute runtimes by using GuardDuty)."
       ],
-      "question": "During a security audit, the team must demonstrate continuous vulnerability scanning of compute resources across Amazon EC2 fleets and container images.\n\nWhich TWO Amazon Inspector behaviors support this requirement? (Select TWO)",
+      "question": "During a security audit, the team must demonstrate continuous vulnerability scanning of compute resources across Amazon EC2 fleets and container images.\n\nWhich TWO Amazon Inspector behaviors support this requirement?",
       "choices": [
         {
           "id": "c1",
@@ -5647,7 +5647,7 @@
       "skills": [
         "3.2.4: Deploy patches across compute resources to maintain secure and compliant environments by automating update processes and by integrating continuous validation (for example, Systems Manager Patch Manager, Amazon Inspector)."
       ],
-      "question": "Management has decided to differentiate patch policies between production and non-production environments using Patch Manager. Production should apply only critical and security patches, while non-production can apply all patches.\n\nWhich TWO configurations together implement this? (Select TWO)",
+      "question": "Management has decided to differentiate patch policies between production and non-production environments using Patch Manager. Production should apply only critical and security patches, while non-production can apply all patches.\n\nWhich TWO configurations together implement this?",
       "choices": [
         {
           "id": "c1",
@@ -5822,7 +5822,7 @@
       "skills": [
         "3.2.5: Configure secure administrative access to compute resources (for example, Systems Manager Session Manager, EC2 Instance Connect)."
       ],
-      "question": "The engineering team is evaluating Session Manager hardening options to satisfy audit requirements around administrative access.\n\nWhich TWO configurations are MOST effective? (Select TWO)",
+      "question": "The engineering team is evaluating Session Manager hardening options to satisfy audit requirements around administrative access.\n\nWhich TWO configurations are MOST effective?",
       "choices": [
         {
           "id": "c1",
@@ -6015,7 +6015,7 @@
       "skills": [
         "3.2.6: Configure security tools to discover and remediate vulnerabilities within a pipeline (for example, Amazon Q Developer, Amazon CodeGuru Security)."
       ],
-      "question": "The operations team wants pipeline builds to fail when CodeGuru Security reports critical findings, and to track fixes over time.\n\nWhich TWO actions together deliver this? (Select TWO)",
+      "question": "The operations team wants pipeline builds to fail when CodeGuru Security reports critical findings, and to track fixes over time.\n\nWhich TWO actions together deliver this?",
       "choices": [
         {
           "id": "c1",
@@ -6199,7 +6199,7 @@
       "skills": [
         "3.2.7: Implement protections and guardrails for generative AI applications (for example, by applying GenAI OWASP Top 10 for LLM Applications protections)."
       ],
-      "question": "The organization is looking to reduce exposure to OWASP Top 10 for LLM Applications risks across its Bedrock-based applications.\n\nWhich TWO Bedrock Guardrails features help most directly? (Select TWO)",
+      "question": "The organization is looking to reduce exposure to OWASP Top 10 for LLM Applications risks across its Bedrock-based applications.\n\nWhich TWO Bedrock Guardrails features help most directly?",
       "choices": [
         {
           "id": "c1",
@@ -6394,7 +6394,7 @@
       "skills": [
         "3.3.1: Design and troubleshoot appropriate network controls to permit or prevent network traffic as required (for example, security groups, network ACLs, AWS Network Firewall)."
       ],
-      "question": "During a troubleshooting session, traffic from an instance in subnet A to a peer in subnet B is dropped despite security groups appearing correct.\n\nWhich TWO checks are MOST likely to identify the cause? (Select TWO)",
+      "question": "During a troubleshooting session, traffic from an instance in subnet A to a peer in subnet B is dropped despite security groups appearing correct.\n\nWhich TWO checks are MOST likely to identify the cause?",
       "choices": [
         {
           "id": "c1",
@@ -6588,7 +6588,7 @@
       "skills": [
         "3.3.2: Design secure connectivity between hybrid and multi-cloud networks (for example, AWS Site-to-Site VPN, AWS Direct Connect, MAC Security [MACsec])."
       ],
-      "question": "The organization is looking to build a resilient, secure hybrid network that can ride out loss of a single Direct Connect location.\n\nWhich TWO design choices support that goal? (Select TWO)",
+      "question": "The organization is looking to build a resilient, secure hybrid network that can ride out loss of a single Direct Connect location.\n\nWhich TWO design choices support that goal?",
       "choices": [
         {
           "id": "c1",
@@ -6781,7 +6781,7 @@
       "skills": [
         "3.3.3: Determine and configure security workload requirements for communication between hybrid environments and AWS (for example, by using AWS Verified Access)."
       ],
-      "question": "The engineering team is evaluating AWS Verified Access trust providers to enforce both identity and device posture on hybrid access.\n\nWhich TWO trust-provider types directly support that model? (Select TWO)",
+      "question": "The engineering team is evaluating AWS Verified Access trust providers to enforce both identity and device posture on hybrid access.\n\nWhich TWO trust-provider types directly support that model?",
       "choices": [
         {
           "id": "c1",
@@ -6956,7 +6956,7 @@
       "skills": [
         "3.3.4: Design network segmentation based on security requirements (for example, north/south and east/west traffic protections, isolated subnets)."
       ],
-      "question": "To reduce infrastructure costs while adding network segmentation, the team wants a centralized inspection model for east-west and north-south traffic across many VPCs.\n\nWhich TWO design elements support this? (Select TWO)",
+      "question": "To reduce infrastructure costs while adding network segmentation, the team wants a centralized inspection model for east-west and north-south traffic across many VPCs.\n\nWhich TWO design elements support this?",
       "choices": [
         {
           "id": "c1",
@@ -7151,7 +7151,7 @@
       "skills": [
         "3.3.5: Identify unnecessary network access (for example, AWS Verified Access, Network Access Analyzer, Amazon Inspector network reachability findings)."
       ],
-      "question": "The engineering team is evaluating multiple AWS services to identify unnecessary network access for an application portfolio.\n\nWhich TWO service pairings address this goal? (Select TWO)",
+      "question": "The engineering team is evaluating multiple AWS services to identify unnecessary network access for an application portfolio.\n\nWhich TWO service pairings address this goal?",
       "choices": [
         {
           "id": "c1",
@@ -7335,7 +7335,7 @@
       "skills": [
         "4.1.1: Design and establish identity solutions for human, application, and system authentication (for example, AWS IAM Identity Center, Amazon Cognito, multi-factor authentication [MFA], identity provider [IdP] integration)."
       ],
-      "question": "Following a board decision to enforce MFA for all human access to AWS, the team must evaluate their options.\n\nWhich TWO configurations BEST enforce MFA across workforce access? (Select TWO)",
+      "question": "Following a board decision to enforce MFA for all human access to AWS, the team must evaluate their options.\n\nWhich TWO configurations BEST enforce MFA across workforce access?",
       "choices": [
         {
           "id": "c1",
@@ -7532,7 +7532,7 @@
       "skills": [
         "4.1.2: Configure mechanisms to issue temporary credentials (for example, AWS Security Token Service [AWS STS], Amazon S3 presigned URLs)."
       ],
-      "question": "The organization is looking to minimize risk from leaked credentials by issuing temporary credentials wherever possible.\n\nWhich TWO patterns BEST support this goal? (Select TWO)",
+      "question": "The organization is looking to minimize risk from leaked credentials by issuing temporary credentials wherever possible.\n\nWhich TWO patterns BEST support this goal?",
       "choices": [
         {
           "id": "c1",
@@ -7727,7 +7727,7 @@
       "skills": [
         "4.1.3: Troubleshooting authentication issues (for example, CloudTrail, Amazon Cognito, IAM Identity Center permission sets, AWS Directory Service)."
       ],
-      "question": "Users of a mobile app report that social sign-in via Amazon Cognito fails with an invalid token error on certain devices.\n\nWhich TWO checks are MOST useful for diagnosis? (Select TWO)",
+      "question": "Users of a mobile app report that social sign-in via Amazon Cognito fails with an invalid token error on certain devices.\n\nWhich TWO checks are MOST useful for diagnosis?",
       "choices": [
         {
           "id": "c1",
@@ -7922,7 +7922,7 @@
       "skills": [
         "4.2.1: Design and evaluate authorization controls for human, application, and system access (for example, Amazon Verified Permissions, IAM paths, IAM Roles Anywhere, resource policies for cross-account access, IAM role trust policies)."
       ],
-      "question": "The operations team is configuring IAM Roles Anywhere for on-premises servers that must call AWS APIs.\n\nWhich TWO configuration elements are required? (Select TWO)",
+      "question": "The operations team is configuring IAM Roles Anywhere for on-premises servers that must call AWS APIs.\n\nWhich TWO configuration elements are required?",
       "choices": [
         {
           "id": "c1",
@@ -8116,7 +8116,7 @@
       "skills": [
         "4.2.2: Design attribute-based access control (ABAC) and role-based access control (RBAC) strategies (for example, by configuring resource access based on tags or attributes)."
       ],
-      "question": "The engineering team is evaluating how to deliver ABAC for workforce users via IAM Identity Center.\n\nWhich TWO configurations support this? (Select TWO)",
+      "question": "The engineering team is evaluating how to deliver ABAC for workforce users via IAM Identity Center.\n\nWhich TWO configurations support this?",
       "choices": [
         {
           "id": "c1",
@@ -8310,7 +8310,7 @@
       "skills": [
         "4.2.3: Design, interpret, and implement IAM policies by following the principle of least privilege (for example, permission boundaries, session policies)."
       ],
-      "question": "The operations team wants to right-size existing IAM policies to achieve least privilege based on actual API activity.\n\nWhich TWO capabilities BEST support this effort? (Select TWO)",
+      "question": "The operations team wants to right-size existing IAM policies to achieve least privilege based on actual API activity.\n\nWhich TWO capabilities BEST support this effort?",
       "choices": [
         {
           "id": "c1",
@@ -8502,7 +8502,7 @@
       "skills": [
         "4.2.4: Analyze authorization failures to determine causes or effects (for example, IAM Policy Simulator, IAM Access Analyzer)."
       ],
-      "question": "An API call is unexpectedly denied. The team already confirmed the identity policy allows the action.\n\nWhich TWO additional checks are MOST likely to uncover the deny cause? (Select TWO)",
+      "question": "An API call is unexpectedly denied. The team already confirmed the identity policy allows the action.\n\nWhich TWO additional checks are MOST likely to uncover the deny cause?",
       "choices": [
         {
           "id": "c1",
@@ -8697,7 +8697,7 @@
       "skills": [
         "4.2.5: Investigate and correct unintended permissions, authorizations, or privileges granted to a resource, service, or entity (for example, IAM Access Analyzer)."
       ],
-      "question": "The engineering team is evaluating how to investigate and correct unintended permissions across the organization.\n\nWhich TWO actions BEST support this? (Select TWO)",
+      "question": "The engineering team is evaluating how to investigate and correct unintended permissions across the organization.\n\nWhich TWO actions BEST support this?",
       "choices": [
         {
           "id": "c1",
@@ -8890,7 +8890,7 @@
       "skills": [
         "5.1.1: Design and configure mechanisms to require encryption when connecting to connect to resources (for example, by configuring Elastic Load Balancing [ELB] security policies, by enforcing TLS configurations)."
       ],
-      "question": "Following a board decision, all access to Amazon S3 buckets owned by the company must occur only over TLS, and violations must be blocked.\n\nWhich TWO actions BEST enforce this? (Select TWO)",
+      "question": "Following a board decision, all access to Amazon S3 buckets owned by the company must occur only over TLS, and violations must be blocked.\n\nWhich TWO actions BEST enforce this?",
       "choices": [
         {
           "id": "c1",
@@ -9086,7 +9086,7 @@
       "skills": [
         "5.1.2: Design and configure mechanisms for secure and private access to resources (for example, AWS PrivateLink, VPC endpoints, AWS Client VPN, AWS Verified Access)."
       ],
-      "question": "The operations team is configuring private access to an AWS service API (such as AWS KMS) from a private VPC subnet.\n\nWhich TWO configuration steps are required? (Select TWO)",
+      "question": "The operations team is configuring private access to an AWS service API (such as AWS KMS) from a private VPC subnet.\n\nWhich TWO configuration steps are required?",
       "choices": [
         {
           "id": "c1",
@@ -9279,7 +9279,7 @@
       "skills": [
         "5.1.3: Design and configure inter-resource encryption in transit (for example, inter-node encryption configurations for Amazon EMR, Amazon Elastic Kubernetes Service [Amazon EKS], SageMaker AI, Nitro encryption)."
       ],
-      "question": "The engineering team is evaluating how to encrypt pod-to-pod traffic inside an Amazon EKS cluster that runs workloads with strict compliance requirements.\n\nWhich TWO approaches are valid? (Select TWO)",
+      "question": "The engineering team is evaluating how to encrypt pod-to-pod traffic inside an Amazon EKS cluster that runs workloads with strict compliance requirements.\n\nWhich TWO approaches are valid?",
       "choices": [
         {
           "id": "c1",
@@ -9476,7 +9476,7 @@
       "skills": [
         "5.2.1: Design, implement, and configure data encryption at rest based on specific requirements (for example, by selecting the appropriate encryption key service such as AWS CloudHSM or AWS Key Management Service [AWS KMS] or by selecting the appropriate encryption type such as client-side encryption or serverside encryption)."
       ],
-      "question": "The engineering team wants to enforce SSE-KMS on a bucket while minimizing KMS request costs at high object throughput.\n\nWhich TWO actions BEST achieve this? (Select TWO)",
+      "question": "The engineering team wants to enforce SSE-KMS on a bucket while minimizing KMS request costs at high object throughput.\n\nWhich TWO actions BEST achieve this?",
       "choices": [
         {
           "id": "c1",
@@ -9671,7 +9671,7 @@
       "skills": [
         "5.2.2: Design and configure mechanisms to protect data integrity (for example, S3 Object Lock, S3 Glacier Vault Lock, versioning, digital code signing, file validation)."
       ],
-      "question": "The operations team is evaluating how to enforce WORM controls on long-term archives.\n\nWhich TWO options provide an immutable archive? (Select TWO)",
+      "question": "The operations team is evaluating how to enforce WORM controls on long-term archives.\n\nWhich TWO options provide an immutable archive?",
       "choices": [
         {
           "id": "c1",
@@ -9864,7 +9864,7 @@
       "skills": [
         "5.2.3: Design automatic lifecycle management and retention solutions for data (for example, S3 Lifecycle policies, S3 Object Lock, Amazon Elastic File System [Amazon EFS] Lifecycle policies, Amazon FSx for Lustre backup policies)."
       ],
-      "question": "After reviewing quarterly spending, the team wants Amazon S3 objects to auto-tier between storage classes based on access patterns without guesswork, and to retain versioned copies long-term.\n\nWhich TWO actions BEST meet this? (Select TWO)",
+      "question": "After reviewing quarterly spending, the team wants Amazon S3 objects to auto-tier between storage classes based on access patterns without guesswork, and to retain versioned copies long-term.\n\nWhich TWO actions BEST meet this?",
       "choices": [
         {
           "id": "c1",
@@ -10058,7 +10058,7 @@
       "skills": [
         "5.2.4: Design and configure secure data replication and backup solutions (for example, Amazon Data Lifecycle Manager, AWS Backup, ransomware protection, AWS DataSync). secrets, and cryptographic key materials."
       ],
-      "question": "The engineering team is configuring S3 Cross-Region Replication with ransomware resiliency in mind.\n\nWhich TWO configurations BEST support this goal? (Select TWO)",
+      "question": "The engineering team is configuring S3 Cross-Region Replication with ransomware resiliency in mind.\n\nWhich TWO configurations BEST support this goal?",
       "choices": [
         {
           "id": "c1",
@@ -10253,7 +10253,7 @@
       "skills": [
         "5.3.1: Design management and rotation of credentials and secrets (for example, AWS Secrets Manager)."
       ],
-      "question": "The organization is looking to eliminate plaintext database credentials in application configuration files.\n\nWhich TWO practices BEST satisfy this? (Select TWO)",
+      "question": "The organization is looking to eliminate plaintext database credentials in application configuration files.\n\nWhich TWO practices BEST satisfy this?",
       "choices": [
         {
           "id": "c1",
@@ -10426,7 +10426,7 @@
       "skills": [
         "5.3.2: Manage and use imported key material (for example, by managing and rotating imported key material, by managing and configuring external key stores)."
       ],
-      "question": "The engineering team is evaluating rotation for KMS keys with imported material.\n\nWhich TWO statements are accurate? (Select TWO)",
+      "question": "The engineering team is evaluating rotation for KMS keys with imported material.\n\nWhich TWO statements are accurate?",
       "choices": [
         {
           "id": "c1",
@@ -10618,7 +10618,7 @@
       "skills": [
         "5.3.3: Describe the differences between imported key material and AWS generated key material."
       ],
-      "question": "The operations team is comparing AWS-generated and imported key material for an audit.\n\nWhich TWO statements about imported key material are accurate? (Select TWO)",
+      "question": "The operations team is comparing AWS-generated and imported key material for an audit.\n\nWhich TWO statements about imported key material are accurate?",
       "choices": [
         {
           "id": "c1",
@@ -10810,7 +10810,7 @@
       "skills": [
         "5.3.4: Mask sensitive data (for example, CloudWatch Logs data protection policies, Amazon Simple Notification Service [Amazon SNS] message data protection)."
       ],
-      "question": "The organization is looking to discover and reduce exposure of sensitive data in Amazon S3 and data prep pipelines.\n\nWhich TWO services BEST support this? (Select TWO)",
+      "question": "The organization is looking to discover and reduce exposure of sensitive data in Amazon S3 and data prep pipelines.\n\nWhich TWO services BEST support this?",
       "choices": [
         {
           "id": "c1",
@@ -11003,7 +11003,7 @@
       "skills": [
         "5.3.5: Create and manage encryption keys and certificates across a single AWS Region or multiple Regions (for example, AWS KMS customer managed AWS KMS keys, AWS Private Certificate Authority)."
       ],
-      "question": "The engineering team is evaluating controls on customer managed KMS keys.\n\nWhich TWO practices are RECOMMENDED? (Select TWO)",
+      "question": "The engineering team is evaluating controls on customer managed KMS keys.\n\nWhich TWO practices are RECOMMENDED?",
       "choices": [
         {
           "id": "c1",
@@ -11196,7 +11196,7 @@
       "skills": [
         "6.1.1: Deploy and configure organizations by using AWS Organizations."
       ],
-      "question": "The organization is looking to enable trusted access for AWS security services to operate across all accounts.\n\nWhich TWO actions are required? (Select TWO)",
+      "question": "The organization is looking to enable trusted access for AWS security services to operate across all accounts.\n\nWhich TWO actions are required?",
       "choices": [
         {
           "id": "c1",
@@ -11387,7 +11387,7 @@
       "skills": [
         "6.1.2: Implement and manage AWS Control Tower in new and existing environments, and deploy optional and custom controls."
       ],
-      "question": "The engineering team is evaluating how to extend AWS Control Tower with controls specific to the company.\n\nWhich TWO approaches are supported? (Select TWO)",
+      "question": "The engineering team is evaluating how to extend AWS Control Tower with controls specific to the company.\n\nWhich TWO approaches are supported?",
       "choices": [
         {
           "id": "c1",
@@ -11578,7 +11578,7 @@
       "skills": [
         "6.1.3: Implement organization policies to manage permissions (for example, SCPs, RCPs, AI service opt-out policies, declarative policies)."
       ],
-      "question": "The operations team is evaluating organization policy types.\n\nWhich TWO statements are accurate? (Select TWO)",
+      "question": "The operations team is evaluating organization policy types.\n\nWhich TWO statements are accurate?",
       "choices": [
         {
           "id": "c1",
@@ -11771,7 +11771,7 @@
       "skills": [
         "6.1.4: Centrally manage security services (for example, delegated administrator accounts)."
       ],
-      "question": "The organization is looking to reduce dependence on the AWS Organizations management account for day-to-day security operations.\n\nWhich TWO practices BEST support this? (Select TWO)",
+      "question": "The organization is looking to reduce dependence on the AWS Organizations management account for day-to-day security operations.\n\nWhich TWO practices BEST support this?",
       "choices": [
         {
           "id": "c1",
@@ -11968,7 +11968,7 @@
       "skills": [
         "6.1.5: Manage AWS account root user credentials (for example, by centralizing root access for member accounts, managing MFA, designing breakglass procedures)."
       ],
-      "question": "The engineering team is designing a break-glass procedure for root user access.\n\nWhich TWO practices BEST support this? (Select TWO)",
+      "question": "The engineering team is designing a break-glass procedure for root user access.\n\nWhich TWO practices BEST support this?",
       "choices": [
         {
           "id": "c1",
@@ -12163,7 +12163,7 @@
       "skills": [
         "6.2.1: Use infrastructure as code (IaC) to deploy cloud resources consistently and securely across accounts (for example, CloudFormation stack sets, third-party IaC tools, CloudFormation Guard, cfn-lint)."
       ],
-      "question": "The engineering team is evaluating IaC security best practices.\n\nWhich TWO actions BEST support secure delivery? (Select TWO)",
+      "question": "The engineering team is evaluating IaC security best practices.\n\nWhich TWO actions BEST support secure delivery?",
       "choices": [
         {
           "id": "c1",
@@ -12357,7 +12357,7 @@
       "skills": [
         "6.2.2: Use tags to organize AWS resources into groups for management (for example, by grouping by department, cost center, environment)."
       ],
-      "question": "The operations team is evaluating how to use tags operationally after they are applied.\n\nWhich TWO usages are appropriate? (Select TWO)",
+      "question": "The operations team is evaluating how to use tags operationally after they are applied.\n\nWhich TWO usages are appropriate?",
       "choices": [
         {
           "id": "c1",
@@ -12552,7 +12552,7 @@
       "skills": [
         "6.2.3: Deploy and enforce policies and configurations from a central source (for example, AWS Firewall Manager)."
       ],
-      "question": "The engineering team is evaluating which policy types AWS Firewall Manager can centrally deploy.\n\nWhich TWO are supported? (Select TWO)",
+      "question": "The engineering team is evaluating which policy types AWS Firewall Manager can centrally deploy.\n\nWhich TWO are supported?",
       "choices": [
         {
           "id": "c1",
@@ -12746,7 +12746,7 @@
       "skills": [
         "6.2.4: Securely share resources across AWS accounts (for example, AWS Service Catalog, AWS Resource Access Manager [AWS RAM])."
       ],
-      "question": "The operations team is evaluating which resources AWS RAM can share.\n\nWhich TWO are valid shareable resource types? (Select TWO)",
+      "question": "The operations team is evaluating which resources AWS RAM can share.\n\nWhich TWO are valid shareable resource types?",
       "choices": [
         {
           "id": "c1",
@@ -12939,7 +12939,7 @@
       "skills": [
         "6.3.1: Create or enable rules to detect and remediate noncompliant AWS resources and to send notifications (for example, by using AWS Config to aggregate alerts and remediate non-compliant resources, Security Hub)."
       ],
-      "question": "The engineering team wants to aggregate compliance and security findings across a multi-account, multi-Region footprint.\n\nWhich TWO configurations support this? (Select TWO)",
+      "question": "The engineering team wants to aggregate compliance and security findings across a multi-account, multi-Region footprint.\n\nWhich TWO configurations support this?",
       "choices": [
         {
           "id": "c1",
@@ -13132,7 +13132,7 @@
       "skills": [
         "6.3.2: Use AWS audit services to collect and organize evidence (for example, AWS Audit Manager, AWS Artifact)."
       ],
-      "question": "The engineering team is rolling out AWS Audit Manager for a HIPAA assessment.\n\nWhich TWO statements are accurate? (Select TWO)",
+      "question": "The engineering team is rolling out AWS Audit Manager for a HIPAA assessment.\n\nWhich TWO statements are accurate?",
       "choices": [
         {
           "id": "c1",
@@ -13325,7 +13325,7 @@
       "skills": [
         "6.3.3: Use AWS services to evaluate architecture for compliance with AWS security best practices (for example, AWS Well-Architected Framework tool)."
       ],
-      "question": "The engineering team is pairing architectural review with ongoing best-practice checks.\n\nWhich TWO approaches are appropriate? (Select TWO)",
+      "question": "The engineering team is pairing architectural review with ongoing best-practice checks.\n\nWhich TWO approaches are appropriate?",
       "choices": [
         {
           "id": "c1",

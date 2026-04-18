@@ -101,7 +101,7 @@
       "skills": [
         "1.1.1: Access a shell prompt and issue commands with correct syntax."
       ],
-      "question": "A junior administrator is writing a one-liner that should run `command2` only if `command1` exits successfully. They want to know which shell constructs correctly express that conditional sequence on RHEL 10's default Bash shell.\n\nWhich TWO invocations run `command2` only when `command1` exits with status 0? (Select TWO)",
+      "question": "A junior administrator is writing a one-liner that should run `command2` only if `command1` exits successfully. They want to know which shell constructs correctly express that conditional sequence on RHEL 10's default Bash shell.\n\nWhich TWO invocations run `command2` only when `command1` exits with status 0?",
       "choices": [
         {
           "id": "c1",
@@ -292,7 +292,7 @@
       "skills": [
         "1.1.2: Use input-output redirection (>, >>, |, 2>, etc.)."
       ],
-      "question": "To reduce downtime during a troubleshooting session, an engineer wants both standard output and standard error from a script written to `debug.log` as a single combined stream.\n\nWhich TWO commands correctly combine stdout and stderr into `debug.log`? (Select TWO)",
+      "question": "To reduce downtime during a troubleshooting session, an engineer wants both standard output and standard error from a script written to `debug.log` as a single combined stream.\n\nWhich TWO commands correctly combine stdout and stderr into `debug.log`?",
       "choices": [
         {
           "id": "c1",
@@ -483,7 +483,7 @@
       "skills": [
         "1.1.3: Use grep and regular expressions to analyze text."
       ],
-      "question": "During a log review, an administrator wants to see every line in `app.log` that does NOT contain the word `debug`, and each surviving line should carry its original line number.\n\nWhich TWO `grep` flags must be combined to produce that output? (Select TWO)",
+      "question": "During a log review, an administrator wants to see every line in `app.log` that does NOT contain the word `debug`, and each surviving line should carry its original line number.\n\nWhich TWO `grep` flags must be combined to produce that output?",
       "choices": [
         {
           "id": "c1",
@@ -674,7 +674,7 @@
       "skills": [
         "1.1.4: Access remote systems using SSH."
       ],
-      "question": "A junior administrator has been asked to configure passwordless SSH login from their RHEL 10 workstation to a new bastion host. No keys currently exist in their home directory and the bastion allows password authentication for initial setup only.\n\nWhich TWO steps are required to complete the configuration? (Select TWO)",
+      "question": "A junior administrator has been asked to configure passwordless SSH login from their RHEL 10 workstation to a new bastion host. No keys currently exist in their home directory and the bastion allows password authentication for initial setup only.\n\nWhich TWO steps are required to complete the configuration?",
       "choices": [
         {
           "id": "c1",
@@ -843,7 +843,7 @@
       "skills": [
         "1.1.5: Log in and switch users in multiuser targets."
       ],
-      "question": "A junior administrator is writing a diagnostic script that must record which user executed it and what UID that user has. The script runs inside an unmodified RHEL 10 shell with standard coreutils available.\n\nWhich TWO commands correctly report the current user's identity? (Select TWO)",
+      "question": "A junior administrator is writing a diagnostic script that must record which user executed it and what UID that user has. The script runs inside an unmodified RHEL 10 shell with standard coreutils available.\n\nWhich TWO commands correctly report the current user's identity?",
       "choices": [
         {
           "id": "c1",
@@ -1013,7 +1013,7 @@
       "skills": [
         "1.1.6: Archive, compress, unpack, and uncompress files using tar, gzip, and bzip2."
       ],
-      "question": "A maintenance script needs to reduce the disk footprint of `access.log` by producing a gzip-compressed file `access.log.gz` and removing the original uncompressed log after compression completes.\n\nWhich TWO commands result in a compressed `access.log.gz` file with the original `access.log` removed? (Select TWO)",
+      "question": "A maintenance script needs to reduce the disk footprint of `access.log` by producing a gzip-compressed file `access.log.gz` and removing the original uncompressed log after compression completes.\n\nWhich TWO commands result in a compressed `access.log.gz` file with the original `access.log` removed?",
       "choices": [
         {
           "id": "c1",
@@ -1205,7 +1205,7 @@
       "skills": [
         "1.1.7: Create and edit text files."
       ],
-      "question": "A junior administrator has been asked to create an empty file named `report.txt` in the current working directory. The target file does not currently exist, and the team wants two reliable, non-interactive ways to produce a zero-byte file at that path.\n\nWhich TWO commands create a new empty file named `report.txt`? (Select TWO)",
+      "question": "A junior administrator has been asked to create an empty file named `report.txt` in the current working directory. The target file does not currently exist, and the team wants two reliable, non-interactive ways to produce a zero-byte file at that path.\n\nWhich TWO commands create a new empty file named `report.txt`?",
       "choices": [
         {
           "id": "c1",
@@ -1397,7 +1397,7 @@
       "skills": [
         "1.1.8: Create, delete, copy, and move files and directories."
       ],
-      "question": "An operator has been asked to delete a retired directory `/var/data/old-project` that contains many files and subdirectories. The deletion must not fail because the directory is non-empty, and it should remove every file and subdirectory within.\n\nWhich TWO commands correctly remove the non-empty directory and everything it contains? (Select TWO)",
+      "question": "An operator has been asked to delete a retired directory `/var/data/old-project` that contains many files and subdirectories. The deletion must not fail because the directory is non-empty, and it should remove every file and subdirectory within.\n\nWhich TWO commands correctly remove the non-empty directory and everything it contains?",
       "choices": [
         {
           "id": "c1",
@@ -1566,7 +1566,7 @@
       "skills": [
         "1.1.9: Create hard and soft links."
       ],
-      "question": "A junior administrator has been asked to explain the difference between hard links and symbolic links on RHEL 10. Their team wants two statements that are specifically and uniquely true of hard links, so they can be contrasted with symlinks in a runbook.\n\nWhich TWO statements about hard links are correct? (Select TWO)",
+      "question": "A junior administrator has been asked to explain the difference between hard links and symbolic links on RHEL 10. Their team wants two statements that are specifically and uniquely true of hard links, so they can be contrasted with symlinks in a runbook.\n\nWhich TWO statements about hard links are correct?",
       "choices": [
         {
           "id": "c1",
@@ -1757,7 +1757,7 @@
       "skills": [
         "1.1.10: List, set, and change standard ugo/rwx permissions."
       ],
-      "question": "The file `/etc/app/secret.conf` must end up with permissions `rw-r-----` — readable and writable by the owner, readable by the group, and inaccessible to others. The current permissions on the file are `rw-r--r--`\n\nStarting from that existing state, which TWO commands produce exactly the required permissions? (Select TWO)",
+      "question": "The file `/etc/app/secret.conf` must end up with permissions `rw-r-----` — readable and writable by the owner, readable by the group, and inaccessible to others. The current permissions on the file are `rw-r--r--`\n\nStarting from that existing state, which TWO commands produce exactly the required permissions?",
       "choices": [
         {
           "id": "c1",
@@ -1950,7 +1950,7 @@
       "skills": [
         "1.1.11: Locate, read, and use system documentation including man, info, and files in /usr/share/doc."
       ],
-      "question": "During a system audit, an administrator wants to find every installed command whose man page description mentions the word `scheduler` They want two equivalent, standard approaches that work out of the box on RHEL 10.\n\nWhich TWO commands search man page descriptions for the keyword `scheduler`? (Select TWO)",
+      "question": "During a system audit, an administrator wants to find every installed command whose man page description mentions the word `scheduler` They want two equivalent, standard approaches that work out of the box on RHEL 10.\n\nWhich TWO commands search man page descriptions for the keyword `scheduler`?",
       "choices": [
         {
           "id": "c1",
@@ -2143,7 +2143,7 @@
       "skills": [
         "2.1.1: Configure access to RPM repositories."
       ],
-      "question": "The security team distributes signed internal RPMs from https://repo.example.com/internal/ and provides a GPG public key at https://repo.example.com/RPM-GPG-KEY-internal. The administrator must configure RHEL 10 to use this repository while enforcing signature verification.\n\nWhich TWO actions are required? (Select TWO)",
+      "question": "The security team distributes signed internal RPMs from https://repo.example.com/internal/ and provides a GPG public key at https://repo.example.com/RPM-GPG-KEY-internal. The administrator must configure RHEL 10 to use this repository while enforcing signature verification.\n\nWhich TWO actions are required?",
       "choices": [
         {
           "id": "c1",
@@ -2334,7 +2334,7 @@
       "skills": [
         "2.1.2: Install and remove RPM software packages."
       ],
-      "question": "The engineering team is troubleshooting a regression introduced by a recent `nginx` update on RHEL 10. The administrator must roll the package back to the previous version and later view a history of package transactions.\n\nWhich TWO commands help accomplish these goals? (Select TWO)",
+      "question": "The engineering team is troubleshooting a regression introduced by a recent `nginx` update on RHEL 10. The administrator must roll the package back to the previous version and later view a history of package transactions.\n\nWhich TWO commands help accomplish these goals?",
       "choices": [
         {
           "id": "c1",
@@ -2507,7 +2507,7 @@
       "skills": [
         "2.1.3: Configure access to Flatpak repositories."
       ],
-      "question": "During a policy review, the security team wants the existing Flathub remote on a workstation to be temporarily disabled without removing it, then re-enabled after testing.\n\nWhich TWO commands toggle the Flathub remote as requested? (Select TWO)",
+      "question": "During a policy review, the security team wants the existing Flathub remote on a workstation to be temporarily disabled without removing it, then re-enabled after testing.\n\nWhich TWO commands toggle the Flathub remote as requested?",
       "choices": [
         {
           "id": "c1",
@@ -2698,7 +2698,7 @@
       "skills": [
         "2.1.4: Install and remove Flatpak software packages."
       ],
-      "question": "A user wants to install the Blender Flatpak for their account only on a shared workstation, rather than system-wide, and confirm which installed Flatpaks are under the user scope afterwards.\n\nWhich TWO commands accomplish this? (Select TWO)",
+      "question": "A user wants to install the Blender Flatpak for their account only on a shared workstation, rather than system-wide, and confirm which installed Flatpaks are under the user scope afterwards.\n\nWhich TWO commands accomplish this?",
       "choices": [
         {
           "id": "c1",
@@ -2871,7 +2871,7 @@
       "skills": [
         "3.1.1: Conditionally execute code (use of: if, test, [], etc.)."
       ],
-      "question": "An administrator is writing a Bash script that must take different actions depending on whether a service name is `httpd`, `nginx`, or anything else. They want to use native Bash conditional constructs rather than chained if statements.\n\nWhich TWO approaches achieve this cleanly? (Select TWO)",
+      "question": "An administrator is writing a Bash script that must take different actions depending on whether a service name is `httpd`, `nginx`, or anything else. They want to use native Bash conditional constructs rather than chained if statements.\n\nWhich TWO approaches achieve this cleanly?",
       "choices": [
         {
           "id": "c1",
@@ -3062,7 +3062,7 @@
       "skills": [
         "3.1.2: Use Looping constructs (for, etc.) to process file, command line input."
       ],
-      "question": "Management has requested a helper script that runs the same configuration command against every hostname passed in on the command line. The operator will invoke the script like `./apply.sh host1 host2 host3`\n\nWhich TWO loop forms correctly iterate over all arguments? (Select TWO)",
+      "question": "Management has requested a helper script that runs the same configuration command against every hostname passed in on the command line. The operator will invoke the script like `./apply.sh host1 host2 host3`\n\nWhich TWO loop forms correctly iterate over all arguments?",
       "choices": [
         {
           "id": "c1",
@@ -3253,7 +3253,7 @@
       "skills": [
         "3.1.3: Process script inputs ($1, $2, etc.)."
       ],
-      "question": "A script needs to forward every argument it received to an internal helper command without losing arguments that contain spaces, and then discard the first argument so further processing starts from the second.\n\nWhich TWO techniques accomplish these tasks? (Select TWO)",
+      "question": "A script needs to forward every argument it received to an internal helper command without losing arguments that contain spaces, and then discard the first argument so further processing starts from the second.\n\nWhich TWO techniques accomplish these tasks?",
       "choices": [
         {
           "id": "c1",
@@ -3444,7 +3444,7 @@
       "skills": [
         "3.1.4: Processing output of shell commands within a script."
       ],
-      "question": "A script must run `systemctl is-active nginx` and branch based on whether the service is active, while also discarding the command's stderr output so it does not clutter the log file.\n\nWhich TWO techniques correctly drive the branching and suppress stderr? (Select TWO)",
+      "question": "A script must run `systemctl is-active nginx` and branch based on whether the service is active, while also discarding the command's stderr output so it does not clutter the log file.\n\nWhich TWO techniques correctly drive the branching and suppress stderr?",
       "choices": [
         {
           "id": "c1",
@@ -3617,7 +3617,7 @@
       "skills": [
         "4.1.1: Boot, reboot, and shut down a system normally."
       ],
-      "question": "Following a security review, an engineer needs to cancel a previously scheduled `shutdown` that is now running on a production RHEL 10 host and then verify no new shutdown is pending.\n\nWhich TWO steps are required? (Select TWO)",
+      "question": "Following a security review, an engineer needs to cancel a previously scheduled `shutdown` that is now running on a production RHEL 10 host and then verify no new shutdown is pending.\n\nWhich TWO steps are required?",
       "choices": [
         {
           "id": "c1",
@@ -3808,7 +3808,7 @@
       "skills": [
         "4.1.2: Boot systems into different targets manually."
       ],
-      "question": "Management has requested that a RHEL 10 host boot into rescue mode for a one-off maintenance window, without disturbing the default target configuration.\n\nWhich TWO actions accomplish this? (Select TWO)",
+      "question": "Management has requested that a RHEL 10 host boot into rescue mode for a one-off maintenance window, without disturbing the default target configuration.\n\nWhich TWO actions accomplish this?",
       "choices": [
         {
           "id": "c1",
@@ -4001,7 +4001,7 @@
       "skills": [
         "4.1.3: Interrupt the boot process in order to gain access to a system."
       ],
-      "question": "Following a password reset performed after interrupting the boot with `rd.break`, an administrator has chrooted into `/sysroot`, mounted it read-write, and changed the root password. Before continuing the boot, SELinux contexts must be relabeled so that `/etc/shadow` is correctly labeled.\n\nWhich TWO actions are required to complete the recovery? (Select TWO)",
+      "question": "Following a password reset performed after interrupting the boot with `rd.break`, an administrator has chrooted into `/sysroot`, mounted it read-write, and changed the root password. Before continuing the boot, SELinux contexts must be relabeled so that `/etc/shadow` is correctly labeled.\n\nWhich TWO actions are required to complete the recovery?",
       "choices": [
         {
           "id": "c1",
@@ -4181,7 +4181,7 @@
       "skills": [
         "4.1.4: Identify CPU/memory intensive processes and kill processes."
       ],
-      "question": "The engineering team is troubleshooting memory pressure on a RHEL 10 host and wants to list the top memory consumers from the command line for inclusion in an incident report.\n\nWhich TWO commands produce a memory-sorted list of processes? (Select TWO)",
+      "question": "The engineering team is troubleshooting memory pressure on a RHEL 10 host and wants to list the top memory consumers from the command line for inclusion in an incident report.\n\nWhich TWO commands produce a memory-sorted list of processes?",
       "choices": [
         {
           "id": "c1",
@@ -4372,7 +4372,7 @@
       "skills": [
         "4.1.5: Adjust process scheduling."
       ],
-      "question": "Following a security review, batch-report processes on a RHEL 10 host must run at lower priority than interactive sessions. The lead engineer wants to confirm both nice-based and I/O-based scheduling adjustments are available.\n\nWhich TWO commands adjust scheduling behaviour correctly? (Select TWO)",
+      "question": "Following a security review, batch-report processes on a RHEL 10 host must run at lower priority than interactive sessions. The lead engineer wants to confirm both nice-based and I/O-based scheduling adjustments are available.\n\nWhich TWO commands adjust scheduling behaviour correctly?",
       "choices": [
         {
           "id": "c1",
@@ -4563,7 +4563,7 @@
       "skills": [
         "4.1.6: Manage tuning profiles."
       ],
-      "question": "Management has asked for a recommended tuning profile on a newly provisioned RHEL 10 web server, and then for the chosen profile to be applied persistently across reboots.\n\nWhich TWO commands complete this workflow? (Select TWO)",
+      "question": "Management has asked for a recommended tuning profile on a newly provisioned RHEL 10 web server, and then for the chosen profile to be applied persistently across reboots.\n\nWhich TWO commands complete this workflow?",
       "choices": [
         {
           "id": "c1",
@@ -4754,7 +4754,7 @@
       "skills": [
         "4.1.7: Locate and interpret system log files and journals."
       ],
-      "question": "During a system audit, an engineer needs to narrow a large journal down to entries emitted between 09:00 and 10:00 today at priority `err` or higher.\n\nWhich TWO flag combinations help achieve this? (Select TWO)",
+      "question": "During a system audit, an engineer needs to narrow a large journal down to entries emitted between 09:00 and 10:00 today at priority `err` or higher.\n\nWhich TWO flag combinations help achieve this?",
       "choices": [
         {
           "id": "c1",
@@ -4945,7 +4945,7 @@
       "skills": [
         "4.1.8: Preserve system journals."
       ],
-      "question": "Management has requested that older journal data be pruned on a RHEL 10 host to free disk space, without disabling persistence.\n\nWhich TWO commands reduce disk usage of the journal? (Select TWO)",
+      "question": "Management has requested that older journal data be pruned on a RHEL 10 host to free disk space, without disabling persistence.\n\nWhich TWO commands reduce disk usage of the journal?",
       "choices": [
         {
           "id": "c1",
@@ -5118,7 +5118,7 @@
       "skills": [
         "4.1.9: Start, stop, and check the status of network services."
       ],
-      "question": "The engineering team is troubleshooting a failed deployment on a RHEL 10 host. They need to determine whether `nginx.service` is active and to review any recent failures recorded for it.\n\nWhich TWO commands help with this? (Select TWO)",
+      "question": "The engineering team is troubleshooting a failed deployment on a RHEL 10 host. They need to determine whether `nginx.service` is active and to review any recent failures recorded for it.\n\nWhich TWO commands help with this?",
       "choices": [
         {
           "id": "c1",
@@ -5309,7 +5309,7 @@
       "skills": [
         "4.1.10: Securely transfer files between systems."
       ],
-      "question": "Following a failed login attempt, the operations team is retrieving diagnostic bundles from `db01` to their RHEL 10 workstation. They want to use an interactive file-transfer session and also a one-shot copy of a single known file.\n\nWhich TWO commands are valid? (Select TWO)",
+      "question": "Following a failed login attempt, the operations team is retrieving diagnostic bundles from `db01` to their RHEL 10 workstation. They want to use an interactive file-transfer session and also a one-shot copy of a single known file.\n\nWhich TWO commands are valid?",
       "choices": [
         {
           "id": "c1",
@@ -5503,7 +5503,7 @@
       "skills": [
         "5.1.1: List, create, delete partitions on GPT disks."
       ],
-      "question": "You have labelled `/dev/sdb` with GPT and now need to non-interactively create a single primary XFS partition that fills the entire disk, using the `parted` scripting mode.\n\nWhich TWO steps create and verify the partition? (Select TWO)",
+      "question": "You have labelled `/dev/sdb` with GPT and now need to non-interactively create a single primary XFS partition that fills the entire disk, using the `parted` scripting mode.\n\nWhich TWO steps create and verify the partition?",
       "choices": [
         {
           "id": "c1",
@@ -5677,7 +5677,7 @@
       "skills": [
         "5.1.2: Create and remove physical volumes."
       ],
-      "question": "A disk `/dev/sdd` is currently labelled as an LVM physical volume but has never been added to a volume group, and the team now wants to reuse the disk for a non-LVM purpose.\n\nWhich TWO steps cleanly remove the physical volume label and confirm it is gone? (Select TWO)",
+      "question": "A disk `/dev/sdd` is currently labelled as an LVM physical volume but has never been added to a volume group, and the team now wants to reuse the disk for a non-LVM purpose.\n\nWhich TWO steps cleanly remove the physical volume label and confirm it is gone?",
       "choices": [
         {
           "id": "c1",
@@ -5868,7 +5868,7 @@
       "skills": [
         "5.1.3: Assign physical volumes to volume groups."
       ],
-      "question": "A failing disk `/dev/sdb1` is part of volume group `vg_data` but currently holds no allocated extents. The team wants to remove it from the VG and free the disk for replacement.\n\nWhich TWO steps remove the PV from the volume group? (Select TWO)",
+      "question": "A failing disk `/dev/sdb1` is part of volume group `vg_data` but currently holds no allocated extents. The team wants to remove it from the VG and free the disk for replacement.\n\nWhich TWO steps remove the PV from the volume group?",
       "choices": [
         {
           "id": "c1",
@@ -6035,7 +6035,7 @@
       "skills": [
         "5.1.4: Create and delete logical volumes."
       ],
-      "question": "The volume group `vg_data` has 200 free physical extents, and the team wants to allocate 100% of the free space to a new logical volume named `lv_cache`\n\nWhich TWO commands correctly create the logical volume? (Select TWO)",
+      "question": "The volume group `vg_data` has 200 free physical extents, and the team wants to allocate 100% of the free space to a new logical volume named `lv_cache`\n\nWhich TWO commands correctly create the logical volume?",
       "choices": [
         {
           "id": "c1",
@@ -6228,7 +6228,7 @@
       "skills": [
         "5.1.5: Configure systems to mount file systems at boot by universally unique ID (UUID) or label."
       ],
-      "question": "After adding a new fstab entry for an XFS file system on `/srv/app` you want to activate the mount immediately without rebooting, and also confirm the fstab syntax is valid.\n\nWhich TWO actions accomplish this safely? (Select TWO)",
+      "question": "After adding a new fstab entry for an XFS file system on `/srv/app` you want to activate the mount immediately without rebooting, and also confirm the fstab syntax is valid.\n\nWhich TWO actions accomplish this safely?",
       "choices": [
         {
           "id": "c1",
@@ -6421,7 +6421,7 @@
       "skills": [
         "5.1.6: Add new partitions and logical volumes, and swap to a system non-destructively."
       ],
-      "question": "After formatting a new swap partition on `/dev/sdb3`, the operations team needs the swap area active immediately and also persistent across reboots.\n\nWhich TWO steps achieve both goals? (Select TWO)",
+      "question": "After formatting a new swap partition on `/dev/sdb3`, the operations team needs the swap area active immediately and also persistent across reboots.\n\nWhich TWO steps achieve both goals?",
       "choices": [
         {
           "id": "c1",
@@ -6604,7 +6604,7 @@
       "skills": [
         "6.1.1: Create, mount, unmount, and use VFAT, ext4, and xfs file systems."
       ],
-      "question": "The operations team needs to unmount `/srv/data` but `umount` fails with a target-busy error because a user still has an open shell in that directory.\n\nWhich TWO commands help diagnose and complete the unmount safely? (Select TWO)",
+      "question": "The operations team needs to unmount `/srv/data` but `umount` fails with a target-busy error because a user still has an open shell in that directory.\n\nWhich TWO commands help diagnose and complete the unmount safely?",
       "choices": [
         {
           "id": "c1",
@@ -6788,7 +6788,7 @@
       "skills": [
         "6.1.2: Mount and unmount network file systems using NFS."
       ],
-      "question": "A user reports that an NFS mount on `/mnt/reports` has hung because the NFS server is unreachable, and attempts to unmount with `umount /mnt/reports` hang as well.\n\nWhich TWO approaches can release the mount without waiting indefinitely? (Select TWO)",
+      "question": "A user reports that an NFS mount on `/mnt/reports` has hung because the NFS server is unreachable, and attempts to unmount with `umount /mnt/reports` hang as well.\n\nWhich TWO approaches can release the mount without waiting indefinitely?",
       "choices": [
         {
           "id": "c1",
@@ -6979,7 +6979,7 @@
       "skills": [
         "6.1.3: Configure autofs."
       ],
-      "question": "The engineering team is setting up autofs to automount user home directories under `/home/remote/<user>` from an NFS server. The master map must reference an indirect map file that expands each user on access.\n\nWhich TWO configuration steps are required? (Select TWO)",
+      "question": "The engineering team is setting up autofs to automount user home directories under `/home/remote/<user>` from an NFS server. The master map must reference an indirect map file that expands each user on access.\n\nWhich TWO configuration steps are required?",
       "choices": [
         {
           "id": "c1",
@@ -7172,7 +7172,7 @@
       "skills": [
         "6.1.4: Extend existing logical volumes."
       ],
-      "question": "You need to grow the logical volume `/dev/vg_data/lv_db` by 8 GiB and then expand the ext4 file system mounted on `/var/lib/db`, performing each step separately rather than via the combined flag.\n\nWhich TWO commands accomplish this? (Select TWO)",
+      "question": "You need to grow the logical volume `/dev/vg_data/lv_db` by 8 GiB and then expand the ext4 file system mounted on `/var/lib/db`, performing each step separately rather than via the combined flag.\n\nWhich TWO commands accomplish this?",
       "choices": [
         {
           "id": "c1",
@@ -7352,7 +7352,7 @@
       "skills": [
         "6.1.5: Diagnose and correct file permission problems."
       ],
-      "question": "A developer cannot read `/srv/data/reports.csv` even though they belong to the file's group. Listing shows mode `640` with group `data`\n\nWhich TWO commands would reveal the root cause of the access failure? (Select TWO)",
+      "question": "A developer cannot read `/srv/data/reports.csv` even though they belong to the file's group. Listing shows mode `640` with group `data`\n\nWhich TWO commands would reveal the root cause of the access failure?",
       "choices": [
         {
           "id": "c1",
@@ -7543,7 +7543,7 @@
       "skills": [
         "7.1.1: Schedule tasks using at cron and systemd timer units."
       ],
-      "question": "The engineering team has created two unit files `/etc/systemd/system/report.service` and `/etc/systemd/system/report.timer` The timer defines an `OnCalendar` schedule and the service defines the command to run. The new units must take effect and run at the next scheduled time across reboots.\n\nWhich TWO steps are required? (Select TWO)",
+      "question": "The engineering team has created two unit files `/etc/systemd/system/report.service` and `/etc/systemd/system/report.timer` The timer defines an `OnCalendar` schedule and the service defines the command to run. The new units must take effect and run at the next scheduled time across reboots.\n\nWhich TWO steps are required?",
       "choices": [
         {
           "id": "c1",
@@ -7735,7 +7735,7 @@
       "skills": [
         "7.1.2: Start and stop services and configure services to start automatically at boot."
       ],
-      "question": "Management has requested that the `chronyd` time service be removed from automatic boot on an isolated build host but remain available for manual testing without uninstalling the package.\n\nWhich TWO commands together stop the service now and prevent it from starting at boot? (Select TWO)",
+      "question": "Management has requested that the `chronyd` time service be removed from automatic boot on an isolated build host but remain available for manual testing without uninstalling the package.\n\nWhich TWO commands together stop the service now and prevent it from starting at boot?",
       "choices": [
         {
           "id": "c1",
@@ -7926,7 +7926,7 @@
       "skills": [
         "7.1.3: Configure systems to boot into a specific target automatically."
       ],
-      "question": "The engineering team is preparing a maintenance window for a RHEL 10 server. They need to temporarily drop the running system into rescue mode to perform maintenance and then, before leaving, ensure the host boots back into the graphical environment at the next reboot.\n\nWhich TWO commands accomplish this? (Select TWO)",
+      "question": "The engineering team is preparing a maintenance window for a RHEL 10 server. They need to temporarily drop the running system into rescue mode to perform maintenance and then, before leaving, ensure the host boots back into the graphical environment at the next reboot.\n\nWhich TWO commands accomplish this?",
       "choices": [
         {
           "id": "c1",
@@ -8117,7 +8117,7 @@
       "skills": [
         "7.1.4: Configure time service clients."
       ],
-      "question": "Following a recent migration, the time on a RHEL 10 host is drifting. The administrator wants to set the correct time zone to `Europe/London` and ensure the chrony client is actively synchronising network time so timestamps remain correct.\n\nWhich TWO commands should the administrator run? (Select TWO)",
+      "question": "Following a recent migration, the time on a RHEL 10 host is drifting. The administrator wants to set the correct time zone to `Europe/London` and ensure the chrony client is actively synchronising network time so timestamps remain correct.\n\nWhich TWO commands should the administrator run?",
       "choices": [
         {
           "id": "c1",
@@ -8308,7 +8308,7 @@
       "skills": [
         "7.1.5: Install and update software packages from Red Hat Content Delivery Network, a remote repository, or from the local file system."
       ],
-      "question": "The operations team has provided the URL `https://internal.example.com/rhel10/custom/` that hosts a yum-compatible repository. The administrator needs to make this repository available to `dnf` and then apply available updates from it.\n\nWhich TWO steps accomplish this? (Select TWO)",
+      "question": "The operations team has provided the URL `https://internal.example.com/rhel10/custom/` that hosts a yum-compatible repository. The administrator needs to make this repository available to `dnf` and then apply available updates from it.\n\nWhich TWO steps accomplish this?",
       "choices": [
         {
           "id": "c1",
@@ -8499,7 +8499,7 @@
       "skills": [
         "7.1.6: Modify the system bootloader."
       ],
-      "question": "Management has requested that an older kernel be marked as the default so it boots automatically on the next reboot. The kernel package is already installed and listed by grubby.\n\nWhich TWO steps set the default kernel correctly? (Select TWO)",
+      "question": "Management has requested that an older kernel be marked as the default so it boots automatically on the next reboot. The kernel package is already installed and listed by grubby.\n\nWhich TWO steps set the default kernel correctly?",
       "choices": [
         {
           "id": "c1",
@@ -8672,7 +8672,7 @@
       "skills": [
         "8.1.1: Configure IPv4 and IPv6 addresses."
       ],
-      "question": "After modifying the IPv4 address on a connection profile named `ens3`, the administrator needs both to activate the new address immediately and confirm it has been applied to the running interface.\n\nWhich TWO commands should be used? (Select TWO)",
+      "question": "After modifying the IPv4 address on a connection profile named `ens3`, the administrator needs both to activate the new address immediately and confirm it has been applied to the running interface.\n\nWhich TWO commands should be used?",
       "choices": [
         {
           "id": "c1",
@@ -8863,7 +8863,7 @@
       "skills": [
         "8.1.2: Configure hostname resolution."
       ],
-      "question": "To reduce downtime, the administrator must set persistent DNS servers `10.0.0.53` and `10.0.0.54` on the `ens3` connection profile on a RHEL 10 host, and ensure the changes take effect without a reboot.\n\nWhich TWO commands accomplish this? (Select TWO)",
+      "question": "To reduce downtime, the administrator must set persistent DNS servers `10.0.0.53` and `10.0.0.54` on the `ens3` connection profile on a RHEL 10 host, and ensure the changes take effect without a reboot.\n\nWhich TWO commands accomplish this?",
       "choices": [
         {
           "id": "c1",
@@ -9054,7 +9054,7 @@
       "skills": [
         "8.1.3: Configure network services to start automatically at boot."
       ],
-      "question": "Following a security review, the team needs `firewalld` to run on every RHEL 10 web host from the next reboot onward, while ensuring it is running right now without waiting for a reboot.\n\nWhich TWO commands together achieve this? (Select TWO)",
+      "question": "Following a security review, the team needs `firewalld` to run on every RHEL 10 web host from the next reboot onward, while ensuring it is running right now without waiting for a reboot.\n\nWhich TWO commands together achieve this?",
       "choices": [
         {
           "id": "c1",
@@ -9245,7 +9245,7 @@
       "skills": [
         "8.1.4: Restrict network access using firewalld and firewall-cmd."
       ],
-      "question": "Following a security review, the administrator must move the interface `ens3` into the `internal` zone and allow SSH within that zone on a RHEL 10 host. Both changes must persist across reboots.\n\nWhich TWO commands accomplish this? (Select TWO)",
+      "question": "Following a security review, the administrator must move the interface `ens3` into the `internal` zone and allow SSH within that zone on a RHEL 10 host. Both changes must persist across reboots.\n\nWhich TWO commands accomplish this?",
       "choices": [
         {
           "id": "c1",
@@ -9436,7 +9436,7 @@
       "skills": [
         "9.1.1: Create, delete, and modify local user accounts."
       ],
-      "question": "A junior administrator must relocate the existing user `pnguyen` to a new home directory at `/srv/users/pnguyen` on a RHEL 10 host. The old home contents must move to the new path and subsequent logins must use the new location.\n\nWhich TWO flags must be combined with `usermod` to achieve this in a single invocation? (Select TWO)",
+      "question": "A junior administrator must relocate the existing user `pnguyen` to a new home directory at `/srv/users/pnguyen` on a RHEL 10 host. The old home contents must move to the new path and subsequent logins must use the new location.\n\nWhich TWO flags must be combined with `usermod` to achieve this in a single invocation?",
       "choices": [
         {
           "id": "c1",
@@ -9627,7 +9627,7 @@
       "skills": [
         "9.1.2: Change passwords and adjust password aging for local user accounts."
       ],
-      "question": "The engineering team is troubleshooting a compliance finding that the `audit1` account can change its password at will and never expires. On RHEL 10 the administrator needs the account to enforce at least 1 day between password changes and a hard account expiry on `2027-01-01`\n\nWhich TWO commands apply the required settings? (Select TWO)",
+      "question": "The engineering team is troubleshooting a compliance finding that the `audit1` account can change its password at will and never expires. On RHEL 10 the administrator needs the account to enforce at least 1 day between password changes and a hard account expiry on `2027-01-01`\n\nWhich TWO commands apply the required settings?",
       "choices": [
         {
           "id": "c1",
@@ -9800,7 +9800,7 @@
       "skills": [
         "9.1.3: Create, delete, and modify local groups and group memberships."
       ],
-      "question": "A junior administrator is configuring a shared project area on a RHEL 10 host. They must promote `pramos` to be an administrator of the `project` group so that `pramos` can add and remove members, and they must add `jkim` as a regular member of the same group.\n\nWhich TWO commands accomplish this? (Select TWO)",
+      "question": "A junior administrator is configuring a shared project area on a RHEL 10 host. They must promote `pramos` to be an administrator of the `project` group so that `pramos` can add and remove members, and they must add `jkim` as a regular member of the same group.\n\nWhich TWO commands accomplish this?",
       "choices": [
         {
           "id": "c1",
@@ -9973,7 +9973,7 @@
       "skills": [
         "9.1.4: Configure privileged access."
       ],
-      "question": "Management has requested that `sreyes` on a RHEL 10 host be allowed to run only `/usr/bin/systemctl restart httpd.service` and `/usr/bin/systemctl status httpd.service` through sudo, without being granted any other privileges.\n\nWhich THREE steps together correctly implement the requirement? (Select THREE)",
+      "question": "Management has requested that `sreyes` on a RHEL 10 host be allowed to run only `/usr/bin/systemctl restart httpd.service` and `/usr/bin/systemctl status httpd.service` through sudo, without being granted any other privileges.\n\nWhich THREE steps together correctly implement the requirement?",
       "choices": [
         {
           "id": "c1",
@@ -10170,7 +10170,7 @@
       "skills": [
         "10.1.1: Configure firewall settings using firewall-cmd/firewalld."
       ],
-      "question": "A new RHEL 10 host has been built but firewalld has not yet been started. The administrator must ensure the firewall starts now and persists across reboots, then permit inbound traffic on TCP port 8080 for a custom application permanently.\n\nWhich THREE steps together accomplish the requirement? (Select THREE)",
+      "question": "A new RHEL 10 host has been built but firewalld has not yet been started. The administrator must ensure the firewall starts now and persists across reboots, then permit inbound traffic on TCP port 8080 for a custom application permanently.\n\nWhich THREE steps together accomplish the requirement?",
       "choices": [
         {
           "id": "c1",
@@ -10367,7 +10367,7 @@
       "skills": [
         "10.1.2: Manage default file permissions."
       ],
-      "question": "A junior administrator wants to change the default umask for interactive users on a RHEL 10 server to `002`, effective for both Bash login and non-login shells, and persistent for new accounts.\n\nWhich TWO locations are appropriate places to set the umask for this goal? (Select TWO)",
+      "question": "A junior administrator wants to change the default umask for interactive users on a RHEL 10 server to `002`, effective for both Bash login and non-login shells, and persistent for new accounts.\n\nWhich TWO locations are appropriate places to set the umask for this goal?",
       "choices": [
         {
           "id": "c1",
@@ -10540,7 +10540,7 @@
       "skills": [
         "10.1.3: Configure key-based authentication for SSH."
       ],
-      "question": "Management has requested that a RHEL 10 server accept only key-based SSH authentication for user accounts, with password-based SSH logins disabled. Administrators already have working key pairs deployed.\n\nWhich TWO changes in `/etc/ssh/sshd_config` together enforce the requirement? (Select TWO)",
+      "question": "Management has requested that a RHEL 10 server accept only key-based SSH authentication for user accounts, with password-based SSH logins disabled. Administrators already have working key pairs deployed.\n\nWhich TWO changes in `/etc/ssh/sshd_config` together enforce the requirement?",
       "choices": [
         {
           "id": "c1",
@@ -10713,7 +10713,7 @@
       "skills": [
         "10.1.4: Set enforcing and permissive modes for SELinux."
       ],
-      "question": "The operations team is troubleshooting a misbehaving application on a RHEL 10 server and wants to verify whether SELinux is currently enforcing, and what the configured mode at boot is.\n\nWhich TWO commands together provide this information? (Select TWO)",
+      "question": "The operations team is troubleshooting a misbehaving application on a RHEL 10 server and wants to verify whether SELinux is currently enforcing, and what the configured mode at boot is.\n\nWhich TWO commands together provide this information?",
       "choices": [
         {
           "id": "c1",
@@ -10904,7 +10904,7 @@
       "skills": [
         "10.1.5: List and identify SELinux file and process context."
       ],
-      "question": "The operations team is troubleshooting an SELinux policy issue. They need to confirm both the SELinux user and type associated with the current shell session, and the type associated with an arbitrary file.\n\nWhich TWO commands help them gather this information? (Select TWO)",
+      "question": "The operations team is troubleshooting an SELinux policy issue. They need to confirm both the SELinux user and type associated with the current shell session, and the type associated with an arbitrary file.\n\nWhich TWO commands help them gather this information?",
       "choices": [
         {
           "id": "c1",
@@ -11095,7 +11095,7 @@
       "skills": [
         "10.1.6: Restore default file contexts."
       ],
-      "question": "A custom directory `/srv/webapp` has been added to host web content on a RHEL 10 server. The default policy does not label this path as `httpd_sys_content_t` by default. The administrator wants the relabel to be durable across future `restorecon` runs.\n\nWhich TWO steps are required? (Select TWO)",
+      "question": "A custom directory `/srv/webapp` has been added to host web content on a RHEL 10 server. The default policy does not label this path as `httpd_sys_content_t` by default. The administrator wants the relabel to be durable across future `restorecon` runs.\n\nWhich TWO steps are required?",
       "choices": [
         {
           "id": "c1",
@@ -11268,7 +11268,7 @@
       "skills": [
         "10.1.7: Manage SELinux port labels."
       ],
-      "question": "An existing application on a RHEL 10 host has moved from TCP 9000 to TCP 9100. The administrator must remove the old SELinux port mapping and add the new one for the same application type `app_port_t`\n\nWhich TWO commands complete the requirement? (Select TWO)",
+      "question": "An existing application on a RHEL 10 host has moved from TCP 9000 to TCP 9100. The administrator must remove the old SELinux port mapping and add the new one for the same application type `app_port_t`\n\nWhich TWO commands complete the requirement?",
       "choices": [
         {
           "id": "c1",
@@ -11459,7 +11459,7 @@
       "skills": [
         "10.1.8: Use boolean settings to modify system SELinux settings."
       ],
-      "question": "Management has requested that a RHEL 10 web server be allowed to serve users' home directories under SELinux, and that the change be applied immediately without a reboot and also survive reboots.\n\nWhich TWO actions together satisfy the requirement? (Select TWO)",
+      "question": "Management has requested that a RHEL 10 web server be allowed to serve users' home directories under SELinux, and that the change be applied immediately without a reboot and also survive reboots.\n\nWhich TWO actions together satisfy the requirement?",
       "choices": [
         {
           "id": "c1",

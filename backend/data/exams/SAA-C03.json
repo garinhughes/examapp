@@ -1027,7 +1027,7 @@
       "skills": [
         "1.1.2: Designing a flexible authorization model that includes IAM users, groups, roles, and policies."
       ],
-      "question": "The engineering team is evaluating how to delegate IAM administration to junior admins while ensuring those admins cannot grant themselves or others more access than the security team has defined. The team wants to enforce this constraint using a native IAM mechanism within the account.\n\nWhich TWO actions should the team take? (Select TWO)",
+      "question": "The engineering team is evaluating how to delegate IAM administration to junior admins while ensuring those admins cannot grant themselves or others more access than the security team has defined. The team wants to enforce this constraint using a native IAM mechanism within the account.\n\nWhich TWO actions should the team take?",
       "choices": [
         {
           "id": "c1",
@@ -1208,7 +1208,7 @@
       "skills": [
         "1.1.3: Designing a role-based access control strategy (for example, AWS Security Token Service [AWS STS], role switching, cross-account access)."
       ],
-      "question": "Management has decided that an AWS Lambda function in Account A must read data from an Amazon DynamoDB table in Account B. A solutions architect must configure IAM to enable this cross-account access securely.\n\nWhich TWO configurations are required? (Select TWO)",
+      "question": "Management has decided that an AWS Lambda function in Account A must read data from an Amazon DynamoDB table in Account B. A solutions architect must configure IAM to enable this cross-account access securely.\n\nWhich TWO configurations are required?",
       "choices": [
         {
           "id": "c1",
@@ -1397,7 +1397,7 @@
       "skills": [
         "1.1.4: Designing a security strategy for multiple AWS accounts (for example, AWS Control Tower, service control policies [SCPs])."
       ],
-      "question": "The cloud governance team plans to use service control policies in AWS Organizations to limit which AWS services member accounts can use. Before deployment, they want to confirm their understanding of SCP behavior.\n\nWhich TWO statements accurately describe how SCPs work? (Select TWO)",
+      "question": "The cloud governance team plans to use service control policies in AWS Organizations to limit which AWS services member accounts can use. Before deployment, they want to confirm their understanding of SCP behavior.\n\nWhich TWO statements accurately describe how SCPs work?",
       "choices": [
         {
           "id": "c1",
@@ -1576,7 +1576,7 @@
       "skills": [
         "1.1.5: Determining the appropriate use of resource policies for AWS services."
       ],
-      "question": "The platform team is designing a workflow where an Amazon SNS topic in Account A must deliver messages to an Amazon SQS queue in Account B. The Account B team will create the SNS subscription from their side. The team needs to configure the appropriate permissions for this cross-account, cross-service message delivery.\n\nWhich TWO configurations are required? (Select TWO)",
+      "question": "The platform team is designing a workflow where an Amazon SNS topic in Account A must deliver messages to an Amazon SQS queue in Account B. The Account B team will create the SNS subscription from their side. The team needs to configure the appropriate permissions for this cross-account, cross-service message delivery.\n\nWhich TWO configurations are required?",
       "choices": [
         {
           "id": "c1",
@@ -1768,7 +1768,7 @@
       "skills": [
         "1.1.6: Determining when to federate a directory service with IAM roles."
       ],
-      "question": "The enterprise IT team needs to provide federated console access to multiple AWS accounts for on-premises Active Directory users. The solution must support group-based permission assignment across accounts without creating individual IAM users in any account.\n\nWhich TWO actions should the team take? (Select TWO)",
+      "question": "The enterprise IT team needs to provide federated console access to multiple AWS accounts for on-premises Active Directory users. The solution must support group-based permission assignment across accounts without creating individual IAM users in any account.\n\nWhich TWO actions should the team take?",
       "choices": [
         {
           "id": "c1",
@@ -1944,7 +1944,7 @@
         "1.2.1: Designing VPC architectures with security components (for example, security groups, route tables, network ACLs, NAT gateways)."
       ],
       "selectCount": 2,
-      "question": "Management has approved deployment of a two-tier web application in an Amazon VPC. The web tier must accept HTTPS traffic from users on the internet, and the database tier in a private subnet must be accessible only from the web tier.\n\nWhich TWO security group configurations are required to meet these requirements? (Select TWO)",
+      "question": "Management has approved deployment of a two-tier web application in an Amazon VPC. The web tier must accept HTTPS traffic from users on the internet, and the database tier in a private subnet must be accessible only from the web tier.\n\nWhich TWO security group configurations are required to meet these requirements?",
       "choices": [
         {
           "id": "c1",
@@ -2138,7 +2138,7 @@
         "1.2.2: Determining network segmentation strategies (for example, using public subnets and private subnets)."
       ],
       "selectCount": 2,
-      "question": "The engineering team is defining network segmentation guidelines for a new Amazon VPC deployment. They want to apply the principle of least exposure when deciding which resources go in which subnet.\n\nWhich TWO statements describe correct network segmentation best practices? (Select TWO)",
+      "question": "The engineering team is defining network segmentation guidelines for a new Amazon VPC deployment. They want to apply the principle of least exposure when deciding which resources go in which subnet.\n\nWhich TWO statements describe correct network segmentation best practices?",
       "choices": [
         {
           "id": "c1",
@@ -2323,7 +2323,7 @@
         "1.2.3: Integrating AWS services to secure applications (for example, AWS Shield, AWS WAF, IAM Identity Center, AWS Secrets Manager)."
       ],
       "selectCount": 2,
-      "question": "Management has approved a budget to protect a customer-facing API deployed on Amazon API Gateway from both volumetric DDoS attacks and application-layer exploits, including rate-based abuse and automated bot traffic.\n\nWhich TWO actions provide COMPREHENSIVE protection against both threat categories? (Select TWO)",
+      "question": "Management has approved a budget to protect a customer-facing API deployed on Amazon API Gateway from both volumetric DDoS attacks and application-layer exploits, including rate-based abuse and automated bot traffic.\n\nWhich TWO actions provide COMPREHENSIVE protection against both threat categories?",
       "choices": [
         {
           "id": "c1",
@@ -2521,7 +2521,7 @@
         "1.2.4: Securing external network connections to and from the AWS Cloud (for example, VPN, AWS Direct Connect)."
       ],
       "selectCount": 2,
-      "question": "To reduce infrastructure costs, an organization must transfer financial data between an on-premises data center and AWS over a connection that is both private (not traversing the public internet) and encrypted in transit.\n\nWhich TWO components should be combined to satisfy both requirements simultaneously? (Select TWO)",
+      "question": "To reduce infrastructure costs, an organization must transfer financial data between an on-premises data center and AWS over a connection that is both private (not traversing the public internet) and encrypted in transit.\n\nWhich TWO components should be combined to satisfy both requirements simultaneously?",
       "choices": [
         {
           "id": "c1",
@@ -2702,7 +2702,7 @@
       "skills": [
         "1.3.1: Aligning AWS technologies to meet compliance requirements."
       ],
-      "question": "Following an internal review, the compliance team must demonstrate two distinct capabilities to external auditors for their HIPAA-covered AWS workloads. First, the team must show that all API calls made to AWS services are logged and traceable to individual users or roles. Second, the team must demonstrate that changes to the configuration of AWS resources are recorded and evaluated against defined security baselines.\n\nWhich TWO services should the team enable to satisfy these specific requirements? (Select TWO)",
+      "question": "Following an internal review, the compliance team must demonstrate two distinct capabilities to external auditors for their HIPAA-covered AWS workloads. First, the team must show that all API calls made to AWS services are logged and traceable to individual users or roles. Second, the team must demonstrate that changes to the configuration of AWS resources are recorded and evaluated against defined security baselines.\n\nWhich TWO services should the team enable to satisfy these specific requirements?",
       "choices": [
         {
           "id": "c1",
@@ -2911,7 +2911,7 @@
       "skills": [
         "1.3.2: Encrypting data at rest (for example, AWS Key Management Service [AWS KMS])."
       ],
-      "question": "The engineering team is reviewing how AWS KMS integrates with Amazon S3 and Amazon RDS to protect data at rest. They want to understand which statements accurately describe KMS-based encryption behavior for these services and identify correct statements before implementing encryption across their production workloads.\n\nWhich TWO statements about AWS KMS encryption for AWS managed services are correct? (Select TWO)",
+      "question": "The engineering team is reviewing how AWS KMS integrates with Amazon S3 and Amazon RDS to protect data at rest. They want to understand which statements accurately describe KMS-based encryption behavior for these services and identify correct statements before implementing encryption across their production workloads.\n\nWhich TWO statements about AWS KMS encryption for AWS managed services are correct?",
       "choices": [
         {
           "id": "c1",
@@ -3088,7 +3088,7 @@
       "skills": [
         "1.3.3: Encrypting data in transit (for example, AWS Certificate Manager [ACM] using TLS)."
       ],
-      "question": "The engineering team is configuring an Application Load Balancer for a customer-facing e-commerce application. The organization's security policy requires that all traffic between clients and the ALB is encrypted in transit and that only TLS 1.2 and above is accepted, with older protocol versions explicitly disabled. The team needs to apply two specific ALB configurations to meet both requirements.\n\nWhich TWO configurations should the team apply to the ALB? (Select TWO)",
+      "question": "The engineering team is configuring an Application Load Balancer for a customer-facing e-commerce application. The organization's security policy requires that all traffic between clients and the ALB is encrypted in transit and that only TLS 1.2 and above is accepted, with older protocol versions explicitly disabled. The team needs to apply two specific ALB configurations to meet both requirements.\n\nWhich TWO configurations should the team apply to the ALB?",
       "choices": [
         {
           "id": "c1",
@@ -3292,7 +3292,7 @@
       "skills": [
         "1.3.4: Implementing access policies for encryption keys."
       ],
-      "question": "The operations team needs to allow an AWS Lambda function in Account B to use a customer managed key created in Account A for encrypting and decrypting application data. The key is currently configured with a default key policy that grants access only to Account A's root principal. Two separate configuration changes are required to enable this cross-account access.\n\nWhich TWO actions MOST effectively grant Account B's Lambda function access to the CMK in Account A? (Select TWO)",
+      "question": "The operations team needs to allow an AWS Lambda function in Account B to use a customer managed key created in Account A for encrypting and decrypting application data. The key is currently configured with a default key policy that grants access only to Account A's root principal. Two separate configuration changes are required to enable this cross-account access.\n\nWhich TWO actions MOST effectively grant Account B's Lambda function access to the CMK in Account A?",
       "choices": [
         {
           "id": "c1",
@@ -3466,7 +3466,7 @@
       "skills": [
         "1.3.5: Implementing data backups and replications."
       ],
-      "question": "Management has directed the team to ensure that their Amazon DynamoDB tables and Amazon RDS MySQL instances can each be restored to any point in time within the last 35 days following accidental data deletion or corruption. The team must enable the appropriate native AWS features for each service to satisfy this continuous recovery requirement without implementing custom backup solutions.\n\nWhich TWO features should the team enable to meet these requirements? (Select TWO)",
+      "question": "Management has directed the team to ensure that their Amazon DynamoDB tables and Amazon RDS MySQL instances can each be restored to any point in time within the last 35 days following accidental data deletion or corruption. The team must enable the appropriate native AWS features for each service to satisfy this continuous recovery requirement without implementing custom backup solutions.\n\nWhich TWO features should the team enable to meet these requirements?",
       "choices": [
         {
           "id": "c1",
@@ -3670,7 +3670,7 @@
       "skills": [
         "1.3.6: Implementing policies for data access, lifecycle, and protection."
       ],
-      "question": "The data governance team needs to apply two access controls to an Amazon S3 bucket storing regulatory data. All requests to the bucket must originate from the corporate network IP range, and all requests must use HTTPS. The team wants to express both restrictions in the S3 bucket policy using condition keys so that any request violating either constraint is denied.\n\nWhich TWO condition keys should be included in the S3 bucket policy to MOST effectively enforce both restrictions? (Select TWO)",
+      "question": "The data governance team needs to apply two access controls to an Amazon S3 bucket storing regulatory data. All requests to the bucket must originate from the corporate network IP range, and all requests must use HTTPS. The team wants to express both restrictions in the S3 bucket policy using condition keys so that any request violating either constraint is denied.\n\nWhich TWO condition keys should be included in the S3 bucket policy to MOST effectively enforce both restrictions?",
       "choices": [
         {
           "id": "c1",
@@ -3845,7 +3845,7 @@
       "skills": [
         "1.3.7: Rotating encryption keys and renewing certificates."
       ],
-      "question": "The operations team manages TLS certificates issued through AWS Certificate Manager for a customer-facing application served by an Application Load Balancer. During a recent incident, an ACM-issued certificate expired unexpectedly because the DNS CNAME validation record had been accidentally removed from the hosted zone, preventing automatic renewal. The team wants to implement measures to prevent certificate expiry incidents from recurring.\n\nWhich TWO actions MOST effectively prevent future certificate expiry incidents caused by domain validation failures? (Select TWO)",
+      "question": "The operations team manages TLS certificates issued through AWS Certificate Manager for a customer-facing application served by an Application Load Balancer. During a recent incident, an ACM-issued certificate expired unexpectedly because the DNS CNAME validation record had been accidentally removed from the hosted zone, preventing automatic renewal. The team wants to implement measures to prevent certificate expiry incidents from recurring.\n\nWhich TWO actions MOST effectively prevent future certificate expiry incidents caused by domain validation failures?",
       "choices": [
         {
           "id": "c1",

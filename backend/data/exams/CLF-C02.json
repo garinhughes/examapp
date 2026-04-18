@@ -584,7 +584,7 @@
         }
       ],
       "tip": "Consider how to optimize storage costs while meeting regulatory data retention requirements.",
-      "explanation": "S3 lifecycle policies automatically transition objects between storage classes to optimize costs based on access patterns.\n\n**Why it works:** Policies can move objects from S3 Standard (hot) \u2192 S3 Intelligent-Tiering \u2192 Glacier (warm) \u2192 Deep Archive (cold) as they age, reducing storage costs significantly.\n\n**Why the others fail:**\n- Encryption: Managed separately via server-side encryption settings, not lifecycle policies\n- Access restrictions: Controlled by bucket policies and IAM, not object age rules\n- Compression: Pre-processing task, not automated by lifecycle policies\n\n**Implementation:** Create an S3 lifecycle policy in the bucket settings to transition objects after 30 days to Glacier and after 1 year to Deep Archive.",
+      "explanation": "S3 lifecycle policies automatically transition objects between storage classes to optimize costs based on access patterns.\n\n**Why it works:** Policies can move objects from S3 Standard (hot) → S3 Intelligent-Tiering → Glacier (warm) → Deep Archive (cold) as they age, reducing storage costs significantly.\n\n**Why the others fail:**\n- Encryption: Managed separately via server-side encryption settings, not lifecycle policies\n- Access restrictions: Controlled by bucket policies and IAM, not object age rules\n- Compression: Pre-processing task, not automated by lifecycle policies\n\n**Implementation:** Create an S3 lifecycle policy in the bucket settings to transition objects after 30 days to Glacier and after 1 year to Deep Archive.",
       "domain": "Cloud Technology and Services",
       "difficulty": 1,
       "lastReviewed": "2026-03-31"
@@ -644,7 +644,7 @@
       "skills": [
         "3.6.6: Understanding use cases for lifecycle policies."
       ],
-      "question": "Three distinct access tiers define the data lifecycle: frequently accessed databases (first 3 months), occasionally accessed archives (3\u201312 months), and rarely accessed long-term compliance records (beyond 1 year). Both cost and performance must be optimized.\n\nWhich TWO lifecycle policy strategies address this?",
+      "question": "Three distinct access tiers define the data lifecycle: frequently accessed databases (first 3 months), occasionally accessed archives (3–12 months), and rarely accessed long-term compliance records (beyond 1 year). Both cost and performance must be optimized.\n\nWhich TWO lifecycle policy strategies address this?",
       "choices": [
         {
           "id": "c1",
@@ -1443,7 +1443,7 @@
       "skills": [
         "1.1.1: Understanding the economies of scale (for example, cost savings)."
       ],
-      "question": "During an infrastructure cost review, a cloud consultant explains that economies of scale are a key driver of how AWS is able to sustain and improve its pricing model. The finance team wants to understand exactly what this delivers in practice.\n\nWhich TWO outcomes result directly from AWS economies of scale? (Select TWO)",
+      "question": "During an infrastructure cost review, a cloud consultant explains that economies of scale are a key driver of how AWS is able to sustain and improve its pricing model. The finance team wants to understand exactly what this delivers in practice.\n\nWhich TWO outcomes result directly from AWS economies of scale?",
       "selectCount": 2,
       "choices": [
         {
@@ -1628,7 +1628,7 @@
       "skills": [
         "1.1.2: Understanding the benefits of global infrastructure (for example, speed of deployment, global reach)."
       ],
-      "question": "During an international expansion review, the team is comparing AWS to building its own private data centers in each target country.\n\nWhich TWO benefits does AWS global infrastructure provide that would be difficult or costly to replicate with private data centers? (Select TWO)",
+      "question": "During an international expansion review, the team is comparing AWS to building its own private data centers in each target country.\n\nWhich TWO benefits does AWS global infrastructure provide that would be difficult or costly to replicate with private data centers?",
       "selectCount": 2,
       "choices": [
         {
@@ -1809,7 +1809,7 @@
       "skills": [
         "1.1.3: Understanding the advantages of high availability, elasticity, and agility."
       ],
-      "question": "The development team is planning to experiment with a new product feature. They need to quickly provision a test environment, evaluate results within a few days, and then decommission everything if the test is unsuccessful.\n\nWhich TWO AWS advantages make this rapid experimentation approach practical and cost-effective? (Select TWO)",
+      "question": "The development team is planning to experiment with a new product feature. They need to quickly provision a test environment, evaluate results within a few days, and then decommission everything if the test is unsuccessful.\n\nWhich TWO AWS advantages make this rapid experimentation approach practical and cost-effective?",
       "selectCount": 2,
       "choices": [
         {
@@ -1993,7 +1993,7 @@
       "skills": [
         "1.2.1: Understanding the pillars of the Well-Architected Framework (for example, operational excellence, security, reliability, performance efficiency, cost optimization, sustainability)."
       ],
-      "question": "Following a board decision to build a new customer-facing application on AWS, the architecture team reviews two key requirements: the system must automatically recover from component failures, and all customer data must meet regulatory requirements for encryption and access control.\n\nWhich TWO pillars of the AWS Well-Architected Framework directly address these requirements? (Select TWO)",
+      "question": "Following a board decision to build a new customer-facing application on AWS, the architecture team reviews two key requirements: the system must automatically recover from component failures, and all customer data must meet regulatory requirements for encryption and access control.\n\nWhich TWO pillars of the AWS Well-Architected Framework directly address these requirements?",
       "choices": [
         {
           "id": "c1",
@@ -2209,7 +2209,7 @@
       "skills": [
         "1.2.2: Identifying differences between the pillars of the Well-Architected Framework."
       ],
-      "question": "The platform team is conducting a Well-Architected review and identifies two open issues: several Amazon EBS volumes attached to stopped instances have been unused for six months and continue to incur charges, and an Amazon S3 bucket containing customer records has a bucket policy that permits public read access.\n\nWhich TWO pillars of the AWS Well-Architected Framework do these issues fall under? (Select TWO)",
+      "question": "The platform team is conducting a Well-Architected review and identifies two open issues: several Amazon EBS volumes attached to stopped instances have been unused for six months and continue to incur charges, and an Amazon S3 bucket containing customer records has a bucket policy that permits public read access.\n\nWhich TWO pillars of the AWS Well-Architected Framework do these issues fall under?",
       "choices": [
         {
           "id": "c1",
