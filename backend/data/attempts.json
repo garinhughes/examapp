@@ -75726,6 +75726,3359 @@
           "lastReviewed": "2026-03-24"
         }
       ]
+    },
+    {
+      "attemptId": "cd54fccd-bab9-4599-9ceb-03e424f25890",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "EX200",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-04-18T13:11:55.956Z",
+      "updatedAt": "2026-04-18T13:13:33.531Z",
+      "finishedAt": null,
+      "status": "in-progress",
+      "score": null,
+      "answers": [],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "EX200-0022",
+          "type": "single-choice",
+          "question": "An engineer has received `software-2.1.tar.bz2` from a vendor and must extract its contents into the current working directory while listing each file as it is written out.\n\nWhich command extracts the bzip2-compressed tarball while listing each file?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `untar -bz2 software-2.1.tar.bz2`",
+              "isCorrect": false,
+              "explanation": "`untar` is not a command on RHEL 10; extraction is performed by `tar -x`"
+            },
+            {
+              "id": "c2",
+              "text": "Run `tar -xzvf software-2.1.tar.bz2`",
+              "isCorrect": false,
+              "explanation": "`-z` selects gzip, so `tar` cannot decompress a bzip2 stream."
+            },
+            {
+              "id": "c1",
+              "text": "Run `tar -xjvf software-2.1.tar.bz2`",
+              "isCorrect": true,
+              "explanation": "`-x` extracts, `-j` selects bzip2, `-v` is verbose, and `-f` names the archive.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Run `tar -cjvf software-2.1.tar.bz2`",
+              "isCorrect": false,
+              "explanation": "`-c` creates a new archive, overwriting the vendor's file."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.6: Archive, compress, unpack, and uncompress files using tar, gzip, and bzip2."
+          ],
+          "services": [
+            "tar",
+            "bzip2"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/tar.1.html",
+          "tip": "Consider the flag that selects bzip2 decompression and the flag that specifies extraction.",
+          "explanation": "`tar -xjvf ...` extracts a bzip2-compressed archive.\n\n**Why it works:** `-x` extracts, `-j` filters through bzip2, `-v` lists each file, and `-f` specifies the archive path.\n\n**Why the others don't work:**\n- `-z` selects gzip, which cannot decode bzip2.\n- `-c` would overwrite the file with a new archive.\n- `untar` is not a real command.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0007",
+          "type": "multiple-choice",
+          "question": "To reduce downtime during a troubleshooting session, an engineer wants both standard output and standard error from a script written to `debug.log` as a single combined stream.\n\nWhich TWO commands correctly combine stdout and stderr into `debug.log`? (Select TWO)",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run `script.sh &> debug.log`",
+              "isCorrect": true,
+              "explanation": "`&>` is the Bash shorthand that redirects both fd 1 and fd 2 to the target file.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Run `script.sh > debug.log 2> debug.log`",
+              "isCorrect": false,
+              "explanation": "This opens the same file twice with separate offsets, so the streams can overwrite each other."
+            },
+            {
+              "id": "c5",
+              "text": "Run `script.sh | debug.log`",
+              "isCorrect": false,
+              "explanation": "`|` pipes into a command; `debug.log` is not executable, so this is a syntax error."
+            },
+            {
+              "id": "c4",
+              "text": "Run `script.sh > debug.log 1>&2`",
+              "isCorrect": false,
+              "explanation": "`1>&2` sends stdout to wherever stderr currently points, which is the terminal; the file only captures nothing useful."
+            },
+            {
+              "id": "c2",
+              "text": "Run `script.sh > debug.log 2>&1`",
+              "isCorrect": true,
+              "explanation": "`> debug.log` redirects fd 1 and `2>&1` duplicates fd 2 onto the same destination.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.2: Use input-output redirection (>, >>, |, 2>, etc.)."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html",
+          "tip": "Look for the two idioms that cause both file descriptors to land in the same file.",
+          "explanation": "Both `&>` and `> file 2>&1` merge stdout and stderr into one file.\n\n**Why it works:** `&>` is a direct shorthand, and the longer form first points fd 1 at the file and then duplicates fd 2 onto fd 1.\n\n**Why the others don't work:**\n- Redirecting twice to the same file opens it twice with independent offsets, risking truncation.\n- `1>&2` sends stdout to stderr, not to the file.\n- A pipe requires a command on the right-hand side.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0019",
+          "type": "multiple-choice",
+          "question": "A junior administrator is writing a diagnostic script that must record which user executed it and what UID that user has. The script runs inside an unmodified RHEL 10 shell with standard coreutils available.\n\nWhich TWO commands correctly report the current user's identity? (Select TWO)",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Run `getuid` to print the current user's numeric UID.",
+              "isCorrect": false,
+              "explanation": "`getuid` is a library function, not a shell command."
+            },
+            {
+              "id": "c2",
+              "text": "Run `id` to print the UID, primary GID, and group memberships of the current user.",
+              "isCorrect": true,
+              "explanation": "`id` gives the UID, primary GID, and supplementary groups.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Run `whoami` to print the effective username of the current user.",
+              "isCorrect": true,
+              "explanation": "`whoami` outputs the effective username.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `username` to print the current user's name.",
+              "isCorrect": false,
+              "explanation": "`username` is not a standard command on RHEL 10."
+            },
+            {
+              "id": "c3",
+              "text": "Run `users` to print the UID of every logged-in session.",
+              "isCorrect": false,
+              "explanation": "`users` prints usernames of logged-in users, not UIDs, and does not describe the caller specifically."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.5: Log in and switch users in multiuser targets."
+          ],
+          "services": [
+            "id",
+            "whoami"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/configuring_authentication_and_authorization_in_rhel",
+          "tip": "Consider which of these commands are standard coreutils utilities and which are invented.",
+          "explanation": "Both `whoami` and `id` are standard coreutils commands for reporting identity.\n\n**Why it works:** `whoami` returns the current effective username and `id` returns the full UID, GID, and group list, satisfying both halves of the requirement.\n\n**Why the others don't work:**\n- `users` reports who is logged in, not the invoker.\n- `username` is not a valid command.\n- `getuid` is a C library function, not a userland command.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0055",
+          "type": "multiple-choice",
+          "question": "During a policy review, the security team wants the existing Flathub remote on a workstation to be temporarily disabled without removing it, then re-enabled after testing.\n\nWhich TWO commands toggle the Flathub remote as requested? (Select TWO)",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run `flatpak remote-modify --disable flathub` to mark the remote as disabled in the Flatpak configuration.",
+              "isCorrect": true,
+              "explanation": "`remote-modify --disable` sets the remote to disabled without removing it.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `flatpak remote-modify --enable flathub` to re-enable the Flathub remote after testing completes.",
+              "isCorrect": true,
+              "explanation": "`remote-modify --enable` restores the remote to enabled state.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Edit `/etc/flatpak/flathub.conf` and set `Enabled=false` to disable the remote.",
+              "isCorrect": false,
+              "explanation": "Flatpak remote state is not toggled by editing files under `/etc/flatpak/`"
+            },
+            {
+              "id": "c4",
+              "text": "Run `flatpak disable-remote flathub` and later `flatpak enable-remote flathub` to flip its state.",
+              "isCorrect": false,
+              "explanation": "`flatpak disable-remote` is not a valid subcommand."
+            },
+            {
+              "id": "c3",
+              "text": "Run `flatpak remote-delete --temporary flathub` so the remote is removed and can be restored automatically.",
+              "isCorrect": false,
+              "explanation": "`remote-delete` permanently removes a remote; there is no `--temporary` flag."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.3: Configure access to Flatpak repositories."
+          ],
+          "services": [
+            "Flatpak"
+          ],
+          "docs": "https://docs.flatpak.org/en/latest/using-flatpak.html",
+          "tip": "Consider the subcommand that changes attributes of an existing remote.",
+          "explanation": "`flatpak remote-modify` edits attributes of an existing remote.\n\n**Why it works:** The `--disable` and `--enable` flags flip the enabled state while leaving the remote definition intact.\n\n**Why the others don't work:**\n- `remote-delete --temporary`: deletion is permanent; no temporary flag exists.\n- `flatpak disable-remote`: invented subcommand.\n- Editing `/etc/flatpak/` files: not where remote state lives.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0014",
+          "type": "single-choice",
+          "question": "You are configuring passwordless SSH access from your RHEL 10 workstation to a managed host. An RSA key pair already exists in `~/.ssh/` and the target server currently permits password authentication for the user `deploy` You need the public key appended to the correct location on the server with the required permissions applied automatically.\n\nWhich command installs the public key on the server?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Run `scp ~/.ssh/id_rsa.pub deploy@server:~/.ssh/authorized_keys` to copy the public key into place.",
+              "isCorrect": false,
+              "explanation": "`scp` overwrites any existing `authorized_keys` and does not set the required permissions."
+            },
+            {
+              "id": "c3",
+              "text": "Run `ssh-add deploy@server` to register the public key on the remote host.",
+              "isCorrect": false,
+              "explanation": "`ssh-add` loads a private key into the local agent; it does not interact with a remote host."
+            },
+            {
+              "id": "c4",
+              "text": "Run `ssh-keygen --copy deploy@server` to distribute the public key.",
+              "isCorrect": false,
+              "explanation": "`ssh-keygen` has no `--copy` option; key distribution is the role of `ssh-copy-id`"
+            },
+            {
+              "id": "c1",
+              "text": "Run `ssh-copy-id deploy@server` to append the public key to `~/.ssh/authorized_keys` on the target.",
+              "isCorrect": true,
+              "explanation": "`ssh-copy-id` appends the local public key and corrects the permissions on `~/.ssh` and `authorized_keys`",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.4: Access remote systems using SSH."
+          ],
+          "services": [
+            "OpenSSH"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/securing_networks",
+          "tip": "Think about which utility both appends to the authorised keys file and sets the correct permissions.",
+          "explanation": "`ssh-copy-id deploy@server` is the purpose-built tool for distributing a public key.\n\n**Why it works:** It authenticates once via password, appends the public key to `~/.ssh/authorized_keys`, and sets `0700` and `0600` permissions on the directory and file respectively.\n\n**Why the others don't work:**\n- `scp` overwrites existing keys and does not fix permissions.\n- `ssh-add` manages the local agent only.\n- `ssh-keygen --copy` is invented.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0060",
+          "type": "ordering",
+          "question": "Arrange the steps required to find, install, launch, and later remove a Flatpak application using the command line.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `flatpak run org.libreoffice.LibreOffice` to launch the installed application.",
+              "isCorrect": true,
+              "explanation": "`flatpak run` starts an installed Flatpak.",
+              "sequence": 3
+            },
+            {
+              "id": "c2",
+              "text": "Run `flatpak install flathub org.libreoffice.LibreOffice` to install the application from the identified remote.",
+              "isCorrect": true,
+              "explanation": "Installation follows identification.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Run `flatpak search libreoffice` to locate the application in configured remotes.",
+              "isCorrect": true,
+              "explanation": "Searching identifies the correct application ID and remote.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `flatpak uninstall org.libreoffice.LibreOffice` when the application is no longer required.",
+              "isCorrect": true,
+              "explanation": "Uninstall removes the application when done.",
+              "sequence": 4
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Manage software",
+          "skills": [
+            "2.1.4: Install and remove Flatpak software packages."
+          ],
+          "services": [
+            "Flatpak"
+          ],
+          "docs": "https://docs.flatpak.org/en/latest/using-flatpak.html",
+          "tip": "Follow the natural lifecycle of a Flatpak application.",
+          "explanation": "The command-line workflow for Flatpak applications flows from discovery to installation, launch, and finally removal.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0029",
+          "type": "single-choice",
+          "question": "An administrator must copy the directory `/opt/app/config` along with every file and subdirectory it contains to `/backup/config-2026-04-18` File ownership and permissions must be preserved in the copy.\n\nWhich command copies the directory recursively while preserving ownership and mode?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run `cp -a /opt/app/config /backup/config-2026-04-18`",
+              "isCorrect": true,
+              "explanation": "`-a` archives the source, recursing and preserving ownership, mode, and timestamps.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `cp /opt/app/config /backup/config-2026-04-18`",
+              "isCorrect": false,
+              "explanation": "Without `-r` or `-a`, `cp` refuses to copy a directory."
+            },
+            {
+              "id": "c3",
+              "text": "Run `cp -R --no-preserve=all /opt/app/config /backup/config-2026-04-18`",
+              "isCorrect": false,
+              "explanation": "`--no-preserve=all` explicitly strips ownership, mode, and timestamps from the copy."
+            },
+            {
+              "id": "c4",
+              "text": "Run `copy -r /opt/app/config /backup/config-2026-04-18`",
+              "isCorrect": false,
+              "explanation": "`copy` is not a command on RHEL 10; the tool is `cp`"
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.8: Create, delete, copy, and move files and directories."
+          ],
+          "services": [
+            "cp"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Consider which single flag both recurses into directories and preserves all metadata.",
+          "explanation": "`cp -a` performs an archival copy.\n\n**Why it works:** `-a` is shorthand for `--preserve=all --recursive --no-dereference`, so the directory tree, ownership, mode, and timestamps are all preserved.\n\n**Why the others don't work:**\n- Omitting `-r`/`-a` fails because the source is a directory.\n- `--no-preserve=all` discards the metadata the requirement demands.\n- `copy` is not a valid command on RHEL.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0064",
+          "type": "matching",
+          "question": "Match each test expression to its correct purpose.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "True when the variable value has non-zero length.",
+              "isCorrect": false,
+              "explanation": "`-n` tests for non-empty string."
+            },
+            {
+              "id": "c2",
+              "text": "True when the variable value has zero length.",
+              "isCorrect": false,
+              "explanation": "`-z` tests for empty string."
+            },
+            {
+              "id": "c1",
+              "text": "True when the named path exists, regardless of type.",
+              "isCorrect": false,
+              "explanation": "`-e` tests path existence."
+            },
+            {
+              "id": "c4",
+              "text": "True when the two string values are equal.",
+              "isCorrect": false,
+              "explanation": "`=` compares strings for equality."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "`[ -z \"$VAR\" ]`",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s1",
+              "label": "`[ -e /etc/hosts ]`",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "`[ -n \"$VAR\" ]`",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s4",
+              "label": "`[ \"$A\" = \"$B\" ]`",
+              "correctChoiceId": "c4"
+            }
+          ],
+          "domain": "Create simple shell scripts",
+          "skills": [
+            "3.1.1: Conditionally execute code (use of: if, test, [], etc.)."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Bash-Conditional-Expressions.html",
+          "tip": "Recall the flags for existence and the operators for string comparison.",
+          "explanation": "Test expressions cover different checks: existence, empty strings, non-empty strings, and equality.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0054",
+          "type": "single-choice",
+          "question": "An administrator needs to review which Flatpak remotes are currently configured on a RHEL 10 workstation and confirm their URLs.\n\nWhich command lists configured Flatpak remotes with their associated URLs?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run `flatpak remotes --show-details` to list every remote with its URL, scope, and options.",
+              "isCorrect": true,
+              "explanation": "`flatpak remotes --show-details` prints remote names along with their URLs.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `flatpak status` to display current remote connections and cached metadata.",
+              "isCorrect": false,
+              "explanation": "`flatpak status` is not a real subcommand."
+            },
+            {
+              "id": "c3",
+              "text": "Run `flatpak config --remotes` to view the remote list stored in the system Flatpak configuration.",
+              "isCorrect": false,
+              "explanation": "`flatpak config` does not accept a `--remotes` flag for listing remotes."
+            },
+            {
+              "id": "c2",
+              "text": "Run `flatpak list --remotes` to enumerate all configured remote sources on the system.",
+              "isCorrect": false,
+              "explanation": "`flatpak list` shows installed applications, not remotes, and `--remotes` is not a valid flag."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.3: Configure access to Flatpak repositories."
+          ],
+          "services": [
+            "Flatpak"
+          ],
+          "docs": "https://docs.flatpak.org/en/latest/using-flatpak.html",
+          "tip": "Focus on the subcommand dedicated to remote management.",
+          "explanation": "`flatpak remotes` prints configured remotes.\n\n**Why it works:** Adding `--show-details` includes the URL and scope for each remote.\n\n**Why the others don't work:**\n- `flatpak list`: reports installed apps, not remotes.\n- `flatpak config --remotes`: invalid flag.\n- `flatpak status`: invented subcommand.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0015",
+          "type": "multiple-choice",
+          "question": "A junior administrator has been asked to configure passwordless SSH login from their RHEL 10 workstation to a new bastion host. No keys currently exist in their home directory and the bastion allows password authentication for initial setup only.\n\nWhich TWO steps are required to complete the configuration? (Select TWO)",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Copy the public key to the bastion host by running `ssh-copy-id admin@bastion`",
+              "isCorrect": true,
+              "explanation": "`ssh-copy-id` installs the public key in `~/.ssh/authorized_keys` on the remote side with correct permissions.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Install the OpenSSH client by running `apt install openssh-client` on the workstation.",
+              "isCorrect": false,
+              "explanation": "`apt` is a Debian/Ubuntu package manager; on RHEL 10 use `dnf`, and the client ships by default."
+            },
+            {
+              "id": "c1",
+              "text": "Generate a new key pair on the workstation by running `ssh-keygen -t rsa -b 4096`",
+              "isCorrect": true,
+              "explanation": "A local key pair must exist before any public key can be distributed.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Restart the local SSH service with `service ssh restart` to load the new key.",
+              "isCorrect": false,
+              "explanation": "No local service restart is needed, and `service ssh restart` uses non-systemd syntax with a non-RHEL unit name."
+            },
+            {
+              "id": "c3",
+              "text": "Copy the private key to the bastion host by running `scp ~/.ssh/id_rsa admin@bastion:~/.ssh/`",
+              "isCorrect": false,
+              "explanation": "The private key must never leave the workstation; distributing it compromises the credential."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.4: Access remote systems using SSH."
+          ],
+          "services": [
+            "OpenSSH"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/securing_networks",
+          "tip": "Consider which two actions produce a usable key pair locally and a matching entry on the remote host.",
+          "explanation": "Key generation and public-key distribution are the only two required steps.\n\n**Why it works:** `ssh-keygen` produces the key pair and `ssh-copy-id` installs the public half on the bastion.\n\n**Why the others don't work:**\n- Sharing the private key destroys the security model.\n- `apt install` is not a RHEL command.\n- No local SSH service restart is required.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0028",
+          "type": "matching",
+          "question": "Match each Vim command issued from normal mode to the action it performs.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Enters insert mode at the current cursor position.",
+              "isCorrect": false,
+              "explanation": "`i` switches from normal to insert mode."
+            },
+            {
+              "id": "c2",
+              "text": "Exits the editor and discards any unsaved changes.",
+              "isCorrect": false,
+              "explanation": "`:q!` is force-quit."
+            },
+            {
+              "id": "c1",
+              "text": "Writes the current buffer to disk without exiting the editor.",
+              "isCorrect": false,
+              "explanation": "`:w` is write."
+            },
+            {
+              "id": "c3",
+              "text": "Deletes the line the cursor is currently on.",
+              "isCorrect": false,
+              "explanation": "`dd` cuts the current line into the default register."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "`:q!`",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s4",
+              "label": "`i`",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s1",
+              "label": "`:w`",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "`dd`",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.7: Create and edit text files."
+          ],
+          "services": [
+            "vim"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/vim.1.html",
+          "tip": "Separate the ex commands that start with `:` from the normal-mode key commands.",
+          "explanation": "`:w` and `:q!` are ex commands that save or force-quit; `dd` and `i` are single-line normal-mode commands for editing and mode switching.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0003",
+          "type": "multiple-choice",
+          "question": "A junior administrator is writing a one-liner that should run `command2` only if `command1` exits successfully. They want to know which shell constructs correctly express that conditional sequence on RHEL 10's default Bash shell.\n\nWhich TWO invocations run `command2` only when `command1` exits with status 0? (Select TWO)",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `command1 || command2` on a single line.",
+              "isCorrect": false,
+              "explanation": "`||` is the inverse: it runs the second command only when the first fails."
+            },
+            {
+              "id": "c2",
+              "text": "Wrap the pair in a conditional such as `if command1; then command2; fi`",
+              "isCorrect": true,
+              "explanation": "An `if` block runs its body only when the tested command succeeds, matching the required behaviour.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Run `command1 ; command2` on a single line.",
+              "isCorrect": false,
+              "explanation": "`;` runs both commands in sequence regardless of the first command's exit status."
+            },
+            {
+              "id": "c1",
+              "text": "Run `command1 && command2` on a single line.",
+              "isCorrect": true,
+              "explanation": "The `&&` operator runs the second command only when the first returns an exit status of 0.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Run `command1 | command2` on a single line.",
+              "isCorrect": false,
+              "explanation": "`|` pipes `command1`'s stdout into `command2`'s stdin; both commands run in parallel."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.1: Access a shell prompt and issue commands with correct syntax."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Lists.html",
+          "tip": "Consider which operators evaluate the first command's exit status before deciding whether to run the second.",
+          "explanation": "Both `&&` and an `if` block conditionally execute on success.\n\n**Why it works:** `&&` is a short-circuit AND on exit status, and `if` tests the command's exit status directly.\n\n**Why the others don't work:**\n- `||` executes the second command on failure, not success.\n- `;` is an unconditional separator.\n- `|` is a pipeline; both commands are launched regardless.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0001",
+          "type": "single-choice",
+          "question": "You are logged into a RHEL 10 server over SSH as an unprivileged user, and the shell prompt ends with a `$` After running one command, the prompt changes and now ends with a `#`\n\nWhat does the change from `$` to `#` indicate about the current shell?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "The shell has entered a subshell spawned by the previous command and is awaiting a nested command.",
+              "isCorrect": false,
+              "explanation": "Subshells inherit the same `$` prompt; the prompt character is driven by `PS1`, not nesting depth."
+            },
+            {
+              "id": "c3",
+              "text": "The default login shell has switched from Bash to the Z shell (`zsh`) after the command.",
+              "isCorrect": false,
+              "explanation": "The prompt character reflects effective privilege, not shell choice; the default Bash user prompt would remain `$`"
+            },
+            {
+              "id": "c4",
+              "text": "The shell is waiting for additional input because the previous command was syntactically incomplete.",
+              "isCorrect": false,
+              "explanation": "A continuation prompt is `>` (from `PS2`), not `#`"
+            },
+            {
+              "id": "c1",
+              "text": "The shell is now running with an effective UID of 0, typically because the user has switched to root.",
+              "isCorrect": true,
+              "explanation": "The `#` prompt is Bash's conventional indicator that the current effective user is root.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.1: Access a shell prompt and issue commands with correct syntax."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Command-Line-Editing.html",
+          "tip": "Think about what each prompt character is conventionally meant to signal about privilege.",
+          "explanation": "The `#` prompt signals a root shell.\n\n**Why it works:** The default `PS1` shipped with RHEL uses `#` when the effective UID is 0 and `$` for every other user.\n\n**Why the others don't work:**\n- Subshells inherit `PS1` from their parent; the character does not change with nesting.\n- The shell in use does not determine the final prompt character; `PS1` does.\n- An incomplete command triggers `PS2`, which is `>` by default, not `#`",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0027",
+          "type": "multiple-choice",
+          "question": "A junior administrator has been asked to create an empty file named `report.txt` in the current working directory. The target file does not currently exist, and the team wants two reliable, non-interactive ways to produce a zero-byte file at that path.\n\nWhich TWO commands create a new empty file named `report.txt`? (Select TWO)",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `mkfile report.txt`",
+              "isCorrect": false,
+              "explanation": "`mkfile` is a Solaris utility and is not installed on RHEL 10."
+            },
+            {
+              "id": "c1",
+              "text": "Run `touch report.txt`",
+              "isCorrect": true,
+              "explanation": "`touch` creates an empty file when the target does not exist.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Run `create-file report.txt`",
+              "isCorrect": false,
+              "explanation": "`create-file` is not a standard Linux command."
+            },
+            {
+              "id": "c2",
+              "text": "Run `: > report.txt` using the shell's null command and output redirection.",
+              "isCorrect": true,
+              "explanation": "`:` is the shell null command; combined with `>` it creates a zero-byte file.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Run `mkdir report.txt`",
+              "isCorrect": false,
+              "explanation": "`mkdir` creates a directory, not a regular file."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.7: Create and edit text files."
+          ],
+          "services": [
+            "touch",
+            "Bash"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/touch.1.html",
+          "tip": "Consider which of these are real, standard RHEL 10 tools and which are invented or platform-specific.",
+          "explanation": "`touch report.txt` and `: > report.txt` both produce a zero-byte regular file.\n\n**Why it works:** `touch` is the canonical empty-file tool; `: > report.txt` opens the file for writing with no data, which creates it at zero bytes.\n\n**Why the others don't work:**\n- `mkdir` creates a directory, not a file.\n- `mkfile` is a Solaris command.\n- `create-file` is not a real command.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0061",
+          "type": "single-choice",
+          "question": "A junior administrator is writing a backup script that must only run the archive step when the directory `/data` exists. They plan to use the single-bracket test expression inside an if statement.\n\nWhich `if` condition correctly checks that `/data` is an existing directory?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Write `if [ -d /data ]; then` to branch when the path is an existing directory.",
+              "isCorrect": true,
+              "explanation": "`-d` is the test operator that evaluates true when the path is a directory.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Write `if [ exists /data ]; then` using the readable form of the test expression.",
+              "isCorrect": false,
+              "explanation": "There is no `exists` test operator in Bash; the relevant operators are single-letter flags such as `-e`"
+            },
+            {
+              "id": "c2",
+              "text": "Write `if [ -f /data ]; then` to branch when the path exists as a directory.",
+              "isCorrect": false,
+              "explanation": "`-f` tests for a regular file, not a directory."
+            },
+            {
+              "id": "c3",
+              "text": "Write `if [ -x /data ]; then` to branch when the directory is accessible to the script.",
+              "isCorrect": false,
+              "explanation": "`-x` only checks for executable (or traversable) permission and does not confirm the path is a directory."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Create simple shell scripts",
+          "skills": [
+            "3.1.1: Conditionally execute code (use of: if, test, [], etc.)."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html",
+          "tip": "Match the test flag to the file type you need to confirm.",
+          "explanation": "`-d` is the directory test operator.\n\n**Why it works:** Within `[ ... ]`, `-d PATH` returns true when PATH is a directory, enabling the then-branch.\n\n**Why the others don't work:**\n- `-f`: tests for regular file.\n- `-x`: only checks executable/traverse permission.\n- `exists`: not a real operator.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0010",
+          "type": "single-choice",
+          "question": "Following a security review, the team needs to find every file under `/etc` whose contents include the string `PermitRootLogin` The search must descend into subdirectories and examine file contents, not file names.\n\nWhich command recursively searches every file under `/etc` for the pattern?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `find /etc | grep PermitRootLogin`",
+              "isCorrect": false,
+              "explanation": "This greps the list of file paths, not the contents of the files."
+            },
+            {
+              "id": "c1",
+              "text": "Run `grep -r PermitRootLogin /etc`",
+              "isCorrect": true,
+              "explanation": "`-r` reads every file under each named directory recursively.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `grep --deep PermitRootLogin /etc`",
+              "isCorrect": false,
+              "explanation": "`--deep` is not a `grep` option."
+            },
+            {
+              "id": "c4",
+              "text": "Run `grep -l -n PermitRootLogin /etc/*`",
+              "isCorrect": false,
+              "explanation": "The shell glob `/etc/*` expands only to immediate entries; subdirectories are not searched."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.3: Use grep and regular expressions to analyze text."
+          ],
+          "services": [
+            "grep"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/grep.1.html",
+          "tip": "Consider which option causes `grep` to descend into subdirectories automatically.",
+          "explanation": "`grep -r PermitRootLogin /etc` recurses through every regular file beneath `/etc`\n\n**Why it works:** The `-r` flag tells `grep` to open each subdirectory and apply the pattern to every file it finds.\n\n**Why the others don't work:**\n- `--deep` does not exist.\n- Piping from `find` searches the file names, not contents.\n- A shell glob does not recurse into subdirectories.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0031",
+          "type": "multiple-choice",
+          "question": "An operator has been asked to delete a retired directory `/var/data/old-project` that contains many files and subdirectories. The deletion must not fail because the directory is non-empty, and it should remove every file and subdirectory within.\n\nWhich TWO commands correctly remove the non-empty directory and everything it contains? (Select TWO)",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Run `rm -rf --delete /var/data/old-project`",
+              "isCorrect": false,
+              "explanation": "`--delete` is not a valid `rm` option; `rm` already deletes by design."
+            },
+            {
+              "id": "c1",
+              "text": "Run `rm -rf /var/data/old-project`",
+              "isCorrect": true,
+              "explanation": "`-r` recurses into the directory and `-f` suppresses prompts and missing-file errors.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `find /var/data/old-project -delete`",
+              "isCorrect": true,
+              "explanation": "`find -delete` descends the tree and removes every entry, including the directory itself.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Run `rm /var/data/old-project`",
+              "isCorrect": false,
+              "explanation": "`rm` without `-r` refuses to delete a directory."
+            },
+            {
+              "id": "c4",
+              "text": "Run `rmdir /var/data/old-project`",
+              "isCorrect": false,
+              "explanation": "`rmdir` removes only empty directories and fails here."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.8: Create, delete, copy, and move files and directories."
+          ],
+          "services": [
+            "rm",
+            "find"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Focus on which tools are designed to recurse and are not blocked by non-empty directories.",
+          "explanation": "Both `rm -rf` and `find ... -delete` remove a non-empty directory tree.\n\n**Why it works:** `rm -rf` recurses and forces removal, and `find -delete` removes every entry it visits, including the root once empty.\n\n**Why the others don't work:**\n- Plain `rm` refuses directories.\n- `rmdir` rejects non-empty directories.\n- `--delete` is not a `rm` option.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0006",
+          "type": "single-choice",
+          "question": "During a system audit a shell script produces both normal output and a stream of harmless warnings on stderr. The administrator wants to keep only the warnings in `errors.log` while the normal output is thrown away.\n\nWhich invocation writes stderr to `errors.log` and discards stdout?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `script.sh | errors.log` to discard stdout and capture stderr.",
+              "isCorrect": false,
+              "explanation": "`|` pipes stdout into the next command; it cannot write to a filename directly and `errors.log` is not an executable."
+            },
+            {
+              "id": "c2",
+              "text": "Run `script.sh > errors.log 2> /dev/null` to discard stdout and capture stderr.",
+              "isCorrect": false,
+              "explanation": "This inverts the streams — warnings are discarded and normal output is captured."
+            },
+            {
+              "id": "c1",
+              "text": "Run `script.sh > /dev/null 2> errors.log` to discard stdout and capture stderr.",
+              "isCorrect": true,
+              "explanation": "`>` sends stdout to `/dev/null`; `2>` captures stderr to the log file.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Run `script.sh &> errors.log` to discard stdout and capture stderr.",
+              "isCorrect": false,
+              "explanation": "`&>` combines both streams into the same file; nothing is discarded."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.2: Use input-output redirection (>, >>, |, 2>, etc.)."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html",
+          "tip": "Consider which descriptor number targets stderr and which targets stdout.",
+          "explanation": "Discarding stdout requires redirecting file descriptor 1 to `/dev/null` while sending file descriptor 2 to the log.\n\n**Why it works:** `>` without a number defaults to fd 1 (stdout); `2>` explicitly redirects fd 2 (stderr).\n\n**Why the others don't work:**\n- Swapping the targets inverts which stream is kept.\n- `&>` redirects both streams to the same destination.\n- `|` is a pipe, not a file redirect, and the filename is not a command.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0013",
+          "type": "single-choice",
+          "question": "The operations team has migrated an internal application server to a hardened host where the SSH daemon listens on port 2222 instead of the default. A systems administrator needs to open an interactive shell on the host as the user `ansible` from a workstation running RHEL 10.\n\nWhich command establishes the SSH session on the custom port?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Run `ssh --port 2222 ansible@appserver` to initiate the connection on port 2222.",
+              "isCorrect": false,
+              "explanation": "OpenSSH does not define a `--port` long option; the port flag for `ssh` is `-p`"
+            },
+            {
+              "id": "c4",
+              "text": "Run `ssh ansible@appserver:2222` to initiate the connection on port 2222.",
+              "isCorrect": false,
+              "explanation": "The `host:port` notation is used by `scp` for remote paths, not by `ssh` to specify a port."
+            },
+            {
+              "id": "c1",
+              "text": "Run `ssh -p 2222 ansible@appserver` to initiate the connection on port 2222.",
+              "isCorrect": true,
+              "explanation": "`ssh` uses the lowercase `-p` flag to specify a non-default port.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Run `ssh -P 2222 ansible@appserver` to initiate the connection on port 2222.",
+              "isCorrect": false,
+              "explanation": "Uppercase `-P` is the port flag for `scp` and `sftp`, not for `ssh`"
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.4: Access remote systems using SSH."
+          ],
+          "services": [
+            "OpenSSH"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/securing_networks",
+          "tip": "Recall which letter-case OpenSSH uses for the port option in interactive sessions.",
+          "explanation": "The correct invocation is `ssh -p 2222 ansible@appserver`\n\n**Why it works:** The `ssh` client accepts `-p <port>` to connect to a non-default SSH port.\n\n**Why the others don't work:**\n- `--port` is not a valid `ssh` long option.\n- `-P` is the port flag for `scp` and `sftp`, not `ssh`\n- The `host:port` form is `scp`/`sftp` remote path syntax, not an `ssh` port selector.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0016",
+          "type": "ordering",
+          "question": "A systems administrator is configuring key-based SSH access from a RHEL 10 control node to a newly provisioned managed host. Password authentication is enabled on the managed host and no SSH key pair exists on the control node yet.\n\nArrange the following actions in the correct order to establish and verify passwordless SSH access.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Generate a new key pair on the control node by running `ssh-keygen -t rsa -b 4096`",
+              "isCorrect": true,
+              "explanation": "The key pair must exist locally before any public key can be distributed.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Confirm passwordless access by running `ssh admin@managed-host` and observing a shell prompt with no password challenge.",
+              "isCorrect": true,
+              "explanation": "Verification is the final step; it is only meaningful after the key has been installed on the remote host.",
+              "sequence": 3
+            },
+            {
+              "id": "c2",
+              "text": "Copy the public key to the managed host by running `ssh-copy-id admin@managed-host`",
+              "isCorrect": true,
+              "explanation": "`ssh-copy-id` uses the current password authentication to install the public key remotely.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 3,
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.4: Access remote systems using SSH."
+          ],
+          "services": [
+            "OpenSSH"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/securing_networks",
+          "tip": "Consider which artefact must exist before it can be installed, and what must be true before verification can succeed.",
+          "explanation": "The correct order is generate, distribute, then verify.\n\n**Why it works:** `ssh-keygen` must create the key pair before `ssh-copy-id` has anything to send, and successful passwordless login can only be confirmed after the public key is present in `~/.ssh/authorized_keys` on the managed host.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0056",
+          "type": "matching",
+          "question": "Match each Flatpak subcommand to the remote-management action it performs.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Permanently remove an existing remote from the Flatpak configuration.",
+              "isCorrect": false,
+              "explanation": "`remote-delete` removes a configured remote."
+            },
+            {
+              "id": "c4",
+              "text": "Change attributes such as enabled state or GPG key on an existing remote.",
+              "isCorrect": false,
+              "explanation": "`remote-modify` edits remote attributes."
+            },
+            {
+              "id": "c3",
+              "text": "List all currently configured remotes, optionally with details.",
+              "isCorrect": false,
+              "explanation": "`remotes` prints the remote list."
+            },
+            {
+              "id": "c1",
+              "text": "Register a new remote from a URL or .flatpakrepo descriptor.",
+              "isCorrect": false,
+              "explanation": "`remote-add` creates new remotes."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s4",
+              "label": "`flatpak remote-modify`",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s1",
+              "label": "`flatpak remote-add`",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "`flatpak remote-delete`",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s3",
+              "label": "`flatpak remotes`",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Manage software",
+          "skills": [
+            "2.1.3: Configure access to Flatpak repositories."
+          ],
+          "services": [
+            "Flatpak"
+          ],
+          "docs": "https://docs.flatpak.org/en/latest/using-flatpak.html",
+          "tip": "Think about whether the action creates, removes, lists, or modifies.",
+          "explanation": "Each subcommand targets a distinct stage of remote lifecycle management.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0046",
+          "type": "single-choice",
+          "question": "A junior administrator has created `/etc/yum.repos.d/internal.repo` but package searches still return no results from it. The `enabled` key in the file is set to `0`\n\nWhich command enables the `internal` repository persistently?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `dnf repolist --enable internal` so the repository is permanently added to the enabled list.",
+              "isCorrect": false,
+              "explanation": "`dnf repolist` lists repositories; it does not take an `--enable` argument."
+            },
+            {
+              "id": "c1",
+              "text": "Run `dnf config-manager --set-enabled internal` to switch the `enabled` flag in the repository file to `1`",
+              "isCorrect": true,
+              "explanation": "`--set-enabled` flips the enabled key in the `.repo` file, persisting the change.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `dnf --enablerepo=internal update` so future transactions use the new repository automatically.",
+              "isCorrect": false,
+              "explanation": "`--enablerepo` only enables the repository for the single transaction, not persistently."
+            },
+            {
+              "id": "c3",
+              "text": "Run `subscription-manager repos --activate internal` to mark the repository as active on the host.",
+              "isCorrect": false,
+              "explanation": "`subscription-manager repos` uses `--enable`, not `--activate`, and it targets Red Hat CDN repositories, not local `.repo` files."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.1: Configure access to RPM repositories."
+          ],
+          "services": [
+            "DNF"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_software_with_the_dnf_tool",
+          "tip": "Distinguish between one-shot overrides and persistent configuration changes.",
+          "explanation": "`dnf config-manager --set-enabled` persistently enables a repository defined by a `.repo` file.\n\n**Why it works:** It rewrites the `enabled=` line in the file so the change survives subsequent transactions and reboots.\n\n**Why the others don't work:**\n- `--enablerepo=`: only active for the single DNF invocation.\n- `subscription-manager repos --activate`: the correct flag is `--enable`, and it targets Red Hat hosted repos.\n- `dnf repolist --enable`: `repolist` does not accept that flag.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0017",
+          "type": "single-choice",
+          "question": "A systems administrator has logged into a RHEL 10 server as the unprivileged user `ops` and now needs to become root with root's full login environment — root's home directory, root's `PATH`, and the environment variables set in root's login shell files.\n\nWhich command produces a root shell with root's full login environment?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `sudo su` without any arguments and supply the operator's password when prompted.",
+              "isCorrect": false,
+              "explanation": "This starts a root shell but inherits the invoking user's environment, not root's login environment."
+            },
+            {
+              "id": "c1",
+              "text": "Run `su -` and supply root's password when prompted.",
+              "isCorrect": true,
+              "explanation": "The trailing dash tells `su` to start a login shell with the target user's full environment.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `login root` and supply root's password when prompted.",
+              "isCorrect": false,
+              "explanation": "`login` is intended for tty-level authentication, not for switching users from an existing shell."
+            },
+            {
+              "id": "c2",
+              "text": "Run `su` without any arguments and supply root's password when prompted.",
+              "isCorrect": false,
+              "explanation": "Without `-`, `su` keeps the caller's environment, working directory, and `PATH`"
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.5: Log in and switch users in multiuser targets."
+          ],
+          "services": [
+            "su",
+            "sudo"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/configuring_authentication_and_authorization_in_rhel",
+          "tip": "Consider which option causes the new shell to be invoked as a login shell.",
+          "explanation": "`su -` starts a login shell and sources root's login files.\n\n**Why it works:** The dash changes the invocation into a login shell, which causes Bash to read `/etc/profile` and root's `~/.bash_profile`, setting the full target environment.\n\n**Why the others don't work:**\n- Plain `su` inherits the caller's environment.\n- `sudo su` gives root privileges but still with the caller's environment.\n- `login` is not designed to be called from an already-interactive shell on modern RHEL.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0024",
+          "type": "matching",
+          "question": "Match each `tar` short option to the action it performs.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Extracts files from an existing archive into the current directory.",
+              "isCorrect": false,
+              "explanation": "`-x` is the extract operation."
+            },
+            {
+              "id": "c3",
+              "text": "Lists the contents of an archive without writing any files to disk.",
+              "isCorrect": false,
+              "explanation": "`-t` performs a table-of-contents listing."
+            },
+            {
+              "id": "c4",
+              "text": "Filters the archive stream through gzip during create or extract.",
+              "isCorrect": false,
+              "explanation": "`-z` selects gzip compression."
+            },
+            {
+              "id": "c1",
+              "text": "Creates a new archive from the listed sources.",
+              "isCorrect": false,
+              "explanation": "`-c` is the create operation."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "`-x`",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s4",
+              "label": "`-z`",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s3",
+              "label": "`-t`",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "`-c`",
+              "correctChoiceId": "c1"
+            }
+          ],
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.6: Archive, compress, unpack, and uncompress files using tar, gzip, and bzip2."
+          ],
+          "services": [
+            "tar"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/tar.1.html",
+          "tip": "Separate the operation mode flags from the compression-filter flag.",
+          "explanation": "`-c`, `-x`, and `-t` are the three main operation modes, while `-z` is a compression filter applied alongside them.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0034",
+          "type": "single-choice",
+          "question": "The engineering team is troubleshooting a backup routine on a RHEL 10 server. A hard link `/backup/config.conf` was previously created pointing at `/etc/app/config.conf`, and an operator has since removed `/etc/app/config.conf` with `rm`\n\nWhat is the state of `/backup/config.conf` after the removal?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "It is converted into an empty regular file of zero bytes.",
+              "isCorrect": false,
+              "explanation": "Filesystems do not rewrite the data of a file when one of its links is removed."
+            },
+            {
+              "id": "c1",
+              "text": "It still exists with the original contents because the inode is still referenced by `/backup/config.conf`",
+              "isCorrect": true,
+              "explanation": "A file's inode is reclaimed only when every directory entry referencing it has been removed.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "It is automatically removed because the original source file was deleted.",
+              "isCorrect": false,
+              "explanation": "Removing one directory entry does not delete the other directory entry referencing the same inode."
+            },
+            {
+              "id": "c2",
+              "text": "It becomes a dangling reference that reports `No such file or directory` when opened.",
+              "isCorrect": false,
+              "explanation": "That is the behaviour of a symbolic link whose target was removed, not a hard link."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.9: Create hard and soft links."
+          ],
+          "services": [
+            "ln"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Think about how the inode reference count changes when one directory entry is removed.",
+          "explanation": "`/backup/config.conf` remains fully usable because its inode still has a reference.\n\n**Why it works:** Each hard link is a directory entry pointing to the same inode; the inode and its data are freed only when the reference count reaches zero.\n\n**Why the others don't work:**\n- Dangling behaviour belongs to symbolic links.\n- Hard links are not cascaded when siblings are deleted.\n- File data is not rewritten on link removal.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0012",
+          "type": "matching",
+          "question": "Match each regular-expression metacharacter to the behaviour it has in a basic `grep` pattern.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Matches exactly one character, other than a newline.",
+              "isCorrect": false,
+              "explanation": "`.` is the any-single-character wildcard."
+            },
+            {
+              "id": "c2",
+              "text": "Anchors the match to the end of a line.",
+              "isCorrect": false,
+              "explanation": "`$` is the end-of-line anchor."
+            },
+            {
+              "id": "c4",
+              "text": "Matches zero or more occurrences of the preceding atom.",
+              "isCorrect": false,
+              "explanation": "`*` is the Kleene-star quantifier."
+            },
+            {
+              "id": "c1",
+              "text": "Anchors the match to the beginning of a line.",
+              "isCorrect": false,
+              "explanation": "`^` is the start-of-line anchor."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "`^`",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "`$`",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s4",
+              "label": "`*`",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s3",
+              "label": "`.`",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.3: Use grep and regular expressions to analyze text."
+          ],
+          "services": [
+            "grep"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man7/regex.7.html",
+          "tip": "Separate anchors from quantifiers, then match each to its role.",
+          "explanation": "`^` and `$` are positional anchors, `.` is a wildcard for a single character, and `*` is a quantifier for the preceding element.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0050",
+          "type": "single-choice",
+          "question": "A developer has supplied a single RPM file `customtool-1.2-1.el10.x86_64.rpm` that depends on libraries available in the default RHEL repositories. The administrator needs those dependencies resolved automatically during installation.\n\nWhich command installs the package from the local file with dependency resolution?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `yum localinstall --nodeps customtool-1.2-1.el10.x86_64.rpm` to install the package and skip any required checks.",
+              "isCorrect": false,
+              "explanation": "`--nodeps` bypasses dependency resolution, which leaves the package unusable if libraries are missing."
+            },
+            {
+              "id": "c1",
+              "text": "Run `dnf install ./customtool-1.2-1.el10.x86_64.rpm` to install the local RPM with repository dependency resolution.",
+              "isCorrect": true,
+              "explanation": "DNF accepts a local file path and resolves any missing dependencies from enabled repositories.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `rpm -ivh customtool-1.2-1.el10.x86_64.rpm` to install the package with verbose progress output.",
+              "isCorrect": false,
+              "explanation": "`rpm -ivh` installs the file but does not resolve dependencies from repositories, so missing libraries cause failure."
+            },
+            {
+              "id": "c4",
+              "text": "Run `dnf add-local customtool-1.2-1.el10.x86_64.rpm` to register the file and pull in dependencies.",
+              "isCorrect": false,
+              "explanation": "`dnf add-local` is not a valid DNF subcommand."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.2: Install and remove RPM software packages."
+          ],
+          "services": [
+            "DNF"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_software_with_the_dnf_tool",
+          "tip": "Think about which tool reads a local RPM but still consults repositories for missing libraries.",
+          "explanation": "DNF accepts a file path alongside package names.\n\n**Why it works:** Passing a local `.rpm` path to `dnf install` uses repositories to satisfy dependencies while installing the provided file.\n\n**Why the others don't work:**\n- `rpm -ivh`: does not contact repositories for dependencies.\n- `yum localinstall --nodeps`: skipping dependency checks leaves the install unusable.\n- `dnf add-local`: invented subcommand.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0021",
+          "type": "single-choice",
+          "question": "The operations team must produce a single compressed archive of `/home/project` for off-site backup. The destination file is `/backup/project.tar.gz` and the archive must use gzip compression, with verbose output listing each file as it is archived.\n\nWhich command creates the gzipped tar archive?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `tar --compress=zip -cvf /backup/project.tar.gz /home/project`",
+              "isCorrect": false,
+              "explanation": "`--compress=zip` is not a recognised `tar` option; gzip is selected with `-z` or `--gzip`"
+            },
+            {
+              "id": "c3",
+              "text": "Run `tar -xzvf /backup/project.tar.gz /home/project`",
+              "isCorrect": false,
+              "explanation": "`-x` extracts from an archive; it does not create one."
+            },
+            {
+              "id": "c1",
+              "text": "Run `tar -czvf /backup/project.tar.gz /home/project`",
+              "isCorrect": true,
+              "explanation": "`-c` creates, `-z` pipes through gzip, `-v` is verbose, and `-f` names the archive file.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `tar -cjvf /backup/project.tar.gz /home/project`",
+              "isCorrect": false,
+              "explanation": "`-j` selects bzip2 compression, which does not match the `.tar.gz` extension."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.6: Archive, compress, unpack, and uncompress files using tar, gzip, and bzip2."
+          ],
+          "services": [
+            "tar",
+            "gzip"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/tar.1.html",
+          "tip": "Identify the flag that selects gzip compression and the flag that specifies archive creation.",
+          "explanation": "`tar -czvf ...` creates a gzip-compressed tar archive.\n\n**Why it works:** `-c` creates the archive, `-z` runs the output through gzip, `-v` lists each file, and `-f` names the archive path.\n\n**Why the others don't work:**\n- `-j` selects bzip2 rather than gzip.\n- `-x` extracts rather than creates.\n- `--compress=zip` is not a valid `tar` option.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0043",
+          "type": "multiple-choice",
+          "question": "During a system audit, an administrator wants to find every installed command whose man page description mentions the word `scheduler` They want two equivalent, standard approaches that work out of the box on RHEL 10.\n\nWhich TWO commands search man page descriptions for the keyword `scheduler`? (Select TWO)",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Run `help scheduler`",
+              "isCorrect": false,
+              "explanation": "`help` is a Bash builtin for shell builtins; it does not search man pages."
+            },
+            {
+              "id": "c2",
+              "text": "Run `man -k scheduler`",
+              "isCorrect": true,
+              "explanation": "`man -k` is the built-in alias for `apropos` within the `man` binary.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Run `man --find scheduler`",
+              "isCorrect": false,
+              "explanation": "`man` has no `--find` option."
+            },
+            {
+              "id": "c1",
+              "text": "Run `apropos scheduler`",
+              "isCorrect": true,
+              "explanation": "`apropos` performs a keyword search against the man page summary database.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `manual search scheduler`",
+              "isCorrect": false,
+              "explanation": "`manual` is not a command on RHEL 10."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.11: Locate, read, and use system documentation including man, info, and files in /usr/share/doc."
+          ],
+          "services": [
+            "man",
+            "apropos"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/apropos.1.html",
+          "tip": "Recall the two invocations that both consult the man page summary database.",
+          "explanation": "`apropos` and `man -k` are equivalent keyword-search commands.\n\n**Why it works:** Both invocations query the same whatis/apropos index of man page summaries and print every hit.\n\n**Why the others don't work:**\n- `man --find` does not exist.\n- `manual search` is not a command.\n- `help` documents Bash builtins only.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0042",
+          "type": "single-choice",
+          "question": "The `passwd` command has a man page in section 1 and the `passwd` file format has a man page in section 5. An administrator needs to read the section 5 page that documents the format of the file, not the user command.\n\nWhich command opens the section 5 man page for `passwd`?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `info passwd --section 5`",
+              "isCorrect": false,
+              "explanation": "`info` is a separate tool for texinfo documents and does not accept a `--section` flag."
+            },
+            {
+              "id": "c1",
+              "text": "Run `man 5 passwd`",
+              "isCorrect": true,
+              "explanation": "Passing the section number before the page name selects that section.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `man passwd.5`",
+              "isCorrect": false,
+              "explanation": "The section suffix syntax is not valid; the section must be a separate argument or come after `-s`"
+            },
+            {
+              "id": "c2",
+              "text": "Run `man -f passwd` and pick section 5 from the results.",
+              "isCorrect": false,
+              "explanation": "`man -f` only prints a one-line summary for each section; it does not open a page interactively."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.11: Locate, read, and use system documentation including man, info, and files in /usr/share/doc."
+          ],
+          "services": [
+            "man"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/man.1.html",
+          "tip": "Consider the standard positional syntax used to request a specific man page section.",
+          "explanation": "`man 5 passwd` is the canonical way to request section 5.\n\n**Why it works:** `man` accepts an optional section number immediately before the page name and restricts the lookup to that section.\n\n**Why the others don't work:**\n- `man -f` just emits whatis output.\n- `info` does not have a `--section` flag of this kind.\n- `passwd.5` is not a valid page-name syntax.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0063",
+          "type": "multiple-choice",
+          "question": "An administrator is writing a Bash script that must take different actions depending on whether a service name is `httpd`, `nginx`, or anything else. They want to use native Bash conditional constructs rather than chained if statements.\n\nWhich TWO approaches achieve this cleanly? (Select TWO)",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Use a `case \"$svc\" in` block with patterns `httpd)`, `nginx)`, and `*)` plus matching actions.",
+              "isCorrect": true,
+              "explanation": "`case` is the idiomatic construct for branching by value against patterns.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Use `select svc in httpd nginx` to branch on the administrator's choice.",
+              "isCorrect": false,
+              "explanation": "`select` presents an interactive menu; it does not evaluate a variable."
+            },
+            {
+              "id": "c5",
+              "text": "Use `match \"$svc\" with httpd | nginx` to branch on the value.",
+              "isCorrect": false,
+              "explanation": "`match` is not a Bash construct."
+            },
+            {
+              "id": "c3",
+              "text": "Use `switch \"$svc\" { case httpd: ...; case nginx: ...; }` to branch on the value.",
+              "isCorrect": false,
+              "explanation": "Bash does not provide a `switch` statement."
+            },
+            {
+              "id": "c2",
+              "text": "Use `if [ \"$svc\" = httpd ]; then ... elif [ \"$svc\" = nginx ]; then ... else ... fi` to branch on the value.",
+              "isCorrect": true,
+              "explanation": "An if-elif-else chain handles multiple value checks explicitly.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Create simple shell scripts",
+          "skills": [
+            "3.1.1: Conditionally execute code (use of: if, test, [], etc.)."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html",
+          "tip": "Think about which constructs actually exist in Bash for multi-way branching.",
+          "explanation": "Bash offers `case` and chained `if`/`elif`/`else` for multi-way branching.\n\n**Why it works:** Both constructs evaluate a variable and select a branch; `case` is typically cleaner for multiple literal values.\n\n**Why the others don't work:**\n- `switch`: not a Bash construct.\n- `select`: builds an interactive menu.\n- `match`: not a Bash construct.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0057",
+          "type": "single-choice",
+          "question": "The desktop team wants the GIMP image editor deployed system-wide on a RHEL 10 workstation using Flatpak. Flathub is already registered as a remote.\n\nWhich command installs GIMP from the Flathub remote for all users?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `flatpak add flathub org.gimp.GIMP` to register and install the package in one step.",
+              "isCorrect": false,
+              "explanation": "`flatpak add` is not a real subcommand; `install` is used."
+            },
+            {
+              "id": "c3",
+              "text": "Run `dnf install flathub:org.gimp.GIMP` to install the Flatpak through DNF.",
+              "isCorrect": false,
+              "explanation": "DNF does not install Flatpak applications."
+            },
+            {
+              "id": "c1",
+              "text": "Run `flatpak install flathub org.gimp.GIMP` to install GIMP from the Flathub remote.",
+              "isCorrect": true,
+              "explanation": "The standard syntax specifies the remote followed by the application ID.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `flatpak get flathub org.gimp.GIMP` to fetch and install the application system-wide.",
+              "isCorrect": false,
+              "explanation": "`flatpak get` is not a valid subcommand."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.4: Install and remove Flatpak software packages."
+          ],
+          "services": [
+            "Flatpak"
+          ],
+          "docs": "https://docs.flatpak.org/en/latest/using-flatpak.html",
+          "tip": "Remember the canonical subcommand for installing from a named remote.",
+          "explanation": "`flatpak install <remote> <app-id>` is the standard installation command.\n\n**Why it works:** It tells Flatpak which remote to query and which application to pull, installing it system-wide by default.\n\n**Why the others don't work:**\n- `flatpak get`: invented subcommand.\n- `dnf install`: DNF does not manage Flatpaks.\n- `flatpak add`: not a real subcommand.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0005",
+          "type": "single-choice",
+          "question": "An administrator is keeping a running log of ad-hoc diagnostic output. Each run of a short script should add its output to `/var/log/diagnostics.log` without discarding the entries written by earlier runs.\n\nWhich redirection appends standard output to the existing file?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Append output by running `script.sh > /var/log/diagnostics.log`",
+              "isCorrect": false,
+              "explanation": "A single `>` truncates the file on each invocation, losing prior entries."
+            },
+            {
+              "id": "c1",
+              "text": "Append output by running `script.sh >> /var/log/diagnostics.log`",
+              "isCorrect": true,
+              "explanation": "`>>` opens the target in append mode, preserving existing content.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Append output by running `script.sh >+ /var/log/diagnostics.log`",
+              "isCorrect": false,
+              "explanation": "`>+` is not a valid Bash redirection operator."
+            },
+            {
+              "id": "c3",
+              "text": "Append output by running `script.sh 2> /var/log/diagnostics.log`",
+              "isCorrect": false,
+              "explanation": "`2>` captures stderr and overwrites the file; it does not append and does not capture stdout."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.2: Use input-output redirection (>, >>, |, 2>, etc.)."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html",
+          "tip": "Identify the operator that specifically opens the destination in append mode.",
+          "explanation": "`>>` is the append-redirection operator.\n\n**Why it works:** Bash opens the target file with `O_APPEND`, so every write lands at the end of the file.\n\n**Why the others don't work:**\n- `>` truncates the file.\n- `2>` redirects only stderr and overwrites.\n- `>+` is not defined in Bash.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0002",
+          "type": "single-choice",
+          "question": "The operations team is troubleshooting a failing deployment. An administrator ran a long `tar` command about ten minutes ago and now needs to re-run it exactly, without retyping. The shell session has been kept open the whole time.\n\nWhich approach re-executes a specific previous command from the session's history?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run `history` to view the numbered list, then run `!N` where `N` is the line number of the desired command.",
+              "isCorrect": true,
+              "explanation": "The `!N` history-expansion syntax replays the command at position `N` in the history list.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `history --run N` to replay the command at position `N` directly.",
+              "isCorrect": false,
+              "explanation": "The `history` builtin has no `--run` option; it only prints, clears, or loads history entries."
+            },
+            {
+              "id": "c3",
+              "text": "Run `rerun N` after checking `history` for the desired command number.",
+              "isCorrect": false,
+              "explanation": "`rerun` is not a standard Bash command and is not present on RHEL 10 by default."
+            },
+            {
+              "id": "c4",
+              "text": "Run `bash --replay N` to re-execute history entry `N` in a fresh shell.",
+              "isCorrect": false,
+              "explanation": "`bash` has no `--replay` option; history expansion happens inside an interactive shell."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.1: Access a shell prompt and issue commands with correct syntax."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/History-Interaction.html",
+          "tip": "Recall the built-in Bash syntax that references a numbered history entry.",
+          "explanation": "Viewing `history` and then running `!N` is the idiomatic way to replay a specific previous command.\n\n**Why it works:** Bash implements history expansion where `!N` is substituted with the command stored at line `N` of the in-memory history list.\n\n**Why the others don't work:**\n- The `history` builtin does not accept a `--run` flag.\n- `rerun` is not a command on a default RHEL 10 system.\n- `bash --replay` is not a real option of the `bash` binary.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0037",
+          "type": "single-choice",
+          "question": "A script named `/opt/tools/deploy.sh` currently has mode `rw-r--r--` The script's owner needs to be able to execute it, but the existing read permissions for group and others must remain exactly as they are.\n\nWhich command adds the execute bit for the owner only, without changing the group or other permissions?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Run `chmod +x /opt/tools/deploy.sh`",
+              "isCorrect": false,
+              "explanation": "`+x` adds execute for user, group, and others, modified by `umask`; it is wider than required."
+            },
+            {
+              "id": "c3",
+              "text": "Run `chmod u=x /opt/tools/deploy.sh`",
+              "isCorrect": false,
+              "explanation": "`u=x` replaces the user's permissions with execute only, removing the existing read and write."
+            },
+            {
+              "id": "c1",
+              "text": "Run `chmod u+x /opt/tools/deploy.sh`",
+              "isCorrect": true,
+              "explanation": "`u+x` adds the execute bit to the user class and leaves other classes unchanged.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `chmod 100 /opt/tools/deploy.sh`",
+              "isCorrect": false,
+              "explanation": "Numeric mode `100` strips read from every class and leaves only owner execute."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.10: List, set, and change standard ugo/rwx permissions."
+          ],
+          "services": [
+            "chmod"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Distinguish between operators that add, replace, or absolutely set a permission.",
+          "explanation": "`chmod u+x` specifically adds execute for the user class.\n\n**Why it works:** The `u` class restricts the change to the owner, and `+x` adds the execute bit without touching existing bits.\n\n**Why the others don't work:**\n- Bare `+x` applies to every class.\n- `u=x` replaces the owner's mode, deleting read and write.\n- Numeric `100` sets the whole mode absolutely, wiping other classes.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0026",
+          "type": "single-choice",
+          "question": "An administrator is editing `/etc/motd` in Vim on a RHEL 10 server. They have just finished typing the new message in insert mode and now need to save the file and exit Vim without leaving the buffer unwritten.\n\nWhich sequence saves the file and exits Vim from insert mode?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Press `Esc`, then type `:quit` and press `Enter`",
+              "isCorrect": false,
+              "explanation": "`:quit` refuses to exit when there are unsaved changes and discards nothing even if it did."
+            },
+            {
+              "id": "c1",
+              "text": "Press `Esc`, then type `:wq` and press `Enter`",
+              "isCorrect": true,
+              "explanation": "`Esc` leaves insert mode, `:w` writes the buffer, and `q` quits.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Type `Ctrl+S` to save, then `Ctrl+X` to exit.",
+              "isCorrect": false,
+              "explanation": "`Ctrl+S` and `Ctrl+X` are `nano` conventions; in a terminal Vim they have no save-and-exit effect."
+            },
+            {
+              "id": "c4",
+              "text": "Press `Esc`, then type `save exit` and press `Enter`",
+              "isCorrect": false,
+              "explanation": "`save exit` is not a Vim ex command; Vim would report an unknown command."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.7: Create and edit text files."
+          ],
+          "services": [
+            "vim"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/vim.1.html",
+          "tip": "Recall the two-letter ex command that combines write and quit.",
+          "explanation": "`Esc` followed by `:wq` writes the buffer and exits.\n\n**Why it works:** Leaving insert mode returns Vim to normal mode, where ex commands are accepted; `:w` writes the file and `q` terminates the editor.\n\n**Why the others don't work:**\n- `Ctrl+S`/`Ctrl+X` are not Vim bindings.\n- `:quit` refuses to exit with unwritten changes.\n- `save exit` is not a valid ex command.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0033",
+          "type": "single-choice",
+          "question": "An administrator has installed a new version of a configuration file at `/etc/myapp/config-v2.conf` They want existing tooling that references `/etc/myapp/config.conf` to automatically use the new file, while leaving the older file untouched at its original path and making the relationship between the two obvious in `ls -l`\n\nWhich command creates a symbolic link named `config.conf` that points to `config-v2.conf`?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `link -soft /etc/myapp/config-v2.conf /etc/myapp/config.conf`",
+              "isCorrect": false,
+              "explanation": "The `link` command performs a hard link only and has no `-soft` option."
+            },
+            {
+              "id": "c1",
+              "text": "Run `ln -s /etc/myapp/config-v2.conf /etc/myapp/config.conf`",
+              "isCorrect": true,
+              "explanation": "`-s` produces a symbolic link that stores the target path.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Run `ln -h /etc/myapp/config-v2.conf /etc/myapp/config.conf`",
+              "isCorrect": false,
+              "explanation": "`-h` on GNU `ln` is `--no-dereference`; it does not select symbolic-link creation."
+            },
+            {
+              "id": "c2",
+              "text": "Run `ln /etc/myapp/config-v2.conf /etc/myapp/config.conf`",
+              "isCorrect": false,
+              "explanation": "Without `-s`, `ln` creates a hard link, which is invisible as such in `ls -l`"
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.9: Create hard and soft links."
+          ],
+          "services": [
+            "ln"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Recall which short option distinguishes a symbolic link from a hard link.",
+          "explanation": "`ln -s <target> <linkname>` creates a symbolic link.\n\n**Why it works:** `-s` stores the target path inside the link file, so `ls -l` displays it as a symlink pointing to `config-v2.conf`\n\n**Why the others don't work:**\n- Omitting `-s` creates a hard link, which does not appear as a symlink.\n- `-h` suppresses dereferencing, not link type.\n- `link` is the hard-link primitive and has no soft-link mode.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0018",
+          "type": "single-choice",
+          "question": "You are writing a runbook that instructs an unprivileged administrator to install the `httpd` package without opening a persistent root shell. The administrator already has sudo rights on the RHEL 10 host.\n\nWhich command installs the package using elevated privileges for just that one command?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `su -c 'dnf install httpd'`",
+              "isCorrect": false,
+              "explanation": "`su -c` prompts for the target user's password — on RHEL that is the root password, not the operator's own."
+            },
+            {
+              "id": "c4",
+              "text": "Run `sudo -e dnf install httpd`",
+              "isCorrect": false,
+              "explanation": "`sudo -e` is `sudoedit`, used to edit files, not to install packages."
+            },
+            {
+              "id": "c1",
+              "text": "Run `sudo dnf install httpd`",
+              "isCorrect": true,
+              "explanation": "`sudo` elevates the single following command using the operator's own password.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `sudo apt install httpd`",
+              "isCorrect": false,
+              "explanation": "`apt` is the Debian/Ubuntu package manager and is not available on RHEL 10."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.5: Log in and switch users in multiuser targets."
+          ],
+          "services": [
+            "sudo"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/configuring_authentication_and_authorization_in_rhel",
+          "tip": "Focus on the elevation mechanism that authenticates with the operator's password and scopes privilege to one command.",
+          "explanation": "`sudo dnf install httpd` is the correct, least-privilege approach.\n\n**Why it works:** `sudo` asks for the operator's password, consults `/etc/sudoers`, and runs only the specified command with elevated privileges.\n\n**Why the others don't work:**\n- `apt` is not a RHEL package manager.\n- `su -c` requires root's password and starts a new shell for that single command.\n- `sudo -e` is a file editor, not a general command runner.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0051",
+          "type": "multiple-choice",
+          "question": "The engineering team is troubleshooting a regression introduced by a recent `nginx` update on RHEL 10. The administrator must roll the package back to the previous version and later view a history of package transactions.\n\nWhich TWO commands help accomplish these goals? (Select TWO)",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Run `apt log` to review recent package transactions on the server.",
+              "isCorrect": false,
+              "explanation": "`apt log` belongs to Debian-family systems."
+            },
+            {
+              "id": "c2",
+              "text": "Run `dnf history undo <ID>` with the regression transaction ID to revert the package changes.",
+              "isCorrect": true,
+              "explanation": "`history undo` reverses the specified transaction.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Run `dnf rollback --latest nginx` to restore the previous package version automatically.",
+              "isCorrect": false,
+              "explanation": "`dnf rollback` is not a valid subcommand; rollback is handled via `history undo`"
+            },
+            {
+              "id": "c4",
+              "text": "Run `rpm -e --rollback '1 day'` to remove recent changes based on time.",
+              "isCorrect": false,
+              "explanation": "RPM on RHEL 10 does not support `--rollback`; that flag was never part of the stable feature set."
+            },
+            {
+              "id": "c1",
+              "text": "Run `dnf history` to list past transactions with IDs, dates, and actions taken.",
+              "isCorrect": true,
+              "explanation": "`dnf history` displays every recorded transaction.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.2: Install and remove RPM software packages."
+          ],
+          "services": [
+            "DNF"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_software_with_the_dnf_tool",
+          "tip": "Recall how DNF tracks and reverses prior transactions.",
+          "explanation": "DNF records every transaction and can reverse them by ID.\n\n**Why it works:** `dnf history` lists transactions and `dnf history undo <ID>` rolls the specified one back.\n\n**Why the others don't work:**\n- `dnf rollback`: no such subcommand.\n- `rpm -e --rollback`: not supported on RHEL.\n- `apt log`: Debian/Ubuntu tool.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0053",
+          "type": "single-choice",
+          "question": "The desktop team wants to provide users with graphical applications from the Flathub remote. A workstation running RHEL 10 has Flatpak installed but no remotes are configured.\n\nWhich command registers Flathub as a system-wide Flatpak remote?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Run `flatpak add-repo flathub https://flathub.org/repo/flathub.flatpakrepo` to install the repository and its key.",
+              "isCorrect": false,
+              "explanation": "`flatpak add-repo` is not a valid subcommand; the correct form is `remote-add`"
+            },
+            {
+              "id": "c1",
+              "text": "Run `flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo` to register the remote for all users.",
+              "isCorrect": true,
+              "explanation": "This is the documented command for adding the Flathub remote system-wide using its `.flatpakrepo` descriptor.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Edit `/etc/flatpak/remotes.d/flathub.conf` manually to point at the Flathub URL.",
+              "isCorrect": false,
+              "explanation": "Flatpak remotes live under `/var/lib/flatpak/repo/`; there is no `remotes.d` directory in `/etc/flatpak/`"
+            },
+            {
+              "id": "c3",
+              "text": "Run `dnf config-manager --add-repo https://flathub.org/repo/flathub.flatpakrepo` to add Flathub alongside RPM sources.",
+              "isCorrect": false,
+              "explanation": "`dnf config-manager` manages DNF repositories, not Flatpak remotes."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.3: Configure access to Flatpak repositories."
+          ],
+          "services": [
+            "Flatpak"
+          ],
+          "docs": "https://docs.flatpak.org/en/latest/using-flatpak.html",
+          "tip": "Remember which tool manages Flatpak sources and how they are addressed.",
+          "explanation": "`flatpak remote-add` registers a new Flatpak remote.\n\n**Why it works:** Providing a `.flatpakrepo` URL stores the remote metadata and GPG key so applications can be installed from it.\n\n**Why the others don't work:**\n- `flatpak add-repo`: invented subcommand.\n- `dnf config-manager`: targets RPM repositories, not Flatpak.\n- Editing `/etc/flatpak/remotes.d/`: that path does not exist.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0025",
+          "type": "single-choice",
+          "question": "A deployment script running on RHEL 10 must ensure that the file `/var/lock/maintenance.lock` exists. If the file is already present, its access and modification timestamps should be updated to the current time; if it is absent, an empty file should be created at that path.\n\nWhich command satisfies both requirements?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Run `echo > /var/lock/maintenance.lock`",
+              "isCorrect": false,
+              "explanation": "This truncates the file to a single newline character when it already exists, discarding any previous contents."
+            },
+            {
+              "id": "c4",
+              "text": "Run `mkfile /var/lock/maintenance.lock`",
+              "isCorrect": false,
+              "explanation": "`mkfile` is a Solaris command and is not present on RHEL 10."
+            },
+            {
+              "id": "c3",
+              "text": "Run `vim /var/lock/maintenance.lock`",
+              "isCorrect": false,
+              "explanation": "`vim` is an interactive editor and requires user input; it is unsuitable for a non-interactive script."
+            },
+            {
+              "id": "c1",
+              "text": "Run `touch /var/lock/maintenance.lock`",
+              "isCorrect": true,
+              "explanation": "`touch` creates the file if it does not exist and otherwise refreshes its atime and mtime.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.7: Create and edit text files."
+          ],
+          "services": [
+            "touch"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/touch.1.html",
+          "tip": "Identify the single command that both creates an absent file and refreshes timestamps on an existing one.",
+          "explanation": "`touch` is designed for exactly this dual behaviour.\n\n**Why it works:** When the target is missing, `touch` creates a zero-byte file; when it exists, `touch` updates the access and modification timestamps without altering the contents.\n\n**Why the others don't work:**\n- `echo >` truncates existing content.\n- `vim` is interactive.\n- `mkfile` is not available on RHEL 10.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0065",
+          "type": "single-choice",
+          "question": "The operations team wants a cleanup script that iterates over every `.log` file in `/var/log/app/` and compresses each one with gzip.\n\nWhich loop correctly processes each matching file?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Write `for (( f in /var/log/app/*.log )); do gzip \"$f\"; done` to iterate through the log files.",
+              "isCorrect": false,
+              "explanation": "`(( ))` is arithmetic syntax and cannot be used to iterate over file lists."
+            },
+            {
+              "id": "c1",
+              "text": "Write `for f in /var/log/app/*.log; do gzip \"$f\"; done` to iterate over each log file.",
+              "isCorrect": true,
+              "explanation": "The glob expands to all matching files and the for loop processes each one in turn.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Write `foreach f in /var/log/app/*.log; do gzip \"$f\"; done` to iterate through the log files.",
+              "isCorrect": false,
+              "explanation": "`foreach` is not a Bash keyword; it belongs to tcsh."
+            },
+            {
+              "id": "c3",
+              "text": "Write `for f in $(/var/log/app/*.log); do gzip \"$f\"; done` to iterate through the log files.",
+              "isCorrect": false,
+              "explanation": "Command substitution around a glob tries to execute the paths as commands."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Create simple shell scripts",
+          "skills": [
+            "3.1.2: Use Looping constructs (for, etc.) to process file, command line input."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Looping-Constructs.html",
+          "tip": "Match the loop form to how Bash expands shell globs.",
+          "explanation": "The standard Bash for loop iterates over a glob expansion.\n\n**Why it works:** Bash expands `/var/log/app/*.log` into a list of filenames and `for` processes each one.\n\n**Why the others don't work:**\n- `foreach`: tcsh syntax, not Bash.\n- `$(...)` around a glob: tries to execute the paths.\n- `(( ))`: arithmetic context, not a file loop.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0008",
+          "type": "matching",
+          "question": "Match each Bash redirection operator to its effect.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Sends standard output of the first command to the standard input of the next command.",
+              "isCorrect": false,
+              "explanation": "`|` is the pipeline operator."
+            },
+            {
+              "id": "c2",
+              "text": "Redirects standard output to a file, appending to any existing content.",
+              "isCorrect": false,
+              "explanation": "Double `>>` opens the file in append mode."
+            },
+            {
+              "id": "c1",
+              "text": "Redirects standard output to a file, truncating the file if it already exists.",
+              "isCorrect": false,
+              "explanation": "Single `>` overwrites."
+            },
+            {
+              "id": "c3",
+              "text": "Redirects standard error to a file, truncating the file if it already exists.",
+              "isCorrect": false,
+              "explanation": "`2>` targets file descriptor 2 specifically."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "`>>`",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s3",
+              "label": "`2>`",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s4",
+              "label": "`|`",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s1",
+              "label": "`>`",
+              "correctChoiceId": "c1"
+            }
+          ],
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.2: Use input-output redirection (>, >>, |, 2>, etc.)."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html",
+          "tip": "Consider which file descriptor each operator affects and whether it overwrites or appends.",
+          "explanation": "Each operator addresses a specific file descriptor with specific file-open semantics, or in the case of `|`, connects two processes without touching the filesystem.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0045",
+          "type": "single-choice",
+          "question": "The operations team has uploaded a new internal RPM repository to a web server at https://repo.example.com/rhel10/base/. The administrator must register this repository so that DNF can install packages from it on every host.\n\nWhich command creates the repository definition on a RHEL 10 system?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `dnf repo-install https://repo.example.com/rhel10/base/` to register and enable the repository in a single step.",
+              "isCorrect": false,
+              "explanation": "`dnf repo-install` is not a valid DNF subcommand."
+            },
+            {
+              "id": "c2",
+              "text": "Run `apt-add-repository https://repo.example.com/rhel10/base/` so the package manager recognises the new source.",
+              "isCorrect": false,
+              "explanation": "`apt-add-repository` is a Debian/Ubuntu tool and is not available on RHEL."
+            },
+            {
+              "id": "c1",
+              "text": "Run `dnf config-manager --add-repo https://repo.example.com/rhel10/base/` to create a `.repo` file under `/etc/yum.repos.d/`",
+              "isCorrect": true,
+              "explanation": "`dnf config-manager --add-repo` generates a repository file from a base URL and stores it in the standard directory.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Edit `/etc/dnf/dnf.conf` and append the URL under a `[main]` directive so DNF queries it during transactions.",
+              "isCorrect": false,
+              "explanation": "Repositories are defined in their own files under `/etc/yum.repos.d/`, not inside `/etc/dnf/dnf.conf`"
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.1: Configure access to RPM repositories."
+          ],
+          "services": [
+            "DNF"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_software_with_the_dnf_tool",
+          "tip": "Think about which DNF helper generates a repository file from a URL.",
+          "explanation": "The `dnf config-manager` plugin adds repositories quickly from a URL.\n\n**Why it works:** `--add-repo` writes a minimal `.repo` file to `/etc/yum.repos.d/` so DNF immediately recognises the source.\n\n**Why the others don't work:**\n- `apt-add-repository`: belongs to Debian and Ubuntu, not RHEL.\n- `dnf repo-install`: not a real DNF subcommand.\n- Editing `/etc/dnf/dnf.conf`: the main config file does not hold per-repository URL definitions.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0036",
+          "type": "matching",
+          "question": "Match each property to the kind of link it describes.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Symbolic link",
+              "isCorrect": false,
+              "explanation": "Symlinks store a path and are not bound to the target's filesystem."
+            },
+            {
+              "id": "c3",
+              "text": "Symbolic link",
+              "isCorrect": false,
+              "explanation": "A symlink becomes dangling when its target disappears."
+            },
+            {
+              "id": "c1",
+              "text": "Hard link",
+              "isCorrect": false,
+              "explanation": "Hard links are additional directory entries for the same inode."
+            },
+            {
+              "id": "c4",
+              "text": "Symbolic link",
+              "isCorrect": false,
+              "explanation": "The `l` mode character identifies a symlink in `ls -l` output."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Shares the same inode number as the target",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "Can point to a file on a different filesystem",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s4",
+              "label": "Is displayed with an `l` type character by `ls -l`",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s3",
+              "label": "Becomes broken when the target is removed",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.9: Create hard and soft links."
+          ],
+          "services": [
+            "ln"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Separate the inode-based property from the path-based properties.",
+          "explanation": "Only hard links are inode-level aliases; everything that depends on a stored path, or that breaks when the target is removed, is a symbolic link property.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0062",
+          "type": "single-choice",
+          "question": "The engineering team is troubleshooting a Bash script that fails when two numeric environment variables are compared. They need to branch when the variable `RETRIES` is greater than `3`\n\nWhich expression correctly compares the integer values inside a `[ ]` test?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Write `if [ \"$RETRIES\" > 3 ]; then` to branch when `RETRIES` exceeds three.",
+              "isCorrect": false,
+              "explanation": "`>` inside `[ ]` is string comparison (and triggers redirection in some contexts), not numeric."
+            },
+            {
+              "id": "c1",
+              "text": "Write `if [ \"$RETRIES\" -gt 3 ]; then` to branch when `RETRIES` exceeds three.",
+              "isCorrect": true,
+              "explanation": "`-gt` is the integer greater-than operator inside single-bracket tests.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Write `if [ \"$RETRIES\" -greater 3 ]; then` to branch when `RETRIES` exceeds three.",
+              "isCorrect": false,
+              "explanation": "`-greater` is not a valid operator; the correct form is `-gt`"
+            },
+            {
+              "id": "c4",
+              "text": "Write `if (( $RETRIES => 3 )); then` to branch when `RETRIES` is at least three.",
+              "isCorrect": false,
+              "explanation": "`=>` is not a valid comparison operator; arithmetic context uses `>=`"
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Create simple shell scripts",
+          "skills": [
+            "3.1.1: Conditionally execute code (use of: if, test, [], etc.)."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Bash-Conditional-Expressions.html",
+          "tip": "Recall the numeric comparison operators used with the test command.",
+          "explanation": "`-gt` performs integer greater-than comparison in test expressions.\n\n**Why it works:** Within `[ ... ]`, numeric operators such as `-eq`, `-ne`, `-lt`, `-gt`, `-le`, and `-ge` are required for integer tests.\n\n**Why the others don't work:**\n- `>` inside `[ ]`: string comparison, not numeric, and can even be parsed as redirection.\n- `-greater`: invented operator.\n- `=>`: invalid syntax in arithmetic context.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0011",
+          "type": "multiple-choice",
+          "question": "During a log review, an administrator wants to see every line in `app.log` that does NOT contain the word `debug`, and each surviving line should carry its original line number.\n\nWhich TWO `grep` flags must be combined to produce that output? (Select TWO)",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Use `-L` to list only files that contain no matches.",
+              "isCorrect": false,
+              "explanation": "`-L` reports file names, not individual lines."
+            },
+            {
+              "id": "c2",
+              "text": "Use `-n` to prefix each printed line with its line number in the input.",
+              "isCorrect": true,
+              "explanation": "`-n` prepends each line with its source line number.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Use `-E` to enable extended regular expressions in the pattern.",
+              "isCorrect": false,
+              "explanation": "`-E` controls regex dialect, not output formatting or match inversion."
+            },
+            {
+              "id": "c1",
+              "text": "Use `-v` to invert the match so only non-matching lines are returned.",
+              "isCorrect": true,
+              "explanation": "`-v` is the invert-match flag.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Use `-c` to print only a count of matching lines instead of the lines themselves.",
+              "isCorrect": false,
+              "explanation": "`-c` replaces the output with a match count; it does not show lines."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.3: Use grep and regular expressions to analyze text."
+          ],
+          "services": [
+            "grep"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/grep.1.html",
+          "tip": "Consider which flag affects whether a line is printed and which prefixes output with a line number.",
+          "explanation": "Combining `-v` (invert) and `-n` (line numbers) produces the desired output.\n\n**Why it works:** `-v` keeps lines that do not match `debug`, and `-n` prepends each printed line with its position in the input file.\n\n**Why the others don't work:**\n- `-c` suppresses the matching lines and prints only a count.\n- `-L` lists files without matches, not lines.\n- `-E` only affects regex parsing.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0004",
+          "type": "matching",
+          "question": "Match each Bash list operator to its behaviour when two commands are joined by it.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Runs the preceding command in the background and returns control to the shell immediately.",
+              "isCorrect": false,
+              "explanation": "`&` detaches the command and frees the prompt."
+            },
+            {
+              "id": "c2",
+              "text": "Runs the next command only if the previous command exited with status 0.",
+              "isCorrect": false,
+              "explanation": "`&&` is the logical-AND short-circuit."
+            },
+            {
+              "id": "c1",
+              "text": "Runs the next command sequentially, regardless of the previous command's exit status.",
+              "isCorrect": false,
+              "explanation": "`;` is an unconditional separator."
+            },
+            {
+              "id": "c3",
+              "text": "Runs the next command only if the previous command exited with a non-zero status.",
+              "isCorrect": false,
+              "explanation": "`||` is the logical-OR short-circuit."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "`;`",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "`&&`",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s3",
+              "label": "`||`",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s4",
+              "label": "`&`",
+              "correctChoiceId": "c4"
+            }
+          ],
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.1: Access a shell prompt and issue commands with correct syntax."
+          ],
+          "services": [
+            "Bash"
+          ],
+          "docs": "https://www.gnu.org/software/bash/manual/html_node/Lists.html",
+          "tip": "Consider whether the operator is conditional on the exit status or unconditional.",
+          "explanation": "Each operator evaluates the previous command's exit status differently, or in the case of `&`, does not wait for it at all.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0030",
+          "type": "single-choice",
+          "question": "A deployment script on RHEL 10 must ensure that the directory path `/srv/app/logs/2026/04` exists. None of the intermediate parent directories `/srv/app`, `/srv/app/logs`, or `/srv/app/logs/2026` currently exist on the filesystem.\n\nWhich command creates the entire nested path in a single invocation?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `mkdir --recursive /srv/app/logs/2026/04`",
+              "isCorrect": false,
+              "explanation": "`mkdir` has no `--recursive` long option; parents are created via `-p`/`--parents`"
+            },
+            {
+              "id": "c2",
+              "text": "Run `mkdir -R /srv/app/logs/2026/04`",
+              "isCorrect": false,
+              "explanation": "`-R` is not a `mkdir` option; it is a `cp` and `chmod` recursion flag."
+            },
+            {
+              "id": "c4",
+              "text": "Run `mkdirs /srv/app/logs/2026/04`",
+              "isCorrect": false,
+              "explanation": "`mkdirs` is not a standard command on RHEL 10."
+            },
+            {
+              "id": "c1",
+              "text": "Run `mkdir -p /srv/app/logs/2026/04`",
+              "isCorrect": true,
+              "explanation": "`-p` creates missing parent directories as needed and succeeds even if the target already exists.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.8: Create, delete, copy, and move files and directories."
+          ],
+          "services": [
+            "mkdir"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Consider the short option whose name refers to creating parent directories.",
+          "explanation": "`mkdir -p /srv/app/logs/2026/04` creates the full path.\n\n**Why it works:** `-p` (`--parents`) instructs `mkdir` to create any missing intermediate directories and to not error if the final directory already exists.\n\n**Why the others don't work:**\n- `-R` is not a `mkdir` flag.\n- There is no `--recursive` long option for `mkdir`\n- `mkdirs` is not a real command.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0049",
+          "type": "single-choice",
+          "question": "A web server is being commissioned and must serve HTTP content through the Apache package `httpd` The administrator will handle the firewall and service start separately.\n\nWhich command installs the `httpd` package on RHEL 10?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Run `apt install httpd` so the system package manager resolves and installs the web server.",
+              "isCorrect": false,
+              "explanation": "`apt` is the Debian/Ubuntu package manager and does not exist on RHEL."
+            },
+            {
+              "id": "c3",
+              "text": "Run `rpm -i httpd` to install the package directly from the configured repositories.",
+              "isCorrect": false,
+              "explanation": "`rpm -i` installs only from a local package file path, not from repositories, and it does not resolve dependencies."
+            },
+            {
+              "id": "c1",
+              "text": "Run `dnf install httpd` to fetch the package and its dependencies from the configured repositories.",
+              "isCorrect": true,
+              "explanation": "`dnf install` is the standard way to install a package and dependencies on RHEL 10.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `dnf fetch httpd` to download and activate the package on the system.",
+              "isCorrect": false,
+              "explanation": "`dnf fetch` is not a valid subcommand."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.2: Install and remove RPM software packages."
+          ],
+          "services": [
+            "DNF"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_software_with_the_dnf_tool",
+          "tip": "Consider which tool on RHEL pulls packages with their dependencies from configured sources.",
+          "explanation": "`dnf install` is the standard RHEL 10 package installation command.\n\n**Why it works:** DNF resolves dependencies against enabled repositories and installs the requested package.\n\n**Why the others don't work:**\n- `apt install`: Debian/Ubuntu tooling.\n- `rpm -i`: needs a local file path and does not resolve dependencies.\n- `dnf fetch`: not a real subcommand (the closest real one is `dnf download`).",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0039",
+          "type": "multiple-choice",
+          "question": "The file `/etc/app/secret.conf` must end up with permissions `rw-r-----` — readable and writable by the owner, readable by the group, and inaccessible to others. The current permissions on the file are `rw-r--r--`\n\nStarting from that existing state, which TWO commands produce exactly the required permissions? (Select TWO)",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Run `chmod o= /etc/app/secret.conf`",
+              "isCorrect": true,
+              "explanation": "Starting from `rw-r--r--`, removing all `o` bits yields `rw-r-----`",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Run `chmod a=640 /etc/app/secret.conf`",
+              "isCorrect": false,
+              "explanation": "`a=640` is not valid symbolic syntax; numeric values are not accepted after `=`"
+            },
+            {
+              "id": "c1",
+              "text": "Run `chmod 640 /etc/app/secret.conf`",
+              "isCorrect": true,
+              "explanation": "`640` is exactly `rw-r-----`",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Run `chmod 740 /etc/app/secret.conf`",
+              "isCorrect": false,
+              "explanation": "`740` is `rwxr-----`, which adds execute for the owner."
+            },
+            {
+              "id": "c4",
+              "text": "Run `chmod go-w /etc/app/secret.conf`",
+              "isCorrect": false,
+              "explanation": "The starting mode has no group or other write bits to remove, so nothing changes."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.10: List, set, and change standard ugo/rwx permissions."
+          ],
+          "services": [
+            "chmod"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Compute each candidate mode explicitly and compare with `rw-r-----`",
+          "explanation": "Numeric `640` and symbolic `o=` (to clear other's bits) both produce the target mode from the given starting point.\n\n**Why it works:** `640` sets the absolute mode directly, and `o=` assigns an empty permission set to the other class while leaving user and group untouched at `rw-` and `r--`\n\n**Why the others don't work:**\n- `740` grants owner execute.\n- `go-w` has no effect when no write bits are currently set for group or other.\n- Numeric values after `=` in symbolic mode are not valid syntax.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0023",
+          "type": "multiple-choice",
+          "question": "A maintenance script needs to reduce the disk footprint of `access.log` by producing a gzip-compressed file `access.log.gz` and removing the original uncompressed log after compression completes.\n\nWhich TWO commands result in a compressed `access.log.gz` file with the original `access.log` removed? (Select TWO)",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `bzip2 access.log`",
+              "isCorrect": false,
+              "explanation": "`bzip2` produces `access.log.bz2`, not `.gz`"
+            },
+            {
+              "id": "c1",
+              "text": "Run `gzip access.log`",
+              "isCorrect": true,
+              "explanation": "The default behaviour of `gzip` is to replace the input file with a compressed copy.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `gzip -9 access.log`",
+              "isCorrect": true,
+              "explanation": "`-9` chooses maximum compression and otherwise behaves like the default, replacing the original.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Run `tar -czf access.log`",
+              "isCorrect": false,
+              "explanation": "`tar -czf` without further arguments is malformed; it would attempt to treat `access.log` as the archive file name but provide no source, and the output is a tar archive, not a pure gzip file."
+            },
+            {
+              "id": "c3",
+              "text": "Run `compress access.log`",
+              "isCorrect": false,
+              "explanation": "`compress` produces `access.log.Z`, not `.gz`, using the older LZW algorithm."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.6: Archive, compress, unpack, and uncompress files using tar, gzip, and bzip2."
+          ],
+          "services": [
+            "gzip"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/gzip.1.html",
+          "tip": "Focus on the tool whose default output extension is exactly `.gz`",
+          "explanation": "Both `gzip access.log` and `gzip -9 access.log` produce `access.log.gz` and remove the original.\n\n**Why it works:** `gzip`'s default operation is to create `<file>.gz`, delete `<file>`, and keep the original modification time; compression level does not change that.\n\n**Why the others don't work:**\n- `compress` yields `.Z` output.\n- `bzip2` yields `.bz2` output.\n- `tar -czf` creates a tar archive, not a raw gzip file, and the shown invocation is malformed.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0047",
+          "type": "multiple-choice",
+          "question": "The security team distributes signed internal RPMs from https://repo.example.com/internal/ and provides a GPG public key at https://repo.example.com/RPM-GPG-KEY-internal. The administrator must configure RHEL 10 to use this repository while enforcing signature verification.\n\nWhich TWO actions are required? (Select TWO)",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Disable `gpgcheck` in `/etc/dnf/dnf.conf` during the first install so DNF can proceed without blocking on the unfamiliar key.",
+              "isCorrect": false,
+              "explanation": "Disabling `gpgcheck` removes the very protection the team requires."
+            },
+            {
+              "id": "c3",
+              "text": "Run `rpm --reset-keys` before installing any package so stale signing data cannot interfere with the new repository.",
+              "isCorrect": false,
+              "explanation": "`rpm --reset-keys` is not a valid option; it is a fabricated command."
+            },
+            {
+              "id": "c2",
+              "text": "Add `gpgkey=https://repo.example.com/RPM-GPG-KEY-internal` to the repository definition so DNF imports and verifies against the published key.",
+              "isCorrect": true,
+              "explanation": "`gpgkey=` tells DNF where to fetch the signing key used to verify packages.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Create `/etc/yum.repos.d/internal.repo` with `baseurl=https://repo.example.com/internal/`, `enabled=1`, and `gpgcheck=1`",
+              "isCorrect": true,
+              "explanation": "Defining the repository file with gpgcheck enabled registers the source and enforces signature checking.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Run `apt-key add` with the downloaded key file so DNF trusts the signatures on future transactions.",
+              "isCorrect": false,
+              "explanation": "`apt-key` is a Debian/Ubuntu utility and has no effect on RHEL."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.1: Configure access to RPM repositories."
+          ],
+          "services": [
+            "DNF"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_software_with_the_dnf_tool",
+          "tip": "A trusted repository needs both its source URL and a reference to its signing key.",
+          "explanation": "A signed DNF repository requires a `.repo` file and a matching GPG key reference.\n\n**Why it works:** With `gpgcheck=1` and a `gpgkey=` URL, DNF verifies every RPM against the published key before installation.\n\n**Why the others don't work:**\n- `rpm --reset-keys`: not a real option.\n- Disabling `gpgcheck`: weakens security and contradicts the requirement.\n- `apt-key add`: belongs to Debian-based systems.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0038",
+          "type": "single-choice",
+          "question": "A newly created shell script `/srv/automation/run.sh` must end up with permissions `rwx` for the owner, `r-x` for the group, and `r-x` for everyone else. The administrator wants to apply those exact permissions in a single numeric `chmod` call.\n\nWhich numeric `chmod` invocation sets exactly those permissions?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run `chmod 755 /srv/automation/run.sh`",
+              "isCorrect": true,
+              "explanation": "`7` is `rwx`, `5` is `r-x`; the mode `755` matches the requirement exactly.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `chmod 0755 --symbolic /srv/automation/run.sh`",
+              "isCorrect": false,
+              "explanation": "`--symbolic` is not a valid `chmod` option; `chmod` accepts numeric or symbolic modes directly."
+            },
+            {
+              "id": "c2",
+              "text": "Run `chmod 775 /srv/automation/run.sh`",
+              "isCorrect": false,
+              "explanation": "`775` grants group write, which the requirement excludes."
+            },
+            {
+              "id": "c3",
+              "text": "Run `chmod 644 /srv/automation/run.sh`",
+              "isCorrect": false,
+              "explanation": "`644` provides no execute for any class, so the script cannot be run directly."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.10: List, set, and change standard ugo/rwx permissions."
+          ],
+          "services": [
+            "chmod"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Translate each octal digit to its `rwx` equivalent before committing to a mode.",
+          "explanation": "`chmod 755` matches the required `rwxr-xr-x` layout.\n\n**Why it works:** The three digits map to `rwx`, `r-x`, `r-x` for user, group, and others respectively.\n\n**Why the others don't work:**\n- `775` grants group write.\n- `644` removes execute everywhere.\n- `--symbolic` is not a valid option.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0035",
+          "type": "multiple-choice",
+          "question": "A junior administrator has been asked to explain the difference between hard links and symbolic links on RHEL 10. Their team wants two statements that are specifically and uniquely true of hard links, so they can be contrasted with symlinks in a runbook.\n\nWhich TWO statements about hard links are correct? (Select TWO)",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "A hard link cannot cross filesystem boundaries.",
+              "isCorrect": true,
+              "explanation": "Inode numbers are unique only within a filesystem, so a hard link must live on the same filesystem as its target.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "A hard link is shown with an `l` type character in the first column of `ls -l`",
+              "isCorrect": false,
+              "explanation": "That type character indicates a symbolic link, not a hard link."
+            },
+            {
+              "id": "c4",
+              "text": "A hard link becomes a broken reference when the target file is deleted.",
+              "isCorrect": false,
+              "explanation": "Breaking on target deletion is a symbolic-link behaviour."
+            },
+            {
+              "id": "c1",
+              "text": "A hard link and its target share the same inode number on disk.",
+              "isCorrect": true,
+              "explanation": "Hard links are simply additional directory entries pointing to the same inode.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "A hard link to a directory can be created freely by any user.",
+              "isCorrect": false,
+              "explanation": "Most RHEL filesystems forbid user-created hard links to directories."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.9: Create hard and soft links."
+          ],
+          "services": [
+            "ln"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Consider which properties are intrinsic to how hard links map onto inodes.",
+          "explanation": "Sharing an inode and being filesystem-local are the two defining properties of hard links.\n\n**Why it works:** A hard link is a second name for the same inode; because inode numbers are scoped to a filesystem, the link cannot cross filesystems.\n\n**Why the others don't work:**\n- Directory hard links are not allowed.\n- Breaking on target removal is symlink behaviour.\n- The `l` type marks symlinks in `ls -l`",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0009",
+          "type": "single-choice",
+          "question": "An engineer is troubleshooting an httpd service on RHEL 10 and needs to find every line containing `error`, `Error`, or `ERROR` in `/var/log/httpd/access_log` The match must be case-insensitive so every variant is returned.\n\nWhich command returns matching lines regardless of case?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `grep -v -c error /var/log/httpd/access_log`",
+              "isCorrect": false,
+              "explanation": "`-v` inverts the match and `-c` prints only a count; neither affects case sensitivity."
+            },
+            {
+              "id": "c2",
+              "text": "Run `grep --case=off error /var/log/httpd/access_log`",
+              "isCorrect": false,
+              "explanation": "`--case=off` is not a recognised `grep` option."
+            },
+            {
+              "id": "c3",
+              "text": "Run `grep -I error /var/log/httpd/access_log`",
+              "isCorrect": false,
+              "explanation": "Uppercase `-I` tells `grep` to skip binary files; it has no effect on case sensitivity."
+            },
+            {
+              "id": "c1",
+              "text": "Run `grep -i error /var/log/httpd/access_log`",
+              "isCorrect": true,
+              "explanation": "`-i` makes the pattern match case-insensitively.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.3: Use grep and regular expressions to analyze text."
+          ],
+          "services": [
+            "grep"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/grep.1.html",
+          "tip": "Recall the short option that toggles case-insensitive matching.",
+          "explanation": "`-i` is the case-insensitive flag.\n\n**Why it works:** With `-i`, `grep` lowercases both the pattern and each input line for comparison purposes.\n\n**Why the others don't work:**\n- `--case=off` does not exist.\n- `-I` controls binary-file handling.\n- `-v` and `-c` change what is reported, not how matching is performed.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0052",
+          "type": "ordering",
+          "question": "Arrange the steps an administrator follows to cleanly remove the `postfix` package and any orphaned dependencies it leaves behind.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run `dnf list installed postfix` to confirm the package is present before removal.",
+              "isCorrect": true,
+              "explanation": "Verifying installation prevents operator errors on the wrong host.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `dnf remove postfix` to uninstall the package and its unique dependencies.",
+              "isCorrect": true,
+              "explanation": "`dnf remove` is the standard removal command.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Run `dnf autoremove` to clear any dependencies no longer required by remaining packages.",
+              "isCorrect": true,
+              "explanation": "`autoremove` cleans up leaf dependencies.",
+              "sequence": 3
+            },
+            {
+              "id": "c4",
+              "text": "Run `dnf history` to confirm the removal transaction was recorded correctly.",
+              "isCorrect": true,
+              "explanation": "Reviewing history provides an audit trail.",
+              "sequence": 4
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Manage software",
+          "skills": [
+            "2.1.2: Install and remove RPM software packages."
+          ],
+          "services": [
+            "DNF"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_software_with_the_dnf_tool",
+          "tip": "Verify, remove, clean up, then confirm.",
+          "explanation": "Cleanly removing a package involves confirmation, removal, cleanup of orphans, and verification of the audit record.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0058",
+          "type": "single-choice",
+          "question": "A user reports that the Inkscape Flatpak is no longer needed on their workstation. The administrator wants to remove the application and reclaim any runtime components that are not required by other installed Flatpaks.\n\nWhich command removes the application and uninstalls orphaned runtimes afterwards?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Run `flatpak remove org.inkscape.Inkscape --purge` to delete the application and every related runtime.",
+              "isCorrect": false,
+              "explanation": "`flatpak remove` is not a real subcommand; `uninstall` is used, and `--purge` is not a flag."
+            },
+            {
+              "id": "c1",
+              "text": "Run `flatpak uninstall org.inkscape.Inkscape` followed by `flatpak uninstall --unused` to remove leftover runtimes.",
+              "isCorrect": true,
+              "explanation": "`--unused` removes runtimes that are no longer referenced by any installed application.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run `flatpak uninstall --all` to remove every application and runtime regardless of use.",
+              "isCorrect": false,
+              "explanation": "`--all` removes everything, which exceeds the requested scope."
+            },
+            {
+              "id": "c3",
+              "text": "Run `flatpak uninstall org.inkscape.Inkscape --autoremove` so dependencies are cleaned up automatically.",
+              "isCorrect": false,
+              "explanation": "`--autoremove` is not a recognised flag for `flatpak uninstall`"
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.4: Install and remove Flatpak software packages."
+          ],
+          "services": [
+            "Flatpak"
+          ],
+          "docs": "https://docs.flatpak.org/en/latest/using-flatpak.html",
+          "tip": "Separate the removal of the application from the cleanup of unused runtimes.",
+          "explanation": "Flatpak handles application removal and unused-runtime cleanup with distinct invocations.\n\n**Why it works:** Uninstalling the app removes the application, then `flatpak uninstall --unused` cleans up orphan runtimes.\n\n**Why the others don't work:**\n- `flatpak remove --purge`: subcommand and flag are both invented.\n- `--autoremove`: not a valid flag.\n- `--all`: too broad, removing everything.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0048",
+          "type": "matching",
+          "question": "Match each DNF command to the repository-management task it performs.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Show every configured repository along with its enabled or disabled state.",
+              "isCorrect": false,
+              "explanation": "`repolist --all` prints every known repository."
+            },
+            {
+              "id": "c2",
+              "text": "Persistently disable a named repository by rewriting its .repo file.",
+              "isCorrect": false,
+              "explanation": "`--set-disabled` flips the enabled flag to `0`"
+            },
+            {
+              "id": "c4",
+              "text": "Remove cached metadata and packages so the next transaction refreshes everything.",
+              "isCorrect": false,
+              "explanation": "`clean all` clears DNF caches."
+            },
+            {
+              "id": "c3",
+              "text": "Generate a new .repo file under /etc/yum.repos.d/ pointing at the given URL.",
+              "isCorrect": false,
+              "explanation": "`--add-repo` creates the definition from a base URL."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "`dnf repolist --all`",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s4",
+              "label": "`dnf clean all`",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s3",
+              "label": "`dnf config-manager --add-repo https://example.com/repo/`",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "`dnf config-manager --set-disabled epel`",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Manage software",
+          "skills": [
+            "2.1.1: Configure access to RPM repositories."
+          ],
+          "services": [
+            "DNF"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_software_with_the_dnf_tool",
+          "tip": "Think about whether the command inspects, modifies, or purges repository state.",
+          "explanation": "Each command addresses a distinct aspect of repository lifecycle: listing, disabling, adding, and refreshing.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0032",
+          "type": "ordering",
+          "question": "An administrator is migrating the contents of `/srv/legacy` to `/srv/current` on the same filesystem. To avoid data loss, they want to copy first, verify that both trees are identical, and only then delete the originals.\n\nArrange the following steps in the correct order.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run `cp -a /srv/legacy/. /srv/current/` to copy the contents and preserve all attributes.",
+              "isCorrect": true,
+              "explanation": "The copy must exist before it can be verified.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `diff -r /srv/legacy /srv/current` to confirm that both trees are identical.",
+              "isCorrect": true,
+              "explanation": "Verification is only meaningful once both locations hold data.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Run `rm -rf /srv/legacy` to remove the original directory and its contents.",
+              "isCorrect": true,
+              "explanation": "Deletion comes last, after verified success, so data is not lost on mismatch.",
+              "sequence": 3
+            }
+          ],
+          "selectCount": 3,
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.8: Create, delete, copy, and move files and directories."
+          ],
+          "services": [
+            "cp",
+            "diff",
+            "rm"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Consider which step creates the data, which proves equivalence, and which destroys the original.",
+          "explanation": "Copy, verify, then delete is the safe ordering that ensures data exists at the destination before the source is destroyed.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0040",
+          "type": "matching",
+          "question": "Match each octal digit in a `chmod` mode to the `rwx` permission string it represents.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "rw-",
+              "isCorrect": false,
+              "explanation": "Read (4) + write (2) sums to 6."
+            },
+            {
+              "id": "c4",
+              "text": "r--",
+              "isCorrect": false,
+              "explanation": "Read (4) only."
+            },
+            {
+              "id": "c2",
+              "text": "r-x",
+              "isCorrect": false,
+              "explanation": "Read (4) + execute (1) sums to 5."
+            },
+            {
+              "id": "c1",
+              "text": "rwx",
+              "isCorrect": false,
+              "explanation": "Read (4) + write (2) + execute (1) sums to 7."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s4",
+              "label": "`4`",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s3",
+              "label": "`6`",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "`5`",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s1",
+              "label": "`7`",
+              "correctChoiceId": "c1"
+            }
+          ],
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.10: List, set, and change standard ugo/rwx permissions."
+          ],
+          "services": [
+            "chmod"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/managing_file_systems",
+          "tip": "Remember that read is worth 4, write 2, and execute 1, and sum them to compute each digit.",
+          "explanation": "Each digit is the sum of the bit values: read 4, write 2, execute 1.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0044",
+          "type": "matching",
+          "question": "Match each documentation facility on RHEL 10 to the resource it primarily provides.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Displays the reference manual page for a command, system call, or file format.",
+              "isCorrect": false,
+              "explanation": "`man` is the traditional page viewer."
+            },
+            {
+              "id": "c3",
+              "text": "Searches the short descriptions of installed man pages for a keyword.",
+              "isCorrect": false,
+              "explanation": "`apropos` is the keyword search tool."
+            },
+            {
+              "id": "c4",
+              "text": "Directory containing package-specific documentation such as README files, changelogs, and examples.",
+              "isCorrect": false,
+              "explanation": "`/usr/share/doc` is populated by installed packages with their ancillary documentation."
+            },
+            {
+              "id": "c2",
+              "text": "Navigates hyperlinked GNU texinfo documentation, often more detailed than the man page.",
+              "isCorrect": false,
+              "explanation": "`info` displays texinfo nodes."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "`info`",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s3",
+              "label": "`apropos`",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "`man`",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s4",
+              "label": "`/usr/share/doc`",
+              "correctChoiceId": "c4"
+            }
+          ],
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.11: Locate, read, and use system documentation including man, info, and files in /usr/share/doc."
+          ],
+          "services": [
+            "man",
+            "info",
+            "apropos"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/man.1.html",
+          "tip": "Distinguish the interactive viewers from the search tool and the on-disk documentation directory.",
+          "explanation": "Each facility serves a different documentation role: structured manual pages, hyperlinked texinfo, keyword search, and package-specific files on disk.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0020",
+          "type": "ordering",
+          "question": "An administrator logged in as `ops` needs to temporarily become the `database` service account to verify file ownership, confirm the shell is running as the new account, and then return to their original session.\n\nArrange the following actions in the correct order.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run `su - database` and supply the `database` account password.",
+              "isCorrect": true,
+              "explanation": "The user must switch to the service account before doing anything as that user.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `id` to verify that the shell is now running as `database`",
+              "isCorrect": true,
+              "explanation": "Verification is only meaningful once the switch has taken effect.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Run `exit` to terminate the subshell and return to the original `ops` session.",
+              "isCorrect": true,
+              "explanation": "Leaving the subshell is the final step that restores the original context.",
+              "sequence": 3
+            }
+          ],
+          "selectCount": 3,
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.5: Log in and switch users in multiuser targets."
+          ],
+          "services": [
+            "su",
+            "id"
+          ],
+          "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/configuring_authentication_and_authorization_in_rhel",
+          "tip": "Consider which action must precede verification, and which must come last to restore the original session.",
+          "explanation": "The administrator must switch first, verify the switch, and then terminate the subshell to return.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0041",
+          "type": "single-choice",
+          "question": "An administrator remembers that there is a command to display the system's uptime but cannot recall its name. They want to search the short descriptions of all installed man pages for the keyword `uptime` to find the command.\n\nWhich command searches the short descriptions of installed man pages for the keyword?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run `info --keyword uptime`",
+              "isCorrect": false,
+              "explanation": "`info` has no `--keyword` option; it reads texinfo documents rather than searching man summaries."
+            },
+            {
+              "id": "c3",
+              "text": "Run `man -f uptime`",
+              "isCorrect": false,
+              "explanation": "`man -f` is `whatis`, which requires an exact command name, not a keyword search."
+            },
+            {
+              "id": "c2",
+              "text": "Run `man --search uptime`",
+              "isCorrect": false,
+              "explanation": "`man` does not have a `--search` option; keyword search is handled by `apropos` or `man -k`"
+            },
+            {
+              "id": "c1",
+              "text": "Run `apropos uptime`",
+              "isCorrect": true,
+              "explanation": "`apropos` matches a keyword against the one-line summaries in the man page index.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Understand and use essential tools",
+          "skills": [
+            "1.1.11: Locate, read, and use system documentation including man, info, and files in /usr/share/doc."
+          ],
+          "services": [
+            "man",
+            "apropos"
+          ],
+          "docs": "https://man7.org/linux/man-pages/man1/apropos.1.html",
+          "tip": "Recall which utility is explicitly designed for keyword searches against short descriptions.",
+          "explanation": "`apropos uptime` searches the man page database by keyword.\n\n**Why it works:** `apropos` performs a substring match against every installed man page's short description and prints each hit.\n\n**Why the others don't work:**\n- `man --search` is not a valid invocation.\n- `man -f` is whatis mode and requires an exact name.\n- `info --keyword` is not defined.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-18"
+        },
+        {
+          "id": "EX200-0059",
+          "type": "multiple-choice",
+          "question": "A user wants to install the Blender Flatpak for their account only on a shared workstation, rather than system-wide, and confirm which installed Flatpaks are under the user scope afterwards.\n\nWhich TWO commands accomplish this? (Select TWO)",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run `flatpak install --local flathub org.blender.Blender` so the installation is restricted to the current user.",
+              "isCorrect": false,
+              "explanation": "`--local` is not a valid flag for `flatpak install`"
+            },
+            {
+              "id": "c1",
+              "text": "Run `flatpak install --user flathub org.blender.Blender` to install Blender in the user scope.",
+              "isCorrect": true,
+              "explanation": "`--user` installs into the user's home directory rather than system-wide.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Run `flatpak list --user` to show every application and runtime installed under the user scope.",
+              "isCorrect": true,
+              "explanation": "`list --user` filters output to user-scope installations.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Run `sudo flatpak install flathub org.blender.Blender` to give the user permission to run it.",
+              "isCorrect": false,
+              "explanation": "Using `sudo` installs system-wide, which contradicts the user-scope requirement."
+            },
+            {
+              "id": "c5",
+              "text": "Run `flatpak list --scope=user` to list packages installed specifically for the user.",
+              "isCorrect": false,
+              "explanation": "`--scope=user` is not a recognised flag; the correct flag is `--user`"
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Manage software",
+          "skills": [
+            "2.1.4: Install and remove Flatpak software packages."
+          ],
+          "services": [
+            "Flatpak"
+          ],
+          "docs": "https://docs.flatpak.org/en/latest/using-flatpak.html",
+          "tip": "Consider the flag that distinguishes per-user installations from system-wide ones.",
+          "explanation": "Flatpak separates system-wide and per-user installations with the `--user` flag.\n\n**Why it works:** `flatpak install --user` targets the user's Flatpak directory, and `flatpak list --user` reports what is installed there.\n\n**Why the others don't work:**\n- `--local`: invented flag.\n- `sudo flatpak install`: installs system-wide.\n- `--scope=user`: invented flag.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-18"
+        }
+      ],
+      "currentIndex": 58,
+      "flags": [],
+      "timeLeft": null,
+      "timed": false,
+      "durationMinutes": 90,
+      "numQuestions": 65,
+      "examMode": "casual",
+      "revealAnswers": "immediately"
     }
   ]
 }

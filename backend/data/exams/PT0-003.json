@@ -1049,12 +1049,12 @@
         },
         {
           "id": "c2",
-          "text": "Sends crafted `TCP` and `UDP` probes to remote hosts to map open ports, identify running services, and fingerprint software versions",
+          "text": "Sends crafted TCP and UDP probes to remote hosts to map open ports, identify running services, and fingerprint software versions",
           "explanation": "Protocol scanning actively contacts target systems with crafted packets to enumerate listening services, classifying it as an active reconnaissance technique."
         },
         {
           "id": "c3",
-          "text": "Aggregates data from certificate transparency logs, `WHOIS` registries, and public code repositories without directing any traffic at client-owned infrastructure",
+          "text": "Aggregates data from certificate transparency logs, WHOIS registries, and public code repositories without directing any traffic at client-owned infrastructure",
           "explanation": "`OSINT` relies entirely on publicly available third-party data sources, generating no traffic toward the target and leaving no trace on client-owned systems."
         },
         {
@@ -1276,7 +1276,7 @@
       "choices": [
         {
           "id": "c1",
-          "text": "Requests all `DNS` records from an authoritative server in one `AXFR` query, exposing the full zone when misconfigured",
+          "text": "Requests all DNS records from an authoritative server in one AXFR query, exposing the full zone when misconfigured",
           "explanation": "A `zone transfer` (`AXFR`) retrieves all `DNS` records at once from a misconfigured authoritative name server, making it the most efficient single-request `DNS` enumeration technique."
         },
         {
@@ -1291,7 +1291,7 @@
         },
         {
           "id": "c4",
-          "text": "Combines `DNS brute-forcing` with attempted `zone transfers` to discover subdomains and map their associated IP addresses",
+          "text": "Combines DNS brute-forcing with attempted zone transfers to discover subdomains and map their associated IP addresses",
           "explanation": "`fierce` uses both dictionary-based `DNS brute-forcing` and opportunistic `zone transfer` attempts to enumerate subdomains and build a map of the target's external `DNS` footprint."
         }
       ],
@@ -1900,7 +1900,7 @@
         },
         {
           "id": "m2",
-          "text": "Reflected `XSS` allowing attacker-controlled script execution in the victim's browser context"
+          "text": "Reflected XSS allowing attacker-controlled script execution in the victim's browser context"
         },
         {
           "id": "m3",

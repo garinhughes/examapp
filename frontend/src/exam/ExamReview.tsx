@@ -207,7 +207,7 @@ export function ExamReview() {
                           const bg = isCorrectSlot ? 'bg-green-50 dark:bg-green-900/25 border-green-400/50' : 'bg-red-50 dark:bg-red-900/25 border-red-400/50'
                           return (
                             <div key={slot.id} className={`px-3 py-2 rounded-lg border text-sm ${bg}`}>
-                              <div className="font-medium">{si + 1}. {slot.label}</div>
+                              <div className="font-medium">{si + 1}. <MarkdownText text={slot.label} /></div>
                               <div className="mt-1">Your answer: <strong>{choiceMap.get(userChoice)?.text ?? '-'}</strong></div>
                               {!isCorrectSlot && <div className="mt-0.5 text-green-600 dark:text-green-400 text-xs">Correct: {choiceMap.get(slot.correctChoiceId)?.text}</div>}
                             </div>

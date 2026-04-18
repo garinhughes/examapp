@@ -1830,22 +1830,22 @@
       "choices": [
         {
           "id": "c1",
-          "text": "`rwx`",
+          "text": "rwx",
           "explanation": "Read (4) + write (2) + execute (1) sums to 7."
         },
         {
           "id": "c2",
-          "text": "`r-x`",
+          "text": "r-x",
           "explanation": "Read (4) + execute (1) sums to 5."
         },
         {
           "id": "c3",
-          "text": "`rw-`",
+          "text": "rw-",
           "explanation": "Read (4) + write (2) sums to 6."
         },
         {
           "id": "c4",
-          "text": "`r--`",
+          "text": "r--",
           "explanation": "Read (4) only."
         }
       ],
@@ -2221,12 +2221,12 @@
         },
         {
           "id": "c2",
-          "text": "Persistently disable a named repository by rewriting its `.repo` file.",
+          "text": "Persistently disable a named repository by rewriting its .repo file.",
           "explanation": "`--set-disabled` flips the enabled flag to `0`"
         },
         {
           "id": "c3",
-          "text": "Generate a new `.repo` file under `/etc/yum.repos.d/` pointing at the given URL.",
+          "text": "Generate a new .repo file under /etc/yum.repos.d/ pointing at the given URL.",
           "explanation": "`--add-repo` creates the definition from a base URL."
         },
         {
@@ -2580,7 +2580,7 @@
       "choices": [
         {
           "id": "c1",
-          "text": "Register a new remote from a URL or `.flatpakrepo` descriptor.",
+          "text": "Register a new remote from a URL or .flatpakrepo descriptor.",
           "explanation": "`remote-add` creates new remotes."
         },
         {
@@ -4269,7 +4269,7 @@
         },
         {
           "id": "c4",
-          "text": "Suspend the process without terminating it, until a `SIGCONT` is received.",
+          "text": "Suspend the process without terminating it, until a SIGCONT is received.",
           "explanation": "Uncatchable stop."
         }
       ],
@@ -5206,7 +5206,7 @@
         },
         {
           "id": "c4",
-          "text": "Strongly disable the unit by linking it to `/dev/null` so it cannot be activated.",
+          "text": "Strongly disable the unit by linking it to /dev/null so it cannot be activated.",
           "explanation": "Prevents any activation path."
         }
       ],
@@ -7057,7 +7057,7 @@
         },
         {
           "id": "c2",
-          "text": "Drop-in directory whose `.autofs` files extend the master map.",
+          "text": "Drop-in directory whose .autofs files extend the master map.",
           "explanation": "Maps to `/etc/auto.master.d/`"
         },
         {
@@ -7823,7 +7823,7 @@
         },
         {
           "id": "c4",
-          "text": "Symlinks the unit to `/dev/null`, preventing any activation attempt from succeeding.",
+          "text": "Symlinks the unit to /dev/null, preventing any activation attempt from succeeding.",
           "explanation": "`mask` forbids activation."
         }
       ],
@@ -8205,7 +8205,7 @@
         },
         {
           "id": "c4",
-          "text": "Enumerates the valid time zone identifiers that can be passed to `set-timezone`",
+          "text": "Enumerates the valid time zone identifiers that can be passed to set-timezone",
           "explanation": "Lists zones from the tzdata database."
         }
       ],
@@ -9137,12 +9137,12 @@
         },
         {
           "id": "c3",
-          "text": "Unit has no `[Install]` section and cannot be enabled, only pulled in by dependencies.",
+          "text": "Unit has no [Install] section and cannot be enabled, only pulled in by dependencies.",
           "explanation": "Typical of helper or generator units."
         },
         {
           "id": "c4",
-          "text": "Unit is symlinked to `/dev/null`, preventing activation by any means.",
+          "text": "Unit is symlinked to /dev/null, preventing activation by any means.",
           "explanation": "Masking forbids activation."
         }
       ],

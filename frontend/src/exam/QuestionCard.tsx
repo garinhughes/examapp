@@ -159,7 +159,7 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
                           <div className="font-medium text-sm mb-2 flex items-center gap-1.5">
                             {isCorrectMapping && <Check className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0" />}
                             {isIncorrectMapping && <X className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />}
-                            {si + 1}. {slot.label}
+                            <span>{si + 1}. <MarkdownText text={slot.label} /></span>
                           </div>
                           <select
                             value={selectedChoice ?? ''}
