@@ -196,6 +196,7 @@ export interface ExamContextType {
   handleSubmitExam: (earlyComplete?: boolean) => Promise<void>
   resumeExam: (examCode?: string) => Promise<void>
   serverInProgress: Array<{ attemptId: string; examCode: string; answeredCount: number; total: number; updatedAt: string | null }>
+  setServerInProgress: React.Dispatch<React.SetStateAction<Array<{ attemptId: string; examCode: string; answeredCount: number; total: number; updatedAt: string | null }>>>
   saveExamProgress: () => void
   downloadAttemptCSV: () => void
   downloadAttemptPDF: () => void
@@ -1364,7 +1365,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     takeDomains, setTakeDomains, domainOpen, setDomainOpen, domainRef, domainToggleRef, examStarted, setExamStarted, timed, setTimed, durationMinutes, setDurationMinutes, examMode, setExamMode, revealAnswers, setRevealAnswers, ttsEnabled, setTtsEnabled, revealedQuestions, setRevealedQuestions, stagedAnswer, setStagedAnswer, weakestLinkInfo, setWeakestLinkInfo, loadingWeakestLink, timeLeft, setTimeLeft, numQuestions, setNumQuestions, visitedQuestions, setVisitedQuestions,
     serviceFilterText, setServiceFilterText, homeExamFilter, setHomeExamFilter, selectedServices, setSelectedServices, availableServices, serviceDropOpen, setServiceDropOpen, serviceSearchText, setServiceSearchText, serviceDropRef, serviceDropToggleRef,
     scoreHistory, loadingScoreHistory, analyticsAttempts, analyticsDomains, deletingAttemptId, setDeletingAttemptId,
-    filteredByDomain, availableFilteredCount, displayQuestions, savedProgress, anySavedExam, serverInProgress,
+    filteredByDomain, availableFilteredCount, displayQuestions, savedProgress, anySavedExam, serverInProgress, setServerInProgress,
     setupExamFromMeta, fetchScoreHistory, createAttempt, submitAnswer, submitMatchingAnswer, submitOrderingAnswer, finishAttempt, handleSubmitExam, resumeExam, saveExamProgress,
     downloadAttemptCSV, downloadAttemptPDF, downloadAnalyticsCSV,
   }

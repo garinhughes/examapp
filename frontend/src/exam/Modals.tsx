@@ -18,6 +18,7 @@ export function Modals({ onReviewAnswers }: { onReviewAnswers?: () => void }) {
     setSelectedAnswers, setMultiSelectPending,
     setFlaggedQuestions, setCurrentQuestionIndex,
     setTimeLeft, setServiceFilterText, setSelectedServices,
+    setServerInProgress,
   } = useExam()
 
   useEffect(() => {
@@ -76,6 +77,7 @@ export function Modals({ onReviewAnswers }: { onReviewAnswers?: () => void }) {
                 const codeToRemove = anySavedExam?.code ?? selected
                 try { if (codeToRemove) localStorage.removeItem(`attempt:${codeToRemove}`) } catch {}
                 try { if (codeToRemove) localStorage.removeItem(`examProgress:${codeToRemove}`) } catch {}
+                setServerInProgress(prev => prev.filter(s => s.attemptId !== attemptId && s.examCode !== codeToRemove))
                 setSavedExamVersion(v => v + 1)
                 setAttemptId(null)
                 setAttemptData(null)
