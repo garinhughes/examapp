@@ -117,4 +117,18 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     return { scores, attempts, domains }
   })
+
+  // Return attempt counts grouped by exam code for the current user
+  server.get('/summary', { preHandler: [server.authenticate], config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
+    const userAttempts = await attemptsStore.listByUser(userId)
+    const counts: Record<string, number> = {}
+    for (const a of userAttempts || []) {
+      const code = String(a.examCode || '').toUpperCase()
+      if (!code) continue
+      counts[code] = (counts[code] ?? 0) + 1
+    }
+    return { counts }
+  })
 }

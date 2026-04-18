@@ -11,7 +11,7 @@ import {
   X,
   CreditCard,
   User,
-  Activity,
+  TrendingUp,
   BarChart2,
   Network,
   Terminal,
@@ -30,14 +30,14 @@ import type { AuthUser } from "@/auth/AuthContext";
 const navItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/", key: 'home' },
   { icon: BookOpen, label: "Exams", href: "/exams", key: 'practice' },
-  { icon: Activity, label: "Analytics", href: "/analytics", key: 'analytics' },
-  { icon: BarChart2, label: "Metrics", href: "/metrics", key: 'metrics' },
-  { icon: Network, label: "Diagrams", href: "/diagrams", key: 'diagrams' },
+  { icon: TrendingUp, label: "Analytics", href: "/analytics", key: 'analytics' },
   { icon: Terminal, label: "Skill Labs", href: "/skill-labs", key: 'skill-labs' },
   { icon: MessageSquare, label: "Feedback", href: "/feedback", key: 'feedback' },
-  { icon: User, label: "Account", href: "/account", key: 'account' },
   { icon: CreditCard, label: "Pricing", href: "/pricing", key: 'pricing' },
   { icon: ShoppingCart, label: "Basket", href: "/basket", key: 'basket' },
+  { icon: User, label: "Account", href: "/account", key: 'account' },
+  { icon: Network, label: "Diagrams", href: "/diagrams", key: 'diagrams' },
+  { icon: BarChart2, label: "Metrics", href: "/metrics", key: 'metrics' },
   { icon: Settings, label: "Admin", href: "/admin", key: 'admin' },
 ];
 
@@ -202,7 +202,7 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
       {/* Mobile drawer — always full w-64, slides in/out */}
       <aside
         className={cn(
-          "md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border flex flex-col text-sidebar-foreground transition-transform duration-300",
+          "md:hidden fixed inset-y-0 left-0 z-50 w-52 bg-sidebar border-r border-sidebar-border flex flex-col text-sidebar-foreground transition-transform duration-300",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -219,9 +219,9 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
         {/* Animated-width wrapper clips content during transition */}
         <div className={cn(
           "h-full transition-[width] duration-300 ease-in-out overflow-hidden",
-          collapsed ? "w-14" : "w-64"
+          collapsed ? "w-14" : "w-52"
         )}>
-          <aside className="h-full w-64 bg-sidebar border-r border-sidebar-border flex flex-col text-sidebar-foreground">
+          <aside className="h-full w-52 bg-sidebar border-r border-sidebar-border flex flex-col text-sidebar-foreground">
             {sidebarContent(false)}
           </aside>
         </div>

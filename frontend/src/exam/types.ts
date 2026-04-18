@@ -9,6 +9,7 @@ export type Exam = {
   defaultQuestions?: number
   defaultQuestionCount?: number
   defaultDuration?: number
+  questionCount?: number
   questions?: unknown[]
   level?: string
   predecessorCode?: string

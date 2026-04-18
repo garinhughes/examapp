@@ -36,6 +36,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       passMark: typeof e.passMark === 'number' ? e.passMark : 70,
       defaultQuestions: e.defaultQuestions,
       defaultDuration: e.defaultDuration,
+      questionCount: Array.isArray(e.questions) ? e.questions.length : 0,
       // include level where present so frontend can render badges
       level: e.level,
       predecessorCode: e.predecessorCode ?? undefined,

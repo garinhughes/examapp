@@ -17,15 +17,9 @@ export const TOUR_STEPS: TourStep[] = [
     placement: 'bottom',
   },
   {
-    target: 'analytics-btn',
-    title: 'Track Your Progress',
-    body: 'See per-domain analytics and your score history for each exam.',
-    placement: 'bottom',
-  },
-  {
     target: 'setup-exam-btn',
     title: "Let's Try It",
-    body: 'Click "Setup Exam" on any exam to continue the tour.',
+    body: 'Click any exam card to continue the tour.',
     placement: 'bottom',
     waitForNav: true,
   },

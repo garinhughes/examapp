@@ -1,12 +1,12 @@
 import { useExam } from './ExamContext'
-import { Info, Activity, ChevronDown, ChevronRight, Search } from 'lucide-react'
+import { Info, ChevronDown, ChevronRight, Search, BookOpen, SlidersHorizontal, ListOrdered, TrendingUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTourContext } from '@/components/TourProvider'
 
 export function PracticeExams() {
   const {
     providers, examStarted, anySavedExam, selected, savedProgress,
-    setupExamFromMeta, setSelected, setRoute,
+    setupExamFromMeta,
     user, authLoading,
   } = useExam()
   const tour = useTourContext()
@@ -26,15 +26,37 @@ export function PracticeExams() {
     return providers.length > 0 && providers.every(p => collapsedProviders.has(p.provider))
   }
 
-  useEffect(() => {
-    if (!authLoading && !user && !tour.active && !tour.completed && providers.length > 0) {
-      tour.start()
-    }
-  }, [authLoading, user, providers.length])
+  // useEffect(() => {
+  //   if (!authLoading && !user && !tour.active && !tour.completed && providers.length > 0) {
+  //     tour.start()
+  //   }
+  // }, [authLoading, user, providers.length])
 
   return (
     <div className="mb-6">
       <div className="space-y-6">
+        <div className="flex items-start gap-0 mb-2 -mx-1">
+          {[
+            { icon: BookOpen,          label: 'Pick an exam',   desc: 'Choose a certification below' },
+            { icon: SlidersHorizontal, label: 'Configure',      desc: 'Set mode, domains & length'   },
+            { icon: ListOrdered,       label: 'Practice',       desc: 'Answer at your own pace'      },
+            { icon: TrendingUp,        label: 'Track progress', desc: 'Review scores in Analytics'   },
+          ].map(({ icon: Icon, label, desc }, i, arr) => (
+            <div key={label} className="flex items-center flex-1 min-w-0">
+              <div className="flex flex-col items-center flex-1 min-w-0 px-1">
+                <Icon className="w-6 h-6 text-primary flex-shrink-0" />
+                <span className="mt-1.5 text-sm font-semibold text-foreground text-center leading-tight">{label}</span>
+                <span className="text-xs text-muted-foreground text-center leading-tight mt-0.5 hidden sm:block">{desc}</span>
+              </div>
+              {i < arr.length - 1 && (
+                <div className="flex-shrink-0 flex flex-col items-center" style={{ marginTop: '-18px' }}>
+                  <div className="w-4 h-px bg-border" />
+                  <ChevronRight className="w-3.5 h-3.5 text-primary -mt-px" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
         <div className="relative mb-1">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
           <input
@@ -74,48 +96,49 @@ export function PracticeExams() {
               {p.provider}
             </button>
             {!collapsed && <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {filteredExams.map((ex: any, exIndex) => (
-                <div key={ex.code} className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm relative flex flex-col">
-                  <div className="flex-1">
-                    <div className="font-medium">{ex.title ?? ex.code}</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-muted-foreground">{ex.code}</span>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex items-center gap-2">
-                    <button
-                      ref={pIndex === 0 && exIndex === 0 ? (el) => tour.registerTarget('setup-exam-btn', el) : undefined}
-                      className={`h-7 px-2 rounded font-medium text-sm inline-flex items-center gap-2 transition-colors ${examStarted || anySavedExam || (selected && savedProgress) ? 'bg-muted/60 text-muted-foreground/60 border border-border cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'}`}
-                      disabled={!!(examStarted || anySavedExam || (selected && savedProgress))}
-                      title={examStarted || anySavedExam || (selected && savedProgress) ? 'Complete or cancel your current exam first' : 'Setup this exam'}
-                      onClick={() => { if (examStarted || anySavedExam || (selected && savedProgress)) return; setupExamFromMeta(ex) }}
-                    >
-                      Setup Exam
-                    </button>
-                    <button
-                      ref={pIndex === 0 && exIndex === 0 ? (el) => tour.registerTarget('analytics-btn', el) : undefined}
-                      onClick={(e) => { e.stopPropagation(); setSelected(ex.code); setRoute('analytics') }}
-                      title={`View analytics for ${ex.title ?? ex.code}`}
-                      className="h-7 w-7 rounded bg-secondary text-secondary-foreground hover:bg-secondary/80 text-sm inline-flex items-center justify-center"
-                      aria-label={`Analytics for ${ex.title ?? ex.code}`}
-                    >
-                      <Activity className="w-4 h-4" aria-hidden />
-                      <span className="sr-only">Analytics</span>
-                    </button>
-                  </div>
-                  {ex.logo && (
+              {filteredExams.map((ex: any, exIndex) => {
+                const cardDisabled = !!(examStarted || anySavedExam || (selected && savedProgress))
+                const handleCardActivate = () => { if (cardDisabled) return; setupExamFromMeta(ex) }
+                return (
+                <div
+                  key={ex.code}
+                  ref={pIndex === 0 && exIndex === 0 ? (el) => tour.registerTarget('setup-exam-btn', el) : undefined}
+                  role="button"
+                  tabIndex={cardDisabled ? -1 : 0}
+                  aria-disabled={cardDisabled}
+                  title={cardDisabled ? 'Complete or cancel your current exam first' : `Setup ${ex.title ?? ex.code}`}
+                  onClick={handleCardActivate}
+                  onKeyDown={(e) => { if (!cardDisabled && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); handleCardActivate() } }}
+                  className={`rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${cardDisabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:border-primary hover:bg-primary/5'}`}
+                >
+                  {ex.logo ? (
                     ex.logoHref ? (
-                      <a href={ex.logoHref} title="Amazon.com Inc., Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>, via Wikimedia Commons" target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-white rounded-full p-1 shadow-sm" aria-label={`${ex.provider ?? 'Provider'} logo link`}>
-                        <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
+                      <a href={ex.logoHref} title="Provider logo" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="h-14 bg-white dark:bg-gray-200 flex items-center justify-center px-4 border-b border-border" aria-label={`${ex.provider ?? 'Provider'} logo link`}>
+                        <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="max-h-8 max-w-full w-auto object-contain" />
                       </a>
                     ) : (
-                      <div className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-white rounded-full p-1 shadow-sm" aria-hidden>
-                        <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
+                      <div className="h-14 bg-white dark:bg-gray-200 flex items-center justify-center px-4 border-b border-border" aria-hidden>
+                        <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="max-h-8 max-w-full w-auto object-contain" />
                       </div>
                     )
+                  ) : (
+                    <div className="h-14 bg-muted/40 flex items-center justify-center border-b border-border text-muted-foreground text-xs font-medium" aria-hidden>
+                      {ex.provider ?? ''}
+                    </div>
                   )}
+                  <div className="p-4 flex-1 flex flex-col">
+                    <div className="font-medium leading-tight">{ex.title ?? ex.code}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{ex.code}</div>
+                    {typeof ex.questionCount === 'number' && ex.questionCount > 0 && (
+                      <div className="mt-auto pt-3">
+                        <span className="bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm">
+                          {ex.questionCount} questions
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              ))}
+              )})}
             </div>}
           </div>
           )

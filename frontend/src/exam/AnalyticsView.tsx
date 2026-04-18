@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react'
-import { Trash2, ChevronDown, ChevronRight, Search, ChevronLeft, Eye, CalendarDays } from 'lucide-react'
+import { useState, useCallback, useEffect } from 'react'
+import { Trash2, ChevronDown, ChevronRight, Search, ChevronLeft, Eye, CalendarDays, BookOpen, TrendingUp, BarChart2 } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
 import { ScoreHistoryChart } from './ScoreHistoryChart'
@@ -11,7 +11,7 @@ export function AnalyticsView() {
     gamState, fetchScoreHistory, setupExamFromMeta,
     setRoute, authFetch, setAttemptData, setSelected, questions, setQuestions,
     attemptId, setAttemptId, showToast, setExamStarted,
-    examStarted, anySavedExam, savedProgress,
+    examStarted, anySavedExam, savedProgress, user,
   } = useExam()
 
   const passMark = typeof selectedMeta?.passMark === 'number' ? selectedMeta.passMark : 70
@@ -19,9 +19,20 @@ export function AnalyticsView() {
   const [collapsedProviders, setCollapsedProviders] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState('')
   const [showScores, setShowScores] = useState(false)
+  const [attemptCounts, setAttemptCounts] = useState<Record<string, number>>({})
   const [scoresPage, setScoresPage] = useState(0)
   const [deleteTarget, setDeleteTarget] = useState<{ attemptId: string; label: string } | null>(null)
   const SCORES_PAGE_SIZE = 20
+
+  useEffect(() => {
+    if (!user) return
+    authFetch('/analytics/summary').then(async res => {
+      if (res.ok) {
+        const d = await res.json()
+        if (d.counts && typeof d.counts === 'object') setAttemptCounts(d.counts)
+      }
+    }).catch(() => {})
+  }, [user])
 
   function toggleProvider(name: string) {
     setCollapsedProviders(prev => {
@@ -75,6 +86,29 @@ export function AnalyticsView() {
 
   return (
     <div className="mb-6">
+      <div className="flex items-start gap-0 mb-4 -mx-1">
+        {[
+          { icon: BookOpen,   label: 'Pick an exam',  desc: 'Choose a certification below'  },
+          { icon: TrendingUp, label: 'Score history', desc: 'See pass/fail over time'        },
+          { icon: BarChart2,  label: 'Domains',       desc: 'Spot strengths & weak areas'   },
+          { icon: Eye,        label: 'Review',        desc: 'Replay any past attempt'        },
+        ].map(({ icon: Icon, label, desc }, i, arr) => (
+          <div key={label} className="flex items-center flex-1 min-w-0">
+            <div className="flex flex-col items-center flex-1 min-w-0 px-1">
+              <Icon className="w-6 h-6 text-primary flex-shrink-0" />
+              <span className="mt-1.5 text-sm font-semibold text-foreground text-center leading-tight">{label}</span>
+              <span className="text-xs text-muted-foreground text-center leading-tight mt-0.5 hidden sm:block">{desc}</span>
+            </div>
+            {i < arr.length - 1 && (
+              <div className="flex-shrink-0 flex flex-col items-center" style={{ marginTop: '-18px' }}>
+                <div className="w-4 h-px bg-border" />
+                <ChevronRight className="w-3.5 h-3.5 text-primary -mt-px" />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-sm text-muted-foreground flex items-center gap-2">
@@ -166,32 +200,46 @@ export function AnalyticsView() {
                 </button>
                 {!collapsed && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {filteredExams.map((ex: any) => (
+                    {filteredExams.map((ex: any) => {
+                      const attempts = attemptCounts[ex.code.toUpperCase()] ?? 0
+                      return (
                       <div
                         key={ex.code}
-                        className="relative p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm cursor-pointer hover:border-primary transition-colors"
-                        onClick={() => {
-                          setSelected(ex.code)
-                          void fetchScoreHistory(ex.code)
-                        }}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => { setSelected(ex.code); void fetchScoreHistory(ex.code) }}
+                        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(ex.code); void fetchScoreHistory(ex.code) } }}
+                        className="rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                       >
-                        <div className={ex.logo ? 'pr-10' : ''}>
-                          <div className="font-medium leading-snug">{ex.title ?? ex.code}</div>
-                          <div className="text-xs text-muted-foreground mt-1">{ex.code}</div>
-                        </div>
-                        {ex.logo && (
+                        {ex.logo ? (
                           ex.logoHref ? (
-                            <a href={ex.logoHref} title="Amazon.com Inc., Apache License 2.0 <http://www.apache.org/licenses/LICENSE-2.0>, via Wikimedia Commons" target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-white rounded-full p-1 shadow-sm" aria-label={`${ex.provider ?? 'Provider'} logo link`} onClick={e => e.stopPropagation()}>
-                              <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
+                            <a href={ex.logoHref} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="h-14 bg-white dark:bg-gray-200 flex items-center justify-center px-4 border-b border-border" aria-label={`${ex.provider ?? 'Provider'} logo link`}>
+                              <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="max-h-8 max-w-full w-auto object-contain" />
                             </a>
                           ) : (
-                            <div className="absolute bottom-2 right-2 inline-flex items-center justify-center bg-white rounded-full p-1 shadow-sm" aria-hidden>
-                              <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="h-6 w-auto" style={{ objectFit: 'contain' }} />
+                            <div className="h-14 bg-white dark:bg-gray-200 flex items-center justify-center px-4 border-b border-border" aria-hidden>
+                              <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="max-h-8 max-w-full w-auto object-contain" />
                             </div>
                           )
+                        ) : (
+                          <div className="h-14 bg-muted/40 flex items-center justify-center border-b border-border text-muted-foreground text-xs font-medium" aria-hidden>
+                            {ex.provider ?? ''}
+                          </div>
                         )}
+                        <div className="p-4 flex-1 flex flex-col">
+                          <div className="font-medium leading-tight">{ex.title ?? ex.code}</div>
+                          <div className="text-xs text-muted-foreground mt-1">{ex.code}</div>
+                          {attempts > 0 && (
+                            <div className="mt-auto pt-3">
+                              <span className="bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm">
+                                {attempts} attempt{attempts !== 1 ? 's' : ''}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </div>
