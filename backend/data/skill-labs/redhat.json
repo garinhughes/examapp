@@ -1,0 +1,214 @@
+[
+  {
+    "id": "rhel-apache-phased-pipeline",
+    "title": "Deploy Apache Web Server on RHEL 10",
+    "description": "Categorise and sequence the steps to deploy a secure Apache HTTP server on a fresh RHEL 10 instance, from subscription registration through SELinux hardening.",
+    "type": "phased-pipeline",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "Apache httpd", "firewalld", "SELinux", "dnf", "systemctl"],
+    "version": 2,
+    "scenario": "A fresh RHEL 10 server needs Apache deployed and secured. Drag each step into the correct deployment phase (Prepare, then Install, then Configure, then Harden) and arrange the steps in the right order within each phase.",
+    "phases": [
+      { "id": "prepare",   "label": "Prepare",   "color": "blue"   },
+      { "id": "install",   "label": "Install",   "color": "orange" },
+      { "id": "configure", "label": "Configure", "color": "green"  },
+      { "id": "harden",    "label": "Harden",    "color": "purple" }
+    ],
+    "steps": [
+      { "id": "s1",  "text": "Register the system with Red Hat Subscription Manager",     "command": "subscription-manager register",                                     "correctPhaseId": "prepare" },
+      { "id": "s2",  "text": "Patch the base OS before installing new packages",          "command": "dnf update -y",                                                     "correctPhaseId": "prepare",   "mustFollowIds": ["s1"] },
+      { "id": "s3",  "text": "Install the Apache HTTP server package (httpd)",            "command": "dnf install -y httpd",                                              "correctPhaseId": "install" },
+      { "id": "s4",  "text": "Install mod_ssl for TLS support",                           "command": "dnf install -y mod_ssl",                                            "correctPhaseId": "install",   "mustFollowIds": ["s3"] },
+      { "id": "s5",  "text": "Set the ServerName directive in httpd.conf",                "command": "vi /etc/httpd/conf/httpd.conf",                                     "correctPhaseId": "configure" },
+      { "id": "s6",  "text": "Create the document root index.html",                       "command": "echo 'Welcome' > /var/www/html/index.html",                         "correctPhaseId": "configure" },
+      { "id": "s7",  "text": "Enable and start the httpd service",                        "command": "systemctl enable --now httpd",                                      "correctPhaseId": "configure", "mustFollowIds": ["s5", "s6"] },
+      { "id": "s8",  "text": "Allow HTTP and HTTPS through firewalld (permanent)",        "command": "firewall-cmd --add-service=http --add-service=https --permanent",  "correctPhaseId": "harden" },
+      { "id": "s9",  "text": "Reload firewall rules",                                     "command": "firewall-cmd --reload",                                             "correctPhaseId": "harden",    "mustFollowIds": ["s8"] },
+      { "id": "s10", "text": "Restore correct SELinux file context on the web root",     "command": "restorecon -Rv /var/www/html",                                      "correctPhaseId": "harden" }
+    ],
+    "explanation": "Apache deployment on RHEL 10 follows four phases. Within a phase, some steps have real ordering dependencies and some do not.\n\n**1. Prepare** (get the host ready before installing anything)\n1. Register with `subscription-manager` so `dnf` can reach the correct repos\n2. Patch the base OS with `dnf update`\n\n**2. Install** (put packages on disk, do not configure them yet)\n1. Install `httpd`\n2. Install `mod_ssl` (the SSL module plugs into an already-installed `httpd`, so `httpd` must exist first)\n\n**3. Configure**\n- Set the `ServerName` directive in `/etc/httpd/conf/httpd.conf`\n- Create `/var/www/html/index.html`\n- *(either order above is fine)*\n- Run `systemctl enable --now httpd` last; the service must boot against a valid config and real content\n\n**4. Harden**\n- Open firewall ports with `firewall-cmd --add-service` (must come before reload)\n- Run `firewall-cmd --reload`; reload only applies rules already added\n- Run `restorecon -Rv /var/www/html`; independent of the firewall steps, but belongs in Harden rather than Configure because it enforces SELinux policy on files written during configuration",
+    "learningOutcomes": [
+      "Sequence RHEL system administration tasks across operational phases",
+      "Understand Apache deployment prerequisites and configuration order",
+      "Apply firewalld and SELinux hardening after service configuration"
+    ],
+    "realWorldValue": "Deploying web servers in the correct order prevents both security gaps and service failures. RHEL environments require subscription management, SELinux context management, and firewalld rules. Skipping or misordering any phase results in a non-functional or insecure server."
+  },
+  {
+    "id": "rhel-nfs-terminal-replay",
+    "title": "Configure NFS Server on RHEL 10",
+    "description": "Build the correct command sequence to configure an NFS server on RHEL 10. Exclude dangerous distractors and arrange the real commands in the right order, then watch them run.",
+    "type": "terminal-replay",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "NFS", "nfs-utils", "firewalld", "exportfs", "systemctl"],
+    "version": 2,
+    "scenario": "A RHEL 10 server must export /exports/data to the 192.168.1.0/24 subnet over NFS. Drag the correct commands into the queue in the right order. Three of the listed commands are distractors that should never be run in production.",
+    "prompt": "[root@rhel10 ~]#",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "dnf install -y nfs-utils",
+        "successOutput": "Installed:\n  nfs-utils-2.6.4-3.el10.x86_64",
+        "errorOutput": "nfs-utils must be installed first. All other steps depend on it."
+      },
+      {
+        "id": "c2",
+        "command": "mkdir -p /exports/data",
+        "successOutput": "",
+        "errorOutput": "Install nfs-utils first before creating the export directory.",
+        "mustFollowIds": ["c1"]
+      },
+      {
+        "id": "c3",
+        "command": "echo \"/exports/data 192.168.1.0/24(rw,sync,no_root_squash)\" >> /etc/exports",
+        "successOutput": "",
+        "errorOutput": "/etc/exports does not exist yet, or the export directory has not been created. Install nfs-utils and create the directory first.",
+        "mustFollowIds": ["c1", "c2"]
+      },
+      {
+        "id": "c4",
+        "command": "systemctl enable --now nfs-server",
+        "successOutput": "Created symlink /etc/systemd/system/multi-user.target.wants/nfs-server.service",
+        "errorOutput": "Cannot start nfs-server before the package is installed and /etc/exports is configured.",
+        "mustFollowIds": ["c3"]
+      },
+      {
+        "id": "c5",
+        "command": "exportfs -arv",
+        "successOutput": "exporting 192.168.1.0/24:/exports/data",
+        "errorOutput": "exportfs needs the NFS server running and /etc/exports configured. Enable nfs-server first.",
+        "mustFollowIds": ["c4"]
+      },
+      {
+        "id": "c6",
+        "command": "firewall-cmd --add-service={nfs,mountd,rpc-bind} --permanent",
+        "successOutput": "success\nsuccess\nsuccess",
+        "errorOutput": "FirewallD: --reload must be run after --add-service, not before."
+      },
+      {
+        "id": "c9",
+        "command": "firewall-cmd --reload",
+        "successOutput": "success",
+        "errorOutput": "firewall-cmd --reload must come after --add-service so there are rules to reload.",
+        "mustFollowIds": ["c6"]
+      },
+      {
+        "id": "c10",
+        "command": "showmount -e localhost",
+        "successOutput": "Export list for localhost:\n/exports/data  192.168.1.0/24",
+        "errorOutput": "RPC: Program not registered. The NFS server must be running and exports active before showmount can query them.",
+        "mustFollowIds": ["c5"]
+      },
+      {
+        "id": "d1",
+        "command": "setenforce 0",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Disabling SELinux enforcement violates production security policy. Use setsebool or restorecon to manage permissions instead.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "systemctl stop firewalld",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Stopping firewalld instead of adding service rules exposes the entire server to the network. Always add specific service rules.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "chmod 777 /exports/data",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: World-writable export permissions are a serious security risk. Use specific UIDs, GIDs, or ACLs to control access.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "The NFS setup has two independent chains that can interleave, as long as internal order within each chain is respected.\n\n**NFS chain** (strict order):\n1. `dnf install -y nfs-utils` (everything else depends on this package)\n2. `mkdir -p /exports/data` (create the export directory before referencing it in `/etc/exports`)\n3. `echo ... >> /etc/exports` (configure the export after the directory exists)\n4. `systemctl enable --now nfs-server` (start the server after `/etc/exports` is configured)\n5. `exportfs -arv` (re-read `/etc/exports` after the server is running)\n6. `showmount -e localhost` (verify last, once the server is active and exports are live)\n\n**Firewall chain** (can run at any point, as long as `--reload` follows `--add-service`):\n1. `firewall-cmd --add-service={nfs,mountd,rpc-bind} --permanent`\n2. `firewall-cmd --reload`\n\n**Distractors to avoid:**\n- `setenforce 0`: disabling `SELinux` enforcement violates production security policy; use `setsebool` or `restorecon` instead\n- `systemctl stop firewalld`: exposes the server to the network; add specific service rules instead\n- `chmod 777 /exports/data`: world-writable exports are a serious security risk; use UIDs, GIDs, or ACLs",
+    "learningOutcomes": [
+      "Configure a complete NFS server stack on RHEL 10 in the correct order",
+      "Identify and exclude dangerous sysadmin antipatterns from a command sequence",
+      "Understand which firewalld services are required for NFS (nfs, mountd, rpc-bind)"
+    ],
+    "realWorldValue": "NFS is a core component of RHEL infrastructure for shared storage. Getting the configuration order wrong, or including dangerous shortcuts, leads to inaccessible shares, SELinux AVC denials, or network-exposed data. This lab mirrors the exact workflow you would follow when setting up NFS on a production Red Hat system."
+  },
+  {
+    "id": "rhel-nginx-command-terminal",
+    "title": "Install and run nginx on RHEL 10",
+    "description": "Type each command into the terminal to install nginx, enable it on boot, and inspect its logs. Flags can appear in any order. Use --help when you get stuck.",
+    "type": "command-terminal",
+    "difficulty": "beginner",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "dnf", "systemctl", "journalctl", "nginx"],
+    "version": 1,
+    "scenario": "A fresh RHEL 10 host needs `nginx` installed, started, set to launch on boot, and verified through the journal. Complete the three commands in order. Each command accepts its flags in any order, and `<command> --help` lists options including distractors that are not needed for this task.",
+    "prompt": "[root@rhel10 ~]#",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Install the `nginx` package non-interactively using `dnf`.",
+        "hint": "You need the `install` subcommand, the package name, and a flag that answers yes to every prompt.",
+        "program": "dnf",
+        "requirements": [
+          { "id": "sub", "kind": "positional", "variants": ["install"], "description": "install                        install a package" },
+          { "id": "yes", "kind": "flag",       "variants": ["-y", "--assumeyes"], "description": "-y, --assumeyes                assume yes to all prompts" },
+          { "id": "pkg", "kind": "positional", "variants": ["nginx"], "description": "<package>                      name of the package to install" }
+        ],
+        "distractors": [
+          { "flag": "--refresh",      "description": "--refresh                      set metadata as expired before running the command" },
+          { "flag": "--allowerasing", "description": "--allowerasing                 allow erasing of installed packages to resolve dependencies" },
+          { "flag": "-q",             "description": "-q, --quiet                    suppress command output" }
+        ],
+        "successOutput": "Installed:\n  nginx-1.24.0-4.el10.x86_64\n\nComplete!",
+        "canonicalCommand": "dnf install -y nginx"
+      },
+      {
+        "id": "s2",
+        "task": "Enable `nginx` to start on boot AND start it right now, using a single `systemctl` invocation.",
+        "hint": "One flag tells systemctl to also start the unit immediately, on top of enabling it.",
+        "program": "systemctl",
+        "requirements": [
+          { "id": "sub",  "kind": "positional", "variants": ["enable"], "description": "enable                         enable one or more unit files" },
+          { "id": "now",  "kind": "flag",       "variants": ["--now"],  "description": "--now                          when used with enable, also start the unit right now" },
+          { "id": "unit", "kind": "positional", "variants": ["nginx", "nginx.service"], "description": "<unit>                         the unit to operate on" }
+        ],
+        "distractors": [
+          { "flag": "--user",     "description": "--user                         manage user services instead of system services" },
+          { "flag": "--runtime",  "description": "--runtime                      make changes only until next reboot (not persistent)" },
+          { "flag": "--no-block", "description": "--no-block                     do not wait for the operation to finish" }
+        ],
+        "successOutput": "Created symlink /etc/systemd/system/multi-user.target.wants/nginx.service -> /usr/lib/systemd/system/nginx.service.",
+        "canonicalCommand": "systemctl enable --now nginx"
+      },
+      {
+        "id": "s3",
+        "task": "Using `journalctl`, show the last 50 log lines for the `nginx` unit.",
+        "hint": "You need two flag/value pairs: one to filter by unit, one to limit the number of lines.",
+        "program": "journalctl",
+        "requirements": [
+          { "id": "unit",  "kind": "flag-value", "variants": ["-u", "--unit"],  "value": "nginx", "description": "-u, --unit=UNIT                show entries from the specified unit" },
+          { "id": "lines", "kind": "flag-value", "variants": ["-n", "--lines"], "value": "50",    "description": "-n, --lines=N                  show the last N entries" }
+        ],
+        "distractors": [
+          { "flag": "-f",      "description": "-f, --follow                   follow the journal, printing new entries as they arrive" },
+          { "flag": "-r",      "description": "-r, --reverse                  show the newest entries first" },
+          { "flag": "--since", "description": "--since=DATE                   show entries on or newer than the specified date" }
+        ],
+        "successOutput": "-- Logs begin at Mon 2026-04-13 09:12:04 UTC --\nsystemd[1]: Starting The nginx HTTP and reverse proxy server...\nnginx[2031]: nginx: the configuration file /etc/nginx/nginx.conf syntax is ok\nnginx[2031]: nginx: configuration file /etc/nginx/nginx.conf test is successful\nsystemd[1]: Started The nginx HTTP and reverse proxy server.",
+        "canonicalCommand": "journalctl -u nginx -n 50"
+      }
+    ],
+    "explanation": "Three commands cover the full install, run, verify loop on RHEL 10.\n\n**1. `dnf install -y nginx`**\n- `install` is the dnf subcommand that installs a package\n- `-y` (or `--assumeyes`) skips the interactive confirmation prompt, important in scripts and one-shot labs\n- `nginx` is the package name\n- Distractors like `--refresh` (force-refresh metadata), `--allowerasing` (allow conflicting packages to be removed), and `-q` (quiet) are valid dnf flags, they just are not needed here\n\n**2. `systemctl enable --now nginx`**\n- `enable` creates the boot-time symlink so the unit starts on every boot\n- `--now` is the shortcut that also starts the unit immediately, avoiding a separate `systemctl start` call\n- Distractors: `--user` operates on user units (wrong scope), `--runtime` makes a non-persistent change (defeats the point of enabling on boot), `--no-block` just affects how systemctl waits\n\n**3. `journalctl -u nginx -n 50`**\n- `-u nginx` filters the journal to the `nginx` unit\n- `-n 50` limits output to the last 50 entries\n- Long-form equivalents (`--unit=nginx`, `--lines=50`) work the same way\n- Distractors: `-f` follows new entries (blocks the terminal), `-r` reverses order, `--since=DATE` is a time filter, none of which are required by the task\n\n**Flag order does not matter.** `systemctl --now enable nginx` and `systemctl enable nginx --now` are both accepted, because systemctl (and most RHEL CLIs) parse flags positionally by name, not by position in the command line.",
+    "learningOutcomes": [
+      "Install, enable, and verify a service on RHEL 10 from the command line",
+      "Use `--help` to identify the right flags and distinguish them from distractors",
+      "Combine `enable --now` and flag-value pairs like `-u unit` and `-n count`"
+    ],
+    "realWorldValue": "Every RHCSA candidate and RHEL admin runs this loop constantly: install a package, enable-and-start the service, check the journal. Getting the flags right from memory, with or without `--help`, is the difference between confident command-line work and paging through documentation for every task."
+  }
+]

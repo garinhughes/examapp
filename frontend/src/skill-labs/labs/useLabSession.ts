@@ -10,10 +10,11 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { LabSummary } from '../types'
+import { LAB_TIME_LIMITS } from '../types'
 import { useLabProgress } from './useLabProgress'
 import { useLabComplete } from './shared'
 
-type LabMeta = Pick<LabSummary, 'id' | 'type' | 'difficulty' | 's3VersionId'> & { timeLimit: number }
+type LabMeta = Pick<LabSummary, 'id' | 'type' | 'difficulty' | 's3VersionId'>
 
 export function useLabSession<TProgress extends { timeLeft: number }>(options: {
   lab: LabMeta
@@ -21,6 +22,7 @@ export function useLabSession<TProgress extends { timeLeft: number }>(options: {
 }): {
   savedProgress: TProgress | null
   saveProgress: (state: TProgress) => void
+  timeLimit: number
   timeLeft: number
   labPaused: boolean
   setLabPaused: (v: boolean) => void
@@ -39,8 +41,9 @@ export function useLabSession<TProgress extends { timeLeft: number }>(options: {
   const { lab, timed } = options
   const completeWithGamification = useLabComplete(lab)
   const { savedProgress, saveProgress, clearProgress } = useLabProgress<TProgress>(lab.id, timed, lab.s3VersionId)
+  const timeLimit = LAB_TIME_LIMITS[lab.difficulty]
 
-  const [timeLeft, setTimeLeft] = useState<number>(savedProgress ? savedProgress.timeLeft : lab.timeLimit)
+  const [timeLeft, setTimeLeft] = useState<number>(savedProgress ? savedProgress.timeLeft : timeLimit)
   const [labPaused, setLabPaused] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [resumeNotice, setResumeNotice] = useState(savedProgress !== null)
@@ -102,6 +105,7 @@ export function useLabSession<TProgress extends { timeLeft: number }>(options: {
   return {
     savedProgress,
     saveProgress,
+    timeLimit,
     timeLeft,
     labPaused,
     setLabPaused,

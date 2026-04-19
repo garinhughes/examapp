@@ -4,6 +4,7 @@ import { useExam } from '@/exam/ExamContext'
 import { Clock, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Bookmark, Search, X, Lock, Play } from 'lucide-react'
 import { clarityEvent, clarityTag } from '@/clarity'
 import type { LabSummary, SkillLevel } from './types'
+import { LAB_TIME_LIMITS } from './types'
 import { apiUrl } from '@/apiBase'
 import { SearchableFilter } from './SearchableFilter'
 import { getBookmarkedLabs, toggleBookmark, getInProgressLabs, clearLabProgress } from './labs/shared'
@@ -308,7 +309,7 @@ export function SkillLabsPage() {
           <div className="w-px h-6 bg-border" />
 
           <SearchableFilter
-            label="Platform"
+            label="Provider"
             options={filterOptions.platforms}
             selected={selectedPlatforms}
             onChange={(v) => { setSelectedPlatforms(v); setPage(1) }}
@@ -502,7 +503,7 @@ export function SkillLabsPage() {
                     </span>
                     <span className="flex items-center gap-1 text-muted-foreground ml-auto">
                       <Clock className="w-3 h-3" />
-                      {typeof lab.timeLimit === 'number' && lab.timeLimit > 0 ? `${Math.floor(lab.timeLimit / 60)} min` : '-'}
+                      {Math.floor(LAB_TIME_LIMITS[lab.difficulty] / 60)} min
                     </span>
                     {lab.locked && (
                       <span className="text-amber-700 dark:text-amber-400">Premium</span>

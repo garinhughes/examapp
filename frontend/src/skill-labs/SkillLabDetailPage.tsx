@@ -5,6 +5,7 @@ import { useExam } from '@/exam/ExamContext'
 import { clarityEvent, clarityTag } from '@/clarity'
 import { apiUrl } from '@/apiBase'
 import type { LabSummary } from './types'
+import { LAB_TIME_LIMITS } from './types'
 import { getInProgressLabs, clearLabProgress } from './labs/shared'
 import { MarkdownText } from '@/exam/utils'
 import { DIFFICULTY_COLORS, getPlatformMeta, CloudIcon } from './platformMeta'
@@ -146,12 +147,10 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
             <span className="px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground text-xs font-medium capitalize">
               {lab.labCategory}
             </span>
-            {typeof lab.timeLimit === 'number' && lab.timeLimit > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground text-xs font-medium">
-                <Clock className="w-3 h-3" />
-                {Math.floor(lab.timeLimit / 60)} min
-              </span>
-            )}
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground text-xs font-medium">
+              <Clock className="w-3 h-3" />
+              {Math.floor(LAB_TIME_LIMITS[lab.difficulty] / 60)} min
+            </span>
           </div>
 
           {lab.description && (
@@ -249,7 +248,7 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
                     <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">Time limit</div>
                     <div className="text-sm font-semibold flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
-                      {typeof lab.timeLimit === 'number' && lab.timeLimit > 0 ? `${Math.floor(lab.timeLimit / 60)} min` : '—'}
+                      {Math.floor(LAB_TIME_LIMITS[lab.difficulty] / 60)} min
                     </div>
                   </div>
                   <div>

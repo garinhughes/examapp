@@ -48,7 +48,6 @@ export interface SkillLabIndexEntry {
   platform?: string
   category?: string
   difficulty?: string
-  timeLimit?: number
   technologies?: string[]
   description?: string
   /** If true, this lab is part of the visitor/registered showcase */
@@ -172,7 +171,6 @@ export async function publishLab(
     platform: meta.platform,
     category: meta.category,
     difficulty: meta.difficulty,
-    timeLimit: meta.timeLimit,
     technologies: meta.technologies,
     description: meta.description,
     showcase: meta.showcase,

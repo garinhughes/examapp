@@ -5,6 +5,7 @@ import { apiUrl } from '@/apiBase'
 import type { PolicyFixLabDefinition } from '../../types'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { LabHeader } from '../LabHeader'
+import { LabDiagram } from '../LabDiagram'
 import { useLabSession } from '../useLabSession'
 import { MarkdownText } from '@/exam/utils'
 
@@ -85,24 +86,25 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
         </div>
       )}
 
-      {/* Top row: Scenario left, Editor right */}
-      <div className="flex-1 flex gap-4 min-h-0">
-        {/* Left: Scenario */}
-        <div className="w-72 shrink-0 rounded-lg border border-border bg-card p-4 overflow-y-auto">
-          <h3 className="font-semibold text-base mb-3">Scenario</h3>
-          <MarkdownText text={lab.scenario} className="text-sm text-muted-foreground leading-relaxed" />
-          <div className="mt-4 space-y-2">
-            <h4 className="font-semibold text-sm">Requirements</h4>
-            {lab.validations.map((v, i) => (
-              <div key={i} className="text-xs bg-muted/50 rounded px-2 py-1">
-                <span className="font-medium">{v.field}</span>
-              </div>
-            ))}
+      {/* Scenario (top, full width) */}
+      <div className="shrink-0 rounded-lg border border-border bg-card p-4">
+        <h3 className="font-semibold text-base mb-2">Scenario</h3>
+        <MarkdownText text={lab.scenario} className="text-sm text-muted-foreground leading-relaxed" />
+        {lab.mermaidCode && <LabDiagram code={lab.mermaidCode} idHint={lab.id} className="mt-3" />}
+        {lab.validations.length > 0 && (
+          <div className="mt-3">
+            <h4 className="font-semibold text-xs uppercase tracking-wide text-muted-foreground mb-1.5">Requirements</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {lab.validations.map((v, i) => (
+                <span key={i} className="text-xs bg-muted/60 rounded px-2 py-0.5 font-medium">{v.field}</span>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Right: Editor */}
-        <div className="flex-1 rounded-lg border border-border overflow-hidden min-w-0">
+      {/* Editor */}
+      <div className="rounded-lg border border-border overflow-hidden min-w-0 h-[420px] md:h-[520px]">
           <Editor
             height="100%"
             defaultLanguage="json"
@@ -119,7 +121,6 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
               formatOnPaste: true,
             }}
           />
-        </div>
       </div>
 
       {/* Bottom row: Test Results (full width) */}

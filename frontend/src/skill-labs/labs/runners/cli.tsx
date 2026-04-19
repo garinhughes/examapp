@@ -30,10 +30,8 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
   const session = useLabSession<CliProgress>({ lab, timed })
 
   const defaultLines: TerminalLine[] = [
-    { type: 'output', text: `Lab: ${lab.title}` },
-    { type: 'output', text: lab.scenario },
-    { type: 'output', text: '' },
-    { type: 'output', text: 'Type AWS CLI commands to investigate the environment.' },
+    { type: 'output', text: '# This is not a real terminal. A limited set of commands is available.' },
+    { type: 'output', text: "# Type 'help' to list commands, or 'clear' to reset the screen." },
     { type: 'output', text: '' },
   ]
 
@@ -130,7 +128,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
       newLines.push({ type: 'output', text: '' })
       newLines.push({ type: 'output', text: 'Builtins: help, clear' })
     } else if (trimmed.toLowerCase() === 'clear') {
-      setLines([])
+      setLines(defaultLines)
       setInput('')
       return
     } else {
@@ -185,7 +183,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
       {session.showConfirmModal && (
         <LabCompleteModal
           title={lab.title}
-          timeTaken={lab.timeLimit - session.timeLeft}
+          timeTaken={session.timeLimit - session.timeLeft}
           timed={timed}
           onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
           onCancel={() => session.setShowConfirmModal(false)}

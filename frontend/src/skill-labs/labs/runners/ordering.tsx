@@ -70,7 +70,7 @@ export function OrderingRunner({ lab, timed = true }: Props) {
       {session.showConfirmModal && (
         <LabCompleteModal
           title={lab.title}
-          timeTaken={lab.timeLimit - session.timeLeft}
+          timeTaken={session.timeLimit - session.timeLeft}
           timed={timed}
           onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
           onCancel={() => session.setShowConfirmModal(false)}

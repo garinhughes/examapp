@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useExam } from '@/exam/ExamContext'
 import type { DriftDetectionLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { LabDiagram } from '../LabDiagram'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
@@ -23,7 +24,6 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
   const [selections, setSelections] = useState<Record<string, boolean>>(
     () => session.savedProgress?.selections ?? {}
   )
-  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [results, setResults] = useState<Record<string, boolean> | null>(null)
 
   useEffect(() => {
@@ -55,13 +55,15 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
 
   const totalResources = lab.resources.length
   const markedCount = Object.values(selections).filter(Boolean).length
+  const correctCount = results ? Object.values(results).filter(Boolean).length : 0
+  const allCorrect = results != null && correctCount === totalResources
 
   return (
     <div className="flex flex-col h-full gap-3">
       {session.showConfirmModal && (
         <LabCompleteModal
           title={lab.title}
-          timeTaken={lab.timeLimit - session.timeLeft}
+          timeTaken={session.timeLimit - session.timeLeft}
           timed={timed}
           onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
           onCancel={() => session.setShowConfirmModal(false)}
@@ -84,34 +86,45 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
         </div>
       )}
 
+      {/* Expected-state diagram */}
+      {lab.mermaidCode && (
+        <div className="rounded-lg border border-border bg-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-500" />
+            Expected state (Terraform)
+          </div>
+          <LabDiagram code={lab.mermaidCode} idHint={lab.id} />
+        </div>
+      )}
+
       {/* Status bar */}
       <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/50 border border-border text-sm">
         <span className="text-muted-foreground">
-          {totalResources} resources to inspect • {markedCount} marked as drifted
+          {totalResources} live resources • {markedCount} marked as drifted
         </span>
         {session.submitted && results && (
-          <span className={`font-semibold ${Object.values(results).every(Boolean) ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-            {Object.values(results).filter(Boolean).length}/{totalResources} correct
+          <span className={`font-semibold ${allCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+            {correctCount}/{totalResources} correct
           </span>
         )}
       </div>
 
-      {/* Resource list */}
-      <div className="flex-1 overflow-y-auto space-y-3">
+      {/* Resource list — flat, actual values only */}
+      <div className="flex-1 overflow-y-auto space-y-2">
         {lab.resources.map(resource => {
-          const isExpanded = expandedId === resource.id
           const userMarkedDrifted = !!selections[resource.id]
           const showResult = session.submitted && results
           const isCorrect = showResult ? results[resource.id] : undefined
 
-          // Find actual diff keys
-          const allKeys = [...new Set([...Object.keys(resource.expected), ...Object.keys(resource.actual)])]
-          const diffKeys = allKeys.filter(k => resource.expected[k] !== resource.actual[k])
+          // With a mermaid diagram, the diagram is the source of truth — show actual only.
+          // Without one, show expected alongside actual so users can still spot the drift.
+          const showExpected = !lab.mermaidCode
+          const keys = Object.keys({ ...resource.expected, ...resource.actual })
 
           return (
             <div
               key={resource.id}
-              className={`rounded-lg border transition ${
+              className={`rounded-lg border p-3 transition ${
                 showResult
                   ? isCorrect
                     ? 'border-green-500/50 bg-green-500/5'
@@ -121,92 +134,61 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
                     : 'border-border bg-card'
               }`}
             >
-              {/* Resource header */}
-              <button
-                onClick={() => setExpandedId(isExpanded ? null : resource.id)}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left"
-              >
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                  {resource.resourceType}
-                </span>
-                <span className="font-medium text-sm flex-1">{resource.resourceName}</span>
-                {showResult && (
-                  <span className={`text-xs font-bold ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-                    {isCorrect ? '✓' : '✗'}
-                    {showResult && !isCorrect && (
-                      <span className="ml-1 font-normal">
-                        {resource.drifted ? '(has drift)' : '(no drift)'}
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                      {resource.resourceType}
+                    </span>
+                    <span className="font-medium text-sm">{resource.resourceName}</span>
+                    {showResult && (
+                      <span className={`text-xs font-bold ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+                        {isCorrect ? '✓' : `✗ ${resource.drifted ? 'actually drifted' : 'no drift'}`}
                       </span>
                     )}
-                  </span>
-                )}
-                <span className="text-muted-foreground text-xs">{isExpanded ? '▲' : '▼'}</span>
-              </button>
-
-              {/* Expanded: side-by-side config */}
-              {isExpanded && (
-                <div className="px-4 pb-4 space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    {/* Expected */}
-                    <div className="rounded-md border border-border bg-background p-3">
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-blue-500" />
-                        Expected (Terraform)
-                      </div>
-                      <div className="space-y-1.5">
-                        {allKeys.map(key => (
-                          <div key={key} className="flex justify-between text-xs">
-                            <span className="font-mono text-muted-foreground">{key}</span>
-                            <span className={`font-mono font-medium ${
-                              showResult && diffKeys.includes(key) ? 'text-blue-600 dark:text-blue-400' : ''
-                            }`}>
-                              {resource.expected[key] ?? '-'}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Actual */}
-                    <div className="rounded-md border border-border bg-background p-3">
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-amber-500" />
-                        Actual (AWS Console)
-                      </div>
-                      <div className="space-y-1.5">
-                        {allKeys.map(key => {
-                          const isDiff = resource.expected[key] !== resource.actual[key]
-                          return (
-                            <div key={key} className="flex justify-between text-xs">
-                              <span className="font-mono text-muted-foreground">{key}</span>
-                              <span className={`font-mono font-medium ${
-                                showResult && isDiff ? 'text-amber-600 dark:text-amber-400 font-bold' : ''
-                              }`}>
-                                {resource.actual[key] ?? '-'}
-                                {showResult && isDiff && <span className="ml-1 text-destructive">⚠</span>}
-                              </span>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
                   </div>
-
-                  {/* Mark as drifted button */}
-                  {!session.submitted && (
-                    <button
-                      onClick={() => toggleSelection(resource.id)}
-                      className={`w-full px-3 py-2 rounded-md border text-sm font-medium transition ${
-                        userMarkedDrifted
-                          ? 'border-amber-400 bg-amber-500/10 text-amber-700 dark:text-amber-400'
-                          : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted/50'
-                      }`}
-                    >
-                      {userMarkedDrifted ? '⚠ Marked as Drifted - click to undo' : 'Mark as Drifted'}
-                    </button>
-                  )}
+                  <div className={`grid gap-x-4 gap-y-0.5 ${showExpected ? 'grid-cols-[auto_1fr_1fr]' : 'grid-cols-1 sm:grid-cols-2'}`}>
+                    {showExpected && (
+                      <>
+                        <span />
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">Expected</span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">Actual</span>
+                      </>
+                    )}
+                    {keys.map(key => {
+                      const expected = resource.expected[key] ?? '—'
+                      const actual = resource.actual[key] ?? '—'
+                      const differs = expected !== actual
+                      if (showExpected) {
+                        return (
+                          <div key={key} className="contents text-xs">
+                            <span className="font-mono text-muted-foreground truncate">{key}</span>
+                            <span className="font-mono truncate">{expected}</span>
+                            <span className={`font-mono truncate ${differs ? 'text-amber-600 dark:text-amber-400 font-bold' : ''}`}>{actual}</span>
+                          </div>
+                        )
+                      }
+                      return (
+                        <div key={key} className="flex justify-between gap-2 text-xs">
+                          <span className="font-mono text-muted-foreground truncate">{key}</span>
+                          <span className="font-mono font-medium text-right truncate">{actual}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
-              )}
+                <button
+                  onClick={() => toggleSelection(resource.id)}
+                  disabled={session.submitted}
+                  className={`shrink-0 px-3 py-1.5 rounded-md border text-xs font-medium transition ${
+                    userMarkedDrifted
+                      ? 'border-amber-400 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                      : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted/50'
+                  } disabled:cursor-not-allowed disabled:opacity-70`}
+                >
+                  {userMarkedDrifted ? '⚠ Drifted' : 'Mark Drifted'}
+                </button>
+              </div>
             </div>
           )
         })}
@@ -215,9 +197,9 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
       {/* Bottom bar */}
       <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
         {!session.submitted ? (
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
             <p className="text-sm text-muted-foreground">
-              Expand each resource to compare expected vs actual configuration. Mark resources that have drifted.
+              Compare each live resource against the expected Terraform state, then mark the ones that have drifted.
             </p>
             <button
               className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
@@ -228,10 +210,8 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
           </div>
         ) : (
           <div className="space-y-2">
-            <div className={`font-semibold text-sm ${results && Object.values(results).every(Boolean) ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {results && Object.values(results).every(Boolean)
-                ? '✓ All drift assessments correct!'
-                : `✗ ${results ? Object.values(results).filter(Boolean).length : 0}/${totalResources} correct`}
+            <div className={`font-semibold text-sm ${allCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+              {allCorrect ? '✓ All drift assessments correct!' : `✗ ${correctCount}/${totalResources} correct`}
             </div>
             <ExplanationBlock text={lab.explanation} />
             <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">

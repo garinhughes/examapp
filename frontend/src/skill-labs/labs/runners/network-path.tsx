@@ -22,7 +22,6 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
   const session = useLabSession<NetworkPathProgress>({ lab, timed })
 
   const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>(session.savedProgress?.checkedSteps ?? {})
-  const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({})
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(session.savedProgress?.selectedAnswer ?? null)
   const [isCorrect, setIsCorrect] = useState(false)
 
@@ -54,7 +53,7 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
       {session.showConfirmModal && (
         <LabCompleteModal
           title={lab.title}
-          timeTaken={lab.timeLimit - session.timeLeft}
+          timeTaken={session.timeLimit - session.timeLeft}
           timed={timed}
           onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
           onCancel={() => session.setShowConfirmModal(false)}
@@ -102,45 +101,30 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
         {/* Check controls */}
         <div className="w-80 shrink-0 rounded-lg border border-border bg-card p-4 overflow-y-auto">
           <h3 className="font-semibold text-sm mb-3">Diagnostic Checks</h3>
-          <p className="text-xs text-muted-foreground mb-4">Click each check to run diagnostics and trace the request path.</p>
+          <p className="text-xs text-muted-foreground mb-4">Click each check to run the diagnostic and reveal its output. You decide where the failure lies.</p>
           <div className="space-y-2">
             {lab.steps.map((step) => {
               const checked = checkedSteps[step.id]
+              const run = checked !== undefined
               return (
                 <div key={step.id}>
                   <button
                     onClick={() => runCheck(step.id)}
-                    disabled={session.submitted || checked !== undefined}
+                    disabled={session.submitted || run}
                     className={`w-full text-left px-3 py-2.5 rounded-md border text-sm transition ${
-                      checked === undefined
-                        ? 'border-border hover:bg-muted/50 cursor-pointer'
-                        : checked
-                          ? 'border-green-500/30 bg-green-500/10'
-                          : 'border-destructive/30 bg-destructive/10'
+                      run
+                        ? 'border-border bg-muted/40'
+                        : 'border-border hover:bg-muted/50 cursor-pointer'
                     } disabled:cursor-not-allowed`}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <span className="font-medium">{step.checkLabel}</span>
-                      {checked !== undefined && (
-                        <span className={checked ? 'text-green-600 dark:text-green-400 text-xs font-bold' : 'text-destructive text-xs font-bold'}>
-                          {checked ? '✓ PASS' : '✗ FAIL'}
-                        </span>
-                      )}
+                      <span className="text-xs text-muted-foreground shrink-0">{run ? 'ran' : 'run →'}</span>
                     </div>
                   </button>
-                  {checked !== undefined && (
-                    <div>
-                      <button
-                        onClick={() => setExpandedSteps(prev => ({ ...prev, [step.id]: !prev[step.id] }))}
-                        className="mt-1 ml-3 text-xs text-muted-foreground hover:text-foreground transition"
-                      >
-                        {expandedSteps[step.id] ? '▾ hide detail' : '▸ show detail'}
-                      </button>
-                      {expandedSteps[step.id] && (
-                        <div className="mt-1 ml-3 text-xs text-muted-foreground font-mono bg-muted/40 rounded px-2 py-1">
-                          {step.detail}
-                        </div>
-                      )}
+                  {run && (
+                    <div className="mt-1 ml-3 text-xs text-muted-foreground font-mono bg-muted/40 rounded px-2 py-1 whitespace-pre-wrap">
+                      {step.detail}
                     </div>
                   )}
                 </div>

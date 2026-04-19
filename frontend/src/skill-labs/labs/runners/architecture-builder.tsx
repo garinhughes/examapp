@@ -15,6 +15,7 @@ import 'reactflow/dist/style.css'
 import { useExam } from '@/exam/ExamContext'
 import type { ArchitectureBuilderLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { LabDiagram } from '../LabDiagram'
 import { useLabSession } from '../useLabSession'
 import { LabCompleteModal } from '../LabCompleteModal'
 import { ExplanationBlock } from '../ExplanationBlock'
@@ -70,8 +71,22 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
     if (timed && session.timeLeft === 0 && !session.submitted) doValidate()
   }, [session.timeLeft])
 
-  const addComponent = useCallback((comp: typeof lab.availableComponents[0]) => {
-    if (placedComponents.has(comp.id) || session.submitted) return
+  const removeComponent = useCallback((id: string) => {
+    setPlacedComponents((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setNodes((prev) => prev.filter((n) => n.id !== id))
+    setEdges((prev) => prev.filter((e) => e.source !== id && e.target !== id))
+  }, [setNodes, setEdges])
+
+  const toggleComponent = useCallback((comp: typeof lab.availableComponents[0]) => {
+    if (session.submitted) return
+    if (placedComponents.has(comp.id)) {
+      removeComponent(comp.id)
+      return
+    }
     setPlacedComponents((prev) => new Set([...prev, comp.id]))
     const n = nodeCountRef.current++
     const col = n % 3
@@ -91,7 +106,12 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
       },
     }
     setNodes((prev) => [...prev, newNode])
-  }, [placedComponents, session.submitted, reactFlowInstance])
+  }, [placedComponents, session.submitted, removeComponent, setNodes])
+
+  const onNodesDelete = useCallback((deleted: Node[]) => {
+    if (session.submitted) return
+    for (const n of deleted) removeComponent(n.id)
+  }, [session.submitted, removeComponent])
 
   const onConnect = useCallback((connection: Connection) => {
     if (session.submitted) return
@@ -149,7 +169,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
   return (
     <div className="flex flex-col h-full gap-4">
       {session.showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - session.timeLeft} timed={timed}
+        <LabCompleteModal title={lab.title} timeTaken={session.timeLimit - session.timeLeft} timed={timed}
           onConfirm={() => { session.setShowConfirmModal(false); doValidate() }} onCancel={() => session.setShowConfirmModal(false)} />
       )}
       <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={displayScenario} labId={lab.id}
@@ -162,6 +182,8 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
         </div>
       )}
 
+      {lab.mermaidCode && <LabDiagram code={lab.mermaidCode} idHint={lab.id} />}
+
       <div className="flex gap-4 min-h-[500px]">
         {/* Component palette */}
         <div className="w-56 shrink-0 rounded-lg border border-border bg-card p-3 overflow-y-auto flex flex-col gap-4">
@@ -171,27 +193,36 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
               <div key={cat} className="mb-3">
                 <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{cat}</div>
                 <div className="space-y-1">
-                  {comps.map((comp) => (
-                    <button
-                      key={comp.id}
-                      onClick={() => addComponent(comp)}
-                      disabled={placedComponents.has(comp.id) || session.submitted}
-                      className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm transition ${
-                        placedComponents.has(comp.id)
-                          ? 'bg-primary/10 text-primary border border-primary/30'
-                          : 'border border-border hover:bg-muted/50 cursor-pointer'
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                      {comp.icon} {comp.label}
-                    </button>
-                  ))}
+                  {comps.map((comp) => {
+                    const placed = placedComponents.has(comp.id)
+                    return (
+                      <button
+                        key={comp.id}
+                        onClick={() => toggleComponent(comp)}
+                        disabled={session.submitted}
+                        title={placed ? 'Click to remove from canvas' : 'Click to add to canvas'}
+                        className={`w-full flex items-center justify-between gap-2 text-left px-2.5 py-1.5 rounded-md text-sm transition ${
+                          placed
+                            ? 'bg-primary/10 text-primary border border-primary/30 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30'
+                            : 'border border-border hover:bg-muted/50 cursor-pointer'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        <span className="truncate">{comp.icon} {comp.label}</span>
+                        {placed && (
+                          <span className="shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-destructive/15 text-destructive text-sm font-bold leading-none">
+                            ×
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             ))}
           </div>
 
           <div className="border-t border-border pt-3">
-            <p className="text-xs text-muted-foreground mt-2 leading-relaxed">Tip: Drag from a node's edge handle to connect it to another node. Click a connection line to remove it. Click "Validate Architecture" when ready.</p>
+            <p className="text-xs text-muted-foreground mt-2 leading-relaxed">Tip: Click a component to add or remove it. Drag from a node's edge handle to connect it to another node. Click a connection line, or select a node and press Delete, to remove it. Click "Validate Architecture" when ready.</p>
           </div>
         </div>
 
@@ -204,6 +235,8 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onEdgeClick={onEdgeClick}
+            onNodesDelete={onNodesDelete}
+            deleteKeyCode={['Delete', 'Backspace']}
             fitView
             proOptions={{ hideAttribution: true }}
             nodesConnectable={!session.submitted}

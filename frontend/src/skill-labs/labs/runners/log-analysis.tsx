@@ -83,7 +83,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
   return (
     <div className="flex flex-col h-full gap-4">
       {session.showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={lab.timeLimit - session.timeLeft} timed={timed}
+        <LabCompleteModal title={lab.title} timeTaken={session.timeLimit - session.timeLeft} timed={timed}
           onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
           onCancel={() => session.setShowConfirmModal(false)} />
       )}

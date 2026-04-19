@@ -4,6 +4,7 @@ import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { CodeFixLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
+import { LabDiagram } from '../LabDiagram'
 import { useLabSession } from '../useLabSession'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { MarkdownText } from '@/exam/utils'
@@ -37,7 +38,9 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
   }, [code, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) handleTest()
+    if (timed && session.timeLeft === 0 && !session.submitted) {
+      session.finalize(validationResult?.success === true, 'time-up')
+    }
   }, [session.timeLeft])
 
   const handleTest = useCallback(async () => {
@@ -50,15 +53,16 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
       })
       const result: ValidationResult = await res.json()
       setValidationResult(result)
-      if (result.success) {
-        await session.finalize(true, 'solved')
-      }
     } catch {
       setValidationResult({ success: false, errors: ['Failed to validate. Please try again.'] })
     } finally {
       setValidating(false)
     }
-  }, [code, lab.id, session.finalize])
+  }, [code, lab.id])
+
+  const handleComplete = useCallback(async () => {
+    await session.finalize(true, 'solved')
+  }, [session.finalize])
 
   const handleGiveUp = useCallback(async () => {
     setCode(lab.correctCode)
@@ -84,24 +88,25 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
         </div>
       )}
 
-      {/* Top row: Scenario left, Editor right */}
-      <div className="flex-1 flex gap-4 min-h-0">
-        {/* Left: Scenario */}
-        <div className="w-72 shrink-0 rounded-lg border border-border bg-card p-4 overflow-y-auto">
-          <h3 className="font-semibold text-base mb-3">Scenario</h3>
-          <MarkdownText text={lab.scenario} className="text-sm text-muted-foreground leading-relaxed" />
-          <div className="mt-4 space-y-2">
-            <h4 className="font-semibold text-sm">Requirements</h4>
-            {lab.validations.map((v, i) => (
-              <div key={i} className="text-xs bg-muted/50 rounded px-2 py-1">
-                <span className="font-medium">{v.field}</span>
-              </div>
-            ))}
+      {/* Scenario (top, full width) */}
+      <div className="shrink-0 rounded-lg border border-border bg-card p-4">
+        <h3 className="font-semibold text-base mb-2">Scenario</h3>
+        <MarkdownText text={lab.scenario} className="text-sm text-muted-foreground leading-relaxed" />
+        {lab.mermaidCode && <LabDiagram code={lab.mermaidCode} idHint={lab.id} className="mt-3" />}
+        {lab.validations.length > 0 && (
+          <div className="mt-3">
+            <h4 className="font-semibold text-xs uppercase tracking-wide text-muted-foreground mb-1.5">Requirements</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {lab.validations.map((v, i) => (
+                <span key={i} className="text-xs bg-muted/60 rounded px-2 py-0.5 font-medium">{v.field}</span>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Right: Editor */}
-        <div className="flex-1 rounded-lg border border-border overflow-hidden min-w-0">
+      {/* Editor */}
+      <div className="rounded-lg border border-border overflow-hidden min-w-0 h-[420px] md:h-[520px]">
           <Editor
             height="100%"
             language={lab.language}
@@ -118,7 +123,6 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
               formatOnPaste: true,
             }}
           />
-        </div>
       </div>
 
       {/* Bottom row: Test Results (full width) */}
@@ -129,14 +133,16 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
 
             {!validationResult && !session.submitted && (
               <p className="text-sm text-muted-foreground">
-                Edit the code and click "Test Code" to validate your changes.
+                Edit the code and click "Test Code" to validate your changes. Keep iterating — tests can be run as many times as you like.
               </p>
             )}
 
             {validationResult && (
               <div className="space-y-2">
                 <div className={`flex items-center gap-2 font-semibold text-sm ${validationResult.success ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-                  {validationResult.success ? '✓ All checks passed!' : '✗ Validation failed'}
+                  {validationResult.success
+                    ? '✓ All checks passed — click Complete Lab to finish.'
+                    : `✗ ${validationResult.errors.length} check${validationResult.errors.length === 1 ? '' : 's'} still failing`}
                 </div>
                 {validationResult.errors.length > 0 && (
                   <ul className="flex flex-wrap gap-2">
@@ -147,9 +153,7 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
                     ))}
                   </ul>
                 )}
-                {validationResult.success && (
-                  <ExplanationBlock text={lab.explanation} />
-                )}
+                {session.submitted && <ExplanationBlock text={lab.explanation} />}
               </div>
             )}
           </div>
@@ -164,6 +168,14 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
                 >
                   {validating ? 'Validating…' : 'Test Code'}
                 </button>
+                {validationResult?.success && (
+                  <button
+                    className="px-4 py-2 rounded-md bg-green-600 text-white font-medium text-sm hover:bg-green-700 transition"
+                    onClick={handleComplete}
+                  >
+                    Complete Lab
+                  </button>
+                )}
                 <button
                   className="px-4 py-2 rounded-md border border-border text-muted-foreground font-medium text-sm hover:bg-muted/50 transition"
                   onClick={handleGiveUp}

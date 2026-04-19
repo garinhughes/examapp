@@ -367,5 +367,135 @@
     "correct": true,
     "timeTaken": 20,
     "createdAt": "2026-04-13T18:41:58.953Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "2e6e6a3a-7a15-432e-bd94-7e0020d53232",
+    "labId": "aws-fix-alb-health-check",
+    "labType": "diagnose",
+    "selectedAnswer": "{\"protocol\":\"HTTPS\",\"port\":\"80\",\"path\":\"/health\",\"healthy-threshold\":\"5\",\"interval\":\"30\",\"timeout\":\"5\",\"matcher\":\"200\",\"dereg-delay\":\"300\"}",
+    "correct": false,
+    "timeTaken": 98,
+    "createdAt": "2026-04-19T15:22:54.496Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "1356773b-e51e-4511-99fa-2f1f576b3d86",
+    "labId": "aws-fix-terraform-s3",
+    "labType": "diagnose",
+    "selectedAnswer": "gave-up",
+    "correct": false,
+    "timeTaken": 83,
+    "createdAt": "2026-04-19T17:00:44.782Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "72646c59-b79e-42d4-8e64-9b9e644bd8e9",
+    "labId": "aws-fix-terraform-s3",
+    "labType": "diagnose",
+    "selectedAnswer": "gave-up",
+    "correct": false,
+    "timeTaken": 26,
+    "createdAt": "2026-04-19T17:25:40.459Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "0629762a-02b5-4fbd-bd51-1b2a7bc563a9",
+    "labId": "rhel-apache-phased-pipeline",
+    "labType": "unknown",
+    "selectedAnswer": "{\"pool\":[],\"prepare\":[\"s2\",\"s1\"],\"install\":[\"s4\",\"s3\"],\"configure\":[\"s7\",\"s5\",\"s6\",\"s10\"],\"harden\":[\"s8\",\"s9\"]}",
+    "correct": false,
+    "timeTaken": 138,
+    "createdAt": "2026-04-19T18:15:02.750Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "33a1212f-476f-4722-a57f-343710f09483",
+    "labId": "rhel-apache-phased-pipeline",
+    "labType": "unknown",
+    "selectedAnswer": "{\"pool\":[],\"prepare\":[\"s1\"],\"install\":[\"s2\",\"s3\",\"s4\"],\"configure\":[\"s7\",\"s5\",\"s6\",\"s10\"],\"harden\":[\"s8\",\"s9\"]}",
+    "correct": false,
+    "timeTaken": 179,
+    "createdAt": "2026-04-19T18:21:50.166Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "1a63607b-8346-420d-9af1-bc4ab767ff61",
+    "labId": "rhel-apache-phased-pipeline",
+    "labType": "unknown",
+    "selectedAnswer": "{\"pool\":[],\"prepare\":[\"s1\",\"s2\"],\"install\":[\"s3\",\"s4\"],\"configure\":[\"s6\",\"s7\",\"s5\"],\"harden\":[\"s8\",\"s9\",\"s10\"]}",
+    "correct": false,
+    "timeTaken": 121,
+    "createdAt": "2026-04-19T18:36:17.570Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "ba71db38-bb79-455b-b4dc-9dd415b380eb",
+    "labId": "rhel-apache-phased-pipeline",
+    "labType": "unknown",
+    "selectedAnswer": "{\"pool\":[],\"prepare\":[\"s1\",\"s2\"],\"install\":[\"s3\",\"s4\"],\"configure\":[\"s6\",\"s5\",\"s7\"],\"harden\":[\"s10\",\"s8\",\"s9\"]}",
+    "correct": false,
+    "timeTaken": 58,
+    "createdAt": "2026-04-19T18:40:21.895Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "07ef0db8-40ea-41a5-bdf5-f7f79ca7538b",
+    "labId": "rhel-apache-phased-pipeline",
+    "labType": "unknown",
+    "selectedAnswer": "{\"pool\":[],\"prepare\":[\"s2\",\"s1\"],\"install\":[\"s4\",\"s3\"],\"configure\":[\"s5\",\"s6\",\"s7\"],\"harden\":[\"s10\",\"s8\",\"s9\"]}",
+    "correct": false,
+    "timeTaken": 71,
+    "createdAt": "2026-04-19T18:47:00.255Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "4297a303-fbe2-4ce6-80b8-c4ea1849213e",
+    "labId": "rhel-nfs-terminal-replay",
+    "labType": "unknown",
+    "selectedAnswer": "c1,c2,c3,c4,c6,c9,c5,c10",
+    "correct": true,
+    "timeTaken": 8,
+    "createdAt": "2026-04-19T19:14:01.797Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "b38e3279-2a0d-493d-af9f-6293cef977e8",
+    "labId": "rhel-nfs-terminal-replay",
+    "labType": "unknown",
+    "selectedAnswer": "c1,c2,c3,c4,c6,c9,c5,c10",
+    "correct": true,
+    "timeTaken": 28,
+    "createdAt": "2026-04-19T19:17:29.040Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "0898f0a6-41a6-4956-a5cc-6c6da2a0b3f1",
+    "labId": "rhel-nfs-terminal-replay",
+    "labType": "unknown",
+    "selectedAnswer": "c6",
+    "correct": true,
+    "timeTaken": 5,
+    "createdAt": "2026-04-19T19:21:20.180Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "a4963fb0-5453-42c4-b273-a746bf59182a",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "unknown",
+    "selectedAnswer": "all-steps-complete",
+    "correct": true,
+    "timeTaken": 224,
+    "createdAt": "2026-04-19T19:52:32.641Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "3117f754-4181-4072-92ff-746ed8fe7e91",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "unknown",
+    "selectedAnswer": "all-steps-complete",
+    "correct": true,
+    "timeTaken": 64,
+    "createdAt": "2026-04-19T19:54:57.823Z"
   }
 ]

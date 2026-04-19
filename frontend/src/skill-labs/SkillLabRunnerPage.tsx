@@ -17,7 +17,6 @@ const providerRunnerImports: Partial<Record<string, () => Promise<{ default: Com
 
 // Generic fallback runners - one file per type, shared across all providers
 const genericRunnerImports: Record<SkillLabType, () => Promise<{ default: ComponentType<any> }>> = {
-  'diagnose':              () => import('./labs/runners/diagnose').then(m => ({ default: m.DiagnoseLabRunner })),
   'cli':                   () => import('./labs/runners/cli').then(m => ({ default: m.CliLabRunner })),
   'policy-fix':            () => import('./labs/runners/policy-fix').then(m => ({ default: m.PolicyFixLabRunner })),
   'architecture-builder':  () => import('./labs/runners/architecture-builder').then(m => ({ default: m.ArchitectureBuilderRunner })),
@@ -28,7 +27,6 @@ const genericRunnerImports: Record<SkillLabType, () => Promise<{ default: Compon
   'cost-optimization':     () => import('./labs/runners/cost-optimization').then(m => ({ default: m.CostOptimizationRunner })),
   'security-hardening':    () => import('./labs/runners/security-hardening').then(m => ({ default: m.SecurityHardeningRunner })),
   'performance-optimization': () => import('./labs/runners/performance-optimization').then(m => ({ default: m.PerformanceOptRunner })),
-  'policy-simulation':     () => import('./labs/runners/policy-simulation').then(m => ({ default: m.PolicySimulationRunner })),
   'service-limits':        () => import('./labs/runners/service-limits').then(m => ({ default: m.ServiceLimitsRunner })),
   'code-fix':              () => import('./labs/runners/code-fix').then(m => ({ default: m.CodeFixLabRunner })),
   'fill-command':          () => import('./labs/runners/fill-command').then(m => ({ default: m.FillCommandRunner })),
@@ -36,6 +34,9 @@ const genericRunnerImports: Record<SkillLabType, () => Promise<{ default: Compon
   'diagram-label':         () => import('./labs/runners/diagram-label').then(m => ({ default: m.DiagramLabelRunner })),
   'incident-response':    () => import('./labs/runners/incident-response').then(m => ({ default: m.IncidentResponseRunner })),
   'drift-detection':      () => import('./labs/runners/drift-detection').then(m => ({ default: m.DriftDetectionRunner })),
+  'phased-pipeline':      () => import('./labs/runners/phased-pipeline').then(m => ({ default: m.PhasedPipelineRunner })),
+  'terminal-replay':      () => import('./labs/runners/terminal-replay').then(m => ({ default: m.TerminalReplayRunner })),
+  'command-terminal':     () => import('./labs/runners/command-terminal').then(m => ({ default: m.CommandTerminalRunner })),
 }
 
 export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPageProps) {
