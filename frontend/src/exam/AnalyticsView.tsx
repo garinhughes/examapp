@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import { ProviderLogo } from '@/components/ProviderLogo'
 import { Trash2, ChevronDown, ChevronRight, Search, ChevronLeft, Eye, CalendarDays, BookOpen, TrendingUp, BarChart2 } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { computeDerivedAttempt } from './utils'
@@ -100,9 +101,8 @@ export function AnalyticsView() {
               <span className="text-xs text-muted-foreground text-center leading-tight mt-0.5 hidden sm:block">{desc}</span>
             </div>
             {i < arr.length - 1 && (
-              <div className="flex-shrink-0 flex flex-col items-center" style={{ marginTop: '-18px' }}>
-                <div className="w-4 h-px bg-border" />
-                <ChevronRight className="w-3.5 h-3.5 text-primary -mt-px" />
+              <div className="flex-shrink-0 flex flex-col items-center">
+                <ChevronRight className="w-3.5 h-3.5 text-primary" />
               </div>
             )}
           </div>
@@ -112,24 +112,22 @@ export function AnalyticsView() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-sm text-muted-foreground flex items-center gap-2">
-            {selected ? (
+            {selected && (
               <>
                 {selectedMeta?.title ?? selected}
                 {selectedMeta?.code ? ` (${selectedMeta.code})` : ''}
               </>
-            ) : (
-              'Select an exam below to view analytics'
             )}
           </div>
         </div>
         <div className="flex items-center gap-2">
           {selected ? (
-            <button className="px-3 py-1 rounded bg-accent text-sm" onClick={() => setSelected(null)}>
-              ← All exams
+            <button className="inline-flex items-center gap-1 px-3 py-1 rounded bg-accent text-sm" onClick={() => setSelected(null)}>
+              <ChevronLeft className="w-3.5 h-3.5" /> Analytics
             </button>
           ) : (
-            <button className="px-3 py-1 rounded bg-accent text-sm" onClick={() => setRoute('practice')}>
-              Back
+            <button className="inline-flex items-center gap-1 px-3 py-1 rounded bg-accent text-sm" onClick={() => setRoute('practice')}>
+              <ChevronLeft className="w-3.5 h-3.5" /> Exams
             </button>
           )}
           {selected && (
@@ -211,21 +209,7 @@ export function AnalyticsView() {
                         onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(ex.code); void fetchScoreHistory(ex.code) } }}
                         className="rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                       >
-                        {ex.logo ? (
-                          ex.logoHref ? (
-                            <a href={ex.logoHref} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="h-14 bg-white dark:bg-gray-200 flex items-center justify-center px-4 border-b border-border" aria-label={`${ex.provider ?? 'Provider'} logo link`}>
-                              <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="max-h-8 max-w-full w-auto object-contain" />
-                            </a>
-                          ) : (
-                            <div className="h-14 bg-white dark:bg-gray-200 flex items-center justify-center px-4 border-b border-border" aria-hidden>
-                              <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="max-h-8 max-w-full w-auto object-contain" />
-                            </div>
-                          )
-                        ) : (
-                          <div className="h-14 bg-muted/40 flex items-center justify-center border-b border-border text-muted-foreground text-xs font-medium" aria-hidden>
-                            {ex.provider ?? ''}
-                          </div>
-                        )}
+                        <ProviderLogo provider={ex.provider} size="md" />
                         <div className="p-4 flex-1 flex flex-col">
                           <div className="font-medium leading-tight">{ex.title ?? ex.code}</div>
                           <div className="text-xs text-muted-foreground mt-1">{ex.code}</div>
@@ -251,7 +235,7 @@ export function AnalyticsView() {
       {selected && (
         <div className="mt-4 space-y-4">
           {/* Score history chart */}
-          <div className="p-4 rounded bg-card/60 dark:bg-card">
+          <div className="p-4 rounded-lg bg-card/60 dark:bg-card">
             <div className="flex items-center justify-between mb-2">
               <div className="font-semibold">Score history</div>
               <button
@@ -292,7 +276,7 @@ export function AnalyticsView() {
               const passRate = finished ? Math.round((passed / finished) * 100) : null
 
               const stat = (label: string, value: any) => (
-                <div className="p-3 rounded bg-card/60 dark:bg-card border border-border/60 dark:border-border/60">
+                <div className="p-3 rounded-lg bg-card/60 dark:bg-card border border-border/60 dark:border-border/60">
                   <div className="text-xs text-muted-foreground">{label}</div>
                   <div className="text-lg font-semibold">{value ?? '-'}</div>
                 </div>
@@ -315,7 +299,7 @@ export function AnalyticsView() {
               .map(([domain, v]) => ({ domain, ...v }))
               .sort((a, b) => a.avgScore - b.avgScore)
             return (
-              <div className="p-4 rounded bg-card/60 dark:bg-card">
+              <div className="p-4 rounded-lg bg-card/60 dark:bg-card">
                 <div className="font-semibold mb-3">Domain Performance</div>
                 <div className="space-y-3">
                   {entries.map(({ domain, avgScore, correct, total, attemptCount }) => {
@@ -350,7 +334,7 @@ export function AnalyticsView() {
 
           {/* Previous version attempts */}
           {predecessorCode && (
-            <div className="p-4 rounded bg-card/60 dark:bg-card">
+            <div className="p-4 rounded-lg bg-card/60 dark:bg-card">
               <button
                 className="flex items-center gap-2 text-sm font-semibold w-full text-left"
                 onClick={() => {
@@ -425,7 +409,7 @@ export function AnalyticsView() {
           )}
 
           {/* Previous Scores — collapsible */}
-          <div className="rounded bg-card/60 dark:bg-card overflow-hidden">
+          <div className="rounded-lg bg-card/60 dark:bg-card overflow-hidden">
             <button
               className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-muted/20 transition-colors"
               onClick={() => setShowScores(s => !s)}

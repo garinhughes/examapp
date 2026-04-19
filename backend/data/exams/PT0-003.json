@@ -2,7 +2,6 @@
   "code": "PT0-003",
   "provider": "CompTIA",
   "passMark": 75,
-  "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Comptia-logo.svg/250px-Comptia-logo.svg.png",
   "defaultQuestions": 90,
   "defaultDuration": 165,
   "title": "CompTIA PenTest+",

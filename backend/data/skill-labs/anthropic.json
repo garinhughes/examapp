@@ -13,6 +13,13 @@
       "Tool Use"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Identify the five stages of a Claude agentic loop in execution order",
+      "Distinguish between model-turn steps and client-turn steps",
+      "Recognise where tool results must be appended to continue the loop"
+    ],
+    "realWorldValue": "Every production Claude agent is built on this loop. Getting the order right in your head prevents the most common implementation bug: structuring the loop so that tool results are never returned to the model, which causes the agent to silently stall or hallucinate outputs.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "You are implementing a Claude agentic loop from scratch using the Messages API. The loop must correctly handle tool calls until Claude signals it has finished.\n\nPut the following steps in the correct order.",
     "steps": [
       {
@@ -60,6 +67,13 @@
       "Tool Use"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Diagnose a loop that terminates or continues on the wrong signal",
+      "Apply stop_reason as the canonical loop control flag",
+      "Reject the anti-pattern of inspecting the last content block type"
+    ],
+    "realWorldValue": "Loops that branch on block types instead of stop_reason appear to work in demos but break the moment Claude emits mixed content, thinking blocks, or parallel tool calls. Using stop_reason is the only forward-compatible contract the API guarantees.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A developer wrote an agentic loop that checks whether the last content block is a `tool_use` block to decide whether to keep iterating. During testing, the loop occasionally exits early (missing tool calls) and occasionally runs one extra iteration after Claude has finished.\n\nFix the loop termination condition to use the authoritative API signal.",
     "language": "python",
     "brokenCode": "import anthropic\n\nclient = anthropic.Anthropic()\n\ndef run_agent(tools, messages):\n    while True:\n        response = client.messages.create(\n            model=\"claude-opus-4-6\",\n            max_tokens=4096,\n            tools=tools,\n            messages=messages\n        )\n\n        messages.append({\"role\": \"assistant\", \"content\": response.content})\n\n        # BUG: checks content block type instead of stop_reason\n        last_block = response.content[-1] if response.content else None\n        if not last_block or last_block.type != \"tool_use\":\n            break\n\n        tool_results = []\n        for block in response.content:\n            if block.type == \"tool_use\":\n                result = execute_tool(block.name, block.input)\n                tool_results.append({\n                    \"type\": \"tool_result\",\n                    \"tool_use_id\": block.id,\n                    \"content\": result\n                })\n\n        messages.append({\"role\": \"user\", \"content\": tool_results})\n\n    return next((b.text for b in response.content if b.type == \"text\"), \"\")",
@@ -89,6 +103,13 @@
       "Tool Use"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Match each tool_result to the originating tool_use id",
+      "Debug 400-level errors caused by mismatched tool identifiers",
+      "Structure tool result messages that the API will accept on the next turn"
+    ],
+    "realWorldValue": "A fresh UUID on every tool_result is the single most common cause of \"cannot match result to any outstanding tool request\" errors in production. Correct id threading is a prerequisite for any multi-tool agent.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "An agent is returning tool results, but Claude keeps responding with an error saying it cannot match the result to any outstanding tool request. A code review reveals that the developer is generating a new UUID for `tool_use_id` rather than echoing the ID from the `tool_use` block.\n\nFix the tool result construction so Claude can correctly match each result to its originating request.",
     "language": "python",
     "brokenCode": "import uuid\nimport anthropic\n\nclient = anthropic.Anthropic()\n\ndef process_tool_calls(response_content, tools_map):\n    \"\"\"Execute all tool calls in a response and return tool_result blocks.\"\"\"\n    tool_results = []\n\n    for block in response_content:\n        if block.type == \"tool_use\":\n            result = tools_map[block.name](**block.input)\n\n            # BUG: generates a new UUID instead of using block.id\n            tool_results.append({\n                \"type\": \"tool_result\",\n                \"tool_use_id\": str(uuid.uuid4()),\n                \"content\": str(result)\n            })\n\n    return tool_results",
@@ -117,6 +138,13 @@
       "Multi-Agent"
     ],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Trace message flow through a coordinator and subagent topology",
+      "Identify peer-to-peer communication that bypasses the coordinator",
+      "Explain why unmediated subagent traffic breaks orchestration guarantees"
+    ],
+    "realWorldValue": "Multi-agent systems that allow direct peer communication lose the single point of control that makes behaviour auditable and recoverable. Spotting this anti-pattern on an architecture diagram is a core reviewer skill.",
+    "relatedExamCodes": ["CCA-F"],
     "nodes": [
       {
         "id": "coordinator",
@@ -359,6 +387,13 @@
       "Multi-Agent"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Configure an AgentDefinition with the correct allowedTools set",
+      "Identify why a coordinator silently refuses to spawn subagents",
+      "Validate that Task delegation is reachable from the coordinator"
+    ],
+    "realWorldValue": "The Task tool is what allows a coordinator to delegate. Omitting it produces an agent that looks configured but cannot orchestrate, a failure mode that is hard to spot without reading the tool manifest carefully.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A coordinator agent is configured to delegate research tasks to specialized subagents, but it never spawns them. Instead it attempts all research itself, ignoring the `Task` tool entirely.\n\nA code review reveals the `AgentDefinition` JSON. Fix it to allow the coordinator to spawn subagents.",
     "brokenPolicy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"WebSearch\",\n    \"FileRead\"\n  ]\n}",
     "correctPolicy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"Task\",\n    \"WebSearch\",\n    \"FileRead\"\n  ]\n}",
@@ -387,6 +422,13 @@
       "Multi-Agent"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Embed parent-context data explicitly into a subagent prompt",
+      "Recognise that subagents do not inherit the coordinator conversation history",
+      "Structure prompts so subagents have the facts they need on turn one"
+    ],
+    "realWorldValue": "A subagent that starts with an empty context hallucinates or asks the coordinator for data the coordinator already has. Understanding the context boundary between parent and child agents is fundamental to building reliable pipelines.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A coordinator agent collects customer order data from a database tool, accumulating it in its own conversation history. It then spawns a fraud-detection subagent — but the subagent always returns `\"No order data provided to analyse.\"`\n\nFix the coordinator so it passes the order data explicitly in the subagent's prompt.",
     "language": "typescript",
     "brokenCode": "import Anthropic from \"@anthropic-ai/sdk\";\n\nconst client = new Anthropic();\n\nasync function runFraudDetection(userId: string): Promise<string> {\n  // Step 1: Coordinator fetches orders (result stays in coordinator context only)\n  const coordinatorResponse = await client.messages.create({\n    model: \"claude-opus-4-6\",\n    max_tokens: 4096,\n    system: \"You are a fraud detection coordinator.\",\n    tools: [getOrdersTool],\n    messages: [{\n      role: \"user\",\n      content: `Fetch all orders for user ${userId}`\n    }]\n  });\n\n  // Extract order data from coordinator's tool result\n  const orderData = extractOrderData(coordinatorResponse);\n\n  // Step 2: BUG — spawns subagent without passing the order data\n  const subagentResponse = await client.messages.create({\n    model: \"claude-opus-4-6\",\n    max_tokens: 4096,\n    system: \"You are a fraud detection specialist. Analyse the provided orders.\",\n    messages: [{\n      role: \"user\",\n      content: \"Analyse these orders for fraud patterns.\"\n      // Missing: the actual order data\n    }]\n  });\n\n  return extractText(subagentResponse);\n}",
@@ -415,6 +457,13 @@
       "CLAUDE.md"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Configure a three-tier CLAUDE.md hierarchy across user, project, and directory scopes",
+      "Apply path globs to scope a rule to a subset of the repo",
+      "Locate the correct user-level configuration file"
+    ],
+    "realWorldValue": "A well-structured CLAUDE.md hierarchy is the difference between an assistant that follows team conventions and one that drifts. Knowing which tier owns which rule keeps context focused and prevents rules from clashing.",
+    "relatedExamCodes": [],
     "scenario": "A monorepo uses a three-tier CLAUDE.md hierarchy: user-level, project-level, and directory-level. Several configuration files have gaps that prevent Claude Code from applying the right rules in the right places.\n\nFill in the missing values to complete the configuration.",
     "questions": [
       {
@@ -473,6 +522,13 @@
       "Multi-Agent"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Emit multiple Task tool calls in a single assistant turn for concurrent dispatch",
+      "Diagnose sequential dispatch that serialises independent work",
+      "Measure the latency cost of one-call-per-turn patterns"
+    ],
+    "realWorldValue": "Running three five-second API calls serially takes fifteen seconds; dispatched in parallel they take five. The pattern change is small but the user-facing latency difference is the difference between a usable agent and a frustrating one.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A coordinator agent fetches data from three independent APIs (weather, stocks, news) before synthesising a report. Currently it issues one `Task` call per turn, waiting for each result — so total latency is roughly `T_weather + T_stocks + T_news`.\n\nFix the coordinator's system prompt and tool configuration so it emits all three `Task` calls in a single response, triggering parallel dispatch. Target latency: `max(T_weather, T_stocks, T_news)`.",
     "language": "python",
     "brokenCode": "import anthropic\n\nclient = anthropic.Anthropic()\n\n# BUG: system prompt instructs the coordinator to call subagents one at a time\nSYSTEM_PROMPT = \"\"\"\nYou are a data coordinator. To gather the report data:\n1. First, call the weather subagent using the Task tool.\n2. Wait for the result, then call the stocks subagent.\n3. Wait for that result, then call the news subagent.\n4. Once you have all three results, synthesise the final report.\n\"\"\"\n\ndef run_coordinator(user_request: str) -> str:\n    response = client.messages.create(\n        model=\"claude-opus-4-6\",\n        max_tokens=8192,\n        system=SYSTEM_PROMPT,\n        tools=[\n            {\n                \"name\": \"Task\",\n                \"description\": \"Spawn a subagent to handle a subtask\",\n                \"input_schema\": {\n                    \"type\": \"object\",\n                    \"properties\": {\n                        \"description\": {\"type\": \"string\"},\n                        \"prompt\": {\"type\": \"string\"}\n                    },\n                    \"required\": [\"description\", \"prompt\"]\n                }\n            }\n        ],\n        messages=[{\"role\": \"user\", \"content\": user_request}]\n    )\n    # ... agentic loop continues\n    return extract_final_response(response)",
@@ -502,6 +558,13 @@
       "Security"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Replace a system-prompt instruction with a code-level prerequisite check",
+      "Explain why prompt-based gates are not a security boundary",
+      "Block sensitive tool calls when prerequisites have not been met"
+    ],
+    "realWorldValue": "System prompts are suggestions to the model, not guarantees. Any high-impact tool call, especially anything touching money, identity, or production data, needs a programmatic guard in the tool-execution path.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A fintech agent can initiate wire transfers. The system prompt says:\n\n> \"You MUST always call `verify_customer_identity` before calling `initiate_wire_transfer`. This is a regulatory requirement.\"\n\nA penetration test shows an adversarial prompt can cause the model to skip verification and call `initiate_wire_transfer` directly.\n\nAdd a programmatic gate in the tool dispatcher that enforces the prerequisite at the code level, independent of the model's behaviour.",
     "language": "typescript",
     "brokenCode": "import Anthropic from \"@anthropic-ai/sdk\";\n\nconst client = new Anthropic();\n\n// RISK: the only enforcement is a prompt instruction — a non-zero failure rate\nconst SYSTEM = `You are a fintech assistant.\nYou MUST always call verify_customer_identity before calling initiate_wire_transfer.\nThis is a regulatory requirement. Never skip verification.`;\n\nasync function executeTool(\n  toolName: string,\n  toolInput: Record<string, unknown>\n): Promise<string> {\n  if (toolName === \"verify_customer_identity\") {\n    return await verifyIdentity(toolInput.customerId as string);\n  }\n\n  if (toolName === \"initiate_wire_transfer\") {\n    // BUG: no code-level check — relies entirely on the model following the prompt\n    return await initiateTransfer(toolInput);\n  }\n\n  throw new Error(`Unknown tool: ${toolName}`);\n}",
@@ -535,6 +598,13 @@
       "Context Management"
     ],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Identify context loss patterns in long-running multi-turn agents",
+      "Distinguish context eviction from context overwrite and summarisation drift",
+      "Propose mitigations such as compaction, retrieval, or scoped subagents"
+    ],
+    "realWorldValue": "Agents that work for ten minutes and then forget earlier facts are failing a predictable way. Knowing how context pressure manifests lets you pick the right fix rather than blaming the model.",
+    "relatedExamCodes": ["CCA-F"],
     "nodes": [
       {
         "id": "user",
@@ -785,6 +855,13 @@
       "Tool Use"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Construct a valid assistant turn that contains the originating tool_use block",
+      "Recognise conversation history that skips the assistant turn before a tool_result",
+      "Fix 400 errors caused by orphaned tool_result messages"
+    ],
+    "realWorldValue": "Forgetting to append the assistant turn alongside the tool_result is one of the most common agentic-loop bugs. The symptom is intermittent, the fix is a one-line change, and debugging it without this mental model is painful.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A developer's agentic loop occasionally causes Claude to respond with `\"I don't have a tool result to refer to\"` or raises a `400 Bad Request`. A code review reveals that after calling a tool, only the `tool_result` user message is appended — the assistant turn containing the `tool_use` block is silently dropped.\n\nFix the history management so Claude always receives the complete conversation.",
     "language": "python",
     "brokenCode": "import anthropic\n\nclient = anthropic.Anthropic()\n\ndef run_agent(tools, initial_messages):\n    messages = list(initial_messages)\n\n    while True:\n        response = client.messages.create(\n            model=\"claude-opus-4-6\",\n            max_tokens=4096,\n            tools=tools,\n            messages=messages\n        )\n\n        if response.stop_reason == \"end_turn\":\n            break\n\n        # BUG: assistant turn is never appended — only tool_results go in\n        tool_results = []\n        for block in response.content:\n            if block.type == \"tool_use\":\n                result = execute_tool(block.name, block.input)\n                tool_results.append({\n                    \"type\": \"tool_result\",\n                    \"tool_use_id\": block.id,\n                    \"content\": result\n                })\n\n        messages.append({\"role\": \"user\", \"content\": tool_results})\n\n    return next((b.text for b in response.content if b.type == \"text\"), \"\")",
@@ -814,6 +891,13 @@
       "Tool Use"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Add the required array to a tool input schema",
+      "Explain why optional-by-default properties lead to missing arguments",
+      "Validate tool schemas against intended call shapes"
+    ],
+    "realWorldValue": "Without a required array, JSON Schema treats every property as optional, and Claude will sometimes omit critical fields. Tightening the schema at definition time prevents a whole class of flaky tool calls.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A scheduling agent uses a `create_event` tool. In testing, Claude occasionally omits `date` or `title` from its tool call, causing a `KeyError` crash in the event-creation function. A code review reveals the tool's JSON schema defines `date` and `title` as properties but has no `required` array — so Claude treats them as optional.\n\nFix the tool schema so Claude always provides both fields.",
     "language": "python",
     "brokenCode": "import anthropic\n\nclient = anthropic.Anthropic()\n\n# BUG: properties defined but \"required\" array is missing\ncreate_event_tool = {\n    \"name\": \"create_event\",\n    \"description\": \"Create a calendar event with a title and date.\",\n    \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n            \"title\": {\n                \"type\": \"string\",\n                \"description\": \"The title of the event\"\n            },\n            \"date\": {\n                \"type\": \"string\",\n                \"description\": \"The date of the event in YYYY-MM-DD format\"\n            }\n        }\n    }\n}\n\nresponse = client.messages.create(\n    model=\"claude-opus-4-6\",\n    max_tokens=1024,\n    tools=[create_event_tool],\n    messages=[{\"role\": \"user\", \"content\": \"Book a team lunch.\"}]\n)",
@@ -842,6 +926,13 @@
       "Prompt Caching"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Order Messages API fields to maximise cache prefix reuse",
+      "Place cache_control breakpoints at stable boundaries",
+      "Explain why reordering fields invalidates the cache"
+    ],
+    "realWorldValue": "Prompt caching can cut input-token cost by ninety percent on high-traffic agents, but only when the cached prefix is truly stable. Ordering the request correctly is the entry requirement for any real savings.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "You are configuring prompt caching for a high-traffic Claude API integration. To maximise cache hit rate, the elements of each request must be arranged so that the largest, most-stable content appears earliest — forming a long, stable prefix that the cache can reuse across requests.\n\nArrange the four elements in the correct order for maximum cache reuse.",
     "steps": [
       {
@@ -884,6 +975,13 @@
       "Python"
     ],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Diagnose why cache_read_input_tokens reports zero despite cache_control being set",
+      "Identify non-obvious cache invalidators such as timestamp injection",
+      "Verify cache behaviour through API response usage fields"
+    ],
+    "realWorldValue": "Cache hit rate is the metric that decides whether prompt caching pays for itself. Being able to read the usage block and pinpoint what is busting the cache is directly tied to infrastructure spend.",
+    "relatedExamCodes": ["CCA-F"],
     "nodes": [
       {
         "id": "client",
@@ -1053,6 +1151,13 @@
       "Tool Use"
     ],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Diagnose tool definitions that Claude refuses to invoke",
+      "Connect weak tool descriptions to low selection rates",
+      "Improve tool naming and descriptions to drive correct invocation"
+    ],
+    "realWorldValue": "A tool Claude never calls is the same as no tool at all. The description, name, and schema shape are the only signals the model has, and polishing them is often the difference between a useful agent and a dead one.",
+    "relatedExamCodes": ["CCA-F"],
     "nodes": [
       {
         "id": "client",
@@ -1201,6 +1306,13 @@
       "Tool Use"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Handle the pause_turn stop reason in a client loop",
+      "Resume server-side tool execution on the next request",
+      "Distinguish pause_turn flow from end_turn and tool_use flow"
+    ],
+    "realWorldValue": "Server-side tools like web search and code execution introduce pause_turn as a new stop reason. Agents that do not handle it correctly freeze or drop results, so every loop that touches server-side tools needs this pattern.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "You are completing an agentic loop that supports both client-side and server-side tools. Server-side tools (executed by the API itself) signal their progress using a different `stop_reason` than client-side tools. When that reason appears, the loop must extend the conversation history with the current response and re-send — without executing any tools itself.\n\nFill in the three blanks to complete the loop.",
     "questions": [
       {
@@ -1259,6 +1371,13 @@
       "Prompt Caching"
     ],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Identify dynamic content that silently invalidates a cached prefix",
+      "Separate stable prompt sections from per-request context",
+      "Restore a zero-hit cache to steady-state high hit rate"
+    ],
+    "realWorldValue": "Injecting the current timestamp or a fresh session id into the system prompt guarantees a cache miss on every call. Finding these invalidators is a high-leverage optimisation that pays back immediately in token cost.",
+    "relatedExamCodes": ["CCA-F"],
     "nodes": [
       {
         "id": "agent",
@@ -1423,6 +1542,13 @@
       "Pydantic"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Identify Pydantic constraints that structured outputs silently strip",
+      "Choose constraint shapes the API actually enforces",
+      "Validate outputs post-generation when schema enforcement is partial"
+    ],
+    "realWorldValue": "Assuming a schema constraint is enforced when it is not leads to downstream data-quality bugs that only surface in production. Knowing which constraints survive the API round trip is essential for any structured-output pipeline.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A research pipeline uses structured outputs to extract a summary and confidence score from Claude. The Pydantic model declares `min_length=50` on `summary` and `ge=0` on `confidence_score` — but in production, empty summaries and negative confidence scores occasionally slip through.\n\nA code review reveals the API silently strips unsupported JSON Schema constraints. Fix the model to remove the invalid constraints and add client-side validation after parsing.",
     "language": "python",
     "brokenCode": "from anthropic import Anthropic\nfrom pydantic import BaseModel, Field\n\nclient = Anthropic()\n\n# BUG: min_length and ge (minimum) are not supported by the structured outputs API\n# They are silently stripped — validation appears to pass but constraints are not enforced\nclass ResearchSummary(BaseModel):\n    summary: str = Field(min_length=50, description=\"A summary of at least 50 characters\")\n    confidence_score: float = Field(ge=0, le=1, description=\"Confidence between 0 and 1\")\n    key_findings: list[str]\n\ndef extract_summary(text: str) -> ResearchSummary:\n    response = client.messages.create(\n        model=\"claude-opus-4-6\",\n        max_tokens=1024,\n        messages=[{\"role\": \"user\", \"content\": f\"Summarise this research: {text}\"}]\n    )\n    # messages.parse() silently drops unsupported constraints\n    return response.messages.parse(ResearchSummary)",
@@ -1456,6 +1582,13 @@
       "Security"
     ],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Recognise tool_result content that attempts to impersonate a system message",
+      "Apply input sanitisation to untrusted subagent and tool output",
+      "Explain why the trust boundary of a multi-agent system sits at the tool_result"
+    ],
+    "realWorldValue": "Any tool that consumes web content is a prompt-injection vector. Treating tool_result as untrusted input and stripping or escaping control sequences is the baseline defence for any agent that talks to the internet.",
+    "relatedExamCodes": ["CCA-F"],
     "nodes": [
       {
         "id": "user",
@@ -1613,6 +1746,13 @@
       "Context Management"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Configure server-side context compaction for long-running agents",
+      "Set compaction thresholds that preserve critical working memory",
+      "Balance compaction aggressiveness against context-loss risk"
+    ],
+    "realWorldValue": "Agents that run for hours or days cannot rely on raw context windows. Compaction keeps the session alive without manual summarisation, and tuning it correctly is what turns a prototype into something you can leave running overnight.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "You are configuring server-side context compaction for a long-running research agent. Compaction automatically summarises earlier conversation history when the context window approaches its limit — preventing `max_tokens` failures mid-session.\n\nFill in the three blanks to enable compaction correctly.",
     "questions": [
       {
@@ -1671,6 +1811,13 @@
       "JSON Schema"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Add the required array to a tool input schema",
+      "Validate that Claude receives all needed arguments on every call",
+      "Prevent silent argument omission at the schema level"
+    ],
+    "realWorldValue": "Schema hygiene on tool definitions is cheap insurance. A missing required array looks harmless in code review but produces flaky behaviour that takes hours to reproduce in testing.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A scheduling agent uses a `schedule_meeting` tool. In production, the downstream calendar API crashes with `KeyError: 'start_time'` when Claude omits the field. Inspecting the tool's JSON schema reveals the `required` array is missing entirely — Claude treats all parameters as optional.\n\nFix the schema so Claude must always supply `attendees` and `start_time`.",
     "brokenPolicy": "{\n  \"name\": \"schedule_meeting\",\n  \"description\": \"Schedule a calendar meeting with specified attendees at a given time.\",\n  \"input_schema\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"attendees\": {\n        \"type\": \"array\",\n        \"items\": {\"type\": \"string\"},\n        \"description\": \"List of attendee email addresses\"\n      },\n      \"start_time\": {\n        \"type\": \"string\",\n        \"description\": \"Meeting start time in ISO 8601 format (e.g. 2026-04-15T14:00:00Z)\"\n      },\n      \"duration_minutes\": {\n        \"type\": \"integer\",\n        \"description\": \"Duration of the meeting in minutes (optional, defaults to 30)\"\n      },\n      \"title\": {\n        \"type\": \"string\",\n        \"description\": \"Meeting title (optional)\"\n      }\n    }\n  }\n}",
     "correctPolicy": "{\n  \"name\": \"schedule_meeting\",\n  \"description\": \"Schedule a calendar meeting with specified attendees at a given time.\",\n  \"input_schema\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"attendees\": {\n        \"type\": \"array\",\n        \"items\": {\"type\": \"string\"},\n        \"description\": \"List of attendee email addresses\"\n      },\n      \"start_time\": {\n        \"type\": \"string\",\n        \"description\": \"Meeting start time in ISO 8601 format (e.g. 2026-04-15T14:00:00Z)\"\n      },\n      \"duration_minutes\": {\n        \"type\": \"integer\",\n        \"description\": \"Duration of the meeting in minutes (optional, defaults to 30)\"\n      },\n      \"title\": {\n        \"type\": \"string\",\n        \"description\": \"Meeting title (optional)\"\n      }\n    },\n    \"required\": [\"attendees\", \"start_time\"]\n  }\n}",
@@ -1707,6 +1854,13 @@
       "Multi-Agent"
     ],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Match subagent model choice to task stakes and complexity",
+      "Recognise when a cost-driven downgrade degrades output quality unacceptably",
+      "Justify model selection in a multi-agent cost-and-quality tradeoff"
+    ],
+    "realWorldValue": "Picking Haiku for a high-stakes legal summarisation subagent to save a few cents is the kind of trade that looks smart on a cost dashboard and causes an incident in production. Model selection is a real architectural decision.",
+    "relatedExamCodes": ["CCA-F"],
     "scenario": "A multi-agent legal research pipeline has a coordinator that delegates to specialist subagents. The legal summarisation subagent is producing inaccurate summaries — misattributing case holdings and omitting critical nuance. A review of the `AgentDefinition` reveals it is using `claude-haiku-4-5-20251001` to reduce costs.\n\nFix the subagent definition to use the most capable model tier for high-stakes legal reasoning. Also ensure the subagent's `maxTokens` is sufficient for long legal documents (at least 4096).",
     "brokenPolicy": "{\n  \"name\": \"Legal Summarisation Subagent\",\n  \"description\": \"Produces accurate, citation-preserving summaries of legal case documents for use in appellate briefs\",\n  \"model\": \"claude-haiku-4-5-20251001\",\n  \"maxTokens\": 1024,\n  \"system\": \"You are an expert legal analyst. Summarise the provided case document accurately, preserving all citations, holdings, and dissenting opinions. This output will be used in live court filings — accuracy is critical.\",\n  \"allowedTools\": [\n    \"ReadDocument\",\n    \"ExtractCitations\"\n  ]\n}",
     "correctPolicy": "{\n  \"name\": \"Legal Summarisation Subagent\",\n  \"description\": \"Produces accurate, citation-preserving summaries of legal case documents for use in appellate briefs\",\n  \"model\": \"claude-opus-4-6\",\n  \"maxTokens\": 4096,\n  \"system\": \"You are an expert legal analyst. Summarise the provided case document accurately, preserving all citations, holdings, and dissenting opinions. This output will be used in live court filings — accuracy is critical.\",\n  \"allowedTools\": [\n    \"ReadDocument\",\n    \"ExtractCitations\"\n  ]\n}",

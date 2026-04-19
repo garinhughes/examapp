@@ -55,6 +55,9 @@ export interface SkillLabIndexEntry {
   showcase?: boolean
   /** Position in the showcase ordering (lower = shown first) */
   showcaseOrder?: number
+  learningOutcomes?: string[]
+  realWorldValue?: string
+  relatedExamCodes?: string[]
 }
 
 /* ------------------------------------------------------------------ */
@@ -152,6 +155,9 @@ export async function publishLab(
     description?: string
     showcase?: boolean
     showcaseOrder?: number
+    learningOutcomes?: string[]
+    realWorldValue?: string
+    relatedExamCodes?: string[]
   },
 ): Promise<SkillLabIndexEntry> {
   const { s3Key, s3VersionId } = await uploadLabToS3(labId, jsonBody)
@@ -171,6 +177,9 @@ export async function publishLab(
     description: meta.description,
     showcase: meta.showcase,
     showcaseOrder: meta.showcaseOrder,
+    learningOutcomes: meta.learningOutcomes,
+    realWorldValue: meta.realWorldValue,
+    relatedExamCodes: meta.relatedExamCodes,
   }
   await putLabIndex(entry)
   return entry

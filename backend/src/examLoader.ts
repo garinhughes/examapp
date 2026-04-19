@@ -67,6 +67,7 @@ export interface Question {
   tip?: string
   explanation?: string
   image?: string
+  diagram?: string
   difficulty?: number
   lastReviewed?: string
 }
@@ -78,8 +79,6 @@ export interface Exam {
   passMark?: number
   defaultQuestions?: number
   defaultDuration?: number
-  logo?: string | null
-  logoHref?: string | null
   level?: string
   version?: number | string
   publishedAt?: string
@@ -146,6 +145,7 @@ export function normaliseQuestion(raw: any): Question {
     tip: raw.tip,
     explanation: raw.explanation,
     image: raw.image,
+    diagram: raw.diagram,
     difficulty: raw.difficulty,
     lastReviewed: raw.lastReviewed,
   }
@@ -162,8 +162,6 @@ function parseExamJson(raw: any, code: string, s3VersionId?: string | null): Exa
     passMark: raw.passMark,
     defaultQuestions: raw.defaultQuestions ?? raw.defaultQuestionCount,
     defaultDuration: raw.defaultDuration,
-    logo: raw.logo,
-    logoHref: raw.logoHref,
     level: raw.level,
     version: raw.version ?? raw.v ?? undefined,
     publishedAt: raw.publishedAt ?? undefined,

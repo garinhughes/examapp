@@ -4,6 +4,7 @@ import { useExam } from './ExamContext'
 import { isAnswerCorrect, renderChoiceContent, MarkdownText } from './utils'
 import type { Question, QuestionType } from './types'
 import { QuestionImage } from './QuestionImage'
+import { QuestionDiagram } from './QuestionDiagram'
 
 export function ExamReview() {
   const {
@@ -346,6 +347,7 @@ export function ExamReview() {
                         </div>
                       )}
                       {(item.q as any).image && <QuestionImage imageKey={(item.q as any).image} />}
+                      {(item.q as any).diagram && <QuestionDiagram diagramKey={(item.q as any).diagram} />}
                     </div>
                   </div>
                 )}

@@ -1,4 +1,5 @@
 import { useExam } from './ExamContext'
+import { ProviderLogo } from '@/components/ProviderLogo'
 import { Info, ChevronDown, ChevronRight, Search, BookOpen, SlidersHorizontal, ListOrdered, TrendingUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTourContext } from '@/components/TourProvider'
@@ -49,9 +50,8 @@ export function PracticeExams() {
                 <span className="text-xs text-muted-foreground text-center leading-tight mt-0.5 hidden sm:block">{desc}</span>
               </div>
               {i < arr.length - 1 && (
-                <div className="flex-shrink-0 flex flex-col items-center" style={{ marginTop: '-18px' }}>
-                  <div className="w-4 h-px bg-border" />
-                  <ChevronRight className="w-3.5 h-3.5 text-primary -mt-px" />
+                <div className="flex-shrink-0 flex flex-col items-center">
+                  <ChevronRight className="w-3.5 h-3.5 text-primary" />
                 </div>
               )}
             </div>
@@ -111,21 +111,7 @@ export function PracticeExams() {
                   onKeyDown={(e) => { if (!cardDisabled && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); handleCardActivate() } }}
                   className={`rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${cardDisabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:border-primary hover:bg-primary/5'}`}
                 >
-                  {ex.logo ? (
-                    ex.logoHref ? (
-                      <a href={ex.logoHref} title="Provider logo" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="h-14 bg-white dark:bg-gray-200 flex items-center justify-center px-4 border-b border-border" aria-label={`${ex.provider ?? 'Provider'} logo link`}>
-                        <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="max-h-8 max-w-full w-auto object-contain" />
-                      </a>
-                    ) : (
-                      <div className="h-14 bg-white dark:bg-gray-200 flex items-center justify-center px-4 border-b border-border" aria-hidden>
-                        <img src={ex.logo} alt={`${ex.provider ?? 'Provider'} logo`} className="max-h-8 max-w-full w-auto object-contain" />
-                      </div>
-                    )
-                  ) : (
-                    <div className="h-14 bg-muted/40 flex items-center justify-center border-b border-border text-muted-foreground text-xs font-medium" aria-hidden>
-                      {ex.provider ?? ''}
-                    </div>
-                  )}
+                  <ProviderLogo provider={ex.provider} size="md" />
                   <div className="p-4 flex-1 flex flex-col">
                     <div className="font-medium leading-tight">{ex.title ?? ex.code}</div>
                     <div className="text-xs text-muted-foreground mt-1">{ex.code}</div>

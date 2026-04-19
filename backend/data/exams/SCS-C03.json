@@ -2,7 +2,6 @@
   "code": "SCS-C03",
   "provider": "AWS",
   "passMark": 75,
-  "logo": "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
   "defaultQuestions": 65,
   "defaultDuration": 170,
   "title": "AWS Certified Security - Specialty",

@@ -7,6 +7,7 @@ import { useExam } from './ExamContext'
 import { renderChoiceContent, MarkdownText } from './utils'
 import { SortableOrderItem } from './SortableOrderItem'
 import { QuestionImage } from './QuestionImage'
+import { QuestionDiagram } from './QuestionDiagram'
 import type { QuestionType } from './types'
 
 export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
@@ -502,6 +503,7 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
                       )}
                     </div>
                     {q.image && <QuestionImage imageKey={q.image} />}
+                    {q.diagram && <QuestionDiagram diagramKey={q.diagram} />}
                   </div>
                 )}
               </div>

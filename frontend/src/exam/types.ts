@@ -3,8 +3,6 @@ export type Exam = {
   title?: string
   provider?: string
   version?: string
-  logo?: string
-  logoHref?: string
   passMark?: number
   defaultQuestions?: number
   defaultQuestionCount?: number
@@ -44,6 +42,7 @@ export type Question = {
   tip?: string
   explanation?: string
   image?: string
+  diagram?: string
   docs?: string
   difficulty?: number
   services?: string[]

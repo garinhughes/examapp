@@ -32,6 +32,9 @@ export interface LabSummary {
   locked?: boolean
   showcase?: boolean
   showcaseOrder?: number
+  learningOutcomes?: string[]     // "What you'll demonstrate" bullets
+  realWorldValue?: string         // Short paragraph — why this matters on the job
+  relatedExamCodes?: string[]     // e.g. ['SAA-C03', 'CLF-C02']
 }
 
 // --- Diagnose lab types ---

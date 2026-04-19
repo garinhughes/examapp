@@ -101,6 +101,9 @@ async function main() {
       description: lab.description,
       showcase: lab.showcase,
       showcaseOrder: lab.showcaseOrder,
+      learningOutcomes: lab.learningOutcomes,
+      realWorldValue: lab.realWorldValue,
+      relatedExamCodes: lab.relatedExamCodes,
     })
     console.log(`    → published: s3VersionId=${entry.s3VersionId}`)
     console.log(`    → index updated: version=${entry.version} publishedAt=${entry.publishedAt}\n`)

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { X, Brain, Eye, Lock, ChevronDown, ChevronLeft, Volume2, Settings2, Coffee, Hourglass } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useExam } from './ExamContext'
+import { useIsAdmin } from '@/auth/useIsAdmin'
 import { useTourContext } from '@/components/TourProvider'
 import { clarityEvent, clarityTag } from '@/clarity'
 
@@ -32,6 +33,9 @@ export function ExamSetup() {
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const [qInputVal, setQInputVal] = useState(String(numQuestions))
   const [durInputVal, setDurInputVal] = useState(String(durationMinutes))
+  const isAdminFn = useIsAdmin()
+  const isAdmin = isAdminFn()
+  const [pinnedQuestionId, setPinnedQuestionId] = useState('')
 
   // Keep local string inputs in sync when slider or external state changes
   useEffect(() => { setQInputVal(String(numQuestions)) }, [numQuestions])
@@ -257,6 +261,53 @@ export function ExamSetup() {
 
         {advancedOpen && (
           <div className="mt-4 space-y-4 pt-4 border-t border-border/40">
+
+            {/* Admin: pin a specific question ID */}
+            {isAdmin && (() => {
+              const pinMatches = pinnedQuestionId.trim()
+                ? (questions as any[]).filter((q) => String(q.id).toLowerCase().includes(pinnedQuestionId.toLowerCase())).slice(0, 12)
+                : []
+              const exactMatch = (questions as any[]).some((q) => String(q.id).toLowerCase() === pinnedQuestionId.toLowerCase())
+              return (
+                <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400 mb-1">
+                    Admin · Pin question
+                  </label>
+                  <div className="relative flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={pinnedQuestionId}
+                      onChange={(e) => setPinnedQuestionId(e.target.value)}
+                      placeholder="Type e.g. 0046 to search…"
+                      className="flex-1 px-2 py-1 text-sm rounded bg-background border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+                      disabled={locked}
+                      autoComplete="off"
+                    />
+                    {pinnedQuestionId && (
+                      <button type="button" onClick={() => setPinnedQuestionId('')} className="text-xs text-muted-foreground hover:text-foreground">clear</button>
+                    )}
+                    {pinMatches.length > 0 && !exactMatch && (
+                      <ul className="absolute top-full left-0 right-8 z-50 mt-1 rounded border border-border bg-popover shadow-md text-sm overflow-hidden">
+                        {pinMatches.map((q: any) => (
+                          <li key={q.id}>
+                            <button
+                              type="button"
+                              className="w-full text-left px-3 py-1.5 hover:bg-accent truncate"
+                              onClick={() => setPinnedQuestionId(q.id)}
+                            >
+                              {q.id}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    Loads only this question — bypasses filters and question count.
+                  </p>
+                </div>
+              )
+            })()}
 
             {/* Number of questions */}
             <div>
@@ -582,7 +633,7 @@ export function ExamSetup() {
           <button
             ref={(el) => tour.registerTarget('start-exam-btn', el)}
             className={`px-4 py-2 rounded-md text-white font-semibold transition-all bg-primary ${loadingWeakestLink ? 'opacity-70 cursor-wait' : ''}`}
-            onClick={() => { createAttempt(); clarityEvent('exam_start_clicked'); clarityTag('exam_code', selected ?? '') }}
+            onClick={() => { createAttempt(pinnedQuestionId ? { pinnedQuestionId } : undefined); clarityEvent('exam_start_clicked'); clarityTag('exam_code', selected ?? '') }}
             disabled={loadingWeakestLink}
           >
             {loadingWeakestLink ? 'Preparing…' : savedProgress ? 'Start new' : 'Start exam'}

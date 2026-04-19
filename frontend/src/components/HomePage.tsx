@@ -563,7 +563,7 @@ export function HomePage() {
             },
             {
               q: 'Which certifications do you cover?',
-              a: 'We currently offer practice exams and skill labs for AWS; more providers are coming soon. New certifications are added regularly.',
+              a: 'We currently offer practice exams and skill labs for AWS, Anthropic, CompTIA, and Red Hat. New certifications are added regularly.',
             },
             {
               q: 'Can I study on mobile?',

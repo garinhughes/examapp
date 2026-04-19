@@ -74,6 +74,9 @@ async function loadLabsS3Summary(): Promise<any[]> {
       labCategory: (e as any).labCategory ?? 'Troubleshoot',
       showcase: e.showcase ?? false,
       showcaseOrder: e.showcaseOrder ?? 99,
+      ...((e as any).learningOutcomes ? { learningOutcomes: (e as any).learningOutcomes } : {}),
+      ...((e as any).realWorldValue ? { realWorldValue: (e as any).realWorldValue } : {}),
+      ...((e as any).relatedExamCodes ? { relatedExamCodes: (e as any).relatedExamCodes } : {}),
     }))
   } catch (err) {
     console.error('[skill-labs] Failed to scan DynamoDB index', err)
@@ -173,6 +176,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           labCategory: lab.labCategory || 'Troubleshoot',
           showcase: lab.showcase ?? false,
           showcaseOrder: lab.showcaseOrder ?? 99,
+          ...(lab.learningOutcomes ? { learningOutcomes: lab.learningOutcomes } : {}),
+          ...(lab.realWorldValue ? { realWorldValue: lab.realWorldValue } : {}),
+          ...(lab.relatedExamCodes ? { relatedExamCodes: lab.relatedExamCodes } : {}),
         }))
 
     if (request.user) {

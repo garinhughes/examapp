@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import Loader from '@/components/Loader'
 import { useExam } from '@/exam/ExamContext'
-import { Clock, Hourglass, Coffee, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Heart, Bookmark, Search, ArrowRight, X, Lock, ExternalLink, Play } from 'lucide-react'
+import { Clock, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Bookmark, Search, X, Lock, Play } from 'lucide-react'
 import { clarityEvent, clarityTag } from '@/clarity'
 import type { LabSummary, SkillLevel } from './types'
 import { apiUrl } from '@/apiBase'
 import { SearchableFilter } from './SearchableFilter'
 import { getBookmarkedLabs, toggleBookmark, getInProgressLabs, clearLabProgress } from './labs/shared'
+import { DIFFICULTY_COLORS } from './platformMeta'
+import { ProviderLogo } from '@/components/ProviderLogo'
 
 const DIFFICULTY_LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced']
 
@@ -17,24 +19,21 @@ function readLabsSession(): Record<string, unknown> {
     return raw ? JSON.parse(raw) : {}
   } catch { return {} }
 }
-const DIFFICULTY_COLORS: Record<SkillLevel, string> = {
-  beginner: 'bg-green-500/15 text-green-700 dark:text-green-400',
-  intermediate: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
-  advanced: 'bg-red-500/15 text-red-700 dark:text-red-400',
-}
 const LABS_PER_PAGE = 12 // 3 cols × 4 rows
+
+function inlineMarkdown(text: string) {
+  return text.split(/(`[^`]+`)/).map((part, i) =>
+    part.startsWith('`') && part.endsWith('`')
+      ? <code key={i} className="text-[0.82em] bg-zinc-100 dark:bg-zinc-800 text-rose-700 dark:text-rose-300 px-1 py-px rounded font-mono border border-zinc-200 dark:border-zinc-700">{part.slice(1, -1)}</code>
+      : part
+  )
+}
 
 export function SkillLabsPage() {
   const { setRoute, authFetch, user } = useExam()
   const [labs, setLabs] = useState<LabSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  // Timed/casual toggle (default to casual)
-  const [timed, setTimed] = useState(() => {
-    const ss = readLabsSession()
-    return typeof ss.timed === 'boolean' ? ss.timed : false
-  })
 
   // Search query for titles & descriptions
   const [searchQuery, setSearchQuery] = useState(() => {
@@ -166,7 +165,6 @@ export function SkillLabsPage() {
   useEffect(() => {
     try {
       sessionStorage.setItem(SL_SESSION_KEY, JSON.stringify({
-        timed,
         searchQuery,
         selectedDifficulty,
         selectedPlatforms: [...selectedPlatforms],
@@ -176,7 +174,7 @@ export function SkillLabsPage() {
         page,
       }))
     } catch {}
-  }, [timed, searchQuery, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showSavedOnly, page])
+  }, [searchQuery, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showSavedOnly, page])
 
   // Derive unique filter options from lab data
   const filterOptions = useMemo(() => {
@@ -254,51 +252,39 @@ export function SkillLabsPage() {
 
   return (
     <div className="space-y-5">
-      {/* Controls bar: timed toggle + filters */}
+      {/* Controls bar: search + filters */}
       <div className="flex flex-col gap-3">
-        {/* Top row: mode toggle + clear */}
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            {/* Timed / Casual toggle + Search */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50 border border-border">
-                <button
-                  onClick={() => setTimed(false)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition ${
-                    !timed ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Coffee className="w-3.5 h-3.5" />
-                  Casual
-                </button>
-                <button
-                  onClick={() => setTimed(true)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition ${
-                    timed ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Hourglass className="w-3.5 h-3.5" />
-                  Timed
-                </button>
+        {/* Top row: search + saved + count */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative flex-1 sm:flex-none">
+              <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                <Search className="w-4 h-4 text-muted-foreground" />
               </div>
-
-              <div className="relative flex-1 sm:flex-none">
-                <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                  <Search className="w-4 h-4 text-muted-foreground" />
-                </div>
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => { setSearchQuery(e.target.value); setPage(1) }}
-                  placeholder="Search labs..."
-                  className="ml-1 pl-8 w-full sm:w-64 md:w-80 px-3 py-1.5 rounded-md border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setPage(1) }}
+                placeholder="Search labs..."
+                className="pl-8 w-full sm:w-64 md:w-80 px-3 py-1.5 rounded-md border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
-
-            <div className="text-sm text-muted-foreground">
-              {filtered.length} lab{filtered.length !== 1 ? 's' : ''}
-            </div>
+            <button
+              onClick={() => { setShowSavedOnly(!showSavedOnly); setPage(1) }}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition border ${
+                showSavedOnly
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              }`}
+            >
+              <Bookmark className="w-3 h-3" />
+              Saved{bookmarkedLabIds.size > 0 ? ` (${bookmarkedLabIds.size})` : ''}
+            </button>
           </div>
+          <div className="text-sm text-muted-foreground">
+            {filtered.length} lab{filtered.length !== 1 ? 's' : ''}
+          </div>
+        </div>
 
         {/* Filter row */}
         <div className="flex items-center gap-2 flex-wrap">
@@ -358,18 +344,6 @@ export function SkillLabsPage() {
             ))}
           </div>
 
-          <button
-            onClick={() => { setShowSavedOnly(!showSavedOnly); setPage(1) }}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition border ${
-              showSavedOnly
-                ? 'border-primary bg-primary/10 text-primary'
-                : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-          >
-            <Bookmark className="w-3 h-3" />
-            Saved{bookmarkedLabIds.size > 0 ? ` (${bookmarkedLabIds.size})` : ''}
-          </button>
-
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
@@ -402,7 +376,7 @@ export function SkillLabsPage() {
                 className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition"
                 onClick={() => {
                   const savedTimed = inProgressLabs.get(resumable.id)?.timed
-                  const mode = savedTimed !== null && savedTimed !== undefined ? (savedTimed ? 'timed' : 'casual') : (timed ? 'timed' : 'casual')
+                  const mode = (savedTimed === true) ? 'timed' : 'casual'
                   clarityEvent('lab_resumed')
                   clarityTag('lab_id', resumable.id)
                   clarityTag('lab_mode', mode)
@@ -430,123 +404,114 @@ export function SkillLabsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paginated.map((lab) => (
-            <div
-              key={lab.id}
-              className={`group relative p-5 rounded-lg border bg-card shadow-sm flex flex-col justify-between transition-all ${
-                lab.locked
-                  ? 'border-border opacity-70'
-                  : 'border-border hover:border-primary/30 hover:shadow-md'
-              }`}
-            >
-              <div>
-                {/* Title row */}
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="font-semibold text-base leading-snug">{lab.title}</h3>
-                  <div className="flex items-center gap-1.5 shrink-0">
+          {paginated.map((lab) => {
+            const anyInProgress = inProgressLabs.size > 0
+            const thisInProgress = inProgressLabs.has(lab.id)
+            const isCompleted = completedLabIds.has(lab.id) && !thisInProgress
+            const blockedByOther = anyInProgress && !thisInProgress && !lab.locked
+            const cardDisabled = blockedByOther
+            const handleCardActivate = () => {
+              if (cardDisabled) return
+              clarityEvent('lab_visited')
+              clarityTag('lab_id', lab.id)
+              setRoute(`skill-lab-detail:${lab.id}` as any)
+            }
+            return (
+              <div
+                key={lab.id}
+                role="button"
+                tabIndex={cardDisabled ? -1 : 0}
+                aria-disabled={cardDisabled}
+                title={cardDisabled ? 'Complete or cancel your current lab first' : `Open ${lab.title}`}
+                onClick={handleCardActivate}
+                onKeyDown={(e) => {
+                  if (!cardDisabled && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); handleCardActivate() }
+                }}
+                className={`group relative rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                  cardDisabled
+                    ? 'opacity-60 cursor-not-allowed'
+                    : lab.locked
+                      ? 'opacity-80 cursor-pointer hover:border-primary/30'
+                      : 'cursor-pointer hover:border-primary hover:bg-primary/5'
+                }`}
+              >
+                {/* Logo strip */}
+                <div className="relative">
+                  <ProviderLogo provider={lab.platform} size="md" />
+
+                  {/* Top-right overlay: bookmark + status */}
+                  <div className="absolute top-1.5 right-1.5 flex items-center gap-1">
                     {lab.locked && (
-                      <span title="Premium lab">
+                      <span title="Premium lab" className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/90 dark:bg-gray-900/80 border border-border shadow-sm">
                         <Lock className="w-3.5 h-3.5 text-muted-foreground" />
                       </span>
                     )}
                     {!lab.locked && (
                       <button
                         onClick={(e) => { e.stopPropagation(); handleToggleBookmark(lab.id) }}
-                        className="p-1 rounded hover:bg-muted/60 transition"
+                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/90 dark:bg-gray-900/80 border border-border shadow-sm hover:bg-white transition"
                         title={bookmarkedLabIds.has(lab.id) ? 'Remove bookmark' : 'Save for later'}
                       >
-                        <Heart
-                          className={`w-4 h-4 transition ${
-                            bookmarkedLabIds.has(lab.id) ? 'fill-red-500 text-red-500' : 'text-muted-foreground'
+                        <Bookmark
+                          className={`w-3.5 h-3.5 transition ${
+                            bookmarkedLabIds.has(lab.id) ? 'fill-primary text-primary' : 'text-muted-foreground'
                           }`}
                         />
                       </button>
                     )}
+                    {thisInProgress && !lab.locked && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setConfirmCancelLabId(lab.id) }}
+                        title="Cancel lab progress"
+                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/90 dark:bg-gray-900/80 border border-border shadow-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {isCompleted && !lab.locked && (
+                      <span title="Completed" className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-600 text-white shadow-sm">
+                        <CheckCircle2 className="w-4 h-4" />
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                {/* Description */}
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{lab.description}</p>
+                {/* Content */}
+                <div className="p-4 flex-1 flex flex-col">
+                  <div className="font-medium leading-tight">{lab.title}</div>
+                  <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{inlineMarkdown(lab.description)}</p>
 
-                {/* Tags row */}
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${DIFFICULTY_COLORS[lab.difficulty]}`}>
-                    {lab.difficulty}
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                    {lab.platform}
-                  </span>
-                </div>
+                  {/* Tech pills */}
+                  {(lab.technologies || []).length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {(lab.technologies || []).map((tech) => (
+                        <span key={tech} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/70 text-xs text-muted-foreground">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
-                {/* Tech pills */}
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {(lab.technologies || []).map((tech) => (
-                    <span key={tech} className="px-1.5 py-0.5 rounded bg-muted/70 text-xs text-muted-foreground">
-                      {tech}
+                  {/* Meta — bottom-aligned: level, type, duration */}
+                  <div className="mt-auto pt-3 flex items-center gap-1.5 flex-wrap text-xs">
+                    <span className={`px-2 py-0.5 rounded-full font-medium capitalize ${DIFFICULTY_COLORS[lab.difficulty]}`}>
+                      {lab.difficulty}
                     </span>
-                  ))}
-                </div>
-
-                {/* Meta row */}
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium capitalize">
+                      {lab.labCategory}
+                    </span>
+                    <span className="flex items-center gap-1 text-muted-foreground ml-auto">
                       <Clock className="w-3 h-3" />
                       {typeof lab.timeLimit === 'number' && lab.timeLimit > 0 ? `${Math.floor(lab.timeLimit / 60)} min` : '-'}
                     </span>
-                  <span className="capitalize">{lab.category}</span>
+                    {lab.locked && (
+                      <span className="text-amber-700 dark:text-amber-400">Premium</span>
+                    )}
+                  </div>
                 </div>
               </div>
-
-              <div className="mt-4 space-y-2">
-                {lab.locked && (
-                  <p className="text-xs text-amber-700 dark:text-amber-400">
-                    Purchase required to access this lab.
-                  </p>
-                )}
-                <div className="flex items-center gap-2">
-                {(() => {
-                  const anyInProgress = inProgressLabs.size > 0
-                  const thisInProgress = inProgressLabs.has(lab.id)
-                  const blockedByOther = anyInProgress && !thisInProgress && !lab.locked
-                  return (
-                    <button
-                      className={`flex-1 px-4 py-2 rounded-md font-medium text-sm inline-flex items-center gap-2 transition justify-center ${
-                        blockedByOther
-                          ? 'bg-muted/60 text-muted-foreground/60 border border-border cursor-not-allowed'
-                          : 'bg-primary text-primary-foreground hover:bg-primary/90'
-                      }`}
-                      disabled={blockedByOther}
-                      title={blockedByOther ? 'Complete or cancel your current lab first' : undefined}
-                      onClick={() => {
-                        if (blockedByOther) return
-                        clarityEvent('lab_visited')
-                        clarityTag('lab_id', lab.id)
-                        setRoute(`skill-lab-detail:${lab.id}` as any)
-                      }}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Visit Lab
-                    </button>
-                  )
-                })()}
-                {inProgressLabs.has(lab.id) && !lab.locked && (
-                  <button
-                    onClick={() => setConfirmCancelLabId(lab.id)}
-                    title="Cancel lab progress"
-                    className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-border text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-                {completedLabIds.has(lab.id) && !inProgressLabs.has(lab.id) && !lab.locked && (
-                  <span title="Completed" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-600 text-white text-sm shadow-md">
-                    <CheckCircle2 className="w-5 h-5" />
-                  </span>
-                )}
-                </div>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

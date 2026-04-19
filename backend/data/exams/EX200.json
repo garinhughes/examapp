@@ -2,7 +2,6 @@
   "code": "EX200",
   "provider": "RedHat",
   "passMark": 70,
-  "logo": "https://upload.wikimedia.org/wikipedia/commons/7/79/Red_Hat_Logo_2019.svg",
   "defaultQuestions": 65,
   "defaultDuration": 90,
   "title": "RedHat Certified System Administrator (RHCSA)",

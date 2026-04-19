@@ -31,8 +31,6 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       code: e.code,
       title: e.title,
       provider: e.provider,
-      logo: e.logo,
-      logoHref: e.logoHref,
       passMark: typeof e.passMark === 'number' ? e.passMark : 70,
       defaultQuestions: e.defaultQuestions,
       defaultDuration: e.defaultDuration,

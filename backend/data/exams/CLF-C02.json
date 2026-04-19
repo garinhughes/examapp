@@ -2,7 +2,6 @@
   "code": "CLF-C02",
   "provider": "AWS",
   "passMark": 70,
-  "logo": "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
   "defaultQuestions": 65,
   "defaultDuration": 90,
   "title": "AWS Certified Cloud Practitioner",

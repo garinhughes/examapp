@@ -188,7 +188,7 @@ export interface ExamContextType {
   // Actions
   setupExamFromMeta: (ex: any) => void
   fetchScoreHistory: (code: string) => Promise<void>
-  createAttempt: () => Promise<void>
+  createAttempt: (opts?: { pinnedQuestionId?: string }) => Promise<void>
   submitAnswer: (q: Question, i: string | string[]) => Promise<void>
   submitMatchingAnswer: (q: Question, mappings: Record<string, string>) => Promise<void>
   submitOrderingAnswer: (q: Question, order: string[]) => Promise<void>
@@ -671,8 +671,9 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }
 
-  async function createAttempt() {
+  async function createAttempt(opts?: { pinnedQuestionId?: string }) {
     if (!selected) return
+    const pinnedId = opts?.pinnedQuestionId?.trim() || null
     setSelectedAnswers({})
     setAttemptData(null)
     setLastError(null)
@@ -740,6 +741,32 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Normal (casual / timed) mode
+      // Admin-pinned single question: bypass filters, send inline question
+      if (pinnedId) {
+        const pinned = (questions || []).find((q: any) => String(q.id).toLowerCase() === pinnedId.toLowerCase())
+        if (!pinned) { setLastError(`Question "${pinnedId}" not found in this exam's accessible set`); return }
+        const res = await authFetch('/attempts', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ examCode: selected, questions: [pinned], metadata: { pinned: true, pinnedQuestionId: pinned.id } })
+        })
+        if (!res.ok) { setLastError(await extractErrorMessage(res, 'create attempt failed')); return }
+        const data = await res.json()
+        if (data?.attemptId) {
+          recordPracticeDay()
+          const r2 = await authFetch(`/attempts/${data.attemptId}`)
+          if (r2.ok) {
+            const attemptFull = await r2.json()
+            setAttemptId(data.attemptId)
+            try { localStorage.setItem(key, JSON.stringify({ attemptId: data.attemptId, examVersion: attemptFull?.examVersion ?? null, attemptSchemaVersion: 1 })) } catch {}
+            setAttemptData(attemptFull)
+            if (Array.isArray(attemptFull.questions)) { setQuestions(attemptFull.questions); setNumQuestions(attemptFull.questions.length) }
+            setExamStarted(true)
+            if (examMode === 'timed') setTimeLeft(durationMinutes * 60)
+          }
+        }
+        return
+      }
+
       const keywords = serviceFilterText.split(',').map((s) => s.trim()).filter(Boolean)
       const domainFilterList = (takeDomains.includes('All') || takeDomains.length === 0) ? [] : takeDomains
       const hasAnyFilter = keywords.length > 0 || domainFilterList.length > 0 || selectedServices.length > 0

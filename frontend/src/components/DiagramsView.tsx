@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import mermaid from 'mermaid'
-import { icons as logosIcons } from '@iconify-json/logos'
+import { ensureCloudIconPacks, detectProviders } from '@/lib/cloudIconPacks'
 
 const SAMPLE_DIAGRAM = `architecture-beta
   %% Reordered left-to-right for better fit in preview
@@ -9,24 +9,24 @@ const SAMPLE_DIAGRAM = `architecture-beta
   group data[Data]
   group monitoring[Monitoring]
 
-  service dns(logos:aws-route53)[Route 53] in edge
-  service waf(logos:aws-waf)[WAF] in edge
-  service cf(logos:aws-cloudfront)[CloudFront] in edge
-  service s3fe(logos:aws-s3)[S3 frontend] in edge
+  service dns(icon:aws:route-53)[Route 53] in edge
+  service waf(icon:aws:waf)[WAF] in edge
+  service cf(icon:aws:cloudfront)[CloudFront] in edge
+  service s3fe(icon:aws:simple-storage-service)[S3 frontend] in edge
 
-  service alb(logos:aws-elb)[ALB] in compute
-  service ecs(logos:aws-fargate)[ECS Fargate] in compute
-  service ecr(logos:aws-ecs)[ECR] in compute
-  service sm(logos:aws-secrets-manager)[Secrets Mgr] in data
+  service alb(icon:aws:elastic-load-balancing)[ALB] in compute
+  service ecs(icon:aws:elastic-container-service)[ECS Fargate] in compute
+  service ecr(icon:aws:elastic-container-registry)[ECR] in compute
+  service sm(icon:aws:secrets-manager)[Secrets Mgr] in data
 
-  service cognito(logos:aws-cognito)[Cognito] in edge
-  service dynamo(logos:aws-dynamodb)[DynamoDB] in data
-  service s3exams(logos:aws-s3)[S3 exams] in data
+  service cognito(icon:aws:cognito)[Cognito] in edge
+  service dynamo(icon:aws:dynamodb)[DynamoDB] in data
+  service s3exams(icon:aws:simple-storage-service)[S3 exams] in data
 
-  service eb(logos:aws-eventbridge)[EventBridge] in monitoring
-  service lambda(logos:aws-lambda)[Lambda] in monitoring
-  service apigw(logos:aws-api-gateway)[API GW] in monitoring
-  service cw(logos:aws-cloudwatch)[CloudWatch] in monitoring
+  service eb(icon:aws:eventbridge)[EventBridge] in monitoring
+  service lambda(icon:aws:lambda)[Lambda] in monitoring
+  service apigw(icon:aws:api-gateway)[API GW] in monitoring
+  service cw(icon:aws:cloudwatch)[CloudWatch] in monitoring
 
   dns:R -- L:waf
   waf:R -- L:cf
@@ -47,17 +47,7 @@ const SAMPLE_DIAGRAM = `architecture-beta
   lambda:R -- L:cw
   lambda:B -- T:dynamo`
 
-let iconPacksRegistered = false
 let mermaidTheme: string | null = null
-
-function ensureIconPacks() {
-  if (!iconPacksRegistered) {
-    mermaid.registerIconPacks([
-      { name: 'logos', icons: logosIcons },
-    ])
-    iconPacksRegistered = true
-  }
-}
 
 export function DiagramsView() {
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
@@ -132,7 +122,7 @@ export function DiagramsView() {
     setRendering(true)
     setError(null)
     try {
-      ensureIconPacks()
+      await ensureCloudIconPacks(detectProviders(diagramCode))
       const mTheme = theme === 'dark' ? 'dark' : 'default'
       if (mermaidTheme !== mTheme) {
         mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: mTheme })
