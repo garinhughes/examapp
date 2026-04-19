@@ -86,6 +86,49 @@ function CarouselSlide({ imageKey, alt, onOpen }: { imageKey: string; alt: strin
 }
 
 /* ------------------------------------------------------------------ */
+/*  AI content pipeline flow diagram                                  */
+/* ------------------------------------------------------------------ */
+
+const pipelineSteps = [
+  { label: 'Number Skills', desc: 'Map content to official exam skills by ID' },
+  { label: 'Generate Draft', desc: 'AI drafts questions per skill using source docs' },
+  { label: 'Human Review', desc: 'Subject-matter experts approve or reject' },
+  { label: 'Add Additional Content', desc: 'Enrich with images, diagrams and references' },
+  { label: 'Publish', desc: 'Content goes live on the platform' },
+  { label: 'User Feedback / Update', desc: 'Ratings and reports trigger further review' },
+]
+
+function AIPipelineFlow() {
+  return (
+    <div className="mt-4 flex flex-col items-center">
+      {pipelineSteps.map((step, i) => (
+        <div key={step.label} className="flex flex-col items-center w-full max-w-sm">
+          <div className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-border bg-muted/30">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm text-orange-500 bg-orange-500/15">
+              {i + 1}
+            </div>
+            <div>
+              <div className="font-medium text-sm">{step.label}</div>
+              <div className="text-xs text-muted-foreground">{step.desc}</div>
+            </div>
+          </div>
+          {i < pipelineSteps.length - 1 ? (
+            <div className="flex flex-col items-center py-0.5">
+              <div className="w-px h-3 bg-border" />
+              <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[6px] border-l-transparent border-r-transparent border-t-border" />
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+              <span>↺</span> cycle continues with each update
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /*  Research data for the chart                                       */
 /* ------------------------------------------------------------------ */
 
@@ -330,6 +373,68 @@ export function HomePage() {
       {/* ── Poll ─────────────────────────────────────────────── */}
       <PollWidget />
 
+      {/* ── Trust / Why certshack ──────────────────────────────── */}
+      <section>
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold">Why learners choose certshack</h2>
+          <p className="text-muted-foreground mt-2">The most flexible way to prepare, however you learn best.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[
+            {
+              icon: MessageSquare,
+              title: 'Community-Driven',
+              desc: 'Early user testing shaped certshack into what it is today. Polls, ratings, and reports feed directly into what we prioritise.',
+              color: 'text-orange-500 bg-orange-500/10',
+            },
+            {
+              icon: Shield,
+              title: 'Exam-Accurate Questions',
+              desc: 'Questions modelled on real certification exam formats, domains, and difficulty levels.',
+              color: 'text-blue-500 bg-blue-500/10',
+            },
+            {
+              icon: Zap,
+              title: 'Comparative Explanations',
+              desc: 'Per-question explanations with references so you understand why each answer is right and why others aren\'t.',
+              color: 'text-amber-500 bg-amber-500/10',
+            },
+            {
+              icon: BarChart3,
+              title: 'Deep Analytics',
+              desc: 'Track practice exam performance by domain over time. Spot trends and focus where it matters.',
+              color: 'text-emerald-500 bg-emerald-500/10',
+            },
+            {
+              icon: GraduationCap,
+              title: 'Real-World Readiness',
+              desc: 'Skill labs simulate actual production tasks. Immediate access without the setup overhead.',
+              color: 'text-purple-500 bg-purple-500/10',
+            },
+            {
+              icon: Target,
+              title: 'Learning Plans',
+              desc: 'Set your goal and we\'ll help you get there. Learning Plans map out what to study and keep you on track so you always know what to do next.',
+              color: 'text-pink-500 bg-pink-500/10',
+              badge: 'Coming Soon',
+            },
+          ].map(({ icon: Icon, title, desc, color, badge }) => (
+            <div key={title} className="p-5 rounded-xl bg-card border border-border hover:shadow-md transition-shadow">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color} mb-3`}>
+                <Icon className="w-5 h-5" />
+              </div>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold">{title}</h3>
+                {badge && (
+                  <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{badge}</span>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── Research / Why Practice Works ─────────────────────── */}
       <section className="p-6 md:p-10 rounded-xl bg-card border border-border shadow-sm">
         <div className="text-center mb-8">
@@ -443,68 +548,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ── Trust / Why certshack ──────────────────────────────── */}
-      <section>
-        <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold">Why learners choose certshack</h2>
-          <p className="text-muted-foreground mt-2">Built by engineers, for engineers who want to do more than just pass.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[
-            {
-              icon: MessageSquare,
-              title: 'Community-Driven',
-              desc: 'Early user testing shaped certshack into what it is today. Polls, ratings, and reports feed directly into what we prioritise.',
-              color: 'text-orange-500 bg-orange-500/10',
-            },
-            {
-              icon: Shield,
-              title: 'Exam-Accurate Questions',
-              desc: 'Questions modelled on real certification exam formats, domains, and difficulty levels.',
-              color: 'text-blue-500 bg-blue-500/10',
-            },
-            {
-              icon: Zap,
-              title: 'Instant Feedback',
-              desc: 'Per-question explanations with references so you understand why each answer is right and why others aren\'t.',
-              color: 'text-amber-500 bg-amber-500/10',
-            },
-            {
-              icon: BarChart3,
-              title: 'Deep Analytics',
-              desc: 'Track practice exam performance by domain over time. Spot trends and focus where it matters.',
-              color: 'text-emerald-500 bg-emerald-500/10',
-            },
-            {
-              icon: GraduationCap,
-              title: 'Real-World Readiness',
-              desc: 'Skill labs simulate actual production tasks. Immediate access without the setup overhead.',
-              color: 'text-purple-500 bg-purple-500/10',
-            },
-            {
-              icon: Target,
-              title: 'Learning Plans',
-              desc: 'Set your goal and we\'ll help you get there. Learning Plans map out what to study and keep you on track so you always know what to do next.',
-              color: 'text-pink-500 bg-pink-500/10',
-              badge: 'Coming Soon',
-            },
-          ].map(({ icon: Icon, title, desc, color, badge }) => (
-            <div key={title} className="p-5 rounded-xl bg-card border border-border hover:shadow-md transition-shadow">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color} mb-3`}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold">{title}</h3>
-                {badge && (
-                  <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{badge}</span>
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── FAQ for SEO ───────────────────────────────────────── */}
       <section className="p-6 md:p-10 rounded-xl bg-card border border-border shadow-sm">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
@@ -537,14 +580,16 @@ export function HomePage() {
             {
               q: 'Are the questions created with AI?',
               a: 'AI is part of our content pipeline, but it is never the final word. We follow a human-in-the-loop review process: questions are AI-drafted, then reviewed and approved by subject-matter experts through a dedicated internal authoring tool with a structured quality-control workflow before anything is published. Many explanations are further enriched with images and diagrams to reinforce understanding. Questions are also authored at the individual skill level rather than broadly by domain, a more granular approach than most platforms take. Each skill is grounded in selected official documentation, from which real-world scenarios are constructed that reflect what you are likely to encounter in practice. Where official exam guides omit skill-level numbering, our team researches and applies it, so the mapping between content and certification objectives remains accurate. User reports and ratings also feed back into our review process, so content is continuously refined rather than frozen at the point of publication.',
+              extra: <AIPipelineFlow />,
             }
-          ].map(({ q, a }) => (
+          ].map(({ q, a, extra }) => (
             <details key={q} className="group">
               <summary className="cursor-pointer font-semibold text-foreground hover:text-primary transition-colors list-none flex items-center justify-between">
                 <span>{q}</span>
                 <ChevronRight className="w-4 h-4 transition-transform group-open:rotate-90 shrink-0 ml-2" />
               </summary>
               <p className="mt-2 text-sm text-muted-foreground pl-0">{a}</p>
+              {extra}
             </details>
           ))}
         </div>
