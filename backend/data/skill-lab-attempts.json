@@ -497,5 +497,85 @@
     "correct": true,
     "timeTaken": 64,
     "createdAt": "2026-04-19T19:54:57.823Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "9523e00a-51f8-4dd4-a6d3-e7a75458096e",
+    "labId": "rhel-lvm-phased-pipeline",
+    "labType": "unknown",
+    "selectedAnswer": "{\"pool\":[],\"prepare\":[\"s1\",\"s4\"],\"create\":[\"s2\",\"s3\",\"s5\",\"s8\"],\"format\":[\"s6\",\"s7\"],\"mount\":[\"s10\",\"s9\"]}",
+    "correct": false,
+    "timeTaken": 140,
+    "createdAt": "2026-04-19T20:48:53.021Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "2b1cebc6-08a7-4762-9e85-3146f68ca7d0",
+    "labId": "rhel-lvm-phased-pipeline",
+    "labType": "unknown",
+    "selectedAnswer": "{\"pool\":[],\"prepare\":[\"s3\",\"s5\"],\"create\":[\"s1\",\"s4\",\"s8\"],\"format\":[\"s7\",\"s6\",\"s10\"],\"mount\":[\"s9\",\"s2\"]}",
+    "correct": false,
+    "timeTaken": 20,
+    "createdAt": "2026-04-19T20:51:10.343Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "8dad5594-9f1f-4b11-84fa-0973bb09c706",
+    "labId": "rhel-lvm-phased-pipeline",
+    "labType": "unknown",
+    "selectedAnswer": "{\"pool\":[],\"prepare\":[\"s2\",\"s1\",\"s5\"],\"create\":[\"s6\",\"s4\",\"s8\"],\"format\":[\"s7\",\"s3\"],\"mount\":[\"s9\",\"s10\"]}",
+    "correct": false,
+    "timeTaken": 21,
+    "createdAt": "2026-04-19T20:51:43.674Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "400da9d9-0c1c-4b69-9061-00a79ba0db92",
+    "labId": "rhel-chrony-terminal-replay",
+    "labType": "unknown",
+    "selectedAnswer": "c1,c2,c4,c3",
+    "correct": true,
+    "timeTaken": 102,
+    "createdAt": "2026-04-19T20:53:57.420Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "ad75523c-d8de-4412-929b-cd95561a32b4",
+    "labId": "rhel-user-mgmt-command-terminal",
+    "labType": "unknown",
+    "selectedAnswer": "all-steps-complete",
+    "correct": true,
+    "timeTaken": 213,
+    "createdAt": "2026-04-19T20:57:55.564Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "2472a5e6-611d-46ee-b649-57d1d699b101",
+    "labId": "rhel-user-mgmt-command-terminal",
+    "labType": "unknown",
+    "selectedAnswer": "all-steps-complete",
+    "correct": true,
+    "timeTaken": 56,
+    "createdAt": "2026-04-19T20:59:11.746Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "aed0c4fd-5df1-4efb-9954-da1e296712f9",
+    "labId": "rhel-tar-command-terminal",
+    "labType": "unknown",
+    "selectedAnswer": "all-steps-complete",
+    "correct": true,
+    "timeTaken": 220,
+    "createdAt": "2026-04-19T21:20:24.340Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "8102cb19-46f0-46ca-96d9-7733f2a0bde0",
+    "labId": "rhel-logrotate-code-fix",
+    "labType": "unknown",
+    "selectedAnswer": "solved",
+    "correct": true,
+    "timeTaken": 105,
+    "createdAt": "2026-04-19T21:50:14.447Z"
   }
 ]

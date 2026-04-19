@@ -10,6 +10,8 @@
     "labCategory": "Implement",
     "technologies": ["RHEL 10", "Apache httpd", "firewalld", "SELinux", "dnf", "systemctl"],
     "version": 2,
+    "showcase": true,
+    "showcaseOrder": 1,
     "scenario": "A fresh RHEL 10 server needs Apache deployed and secured. Drag each step into the correct deployment phase (Prepare, then Install, then Configure, then Harden) and arrange the steps in the right order within each phase.",
     "phases": [
       { "id": "prepare",   "label": "Prepare",   "color": "blue"   },
@@ -35,7 +37,8 @@
       "Understand Apache deployment prerequisites and configuration order",
       "Apply firewalld and SELinux hardening after service configuration"
     ],
-    "realWorldValue": "Deploying web servers in the correct order prevents both security gaps and service failures. RHEL environments require subscription management, SELinux context management, and firewalld rules. Skipping or misordering any phase results in a non-functional or insecure server."
+    "realWorldValue": "Deploying web servers in the correct order prevents both security gaps and service failures. RHEL environments require subscription management, SELinux context management, and firewalld rules. Skipping or misordering any phase results in a non-functional or insecure server.",
+    "relatedExamCodes": ["EX200"]
   },
   {
     "id": "rhel-nfs-terminal-replay",
@@ -48,6 +51,8 @@
     "labCategory": "Implement",
     "technologies": ["RHEL 10", "NFS", "nfs-utils", "firewalld", "exportfs", "systemctl"],
     "version": 2,
+    "showcase": true,
+    "showcaseOrder": 3,
     "scenario": "A RHEL 10 server must export /exports/data to the 192.168.1.0/24 subnet over NFS. Drag the correct commands into the queue in the right order. Three of the listed commands are distractors that should never be run in production.",
     "prompt": "[root@rhel10 ~]#",
     "commands": [
@@ -133,7 +138,8 @@
       "Identify and exclude dangerous sysadmin antipatterns from a command sequence",
       "Understand which firewalld services are required for NFS (nfs, mountd, rpc-bind)"
     ],
-    "realWorldValue": "NFS is a core component of RHEL infrastructure for shared storage. Getting the configuration order wrong, or including dangerous shortcuts, leads to inaccessible shares, SELinux AVC denials, or network-exposed data. This lab mirrors the exact workflow you would follow when setting up NFS on a production Red Hat system."
+    "realWorldValue": "NFS is a core component of RHEL infrastructure for shared storage. Getting the configuration order wrong, or including dangerous shortcuts, leads to inaccessible shares, SELinux AVC denials, or network-exposed data. This lab mirrors the exact workflow you would follow when setting up NFS on a production Red Hat system.",
+    "relatedExamCodes": ["EX200"]
   },
   {
     "id": "rhel-nginx-command-terminal",
@@ -146,6 +152,8 @@
     "labCategory": "Implement",
     "technologies": ["RHEL 10", "dnf", "systemctl", "journalctl", "nginx"],
     "version": 1,
+    "showcase": true,
+    "showcaseOrder": 2,
     "scenario": "A fresh RHEL 10 host needs `nginx` installed, started, set to launch on boot, and verified through the journal. Complete the three commands in order. Each command accepts its flags in any order, and `<command> --help` lists options including distractors that are not needed for this task.",
     "prompt": "[root@rhel10 ~]#",
     "steps": [
@@ -209,6 +217,1323 @@
       "Use `--help` to identify the right flags and distinguish them from distractors",
       "Combine `enable --now` and flag-value pairs like `-u unit` and `-n count`"
     ],
-    "realWorldValue": "Every RHCSA candidate and RHEL admin runs this loop constantly: install a package, enable-and-start the service, check the journal. Getting the flags right from memory, with or without `--help`, is the difference between confident command-line work and paging through documentation for every task."
+    "realWorldValue": "Every RHCSA candidate and RHEL admin runs this loop constantly: install a package, enable-and-start the service, check the journal. Getting the flags right from memory, with or without `--help`, is the difference between confident command-line work and paging through documentation for every task.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-lvm-phased-pipeline",
+    "title": "Provision an LVM Logical Volume on RHEL 10",
+    "description": "Categorise and sequence the steps to provision a new LVM logical volume on RHEL 10, from partitioning a raw disk through to a persistent XFS mount.",
+    "type": "phased-pipeline",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "LVM", "parted", "pvcreate", "vgcreate", "lvcreate", "mkfs.xfs", "fstab"],
+    "version": 1,
+    "showcase": true,
+    "showcaseOrder": 7,
+    "scenario": "A second disk `/dev/sdb` has been added to the RHEL 10 host. Provision it as an LVM logical volume, format it XFS, and mount it persistently at `/mnt/data`. Drag each step into the correct phase and arrange any order-dependent steps within each phase.",
+    "phases": [
+      { "id": "prepare", "label": "Prepare", "color": "blue"   },
+      { "id": "create",  "label": "Create",  "color": "orange" },
+      { "id": "format",  "label": "Format",  "color": "green"  },
+      { "id": "mount",   "label": "Mount",   "color": "purple" }
+    ],
+    "steps": [
+      { "id": "s1",  "text": "Identify available disks and their current partition layout",     "command": "lsblk",                                                                         "correctPhaseId": "prepare" },
+      { "id": "s2",  "text": "Create a GPT partition table on /dev/sdb",                        "command": "parted /dev/sdb mklabel gpt",                                                    "correctPhaseId": "prepare", "mustFollowIds": ["s1"] },
+      { "id": "s3",  "text": "Create a primary partition spanning the full disk",               "command": "parted /dev/sdb mkpart primary 1MiB 100%",                                       "correctPhaseId": "prepare", "mustFollowIds": ["s2"] },
+      { "id": "s4",  "text": "Initialise the partition as an LVM physical volume",              "command": "pvcreate /dev/sdb1",                                                             "correctPhaseId": "create",  "mustFollowIds": ["s3"] },
+      { "id": "s5",  "text": "Create volume group vg_data from the physical volume",            "command": "vgcreate vg_data /dev/sdb1",                                                     "correctPhaseId": "create",  "mustFollowIds": ["s4"] },
+      { "id": "s6",  "text": "Allocate a 1 GB logical volume named lv_data",                   "command": "lvcreate -L 1G -n lv_data vg_data",                                             "correctPhaseId": "create",  "mustFollowIds": ["s5"] },
+      { "id": "s7",  "text": "Format the logical volume with the XFS filesystem",               "command": "mkfs.xfs /dev/vg_data/lv_data",                                                 "correctPhaseId": "format",  "mustFollowIds": ["s6"] },
+      { "id": "s8",  "text": "Create the /mnt/data mount point directory",                     "command": "mkdir -p /mnt/data",                                                             "correctPhaseId": "format" },
+      { "id": "s9",  "text": "Add a persistent fstab entry for lv_data",                       "command": "echo '/dev/vg_data/lv_data /mnt/data xfs defaults 0 0' >> /etc/fstab",          "correctPhaseId": "mount",   "mustFollowIds": ["s7", "s8"] },
+      { "id": "s10", "text": "Mount all filesystems from fstab and verify the new mount",      "command": "mount -a",                                                                       "correctPhaseId": "mount",   "mustFollowIds": ["s9"] }
+    ],
+    "explanation": "LVM provisioning follows four distinct phases. Each phase has hard prerequisites on the previous one.\n\n**1. Prepare** (get the disk ready before LVM can use it)\n1. `lsblk` confirms which device to use and checks for existing partitions\n2. `parted /dev/sdb mklabel gpt` writes a GPT partition table; must run before any partitions can be created\n3. `parted /dev/sdb mkpart primary 1MiB 100%` carves out a partition; the 1 MiB start offset avoids alignment warnings\n\n**2. Create** (build the LVM stack on the partition)\n1. `pvcreate /dev/sdb1` stamps LVM metadata onto the partition; the partition must exist first\n2. `vgcreate vg_data /dev/sdb1` creates the volume group from the physical volume\n3. `lvcreate -L 1G -n lv_data vg_data` carves out a 1 GB logical volume; the volume group must exist first\n\n**3. Format** (prepare the logical volume for use)\n- `mkfs.xfs /dev/vg_data/lv_data` writes the XFS filesystem; must come after `lvcreate`\n- `mkdir -p /mnt/data` creates the mount point; independent of the mkfs step, but both must exist before mounting\n\n**4. Mount** (make the volume available and persistent)\n1. The `/etc/fstab` entry must be written after both the filesystem and the mount point exist\n2. `mount -a` reads `/etc/fstab` and mounts everything listed, which validates the entry immediately without rebooting",
+    "learningOutcomes": [
+      "Sequence LVM provisioning across the correct operational phases (Prepare, Create, Format, Mount)",
+      "Understand why each LVM layer (`pvcreate`, `vgcreate`, `lvcreate`) must be created in strict order",
+      "Distinguish between filesystem formatting tasks and OS-level persistence via `/etc/fstab`"
+    ],
+    "realWorldValue": "LVM is the default storage abstraction on RHEL and is tested directly on the EX200 exam. Provisioning a logical volume from a raw disk is a core hands-on task. Running `mkfs` before `lvcreate`, or writing the `fstab` entry before formatting, are common mistakes that leave the host in a broken state.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-chrony-terminal-replay",
+    "title": "Configure the chrony NTP Client on RHEL 10",
+    "description": "Build the correct command sequence to install and verify the chrony NTP client on RHEL 10. Exclude deprecated and destructive distractors and arrange the real commands in the right order.",
+    "type": "terminal-replay",
+    "difficulty": "beginner",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "chrony", "chronyd", "chronyc", "dnf", "systemctl"],
+    "version": 1,
+    "scenario": "A RHEL 10 host needs accurate time synchronisation configured using `chrony`. Drag the correct commands into the queue in the right order. Three of the listed commands are distractors that must not be run in production.",
+    "prompt": "[root@rhel10 ~]#",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "dnf install -y chrony",
+        "successOutput": "Installed:\n  chrony-4.5-1.el10.x86_64\n\nComplete!",
+        "errorOutput": "`chrony` must be installed before any other step. Install the package first."
+      },
+      {
+        "id": "c2",
+        "command": "systemctl enable --now chronyd",
+        "successOutput": "Created symlink /etc/systemd/system/multi-user.target.wants/chronyd.service -> /usr/lib/systemd/system/chronyd.service.",
+        "errorOutput": "`chrony` must be installed before `chronyd` can be enabled. Run `dnf install -y chrony` first.",
+        "mustFollowIds": ["c1"]
+      },
+      {
+        "id": "c3",
+        "command": "chronyc makestep",
+        "successOutput": "200 OK",
+        "errorOutput": "`chronyd` must be running before `chronyc` can communicate with it. Enable and start the service first.",
+        "mustFollowIds": ["c2"]
+      },
+      {
+        "id": "c4",
+        "command": "chronyc sources",
+        "successOutput": "MS Name/IP address         Stratum Poll Reach LastRx Last sample\n===============================================================================\n^* ntp1.example.com              2   6   377    42  -0.123ms[+0.456ms] +/-  12ms",
+        "errorOutput": "`chronyd` must be running before `chronyc sources` can query its NTP sources. Enable and start the service first.",
+        "mustFollowIds": ["c2"]
+      },
+      {
+        "id": "d1",
+        "command": "ntpdate pool.ntp.org",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: `ntpdate` is deprecated and removed on RHEL 10. It also conflicts with a running `chronyd`. Use `chronyc makestep` for a one-shot time adjustment instead.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "systemctl stop chronyd",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Stopping `chronyd` removes time synchronisation rather than configuring it. Never stop the daemon as part of an NTP setup workflow.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "timedatectl set-ntp false",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Setting NTP to false disables time synchronisation entirely. The correct approach is to ensure `chronyd` is enabled and running.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "`chrony` is the NTP implementation shipped with RHEL 10 and is tested on EX200 under Skill 7.1.4 (Configure time service clients).\n\n**Setup chain** (strict order):\n1. `dnf install -y chrony` installs the `chrony` package, which provides both `chronyd` (the daemon) and `chronyc` (the control tool)\n2. `systemctl enable --now chronyd` enables the daemon on boot and starts it immediately in one step\n\n**Verification chain** (either order, both required; both depend on the service being active):\n- `chronyc makestep` tells the running `chronyd` to slew the clock immediately rather than waiting for gradual correction\n- `chronyc sources` lists the configured NTP sources and their reachability\n\n**Distractors to avoid:**\n- `ntpdate pool.ntp.org`: the `ntpdate` command is deprecated and removed on RHEL 10; it also conflicts with a running `chronyd`\n- `systemctl stop chronyd`: stops the daemon and removes time synchronisation\n- `timedatectl set-ntp false`: instructs systemd to disable NTP synchronisation entirely",
+    "learningOutcomes": [
+      "Install and start the `chrony` NTP client on RHEL 10 using `dnf` and `systemctl`",
+      "Verify time synchronisation using `chronyc sources` and `chronyc makestep`",
+      "Identify deprecated (`ntpdate`) and destructive commands to exclude from an NTP workflow"
+    ],
+    "realWorldValue": "Accurate time is a dependency for Kerberos authentication, TLS certificate validation, log correlation, and scheduled tasks. RHCSA candidates are expected to configure `chrony` from scratch. The EX200 exam frequently tests whether you can distinguish `chronyd` configuration from deprecated `ntp` tooling and destructive one-liners.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-user-mgmt-command-terminal",
+    "title": "Create and Harden a User Account on RHEL 10",
+    "description": "Type each command to create a developer account with the correct home directory and shell, add the user to a supplementary group without overwriting existing memberships, then enforce a 90-day password policy. Use --help to identify the right flags.",
+    "type": "command-terminal",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "useradd", "usermod", "chage"],
+    "version": 1,
+    "showcase": true,
+    "showcaseOrder": 11,
+    "scenario": "A new developer named `webdev` needs an account on a RHEL 10 host. Create the account with a home directory and `/bin/bash` as the login shell, add them to the `developers` supplementary group without removing any existing group memberships, then set a 90-day maximum password age. Flags can appear in any order. Use `<command> --help` to explore options.",
+    "prompt": "[root@rhel10 ~]#",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Create user `webdev` with a home directory and `/bin/bash` as the login shell.",
+        "hint": "You need `useradd` with a flag to create the home directory and a flag-value pair to set the shell.",
+        "program": "useradd",
+        "requirements": [
+          { "id": "home",  "kind": "flag",       "variants": ["-m", "--create-home"], "description": "-m, --create-home             create the user's home directory" },
+          { "id": "shell", "kind": "flag-value",  "variants": ["-s", "--shell"],       "value": "/bin/bash", "description": "-s, --shell SHELL             login shell for the new account" },
+          { "id": "user",  "kind": "positional",  "variants": ["webdev"],              "description": "<username>                    name of the new user account" }
+        ],
+        "distractors": [
+          { "flag": "-r", "description": "-r, --system                  create a system account (no home directory, no password aging)" },
+          { "flag": "-u", "description": "-u, --uid UID                 force a specific UID for the new account" },
+          { "flag": "-e", "description": "-e, --expiredate DATE         set the account expiry date (YYYY-MM-DD)" }
+        ],
+        "successOutput": "",
+        "canonicalCommand": "useradd -m -s /bin/bash webdev"
+      },
+      {
+        "id": "s2",
+        "task": "Add `webdev` to the `developers` supplementary group without removing their existing group memberships.",
+        "hint": "Without a specific append flag, `-G` replaces all supplementary groups instead of adding to them. Both flags are required.",
+        "program": "usermod",
+        "requirements": [
+          { "id": "append", "kind": "flag",       "variants": ["-a", "--append"],  "description": "-a, --append                  append to the supplementary groups; always combine with -G" },
+          { "id": "group",  "kind": "flag-value", "variants": ["-G", "--groups"],  "value": "developers", "description": "-G, --groups GROUPS           supplementary group list to add or replace" },
+          { "id": "user",   "kind": "positional", "variants": ["webdev"],          "description": "<username>                    account to modify" }
+        ],
+        "distractors": [
+          { "flag": "-g", "description": "-g, --gid GROUP               change the primary group (not a supplementary group)" },
+          { "flag": "-d", "description": "-d, --home HOME               change the user's home directory path" },
+          { "flag": "-l", "description": "-l, --login LOGIN             change the user's login name" }
+        ],
+        "successOutput": "",
+        "canonicalCommand": "usermod -a -G developers webdev"
+      },
+      {
+        "id": "s3",
+        "task": "Set a maximum password age of 90 days for `webdev` using `chage`.",
+        "hint": "One flag-value pair specifies the maximum number of days between password changes. Watch out for the lowercase variant which controls something different.",
+        "program": "chage",
+        "requirements": [
+          { "id": "max",  "kind": "flag-value", "variants": ["-M", "--maxdays"], "value": "90", "description": "-M, --maxdays DAYS            maximum number of days between password changes" },
+          { "id": "user", "kind": "positional", "variants": ["webdev"],          "description": "<username>                    account to configure" }
+        ],
+        "distractors": [
+          { "flag": "-m", "description": "-m, --mindays DAYS            minimum number of days between password changes" },
+          { "flag": "-W", "description": "-W, --warndays DAYS           days of warning before password expiry" },
+          { "flag": "-I", "description": "-I, --inactive DAYS           days after expiry before the account is locked" }
+        ],
+        "successOutput": "",
+        "canonicalCommand": "chage -M 90 webdev"
+      }
+    ],
+    "explanation": "User account management covers EX200 Domain 9 and involves three separate tools, each with distinct flags.\n\n**Step 1: `useradd -m -s /bin/bash webdev`**\n- `-m` (or `--create-home`) creates `/home/webdev`; without it the user has no home directory and interactive login may fail\n- `-s /bin/bash` sets the login shell; the default on minimal RHEL installs is often `/sbin/nologin`, which blocks interactive logins\n- Distractors: `-r` creates a system account with no home and no password aging; `-u` forces a specific UID; `-e` sets an account expiry date (separate from password aging policy)\n\n**Step 2: `usermod -a -G developers webdev`**\n- `-G developers` sets the supplementary group list; without `-a`, this replaces all existing supplementary groups and can silently lock the user out of groups they already belong to\n- `-a` (append) must always accompany `-G` when the intent is to add to groups, not replace them\n- Distractor: `-g` changes the primary group (GID in `/etc/passwd`), not the supplementary list\n\n**Step 3: `chage -M 90 webdev`**\n- `chage` manages password aging non-interactively and is the standard tool for this on RHEL\n- `-M 90` (uppercase) sets the maximum days between password changes to 90\n- `-m` (lowercase) sets the minimum days; easy to confuse with `-M` and a common exam trap\n- `-W` sets warning days; `-I` sets the inactive lock period; neither controls the maximum age",
+    "learningOutcomes": [
+      "Create a user account with `useradd -m -s` to set home directory and login shell",
+      "Safely append a supplementary group with `usermod -a -G` without overwriting existing memberships",
+      "Set password aging policy non-interactively with `chage -M`"
+    ],
+    "realWorldValue": "EX200 Domain 9 tests user and group management hands-on. The `-a` flag omission with `usermod -G` is a classic RHCSA mistake that silently removes users from all other groups. Knowing `chage -M` versus `chage -m` by flag case is exactly the kind of detail the exam probes under time pressure.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-ssh-keyauth-phased-pipeline",
+    "title": "Configure SSH Key-Based Authentication on RHEL 10",
+    "description": "Sequence the steps to replace SSH password authentication with key-based authentication across client and server, from keypair generation through sshd hardening and verification.",
+    "type": "phased-pipeline",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "OpenSSH", "ssh-keygen", "ssh-copy-id", "sshd_config"],
+    "version": 1,
+    "scenario": "A RHEL 10 bastion host is migrating from password to key-only SSH authentication. Drag each step into the correct phase (Client Prep, then Distribute, then Server Harden, then Verify) and arrange any order-dependent steps within each phase.",
+    "phases": [
+      { "id": "prep",       "label": "Client Prep",   "color": "blue"   },
+      { "id": "distribute", "label": "Distribute",    "color": "orange" },
+      { "id": "harden",     "label": "Server Harden", "color": "green"  },
+      { "id": "verify",     "label": "Verify",        "color": "purple" }
+    ],
+    "steps": [
+      { "id": "s1",  "text": "Generate an ed25519 keypair on the client",             "command": "ssh-keygen -t ed25519 -C admin@workstation",                                                "correctPhaseId": "prep" },
+      { "id": "s2",  "text": "Tighten ~/.ssh directory permissions on the client",     "command": "chmod 700 ~/.ssh",                                                                           "correctPhaseId": "prep",       "mustFollowIds": ["s1"] },
+      { "id": "s3",  "text": "Copy the public key to the server account",              "command": "ssh-copy-id admin@rhel10.example.com",                                                       "correctPhaseId": "distribute", "mustFollowIds": ["s1"] },
+      { "id": "s4",  "text": "Ensure authorized_keys is 0600 on the server",           "command": "chmod 600 ~/.ssh/authorized_keys",                                                           "correctPhaseId": "distribute", "mustFollowIds": ["s3"] },
+      { "id": "s5",  "text": "Disable password authentication in sshd_config",         "command": "sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config",  "correctPhaseId": "harden" },
+      { "id": "s6",  "text": "Disable direct root login in sshd_config",               "command": "sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config",                "correctPhaseId": "harden" },
+      { "id": "s7",  "text": "Validate sshd config syntax before reloading",           "command": "sshd -t",                                                                                    "correctPhaseId": "harden",     "mustFollowIds": ["s5", "s6"] },
+      { "id": "s8",  "text": "Reload sshd to apply the hardened config",               "command": "systemctl reload sshd",                                                                      "correctPhaseId": "harden",     "mustFollowIds": ["s7"] },
+      { "id": "s9",  "text": "Open a new session authenticating with the key",         "command": "ssh admin@rhel10.example.com",                                                               "correctPhaseId": "verify",     "mustFollowIds": ["s8", "s4"] },
+      { "id": "s10", "text": "Confirm password authentication is now rejected",        "command": "ssh -o PubkeyAuthentication=no admin@rhel10.example.com",                                    "correctPhaseId": "verify",     "mustFollowIds": ["s8"] }
+    ],
+    "explanation": "Key-based SSH cutover has a strict order across four phases because each phase depends on artefacts produced by the previous one.\n\n**1. Client Prep**\n1. `ssh-keygen -t ed25519` produces `~/.ssh/id_ed25519` (private) and `id_ed25519.pub` (public). ed25519 is the modern default — smaller and faster than RSA for equivalent strength.\n2. `chmod 700 ~/.ssh` tightens the directory; SSH refuses to use keys if the parent directory is world- or group-writable.\n\n**2. Distribute**\n1. `ssh-copy-id` appends the public key to `~/.ssh/authorized_keys` on the server and sets correct permissions. Runs over the existing (password) session — so it must come *before* password auth is disabled.\n2. `chmod 600 ~/.ssh/authorized_keys` is a defensive belt-and-braces step; sshd rejects authorized_keys with loose permissions.\n\n**3. Server Harden** (never skip the config validation)\n- Disable `PasswordAuthentication` and `PermitRootLogin` — either order is fine, they are independent edits.\n- `sshd -t` validates syntax *before* reloading. Reloading a broken sshd can leave you locked out.\n- `systemctl reload sshd` re-reads config without dropping existing sessions — safer than `restart`.\n\n**4. Verify** (prove the new config works before closing your current session)\n- A successful key-based login confirms the distribute phase.\n- Rejecting a forced password attempt (`-o PubkeyAuthentication=no`) confirms the harden phase. Both must pass before you log out of the password session that got you in.",
+    "learningOutcomes": [
+      "Generate an ed25519 keypair and deploy it with `ssh-copy-id`",
+      "Edit `/etc/ssh/sshd_config` safely and validate syntax with `sshd -t` before reloading",
+      "Separate client-side, server-side, and verification work when cutting over authentication methods"
+    ],
+    "realWorldValue": "Every RHEL admin is expected to configure key-based SSH — it is explicitly tested in EX200 Skill 10.1.3. Disabling password authentication before proving the key works is one of the most common RHCSA lockouts; this phased approach mirrors the safe cutover every production runbook follows.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-selinux-phased-pipeline",
+    "title": "Resolve SELinux Denials for a Custom Web Root on RHEL 10",
+    "description": "Diagnose and remediate an Apache 403 caused by SELinux on a non-default document root, covering file context relabelling, port labels, and boolean tuning.",
+    "type": "phased-pipeline",
+    "difficulty": "advanced",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Troubleshoot",
+    "technologies": ["RHEL 10", "SELinux", "semanage", "restorecon", "setsebool", "audit", "httpd"],
+    "version": 1,
+    "scenario": "Apache has been reconfigured to serve `/srv/web` on port 8080, but clients receive a 403 and httpd refuses to bind to the port. SELinux is Enforcing. Drag each step into the correct phase (Investigate, then Relabel, then Policy, then Verify) and order the steps within each phase.",
+    "phases": [
+      { "id": "investigate", "label": "Investigate", "color": "blue"   },
+      { "id": "relabel",     "label": "Relabel",     "color": "orange" },
+      { "id": "policy",      "label": "Policy",      "color": "green"  },
+      { "id": "verify",      "label": "Verify",      "color": "purple" }
+    ],
+    "steps": [
+      { "id": "s1",  "text": "Confirm SELinux is in Enforcing mode",                  "command": "getenforce",                                                                "correctPhaseId": "investigate" },
+      { "id": "s2",  "text": "Review recent AVC denials in the audit log",            "command": "ausearch -m avc -ts recent",                                                "correctPhaseId": "investigate", "mustFollowIds": ["s1"] },
+      { "id": "s3",  "text": "Inspect current SELinux context on the new web root",   "command": "ls -Z /srv/web",                                                            "correctPhaseId": "investigate", "mustFollowIds": ["s1"] },
+      { "id": "s4",  "text": "Install the policy management tooling",                 "command": "dnf install -y policycoreutils-python-utils",                               "correctPhaseId": "relabel" },
+      { "id": "s5",  "text": "Define the persistent httpd_sys_content_t mapping",     "command": "semanage fcontext -a -t httpd_sys_content_t '/srv/web(/.*)?'",              "correctPhaseId": "relabel",     "mustFollowIds": ["s4"] },
+      { "id": "s6",  "text": "Apply the new file context recursively",                 "command": "restorecon -Rv /srv/web",                                                   "correctPhaseId": "relabel",     "mustFollowIds": ["s5"] },
+      { "id": "s7",  "text": "Label TCP port 8080 as an http_port_t",                  "command": "semanage port -a -t http_port_t -p tcp 8080",                               "correctPhaseId": "policy",      "mustFollowIds": ["s4"] },
+      { "id": "s8",  "text": "Persistently enable the httpd_enable_homedirs boolean",  "command": "setsebool -P httpd_enable_homedirs on",                                     "correctPhaseId": "policy" },
+      { "id": "s9",  "text": "Reload httpd to pick up the new policy",                 "command": "systemctl reload httpd",                                                    "correctPhaseId": "verify",      "mustFollowIds": ["s6", "s7"] },
+      { "id": "s10", "text": "Confirm a request to :8080 now succeeds",                "command": "curl -I http://localhost:8080/",                                            "correctPhaseId": "verify",      "mustFollowIds": ["s9"] }
+    ],
+    "explanation": "SELinux troubleshooting almost always follows investigate → relabel → policy → verify. Skipping the investigate phase leads to guess-driven changes that damage policy rather than fix it.\n\n**1. Investigate**\n- `getenforce` confirms the mode: if it says `Permissive`, nothing you are about to do is required for function; it is still good hygiene.\n- `ausearch -m avc -ts recent` extracts the exact Access Vector Cache denials from the audit log, including source/target contexts and the port or path involved.\n- `ls -Z /srv/web` shows the current label. A freshly created directory under `/srv` typically inherits `var_t`, which is not readable by `httpd_t`.\n\n**2. Relabel** (make the change persistent)\n- `policycoreutils-python-utils` provides `semanage`; on a minimal install it is not present.\n- `semanage fcontext -a -t httpd_sys_content_t '/srv/web(/.*)?'` registers the mapping in the policy database, so relabels survive a future `restorecon` or `relabel on reboot`.\n- `restorecon -Rv /srv/web` applies the mapping to files on disk. Always follow an `fcontext` change with `restorecon` — the mapping alone does not relabel existing files.\n\n**3. Policy**\n- `semanage port` labels a non-standard port so `httpd_t` is allowed to bind to it. Without this, `httpd` refuses to start on 8080 regardless of file context.\n- `setsebool -P` toggles a policy boolean persistently. `-P` is critical: without it, the change reverts on reboot.\n\n**4. Verify**\n- Reload httpd so it re-reads labels and port rules.\n- `curl -I` confirms the service now responds on the new port without a 403. Verify with a real request, not just absence of errors in the log.",
+    "learningOutcomes": [
+      "Triage SELinux denials with `getenforce`, `ausearch`, and `ls -Z` before changing policy",
+      "Apply persistent file context with `semanage fcontext` + `restorecon`, and port labels with `semanage port`",
+      "Toggle policy booleans persistently with `setsebool -P` and verify end-to-end with `curl`"
+    ],
+    "realWorldValue": "Most RHCSA SELinux failures are not about switching SELinux off — they are about knowing which surface to fix: context, port, or boolean. EX200 Domain 10 tests each of these directly. Reaching for `setenforce 0` hides the problem and is a deduction on the exam and a terminable offence in production.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-nmcli-terminal-replay",
+    "title": "Configure a Static IPv4 Address with nmcli on RHEL 10",
+    "description": "Build the correct command sequence to configure a static IPv4 address, gateway, DNS, and hostname on RHEL 10 using nmcli. Exclude commands that rely on deprecated network-scripts tooling.",
+    "type": "terminal-replay",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "NetworkManager", "nmcli", "hostnamectl"],
+    "version": 1,
+    "scenario": "A RHEL 10 host named `web01` needs a static IPv4 address of `192.168.10.50/24`, a gateway of `192.168.10.1`, and DNS servers `9.9.9.9` and `1.1.1.1` on interface `ens160`. Drag the correct commands into the queue in the right order. Three of the listed commands are distractors from the deprecated network-scripts era and must not be used on RHEL 10.",
+    "prompt": "[root@rhel10 ~]#",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "nmcli connection show",
+        "successOutput": "NAME     UUID                                  TYPE      DEVICE\nens160   9c6f...                               ethernet  ens160",
+        "errorOutput": "Inspect the current NetworkManager connections first so you know which profile name to modify."
+      },
+      {
+        "id": "c2",
+        "command": "nmcli connection modify ens160 ipv4.addresses 192.168.10.50/24",
+        "successOutput": "",
+        "errorOutput": "Confirm the connection name with `nmcli connection show` before modifying it.",
+        "mustFollowIds": ["c1"]
+      },
+      {
+        "id": "c3",
+        "command": "nmcli connection modify ens160 ipv4.gateway 192.168.10.1",
+        "successOutput": "",
+        "errorOutput": "Confirm the connection name with `nmcli connection show` before modifying it.",
+        "mustFollowIds": ["c1"]
+      },
+      {
+        "id": "c4",
+        "command": "nmcli connection modify ens160 ipv4.dns \"9.9.9.9 1.1.1.1\"",
+        "successOutput": "",
+        "errorOutput": "Confirm the connection name with `nmcli connection show` before modifying it.",
+        "mustFollowIds": ["c1"]
+      },
+      {
+        "id": "c5",
+        "command": "nmcli connection modify ens160 ipv4.method manual",
+        "successOutput": "",
+        "errorOutput": "Set the addresses, gateway, and DNS before switching the method to manual, otherwise NetworkManager has nothing to apply.",
+        "mustFollowIds": ["c2", "c3", "c4"]
+      },
+      {
+        "id": "c6",
+        "command": "hostnamectl set-hostname web01.example.com",
+        "successOutput": "",
+        "errorOutput": "Set the hostname at any point in the workflow — it is independent of the interface configuration."
+      },
+      {
+        "id": "c7",
+        "command": "nmcli connection up ens160",
+        "successOutput": "Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/3)",
+        "errorOutput": "Activate the connection only after method is set to manual and the address/gateway/DNS attributes are all configured.",
+        "mustFollowIds": ["c5"]
+      },
+      {
+        "id": "c8",
+        "command": "ip -4 addr show ens160",
+        "successOutput": "2: ens160: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 ...\n    inet 192.168.10.50/24 brd 192.168.10.255 scope global ens160",
+        "errorOutput": "The connection must be active before `ip addr show` reflects the new address. Bring the connection up first.",
+        "mustFollowIds": ["c7"]
+      },
+      {
+        "id": "d1",
+        "command": "systemctl restart network",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: The `network.service` unit from legacy network-scripts does not exist on RHEL 10. NetworkManager is the sole network provider; use `nmcli connection up`.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "echo -e \"DEVICE=ens160\\nBOOTPROTO=static\\nIPADDR=192.168.10.50\\nPREFIX=24\" > /etc/sysconfig/network-scripts/ifcfg-ens160",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Hand-editing `ifcfg-*` files bypasses NetworkManager and is deprecated on RHEL 10 — the network-scripts package is no longer installed by default and keyfile profiles are preferred.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "ifup ens160",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: `ifup`/`ifdown` are provided by the legacy network-scripts package which is not installed on RHEL 10. Use `nmcli connection up` instead.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "Static IPv4 configuration on RHEL 10 is done exclusively through NetworkManager — `network-scripts` is gone and `network.service` no longer exists.\n\n**Inspect first**\n- `nmcli connection show` lists profiles. The *profile name* (e.g. `ens160`) is what `nmcli modify` takes, not necessarily the device name.\n\n**Attribute chain** (all four must be set; order of 2/3/4 is free, method must come last):\n1. `ipv4.addresses 192.168.10.50/24` — address plus prefix in CIDR form\n2. `ipv4.gateway 192.168.10.1`\n3. `ipv4.dns \"9.9.9.9 1.1.1.1\"` — multiple servers space-separated inside one quoted argument\n4. `ipv4.method manual` — switches the profile from DHCP to static. Do this last so the previous attributes already exist when NetworkManager applies the method.\n\n**Activate + verify**\n- `nmcli connection up ens160` applies the change immediately. Skipping this leaves the new config in the profile but not on the interface.\n- `ip -4 addr show ens160` is the authoritative check that the kernel has the address.\n- `hostnamectl set-hostname` is fully independent and can run at any point — it does not touch NetworkManager.\n\n**Distractors to avoid:**\n- `systemctl restart network` targets a unit that does not exist on RHEL 10.\n- Writing `ifcfg-*` files directly bypasses NetworkManager and the `network-scripts` package is no longer shipped.\n- `ifup`/`ifdown` belong to the same deprecated package.",
+    "learningOutcomes": [
+      "Configure static IPv4 addresses, gateway, and DNS on RHEL 10 using `nmcli connection modify`",
+      "Activate a NetworkManager profile and verify with `ip -4 addr show`",
+      "Recognise deprecated network-scripts tooling (`ifup`, `ifcfg-*`, `systemctl restart network`) and avoid it on RHEL 9/10"
+    ],
+    "realWorldValue": "RHEL 10 ships NetworkManager as the only supported network stack. EX200 Domain 8 tests this configuration directly and the exam graders expect nmcli — reaching for ifcfg files or `systemctl restart network` will not function at all on a fresh RHEL 10 install.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-journal-terminal-replay",
+    "title": "Inspect and Preserve systemd Journals on RHEL 10",
+    "description": "Build the correct command sequence to investigate httpd errors and enable persistent journal storage on RHEL 10. Exclude destructive commands that would erase diagnostic evidence.",
+    "type": "terminal-replay",
+    "difficulty": "beginner",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Troubleshoot",
+    "technologies": ["RHEL 10", "systemd-journald", "journalctl"],
+    "version": 1,
+    "scenario": "A RHEL 10 host has a flaky `httpd` service and journals are being lost on reboot because persistence was never enabled. Drag the correct commands into the queue in the right order to investigate the current failure and then make the journal persistent. Three of the listed commands are distractors that would erase evidence or disable logging.",
+    "prompt": "[root@rhel10 ~]#",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "journalctl --list-boots",
+        "successOutput": " IDX BOOT ID                          FIRST ENTRY                 LAST ENTRY\n   0 5f3a...                          Mon 2026-04-13 09:12:04 UTC Mon 2026-04-19 14:02:11 UTC",
+        "errorOutput": "Start by inspecting the boot history so you know which boot contains the failure you want to investigate."
+      },
+      {
+        "id": "c2",
+        "command": "journalctl -b -u httpd -p err",
+        "successOutput": "Apr 19 13:51:02 rhel10 httpd[2041]: (13)Permission denied: AH00072: make_sock: could not bind to address [::]:8080",
+        "errorOutput": "List the boots first so it is clear which boot the errors you are about to read come from.",
+        "mustFollowIds": ["c1"]
+      },
+      {
+        "id": "c3",
+        "command": "mkdir -p /var/log/journal",
+        "successOutput": "",
+        "errorOutput": "Create the persistent journal directory before restarting systemd-journald so the daemon finds it and starts writing there."
+      },
+      {
+        "id": "c4",
+        "command": "systemctl restart systemd-journald",
+        "successOutput": "",
+        "errorOutput": "Create `/var/log/journal` first. Restarting systemd-journald without the directory leaves journals in `/run` (volatile) as before.",
+        "mustFollowIds": ["c3"]
+      },
+      {
+        "id": "c5",
+        "command": "journalctl --verify",
+        "successOutput": "PASS: /var/log/journal/5f3a.../system.journal",
+        "errorOutput": "Only useful once persistent journals exist under `/var/log/journal`. Enable persistence first.",
+        "mustFollowIds": ["c4"]
+      },
+      {
+        "id": "d1",
+        "command": "rm -rf /var/log/journal",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Deleting `/var/log/journal` destroys every persistent journal on the host. Never use this to 'clean up' logs — use `journalctl --vacuum-size` or `--vacuum-time` with a sensible bound.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "journalctl --vacuum-time=1s",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: A 1-second vacuum threshold erases virtually every journal entry including the evidence you just came here to read. Use realistic retention such as `--vacuum-time=2weeks`.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "systemctl disable --now systemd-journald",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Disabling systemd-journald stops all journal collection. The goal is persistence, not disabling logging.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "The journal workflow has two independent chains that share one prerequisite (being on the right host) but otherwise do not overlap.\n\n**Investigation chain** (strict order):\n1. `journalctl --list-boots` — shows the index and boot IDs. Knowing *which* boot you are reading from is a precondition to any meaningful triage.\n2. `journalctl -b -u httpd -p err` — filter to the current boot (`-b`), the `httpd` unit (`-u`), and priority error or worse (`-p err`). The error priority filter is what surfaces the real signal out of noisy access logs.\n\n**Persistence chain** (strict order):\n1. `mkdir -p /var/log/journal` — the mere existence of this directory is the switch that tells systemd-journald to write persistently. No config edit is required on RHEL 10.\n2. `systemctl restart systemd-journald` — picks up the new directory. Without the restart, the daemon keeps writing to `/run/log/journal` (volatile).\n3. `journalctl --verify` — confirms the persistent files are well-formed and not truncated.\n\n**Distractors to avoid:**\n- `rm -rf /var/log/journal` — destroys all persistent journals. Use `--vacuum-size` or `--vacuum-time` for controlled cleanup.\n- `journalctl --vacuum-time=1s` — a 1-second retention is effectively the same as deletion. Pick something realistic like `2weeks` or `500M`.\n- `systemctl disable --now systemd-journald` — disables the entire journal subsystem, which is the opposite of what you want.",
+    "learningOutcomes": [
+      "Filter `journalctl` output by boot (`-b`), unit (`-u`), and priority (`-p err`)",
+      "Enable persistent journals by creating `/var/log/journal` and restarting `systemd-journald`",
+      "Distinguish controlled journal cleanup (`--vacuum-size`, `--vacuum-time`) from destructive shortcuts (`rm -rf`, disabling the daemon)"
+    ],
+    "realWorldValue": "EX200 Skill 4.1.7 and 4.1.8 test the ability to locate, interpret, and preserve system journals. In production, enabling persistent journals is a one-line change (`mkdir /var/log/journal`) that every new host should have — without it, evidence disappears on every reboot just when you need it most.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-tar-command-terminal",
+    "title": "Archive and Restore Files with tar on RHEL 10",
+    "description": "Type each tar command to create a compressed archive of /etc, list its contents, and extract it to a staging directory. Flags can appear in any order and combined short flags are accepted.",
+    "type": "command-terminal",
+    "difficulty": "beginner",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "tar", "gzip"],
+    "version": 1,
+    "scenario": "You need a throwaway backup of `/etc` before testing a risky config change. Create the archive at `/tmp/etc-backup.tar.gz`, confirm its contents by listing them, and extract the archive to `/tmp/restore` to prove you could roll back. Flags can appear in any order; combined short flags like `-czf` are accepted. Use `tar --help` to explore options.",
+    "prompt": "[root@rhel10 ~]#",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Create a gzip-compressed archive at `/tmp/etc-backup.tar.gz` containing `/etc`.",
+        "hint": "Three flags: one to create, one to request gzip compression, and one that takes the output file as its value. Then the path to archive.",
+        "program": "tar",
+        "requirements": [
+          { "id": "create", "kind": "flag",       "variants": ["-c", "--create"],                  "description": "-c, --create                   create a new archive" },
+          { "id": "gzip",   "kind": "flag",       "variants": ["-z", "--gzip"],                    "description": "-z, --gzip                     filter the archive through gzip" },
+          { "id": "file",   "kind": "flag-value", "variants": ["-f", "--file"], "value": "/tmp/etc-backup.tar.gz", "description": "-f, --file=FILE                use archive file FILE" },
+          { "id": "src",    "kind": "positional", "variants": ["/etc"],                            "description": "<path>                         path to include in the archive" }
+        ],
+        "distractors": [
+          { "flag": "-v", "description": "-v, --verbose                  verbosely list files processed" },
+          { "flag": "-j", "description": "-j, --bzip2                    filter the archive through bzip2 (wrong format for this task)" },
+          { "flag": "-p", "description": "-p, --preserve-permissions     preserve permissions on extract (no effect when creating)" }
+        ],
+        "successOutput": "tar: Removing leading `/' from member names\n",
+        "canonicalCommand": "tar -czf /tmp/etc-backup.tar.gz /etc"
+      },
+      {
+        "id": "s2",
+        "task": "List the contents of `/tmp/etc-backup.tar.gz` without extracting anything.",
+        "hint": "Swap the create flag for the list flag. Compression and file flags stay the same.",
+        "program": "tar",
+        "requirements": [
+          { "id": "list", "kind": "flag",       "variants": ["-t", "--list"],                    "description": "-t, --list                     list the contents of an archive" },
+          { "id": "gzip", "kind": "flag",       "variants": ["-z", "--gzip"],                    "description": "-z, --gzip                     filter the archive through gzip" },
+          { "id": "file", "kind": "flag-value", "variants": ["-f", "--file"], "value": "/tmp/etc-backup.tar.gz", "description": "-f, --file=FILE                use archive file FILE" }
+        ],
+        "distractors": [
+          { "flag": "-v",       "description": "-v, --verbose                  verbosely list files processed" },
+          { "flag": "-W",       "description": "-W, --verify                   attempt to verify the archive after writing (creation only)" },
+          { "flag": "--strip-components", "description": "--strip-components=N           strip N leading components from file names on extract" }
+        ],
+        "successOutput": "etc/\netc/passwd\netc/hostname\netc/hosts\netc/ssh/sshd_config\n...",
+        "canonicalCommand": "tar -tzf /tmp/etc-backup.tar.gz"
+      },
+      {
+        "id": "s3",
+        "task": "Extract `/tmp/etc-backup.tar.gz` into `/tmp/restore` (assume the directory already exists).",
+        "hint": "Four flags this time: extract, gzip, file (with value), and change-directory (with value).",
+        "program": "tar",
+        "requirements": [
+          { "id": "extract", "kind": "flag",       "variants": ["-x", "--extract"],                 "description": "-x, --extract                  extract files from an archive" },
+          { "id": "gzip",    "kind": "flag",       "variants": ["-z", "--gzip"],                    "description": "-z, --gzip                     filter the archive through gzip" },
+          { "id": "file",    "kind": "flag-value", "variants": ["-f", "--file"], "value": "/tmp/etc-backup.tar.gz", "description": "-f, --file=FILE                use archive file FILE" },
+          { "id": "chdir",   "kind": "flag-value", "variants": ["-C", "--directory"], "value": "/tmp/restore",       "description": "-C, --directory=DIR            change to directory DIR before extracting" }
+        ],
+        "distractors": [
+          { "flag": "--overwrite",        "description": "--overwrite                    overwrite existing files on extract" },
+          { "flag": "-k",                 "description": "-k, --keep-old-files           do not overwrite existing files (opposite of --overwrite)" },
+          { "flag": "--strip-components", "description": "--strip-components=N           strip N leading components from file names on extract" }
+        ],
+        "successOutput": "",
+        "canonicalCommand": "tar -xzf /tmp/etc-backup.tar.gz -C /tmp/restore"
+      }
+    ],
+    "explanation": "`tar` is the workhorse archiver on RHEL and its flag vocabulary follows a consistent grammar.\n\n**Three action flags, pick one per invocation:**\n- `-c` create an archive\n- `-t` list contents without extracting\n- `-x` extract from an archive\n\n**Two flags that stay constant in this lab:**\n- `-z` tells tar to filter through `gzip`. Required whether you are creating, listing, or extracting a `.tar.gz`.\n- `-f FILE` names the archive. On RHEL the value immediately follows `-f`, which is why combined short flags like `-czf archive.tar.gz` work: `f` is always the last letter so the value binds to it.\n\n**Extract-only flag:**\n- `-C DIR` changes directory before extracting. Without it, files land relative to your current working directory — a common cause of \"tarbomb\" messes in `/tmp` or `/root`.\n\n**Distractors worth knowing anyway:**\n- `-j` filters through bzip2 (wrong compression for a `.tar.gz`).\n- `-v` adds verbose output — helpful at the terminal, unnecessary in scripts.\n- `--strip-components=N` is useful when restoring paths captured from `/` back into a relative directory, but is not needed here.\n\n**Flag order does not matter.** `tar -czf file /etc`, `tar --create --gzip --file=file /etc`, and `tar /etc -czf file` are all accepted. What does matter is that `-f` is followed by the archive filename (or uses the `--file=NAME` long form).",
+    "learningOutcomes": [
+      "Create, list, and extract gzip-compressed tar archives using `tar -c`, `-t`, and `-x`",
+      "Combine short flags (`-czf`) and use long forms (`--create`, `--gzip`, `--file=`)",
+      "Extract safely into a specific directory with `-C` to avoid cluttering the working directory"
+    ],
+    "realWorldValue": "EX200 Skill 1.1.6 tests tar directly, and every RHEL admin uses tar weekly — for backups, config snapshots, software distribution, and shipping evidence to support. Knowing the three-letter grammar `-c/-t/-x` + `-z` + `-f` from memory is essential under exam time pressure.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-firewalld-command-terminal",
+    "title": "Configure firewalld Zones and Services on RHEL 10",
+    "description": "Type each firewall-cmd invocation to set the default zone, permanently add a service, and reload the runtime configuration. Flags can appear in any order. Use --help to explore the firewall-cmd vocabulary.",
+    "type": "command-terminal",
+    "difficulty": "advanced",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "firewalld", "firewall-cmd"],
+    "version": 1,
+    "scenario": "A RHEL 10 edge host needs its default zone set to `public`, HTTP traffic permitted persistently in that zone, and the runtime config reloaded so the new rule takes effect. Flags can appear in any order. Use `firewall-cmd --help` to explore options — several distractors look relevant but are wrong for this task.",
+    "prompt": "[root@rhel10 ~]#",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Set the firewalld default zone to `public` (this change takes effect immediately and is persistent, no --permanent needed).",
+        "hint": "A single flag-value pair. Watch out for the read-only variant that only reports the current default.",
+        "program": "firewall-cmd",
+        "requirements": [
+          { "id": "set-default", "kind": "flag-value", "variants": ["--set-default-zone"], "value": "public", "description": "--set-default-zone=ZONE        set the default zone (persistent, no reload required)" }
+        ],
+        "distractors": [
+          { "flag": "--get-default-zone", "description": "--get-default-zone             print the current default zone (read-only)" },
+          { "flag": "--zone",             "description": "--zone=ZONE                    target a specific zone for another operation (not for changing the default)" },
+          { "flag": "--add-source",       "description": "--add-source=SOURCE            bind a source address to a zone" }
+        ],
+        "successOutput": "success",
+        "canonicalCommand": "firewall-cmd --set-default-zone=public"
+      },
+      {
+        "id": "s2",
+        "task": "Permanently allow the `http` service in the `public` zone.",
+        "hint": "Three arguments together: which zone, which service to add, and the permanent flag so the rule survives a reload or reboot.",
+        "program": "firewall-cmd",
+        "requirements": [
+          { "id": "zone",      "kind": "flag-value", "variants": ["--zone"],        "value": "public", "description": "--zone=ZONE                    operate on the specified zone" },
+          { "id": "add-svc",   "kind": "flag-value", "variants": ["--add-service"], "value": "http",   "description": "--add-service=SERVICE          add a service to the zone" },
+          { "id": "permanent", "kind": "flag",       "variants": ["--permanent"],                     "description": "--permanent                    make the change persist across reloads/reboots" }
+        ],
+        "distractors": [
+          { "flag": "--add-port",            "description": "--add-port=PORT/PROTO          add a raw port (wrong flag when a named service already exists)" },
+          { "flag": "--add-interface",       "description": "--add-interface=INTERFACE      bind a network interface to the zone (not required here)" },
+          { "flag": "--runtime-to-permanent","description": "--runtime-to-permanent         promote all current runtime rules to permanent (too broad for one rule)" },
+          { "flag": "--remove-service",      "description": "--remove-service=SERVICE       remove a service from the zone (opposite of add)" }
+        ],
+        "successOutput": "success",
+        "canonicalCommand": "firewall-cmd --zone=public --add-service=http --permanent"
+      },
+      {
+        "id": "s3",
+        "task": "Reload firewalld so the permanent rule you just added is applied to the running configuration.",
+        "hint": "A single flag. One distractor drops all runtime connections, another only reports state — neither is what you want.",
+        "program": "firewall-cmd",
+        "requirements": [
+          { "id": "reload", "kind": "flag", "variants": ["--reload"], "description": "--reload                       reload firewall rules, keeping state information" }
+        ],
+        "distractors": [
+          { "flag": "--complete-reload",     "description": "--complete-reload              reload firewall rules, losing state (drops established connections)" },
+          { "flag": "--runtime-to-permanent","description": "--runtime-to-permanent         save current runtime rules as permanent (opposite direction to what is needed)" },
+          { "flag": "--state",               "description": "--state                        return the running state of firewalld (read-only)" }
+        ],
+        "successOutput": "success",
+        "canonicalCommand": "firewall-cmd --reload"
+      }
+    ],
+    "explanation": "firewalld uses a *runtime* and a *permanent* configuration which are normally separate. The flag vocabulary is dense and easy to mistake.\n\n**Step 1: `firewall-cmd --set-default-zone=public`**\n- `--set-default-zone` changes `/etc/firewalld/firewalld.conf` and also applies immediately — it is the exception that does **not** need `--permanent` or a reload.\n- Distractor: `--get-default-zone` only reads, it does not write.\n- Distractor: `--zone=public` alone does nothing; it only scopes another operation to that zone.\n\n**Step 2: `firewall-cmd --zone=public --add-service=http --permanent`**\n- `--zone=public` targets a specific zone instead of the default.\n- `--add-service=http` references a named service defined in `/usr/lib/firewalld/services/`. Prefer named services over raw ports (`--add-port=80/tcp`) when one exists — they cover every port the service uses and read better in audits.\n- `--permanent` writes to `/etc/firewalld/zones/public.xml`. Without it, the rule exists only in runtime and disappears at the next reload or reboot.\n- Distractor: `--runtime-to-permanent` promotes *every* current runtime rule to permanent, which is a sledgehammer when you just want this one change saved.\n\n**Step 3: `firewall-cmd --reload`**\n- `--reload` re-reads the permanent config into the runtime, applying the new rule while **preserving established connections** tracked by conntrack.\n- Distractor: `--complete-reload` also works but drops connection state — valid for major rule changes, overkill for adding one service.\n- Distractor: `--state` only reports whether firewalld is running.\n\n**Flag order does not matter** — `--permanent --zone=public --add-service=http` is just as valid. What matters is that every permanent change is followed by `--reload` before it affects traffic.",
+    "learningOutcomes": [
+      "Change the firewalld default zone with `--set-default-zone` (no `--permanent` needed)",
+      "Permanently add a named service to a specific zone with `--zone`, `--add-service`, and `--permanent`",
+      "Know when to use `--reload` vs `--complete-reload`, and recognise read-only flags like `--state` and `--get-default-zone`"
+    ],
+    "realWorldValue": "EX200 Skill 10.1.1 tests firewalld directly. The number-one mistake under exam pressure is forgetting `--permanent`, reloading, and then watching the rule vanish. Knowing the permanent / runtime / reload triangle — and which flags bypass it — is what separates a quick pass from a slow fail.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-boot-ordering",
+    "title": "Sequence the RHEL 10 Boot Process",
+    "description": "Drag the stages of a RHEL 10 boot into the correct order, from firmware power-on through systemd activating the default target and a login prompt appearing.",
+    "type": "ordering",
+    "difficulty": "beginner",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Troubleshoot",
+    "technologies": ["RHEL 10", "UEFI", "GRUB2", "initramfs", "systemd"],
+    "version": 1,
+    "scenario": "You are explaining the RHEL 10 boot sequence to a new hire. Drag each stage into the correct position, starting from firmware power-on and finishing at an interactive login prompt.",
+    "steps": [
+      { "id": "b1", "text": "UEFI firmware completes POST and loads the EFI boot entry from the ESP",                  "correctPosition": 1 },
+      { "id": "b2", "text": "The GRUB2 boot loader is loaded and displays the menu of bootable kernels",            "correctPosition": 2 },
+      { "id": "b3", "text": "GRUB2 loads the selected kernel (`vmlinuz`) and `initramfs` into memory and hands off", "correctPosition": 3 },
+      { "id": "b4", "text": "The kernel mounts `initramfs` as a temporary root and probes hardware/modules",         "correctPosition": 4 },
+      { "id": "b5", "text": "`systemd` is started as PID 1 from `initramfs`",                                        "correctPosition": 5 },
+      { "id": "b6", "text": "systemd pivots to the real root filesystem on disk",                                    "correctPosition": 6 },
+      { "id": "b7", "text": "systemd activates the default target (`multi-user.target` or `graphical.target`)",      "correctPosition": 7 },
+      { "id": "b8", "text": "`getty`/`gdm` starts and presents a login prompt on the console",                       "correctPosition": 8 }
+    ],
+    "explanation": "A RHEL 10 boot is a chain where each stage hands control to the next. Skipping a step is not possible — every stage produces the state the next one needs.\n\n1. **Firmware** — UEFI completes POST (Power On Self Test) and reads its boot entry list. The default entry on RHEL 10 points at `\\EFI\\redhat\\shimx64.efi` on the EFI System Partition.\n2. **GRUB2** — the shim chains into GRUB2, which reads `/boot/grub2/grub.cfg` and presents the kernel menu. On EX200 this is where you press `e` to edit a boot entry for single-user recovery.\n3. **Kernel + initramfs load** — GRUB2 loads the selected `vmlinuz` kernel and the `initramfs` archive into memory, then jumps into the kernel.\n4. **Kernel bring-up** — the kernel decompresses, mounts the `initramfs` as a temporary root filesystem, and probes hardware to load the modules it needs (including storage drivers).\n5. **systemd (initramfs)** — `systemd` starts as PID 1 inside the `initramfs`. This is the earliest point at which unit files run.\n6. **Pivot to real root** — once the real root filesystem is accessible (RAID/LVM/encrypted volumes sorted), systemd pivots onto it and discards the `initramfs`.\n7. **Default target** — systemd activates `default.target`, which is a symlink to `multi-user.target` or `graphical.target`. Use `systemctl get-default` to see which.\n8. **Login prompt** — once the target's dependencies are reached, `getty` or `gdm` opens a login on the TTY or display.",
+    "learningOutcomes": [
+      "Recall the order of RHEL 10 boot stages from firmware to login prompt",
+      "Identify the boundary where each stage hands off (firmware → GRUB → kernel → systemd)",
+      "Know where to intervene to recover a broken boot (GRUB menu, `rd.break`, `systemctl default`)"
+    ],
+    "realWorldValue": "Boot failures are the scariest tickets on a RHEL host because the usual remote-troubleshooting tools are not available yet. Knowing where each stage lives, and which handoff is failing, is the difference between 'hung at GRUB' and 'hung in initramfs' — and determines whether you drop into GRUB edit mode, an emergency shell, or boot into a different target.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-text-tools-drag-match",
+    "title": "Match RHEL Text Tool Flags to Their Behaviour",
+    "description": "Drag each `find`, `grep`, and `sed` flag or pattern to the behaviour it produces. Covers the core EX200 text-processing vocabulary you reach for under time pressure.",
+    "type": "drag-match",
+    "difficulty": "beginner",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "find", "grep", "sed", "awk"],
+    "version": 1,
+    "scenario": "You are triaging a RHEL 10 host and juggling `find`, `grep`, and `sed`. Match each flag or pattern on the left to the behaviour it produces on the right.",
+    "pairs": [
+      { "id": "p1", "term": "`find . -type f`",                  "definition": "Match only regular files (not directories, symlinks, or sockets)" },
+      { "id": "p2", "term": "`find /var/log -mtime +7`",          "definition": "Match files last modified more than seven 24-hour periods ago" },
+      { "id": "p3", "term": "`grep -r pattern /etc`",             "definition": "Search recursively, descending into every subdirectory under `/etc`" },
+      { "id": "p4", "term": "`grep -v pattern`",                  "definition": "Invert the match — print only lines that do NOT contain the pattern" },
+      { "id": "p5", "term": "`grep -E 'err|warn' file`",          "definition": "Treat the pattern as an extended regular expression (alternation, `+`, `?`)" },
+      { "id": "p6", "term": "`sed -i 's/old/new/g' file`",        "definition": "Edit the file in place, replacing every occurrence of `old` with `new` on each line" },
+      { "id": "p7", "term": "`sed -n '5,10p' file`",              "definition": "Suppress default output and print only lines 5 through 10" },
+      { "id": "p8", "term": "`awk '{print $3}' file`",            "definition": "Print the third whitespace-separated field of each line" }
+    ],
+    "explanation": "RHCSA rewards fluency with the Unix text triplet. A few shortcuts that always come up:\n\n- **`find -type f`** — filter by inode type. `d` for directories, `l` for symlinks, `s` for sockets. Combine with `-name`, `-mtime`, `-size` to narrow further.\n- **`find -mtime +N`** — the plus means *more than* N days. `-mtime -N` is *within* N days, `-mtime N` is *exactly* N.\n- **`grep -r`** — recurses into subdirectories, following the directory tree. Pair with `--include='*.conf'` to scope to a file pattern.\n- **`grep -v`** — the invert-match flag. Critical for log triage: `grep -v INFO /var/log/messages` drops the noise.\n- **`grep -E`** — extended regex unlocks `|`, `+`, `?` without needing to backslash them. `grep -F` turns the pattern into fixed strings (fastest, safest for literals).\n- **`sed -i`** — in-place edit. Always combine with a backup (`sed -i.bak`) during the exam so you have an escape hatch.\n- **`sed -n 'RANGEp'`** — the `-n` suppresses default auto-print, so only the explicitly `p`rinted lines appear.\n- **`awk '{print $N}'`** — `awk` splits on whitespace (or `-F:` for a custom delimiter like `/etc/passwd`). `$0` is the whole line.",
+    "learningOutcomes": [
+      "Know the common `find` predicates: `-type`, `-mtime`, `-name`, `-size`",
+      "Recall the meaning of core `grep` flags: `-r`, `-v`, `-E`, `-F`, `-i`",
+      "Use `sed -i` safely for in-place edits and `awk '{print $N}'` for field extraction"
+    ],
+    "realWorldValue": "EX200 Skill 1.1.3 tests `grep` and regex directly, and Skill 1.1.11 expects you to navigate `/usr/share/doc` and man pages. But in practice, the whole exam is gated on your speed with `find | xargs grep | sed`. Every minute you save not re-reading `man find` is a minute you get back to answer a harder question.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-dnf-fill-command",
+    "title": "Fill in the dnf, rpm, and subscription-manager Commands",
+    "description": "Complete each package-management invocation by filling in the missing subcommand or flag. Covers the `dnf`, `rpm`, and `subscription-manager` patterns every RHEL admin runs daily.",
+    "type": "fill-command",
+    "difficulty": "beginner",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "dnf", "rpm", "subscription-manager"],
+    "version": 1,
+    "scenario": "You are setting up a fresh RHEL 10 host: register it, install and update packages, and identify where files come from. Fill in the blanks to complete each command.",
+    "questions": [
+      {
+        "id": "q1",
+        "template": "subscription-manager ___ --username=admin --password=PASS",
+        "blanks": [
+          { "id": "b1", "placeholder": "subcommand", "answer": "register" }
+        ],
+        "hint": "The subcommand that attaches this host to Red Hat's Content Delivery Network."
+      },
+      {
+        "id": "q2",
+        "template": "dnf install ___ httpd",
+        "blanks": [
+          { "id": "b1", "placeholder": "flag", "answer": "-y" }
+        ],
+        "hint": "The one-character flag that answers 'yes' to every confirmation prompt."
+      },
+      {
+        "id": "q3",
+        "template": "dnf ___ -y kernel",
+        "blanks": [
+          { "id": "b1", "placeholder": "subcommand", "answer": "update" }
+        ],
+        "hint": "The subcommand that upgrades an already-installed package to the latest available version."
+      },
+      {
+        "id": "q4",
+        "template": "rpm ___ /etc/httpd/conf/httpd.conf",
+        "blanks": [
+          { "id": "b1", "placeholder": "flags", "answer": "-qf" }
+        ],
+        "hint": "Combined short flags: query mode plus 'find which package owns this file'."
+      },
+      {
+        "id": "q5",
+        "template": "dnf ___ --installed",
+        "blanks": [
+          { "id": "b1", "placeholder": "subcommand", "answer": "list" }
+        ],
+        "hint": "The subcommand that enumerates packages; `--installed` narrows the listing to only those currently present."
+      },
+      {
+        "id": "q6",
+        "template": "dnf ___ kernel",
+        "blanks": [
+          { "id": "b1", "placeholder": "subcommand", "answer": "history" }
+        ],
+        "hint": "Not `update` — the subcommand that shows the audit trail of dnf transactions and supports rollback."
+      }
+    ],
+    "explanation": "Package management on RHEL 10 spans three tools that work together.\n\n**`subscription-manager`** connects the host to Red Hat's Content Delivery Network. Without `register`, `dnf` has no repositories for the base OS. `subscription-manager repos --list` then enables/disables channels.\n\n**`dnf`** is the high-level package manager. Core subcommands:\n- `install [-y]` — install packages (`-y` for unattended)\n- `update` / `upgrade` — upgrade to newer versions; they are aliases on RHEL 10\n- `remove` / `erase` — remove packages\n- `list --installed` / `list --available` / `list --updates` — enumerate packages\n- `search TERM` — search package metadata\n- `history` — transaction audit log; `dnf history undo N` rolls one back\n- `info PKG` — detailed metadata on a single package\n\n**`rpm`** is the low-level backend. You rarely install with `rpm -i` on RHEL because `dnf` resolves dependencies. But `rpm -q*` is indispensable:\n- `rpm -qa` — list all installed packages\n- `rpm -qf PATH` — which package owns a file\n- `rpm -ql PKG` — list files installed by a package\n- `rpm -qi PKG` — info on an installed package\n- `rpm -V PKG` — verify a package's files against the database\n\nCombined short flags like `-qf`, `-ql`, `-qa` are the RHCSA norm — learn them as units, not as individual flags.",
+    "learningOutcomes": [
+      "Register a host with Red Hat using `subscription-manager register`",
+      "Install, update, remove, and list packages with `dnf`",
+      "Identify file ownership and package contents with `rpm -qf` and `rpm -ql`",
+      "Audit and roll back transactions with `dnf history`"
+    ],
+    "realWorldValue": "EX200 Domain 2 and Skill 7.1.5 both test package management, and every troubleshooting question eventually comes back to 'which package owns this file?' (`rpm -qf`) or 'when did this change?' (`dnf history`). Fluency with these flags is the single highest-leverage RHCSA skill.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-logrotate-code-fix",
+    "title": "Fix a Broken Log-Cleanup Bash Script on RHEL 10",
+    "description": "A nightly cron job that trims old application logs is silently failing. Edit the bash script to make it correct, safe, and returning meaningful exit codes.",
+    "type": "code-fix",
+    "difficulty": "beginner",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Troubleshoot",
+    "technologies": ["RHEL 10", "bash", "find", "cron"],
+    "version": 1,
+    "showcase": true,
+    "showcaseOrder": 12,
+    "scenario": "A cron job on a RHEL 10 host runs `/usr/local/sbin/cleanup-logs.sh` every night to remove `.log` files in `/var/log/app` older than 30 days. It has been failing silently for weeks. Fix the script so it runs cleanly, handles a missing directory, and returns a non-zero exit code on failure.",
+    "language": "shell",
+    "brokenCode": "LOG_DIR=/var/log/app\nDAYS=30\n\nif [ -d $LOG_DIR ]\n    find $LOG_DIR -name *.log -mtime +$DAYS -exec rm {}\n    exit 0\nfi\n",
+    "correctCode": "#!/bin/bash\nLOG_DIR=/var/log/app\nDAYS=30\n\nif [ -d \"$LOG_DIR\" ]; then\n    find \"$LOG_DIR\" -name \"*.log\" -mtime +\"$DAYS\" -exec rm {} \\;\n    exit 0\nelse\n    echo \"Log directory $LOG_DIR not found\" >&2\n    exit 1\nfi\n",
+    "validations": [
+      { "field": "shebang",         "expected": "#!/bin/bash" },
+      { "field": "then-keyword",    "expected": "then" },
+      { "field": "quoted-logdir",   "expected": "\"$LOG_DIR\"" },
+      { "field": "quoted-glob",     "expected": "\"*.log\"" },
+      { "field": "exec-terminator", "expected": "\\;" },
+      { "field": "else-branch",     "expected": "else" },
+      { "field": "nonzero-exit",    "expected": "exit 1" }
+    ],
+    "explanation": "The broken script has five separate bugs, any one of which would mask the others on a cron run.\n\n**1. Missing shebang**. cron hands the file to `/bin/sh`, which on RHEL is `bash` in POSIX mode — most of the time this works, but glob behaviour and `[[` availability differ. Adding `#!/bin/bash` makes the intended interpreter explicit.\n\n**2. Missing `then`**. `if [ -d $LOG_DIR ]` must be followed by `then` on the next line or `; then` on the same line. Without it, bash emits a syntax error and cron silently swallows it.\n\n**3. Unquoted variable `$LOG_DIR`**. If the variable is ever empty (say, someone comments out the assignment), `[ -d ]` evaluates differently than `[ -d \"\" ]`. Always quote path variables in tests.\n\n**4. Unquoted glob `*.log`**. Bash expands `*.log` against the current working directory *before* passing it to `find`. If there are no `.log` files in CWD, `find` gets the literal `*.log` and it happens to work; if there are, `find` receives whatever matched in CWD instead. Quote the pattern so `find` does the globbing itself.\n\n**5. Missing `-exec` terminator**. `-exec COMMAND \\;` (or `\\+`) is how `find` knows where the command ends. Without the terminator, `find` errors out with `find: missing argument to \\`-exec'`.\n\n**6. No else branch, no failure exit code**. If `$LOG_DIR` does not exist, the script silently succeeds — cron will happily continue calling it forever and you never learn the directory went away. The fix logs the failure to stderr and exits non-zero so cron's mail-on-error wakes someone up.",
+    "learningOutcomes": [
+      "Write bash scripts with correct `if/then/else/fi` structure",
+      "Always quote path variables and glob patterns passed to `find`",
+      "Terminate `find -exec COMMAND` with `\\;` or `\\+`",
+      "Exit non-zero on failure so cron surfaces the problem instead of swallowing it"
+    ],
+    "realWorldValue": "EX200 Domain 3 tests shell scripting fundamentals and Skill 7.1.1 covers cron. In production, the most dangerous cleanup scripts are the ones that *silently succeed* — they delete the wrong thing, or they stop running, and nobody notices until the disk is full or data is missing. Noisy failure is always safer than silent success.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-sshd-config-toggle",
+    "title": "Harden /etc/ssh/sshd_config on RHEL 10",
+    "description": "Walk through the stock RHEL 10 sshd_config and flip each directive to its hardened value. Covers password/key policy, session timeouts, and user allowlisting.",
+    "type": "config-toggle",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Configure",
+    "technologies": ["RHEL 10", "OpenSSH", "sshd_config"],
+    "version": 1,
+    "showcase": true,
+    "showcaseOrder": 5,
+    "scenario": "A RHEL 10 host will be exposed to the internet. Harden `/etc/ssh/sshd_config` by changing each directive from its stock value to the hardened value used in the CIS RHEL 10 benchmark.",
+    "configItems": [
+      {
+        "id": "pw",
+        "label": "PasswordAuthentication",
+        "shortLabel": "Password auth",
+        "currentValue": "yes",
+        "correctValue": "no",
+        "inputType": "select",
+        "options": ["yes", "no"]
+      },
+      {
+        "id": "root",
+        "label": "PermitRootLogin",
+        "shortLabel": "Root login",
+        "currentValue": "yes",
+        "correctValue": "no",
+        "inputType": "select",
+        "options": ["yes", "no", "prohibit-password", "forced-commands-only"]
+      },
+      {
+        "id": "pubkey",
+        "label": "PubkeyAuthentication",
+        "shortLabel": "Pubkey auth",
+        "currentValue": "no",
+        "correctValue": "yes",
+        "inputType": "select",
+        "options": ["yes", "no"]
+      },
+      {
+        "id": "tries",
+        "label": "MaxAuthTries",
+        "shortLabel": "Max auth tries",
+        "currentValue": "6",
+        "correctValue": "3",
+        "inputType": "text"
+      },
+      {
+        "id": "alive",
+        "label": "ClientAliveInterval (seconds)",
+        "shortLabel": "Idle timeout",
+        "currentValue": "0",
+        "correctValue": "300",
+        "inputType": "text"
+      },
+      {
+        "id": "x11",
+        "label": "X11Forwarding",
+        "shortLabel": "X11 forwarding",
+        "currentValue": "yes",
+        "correctValue": "no",
+        "inputType": "select",
+        "options": ["yes", "no"]
+      },
+      {
+        "id": "empty",
+        "label": "PermitEmptyPasswords",
+        "shortLabel": "Empty passwords",
+        "currentValue": "no",
+        "correctValue": "no",
+        "inputType": "select",
+        "options": ["yes", "no"]
+      }
+    ],
+    "explanation": "The RHEL 10 defaults in `/etc/ssh/sshd_config` are tuned for compatibility, not hardening. Seven changes take an internet-exposed host from 'vulnerable to credential stuffing' to 'CIS-compliant'.\n\n- **`PasswordAuthentication no`** — require public keys. Must come after you have verified key auth works, per the cutover pattern from the SSH key-based auth lab.\n- **`PermitRootLogin no`** — never allow direct root login over SSH. `prohibit-password` is the middle ground (keys only for root), but `no` is safer for RHCSA and CIS.\n- **`PubkeyAuthentication yes`** — the stock value is already `yes`, but this config intentionally has it flipped off to confirm you know to turn it on.\n- **`MaxAuthTries 3`** — the default `6` is generous. Three tries per session is the CIS recommendation and slows online brute-force.\n- **`ClientAliveInterval 300`** — the default `0` disables idle detection. 300 seconds (5 minutes) combined with the default `ClientAliveCountMax 3` kicks idle sessions after 15 minutes, limiting unattended exposure.\n- **`X11Forwarding no`** — server-side X11 tunnelling is a pointless attack surface on a production RHEL host. Turn it off unless you have a concrete desktop-over-SSH use case.\n- **`PermitEmptyPasswords no`** — already the default, but included because misconfigurations elsewhere (PAM, `/etc/shadow`) can create empty-password accounts. Double insurance.\n\nAfter editing, always run `sshd -t` to syntax-check and then `systemctl reload sshd` (not restart — reload preserves existing sessions).",
+    "learningOutcomes": [
+      "Identify the RHEL 10 stock `sshd_config` values and know which are unsafe",
+      "Map each directive to a threat it mitigates (password brute-force, session hijack, X11 abuse)",
+      "Know the order: edit → `sshd -t` → `systemctl reload sshd`"
+    ],
+    "realWorldValue": "Every RHEL host exposed to the internet is attacked within minutes of coming online. Default SSH settings are the most common vector. EX200 Skill 10.1.3 tests key-based auth directly, but grading rubrics also expect a hardened `sshd_config` — leaving password auth on loses marks even if the keys work.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-selinux-security-hardening",
+    "title": "Choose the Correct SELinux Remediation on RHEL 10",
+    "description": "For each SELinux scenario (wrong context, unlabelled port, blocked boolean, stale labels after restore) pick the correct remediation from the RHCSA toolkit. Wrong answers include common exam traps.",
+    "type": "security-hardening",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Troubleshoot",
+    "technologies": ["RHEL 10", "SELinux", "semanage", "restorecon", "setsebool"],
+    "version": 1,
+    "showcase": true,
+    "showcaseOrder": 4,
+    "scenario": "A RHEL 10 host is in Enforcing mode. Four separate services are failing because of SELinux. For each resource, pick the *correct* remediation. Several wrong options are plausible-looking shortcuts that graders and auditors will reject.",
+    "issues": [
+      {
+        "id": "i1",
+        "resource": "Apache serving /srv/web (custom document root)",
+        "issue": "httpd logs `AH00132: file permissions deny server access` and the files show `unconfined_u:object_r:var_t:s0` contexts instead of `httpd_sys_content_t`.",
+        "options": [
+          "Run `setenforce 0` to disable SELinux enforcement",
+          "Run `chmod -R 777 /srv/web` to bypass the permission error",
+          "Run `semanage fcontext -a -t httpd_sys_content_t '/srv/web(/.*)?' && restorecon -Rv /srv/web`",
+          "Edit `/etc/selinux/config` and set `SELINUX=permissive`"
+        ],
+        "correctOption": "Run `semanage fcontext -a -t httpd_sys_content_t '/srv/web(/.*)?' && restorecon -Rv /srv/web`"
+      },
+      {
+        "id": "i2",
+        "resource": "httpd reconfigured to listen on port 8080",
+        "issue": "`systemctl start httpd` fails with `(13)Permission denied: AH00072: make_sock: could not bind to address [::]:8080`. AVC denial shows httpd_t blocked from binding to an unlabelled port.",
+        "options": [
+          "Run `semanage port -a -t http_port_t -p tcp 8080`",
+          "Run `setenforce 0` so httpd can bind to any port",
+          "Disable firewalld with `systemctl disable --now firewalld`",
+          "Change `Listen 8080` back to `Listen 80` in httpd.conf"
+        ],
+        "correctOption": "Run `semanage port -a -t http_port_t -p tcp 8080`"
+      },
+      {
+        "id": "i3",
+        "resource": "Users reporting that CGI scripts in their ~/public_html directories are refused",
+        "issue": "Apache logs show SELinux AVC denials on httpd_t accessing user home directories. The fix must persist across reboots.",
+        "options": [
+          "Run `setsebool httpd_enable_homedirs on` (no -P)",
+          "Run `setsebool -P httpd_enable_homedirs on`",
+          "Run `chcon -t httpd_sys_content_t ~user/public_html` on each user",
+          "Set SELinux to permissive in `/etc/selinux/config`"
+        ],
+        "correctOption": "Run `setsebool -P httpd_enable_homedirs on`"
+      },
+      {
+        "id": "i4",
+        "resource": "A directory tree restored from backup into /var/www",
+        "issue": "Many files now carry stale or incorrect SELinux contexts (user_home_t, default_t). You need to re-apply the contexts defined by the current policy without hand-editing each file.",
+        "options": [
+          "Run `restorecon -Rv /var/www` to re-apply policy-defined contexts",
+          "Run `chcon -R -t httpd_sys_content_t /var/www` (non-persistent)",
+          "Run `rm -rf /var/www && cp -a backup /var/www`",
+          "Run `setenforce 0` and leave the contexts as-is"
+        ],
+        "correctOption": "Run `restorecon -Rv /var/www` to re-apply policy-defined contexts"
+      }
+    ],
+    "explanation": "SELinux remediation on RHEL comes down to four tools. Knowing which one applies is the whole skill.\n\n**1. File context (`semanage fcontext` + `restorecon`)** — when a file is in the wrong place or a new path exists outside the default policy. `semanage fcontext -a` registers the mapping persistently; `restorecon` applies it to files on disk. Always run them as a pair — one without the other is half the fix.\n\n**2. Port labels (`semanage port`)** — when a service needs to bind to a non-default port. Without the label, SELinux denies the bind regardless of firewall rules, because `httpd_t` is only permitted to bind to ports tagged `http_port_t`.\n\n**3. Booleans (`setsebool -P`)** — when policy already anticipates the scenario but has it switched off by default. The `-P` is critical: without it the change reverts on reboot. Common booleans for RHCSA: `httpd_enable_homedirs`, `httpd_can_network_connect`, `ftp_home_dir`, `samba_enable_home_dirs`.\n\n**4. `restorecon`** — when contexts have been corrupted by copying, restoring, or `chcon` (which does not update the policy database). `restorecon -Rv PATH` re-applies what the *policy* says the path should be, overwriting whatever drift got in.\n\n**Why the wrong answers are traps:**\n- `setenforce 0` hides the problem but leaves the policy misaligned. Auditors see it immediately, and a reboot re-enables enforcement — leading to a 'works on my machine' regression.\n- `chmod 777` answers a DAC permission question, not a MAC (SELinux) question. SELinux denials have nothing to do with Unix modes.\n- `chcon` changes the on-disk context *without* updating the policy database, so the next `restorecon` silently reverts it. Almost never the right answer for persistent fixes.\n- Disabling firewalld or changing ports are wrong-scope fixes that avoid the SELinux lesson.",
+    "learningOutcomes": [
+      "Diagnose SELinux failures by distinguishing file context, port label, and boolean issues",
+      "Apply the correct remediation: `semanage fcontext`+`restorecon`, `semanage port`, `setsebool -P`, `restorecon`",
+      "Recognise `setenforce 0`, `chmod 777`, and `chcon` (for persistence) as exam traps"
+    ],
+    "realWorldValue": "Every RHCSA SELinux question is really 'pick the right tool'. Getting this right in practice means the difference between a clean audit and a deduction; in production, it is the difference between a secure host and one where someone has silently been running Permissive for three years because 'SELinux was blocking things'.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-sudoers-policy-fix",
+    "title": "Fix a Broken /etc/sudoers.d Snippet on RHEL 10",
+    "description": "Edit a broken sudoers drop-in so the developers group can manage httpd without a password, while keeping the `webdev` user's scope narrow. Mind the syntax — a bad sudoers file breaks sudo for everyone.",
+    "type": "policy-fix",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Configure",
+    "technologies": ["RHEL 10", "sudo", "sudoers"],
+    "version": 1,
+    "showcase": true,
+    "showcaseOrder": 9,
+    "scenario": "A junior admin has left `/etc/sudoers.d/developers` in a broken state. The `developers` group should be able to restart, reload, and query status of `httpd` without a password, and the user `webdev` should be able to run `dnf update` (only dnf update, nothing else). Fix the file so it is syntactically valid and scoped correctly.",
+    "brokenPolicy": "# Allow developers group to manage httpd\n%developers ALL = /bin/systemctl restart httpd, NOPASSWD: /bin/systemctl status httpd\nwebdev ALL=(ALL) ALL\n",
+    "correctPolicy": "# Allow developers group to manage httpd\n%developers ALL=(root) NOPASSWD: /bin/systemctl restart httpd, /bin/systemctl reload httpd, /bin/systemctl status httpd\nwebdev ALL=(root) NOPASSWD: /usr/bin/dnf update\n",
+    "validations": [
+      { "field": "group-runas",     "expected": "%developers ALL=(root)" },
+      { "field": "nopasswd-prefix", "expected": "NOPASSWD:" },
+      { "field": "webdev-scope",    "expected": "webdev ALL=(root)" },
+      { "field": "webdev-command",  "expected": "/usr/bin/dnf update" },
+      { "field": "no-all-all",      "expected": "NOPASSWD: /usr/bin/dnf update" }
+    ],
+    "explanation": "The broken file has three separate defects, all of which are common RHCSA traps.\n\n**1. Missing runas specification.** `%developers ALL = /bin/systemctl ...` omits the `(root)` runas. `sudoers` syntax is `user HOST=(RUNAS) COMMANDS`. Without `(RUNAS)`, sudo has to fall back to defaults and `visudo` will usually reject the line outright as a syntax error.\n\n**2. Misplaced `NOPASSWD`.** `NOPASSWD:` is a tag that applies to the command that follows — and only until the next tag or end of line. In the broken line, `restart httpd` requires a password but `status httpd` does not, which is the opposite of the intent. The fix places `NOPASSWD:` *before all* the commands so it applies to each.\n\n**3. Over-broad grant to `webdev`.** `webdev ALL=(ALL) ALL` means 'webdev can run anything, as anyone, anywhere'. That is the same as giving webdev root. The intent was to allow only `dnf update`, so the fix is `webdev ALL=(root) NOPASSWD: /usr/bin/dnf update`.\n\n**General sudoers rules for RHCSA:**\n- Edit with `visudo -f /etc/sudoers.d/FILE` — it syntax-checks before saving and refuses to save a broken file (which would lock everyone out of sudo).\n- Drop-in files under `/etc/sudoers.d/` are included automatically. Filenames must not contain dots or tildes (they are skipped silently).\n- Always use full absolute command paths (`/bin/systemctl`, not `systemctl`) — a relative path lets the user satisfy the rule with a binary they placed in `$PATH`.\n- `%groupname` refers to a Unix group; plain `username` is a single user.",
+    "learningOutcomes": [
+      "Write correct sudoers syntax: `user HOST=(RUNAS) [TAG:] COMMANDS`",
+      "Place `NOPASSWD:` so it applies to every command that should be passwordless",
+      "Grant narrow, absolute-path commands instead of `(ALL) ALL`",
+      "Use `visudo -f` to edit drop-in files safely"
+    ],
+    "realWorldValue": "EX200 Skill 9.1.4 tests privileged access, and sudoers is the tool that implements it. A mistake here is one of the few RHCSA mistakes that can lock you out of root — making this exactly the kind of place the exam (and post-incident reviews) pay close attention.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-journal-log-analysis",
+    "title": "Diagnose a Failed httpd Start from journald on RHEL 10",
+    "description": "Read the journald output for a failed `httpd.service` start and identify the root cause. Covers systemd log prefixes, start-limit-hit behaviour, and distinguishing signal from noise.",
+    "type": "log-analysis",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Troubleshoot",
+    "technologies": ["RHEL 10", "systemd", "journald", "httpd"],
+    "version": 1,
+    "showcase": true,
+    "showcaseOrder": 8,
+    "scenario": "A RHEL 10 host's `httpd.service` will not start after a certificate rotation. The on-call engineer has captured the last two minutes of journald output (`journalctl -u httpd -b -n 40`). Read the logs and identify the true root cause.",
+    "logs": [
+      { "timestamp": "2026-04-19 13:51:00", "level": "INFO",  "source": "systemd", "message": "Starting The Apache HTTP Server..." },
+      { "timestamp": "2026-04-19 13:51:00", "level": "ERROR", "source": "httpd",   "message": "AH00526: Syntax error on line 42 of /etc/httpd/conf.d/ssl.conf:" },
+      { "timestamp": "2026-04-19 13:51:00", "level": "ERROR", "source": "httpd",   "message": "SSLCertificateFile: file '/etc/pki/tls/certs/wildcard-prod.pem' does not exist or is empty" },
+      { "timestamp": "2026-04-19 13:51:00", "level": "ERROR", "source": "systemd", "message": "httpd.service: Main process exited, code=exited, status=1/FAILURE" },
+      { "timestamp": "2026-04-19 13:51:00", "level": "ERROR", "source": "systemd", "message": "httpd.service: Failed with result 'exit-code'." },
+      { "timestamp": "2026-04-19 13:51:00", "level": "INFO",  "source": "systemd", "message": "Failed to start The Apache HTTP Server." },
+      { "timestamp": "2026-04-19 13:51:30", "level": "WARN",  "source": "systemd", "message": "httpd.service: Scheduled restart job, restart counter is at 1." },
+      { "timestamp": "2026-04-19 13:51:30", "level": "INFO",  "source": "systemd", "message": "Stopped The Apache HTTP Server." },
+      { "timestamp": "2026-04-19 13:51:30", "level": "INFO",  "source": "systemd", "message": "Starting The Apache HTTP Server..." },
+      { "timestamp": "2026-04-19 13:51:30", "level": "ERROR", "source": "httpd",   "message": "AH00526: Syntax error on line 42 of /etc/httpd/conf.d/ssl.conf:" },
+      { "timestamp": "2026-04-19 13:51:30", "level": "ERROR", "source": "httpd",   "message": "SSLCertificateFile: file '/etc/pki/tls/certs/wildcard-prod.pem' does not exist or is empty" },
+      { "timestamp": "2026-04-19 13:51:30", "level": "ERROR", "source": "systemd", "message": "httpd.service: Failed with result 'exit-code'." },
+      { "timestamp": "2026-04-19 13:52:00", "level": "WARN",  "source": "systemd", "message": "httpd.service: Scheduled restart job, restart counter is at 5." },
+      { "timestamp": "2026-04-19 13:52:05", "level": "ERROR", "source": "systemd", "message": "httpd.service: Start request repeated too quickly." },
+      { "timestamp": "2026-04-19 13:52:05", "level": "ERROR", "source": "systemd", "message": "httpd.service: Failed with result 'start-limit-hit'." },
+      { "timestamp": "2026-04-19 13:52:05", "level": "INFO",  "source": "systemd", "message": "Failed to start The Apache HTTP Server." }
+    ],
+    "answers": [
+      { "id": "a1", "text": "httpd was OOM-killed by the kernel — the host is out of memory",                                                                "correct": false },
+      { "id": "a2", "text": "The SSL configuration on line 42 of ssl.conf references `/etc/pki/tls/certs/wildcard-prod.pem`, which is missing or empty",      "correct": true  },
+      { "id": "a3", "text": "SELinux is blocking httpd from binding to port 443 — run `setenforce 0` to confirm",                                            "correct": false },
+      { "id": "a4", "text": "Another process is already listening on port 80 — investigate with `ss -tlnp`",                                                 "correct": false },
+      { "id": "a5", "text": "systemd hit its start-limit, which means httpd was otherwise healthy but simply restarted too often — clear with `systemctl reset-failed`", "correct": false }
+    ],
+    "explanation": "Reading systemd journals is an exercise in separating the *root cause* line from the *consequence* lines.\n\n**The signal**: `SSLCertificateFile: file '/etc/pki/tls/certs/wildcard-prod.pem' does not exist or is empty`. This is httpd telling you exactly what is missing — a certificate rotation that did not complete. Everything else is downstream.\n\n**The noise that trips people up**:\n- `httpd.service: Failed with result 'exit-code'` — systemd reporting the service exited non-zero. This is a *consequence*, not a cause.\n- `httpd.service: Start request repeated too quickly` / `'start-limit-hit'` — systemd giving up after 5 failed restarts within its default window. This is also a consequence; running `systemctl reset-failed` only clears the flag so you can try again — it does not fix the underlying missing cert.\n- `Scheduled restart job, restart counter is at 5` — shows systemd's auto-restart behaviour kicking in (driven by `Restart=on-failure` in the unit). It is the symptom, not the problem.\n\n**The wrong answers**:\n- *OOM* — no `Out of memory` messages from the kernel, no oom-killer line. Eliminated.\n- *SELinux* — no AVC denials present. `setenforce 0` is the reflex wrong answer on RHCSA.\n- *Port conflict* — httpd is exiting *before* it reaches the bind step; the error is in config parsing, not sockets.\n- *start-limit-hit as root cause* — tempting because it is the last thing in the log, but it is the *effect* of repeated failures, not the cause.\n\n**The fix** is to restore or re-issue the certificate at the path referenced by `ssl.conf`, verify with `httpd -t`, then `systemctl reset-failed httpd && systemctl start httpd`.",
+    "learningOutcomes": [
+      "Read a journald excerpt and separate root-cause messages from consequence messages",
+      "Recognise `start-limit-hit` as a systemd rate-limit symptom, not a root cause",
+      "Understand that `reset-failed` clears state but does not fix the underlying problem",
+      "Confirm a configuration fix with `httpd -t` before restarting the service"
+    ],
+    "realWorldValue": "EX200 Skill 4.1.7 tests interpreting system logs and journals. The harder skill — which the exam also probes — is picking the *right* line out of a noisy journal. Candidates who reach for `setenforce 0` or `reset-failed` as the first move lose marks and, in production, hide bugs instead of fixing them.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-disk-full-incident-response",
+    "title": "Triage a Disk-Full + OOM Incident on a RHEL 10 Host",
+    "description": "A production RHEL 10 host is in crisis: / is 99% full, journald is ballooning, httpd is failing, and the OOM killer has just taken mysqld. Triage across alerts, metrics, logs, and timeline, then choose only the correct remediation actions.",
+    "type": "incident-response",
+    "difficulty": "advanced",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Troubleshoot",
+    "technologies": ["RHEL 10", "systemd-journald", "OOM killer", "du", "journalctl"],
+    "version": 1,
+    "showcase": true,
+    "showcaseOrder": 6,
+    "scenario": "At 14:30 UTC, PagerDuty fires for `web-prod-07`. The on-call receives a disk-full alert, then an OOM-killed process alert within 8 minutes. Triage by cross-referencing alerts, metrics, logs, and the event timeline, then pick only the correct response actions and identify the true root cause.",
+    "alerts": [
+      { "id": "al1", "severity": "critical", "time": "14:22 UTC", "service": "disk-monitor",      "message": "Partition `/` at 98% usage (threshold 90%)" },
+      { "id": "al2", "severity": "critical", "time": "14:25 UTC", "service": "httpd",             "message": "httpd.service failed: journald refuses writes (disk full)" },
+      { "id": "al3", "severity": "warning",  "time": "14:27 UTC", "service": "kernel",            "message": "Low memory condition on web-prod-07 (available < 256 MB)" },
+      { "id": "al4", "severity": "critical", "time": "14:30 UTC", "service": "oom-killer",        "message": "Out of memory: Killed process 2104 (mysqld), reaped 1.2 GB" }
+    ],
+    "metrics": [
+      {
+        "id": "m1",
+        "name": "Disk usage (/)",
+        "unit": "%",
+        "values": [
+          { "time": "14:00", "value": 85 },
+          { "time": "14:10", "value": 90 },
+          { "time": "14:20", "value": 96 },
+          { "time": "14:25", "value": 98 },
+          { "time": "14:30", "value": 99 }
+        ]
+      },
+      {
+        "id": "m2",
+        "name": "Available memory",
+        "unit": "MB",
+        "values": [
+          { "time": "14:00", "value": 2048 },
+          { "time": "14:10", "value": 1600 },
+          { "time": "14:20", "value": 800 },
+          { "time": "14:25", "value": 320 },
+          { "time": "14:30", "value": 80 }
+        ]
+      },
+      {
+        "id": "m3",
+        "name": "Journal size (/var/log/journal)",
+        "unit": "MB",
+        "values": [
+          { "time": "14:00", "value": 500 },
+          { "time": "14:10", "value": 900 },
+          { "time": "14:20", "value": 2200 },
+          { "time": "14:25", "value": 3400 },
+          { "time": "14:30", "value": 3800 }
+        ]
+      }
+    ],
+    "logs": [
+      { "timestamp": "2026-04-19 14:22:04", "level": "ERROR", "source": "systemd-journald", "message": "Failed to write entry (15 items, 1024 bytes) despite vacuuming, ignoring: No space left on device" },
+      { "timestamp": "2026-04-19 14:25:11", "level": "ERROR", "source": "httpd",            "message": "(28)No space left on device: AH00099: could not create /var/log/httpd/error_log" },
+      { "timestamp": "2026-04-19 14:27:02", "level": "WARN",  "source": "kernel",           "message": "systemd-journald invoked oom-killer: gfp_mask=0x100cca(GFP_HIGHUSER_MOVABLE), order=0" },
+      { "timestamp": "2026-04-19 14:30:00", "level": "ERROR", "source": "kernel",           "message": "Out of memory: Killed process 2104 (mysqld) total-vm:1824MB, anon-rss:1210MB" },
+      { "timestamp": "2026-04-19 14:30:01", "level": "ERROR", "source": "mysqld",           "message": "InnoDB: Operating system error number 28 in a file operation. (ENOSPC)" }
+    ],
+    "timeline": [
+      { "time": "14:00 UTC", "event": "Host healthy. Baseline metrics within normal range." },
+      { "time": "14:02 UTC", "event": "Nightly backup cron starts writing to /var/backups (on the / partition)." },
+      { "time": "14:15 UTC", "event": "Backup growth pushes / past 90% — pre-alarm logged to journald." },
+      { "time": "14:22 UTC", "event": "/ hits 98% — disk-monitor fires critical alert." },
+      { "time": "14:25 UTC", "event": "systemd-journald can no longer write; httpd fails its first log rotation." },
+      { "time": "14:27 UTC", "event": "Journald buffers in memory, driving available memory below 256 MB." },
+      { "time": "14:30 UTC", "event": "Kernel invokes OOM killer; mysqld (the largest resident process) is killed." }
+    ],
+    "actions": [
+      { "id": "act1", "description": "Identify the largest consumers on / with `du -xh / | sort -rh | head -30`",             "correct": true  },
+      { "id": "act2", "description": "Cap journald size with `journalctl --vacuum-size=500M` to free space immediately",      "correct": true  },
+      { "id": "act3", "description": "Move `/var/backups` to a separate filesystem once / has breathing room",                "correct": true  },
+      { "id": "act4", "description": "Run `setenforce 0` to rule out SELinux as the cause",                                   "correct": false },
+      { "id": "act5", "description": "Reboot the host immediately to clear the OOM state",                                    "correct": false },
+      { "id": "act6", "description": "Delete `/var/log/journal` entirely with `rm -rf` to free space",                        "correct": false },
+      { "id": "act7", "description": "Set a persistent journal size cap in `/etc/systemd/journald.conf` (SystemMaxUse=1G)",   "correct": true  },
+      { "id": "act8", "description": "Kill all processes with `killall -9` to free memory",                                   "correct": false }
+    ],
+    "answers": [
+      { "id": "r1", "text": "DDoS attack filled httpd logs, which cascaded into disk-full and then OOM",                                                 "correct": false },
+      { "id": "r2", "text": "Backup-to-/ + unbounded journald filled the disk; journald buffering then consumed RAM and triggered OOM against mysqld", "correct": true  },
+      { "id": "r3", "text": "mysqld had a memory leak that drove the host out of memory; the disk alert is unrelated",                                   "correct": false },
+      { "id": "r4", "text": "A kernel bug caused systemd-journald to corrupt the filesystem",                                                            "correct": false }
+    ],
+    "explanation": "The story the data tells, when you line up the four panels, is one cascading failure with two independent contributors.\n\n**Contributor 1 — unbounded `/var/backups` on /.** The timeline shows the nightly backup starting at 14:02 UTC, and the disk-usage metric climbs from 85% at 14:00 to 99% by 14:30. Backups sharing the same filesystem as `/var/log` and `/var/lib/mysql` is the real design flaw.\n\n**Contributor 2 — no cap on journald.** The journal metric more than doubles between 14:20 and 14:30 (2.2 GB → 3.8 GB). Default RHEL 10 journald has `SystemMaxUse=` unset, meaning it uses up to 10% of the filesystem. As the filesystem fills, that 10% cap becomes a moving target, and on a nearly-full `/` there is no headroom left for it to vacuum into.\n\n**Why the OOM.** When journald cannot write to disk (ENOSPC), it buffers pending journal entries in memory. On a busy host this buffer grows fast. Between 14:20 and 14:30 the available-memory series drops from 800 MB to 80 MB — that 720 MB loss is almost exactly the journal growth over the same window. The OOM killer targets the largest RSS process; mysqld at 1.2 GB wins that lottery.\n\n**Correct actions, in order:**\n1. `journalctl --vacuum-size=500M` — this is the fastest reversible free-disk move. Buys you breathing room without destroying logs wholesale.\n2. `du -xh / | sort -rh | head` — identify the largest contributors; confirms `/var/backups` as the primary culprit.\n3. Move `/var/backups` to a separate filesystem (or a remote destination) so future backups cannot fill `/`.\n4. Set `SystemMaxUse=1G` in `/etc/systemd/journald.conf` and `systemctl restart systemd-journald` so journald caps itself persistently.\n\n**Wrong actions and why:**\n- `setenforce 0` — there are no AVC denials. Classic reflexive wrong answer.\n- Reboot — clears the OOM flag but the disk is still 99% full; the cycle repeats immediately.\n- `rm -rf /var/log/journal` — destroys *all* persistent journals, including the evidence you need for the post-incident review. Use vacuum with a bound instead.\n- `killall -9` — kills unrelated processes and does not address the root cause.",
+    "learningOutcomes": [
+      "Cross-reference alerts, metrics, logs, and timeline to build a coherent incident narrative",
+      "Diagnose disk-full + OOM cascades where journald buffering is the link between them",
+      "Choose reversible, bounded remediations (vacuum-size, SystemMaxUse) over destructive shortcuts (rm -rf, reboot)",
+      "Apply durable fixes (move backups off /, cap journald in journald.conf) once the immediate crisis is clear"
+    ],
+    "realWorldValue": "This incident pattern — unbounded logs on the same filesystem as application data, combined with no journald cap — has caused countless production outages on RHEL hosts. EX200 tests the individual tools (`journalctl`, `du`, `systemctl`), but the senior-admin skill is reading a dashboard and choosing the correct sequence under pressure without making the outage worse.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-autofs-terminal-replay",
+    "title": "Configure autofs for On-Demand NFS Home Directories",
+    "description": "Build the correct command sequence to configure autofs on a RHEL 10 client so user home directories mount on demand from an NFS server. Exclude destructive distractors that would break NFS or remove the mapping.",
+    "type": "terminal-replay",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "autofs", "NFS", "systemctl"],
+    "version": 1,
+    "scenario": "A RHEL 10 workstation needs on-demand NFS home directories from `nfs.example.com:/export/home/` mounted under `/home/<user>` via autofs. Drag the correct commands into the queue in the right order. Three of the listed commands are distractors that would disable NFS or erase the mapping.",
+    "prompt": "[root@rhel10 ~]#",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "dnf install -y autofs nfs-utils",
+        "successOutput": "Installed:\n  autofs-5.1.8-18.el10.x86_64\n  nfs-utils-2.6.4-3.el10.x86_64\n\nComplete!",
+        "errorOutput": "autofs and nfs-utils must be installed first; every later step depends on the `automount` daemon and NFS client tooling."
+      },
+      {
+        "id": "c2",
+        "command": "echo '/home /etc/auto.home' >> /etc/auto.master",
+        "successOutput": "",
+        "errorOutput": "Install autofs first so `/etc/auto.master` exists as part of the autofs package.",
+        "mustFollowIds": ["c1"]
+      },
+      {
+        "id": "c3",
+        "command": "echo '* -rw,soft,intr nfs.example.com:/export/home/&' > /etc/auto.home",
+        "successOutput": "",
+        "errorOutput": "Install autofs first — the auto.master reference needs a real auto.home map to point at.",
+        "mustFollowIds": ["c1"]
+      },
+      {
+        "id": "c4",
+        "command": "systemctl enable --now autofs",
+        "successOutput": "Created symlink /etc/systemd/system/multi-user.target.wants/autofs.service -> /usr/lib/systemd/system/autofs.service.",
+        "errorOutput": "Configure both auto.master and auto.home before starting autofs, otherwise the daemon starts with no mappings.",
+        "mustFollowIds": ["c2", "c3"]
+      },
+      {
+        "id": "c5",
+        "command": "ls /home/webdev",
+        "successOutput": "Desktop  Documents  Downloads",
+        "errorOutput": "autofs must be running before an access to `/home/webdev` will trigger an automount.",
+        "mustFollowIds": ["c4"]
+      },
+      {
+        "id": "c6",
+        "command": "mount | grep auto.home",
+        "successOutput": "nfs.example.com:/export/home/webdev on /home/webdev type nfs4 (rw,relatime,vers=4.2,...)",
+        "errorOutput": "You need to have triggered the automount (by accessing a home directory) before `mount` shows it.",
+        "mustFollowIds": ["c5"]
+      },
+      {
+        "id": "d1",
+        "command": "systemctl disable --now nfs-client.target",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Disabling `nfs-client.target` breaks every NFS mount on the host, including the one you are trying to configure. Never disable it as part of an NFS workflow.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "echo '' > /etc/auto.home",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Blanking `/etc/auto.home` removes every mapping. autofs will start cleanly but no home directories will mount.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "mount -t nfs nfs.example.com:/export/home /home",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: A static `mount` bypasses autofs entirely, mounts the whole parent export over `/home`, and persists only until reboot. It is the opposite of on-demand per-user mounts.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "autofs on RHEL 10 is a two-file configuration that follows a strict pattern.\n\n**Master map (`/etc/auto.master`)**: maps a directory prefix to an indirect map file. `/home /etc/auto.home` means 'whenever something under `/home/` is accessed, look it up in `/etc/auto.home`'.\n\n**Indirect map (`/etc/auto.home`)**: maps a key (the part after `/home/`) to a mount source. The magic `*` key matches any username, and `&` in the source expands to whatever matched. So `* -rw,soft,intr nfs.example.com:/export/home/&` means: for any `/home/USER` access, mount `nfs.example.com:/export/home/USER` there with those options.\n\n**Ordering rules**:\n1. Install the packages first — `/etc/auto.master` is shipped by autofs and does not exist before install.\n2. Edit both maps *before* starting the service. Starting it against empty maps just activates an empty daemon and masks the configuration error.\n3. Only then `systemctl enable --now autofs`.\n4. Accessing any `/home/USER` triggers the mount — the mount happens lazily, which is the whole point of autofs.\n\n**Distractors to avoid:**\n- `systemctl disable nfs-client.target` — tears down the entire NFS client stack; autofs can't mount NFS without it.\n- `echo '' > /etc/auto.home` — wipes the map. autofs loads, finds no mappings, and no home directories mount.\n- `mount -t nfs ... /home` — shadows `/home` with a single static NFS mount of the whole export. Breaks autofs's key-per-user model and will not survive reboot.",
+    "learningOutcomes": [
+      "Configure autofs indirect maps with `*` and `&` for per-key substitution",
+      "Know the correct order: install packages → edit maps → enable daemon → trigger access",
+      "Recognise that autofs mounts are lazy — they only appear in `mount` output after something triggers them",
+      "Avoid wrong-scope fixes like disabling `nfs-client.target` or static NFS mounts over `/home`"
+    ],
+    "realWorldValue": "EX200 Skill 6.1.3 tests autofs directly. On multi-user RHEL hosts, autofs is how every site serves home directories without mounting every user's export at boot. A broken autofs configuration is one of the most common reasons new hires log in and find an empty `/home/$USER` — this lab walks the exact path that fixes it.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-stratis-phased-pipeline",
+    "title": "Provision a Stratis Pool and Filesystem on RHEL 10",
+    "description": "Sequence the steps to deploy Stratis storage on RHEL 10 — from installing the daemon through creating a pool, carving out a filesystem, and mounting it persistently.",
+    "type": "phased-pipeline",
+    "difficulty": "advanced",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Implement",
+    "technologies": ["RHEL 10", "Stratis", "XFS", "systemd", "fstab"],
+    "version": 1,
+    "showcase": true,
+    "showcaseOrder": 10,
+    "scenario": "Two new disks (`/dev/sdb`, `/dev/sdc`) have been added to a RHEL 10 host. Deploy Stratis on top of them: create a pool, carve out a filesystem named `shared`, and mount it persistently at `/mnt/shared`. Drag each step into the correct phase (Prepare, then Pool, then Filesystem, then Mount) and order any dependent steps within each phase.",
+    "phases": [
+      { "id": "prepare",    "label": "Prepare",    "color": "blue"   },
+      { "id": "pool",       "label": "Pool",       "color": "orange" },
+      { "id": "filesystem", "label": "Filesystem", "color": "green"  },
+      { "id": "mount",      "label": "Mount",      "color": "purple" }
+    ],
+    "steps": [
+      { "id": "s1",  "text": "Inspect available block devices",                         "command": "lsblk",                                                                                                                       "correctPhaseId": "prepare" },
+      { "id": "s2",  "text": "Install the Stratis daemon and CLI",                      "command": "dnf install -y stratisd stratis-cli",                                                                                         "correctPhaseId": "prepare",    "mustFollowIds": ["s1"] },
+      { "id": "s3",  "text": "Enable and start the stratisd service",                    "command": "systemctl enable --now stratisd",                                                                                             "correctPhaseId": "prepare",    "mustFollowIds": ["s2"] },
+      { "id": "s4",  "text": "Create the data-pool pool across both disks",             "command": "stratis pool create data-pool /dev/sdb /dev/sdc",                                                                             "correctPhaseId": "pool",       "mustFollowIds": ["s3"] },
+      { "id": "s5",  "text": "Verify the pool exists and has expected capacity",        "command": "stratis pool list",                                                                                                           "correctPhaseId": "pool",       "mustFollowIds": ["s4"] },
+      { "id": "s6",  "text": "Create the shared filesystem inside data-pool",            "command": "stratis filesystem create data-pool shared",                                                                                 "correctPhaseId": "filesystem", "mustFollowIds": ["s4"] },
+      { "id": "s7",  "text": "Confirm the filesystem and note its device path",         "command": "stratis filesystem list",                                                                                                     "correctPhaseId": "filesystem", "mustFollowIds": ["s6"] },
+      { "id": "s8",  "text": "Create the mount point directory",                         "command": "mkdir -p /mnt/shared",                                                                                                         "correctPhaseId": "mount" },
+      { "id": "s9",  "text": "Add a persistent fstab entry requiring stratisd",         "command": "echo '/dev/stratis/data-pool/shared /mnt/shared xfs defaults,x-systemd.requires=stratisd.service 0 0' >> /etc/fstab",         "correctPhaseId": "mount",      "mustFollowIds": ["s6", "s8"] },
+      { "id": "s10", "text": "Mount everything from fstab and verify the new mount",    "command": "mount -a && findmnt /mnt/shared",                                                                                              "correctPhaseId": "mount",      "mustFollowIds": ["s9"] }
+    ],
+    "explanation": "Stratis is RHEL 10's declarative storage stack, layered on top of device-mapper and XFS. Deployment divides cleanly into four phases.\n\n**1. Prepare** (host must be able to run Stratis)\n- `lsblk` confirms the block devices you intend to consume are present and not in use.\n- `dnf install stratisd stratis-cli` installs the daemon and control tool — not present on a minimal install.\n- `systemctl enable --now stratisd` starts the daemon; every `stratis` command talks to it over D-Bus.\n\n**2. Pool** (the pool owns the physical devices)\n- `stratis pool create data-pool /dev/sdb /dev/sdc` initialises the devices and binds them into a pool. The devices must not contain any filesystem or PV signature.\n- `stratis pool list` verifies; you should see capacity equal to the combined device size minus pool overhead.\n\n**3. Filesystem** (filesystems are carved out of the pool; XFS underneath, thinly provisioned)\n- `stratis filesystem create data-pool shared` creates an XFS filesystem inside the pool. The device path is `/dev/stratis/<pool>/<fs>`.\n- `stratis filesystem list` confirms and shows the current used/allocated sizes; Stratis grows the filesystem as needed.\n\n**4. Mount** (make it persistent)\n- Create the mount point *before* adding the fstab entry.\n- **Critical**: the fstab entry must include `x-systemd.requires=stratisd.service`. Without it, systemd tries to mount before stratisd has started and the mount fails at boot — followed by a `systemd emergency shell`, which is RHCSA grading's least favourite outcome.\n- `mount -a` validates the entry at configuration time so you catch errors before the next reboot.",
+    "learningOutcomes": [
+      "Install and enable Stratis on RHEL 10 (stratisd + stratis-cli)",
+      "Create a pool across multiple devices and a filesystem inside it",
+      "Add an fstab entry that requires stratisd at boot via `x-systemd.requires=`",
+      "Validate fstab entries immediately with `mount -a` instead of waiting for a reboot"
+    ],
+    "realWorldValue": "EX200 Domain 5 and Domain 6 explicitly list local storage and filesystems, and Stratis is the storage technology Red Hat positions as the modern replacement for LVM+XFS+thin-provisioning-by-hand. Every mount that depends on a userspace daemon needs `x-systemd.requires=` in fstab; getting that wrong on the exam is a boot-breaking mistake that costs both the storage task and any tasks that depend on it.",
+    "relatedExamCodes": ["EX200"]
+  },
+  {
+    "id": "rhel-sysctl-command-terminal",
+    "title": "Tune Kernel Parameters and tuned Profiles on RHEL 10",
+    "description": "Type each command to set a kernel parameter at runtime, persist it via a sysctl drop-in, and activate a tuned profile. Flags can appear in any order. Use --help to identify the right options.",
+    "type": "command-terminal",
+    "difficulty": "intermediate",
+    "platform": "RedHat",
+    "category": "Linux Administration",
+    "labCategory": "Configure",
+    "technologies": ["RHEL 10", "sysctl", "tuned", "systemd"],
+    "version": 1,
+    "scenario": "A RHEL 10 host running a database workload needs a lower swappiness, a persistent sysctl drop-in for it, and the `throughput-performance` tuned profile active. Complete the three commands in order. Flags can appear in any order; combined short flags like `-pq` are accepted. Use `<command> --help` to list options.",
+    "prompt": "[root@rhel10 ~]#",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Set `vm.swappiness=10` on the running kernel (no config file needed yet — just the live value).",
+        "hint": "One flag tells sysctl to *write* a parameter, and the parameter itself is a single positional argument in `key=value` form.",
+        "program": "sysctl",
+        "requirements": [
+          { "id": "write",  "kind": "flag",       "variants": ["-w", "--write"], "description": "-w, --write                    write the following parameter=value assignment" },
+          { "id": "kv",     "kind": "positional", "variants": ["vm.swappiness=10"], "description": "<parameter=value>              kernel parameter assignment" }
+        ],
+        "distractors": [
+          { "flag": "-a", "description": "-a, --all                      display all values currently available" },
+          { "flag": "-n", "description": "-n, --values                   print the value only, not key = value" },
+          { "flag": "-e", "description": "-e, --ignore                   ignore errors about unknown keys" }
+        ],
+        "successOutput": "vm.swappiness = 10",
+        "canonicalCommand": "sysctl -w vm.swappiness=10"
+      },
+      {
+        "id": "s2",
+        "task": "Assume you have written the setting into `/etc/sysctl.d/99-swappiness.conf`. Now load that single file non-interactively so the new value persists across `sysctl -a` without touching other parameters.",
+        "hint": "One flag-value pair: the 'load this file' flag with the path as its value.",
+        "program": "sysctl",
+        "requirements": [
+          { "id": "load", "kind": "flag-value", "variants": ["-p", "--load"], "value": "/etc/sysctl.d/99-swappiness.conf", "description": "-p, --load=FILE                load settings from the specified configuration file" }
+        ],
+        "distractors": [
+          { "flag": "-w", "description": "-w, --write                    write a single parameter=value (not what you want for a file)" },
+          { "flag": "-a", "description": "-a, --all                      display every sysctl value currently set" },
+          { "flag": "-q", "description": "-q, --quiet                    suppress output when reading from a file" }
+        ],
+        "successOutput": "vm.swappiness = 10",
+        "canonicalCommand": "sysctl -p /etc/sysctl.d/99-swappiness.conf"
+      },
+      {
+        "id": "s3",
+        "task": "Activate the `throughput-performance` tuned profile.",
+        "hint": "`tuned-adm` takes a subcommand and the profile name as two positional arguments.",
+        "program": "tuned-adm",
+        "requirements": [
+          { "id": "sub",     "kind": "positional", "variants": ["profile"], "description": "profile <name>                 switch to the specified tuned profile" },
+          { "id": "profile", "kind": "positional", "variants": ["throughput-performance"], "description": "<name>                         name of an installed tuned profile" }
+        ],
+        "distractors": [
+          { "flag": "active",   "description": "active                         show the currently active profile (read-only)" },
+          { "flag": "list",     "description": "list                           list available profiles (read-only)" },
+          { "flag": "recommend","description": "recommend                      print the profile tuned would recommend for this host" }
+        ],
+        "successOutput": "Switching to profile 'throughput-performance'",
+        "canonicalCommand": "tuned-adm profile throughput-performance"
+      }
+    ],
+    "explanation": "Three commands cover the full runtime-plus-persistence loop on RHEL 10.\n\n**1. `sysctl -w vm.swappiness=10`**\n- `-w` is the explicit 'write' flag; it also implicitly the default when an argument contains `=`.\n- `vm.swappiness=10` is one positional in `key=value` form. Values are live immediately, but lost on reboot.\n\n**2. `sysctl -p /etc/sysctl.d/99-swappiness.conf`**\n- `-p FILE` (or `--load=FILE`) reads a specific file instead of the whole `/etc/sysctl.conf` + `/etc/sysctl.d/*` chain.\n- For multi-line drop-ins, drop a file in `/etc/sysctl.d/` with a `.conf` extension; the number prefix controls ordering (`99-` wins last).\n- `sysctl --system` reloads everything — useful after edits, but noisier.\n\n**3. `tuned-adm profile throughput-performance`**\n- `tuned-adm` is the control tool for the `tuned` daemon, which groups many kernel knobs into a named profile.\n- `throughput-performance` favours throughput over latency and is the canonical database/server profile.\n- Check with `tuned-adm active`; see available profiles with `tuned-adm list`; let tuned pick for you with `tuned-adm recommend`.\n\n**Flag order does not matter.** `sysctl vm.swappiness=10 -w`, `sysctl -w vm.swappiness=10`, and `sysctl --write vm.swappiness=10` are all valid. What matters is getting the key-value form and the load-from-file invocation right — both show up in RHCSA.",
+    "learningOutcomes": [
+      "Set kernel parameters live with `sysctl -w` and persistently via `/etc/sysctl.d/*.conf`",
+      "Reload a single sysctl file with `sysctl -p FILE` without touching unrelated parameters",
+      "Switch tuned profiles with `tuned-adm profile <name>` and distinguish from read-only subcommands"
+    ],
+    "realWorldValue": "EX200 Skill 4.1.6 and 7.1.2 both touch tuning and service configuration. Knowing the sysctl + tuned pair from memory lets you tune a host for a workload in under a minute — the difference between an exam-pass and running out the clock fiddling with man pages.",
+    "relatedExamCodes": ["EX200"]
   }
 ]

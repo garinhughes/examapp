@@ -169,7 +169,7 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
                 : `✗ Cost is $${currentTotal}/mo - still above $${lab.targetCost}/mo target`}
             </div>
             <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
+            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
               Back to Skill Labs
             </button>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Shield } from 'lucide-react'
 import { useExam } from '@/exam/ExamContext'
+import { MarkdownText } from '@/exam/utils'
 import type { SecurityHardeningLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
@@ -97,7 +98,7 @@ export function SecurityHardeningRunner({ lab, timed = true }: Props) {
               <Shield className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
               <div>
                 <div className="font-semibold text-sm">{issue.resource}</div>
-                <div className="text-sm text-destructive/80 dark:text-red-400/80">{issue.issue}</div>
+                <div className="text-sm text-destructive/80 dark:text-red-400/80"><MarkdownText text={issue.issue} className="[&_p]:!my-0 [&_code]:!bg-destructive/10 [&_code]:!px-1 [&_code]:!py-0.5 [&_code]:!rounded [&_code]:!text-inherit" /></div>
               </div>
             </div>
             <div className="space-y-1.5 ml-7">
@@ -116,7 +117,7 @@ export function SecurityHardeningRunner({ lab, timed = true }: Props) {
                           : 'border-border hover:bg-muted/50'
                   } disabled:cursor-not-allowed`}
                 >
-                  {option}
+                  <MarkdownText text={option} className="[&_p]:!my-0 [&_code]:!bg-muted [&_code]:!px-1 [&_code]:!py-0.5 [&_code]:!rounded [&_code]:!text-inherit" />
                 </button>
               ))}
             </div>
@@ -145,7 +146,7 @@ export function SecurityHardeningRunner({ lab, timed = true }: Props) {
                 : `✗ ${Object.values(results).filter(Boolean).length}/${lab.issues.length} correct`}
             </div>
             <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition">
+            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
               Back to Skill Labs
             </button>
           </div>

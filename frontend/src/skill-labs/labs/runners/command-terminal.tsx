@@ -29,14 +29,14 @@ function tokenize(raw: string, shortFlagsWithValue: Set<string> = new Set()): st
     if (p.startsWith('--') && p.includes('=')) {
       const eq = p.indexOf('=')
       tokens.push(p.slice(0, eq), p.slice(eq + 1))
-    } else if (
-      p.length > 2 &&
-      p.startsWith('-') &&
-      !p.startsWith('--') &&
-      shortFlagsWithValue.has(p.slice(0, 2))
-    ) {
-      // `-n50` -> `-n`, `50`
-      tokens.push(p.slice(0, 2), p.slice(2))
+    } else if (p.length > 2 && p.startsWith('-') && !p.startsWith('--')) {
+      if (shortFlagsWithValue.has(p.slice(0, 2))) {
+        // `-n50` -> `-n`, `50`
+        tokens.push(p.slice(0, 2), p.slice(2))
+      } else {
+        // `-aG` -> `-a`, `-G`
+        for (const ch of p.slice(1)) tokens.push(`-${ch}`)
+      }
     } else {
       tokens.push(p)
     }
@@ -349,7 +349,7 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
           <ExplanationBlock text={lab.explanation} />
           <button
             onClick={() => setRoute('skill-labs')}
-            className="mt-2 px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition"
+            className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition"
           >
             Back to Skill Labs
           </button>

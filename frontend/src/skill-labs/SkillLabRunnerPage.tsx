@@ -69,7 +69,7 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
       <p className="text-destructive">{error || 'Lab not found'}</p>
       <button
         onClick={() => setRoute('skill-labs')}
-        className="px-4 py-2 rounded-md border border-border bg-card text-sm font-medium hover:bg-muted/50 transition"
+        className="px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition"
       >
         Back to Skill Labs
       </button>
