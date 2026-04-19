@@ -149,7 +149,7 @@ export function ExamSetup() {
         )}
 
         {/* Mode cards */}
-        <div ref={(el) => tour.registerTarget('mode-buttons', el)} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+        <div ref={(el) => tour.registerTarget('mode-buttons', el)} className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-5">
           {/* Practice mode */}
           <button
             type="button"

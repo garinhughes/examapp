@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   BookOpen, Terminal, CheckCircle2, ChevronLeft, ChevronRight,
-  BarChart3, Brain, Target, Award, Shield, Zap, Users,
-  TrendingUp, GraduationCap, Lightbulb, ArrowRight, X, ZoomIn, Hourglass,
+  BarChart3, Brain, Target, Shield, Zap,
+  TrendingUp, GraduationCap, Lightbulb, ArrowRight, X, ZoomIn, Hourglass, MessageSquare,
 } from 'lucide-react'
 import { useEntitlements } from '../hooks/useEntitlements'
 import useEmblaCarousel from 'embla-carousel-react'
@@ -452,6 +452,12 @@ export function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
             {
+              icon: MessageSquare,
+              title: 'Community-Driven',
+              desc: 'Early user testing shaped certshack into what it is today. Polls, ratings, and reports feed directly into what we prioritise.',
+              color: 'text-orange-500 bg-orange-500/10',
+            },
+            {
               icon: Shield,
               title: 'Exam-Accurate Questions',
               desc: 'Questions modelled on real certification exam formats, domains, and difficulty levels.',
@@ -476,23 +482,23 @@ export function HomePage() {
               color: 'text-purple-500 bg-purple-500/10',
             },
             {
-              icon: Users,
-              title: 'Community & Leaderboard',
-              desc: 'Compete on the leaderboard, earn XP, and track your streak. Stay motivated alongside fellow learners.',
+              icon: Target,
+              title: 'Learning Plans',
+              desc: 'Set your goal and we\'ll help you get there. Learning Plans map out what to study and keep you on track so you always know what to do next.',
               color: 'text-pink-500 bg-pink-500/10',
+              badge: 'Coming Soon',
             },
-            {
-              icon: Award,
-              title: 'Verifiable Certificates',
-              desc: 'Earn shareable certificates with QR verification after completing practice exams.',
-              color: 'text-orange-500 bg-orange-500/10',
-            },
-          ].map(({ icon: Icon, title, desc, color }) => (
+          ].map(({ icon: Icon, title, desc, color, badge }) => (
             <div key={title} className="p-5 rounded-xl bg-card border border-border hover:shadow-md transition-shadow">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color} mb-3`}>
                 <Icon className="w-5 h-5" />
               </div>
-              <h3 className="font-semibold mb-1">{title}</h3>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold">{title}</h3>
+                {badge && (
+                  <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{badge}</span>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground">{desc}</p>
             </div>
           ))}
@@ -526,7 +532,11 @@ export function HomePage() {
             },
             {
               q: 'Can I request features or report an issue?',
-              a: 'You can indeed. Reporting issues and rating exams or skill labs are built-in features. Polls appear on the homepage regularly to vote on new features (with an optional comment box). You can also contact us at support@certshack.com'
+              a: 'You can indeed, by clicking the Feedback link in the sidebar. Reporting issues and rating exams or skill labs are built-in features too. Polls appear on the homepage regularly to vote on new features (with an optional comment box). You can also contact us at support@certshack.com'
+            },
+            {
+              q: 'Are the questions created with AI?',
+              a: 'AI is part of our content pipeline, but it is never the final word. We follow a human-in-the-loop review process: questions are AI-drafted, then reviewed and approved by subject-matter experts through a dedicated internal authoring tool with a structured quality-control workflow before anything is published. Many explanations are further enriched with images and diagrams to reinforce understanding. Questions are also authored at the individual skill level rather than broadly by domain, a more granular approach than most platforms take. Each skill is grounded in selected official documentation, from which real-world scenarios are constructed that reflect what you are likely to encounter in practice. Where official exam guides omit skill-level numbering, our team researches and applies it, so the mapping between content and certification objectives remains accurate. User reports and ratings also feed back into our review process, so content is continuously refined rather than frozen at the point of publication.',
             }
           ].map(({ q, a }) => (
             <details key={q} className="group">
