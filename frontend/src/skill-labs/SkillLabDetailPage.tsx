@@ -301,7 +301,10 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
                 {learningOutcomes.map((o, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{o}</span>
+                    <MarkdownText
+                      text={o}
+                      className="[&_p]:!my-0 [&_code]:!bg-muted [&_code]:!px-1 [&_code]:!py-0.5 [&_code]:!rounded"
+                    />
                   </li>
                 ))}
               </ul>
