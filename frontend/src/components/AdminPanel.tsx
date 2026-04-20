@@ -983,8 +983,10 @@ interface CognitoUser {
 
 function CognitoUsersPanel({
   authFetch,
+  embedded,
 }: {
   authFetch: ReturnType<typeof useAuthFetch>
+  embedded?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [users, setUsers] = useState<CognitoUser[]>([])
@@ -1015,8 +1017,8 @@ function CognitoUsersPanel({
   }, [authFetch])
 
   useEffect(() => {
-    if (open) loadUsers(statusFilter)
-  }, [open, statusFilter, loadUsers])
+    if (embedded || open) loadUsers(statusFilter)
+  }, [embedded, open, statusFilter, loadUsers])
 
   async function deleteUser(username: string) {
     setBusy(username)
@@ -1061,6 +1063,140 @@ function CognitoUsersPanel({
     DISABLED: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
   }
 
+  const innerContent = (
+    <div className="space-y-4">
+      {/* Filter bar */}
+      <div className="flex flex-wrap items-center gap-2">
+        {embedded && <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cognito</span>}
+        {!embedded && (
+          <p className="text-xs text-muted-foreground w-full">
+            View and manage users directly in the Cognito user pool. Useful for clearing stuck registrations and resending verification emails.
+          </p>
+        )}
+        <label className="text-xs font-medium text-muted-foreground">Status:</label>
+        <div className="flex gap-1 bg-muted p-0.5 rounded">
+          {['UNCONFIRMED', 'CONFIRMED', 'ALL'].map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s === 'ALL' ? '' : s)}
+              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                (s === 'ALL' ? !statusFilter : statusFilter === s) ? 'bg-card shadow-sm' : 'text-muted-foreground'
+              }`}
+            >
+              {s === 'ALL' ? 'All' : s.charAt(0) + s.slice(1).toLowerCase().replace(/_/g, ' ')}
+            </button>
+          ))}
+        </div>
+        <div className="flex-1" />
+        <button
+          onClick={() => loadUsers(statusFilter)}
+          disabled={loading}
+          className="px-3 py-1.5 rounded-lg bg-accent text-xs font-medium hover:bg-accent disabled:opacity-40 transition-colors"
+        >
+          {loading ? 'Loading…' : '↻ Refresh'}
+        </button>
+      </div>
+
+      {err && (
+        <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
+          {err}
+          <button onClick={() => setErr(null)} className="ml-2 underline text-xs">dismiss</button>
+        </div>
+      )}
+
+      {/* Users list */}
+      {loading && users.length === 0 ? (
+        <div className="text-xs text-muted-foreground text-center py-4">Loading…</div>
+      ) : users.length === 0 ? (
+        <div className="text-xs text-muted-foreground text-center py-4 italic">
+          No {statusFilter ? statusFilter.toLowerCase().replace(/_/g, ' ') : ''} users found.
+        </div>
+      ) : (
+        <div className="rounded-lg border border-border overflow-hidden">
+          <table className="w-full table-auto text-sm">
+            <thead className="bg-muted">
+              <tr className="text-left text-xs text-muted-foreground uppercase tracking-wider">
+                <th className="p-2.5">Email / Username</th>
+                <th className="p-2.5">Status</th>
+                <th className="p-2.5">Created</th>
+                <th className="p-2.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.username} className="border-t border-border/60 hover:bg-muted/50 transition-colors">
+                  <td className="p-2.5">
+                    <div className="font-medium text-sm">{u.email || u.username}</div>
+                    {u.email && u.email !== u.username && (
+                      <div className="text-[10px] text-muted-foreground font-mono truncate max-w-[240px]">{u.username}</div>
+                    )}
+                  </td>
+                  <td className="p-2.5">
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${STATUS_BADGE[u.status] ?? 'bg-accent text-muted-foreground'}`}>
+                      {u.status.replace(/_/g, ' ')}
+                    </span>
+                  </td>
+                  <td className="p-2.5 text-xs text-muted-foreground">{fmtDateTime(u.createdAt)}</td>
+                  <td className="p-2.5">
+                    <div className="flex items-center justify-end gap-1.5">
+                      {u.status === 'UNCONFIRMED' && (
+                        <button
+                          onClick={() => resendConfirmation(u.username)}
+                          disabled={busy === u.username || resent.has(u.username)}
+                          className="px-2 py-1 rounded text-[11px] font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-40 transition-colors"
+                        >
+                          {busy === u.username ? 'Sending…' : resent.has(u.username) ? 'Sent' : 'Resend code'}
+                        </button>
+                      )}
+
+                      {confirmDelete === u.username ? (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => deleteUser(u.username)}
+                            disabled={busy === u.username}
+                            className="px-2 py-1 rounded text-[11px] font-semibold bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
+                          >
+                            {busy === u.username ? 'Deleting…' : 'Confirm'}
+                          </button>
+                          <button
+                            onClick={() => setConfirmDelete(null)}
+                            className="px-2 py-1 rounded text-[11px] bg-accent text-muted-foreground transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmDelete(u.username)}
+                          className="px-2 py-1 rounded text-[11px] font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <p className="text-[10px] text-muted-foreground">
+        Showing {users.length} user{users.length !== 1 ? 's' : ''} from Cognito.
+        {statusFilter === 'UNCONFIRMED' && ' These users registered but never confirmed their email.'}
+      </p>
+    </div>
+  )
+
+  if (embedded) {
+    return (
+      <div className="pt-3 border-t border-border/60">
+        {innerContent}
+      </div>
+    )
+  }
+
   return (
     <div className="rounded-lg border border-border overflow-hidden">
       <button
@@ -1070,132 +1206,7 @@ function CognitoUsersPanel({
         <span>Cognito User Management</span>
         <span className={`text-xs transition-transform inline-block ${open ? 'rotate-180' : ''}`}>▼</span>
       </button>
-
-      {open && (
-        <div className="p-4 space-y-4 bg-card">
-          <p className="text-xs text-muted-foreground">
-            View and manage users directly in the Cognito user pool. Useful for clearing stuck registrations and resending verification emails.
-          </p>
-
-          {/* Filter bar */}
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="text-xs font-medium text-muted-foreground">Status:</label>
-            <div className="flex gap-1 bg-muted p-0.5 rounded">
-              {['UNCONFIRMED', 'CONFIRMED', 'ALL'].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setStatusFilter(s === 'ALL' ? '' : s)}
-                  className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                    (s === 'ALL' ? !statusFilter : statusFilter === s) ? 'bg-card shadow-sm' : 'text-muted-foreground'
-                  }`}
-                >
-                  {s === 'ALL' ? 'All' : s.charAt(0) + s.slice(1).toLowerCase().replace(/_/g, ' ')}
-                </button>
-              ))}
-            </div>
-            <div className="flex-1" />
-            <button
-              onClick={() => loadUsers(statusFilter)}
-              disabled={loading}
-              className="px-3 py-1.5 rounded-lg bg-accent text-xs font-medium hover:bg-accent disabled:opacity-40 transition-colors"
-            >
-              {loading ? 'Loading…' : '↻ Refresh'}
-            </button>
-          </div>
-
-          {err && (
-            <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
-              {err}
-              <button onClick={() => setErr(null)} className="ml-2 underline text-xs">dismiss</button>
-            </div>
-          )}
-
-          {/* Users list */}
-          {loading && users.length === 0 ? (
-            <div className="text-xs text-muted-foreground text-center py-4">Loading…</div>
-          ) : users.length === 0 ? (
-            <div className="text-xs text-muted-foreground text-center py-4 italic">
-              No {statusFilter ? statusFilter.toLowerCase().replace(/_/g, ' ') : ''} users found.
-            </div>
-          ) : (
-            <div className="rounded-lg border border-border overflow-hidden">
-              <table className="w-full table-auto text-sm">
-                <thead className="bg-muted">
-                  <tr className="text-left text-xs text-muted-foreground uppercase tracking-wider">
-                    <th className="p-2.5">Email / Username</th>
-                    <th className="p-2.5">Status</th>
-                    <th className="p-2.5">Created</th>
-                    <th className="p-2.5 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((u) => (
-                    <tr key={u.username} className="border-t border-border/60 hover:bg-muted/50 transition-colors">
-                      <td className="p-2.5">
-                        <div className="font-medium text-sm">{u.email || u.username}</div>
-                        {u.email && u.email !== u.username && (
-                          <div className="text-[10px] text-muted-foreground font-mono truncate max-w-[240px]">{u.username}</div>
-                        )}
-                      </td>
-                      <td className="p-2.5">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${STATUS_BADGE[u.status] ?? 'bg-accent text-muted-foreground'}`}>
-                          {u.status.replace(/_/g, ' ')}
-                        </span>
-                      </td>
-                      <td className="p-2.5 text-xs text-muted-foreground">{fmtDateTime(u.createdAt)}</td>
-                      <td className="p-2.5">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {/* Resend confirmation (only for UNCONFIRMED) */}
-                          {u.status === 'UNCONFIRMED' && (
-                            <button
-                              onClick={() => resendConfirmation(u.username)}
-                              disabled={busy === u.username || resent.has(u.username)}
-                              className="px-2 py-1 rounded text-[11px] font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-40 transition-colors"
-                            >
-                              {busy === u.username ? 'Sending…' : resent.has(u.username) ? 'Sent' : 'Resend code'}
-                            </button>
-                          )}
-
-                          {/* Delete with confirmation */}
-                          {confirmDelete === u.username ? (
-                            <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => deleteUser(u.username)}
-                                disabled={busy === u.username}
-                                className="px-2 py-1 rounded text-[11px] font-semibold bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
-                              >
-                                {busy === u.username ? 'Deleting…' : 'Confirm'}
-                              </button>
-                              <button
-                                onClick={() => setConfirmDelete(null)}
-                                className="px-2 py-1 rounded text-[11px] bg-accent text-muted-foreground transition-colors"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setConfirmDelete(u.username)}
-                              className="px-2 py-1 rounded text-[11px] font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          <p className="text-[10px] text-muted-foreground">
-            Showing {users.length} user{users.length !== 1 ? 's' : ''} from Cognito.
-            {statusFilter === 'UNCONFIRMED' && ' These users registered but never confirmed their email.'}
-          </p>
-        </div>
-      )}
+      {open && <div className="p-4 bg-card">{innerContent}</div>}
     </div>
   )
 }
@@ -2457,7 +2468,6 @@ export default function AdminPanel() {
       )}
 
       <BulkMigratePanel authFetch={authFetch} />
-      <CognitoUsersPanel authFetch={authFetch} />
       <ErasurePanel authFetch={authFetch} users={users} />
       <CarouselPanel authFetch={authFetch} />
       <EmailsPanel authFetch={authFetch} />
@@ -2496,6 +2506,7 @@ export default function AdminPanel() {
 
         {usersOpen && (
           <div className="px-4 pb-4 space-y-3 border-t border-border/60">
+            <CognitoUsersPanel authFetch={authFetch} embedded />
             {/* Toolbar: search + filters */}
             <div className="flex flex-wrap items-center gap-2 pt-3">
               <div className="relative flex-1 min-w-[200px]">

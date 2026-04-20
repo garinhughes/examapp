@@ -169,10 +169,10 @@ export async function sendWelcomeEmail(params: { to: string; name: string; userI
           Start learning
         </a>
       </p>
-      <p style="color:#999;font-size:13px;">If you didn't create this account, you can safely ignore this email.</p>`
+      <p style="color:#999;font-size:13px;">If you didn't create this account, please contact <a href="mailto:support@certshack.com" style="color:#999;">support@certshack.com</a>.</p>`
   }
 
-  const { html, text } = await renderEmail({ title: 'Welcome to certshack!', body: bodyHtml })
+  const { html, text } = await renderEmail({ title: 'Welcome', body: bodyHtml })
   await sendHtml({ from: FROM, to: params.to, subject, html, text })
 }
 

@@ -142,6 +142,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
                 await setEmailOptIn(userId, true)
                 const email = (verified.payload.email ?? verified.payload.preferred_username) as string | undefined
                 const name = ((verified.payload.name ?? verified.payload.given_name) as string | undefined) ?? email ?? 'there'
+                sendInternalAlert({
+                  subject: '[certshack] New user sign-up',
+                  lines: [
+                    `Email:      ${email ?? '(unknown)'}`,
+                    `Name:       ${name}`,
+                    `Provider:   ${(verified.payload.identities as any[] | undefined)?.[0]?.providerName ?? 'Cognito'}`,
+                    `Timestamp:  ${new Date().toISOString()}`,
+                  ],
+                })
                 if (email) sendWelcomeEmail({ to: email, name, userId }).catch((e: any) => request.log?.warn?.({ err: e?.message }, 'welcome email failed'))
               }
             } catch { /* non-critical */ }
@@ -219,6 +228,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
                 await setEmailOptIn(userId, true)
                 const email = (verified.payload.email ?? verified.payload.preferred_username) as string | undefined
                 const name = ((verified.payload.name ?? verified.payload.given_name) as string | undefined) ?? email ?? 'there'
+                sendInternalAlert({
+                  subject: '[certshack] New user sign-up',
+                  lines: [
+                    `Email:      ${email ?? '(unknown)'}`,
+                    `Name:       ${name}`,
+                    `Provider:   ${(verified.payload.identities as any[] | undefined)?.[0]?.providerName ?? 'Cognito'}`,
+                    `Timestamp:  ${new Date().toISOString()}`,
+                  ],
+                })
                 if (email) sendWelcomeEmail({ to: email, name, userId }).catch((e: any) => request.log?.warn?.({ err: e?.message }, 'welcome email failed'))
               }
             } catch { /* non-critical */ }
