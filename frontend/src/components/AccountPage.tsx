@@ -88,6 +88,7 @@ export default function AccountPage() {
     setChangingPlan(true)
     setChangePlanError(null)
     try {
+      // Try Stripe first
       const res = await authFetch('/payments/upgrade-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -102,7 +103,22 @@ export default function AccountPage() {
       }
       const data = await res.json().catch(() => ({}))
       if (res.status === 404 && (data as any).message?.includes('No active Stripe')) {
+        // PayPal sub — call revision endpoint and redirect to PayPal for approval
         setChangePlanIsPayPal(true)
+        const ppRes = await authFetch('/payments/paypal/revise-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetProductId }),
+        })
+        if (ppRes.ok) {
+          const ppData = await ppRes.json() as any
+          if (ppData?.approvalUrl) {
+            window.location.href = ppData.approvalUrl
+            return
+          }
+        }
+        const ppData = await ppRes.json().catch(() => ({}))
+        setChangePlanError((ppData as any).message ?? 'Could not initiate plan change')
       } else {
         setChangePlanError((data as any).message ?? 'Could not change plan')
       }
@@ -705,11 +721,31 @@ export default function AccountPage() {
                     ? 'Upgraded to Pro Plus — your new plan is now active.'
                     : 'Downgrade scheduled. Your Pro Plus access continues until the end of your current billing period, then switches to Pro.'}
                 </p>
-              ) : changePlanIsPayPal ? (
-                <p className="text-sm text-muted-foreground">
-                  PayPal subscribers can't swap plans inline. Cancel your current plan first, then re-subscribe from the{' '}
-                  <a href="/pricing" className="text-primary underline">pricing page</a>.
-                </p>
+              ) : changePlanConfirm && changePlanIsPayPal ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-amber-600 dark:text-amber-400">
+                    {changePlanConfirm === 'up'
+                      ? "Upgrade to Pro Plus? You'll be redirected to PayPal to approve the change."
+                      : "Downgrade to Pro? You'll be redirected to PayPal to approve the change. Pro Plus access continues until your next billing date."}
+                  </p>
+                  {changePlanError && <p className="text-xs text-red-500">{changePlanError}</p>}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => changePlan(changePlanConfirm === 'up' ? 'sub:pro-plus' : 'sub:pro')}
+                      disabled={changingPlan}
+                      className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors"
+                    >
+                      {changingPlan ? 'Redirecting…' : 'Continue to PayPal'}
+                    </button>
+                    <button
+                      onClick={() => { setChangePlanConfirm(null); setChangePlanError(null) }}
+                      disabled={changingPlan}
+                      className="px-4 py-2 rounded-lg bg-muted text-sm font-medium hover:bg-muted/80 transition-colors"
+                    >
+                      Back
+                    </button>
+                  </div>
+                </div>
               ) : changePlanConfirm ? (
                 <div className="space-y-3">
                   <p className="text-sm text-amber-600 dark:text-amber-400">
@@ -764,7 +800,7 @@ export default function AccountPage() {
             </div>
           )}
 
-          {/* Manage billing */}
+          {/* Manage billing — Stripe */}
           {isPaidTier(tier) && entitlementDetails.some((e) => e.source === 'stripe' && e.status === 'active') && (
             <div className="p-4 rounded-lg border border-border bg-card">
               <h3 className="text-sm font-semibold mb-1 text-muted-foreground">Manage billing</h3>
@@ -779,6 +815,24 @@ export default function AccountPage() {
               >
                 {portalLoading ? 'Opening…' : 'Manage billing'}
               </button>
+            </div>
+          )}
+
+          {/* Manage billing — PayPal */}
+          {isPaidTier(tier) && entitlementDetails.some((e) => e.source === 'paypal' && e.status === 'active') && (
+            <div className="p-4 rounded-lg border border-border bg-card">
+              <h3 className="text-sm font-semibold mb-1 text-muted-foreground">Manage PayPal billing</h3>
+              <p className="text-xs text-muted-foreground mb-2">
+                Update your funding source or view PayPal transactions on PayPal's website.
+              </p>
+              <a
+                href="https://www.paypal.com/myaccount/autopay"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition-colors"
+              >
+                Manage PayPal subscription
+              </a>
             </div>
           )}
 
