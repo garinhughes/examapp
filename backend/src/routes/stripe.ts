@@ -761,10 +761,13 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         }
         const periodEnd: string = new Date(periodEndTs * 1000).toISOString()
 
-        // Switch the Stripe plan
+        // Switch the Stripe plan.
+        // Upgrade: `always_invoice` creates the prorated invoice AND immediately charges it,
+        //   so the user pays the difference now rather than at next billing.
+        // Downgrade: `none` keeps Pro Plus access until period end, then bills sub:pro next cycle.
         await stripePost(`/subscriptions/${subEnt.stripeSubscriptionId}`, {
           items: [{ id: itemId, price: newPriceId }],
-          proration_behavior: isUpgrade ? 'create_prorations' : 'none',
+          proration_behavior: isUpgrade ? 'always_invoice' : 'none',
           // Update metadata so the deleted/invoice webhooks revoke/grant the right productId
           metadata: { productIds: JSON.stringify([targetProductId]), userId },
         })

@@ -162,18 +162,23 @@ export async function setEntitlementExpiresAt(userId: string, productId: string,
   }
 }
 
-/** Revoke / cancel an entitlement */
+/**
+ * Revoke an entitlement immediately — status=cancelled AND expiresAt=now so it falls out
+ * of active-entitlements queries. If you need access to continue until a future date
+ * (e.g. PayPal cancel mid-cycle), use setEntitlementExpiresAt instead.
+ */
 export async function revokeEntitlement(userId: string, productId: string): Promise<void> {
   try {
+    const now = new Date().toISOString()
     await ddb.send(
       new UpdateCommand({
         TableName: ENTITLEMENTS_TABLE,
         Key: { userId, productId },
-        UpdateExpression: 'SET #st = :s, revokedAt = :now',
+        UpdateExpression: 'SET #st = :s, revokedAt = :now, expiresAt = :now',
         ExpressionAttributeNames: { '#st': 'status' },
         ExpressionAttributeValues: {
           ':s': 'cancelled',
-          ':now': new Date().toISOString(),
+          ':now': now,
         },
       })
     )
