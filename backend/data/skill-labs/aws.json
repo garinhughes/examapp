@@ -138,51 +138,63 @@
     "commands": [
       {
         "command": "aws s3 ls",
-        "output": "An error occurred (AccessDenied) when calling the ListObjectsV2 operation: Access Denied"
+        "output": "An error occurred (AccessDenied) when calling the ListObjectsV2 operation: Access Denied",
+        "category": "S3 Bucket Inspection"
       },
       {
         "command": "aws s3 ls s3://my-app-bucket",
-        "output": "An error occurred (AccessDenied) when calling the ListObjectsV2 operation: Access Denied"
+        "output": "An error occurred (AccessDenied) when calling the ListObjectsV2 operation: Access Denied",
+        "category": "S3 Bucket Inspection"
       },
       {
         "command": "aws s3api get-bucket-policy --bucket my-app-bucket",
-        "output": "{\n    \"Policy\": {\n        \"Version\": \"2012-10-17\",\n        \"Statement\": [\n            {\n                \"Effect\": \"Deny\",\n                \"Action\": \"s3:*\",\n                \"Resource\": [\n                    \"arn:aws:s3:::my-app-bucket\",\n                    \"arn:aws:s3:::my-app-bucket/*\"\n                ],\n                \"Principal\": \"*\",\n                \"Condition\": {\n                    \"StringNotEquals\": {\n                        \"aws:PrincipalOrgID\": \"o-abc123def4\"\n                    }\n                }\n            }\n        ]\n    }\n}"
+        "output": "{\n    \"Policy\": {\n        \"Version\": \"2012-10-17\",\n        \"Statement\": [\n            {\n                \"Effect\": \"Deny\",\n                \"Action\": \"s3:*\",\n                \"Resource\": [\n                    \"arn:aws:s3:::my-app-bucket\",\n                    \"arn:aws:s3:::my-app-bucket/*\"\n                ],\n                \"Principal\": \"*\",\n                \"Condition\": {\n                    \"StringNotEquals\": {\n                        \"aws:PrincipalOrgID\": \"o-abc123def4\"\n                    }\n                }\n            }\n        ]\n    }\n}",
+        "category": "S3 Bucket Inspection"
       },
       {
         "command": "aws iam get-user",
-        "output": "{\n    \"User\": {\n        \"UserName\": \"dev-user\",\n        \"UserId\": \"AIDAEXAMPLE123456\",\n        \"Arn\": \"arn:aws:iam::987654321098:user/dev-user\",\n        \"CreateDate\": \"2024-01-15T10:30:00Z\"\n    }\n}"
+        "output": "{\n    \"User\": {\n        \"UserName\": \"dev-user\",\n        \"UserId\": \"AIDAEXAMPLE123456\",\n        \"Arn\": \"arn:aws:iam::987654321098:user/dev-user\",\n        \"CreateDate\": \"2024-01-15T10:30:00Z\"\n    }\n}",
+        "category": "IAM"
       },
       {
         "command": "aws sts get-caller-identity",
-        "output": "{\n    \"UserId\": \"AIDAEXAMPLE123456\",\n    \"Account\": \"987654321098\",\n    \"Arn\": \"arn:aws:iam::987654321098:user/dev-user\"\n}"
+        "output": "{\n    \"UserId\": \"AIDAEXAMPLE123456\",\n    \"Account\": \"987654321098\",\n    \"Arn\": \"arn:aws:iam::987654321098:user/dev-user\"\n}",
+        "category": "Identity & Caller"
       },
       {
         "command": "aws iam list-attached-user-policies --user-name dev-user",
-        "output": "{\n    \"AttachedPolicies\": [\n        {\n            \"PolicyName\": \"AmazonS3ReadOnlyAccess\",\n            \"PolicyArn\": \"arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess\"\n        }\n    ]\n}"
+        "output": "{\n    \"AttachedPolicies\": [\n        {\n            \"PolicyName\": \"AmazonS3ReadOnlyAccess\",\n            \"PolicyArn\": \"arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess\"\n        }\n    ]\n}",
+        "category": "IAM"
       },
       {
         "command": "aws s3api get-bucket-acl --bucket my-app-bucket",
-        "output": "{\n    \"Owner\": { \"ID\": \"abc123\" },\n    \"Grants\": [ { \"Grantee\": { \"Type\": \"CanonicalUser\", \"ID\": \"abc123\" }, \"Permission\": \"FULL_CONTROL\" } ]\n}"
+        "output": "{\n    \"Owner\": { \"ID\": \"abc123\" },\n    \"Grants\": [ { \"Grantee\": { \"Type\": \"CanonicalUser\", \"ID\": \"abc123\" }, \"Permission\": \"FULL_CONTROL\" } ]\n}",
+        "category": "S3 Bucket Inspection"
       },
       {
         "command": "aws s3api get-public-access-block --bucket my-app-bucket",
-        "output": "{\n    \"PublicAccessBlockConfiguration\": {\n        \"BlockPublicAcls\": true,\n        \"IgnorePublicAcls\": true,\n        \"BlockPublicPolicy\": true,\n        \"RestrictPublicBuckets\": true\n    }\n}"
+        "output": "{\n    \"PublicAccessBlockConfiguration\": {\n        \"BlockPublicAcls\": true,\n        \"IgnorePublicAcls\": true,\n        \"BlockPublicPolicy\": true,\n        \"RestrictPublicBuckets\": true\n    }\n}",
+        "category": "S3 Bucket Inspection"
       },
       {
         "command": "aws s3api get-bucket-versioning --bucket my-app-bucket",
-        "output": "{\n    \"Status\": \"Enabled\"\n}"
+        "output": "{\n    \"Status\": \"Enabled\"\n}",
+        "category": "S3 Bucket Inspection"
       },
       {
         "command": "aws s3api get-bucket-encryption --bucket my-app-bucket",
-        "output": "{\n    \"ServerSideEncryptionConfiguration\": {\n        \"Rules\": [\n            {\n                \"ApplyServerSideEncryptionByDefault\": {\n                    \"SSEAlgorithm\": \"aws:kms\",\n                    \"KMSMasterKeyID\": \"arn:aws:kms:us-east-1:111122223333:key/mrk-abc123\"\n                },\n                \"BucketKeyEnabled\": true\n            }\n        ]\n    }\n}"
+        "output": "{\n    \"ServerSideEncryptionConfiguration\": {\n        \"Rules\": [\n            {\n                \"ApplyServerSideEncryptionByDefault\": {\n                    \"SSEAlgorithm\": \"aws:kms\",\n                    \"KMSMasterKeyID\": \"arn:aws:kms:us-east-1:111122223333:key/mrk-abc123\"\n                },\n                \"BucketKeyEnabled\": true\n            }\n        ]\n    }\n}",
+        "category": "S3 Bucket Inspection"
       },
       {
         "command": "aws organizations describe-organization",
-        "output": "An error occurred (AWSOrganizationsNotInUseException) when calling the DescribeOrganization operation: Your account is not a member of an organization."
+        "output": "An error occurred (AWSOrganizationsNotInUseException) when calling the DescribeOrganization operation: Your account is not a member of an organization.",
+        "category": "Organizations"
       },
       {
         "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::987654321098:user/dev-user --action-names s3:GetObject --resource-arns arn:aws:s3:::my-app-bucket/report.csv",
-        "output": "{\n    \"EvaluationResults\": [\n        {\n            \"EvalActionName\": \"s3:GetObject\",\n            \"EvalResourceName\": \"arn:aws:s3:::my-app-bucket/report.csv\",\n            \"EvalDecision\": \"implicitDeny\",\n            \"MatchedStatements\": []\n        }\n    ]\n}"
+        "output": "{\n    \"EvaluationResults\": [\n        {\n            \"EvalActionName\": \"s3:GetObject\",\n            \"EvalResourceName\": \"arn:aws:s3:::my-app-bucket/report.csv\",\n            \"EvalDecision\": \"implicitDeny\",\n            \"MatchedStatements\": []\n        }\n    ]\n}",
+        "category": "IAM"
       }
     ],
     "expectedCommands": [
@@ -287,49 +299,49 @@
       {
         "id": "alb",
         "label": "Application Load Balancer",
-        "icon": "⚖️",
+        "icon": "\u2696\ufe0f",
         "category": "Networking"
       },
       {
         "id": "ec2-a",
         "label": "EC2 (AZ-a)",
-        "icon": "🖥️",
+        "icon": "\ud83d\udda5\ufe0f",
         "category": "Compute"
       },
       {
         "id": "ec2-b",
         "label": "EC2 (AZ-b)",
-        "icon": "🖥️",
+        "icon": "\ud83d\udda5\ufe0f",
         "category": "Compute"
       },
       {
         "id": "rds-primary",
         "label": "RDS Primary",
-        "icon": "🗄️",
+        "icon": "\ud83d\uddc4\ufe0f",
         "category": "Database"
       },
       {
         "id": "rds-replica",
         "label": "RDS Standby (Multi-AZ)",
-        "icon": "🗄️",
+        "icon": "\ud83d\uddc4\ufe0f",
         "category": "Database"
       },
       {
         "id": "cloudfront",
         "label": "CloudFront",
-        "icon": "🌐",
+        "icon": "\ud83c\udf10",
         "category": "CDN"
       },
       {
         "id": "elasticache",
         "label": "ElastiCache",
-        "icon": "⚡",
+        "icon": "\u26a1",
         "category": "Cache"
       },
       {
         "id": "nat-gw",
         "label": "NAT Gateway",
-        "icon": "🔒",
+        "icon": "\ud83d\udd12",
         "category": "Networking"
       }
     ],
@@ -1051,7 +1063,7 @@
             "cost": 210
           },
           {
-            "service": "S3 Lifecycle: 30d Standard → IA → Glacier ($65/mo)",
+            "service": "S3 Lifecycle: 30d Standard \u2192 IA \u2192 Glacier ($65/mo)",
             "cost": 65
           },
           {
@@ -1063,7 +1075,7 @@
             "cost": 600
           }
         ],
-        "correctService": "S3 Lifecycle: 30d Standard → IA → Glacier ($65/mo)"
+        "correctService": "S3 Lifecycle: 30d Standard \u2192 IA \u2192 Glacier ($65/mo)"
       },
       {
         "id": "logging",
@@ -1260,7 +1272,7 @@
       "SAA-C03"
     ],
     "scenario": "Your serverless API (API Gateway -> Lambda -> DynamoDB) has a P99 latency of **4.2 seconds**. The SLA requires P99 under **500ms**.\n\nIdentify the correct optimization for each performance bottleneck.",
-    "architectureDescription": "Client → CloudFront (not configured) → API Gateway (REST) → Lambda (1024MB, Python 3.12, no provisioned concurrency) → DynamoDB (on-demand, no caching layer)",
+    "architectureDescription": "Client \u2192 CloudFront (not configured) \u2192 API Gateway (REST) \u2192 Lambda (1024MB, Python 3.12, no provisioned concurrency) \u2192 DynamoDB (on-demand, no caching layer)",
     "problems": [
       {
         "id": "cold-start",
@@ -2210,7 +2222,7 @@
         "drifted": false
       }
     ],
-    "explanation": "Four resources have drifted from the Terraform state:\n\n1. Security Group (sg-web-app) - Port 22 (SSH) was added manually for debugging during the incident. This is a security risk and should be removed, then the Terraform state updated if SSH access is needed.\n\n2. RDS Instance (prod-db) - Instance class was upgraded from db.t3.medium to db.t3.large during the incident for more capacity. The Terraform configuration should be updated to reflect the new size if the upgrade is desired, or the instance should be downgraded.\n\n3. IAM Role (lambda-execution-role) - AmazonS3FullAccess was attached manually. This violates least-privilege and should be replaced with a scoped policy granting only the specific S3 permissions needed.\n\n4. Lambda Function (api-handler) - Memory was doubled (256→512MB), timeout increased (30→60s), and LOG_LEVEL changed from 'warn' to 'debug'. These were emergency changes to handle elevated load and improve debugging. The Terraform config should be updated to keep the memory increase if helpful, but LOG_LEVEL should revert to 'warn' for production."
+    "explanation": "Four resources have drifted from the Terraform state:\n\n1. Security Group (sg-web-app) - Port 22 (SSH) was added manually for debugging during the incident. This is a security risk and should be removed, then the Terraform state updated if SSH access is needed.\n\n2. RDS Instance (prod-db) - Instance class was upgraded from db.t3.medium to db.t3.large during the incident for more capacity. The Terraform configuration should be updated to reflect the new size if the upgrade is desired, or the instance should be downgraded.\n\n3. IAM Role (lambda-execution-role) - AmazonS3FullAccess was attached manually. This violates least-privilege and should be replaced with a scoped policy granting only the specific S3 permissions needed.\n\n4. Lambda Function (api-handler) - Memory was doubled (256\u2192512MB), timeout increased (30\u219260s), and LOG_LEVEL changed from 'warn' to 'debug'. These were emergency changes to handle elevated load and improve debugging. The Terraform config should be updated to keep the memory increase if helpful, but LOG_LEVEL should revert to 'warn' for production."
   },
   {
     "id": "aws-migration-service-mapping",
@@ -2294,7 +2306,7 @@
         "definition": "Amazon Route 53 - Scalable DNS with health checks, failover routing, latency-based routing, and domain registration"
       }
     ],
-    "explanation": "The key AWS service mappings for lift-and-shift migration:\n\n• VMware VMs → EC2: Direct VM-to-instance migration using AWS Application Migration Service (MGN)\n• SAN storage → EBS: Block storage attached to instances; choose gp3 for general purpose, io2 for high IOPS\n• PostgreSQL → RDS: Managed DB eliminates patching/backup overhead; use DMS for data migration\n• NFS → EFS: Elastic shared file system with NFS v4 protocol compatibility\n• F5 → ALB/NLB: ALB for HTTP/HTTPS (Layer 7), NLB for TCP/UDP (Layer 4)\n• Nagios → CloudWatch: Native monitoring with custom metrics, alarms, and integration with SNS for alerting\n• RabbitMQ → SQS: Managed queuing; consider Amazon MQ if AMQP protocol compatibility is required\n• Active Directory → Directory Service: AWS Managed Microsoft AD provides full AD compatibility\n• Veeam → AWS Backup: Centralised backup with retention policies and cross-account/cross-region support\n• BIND DNS → Route 53: Managed DNS with 100% SLA and advanced routing policies"
+    "explanation": "The key AWS service mappings for lift-and-shift migration:\n\n\u2022 VMware VMs \u2192 EC2: Direct VM-to-instance migration using AWS Application Migration Service (MGN)\n\u2022 SAN storage \u2192 EBS: Block storage attached to instances; choose gp3 for general purpose, io2 for high IOPS\n\u2022 PostgreSQL \u2192 RDS: Managed DB eliminates patching/backup overhead; use DMS for data migration\n\u2022 NFS \u2192 EFS: Elastic shared file system with NFS v4 protocol compatibility\n\u2022 F5 \u2192 ALB/NLB: ALB for HTTP/HTTPS (Layer 7), NLB for TCP/UDP (Layer 4)\n\u2022 Nagios \u2192 CloudWatch: Native monitoring with custom metrics, alarms, and integration with SNS for alerting\n\u2022 RabbitMQ \u2192 SQS: Managed queuing; consider Amazon MQ if AMQP protocol compatibility is required\n\u2022 Active Directory \u2192 Directory Service: AWS Managed Microsoft AD provides full AD compatibility\n\u2022 Veeam \u2192 AWS Backup: Centralised backup with retention policies and cross-account/cross-region support\n\u2022 BIND DNS \u2192 Route 53: Managed DNS with 100% SLA and advanced routing policies"
   },
   {
     "id": "aws-disaster-recovery-runbook",
@@ -2461,7 +2473,7 @@
         "expected": "days          = 90"
       }
     ],
-    "explanation": "The Terraform configuration had four security issues:\n\n1. Versioning Disabled → Enabled: Required for audit trail and accidental deletion protection. Without versioning, deleted or overwritten log files are unrecoverable.\n\n2. AES256 → aws:kms: AES256 uses Amazon-managed keys with no audit trail. KMS provides key rotation, access policies, and CloudTrail logging of key usage - required for compliance.\n\n3. restrict_public_buckets = false → true: This was the only public access block setting not enabled. Even if bucket policies don't grant public access today, this setting prevents any future policy from making the bucket public.\n\n4. Missing lifecycle rule: Without a lifecycle configuration, logs accumulate indefinitely in Standard storage. Transitioning to Glacier after 90 days reduces storage costs by ~80% while maintaining compliance retention."
+    "explanation": "The Terraform configuration had four security issues:\n\n1. Versioning Disabled \u2192 Enabled: Required for audit trail and accidental deletion protection. Without versioning, deleted or overwritten log files are unrecoverable.\n\n2. AES256 \u2192 aws:kms: AES256 uses Amazon-managed keys with no audit trail. KMS provides key rotation, access policies, and CloudTrail logging of key usage - required for compliance.\n\n3. restrict_public_buckets = false \u2192 true: This was the only public access block setting not enabled. Even if bucket policies don't grant public access today, this setting prevents any future policy from making the bucket public.\n\n4. Missing lifecycle rule: Without a lifecycle configuration, logs accumulate indefinitely in Standard storage. Transitioning to Glacier after 90 days reduces storage costs by ~80% while maintaining compliance retention."
   },
   {
     "id": "aws-detect-iam-escalation",
@@ -2819,7 +2831,7 @@
         "correctPosition": 9
       }
     ],
-    "explanation": "AZ failure recovery follows a verify → validate → communicate → plan sequence:\n\n1-2. ALB + ASG verification: These are the fastest auto-recovery mechanisms. ALB health checks detect failures within seconds, and ASG launches replacements within minutes. Verify these are working before checking database layer.\n\n3-4. Data tier failover: RDS Multi-AZ failover typically completes in 60-120 seconds. ElastiCache automatic failover depends on configuration but should complete within minutes. Verify these before running end-to-end tests.\n\n5-6. Validation: Smoke tests verify the full request path works. CloudWatch metrics confirm stable operation - look for error rates returning to baseline, latency normalising, and throughput recovering. Don't skip this - auto-recovery succeeding doesn't mean the application is fully healthy.\n\n7. Route 53 adjustment: If using health-check-based failover, the thresholds may need temporary adjustment since you're running at reduced capacity in a single AZ.\n\n8. Communication: Only notify stakeholders after you have confirmed facts - current health, remaining capacity, and whether manual intervention is needed.\n\n9. Resilience planning: Don't wait for eu-west-1a to recover - plan capacity in eu-west-1c so you're not single-AZ for an extended period. This is non-urgent but should be scheduled.",
+    "explanation": "AZ failure recovery follows a verify \u2192 validate \u2192 communicate \u2192 plan sequence:\n\n1-2. ALB + ASG verification: These are the fastest auto-recovery mechanisms. ALB health checks detect failures within seconds, and ASG launches replacements within minutes. Verify these are working before checking database layer.\n\n3-4. Data tier failover: RDS Multi-AZ failover typically completes in 60-120 seconds. ElastiCache automatic failover depends on configuration but should complete within minutes. Verify these before running end-to-end tests.\n\n5-6. Validation: Smoke tests verify the full request path works. CloudWatch metrics confirm stable operation - look for error rates returning to baseline, latency normalising, and throughput recovering. Don't skip this - auto-recovery succeeding doesn't mean the application is fully healthy.\n\n7. Route 53 adjustment: If using health-check-based failover, the thresholds may need temporary adjustment since you're running at reduced capacity in a single AZ.\n\n8. Communication: Only notify stakeholders after you have confirmed facts - current health, remaining capacity, and whether manual intervention is needed.\n\n9. Resilience planning: Don't wait for eu-west-1a to recover - plan capacity in eu-west-1c so you're not single-AZ for an extended period. This is non-urgent but should be scheduled.",
     "showcase": false
   },
   {
@@ -2923,7 +2935,7 @@
         ]
       }
     ],
-    "explanation": "Optimal parameter tuning for Aurora MySQL db.r6g.xlarge (32GB RAM):\n\n1. innodb_buffer_pool_size → 20GB (21474836480): The buffer pool should be approximately 60-75% of total instance memory. At 128MB (default), the database constantly reads from disk. 20GB allows most active data to reside in memory, dramatically reducing I/O.\n\n2. max_connections → 200: 50 connections is far too low for production workloads. With connection pooling, 200 provides adequate headroom. Setting to 1000 wastes memory (each connection consumes ~10MB) and risks resource exhaustion.\n\n3. slow_query_log → 1 (enabled): Essential for identifying performance bottlenecks. Without this, you're blind to which queries are slow. Combine with Performance Insights for query-level analysis.\n\n4. long_query_time → 2 seconds: Captures queries taking more than 2 seconds. The default of 10 seconds misses many problematic queries. 1 second may log too many routine queries in high-throughput systems.\n\n5. query_cache_type → 0 (disabled): The MySQL query cache is deprecated and removed in MySQL 8.0. Even in 5.7, it causes mutex contention under concurrent writes. Disable it - use application-level caching (ElastiCache) instead.\n\n6. innodb_io_capacity → 2000: This tells InnoDB how many IOPS the storage can handle. Aurora's storage can deliver thousands of IOPS; the default of 200 (designed for spinning disks) artificially throttles background I/O operations like flushing dirty pages and merge operations.",
+    "explanation": "Optimal parameter tuning for Aurora MySQL db.r6g.xlarge (32GB RAM):\n\n1. innodb_buffer_pool_size \u2192 20GB (21474836480): The buffer pool should be approximately 60-75% of total instance memory. At 128MB (default), the database constantly reads from disk. 20GB allows most active data to reside in memory, dramatically reducing I/O.\n\n2. max_connections \u2192 200: 50 connections is far too low for production workloads. With connection pooling, 200 provides adequate headroom. Setting to 1000 wastes memory (each connection consumes ~10MB) and risks resource exhaustion.\n\n3. slow_query_log \u2192 1 (enabled): Essential for identifying performance bottlenecks. Without this, you're blind to which queries are slow. Combine with Performance Insights for query-level analysis.\n\n4. long_query_time \u2192 2 seconds: Captures queries taking more than 2 seconds. The default of 10 seconds misses many problematic queries. 1 second may log too many routine queries in high-throughput systems.\n\n5. query_cache_type \u2192 0 (disabled): The MySQL query cache is deprecated and removed in MySQL 8.0. Even in 5.7, it causes mutex contention under concurrent writes. Disable it - use application-level caching (ElastiCache) instead.\n\n6. innodb_io_capacity \u2192 2000: This tells InnoDB how many IOPS the storage can handle. Aurora's storage can deliver thousands of IOPS; the default of 200 (designed for spinning disks) artificially throttles background I/O operations like flushing dirty pages and merge operations.",
     "showcase": true,
     "showcaseOrder": 10
   },
@@ -3027,7 +3039,7 @@
       "Lambda writes processed data to DynamoDB",
       "Lambda publishes a completion notification to SNS"
     ],
-    "explanation": "This is the simplest serverless pipeline on AWS:\n\n1. **S3 → Lambda**: S3 event notifications fire automatically whenever a file is uploaded, invoking the Lambda function with no polling required.\n2. **Lambda → DynamoDB**: Lambda parses the file and writes structured records. DynamoDB scales automatically and needs no server management.\n3. **Lambda → SNS**: After writing the data, Lambda publishes to an SNS topic. Any subscribers (email, webhook, other Lambdas) receive the notification.\n\nThe decoys:\n- **SQS**: Useful for decoupling at high scale but unnecessary for this simple trigger-process-notify flow.\n- **EC2**: Server management overhead - Lambda handles the compute without provisioning instances.\n- **Step Functions**: Adds orchestration complexity that is not required here.\n- **API Gateway**: There is no user-facing API - files go directly to S3 via presigned URLs or the console."
+    "explanation": "This is the simplest serverless pipeline on AWS:\n\n1. **S3 \u2192 Lambda**: S3 event notifications fire automatically whenever a file is uploaded, invoking the Lambda function with no polling required.\n2. **Lambda \u2192 DynamoDB**: Lambda parses the file and writes structured records. DynamoDB scales automatically and needs no server management.\n3. **Lambda \u2192 SNS**: After writing the data, Lambda publishes to an SNS topic. Any subscribers (email, webhook, other Lambdas) receive the notification.\n\nThe decoys:\n- **SQS**: Useful for decoupling at high scale but unnecessary for this simple trigger-process-notify flow.\n- **EC2**: Server management overhead - Lambda handles the compute without provisioning instances.\n- **Step Functions**: Adds orchestration complexity that is not required here.\n- **API Gateway**: There is no user-facing API - files go directly to S3 via presigned URLs or the console."
   },
   {
     "id": "aws-label-vpc-architecture",
@@ -3153,12 +3165,12 @@
         "x": 23.3,
         "y": 84.4,
         "options": [
-          "0.0.0.0/0 → igw-xxxx",
-          "0.0.0.0/0 → nat-xxxx",
-          "10.0.0.0/16 → local",
-          "0.0.0.0/0 → vgw-xxxx"
+          "0.0.0.0/0 \u2192 igw-xxxx",
+          "0.0.0.0/0 \u2192 nat-xxxx",
+          "10.0.0.0/16 \u2192 local",
+          "0.0.0.0/0 \u2192 vgw-xxxx"
         ],
-        "answer": "0.0.0.0/0 → igw-xxxx",
+        "answer": "0.0.0.0/0 \u2192 igw-xxxx",
         "label": "Public subnet routes internet traffic via IGW"
       },
       {
@@ -3166,23 +3178,23 @@
         "x": 72.2,
         "y": 84.4,
         "options": [
-          "0.0.0.0/0 → nat-xxxx",
-          "0.0.0.0/0 → igw-xxxx",
-          "10.0.0.0/16 → local",
-          "0.0.0.0/0 → eni-xxxx"
+          "0.0.0.0/0 \u2192 nat-xxxx",
+          "0.0.0.0/0 \u2192 igw-xxxx",
+          "10.0.0.0/16 \u2192 local",
+          "0.0.0.0/0 \u2192 eni-xxxx"
         ],
-        "answer": "0.0.0.0/0 → nat-xxxx",
+        "answer": "0.0.0.0/0 \u2192 nat-xxxx",
         "label": "Private subnet routes internet traffic via NAT"
       }
     ],
-    "explanation": "VPC architecture components:\n\n• Internet Gateway (IGW): The only component that connects a VPC directly to the internet. It’s horizontally scaled, redundant, and HA by default. Not to be confused with NAT Gateway (outbound-only) or Virtual Private Gateway (VPN/Direct Connect).\n\n• Public vs Private Subnets: A subnet is \"public\" if its route table has a route to an IGW (0.0.0.0/0 → igw-xxxx). A \"private\" subnet has no such route - it can only access the internet outbound via a NAT Gateway.\n\n• Bastion Host: An EC2 instance in the public subnet used as an SSH jump box to reach instances in private subnets. It has an Elastic IP and strict security group rules (SSH from known IPs only).\n\n• NAT Gateway: Sits in the public subnet and allows instances in private subnets to initiate outbound connections (e.g. software updates, API calls) without being directly reachable from the internet. Requires an Elastic IP.\n\n• Application Server: Runs in the private subnet with no public IP. Accessible only from the bastion host via SSH or from the load balancer. This isolation is a security best practice.\n\n• Amazon RDS (MySQL): Managed relational database in the private subnet with Multi-AZ for high availability. Never placed in a public subnet in production.\n\n• Route Tables: The public route table needs 0.0.0.0/0 → igw-xxxx so instances can reach the internet directly. The private route table needs 0.0.0.0/0 → nat-xxxx so outbound traffic goes through the NAT Gateway. Both route tables automatically include 10.0.0.0/16 → local for intra-VPC traffic.",
+    "explanation": "VPC architecture components:\n\n\u2022 Internet Gateway (IGW): The only component that connects a VPC directly to the internet. It\u2019s horizontally scaled, redundant, and HA by default. Not to be confused with NAT Gateway (outbound-only) or Virtual Private Gateway (VPN/Direct Connect).\n\n\u2022 Public vs Private Subnets: A subnet is \"public\" if its route table has a route to an IGW (0.0.0.0/0 \u2192 igw-xxxx). A \"private\" subnet has no such route - it can only access the internet outbound via a NAT Gateway.\n\n\u2022 Bastion Host: An EC2 instance in the public subnet used as an SSH jump box to reach instances in private subnets. It has an Elastic IP and strict security group rules (SSH from known IPs only).\n\n\u2022 NAT Gateway: Sits in the public subnet and allows instances in private subnets to initiate outbound connections (e.g. software updates, API calls) without being directly reachable from the internet. Requires an Elastic IP.\n\n\u2022 Application Server: Runs in the private subnet with no public IP. Accessible only from the bastion host via SSH or from the load balancer. This isolation is a security best practice.\n\n\u2022 Amazon RDS (MySQL): Managed relational database in the private subnet with Multi-AZ for high availability. Never placed in a public subnet in production.\n\n\u2022 Route Tables: The public route table needs 0.0.0.0/0 \u2192 igw-xxxx so instances can reach the internet directly. The private route table needs 0.0.0.0/0 \u2192 nat-xxxx so outbound traffic goes through the NAT Gateway. Both route tables automatically include 10.0.0.0/16 \u2192 local for intra-VPC traffic.",
     "showcase": true,
     "showcaseOrder": 9
   },
   {
     "id": "aws-wire-up-ec2-access",
     "title": "Wire Up EC2 Network Access",
-    "description": "You’ve been handed a VPC with EC2 instances, an RDS database, and networking components already provisioned - but none of the security groups or route tables are configured. Set up the correct rules to enable secure access.",
+    "description": "You\u2019ve been handed a VPC with EC2 instances, an RDS database, and networking components already provisioned - but none of the security groups or route tables are configured. Set up the correct rules to enable secure access.",
     "type": "config-toggle",
     "difficulty": "intermediate",
     "platform": "AWS",
@@ -3320,7 +3332,7 @@
         "shortLabel": "0.0.0.0/0 Target"
       }
     ],
-    "explanation": "Security group and route table configuration explained:\n\n1. Bastion SSH Source → 203.0.113.0/24: Never open SSH to 0.0.0.0/0 (the entire internet). Restrict to your office IP range. Using 10.0.0.0/16 would allow any VPC instance to SSH in, which is too broad. 10.0.1.0/24 would only allow the subnet itself.\n\n2. Bastion Inbound Port → 22: Port 22 is SSH (Linux). Port 3389 is RDP (Windows). Port 443 is HTTPS and port 80 is HTTP - neither is for remote shell access.\n\n3. App Server SSH Source → sg-bastion: Referencing a security group (not an IP) is the AWS best practice. It allows any instance in the bastion SG to connect, even if IPs change. Using 10.0.1.10/32 would work but is fragile - if the bastion IP changes, access breaks. Never use 0.0.0.0/0 for private subnet SSH.\n\n4. App Server Port → 8080: The application runs on port 8080. Port 80/443 would only work if a reverse proxy is configured. Port 3000 is for Node.js development servers, not production.\n\n5. Database Source → sg-app-server: Only the application server should access the database. Using 0.0.0.0/0 exposes the database to the internet (critical vulnerability). Using sg-bastion would allow the bastion to connect directly, bypassing the application layer. 10.0.0.0/16 is too broad.\n\n6. Database Port → 3306: MySQL uses port 3306. Port 5432 is PostgreSQL, 1433 is SQL Server, and 27017 is MongoDB. Using the wrong port means the app server can’t reach the database.\n\n7. Public RT Target → igw-xxxx: Public subnets need a route to the Internet Gateway for direct internet access. Routing to NAT is for private subnets. Routing to VPN Gateway (vgw) is for hybrid connectivity. \"local\" only allows VPC-internal traffic.\n\n8. Private RT Target → nat-xxxx: Private subnets route outbound internet traffic through the NAT Gateway. Routing to IGW would make the subnet effectively public (security risk). VPN Gateway is for on-premises connectivity.",
+    "explanation": "Security group and route table configuration explained:\n\n1. Bastion SSH Source \u2192 203.0.113.0/24: Never open SSH to 0.0.0.0/0 (the entire internet). Restrict to your office IP range. Using 10.0.0.0/16 would allow any VPC instance to SSH in, which is too broad. 10.0.1.0/24 would only allow the subnet itself.\n\n2. Bastion Inbound Port \u2192 22: Port 22 is SSH (Linux). Port 3389 is RDP (Windows). Port 443 is HTTPS and port 80 is HTTP - neither is for remote shell access.\n\n3. App Server SSH Source \u2192 sg-bastion: Referencing a security group (not an IP) is the AWS best practice. It allows any instance in the bastion SG to connect, even if IPs change. Using 10.0.1.10/32 would work but is fragile - if the bastion IP changes, access breaks. Never use 0.0.0.0/0 for private subnet SSH.\n\n4. App Server Port \u2192 8080: The application runs on port 8080. Port 80/443 would only work if a reverse proxy is configured. Port 3000 is for Node.js development servers, not production.\n\n5. Database Source \u2192 sg-app-server: Only the application server should access the database. Using 0.0.0.0/0 exposes the database to the internet (critical vulnerability). Using sg-bastion would allow the bastion to connect directly, bypassing the application layer. 10.0.0.0/16 is too broad.\n\n6. Database Port \u2192 3306: MySQL uses port 3306. Port 5432 is PostgreSQL, 1433 is SQL Server, and 27017 is MongoDB. Using the wrong port means the app server can\u2019t reach the database.\n\n7. Public RT Target \u2192 igw-xxxx: Public subnets need a route to the Internet Gateway for direct internet access. Routing to NAT is for private subnets. Routing to VPN Gateway (vgw) is for hybrid connectivity. \"local\" only allows VPC-internal traffic.\n\n8. Private RT Target \u2192 nat-xxxx: Private subnets route outbound internet traffic through the NAT Gateway. Routing to IGW would make the subnet effectively public (security risk). VPN Gateway is for on-premises connectivity.",
     "visualContainerLabel": "VPC - 10.0.0.0/16",
     "visualZones": [
       {
@@ -3644,7 +3656,7 @@
       "SAA-C03"
     ],
     "scenario": "Your analytics team runs ad-hoc and scheduled Athena queries against a **10 TB** clickstream dataset in S3.\n\n**Current state:**\n- Uncompressed CSV files (~800 KB each, no partitioning)\n- Full dataset scanned per query\n- Cost: $50/day ($5 per TB scanned)\n- P95 query time: 90 seconds\n\n**Targets:**\n- Cost: under $10/day\n- P95 query time: under 10 seconds\n\nMost queries filter by date range and select 3-5 columns out of 45.",
-    "architectureDescription": "S3 (10 TB uncompressed CSV, ~12 million files) → Glue Crawler → Glue Data Catalog → Athena → QuickSight",
+    "architectureDescription": "S3 (10 TB uncompressed CSV, ~12 million files) \u2192 Glue Crawler \u2192 Glue Data Catalog \u2192 Athena \u2192 QuickSight",
     "problems": [
       {
         "id": "table-format",
@@ -3707,7 +3719,7 @@
         "correctOption": "Enforce column projection (SELECT only needed columns) and replace LIKE with equality filters or pre-computed search columns"
       }
     ],
-    "explanation": "Five optimisations bring the 10 TB dataset from $50/day and 90s P95 latency to under $10/day and under 10s:\n\n1. Convert to Parquet - Columnar format enables Athena to read only the 3-5 requested columns instead of all 45, reducing data scanned by ~90%. Snappy compression further reduces file size by 3-5×.\n\n2. Partition by date - With year/month/day partitions and a 7-day query window, Athena scans 7/730 ≈ 1% of the data. Combined with Parquet, this reduces scans from 10 TB to ~10 GB per query.\n\n3. Compact to 128-256 MB files - Eliminates the S3 listing overhead of 12 million tiny files. Larger files allow Parquet row-group pruning to work efficiently and reduce S3 GET request costs.\n\n4. Enable partition projection - Eliminates the 45-minute crawler dependency. Athena computes partition locations mathematically using projection configuration in the table properties, providing instant access to new partitions.\n\n5. Enforce column projection - SELECT * on Parquet still reads all columns from the row groups. Selecting only needed columns enables true columnar pruning. Replacing LIKE '%x%' with pre-computed columns or equality filters enables predicate pushdown at the Parquet level."
+    "explanation": "Five optimisations bring the 10 TB dataset from $50/day and 90s P95 latency to under $10/day and under 10s:\n\n1. Convert to Parquet - Columnar format enables Athena to read only the 3-5 requested columns instead of all 45, reducing data scanned by ~90%. Snappy compression further reduces file size by 3-5\u00d7.\n\n2. Partition by date - With year/month/day partitions and a 7-day query window, Athena scans 7/730 \u2248 1% of the data. Combined with Parquet, this reduces scans from 10 TB to ~10 GB per query.\n\n3. Compact to 128-256 MB files - Eliminates the S3 listing overhead of 12 million tiny files. Larger files allow Parquet row-group pruning to work efficiently and reduce S3 GET request costs.\n\n4. Enable partition projection - Eliminates the 45-minute crawler dependency. Athena computes partition locations mathematically using projection configuration in the table properties, providing instant access to new partitions.\n\n5. Enforce column projection - SELECT * on Parquet still reads all columns from the row groups. Selecting only needed columns enables true columnar pruning. Replacing LIKE '%x%' with pre-computed columns or equality filters enables predicate pushdown at the Parquet level."
   },
   {
     "id": "aws-redshift-slow-query-diagnose",
@@ -5272,55 +5284,55 @@
       {
         "id": "api-gateway",
         "label": "API Gateway",
-        "icon": "🌐",
+        "icon": "\ud83c\udf10",
         "category": "Networking"
       },
       {
         "id": "bedrock-kb",
         "label": "Bedrock Knowledge Base",
-        "icon": "📚",
+        "icon": "\ud83d\udcda",
         "category": "AI"
       },
       {
         "id": "s3-docs",
         "label": "S3 Document Bucket",
-        "icon": "📦",
+        "icon": "\ud83d\udce6",
         "category": "Storage"
       },
       {
         "id": "opensearch-serverless",
         "label": "OpenSearch Serverless (Vector Store)",
-        "icon": "🔍",
+        "icon": "\ud83d\udd0d",
         "category": "Database"
       },
       {
         "id": "claude-fm",
         "label": "Claude (Foundation Model)",
-        "icon": "🧠",
+        "icon": "\ud83e\udde0",
         "category": "AI"
       },
       {
         "id": "lambda-postprocess",
         "label": "Lambda Function",
-        "icon": "⚡",
+        "icon": "\u26a1",
         "category": "Compute"
       },
       {
         "id": "dynamodb-audit",
         "label": "DynamoDB Table",
-        "icon": "📋",
+        "icon": "\ud83d\udccb",
         "category": "Database"
       },
       {
         "id": "kendra",
         "label": "Amazon Kendra",
-        "icon": "🔎",
+        "icon": "\ud83d\udd0e",
         "category": "AI"
       },
       {
         "id": "sagemaker-endpoint",
         "label": "SageMaker Endpoint",
-        "icon": "🖥️",
+        "icon": "\ud83d\udda5\ufe0f",
         "category": "AI"
       }
     ],
@@ -6120,39 +6132,48 @@
     "commands": [
       {
         "command": "aws glue get-job-runs --job-name orders-to-redshift-etl --max-results 5",
-        "output": "{\n  \"JobRuns\": [\n    {\"Id\": \"jr_abc123\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-10T10:00:00Z\", \"CompletedOn\": \"2024-04-10T10:02:44Z\", \"JobRunState\": \"FAILED\", \"ErrorMessage\": \"GlueException: Connection to JDBC target failed. Target: redshift-prod.cluster.eu-west-1.redshift.amazonaws.com:5439\", \"ExecutionTime\": 164},\n    {\"Id\": \"jr_abc122\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-10T09:00:00Z\", \"JobRunState\": \"FAILED\", \"ErrorMessage\": \"GlueException: Connection to JDBC target failed.\", \"ExecutionTime\": 163},\n    {\"Id\": \"jr_abc121\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-10T08:00:00Z\", \"JobRunState\": \"FAILED\", \"ErrorMessage\": \"GlueException: Connection to JDBC target failed.\", \"ExecutionTime\": 162},\n    {\"Id\": \"jr_abc120\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-09T23:00:00Z\", \"JobRunState\": \"SUCCEEDED\", \"ExecutionTime\": 487},\n    {\"Id\": \"jr_abc119\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-09T22:00:00Z\", \"JobRunState\": \"SUCCEEDED\", \"ExecutionTime\": 503}\n  ]\n}"
+        "output": "{\n  \"JobRuns\": [\n    {\"Id\": \"jr_abc123\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-10T10:00:00Z\", \"CompletedOn\": \"2024-04-10T10:02:44Z\", \"JobRunState\": \"FAILED\", \"ErrorMessage\": \"GlueException: Connection to JDBC target failed. Target: redshift-prod.cluster.eu-west-1.redshift.amazonaws.com:5439\", \"ExecutionTime\": 164},\n    {\"Id\": \"jr_abc122\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-10T09:00:00Z\", \"JobRunState\": \"FAILED\", \"ErrorMessage\": \"GlueException: Connection to JDBC target failed.\", \"ExecutionTime\": 163},\n    {\"Id\": \"jr_abc121\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-10T08:00:00Z\", \"JobRunState\": \"FAILED\", \"ErrorMessage\": \"GlueException: Connection to JDBC target failed.\", \"ExecutionTime\": 162},\n    {\"Id\": \"jr_abc120\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-09T23:00:00Z\", \"JobRunState\": \"SUCCEEDED\", \"ExecutionTime\": 487},\n    {\"Id\": \"jr_abc119\", \"JobName\": \"orders-to-redshift-etl\", \"StartedOn\": \"2024-04-09T22:00:00Z\", \"JobRunState\": \"SUCCEEDED\", \"ExecutionTime\": 503}\n  ]\n}",
+        "category": "Glue Job Inspection"
       },
       {
         "command": "aws glue get-connection --name redshift-jdbc-prod",
-        "output": "{\n  \"Connection\": {\n    \"Name\": \"redshift-jdbc-prod\",\n    \"ConnectionType\": \"JDBC\",\n    \"ConnectionProperties\": {\n      \"JDBC_CONNECTION_URL\": \"jdbc:redshift://redshift-prod.cluster.eu-west-1.redshift.amazonaws.com:5439/analytics\",\n      \"USERNAME\": \"glue_user\",\n      \"PASSWORD\": \"**REDACTED**\"\n    },\n    \"PhysicalConnectionRequirements\": {\n      \"SubnetId\": \"subnet-0aabbcc1\",\n      \"SecurityGroupIdList\": [\"sg-0glue1111\"],\n      \"AvailabilityZone\": \"eu-west-1a\"\n    },\n    \"CreationTime\": \"2024-01-15T09:00:00Z\",\n    \"LastUpdatedTime\": \"2024-01-15T09:00:00Z\"\n  }\n}"
+        "output": "{\n  \"Connection\": {\n    \"Name\": \"redshift-jdbc-prod\",\n    \"ConnectionType\": \"JDBC\",\n    \"ConnectionProperties\": {\n      \"JDBC_CONNECTION_URL\": \"jdbc:redshift://redshift-prod.cluster.eu-west-1.redshift.amazonaws.com:5439/analytics\",\n      \"USERNAME\": \"glue_user\",\n      \"PASSWORD\": \"**REDACTED**\"\n    },\n    \"PhysicalConnectionRequirements\": {\n      \"SubnetId\": \"subnet-0aabbcc1\",\n      \"SecurityGroupIdList\": [\"sg-0glue1111\"],\n      \"AvailabilityZone\": \"eu-west-1a\"\n    },\n    \"CreationTime\": \"2024-01-15T09:00:00Z\",\n    \"LastUpdatedTime\": \"2024-01-15T09:00:00Z\"\n  }\n}",
+        "category": "Glue Job Inspection"
       },
       {
         "command": "aws ec2 describe-security-groups --group-ids sg-0glue1111",
-        "output": "{\n  \"SecurityGroups\": [\n    {\n      \"GroupId\": \"sg-0glue1111\",\n      \"GroupName\": \"glue-jobs-sg\",\n      \"Description\": \"Security group for Glue ETL jobs\",\n      \"IpPermissions\": [\n        {\"IpProtocol\": \"-1\", \"UserIdGroupPairs\": [], \"IpRanges\": [], \"Comment\": \"Outbound only - no inbound rules configured\"}\n      ],\n      \"IpPermissionsEgress\": [\n        {\"IpProtocol\": \"-1\", \"IpRanges\": [{\"CidrIp\": \"0.0.0.0/0\"}]}\n      ]\n    }\n  ]\n}"
+        "output": "{\n  \"SecurityGroups\": [\n    {\n      \"GroupId\": \"sg-0glue1111\",\n      \"GroupName\": \"glue-jobs-sg\",\n      \"Description\": \"Security group for Glue ETL jobs\",\n      \"IpPermissions\": [\n        {\"IpProtocol\": \"-1\", \"UserIdGroupPairs\": [], \"IpRanges\": [], \"Comment\": \"Outbound only - no inbound rules configured\"}\n      ],\n      \"IpPermissionsEgress\": [\n        {\"IpProtocol\": \"-1\", \"IpRanges\": [{\"CidrIp\": \"0.0.0.0/0\"}]}\n      ]\n    }\n  ]\n}",
+        "category": "Networking"
       },
       {
         "command": "aws ec2 describe-security-groups --group-ids sg-0glue1111 --query 'SecurityGroups[0].IpPermissions'",
-        "output": "[]"
+        "output": "[]",
+        "category": "Networking"
       },
       {
         "command": "aws glue get-job --job-name orders-to-redshift-etl",
-        "output": "{\n  \"Job\": {\n    \"Name\": \"orders-to-redshift-etl\",\n    \"Role\": \"arn:aws:iam::123456789012:role/GlueJobRole\",\n    \"Command\": {\"Name\": \"glueetl\", \"ScriptLocation\": \"s3://glue-scripts-prod/orders_to_redshift.py\", \"PythonVersion\": \"3\"},\n    \"GlueVersion\": \"4.0\",\n    \"DefaultArguments\": {\"--job-bookmark-option\": \"job-bookmark-enable\", \"--TempDir\": \"s3://glue-temp-prod/tmp/\", \"--enable-continuous-cloudwatch-log\": \"true\"},\n    \"Connections\": {\"Connections\": [\"redshift-jdbc-prod\"]},\n    \"NumberOfWorkers\": 10,\n    \"WorkerType\": \"G.1X\"\n  }\n}"
+        "output": "{\n  \"Job\": {\n    \"Name\": \"orders-to-redshift-etl\",\n    \"Role\": \"arn:aws:iam::123456789012:role/GlueJobRole\",\n    \"Command\": {\"Name\": \"glueetl\", \"ScriptLocation\": \"s3://glue-scripts-prod/orders_to_redshift.py\", \"PythonVersion\": \"3\"},\n    \"GlueVersion\": \"4.0\",\n    \"DefaultArguments\": {\"--job-bookmark-option\": \"job-bookmark-enable\", \"--TempDir\": \"s3://glue-temp-prod/tmp/\", \"--enable-continuous-cloudwatch-log\": \"true\"},\n    \"Connections\": {\"Connections\": [\"redshift-jdbc-prod\"]},\n    \"NumberOfWorkers\": 10,\n    \"WorkerType\": \"G.1X\"\n  }\n}",
+        "category": "Glue Job Inspection"
       },
       {
         "command": "aws ec2 describe-subnets --subnet-ids subnet-0aabbcc1",
-        "output": "{\n  \"Subnets\": [\n    {\n      \"SubnetId\": \"subnet-0aabbcc1\",\n      \"VpcId\": \"vpc-0prod1234\",\n      \"AvailabilityZone\": \"eu-west-1a\",\n      \"CidrBlock\": \"10.0.1.0/24\",\n      \"MapPublicIpOnLaunch\": false,\n      \"Tags\": [{\"Key\": \"Name\", \"Value\": \"private-subnet-1a\"}]\n    }\n  ]\n}"
+        "output": "{\n  \"Subnets\": [\n    {\n      \"SubnetId\": \"subnet-0aabbcc1\",\n      \"VpcId\": \"vpc-0prod1234\",\n      \"AvailabilityZone\": \"eu-west-1a\",\n      \"CidrBlock\": \"10.0.1.0/24\",\n      \"MapPublicIpOnLaunch\": false,\n      \"Tags\": [{\"Key\": \"Name\", \"Value\": \"private-subnet-1a\"}]\n    }\n  ]\n}",
+        "category": "Networking"
       },
       {
         "command": "aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0aabbcc1",
-        "output": "{\n  \"RouteTables\": [\n    {\n      \"RouteTableId\": \"rtb-0private\",\n      \"Routes\": [\n        {\"DestinationCidrBlock\": \"10.0.0.0/8\", \"GatewayId\": \"local\", \"State\": \"active\"},\n        {\"DestinationCidrBlock\": \"0.0.0.0/0\", \"NatGatewayId\": \"nat-0abc123\", \"State\": \"active\"}\n      ]\n    }\n  ]\n}"
+        "output": "{\n  \"RouteTables\": [\n    {\n      \"RouteTableId\": \"rtb-0private\",\n      \"Routes\": [\n        {\"DestinationCidrBlock\": \"10.0.0.0/8\", \"GatewayId\": \"local\", \"State\": \"active\"},\n        {\"DestinationCidrBlock\": \"0.0.0.0/0\", \"NatGatewayId\": \"nat-0abc123\", \"State\": \"active\"}\n      ]\n    }\n  ]\n}",
+        "category": "Networking"
       },
       {
         "command": "aws ec2 describe-vpc-endpoints --filters Name=vpc-id,Values=vpc-0prod1234 Name=service-name,Values=com.amazonaws.eu-west-1.s3",
-        "output": "{\n  \"VpcEndpoints\": [\n    {\"VpcEndpointId\": \"vpce-0s3endpoint\", \"ServiceName\": \"com.amazonaws.eu-west-1.s3\", \"State\": \"available\", \"VpcId\": \"vpc-0prod1234\"}\n  ]\n}"
+        "output": "{\n  \"VpcEndpoints\": [\n    {\"VpcEndpointId\": \"vpce-0s3endpoint\", \"ServiceName\": \"com.amazonaws.eu-west-1.s3\", \"State\": \"available\", \"VpcId\": \"vpc-0prod1234\"}\n  ]\n}",
+        "category": "Networking"
       },
       {
         "command": "aws cloudwatch get-metric-statistics --namespace AWS/Glue --metric-name glue.ALL.s3.filesystem.read_bytes --dimensions Name=JobName,Value=orders-to-redshift-etl --start-time 2024-04-10T10:00:00Z --end-time 2024-04-10T10:04:00Z --period 60 --statistics Average",
-        "output": "{\n  \"Datapoints\": [\n    {\"Timestamp\": \"2024-04-10T10:00:00Z\", \"Average\": 0.0, \"Unit\": \"Bytes\"},\n    {\"Timestamp\": \"2024-04-10T10:01:00Z\", \"Average\": 0.0, \"Unit\": \"Bytes\"}\n  ]\n}"
+        "output": "{\n  \"Datapoints\": [\n    {\"Timestamp\": \"2024-04-10T10:00:00Z\", \"Average\": 0.0, \"Unit\": \"Bytes\"},\n    {\"Timestamp\": \"2024-04-10T10:01:00Z\", \"Average\": 0.0, \"Unit\": \"Bytes\"}\n  ]\n}",
+        "category": "Monitoring"
       }
     ],
     "answers": [
@@ -6427,7 +6448,7 @@
         "description": "No decoy components placed (QuickSight, DMS, EMR, OpenSearch, DynamoDB not required)"
       }
     ],
-    "explanation": "A three-tier data lake (Raw → Curated → Serving) separates landing, transformation, and analytics concerns. Kinesis Firehose handles streaming ingestion to Raw. Step Functions orchestrates Glue ETL transformations between tiers. Glue Crawler maintains the Data Catalog. Lake Formation enforces column/row-level security. Athena provides serverless SQL access; Redshift Spectrum enables federated queries joining the data lake with warehouse tables."
+    "explanation": "A three-tier data lake (Raw \u2192 Curated \u2192 Serving) separates landing, transformation, and analytics concerns. Kinesis Firehose handles streaming ingestion to Raw. Step Functions orchestrates Glue ETL transformations between tiers. Glue Crawler maintains the Data Catalog. Lake Formation enforces column/row-level security. Athena provides serverless SQL access; Redshift Spectrum enables federated queries joining the data lake with warehouse tables."
   },
   {
     "id": "aws-redshift-distribution-style",
@@ -6524,7 +6545,7 @@
       {
         "id": "core-instance",
         "metric": "Core Node Instance Type (r5.4xlarge on-demand - 8 nodes)",
-        "currentValue": "$1.008/hr × 8 × 6hr = $48.38 on-demand cost",
+        "currentValue": "$1.008/hr \u00d7 8 \u00d7 6hr = $48.38 on-demand cost",
         "targetValue": "Reduce core compute cost without losing data durability",
         "options": [
           "Replace r5.4xlarge with r5.2xlarge on-demand (halve per-node cost)",
@@ -6687,7 +6708,7 @@
         "correctPosition": 10
       }
     ],
-    "explanation": "The correct pipeline order is: data validation → feature engineering → train/val/test split → model training → model evaluation → conditional threshold check → model registration → endpoint deployment → smoke test → team notification. The ConditionStep must come after evaluation (needs PropertyFile output) and before registration (gating on quality). The smoke test must run after deployment to validate the live endpoint before declaring success."
+    "explanation": "The correct pipeline order is: data validation \u2192 feature engineering \u2192 train/val/test split \u2192 model training \u2192 model evaluation \u2192 conditional threshold check \u2192 model registration \u2192 endpoint deployment \u2192 smoke test \u2192 team notification. The ConditionStep must come after evaluation (needs PropertyFile output) and before registration (gating on quality). The smoke test must run after deployment to validate the live endpoint before declaring success."
   },
   {
     "id": "aws-sagemaker-pipeline-design",
@@ -6734,7 +6755,7 @@
       },
       {
         "id": "condition-step",
-        "label": "ConditionStep: Accuracy ≥ 0.85",
+        "label": "ConditionStep: Accuracy \u2265 0.85",
         "icon": "condition",
         "category": "SageMaker Step"
       },
@@ -6801,7 +6822,7 @@
       "RegisterModel is on the true branch of ConditionStep only",
       "No decoy steps used (TransformStep, TuningStep, LambdaStep, Glue Job not required)"
     ],
-    "explanation": "A basic SageMaker MLOps Pipeline follows this sequence:\n\n1. **ProcessingStep (Preprocess)** - A Scikit-Learn container reads raw CSV data from S3 and outputs train/test splits. This must run first so the training job has clean inputs.\n2. **TrainingStep** - XGBoost trains on the preprocessed data. SageMaker manages the compute instance and saves model artifacts to S3 automatically.\n3. **ProcessingStep (Evaluate)** - A second processor runs the model against the test split and writes an `evaluation.json` file containing the accuracy score. SageMaker reads this via a PropertyFile.\n4. **ConditionStep** - Reads the accuracy from the PropertyFile. If accuracy ≥ 0.85, the pipeline follows the true branch. Otherwise it stops.\n5. **RegisterModel** - Registers the model package in the SageMaker Model Registry with an Approved status, making it available for deployment.\n\nThe decoys (TransformStep, TuningStep, LambdaStep, Glue Job) are all valid SageMaker steps but are not part of this basic train-evaluate-register pipeline."
+    "explanation": "A basic SageMaker MLOps Pipeline follows this sequence:\n\n1. **ProcessingStep (Preprocess)** - A Scikit-Learn container reads raw CSV data from S3 and outputs train/test splits. This must run first so the training job has clean inputs.\n2. **TrainingStep** - XGBoost trains on the preprocessed data. SageMaker manages the compute instance and saves model artifacts to S3 automatically.\n3. **ProcessingStep (Evaluate)** - A second processor runs the model against the test split and writes an `evaluation.json` file containing the accuracy score. SageMaker reads this via a PropertyFile.\n4. **ConditionStep** - Reads the accuracy from the PropertyFile. If accuracy \u2265 0.85, the pipeline follows the true branch. Otherwise it stops.\n5. **RegisterModel** - Registers the model package in the SageMaker Model Registry with an Approved status, making it available for deployment.\n\nThe decoys (TransformStep, TuningStep, LambdaStep, Glue Job) are all valid SageMaker steps but are not part of this basic train-evaluate-register pipeline."
   },
   {
     "id": "aws-mlops-deployment-steps",
@@ -6875,7 +6896,7 @@
         "correctPosition": 9
       }
     ],
-    "explanation": "The safe MLOps deployment sequence is: approve model in registry → create new endpoint config → add shadow variant (0% traffic) → validate shadow metrics → canary at 10% → monitor → increase to 50% → shift to 100% → clean up old variant → update monitoring. Shadow testing at 0% traffic validates the model's behaviour without any user impact. The canary progression allows rollback at any stage if metrics degrade."
+    "explanation": "The safe MLOps deployment sequence is: approve model in registry \u2192 create new endpoint config \u2192 add shadow variant (0% traffic) \u2192 validate shadow metrics \u2192 canary at 10% \u2192 monitor \u2192 increase to 50% \u2192 shift to 100% \u2192 clean up old variant \u2192 update monitoring. Shadow testing at 0% traffic validates the model's behaviour without any user impact. The canary progression allows rollback at any stage if metrics degrade."
   },
   {
     "id": "aws-textract-iam-policy",
@@ -7106,43 +7127,52 @@
     "relatedExamCodes": [
       "SAA-C03"
     ],
-    "scenario": "The production `api-service` in your ECS cluster has had 0 running tasks for the past 10 minutes.\n\n**Stack:** ECS Fargate → ECR (private image) → CloudWatch Logs\n\nUsers are getting connection refused errors. Use the simulated AWS CLI to investigate and identify the root cause.",
+    "scenario": "The production `api-service` in your ECS cluster has had 0 running tasks for the past 10 minutes.\n\n**Stack:** ECS Fargate \u2192 ECR (private image) \u2192 CloudWatch Logs\n\nUsers are getting connection refused errors. Use the simulated AWS CLI to investigate and identify the root cause.",
     "commands": [
       {
         "command": "aws ecs describe-services --cluster prod-cluster --services api-service",
-        "output": "{\n  \"services\": [\n    {\n      \"serviceName\": \"api-service\",\n      \"clusterArn\": \"arn:aws:ecs:eu-west-1:123456789012:cluster/prod-cluster\",\n      \"status\": \"ACTIVE\",\n      \"desiredCount\": 2,\n      \"runningCount\": 0,\n      \"pendingCount\": 0,\n      \"taskDefinition\": \"arn:aws:ecs:eu-west-1:123456789012:task-definition/api-service:14\",\n      \"events\": [\n        {\n          \"message\": \"(service api-service) (task 3f8b2c1d4a5e6f7890abcdef) failed to launch due to (CannotPullContainerError: failed to pull image 123456789012.dkr.ecr.us-east-1.amazonaws.com/api-service:latest).\"\n        },\n        {\n          \"message\": \"(service api-service) has started 1 tasks: (task 3f8b2c1d4a5e6f7890abcdef) in (cluster prod-cluster).\"\n        }\n      ]\n    }\n  ]\n}"
+        "output": "{\n  \"services\": [\n    {\n      \"serviceName\": \"api-service\",\n      \"clusterArn\": \"arn:aws:ecs:eu-west-1:123456789012:cluster/prod-cluster\",\n      \"status\": \"ACTIVE\",\n      \"desiredCount\": 2,\n      \"runningCount\": 0,\n      \"pendingCount\": 0,\n      \"taskDefinition\": \"arn:aws:ecs:eu-west-1:123456789012:task-definition/api-service:14\",\n      \"events\": [\n        {\n          \"message\": \"(service api-service) (task 3f8b2c1d4a5e6f7890abcdef) failed to launch due to (CannotPullContainerError: failed to pull image 123456789012.dkr.ecr.us-east-1.amazonaws.com/api-service:latest).\"\n        },\n        {\n          \"message\": \"(service api-service) has started 1 tasks: (task 3f8b2c1d4a5e6f7890abcdef) in (cluster prod-cluster).\"\n        }\n      ]\n    }\n  ]\n}",
+        "category": "ECS"
       },
       {
         "command": "aws ecs list-tasks --cluster prod-cluster --service-name api-service --desired-status STOPPED",
-        "output": "{\n  \"taskArns\": [\n    \"arn:aws:ecs:eu-west-1:123456789012:task/prod-cluster/3f8b2c1d4a5e6f7890abcdef\",\n    \"arn:aws:ecs:eu-west-1:123456789012:task/prod-cluster/a1b2c3d4e5f6789012345678\"\n  ]\n}"
+        "output": "{\n  \"taskArns\": [\n    \"arn:aws:ecs:eu-west-1:123456789012:task/prod-cluster/3f8b2c1d4a5e6f7890abcdef\",\n    \"arn:aws:ecs:eu-west-1:123456789012:task/prod-cluster/a1b2c3d4e5f6789012345678\"\n  ]\n}",
+        "category": "ECS"
       },
       {
         "command": "aws ecs describe-tasks --cluster prod-cluster --tasks 3f8b2c1d4a5e6f7890abcdef",
-        "output": "{\n  \"tasks\": [\n    {\n      \"taskArn\": \"arn:aws:ecs:eu-west-1:123456789012:task/prod-cluster/3f8b2c1d4a5e6f7890abcdef\",\n      \"lastStatus\": \"STOPPED\",\n      \"stoppedReason\": \"CannotPullContainerError: failed to pull from any source: failed to pull image 123456789012.dkr.ecr.us-east-1.amazonaws.com/api-service:latest: pulling from host 123456789012.dkr.ecr.us-east-1.amazonaws.com failed with status code [manifests latest]: 404 Not Found\",\n      \"containers\": [\n        {\n          \"name\": \"api-service\",\n          \"image\": \"123456789012.dkr.ecr.us-east-1.amazonaws.com/api-service:latest\",\n          \"reason\": \"CannotPullContainerError\"\n        }\n      ]\n    }\n  ]\n}"
+        "output": "{\n  \"tasks\": [\n    {\n      \"taskArn\": \"arn:aws:ecs:eu-west-1:123456789012:task/prod-cluster/3f8b2c1d4a5e6f7890abcdef\",\n      \"lastStatus\": \"STOPPED\",\n      \"stoppedReason\": \"CannotPullContainerError: failed to pull from any source: failed to pull image 123456789012.dkr.ecr.us-east-1.amazonaws.com/api-service:latest: pulling from host 123456789012.dkr.ecr.us-east-1.amazonaws.com failed with status code [manifests latest]: 404 Not Found\",\n      \"containers\": [\n        {\n          \"name\": \"api-service\",\n          \"image\": \"123456789012.dkr.ecr.us-east-1.amazonaws.com/api-service:latest\",\n          \"reason\": \"CannotPullContainerError\"\n        }\n      ]\n    }\n  ]\n}",
+        "category": "ECS"
       },
       {
         "command": "aws ecs describe-task-definition --task-definition api-service:14",
-        "output": "{\n  \"taskDefinition\": {\n    \"family\": \"api-service\",\n    \"revision\": 14,\n    \"taskRoleArn\": \"arn:aws:iam::123456789012:role/ecsTaskRole\",\n    \"executionRoleArn\": \"arn:aws:iam::123456789012:role/ecsTaskExecutionRole\",\n    \"containerDefinitions\": [{\n      \"name\": \"api-service\",\n      \"image\": \"123456789012.dkr.ecr.us-east-1.amazonaws.com/api-service:latest\",\n      \"cpu\": 512,\n      \"memory\": 1024\n    }]\n  }\n}"
+        "output": "{\n  \"taskDefinition\": {\n    \"family\": \"api-service\",\n    \"revision\": 14,\n    \"taskRoleArn\": \"arn:aws:iam::123456789012:role/ecsTaskRole\",\n    \"executionRoleArn\": \"arn:aws:iam::123456789012:role/ecsTaskExecutionRole\",\n    \"containerDefinitions\": [{\n      \"name\": \"api-service\",\n      \"image\": \"123456789012.dkr.ecr.us-east-1.amazonaws.com/api-service:latest\",\n      \"cpu\": 512,\n      \"memory\": 1024\n    }]\n  }\n}",
+        "category": "ECS"
       },
       {
         "command": "aws ecr describe-repositories --region us-east-1 --repository-names api-service",
-        "output": "An error occurred (RepositoryNotFoundException) when calling the DescribeRepositories operation: The repository with name 'api-service' does not exist in the registry with id '123456789012' in region 'us-east-1'."
+        "output": "An error occurred (RepositoryNotFoundException) when calling the DescribeRepositories operation: The repository with name 'api-service' does not exist in the registry with id '123456789012' in region 'us-east-1'.",
+        "category": "ECR"
       },
       {
         "command": "aws ecr describe-repositories --region eu-west-1 --repository-names api-service",
-        "output": "{\n  \"repositories\": [{\n    \"repositoryName\": \"api-service\",\n    \"repositoryUri\": \"123456789012.dkr.ecr.eu-west-1.amazonaws.com/api-service\",\n    \"imageTagMutability\": \"MUTABLE\",\n    \"createdAt\": \"2025-11-01T10:00:00Z\"\n  }]\n}"
+        "output": "{\n  \"repositories\": [{\n    \"repositoryName\": \"api-service\",\n    \"repositoryUri\": \"123456789012.dkr.ecr.eu-west-1.amazonaws.com/api-service\",\n    \"imageTagMutability\": \"MUTABLE\",\n    \"createdAt\": \"2025-11-01T10:00:00Z\"\n  }]\n}",
+        "category": "ECR"
       },
       {
         "command": "aws ecr list-images --region eu-west-1 --repository-name api-service",
-        "output": "{\n  \"imageIds\": [\n    { \"imageDigest\": \"sha256:abc123\", \"imageTag\": \"latest\" },\n    { \"imageDigest\": \"sha256:def456\", \"imageTag\": \"v1.13.2\" }\n  ]\n}"
+        "output": "{\n  \"imageIds\": [\n    { \"imageDigest\": \"sha256:abc123\", \"imageTag\": \"latest\" },\n    { \"imageDigest\": \"sha256:def456\", \"imageTag\": \"v1.13.2\" }\n  ]\n}",
+        "category": "ECR"
       },
       {
         "command": "aws iam get-role --role-name ecsTaskExecutionRole",
-        "output": "{\n  \"Role\": {\n    \"RoleName\": \"ecsTaskExecutionRole\",\n    \"Arn\": \"arn:aws:iam::123456789012:role/ecsTaskExecutionRole\",\n    \"AssumeRolePolicyDocument\": {\n      \"Statement\": [{ \"Effect\": \"Allow\", \"Principal\": { \"Service\": \"ecs-tasks.amazonaws.com\" }, \"Action\": \"sts:AssumeRole\" }]\n    }\n  }\n}"
+        "output": "{\n  \"Role\": {\n    \"RoleName\": \"ecsTaskExecutionRole\",\n    \"Arn\": \"arn:aws:iam::123456789012:role/ecsTaskExecutionRole\",\n    \"AssumeRolePolicyDocument\": {\n      \"Statement\": [{ \"Effect\": \"Allow\", \"Principal\": { \"Service\": \"ecs-tasks.amazonaws.com\" }, \"Action\": \"sts:AssumeRole\" }]\n    }\n  }\n}",
+        "category": "IAM"
       },
       {
         "command": "aws iam list-attached-role-policies --role-name ecsTaskExecutionRole",
-        "output": "{\n  \"AttachedPolicies\": [{\n    \"PolicyName\": \"AmazonECSTaskExecutionRolePolicy\",\n    \"PolicyArn\": \"arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy\"\n  }]\n}"
+        "output": "{\n  \"AttachedPolicies\": [{\n    \"PolicyName\": \"AmazonECSTaskExecutionRolePolicy\",\n    \"PolicyArn\": \"arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy\"\n  }]\n}",
+        "category": "IAM"
       }
     ],
     "expectedCommands": [
@@ -7282,7 +7312,7 @@
       },
       {
         "id": "nacl-inbound-ephemeral",
-        "label": "Private NACL - Inbound Rule 200 (ports 1024–65535, ephemeral)",
+        "label": "Private NACL - Inbound Rule 200 (ports 1024\u201365535, ephemeral)",
         "currentValue": "DENY",
         "correctValue": "ALLOW",
         "inputType": "select",
@@ -7292,7 +7322,7 @@
         ]
       }
     ],
-    "explanation": "Four issues needed fixing:\n\n1. **Route table target** - the private route table's default route (`0.0.0.0/0`) points to the Internet Gateway (`igw-*`). An IGW route in a private subnet bypasses the NAT Gateway entirely and causes the instance to try to route outbound traffic directly to the internet (which fails as it has no public IP). The target must be the NAT Gateway (`nat-*`).\n\n2. **NAT Gateway location** - a NAT Gateway must reside in a *public* subnet (one whose route table has a direct `0.0.0.0/0 → igw-*` route). If placed in a private subnet, the NAT Gateway itself cannot reach the internet, making it useless. Move it to `public-subnet-1a`.\n\n3. **Outbound NACL for port 443** - NACLs are stateless and evaluated for every packet. An outbound DENY on port 443 blocks all HTTPS traffic leaving the subnet, which is needed for `yum update` and most software download traffic.\n\n4. **Inbound ephemeral port NACL** - NACLs are stateless, so return traffic from internet servers comes *back* to the instance on ephemeral ports (1024–65535). Without an explicit inbound ALLOW for this port range, responses from external servers are dropped even though the outbound request succeeded. Security groups are stateful (they track connections automatically), but NACLs are not.",
+    "explanation": "Four issues needed fixing:\n\n1. **Route table target** - the private route table's default route (`0.0.0.0/0`) points to the Internet Gateway (`igw-*`). An IGW route in a private subnet bypasses the NAT Gateway entirely and causes the instance to try to route outbound traffic directly to the internet (which fails as it has no public IP). The target must be the NAT Gateway (`nat-*`).\n\n2. **NAT Gateway location** - a NAT Gateway must reside in a *public* subnet (one whose route table has a direct `0.0.0.0/0 \u2192 igw-*` route). If placed in a private subnet, the NAT Gateway itself cannot reach the internet, making it useless. Move it to `public-subnet-1a`.\n\n3. **Outbound NACL for port 443** - NACLs are stateless and evaluated for every packet. An outbound DENY on port 443 blocks all HTTPS traffic leaving the subnet, which is needed for `yum update` and most software download traffic.\n\n4. **Inbound ephemeral port NACL** - NACLs are stateless, so return traffic from internet servers comes *back* to the instance on ephemeral ports (1024\u201365535). Without an explicit inbound ALLOW for this port range, responses from external servers are dropped even though the outbound request succeeded. Security groups are stateful (they track connections automatically), but NACLs are not.",
     "showcase": true,
     "showcaseOrder": 11
   },
@@ -7412,5 +7442,920 @@
       }
     ],
     "explanation": "Systems Manager Patch Manager and Parameter Store are core DevOps tools covered heavily in AWS SysOps and DevOps Pro exams.\n\n**Patch Manager commands:**\n- `list-compliance-summaries` - reports patch compliance per resource with severity filtering\n- `send-command` with `AWS-RunPatchBaseline` - the canonical SSM document for patching; `Operation=Scan` audits without changes, `Operation=Install` applies approved patches\n- `--timeout-seconds 7200` - patch installs can take up to 2 hours across large instances; default timeout (3600s) may be insufficient\n- `list-command-invocations --details` - shows the per-instance success/failure status of a send-command run\n\n**Parameter Store:**\n- Type `SecureString` - the only parameter type that encrypts the value using KMS. `String` and `StringList` store values in plaintext.\n- `--key-id \"alias/aws/ssm\"` - uses the AWS-managed SSM KMS key. You can specify a customer-managed key for stricter access control.\n- `--with-decryption` - required flag to receive the plaintext value back; calling without it returns the KMS-encrypted ciphertext. The caller must have `kms:Decrypt` permission on the KMS key."
+  },
+  {
+    "id": "aws-s3-lifecycle-command-terminal",
+    "title": "Apply an S3 Lifecycle Policy with the AWS CLI",
+    "description": "Type the single `aws s3api` command that attaches a lifecycle policy moving log objects through storage classes and expiring them after a year.",
+    "type": "command-terminal",
+    "difficulty": "beginner",
+    "platform": "AWS",
+    "category": "Cloud",
+    "version": 1,
+    "relatedExamCodes": [
+      "SAA-C03"
+    ],
+    "labCategory": "Configure",
+    "technologies": [
+      "S3",
+      "S3 Glacier",
+      "S3 Standard-IA",
+      "Lifecycle Policies"
+    ],
+    "scenario": "The `logs-prod` bucket now holds 40 TB of application logs. Finance wants Standard \u2192 Standard-IA at 30 days, Glacier Flexible Retrieval at 90 days, and full expiration at 365 days. A JSON document is already prepared at `lc.json`. Issue the single command that applies it.",
+    "prompt": "aws-user@lab:~$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Apply the lifecycle configuration in `lc.json` to the `logs-prod` bucket using the `s3api` command group.",
+        "hint": "Use `s3api put-bucket-lifecycle-configuration` and pass the JSON file via `--lifecycle-configuration file://lc.json`. `--lifecycle` (no suffix) is the deprecated v1 API.",
+        "program": "aws",
+        "requirements": [
+          {
+            "id": "svc",
+            "kind": "positional",
+            "variants": [
+              "s3api"
+            ],
+            "description": "s3api                          low-level S3 API commands"
+          },
+          {
+            "id": "sub",
+            "kind": "positional",
+            "variants": [
+              "put-bucket-lifecycle-configuration"
+            ],
+            "description": "put-bucket-lifecycle-configuration  set lifecycle rules on a bucket (v2 API)"
+          },
+          {
+            "id": "bucket",
+            "kind": "flag-value",
+            "variants": [
+              "--bucket"
+            ],
+            "value": "logs-prod",
+            "description": "--bucket <value>               the name of the bucket to configure"
+          },
+          {
+            "id": "lc",
+            "kind": "flag-value",
+            "variants": [
+              "--lifecycle-configuration"
+            ],
+            "value": "file://lc.json",
+            "description": "--lifecycle-configuration <value>  JSON body describing lifecycle rules"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--lifecycle",
+            "description": "--lifecycle <value>            deprecated v1 syntax; replaced by --lifecycle-configuration"
+          },
+          {
+            "flag": "--acl",
+            "description": "--acl <value>                  canned ACL for the bucket (used by put-bucket-acl)"
+          },
+          {
+            "flag": "--cors-configuration",
+            "description": "--cors-configuration <value>   JSON body for CORS rules (put-bucket-cors)"
+          },
+          {
+            "flag": "--expected-bucket-owner",
+            "description": "--expected-bucket-owner <value>  fail if the bucket is not owned by the expected account"
+          }
+        ],
+        "successOutput": "",
+        "canonicalCommand": "aws s3api put-bucket-lifecycle-configuration --bucket logs-prod --lifecycle-configuration file://lc.json"
+      }
+    ],
+    "explanation": "**Skill 4.1.5 \u2014 Managing S3 object lifecycles.**\n\n- `put-bucket-lifecycle-configuration` is the **v2** API; the older `put-bucket-lifecycle` (no `-configuration` suffix) only supports the deprecated v1 rule format and will reject modern transitions like Glacier Instant Retrieval.\n- The JSON body must be supplied via `--lifecycle-configuration file://\u2026`; inline JSON on the command line is error-prone across shells.\n- Lifecycle rules are evaluated daily at midnight UTC. Transitions to IA require objects to be **at least 30 days old** by design, so the 30-day IA rule here is the earliest allowed.\n- For cost-optimised log archives the classic tier ladder is Standard \u2192 Standard-IA \u2192 Glacier Flexible \u2192 expiry; pick Glacier Instant only when occasional millisecond reads are required.",
+    "learningOutcomes": [
+      "Attach a lifecycle configuration to an S3 bucket via the AWS CLI",
+      "Distinguish the v2 `put-bucket-lifecycle-configuration` API from the deprecated v1 call",
+      "Recognise the 30-day minimum before Standard-IA transitions are permitted"
+    ],
+    "realWorldValue": "Applying lifecycle rules at the bucket level is one of the single highest-leverage cost controls on AWS \u2014 a one-line CLI call can cut 60\u201380% off log-storage bills without touching application code."
+  },
+  {
+    "id": "aws-cloudfront-invalidation-command-terminal",
+    "title": "Invalidate a CloudFront Distribution with the AWS CLI",
+    "description": "Use `aws cloudfront create-invalidation` to force CloudFront edges to refetch a stale SPA bundle after a deployment.",
+    "type": "command-terminal",
+    "difficulty": "beginner",
+    "platform": "AWS",
+    "category": "Cloud",
+    "version": 1,
+    "relatedExamCodes": [
+      "SAA-C03"
+    ],
+    "labCategory": "Implement",
+    "technologies": [
+      "CloudFront",
+      "S3",
+      "CDN"
+    ],
+    "scenario": "Your team just deployed a new SPA build to the origin bucket and users are still being served the stale `/index.html`. The distribution ID is `E1ABCDEF123GH`. Issue the single CLI command that invalidates `/index.html` at every edge immediately.",
+    "prompt": "aws-user@lab:~$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Create a CloudFront invalidation for distribution `E1ABCDEF123GH` against the path `/index.html`.",
+        "hint": "The command group is `cloudfront`, the subcommand is `create-invalidation`, and paths are supplied with `--paths`. Do not use `--invalidation-batch` \u2014 that flag is for the batch-file form of the same API and is not needed here.",
+        "program": "aws",
+        "requirements": [
+          {
+            "id": "svc",
+            "kind": "positional",
+            "variants": [
+              "cloudfront"
+            ],
+            "description": "cloudfront                     CloudFront distribution commands"
+          },
+          {
+            "id": "sub",
+            "kind": "positional",
+            "variants": [
+              "create-invalidation"
+            ],
+            "description": "create-invalidation            create a new invalidation request"
+          },
+          {
+            "id": "dist",
+            "kind": "flag-value",
+            "variants": [
+              "--distribution-id"
+            ],
+            "value": "E1ABCDEF123GH",
+            "description": "--distribution-id <value>      the distribution's ID"
+          },
+          {
+            "id": "paths",
+            "kind": "flag-value",
+            "variants": [
+              "--paths"
+            ],
+            "value": "/index.html",
+            "description": "--paths <value>                one or more paths to invalidate (must start with /)"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--invalidation-batch",
+            "description": "--invalidation-batch <value>   batch JSON (used when not passing --paths directly)"
+          },
+          {
+            "flag": "--if-match",
+            "description": "--if-match <value>             ETag of the distribution config (used by update-distribution, not create-invalidation)"
+          },
+          {
+            "flag": "--caller-reference",
+            "description": "--caller-reference <value>     auto-generated inside the batch; not a top-level flag on this call"
+          }
+        ],
+        "successOutput": "{\n    \"Location\": \"https://cloudfront.amazonaws.com/2020-05-31/distribution/E1ABCDEF123GH/invalidation/I2K4F9LX3Z1AB\",\n    \"Invalidation\": {\n        \"Id\": \"I2K4F9LX3Z1AB\",\n        \"Status\": \"InProgress\",\n        \"CreateTime\": \"2026-04-20T11:03:22.418000+00:00\",\n        \"InvalidationBatch\": {\n            \"Paths\": {\"Quantity\": 1, \"Items\": [\"/index.html\"]},\n            \"CallerReference\": \"cli-1713603802\"\n        }\n    }\n}",
+        "canonicalCommand": "aws cloudfront create-invalidation --distribution-id E1ABCDEF123GH --paths /index.html"
+      }
+    ],
+    "explanation": "**Skill 3.4.4 / 4.4.4 \u2014 CDN cache invalidation.**\n\n- CloudFront invalidations are billed per path after the first 1,000 free per month; prefer versioned asset filenames over broad `/*` invalidations where possible.\n- `create-invalidation` returns immediately with `Status: \"InProgress\"`. Propagation to all edges typically completes in 60\u201390 seconds.\n- `--invalidation-batch` is the alternative form used when supplying a JSON file; it is mutually exclusive with the direct `--paths` form used here.\n- `--caller-reference` is automatically generated by the CLI when you use `--paths`; it only needs explicit control if you are de-duplicating identical requests from a pipeline.",
+    "learningOutcomes": [
+      "Trigger a CloudFront invalidation via the AWS CLI",
+      "Distinguish the direct `--paths` form from the `--invalidation-batch` file form",
+      "Understand which response fields indicate in-progress vs completed invalidations"
+    ],
+    "realWorldValue": "Every frontend deploy that does not use fingerprinted asset names will eventually need an invalidation; knowing this one command is the difference between a five-second fix and a ten-minute support ticket."
+  },
+  {
+    "id": "aws-kms-key-rotation-command-terminal",
+    "title": "Enable Automatic KMS Key Rotation and Tag for Compliance",
+    "description": "Enable yearly automatic rotation on a customer-managed KMS key and tag it with the SOC 2 compliance marker. Two distinct CLI calls.",
+    "type": "command-terminal",
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Cloud",
+    "version": 1,
+    "relatedExamCodes": [
+      "SAA-C03",
+      "SCS-C03"
+    ],
+    "labCategory": "Implement",
+    "technologies": [
+      "KMS",
+      "IAM",
+      "Compliance"
+    ],
+    "scenario": "An auditor has flagged the customer-managed KMS key `alias/app-data-key` for missing automatic rotation. Enable annual rotation, then add a `Compliance=SOC2` tag so the compliance report picks it up on the next scan.",
+    "prompt": "aws-user@lab:~$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Enable automatic rotation on the customer-managed key `alias/app-data-key`.",
+        "hint": "Use `kms enable-key-rotation` with `--key-id`. Do NOT pass `--rotation-period-in-days` unless the key is a symmetric CMK that explicitly supports it \u2014 for most workloads the default 365-day cadence is what you want.",
+        "program": "aws",
+        "requirements": [
+          {
+            "id": "svc",
+            "kind": "positional",
+            "variants": [
+              "kms"
+            ],
+            "description": "kms                            KMS key management commands"
+          },
+          {
+            "id": "sub",
+            "kind": "positional",
+            "variants": [
+              "enable-key-rotation"
+            ],
+            "description": "enable-key-rotation            turn on automatic yearly rotation for a CMK"
+          },
+          {
+            "id": "key",
+            "kind": "flag-value",
+            "variants": [
+              "--key-id"
+            ],
+            "value": "alias/app-data-key",
+            "description": "--key-id <value>               identifier of the KMS key (ID, ARN, or alias)"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--rotation-period-in-days",
+            "description": "--rotation-period-in-days <value>  custom rotation period in days (only supported on keys created with a custom period)"
+          },
+          {
+            "flag": "--policy",
+            "description": "--policy <value>               inline key policy document (used by put-key-policy, not enable-key-rotation)"
+          },
+          {
+            "flag": "--origin",
+            "description": "--origin <value>               key material origin (set only at create-key time)"
+          }
+        ],
+        "successOutput": "",
+        "canonicalCommand": "aws kms enable-key-rotation --key-id alias/app-data-key"
+      },
+      {
+        "id": "s2",
+        "task": "Tag the same key with `Compliance=SOC2` so the compliance report picks it up.",
+        "hint": "The call is `kms tag-resource`. Tags are supplied as `TagKey=...,TagValue=...` pairs via `--tags`.",
+        "program": "aws",
+        "requirements": [
+          {
+            "id": "svc",
+            "kind": "positional",
+            "variants": [
+              "kms"
+            ],
+            "description": "kms                            KMS key management commands"
+          },
+          {
+            "id": "sub",
+            "kind": "positional",
+            "variants": [
+              "tag-resource"
+            ],
+            "description": "tag-resource                   add or overwrite tags on a CMK"
+          },
+          {
+            "id": "key",
+            "kind": "flag-value",
+            "variants": [
+              "--key-id"
+            ],
+            "value": "alias/app-data-key",
+            "description": "--key-id <value>               identifier of the KMS key to tag"
+          },
+          {
+            "id": "tags",
+            "kind": "flag-value",
+            "variants": [
+              "--tags"
+            ],
+            "value": "TagKey=Compliance,TagValue=SOC2",
+            "description": "--tags <value>                 one or more TagKey=...,TagValue=... pairs"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--tag-keys",
+            "description": "--tag-keys <value>             list of tag keys to remove (used by untag-resource)"
+          },
+          {
+            "flag": "--grant-tokens",
+            "description": "--grant-tokens <value>         list of grant tokens (used by encrypt/decrypt operations)"
+          },
+          {
+            "flag": "--description",
+            "description": "--description <value>          free-form description (set via update-key-description)"
+          }
+        ],
+        "successOutput": "",
+        "canonicalCommand": "aws kms tag-resource --key-id alias/app-data-key --tags TagKey=Compliance,TagValue=SOC2"
+      }
+    ],
+    "explanation": "**Skill 1.3.7 \u2014 Rotating encryption keys and renewing certificates.**\n\n- `enable-key-rotation` turns on **annual automatic** rotation of the key material for symmetric customer-managed keys. Rotation is transparent: ciphertext encrypted with prior key versions still decrypts correctly.\n- AWS-managed keys (e.g. `aws/s3`) rotate automatically on a ~1-year cadence and cannot be configured; only CMKs need the explicit call.\n- `--rotation-period-in-days` is supported only when the CMK was created with a custom period; leaving it unset gives the default 365 days, which satisfies most compliance frameworks.\n- Tagging is separate from rotation. SOC 2, PCI-DSS, and HIPAA audits commonly require the tag to drive automated evidence collection via Config or Audit Manager.",
+    "learningOutcomes": [
+      "Enable annual automatic rotation on a customer-managed KMS key",
+      "Differentiate between AWS-managed and customer-managed key rotation behaviour",
+      "Attach compliance tags to KMS resources via `tag-resource`"
+    ],
+    "realWorldValue": "Missing automatic rotation on CMKs is one of the most common audit findings; these two commands convert an audit finding into a clean line in the compliance report."
+  },
+  {
+    "id": "aws-asg-target-tracking-command-terminal",
+    "title": "Attach a Target-Tracking Scaling Policy to an Auto Scaling Group",
+    "description": "Attach a target-tracking scaling policy to `web-asg` that keeps the group at 50% average CPU, using a single `aws autoscaling` call.",
+    "type": "command-terminal",
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Cloud",
+    "version": 1,
+    "relatedExamCodes": [
+      "SAA-C03"
+    ],
+    "labCategory": "Implement",
+    "technologies": [
+      "EC2 Auto Scaling",
+      "CloudWatch",
+      "ALB"
+    ],
+    "scenario": "Capacity planning asked for a target-tracking policy on `web-asg` that targets 50% average CPU. The target-tracking config JSON is already at `tt.json`. Run the single command that registers the policy.",
+    "prompt": "aws-user@lab:~$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Register a `TargetTrackingScaling` policy named `cpu50` on `web-asg`, pointing at the JSON file `tt.json`.",
+        "hint": "The call is `autoscaling put-scaling-policy`. `--policy-type TargetTrackingScaling` and `--target-tracking-configuration file://...` are both required. Flags like `--scaling-adjustment` and `--step-adjustments` belong to SimpleScaling / StepScaling policies, not target tracking.",
+        "program": "aws",
+        "requirements": [
+          {
+            "id": "svc",
+            "kind": "positional",
+            "variants": [
+              "autoscaling"
+            ],
+            "description": "autoscaling                    EC2 Auto Scaling commands"
+          },
+          {
+            "id": "sub",
+            "kind": "positional",
+            "variants": [
+              "put-scaling-policy"
+            ],
+            "description": "put-scaling-policy             create or update a scaling policy"
+          },
+          {
+            "id": "asg",
+            "kind": "flag-value",
+            "variants": [
+              "--auto-scaling-group-name"
+            ],
+            "value": "web-asg",
+            "description": "--auto-scaling-group-name <value>  name of the Auto Scaling group"
+          },
+          {
+            "id": "name",
+            "kind": "flag-value",
+            "variants": [
+              "--policy-name"
+            ],
+            "value": "cpu50",
+            "description": "--policy-name <value>          name of the scaling policy"
+          },
+          {
+            "id": "ptype",
+            "kind": "flag-value",
+            "variants": [
+              "--policy-type"
+            ],
+            "value": "TargetTrackingScaling",
+            "description": "--policy-type <value>          SimpleScaling | StepScaling | TargetTrackingScaling | PredictiveScaling"
+          },
+          {
+            "id": "ttc",
+            "kind": "flag-value",
+            "variants": [
+              "--target-tracking-configuration"
+            ],
+            "value": "file://tt.json",
+            "description": "--target-tracking-configuration <value>  JSON body describing the target metric and value"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--scaling-adjustment",
+            "description": "--scaling-adjustment <value>   amount to add/remove (SimpleScaling only)"
+          },
+          {
+            "flag": "--step-adjustments",
+            "description": "--step-adjustments <value>     step adjustment list (StepScaling only)"
+          },
+          {
+            "flag": "--cooldown",
+            "description": "--cooldown <value>             cooldown seconds (SimpleScaling only; target tracking manages its own cooldown)"
+          },
+          {
+            "flag": "--adjustment-type",
+            "description": "--adjustment-type <value>      ChangeInCapacity | ExactCapacity | PercentChangeInCapacity (SimpleScaling/StepScaling only)"
+          }
+        ],
+        "successOutput": "{\n    \"PolicyARN\": \"arn:aws:autoscaling:eu-west-1:123456789012:scalingPolicy:1f5b\u2026:autoScalingGroupName/web-asg:policyName/cpu50\",\n    \"Alarms\": [\n        {\"AlarmName\": \"TargetTracking-web-asg-AlarmHigh-\u2026\", \"AlarmARN\": \"arn:aws:cloudwatch:eu-west-1:123456789012:alarm:\u2026\"},\n        {\"AlarmName\": \"TargetTracking-web-asg-AlarmLow-\u2026\",  \"AlarmARN\": \"arn:aws:cloudwatch:eu-west-1:123456789012:alarm:\u2026\"}\n    ]\n}",
+        "canonicalCommand": "aws autoscaling put-scaling-policy --auto-scaling-group-name web-asg --policy-name cpu50 --policy-type TargetTrackingScaling --target-tracking-configuration file://tt.json"
+      }
+    ],
+    "explanation": "**Skill 3.2.2 \u2014 Identifying metrics and conditions to perform scaling actions.**\n\n- **TargetTrackingScaling** is the default choice for most workloads: supply a target value for a single metric (ASG average CPU, ALB request count per target, \u2026) and AWS manages the step sizes and CloudWatch alarms for you.\n- The two alarms returned in the response (`AlarmHigh` / `AlarmLow`) are auto-created; you do **not** create them manually.\n- Simple and Step scaling require explicit `--scaling-adjustment` / `--step-adjustments` values and their own cooldowns; mixing those flags with a target-tracking policy is a common source of `ValidationError: \u2026` responses.\n- For ALB-based target tracking (e.g. `ALBRequestCountPerTarget`), the target group ARN is supplied **inside** the JSON body via `PredefinedMetricSpecification`.",
+    "learningOutcomes": [
+      "Attach a target-tracking scaling policy to an Auto Scaling group via the CLI",
+      "Identify which flags belong to SimpleScaling/StepScaling vs TargetTrackingScaling",
+      "Read the auto-created CloudWatch alarm response from `put-scaling-policy`"
+    ],
+    "realWorldValue": "Target tracking is the lowest-touch autoscaling strategy AWS offers; one `put-scaling-policy` call replaces dozens of lines of hand-rolled step policies and alarm definitions."
+  },
+  {
+    "id": "aws-rds-promote-replica-command-terminal",
+    "title": "Promote an RDS Read Replica with Explicit Backup Window",
+    "description": "Promote the cross-region read replica `orders-replica-eu` to a standalone primary, setting the backup retention and preferred backup window in the same call.",
+    "type": "command-terminal",
+    "difficulty": "advanced",
+    "platform": "AWS",
+    "category": "Cloud",
+    "version": 1,
+    "relatedExamCodes": [
+      "SAA-C03"
+    ],
+    "labCategory": "Implement",
+    "technologies": [
+      "RDS",
+      "Multi-Region",
+      "Backups"
+    ],
+    "scenario": "The eu-west-1 region is being promoted to primary for the Orders service. The existing read replica `orders-replica-eu` must become a standalone primary with a 7-day backup retention and a preferred backup window of 02:00\u201303:00 UTC. Run the single command that performs the promotion.",
+    "prompt": "aws-user@lab:~$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Promote `orders-replica-eu` with `--backup-retention-period 7` and `--preferred-backup-window 02:00-03:00`.",
+        "hint": "The call is `rds promote-read-replica`. Do NOT pass `--master-user-password`, `--skip-final-snapshot`, or `--apply-immediately` \u2014 none of those flags are accepted by this API.",
+        "program": "aws",
+        "requirements": [
+          {
+            "id": "svc",
+            "kind": "positional",
+            "variants": [
+              "rds"
+            ],
+            "description": "rds                            Relational Database Service commands"
+          },
+          {
+            "id": "sub",
+            "kind": "positional",
+            "variants": [
+              "promote-read-replica"
+            ],
+            "description": "promote-read-replica           promote a read replica to a standalone DB instance"
+          },
+          {
+            "id": "db",
+            "kind": "flag-value",
+            "variants": [
+              "--db-instance-identifier"
+            ],
+            "value": "orders-replica-eu",
+            "description": "--db-instance-identifier <value>  identifier of the read replica to promote"
+          },
+          {
+            "id": "retention",
+            "kind": "flag-value",
+            "variants": [
+              "--backup-retention-period"
+            ],
+            "value": "7",
+            "description": "--backup-retention-period <value>  number of days (0-35) to retain automated backups on the new primary"
+          },
+          {
+            "id": "window",
+            "kind": "flag-value",
+            "variants": [
+              "--preferred-backup-window"
+            ],
+            "value": "02:00-03:00",
+            "description": "--preferred-backup-window <value>  UTC backup window in hh24:mi-hh24:mi format"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--master-user-password",
+            "description": "--master-user-password <value>  master password (set via modify-db-instance, not accepted here)"
+          },
+          {
+            "flag": "--skip-final-snapshot",
+            "description": "--skip-final-snapshot          skip final snapshot (belongs to delete-db-instance)"
+          },
+          {
+            "flag": "--apply-immediately",
+            "description": "--apply-immediately            apply changes without waiting for maintenance window (belongs to modify-db-instance)"
+          },
+          {
+            "flag": "--allocated-storage",
+            "description": "--allocated-storage <value>    storage size in GiB (belongs to create/modify-db-instance)"
+          }
+        ],
+        "successOutput": "{\n    \"DBInstance\": {\n        \"DBInstanceIdentifier\": \"orders-replica-eu\",\n        \"DBInstanceStatus\": \"modifying\",\n        \"ReadReplicaSourceDBInstanceIdentifier\": \"\",\n        \"BackupRetentionPeriod\": 7,\n        \"PreferredBackupWindow\": \"02:00-03:00\",\n        \"Engine\": \"postgres\",\n        \"EngineVersion\": \"15.6\"\n    }\n}",
+        "canonicalCommand": "aws rds promote-read-replica --db-instance-identifier orders-replica-eu --backup-retention-period 7 --preferred-backup-window 02:00-03:00"
+      }
+    ],
+    "explanation": "**Skill 2.2.6 \u2014 Selecting an appropriate DR strategy.**\n\n- `promote-read-replica` is **asynchronous and irreversible**. Once promoted, the instance becomes a standalone primary and cannot be demoted back to a replica.\n- The API accepts only the three configuration flags used here plus `--db-instance-identifier`. Flags that look plausible (password rotation, storage sizing, snapshot control) live on `modify-db-instance` or `delete-db-instance` and will error if supplied here.\n- During promotion, applications pointing at the replica endpoint experience a brief read-only period (usually <60 s) while the instance detaches from the source.\n- For Multi-AZ DR designs, always promote **after** confirming `ReadReplicaStatus` is `replicating` with near-zero lag; promoting a lagging replica loses the unreplicated transactions permanently.",
+    "learningOutcomes": [
+      "Promote an RDS read replica to a standalone instance with correct post-promotion settings",
+      "Identify which flags belong to `modify-db-instance` / `delete-db-instance` vs `promote-read-replica`",
+      "Understand that promotion is asynchronous and irreversible"
+    ],
+    "realWorldValue": "Replica promotion is the central operation in any RDS disaster-recovery runbook; getting the flags right under time pressure is what separates a clean failover from a multi-hour outage."
+  },
+  {
+    "id": "aws-s3-crr-setup-terminal-replay",
+    "title": "Enable S3 Cross-Region Replication for DR",
+    "description": "Queue the correct sequence of `aws s3api` calls that stand up Cross-Region Replication from `orders-primary` (eu-west-1) to a new `orders-backup-us` (us-east-1) bucket, and reject the destructive distractors.",
+    "type": "terminal-replay",
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Cloud",
+    "version": 1,
+    "relatedExamCodes": [
+      "SAA-C03"
+    ],
+    "labCategory": "Implement",
+    "technologies": [
+      "S3",
+      "S3 CRR",
+      "Multi-Region",
+      "IAM"
+    ],
+    "scenario": "Compliance requires a cross-region copy of every object in `orders-primary`. Build the DR replication pipeline in the correct order: create the destination bucket in us-east-1, enable versioning on both buckets, attach the replication rule, then prove it works with a test object. Three distractors in the queue would either replicate into the wrong bucket, break versioning, or delete the source \u2014 do not run them.",
+    "prompt": "aws-user@lab:~$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "aws s3api create-bucket --bucket orders-backup-us --region us-east-1 --create-bucket-configuration LocationConstraint=us-east-1",
+        "successOutput": "{\n    \"Location\": \"http://orders-backup-us.s3.amazonaws.com/\"\n}",
+        "errorOutput": "Start by creating the destination bucket; CRR rules cannot be applied to a bucket that does not exist yet."
+      },
+      {
+        "id": "c2",
+        "command": "aws s3api put-bucket-versioning --bucket orders-primary --versioning-configuration Status=Enabled",
+        "successOutput": "",
+        "errorOutput": "Enable versioning on the source bucket before configuring replication \u2014 CRR requires versioning on both sides.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "aws s3api put-bucket-versioning --bucket orders-backup-us --versioning-configuration Status=Enabled",
+        "successOutput": "",
+        "errorOutput": "The destination bucket must also have versioning enabled before the replication rule is attached.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "aws s3api put-bucket-replication --bucket orders-primary --replication-configuration file://crr.json",
+        "successOutput": "",
+        "errorOutput": "Cannot attach replication rule until both buckets exist and both have versioning enabled.",
+        "mustFollowIds": [
+          "c3"
+        ]
+      },
+      {
+        "id": "c5",
+        "command": "aws s3api put-object --bucket orders-primary --key test.txt --body test.txt",
+        "successOutput": "{\n    \"ETag\": \"\\\"9e107d9d372bb6826bd81d3542a419d6\\\"\",\n    \"VersionId\": \"3sL.vnyTS1Ku4wqtb8.0pqSgo0fR5Hba\"\n}",
+        "errorOutput": "Use a real put-object to trigger the replication pipeline; only versioned objects replicate.",
+        "mustFollowIds": [
+          "c4"
+        ]
+      },
+      {
+        "id": "c6",
+        "command": "aws s3api head-object --bucket orders-backup-us --key test.txt",
+        "successOutput": "{\n    \"ContentLength\": 12,\n    \"ETag\": \"\\\"9e107d9d372bb6826bd81d3542a419d6\\\"\",\n    \"ReplicationStatus\": \"REPLICA\",\n    \"VersionId\": \"X2sNBZ\u2026\"\n}",
+        "errorOutput": "head-object on the destination confirms replication completed; run the put-object first.",
+        "mustFollowIds": [
+          "c5"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "aws s3api put-bucket-versioning --bucket orders-primary --versioning-configuration Status=Suspended",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Suspending versioning on the source breaks CRR \u2014 AWS will stop replicating and existing versions become frozen. Never suspend versioning on a replication source.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "aws s3api put-bucket-replication --bucket orders-primary --replication-configuration file://crr-same-bucket.json",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: This rule points the destination back at `orders-primary` (the source). S3 rejects same-bucket replication; even if it did not, the copy would defeat the DR goal.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "aws s3api delete-bucket --bucket orders-primary",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Deleting the source bucket is the exact opposite of the goal. Production-destructive command.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Skill 2.2.5 \u2014 Implementing strategies to ensure the durability and availability of data.**\n\n**Prerequisites for CRR:**\n1. **Versioning on both buckets.** CRR operates on object versions; without versioning, there are no versions to replicate.\n2. **An IAM role** (referenced in the replication configuration JSON) with `s3:GetObjectVersionForReplication` on the source and `s3:ReplicateObject` on the destination.\n3. **Existing buckets in different regions** for CRR (same-region is SRR and uses the same API).\n\n**Why the order matters:**\n- Creating the destination first means the replication rule can be attached without the API rejecting an unknown bucket.\n- Enabling versioning on both buckets **before** attaching the rule prevents a partial-setup window where new objects would be missed.\n- Only new objects (those written **after** the rule is attached) replicate by default. Historical objects require a separate batch-replication job.",
+    "learningOutcomes": [
+      "Sequence the AWS CLI calls required to configure Cross-Region Replication",
+      "Recognise that versioning on both source and destination is non-negotiable for CRR",
+      "Identify operations that would break or reverse replication (suspension, same-bucket rules, source deletion)"
+    ],
+    "realWorldValue": "Regulated industries frequently require cross-region copies of customer data; knowing the exact order of operations saves hours of debugging when the first test object fails to appear in the backup region."
+  },
+  {
+    "id": "aws-secrets-manager-rotation-terminal-replay",
+    "title": "Rotate an RDS Credential with AWS Secrets Manager",
+    "description": "Create a Secrets Manager secret for RDS credentials, attach a rotation Lambda, trigger a manual rotation, and verify the new version. Reject the distractors that would store the password in plaintext or delete the secret with no recovery window.",
+    "type": "terminal-replay",
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Cloud",
+    "version": 1,
+    "relatedExamCodes": [
+      "SAA-C03",
+      "SCS-C03"
+    ],
+    "labCategory": "Implement",
+    "technologies": [
+      "Secrets Manager",
+      "RDS",
+      "Lambda",
+      "KMS"
+    ],
+    "scenario": "The security team is migrating the `prod/db/creds` password off a hard-coded environment variable and onto Secrets Manager with 30-day automatic rotation. The rotation Lambda `RotateDbCreds` is already deployed. Queue the four correct commands in order and leave the three distractors alone.",
+    "prompt": "aws-user@lab:~$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "aws secretsmanager create-secret --name prod/db/creds --secret-string file://creds.json",
+        "successOutput": "{\n    \"ARN\": \"arn:aws:secretsmanager:eu-west-1:123456789012:secret:prod/db/creds-aB3Xy9\",\n    \"Name\": \"prod/db/creds\",\n    \"VersionId\": \"EXAMPLE1-90ab-cdef-fedc-ba987SECRET1\"\n}",
+        "errorOutput": "Create the secret first \u2014 rotation can only be attached to an existing secret."
+      },
+      {
+        "id": "c2",
+        "command": "aws secretsmanager rotate-secret --secret-id prod/db/creds --rotation-lambda-arn arn:aws:lambda:eu-west-1:123456789012:function:RotateDbCreds --rotation-rules AutomaticallyAfterDays=30",
+        "successOutput": "{\n    \"ARN\": \"arn:aws:secretsmanager:eu-west-1:123456789012:secret:prod/db/creds-aB3Xy9\",\n    \"Name\": \"prod/db/creds\",\n    \"VersionId\": \"EXAMPLE2-rotating\"\n}",
+        "errorOutput": "Attach the rotation Lambda and schedule before you expect rotation to run.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "aws secretsmanager rotate-secret --secret-id prod/db/creds",
+        "successOutput": "{\n    \"ARN\": \"arn:aws:secretsmanager:eu-west-1:123456789012:secret:prod/db/creds-aB3Xy9\",\n    \"Name\": \"prod/db/creds\",\n    \"VersionId\": \"EXAMPLE3-new-current\"\n}",
+        "errorOutput": "Trigger an immediate rotation only after the rotation Lambda is attached.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "aws secretsmanager get-secret-value --secret-id prod/db/creds --version-stage AWSCURRENT",
+        "successOutput": "{\n    \"ARN\": \"arn:aws:secretsmanager:eu-west-1:123456789012:secret:prod/db/creds-aB3Xy9\",\n    \"Name\": \"prod/db/creds\",\n    \"VersionId\": \"EXAMPLE3-new-current\",\n    \"SecretString\": \"{\\\"username\\\":\\\"app\\\",\\\"password\\\":\\\"<redacted-new>\\\"}\",\n    \"VersionStages\": [\"AWSCURRENT\"]\n}",
+        "errorOutput": "Verify the new version after the manual rotation completes.",
+        "mustFollowIds": [
+          "c3"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "aws ssm put-parameter --name /prod/db/password --type String --value hunter2",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Storing a database password as a plain `String` SSM parameter leaks it to anyone with ssm:GetParameter. Use Secrets Manager (or at minimum SecureString) for credentials.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "aws secretsmanager delete-secret --secret-id prod/db/creds --force-delete-without-recovery",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: --force-delete-without-recovery permanently deletes the secret with no undo. Always use the default 30-day recovery window on production secrets.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "aws secretsmanager rotate-secret --secret-id prod/db/creds --rotation-lambda-arn arn:aws:lambda:eu-west-1:123456789012:function:RotateDbCreds --rotation-rules AutomaticallyAfterDays=30",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Running rotate-secret before create-secret fails with ResourceNotFoundException. Ordering matters.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Skill 1.3.7 \u2014 Rotating encryption keys and renewing certificates.**\n\n**Why Secrets Manager over SSM Parameter Store for credentials:**\n- Built-in rotation via managed or custom Lambda functions.\n- Cross-account sharing via resource policy.\n- Audit trail in CloudTrail with full request context.\n\n**The four-step pattern:**\n1. `create-secret` registers the credential and (optionally) encrypts it with a customer-managed CMK.\n2. `rotate-secret` with `--rotation-lambda-arn` + `--rotation-rules` schedules rotation; the first manual rotation runs as part of this call only if `--rotation-rules` is omitted \u2014 best practice is to trigger a separate explicit rotation afterwards.\n3. The second `rotate-secret` (no schedule flags) forces an immediate rotation so you can verify end-to-end wiring before leaving it to the schedule.\n4. `get-secret-value` with `--version-stage AWSCURRENT` confirms the new version is now current (previous version moves to `AWSPREVIOUS`).\n\n**The distractors:**\n- `ssm put-parameter --type String` is the classic credential-in-plaintext antipattern.\n- `--force-delete-without-recovery` bypasses the 7\u201330 day recovery window and is only appropriate for ephemeral test secrets.",
+    "learningOutcomes": [
+      "Stand up a Secrets Manager secret with automatic rotation via the CLI",
+      "Trigger and verify a manual rotation before leaving rotation to the schedule",
+      "Recognise unsafe credential-handling patterns (plaintext SSM, force-delete)"
+    ],
+    "realWorldValue": "Moving static database passwords to Secrets Manager is the single highest-impact credential-hygiene improvement most organisations can make; this four-command sequence is the exact runbook for it."
+  },
+  {
+    "id": "aws-vpc-peering-cross-account-terminal-replay",
+    "title": "Stand Up a Cross-Account VPC Peering Connection",
+    "description": "Queue the correct sequence of `aws ec2` commands that creates a cross-account VPC peering connection and wires the routing tables on both sides \u2014 without opening the routes to 0.0.0.0/0 or deleting the peer VPC.",
+    "type": "terminal-replay",
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Cloud",
+    "version": 1,
+    "relatedExamCodes": [
+      "SAA-C03"
+    ],
+    "labCategory": "Implement",
+    "technologies": [
+      "VPC",
+      "VPC Peering",
+      "Route Tables",
+      "IAM"
+    ],
+    "scenario": "Account A (requester, 111111111111, `vpc-0aaaa1111`, 10.10.0.0/16) needs a peering connection with Account B (accepter, 222222222222, `vpc-0bbbb2222`, 10.20.0.0/16). CLI profiles `requester` and `accepter` are already configured. Build the peering, accept it from the other side, and add only the specific CIDR routes needed \u2014 nothing wider.",
+    "prompt": "aws-user@lab:~$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "aws ec2 describe-vpcs --vpc-ids vpc-0aaaa1111 --profile requester",
+        "successOutput": "{\n    \"Vpcs\": [{\"VpcId\": \"vpc-0aaaa1111\", \"CidrBlock\": \"10.10.0.0/16\", \"OwnerId\": \"111111111111\"}]\n}",
+        "errorOutput": "Confirm the requester VPC CIDR before creating a peering connection \u2014 overlapping CIDRs cannot be peered."
+      },
+      {
+        "id": "c2",
+        "command": "aws ec2 describe-vpcs --vpc-ids vpc-0bbbb2222 --profile accepter",
+        "successOutput": "{\n    \"Vpcs\": [{\"VpcId\": \"vpc-0bbbb2222\", \"CidrBlock\": \"10.20.0.0/16\", \"OwnerId\": \"222222222222\"}]\n}",
+        "errorOutput": "Confirm the accepter VPC CIDR to rule out overlap before proceeding.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "aws ec2 create-vpc-peering-connection --vpc-id vpc-0aaaa1111 --peer-owner-id 222222222222 --peer-vpc-id vpc-0bbbb2222 --peer-region eu-west-1 --profile requester",
+        "successOutput": "{\n    \"VpcPeeringConnection\": {\n        \"VpcPeeringConnectionId\": \"pcx-0ccc33334444\",\n        \"Status\": {\"Code\": \"initiating-request\"}\n    }\n}",
+        "errorOutput": "Initiate the peering from the requester side after confirming both CIDRs.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "aws ec2 accept-vpc-peering-connection --vpc-peering-connection-id pcx-0ccc33334444 --profile accepter",
+        "successOutput": "{\n    \"VpcPeeringConnection\": {\n        \"VpcPeeringConnectionId\": \"pcx-0ccc33334444\",\n        \"Status\": {\"Code\": \"active\"}\n    }\n}",
+        "errorOutput": "Acceptance must be issued from the accepter account, not the requester.",
+        "mustFollowIds": [
+          "c3"
+        ]
+      },
+      {
+        "id": "c5",
+        "command": "aws ec2 create-route --route-table-id rtb-0aaaaaaa --destination-cidr-block 10.20.0.0/16 --vpc-peering-connection-id pcx-0ccc33334444 --profile requester",
+        "successOutput": "{\n    \"Return\": true\n}",
+        "errorOutput": "Add the route on the requester side pointing at the accepter CIDR only \u2014 do not widen it.",
+        "mustFollowIds": [
+          "c4"
+        ]
+      },
+      {
+        "id": "c6",
+        "command": "aws ec2 create-route --route-table-id rtb-0bbbbbbb --destination-cidr-block 10.10.0.0/16 --vpc-peering-connection-id pcx-0ccc33334444 --profile accepter",
+        "successOutput": "{\n    \"Return\": true\n}",
+        "errorOutput": "Add the symmetric route on the accepter side \u2014 peering is not transitive, both sides must have their own route.",
+        "mustFollowIds": [
+          "c5"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "aws ec2 create-route --route-table-id rtb-0aaaaaaa --destination-cidr-block 0.0.0.0/0 --vpc-peering-connection-id pcx-0ccc33334444 --profile requester",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: A 0.0.0.0/0 route through a peering connection is a broad misconfiguration \u2014 peering does not carry internet traffic and this would silently black-hole egress. Scope routes to the specific peer CIDR only.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "aws ec2 delete-vpc --vpc-id vpc-0bbbb2222 --profile accepter",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Deleting the accepter VPC destroys the peer. Production-destructive.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "aws ec2 accept-vpc-peering-connection --vpc-peering-connection-id pcx-0ccc33334444 --profile requester",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: The requester cannot accept its own peering request. Acceptance must come from the accepter account.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Skill 1.2.1 \u2014 VPC architectures with security components. Skill 3.4.1 \u2014 Network topology for hybrid/multi-tier architectures.**\n\n**Cross-account peering mechanics:**\n- Initiation is from the requester (`create-vpc-peering-connection --peer-owner-id --peer-vpc-id --peer-region`).\n- Acceptance must be from the accepter account (`accept-vpc-peering-connection`). The requester cannot self-accept.\n- Both route tables need explicit entries pointing at the peer CIDR. VPC peering is **non-transitive**: a route on one side does not automatically create the reverse.\n\n**Security scoping rules:**\n- Route destinations should be the specific peer CIDR (10.20.0.0/16 here), never a widened 0.0.0.0/0.\n- CIDR blocks on both sides must not overlap; overlapping blocks make peering impossible.\n- Security groups can reference security groups in the peer VPC via the peer account ID + security group ID \u2014 prefer this over CIDR-based SG rules for east-west traffic.",
+    "learningOutcomes": [
+      "Create and accept a cross-account VPC peering connection from the correct account profiles",
+      "Wire symmetric peer-scoped routes on both sides without widening to the internet",
+      "Identify destructive or security-violating peering operations"
+    ],
+    "realWorldValue": "Cross-account peering is the default mechanism for wiring shared services between VPCs in an AWS Organization; this sequence is the same one every landing-zone automation uses under the hood."
+  },
+  {
+    "id": "aws-multi-region-dr-failover-terminal-replay",
+    "title": "Execute a Multi-Region DR Failover via the AWS CLI",
+    "description": "Queue the correct sequence of commands to fail over the Orders service from eu-west-1 to us-east-1: verify replica lag, promote the replica, flip Route 53, and verify health. Reject the distractors that would destroy the primary or cut DNS over too early.",
+    "type": "terminal-replay",
+    "difficulty": "advanced",
+    "platform": "AWS",
+    "category": "Cloud",
+    "version": 1,
+    "relatedExamCodes": [
+      "SAA-C03"
+    ],
+    "labCategory": "Troubleshoot",
+    "technologies": [
+      "RDS",
+      "Route 53",
+      "Multi-Region DR"
+    ],
+    "scenario": "eu-west-1 has lost power and the Orders service must be failed over to us-east-1 within the RTO of 15 minutes. The cross-region RDS replica `orders-replica-dr` sits in us-east-1; a Route 53 failover record with health check `abc-123` is already defined. Run the four commands in order and leave the destructive distractors alone.",
+    "prompt": "aws-user@lab:~$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "aws rds describe-db-instances --db-instance-identifier orders-replica-dr --region us-east-1 --query \"DBInstances[0].StatusInfos\"",
+        "successOutput": "[\n    {\"StatusType\": \"read replication\", \"Normal\": true, \"Status\": \"replicating\", \"Message\": \"\"}\n]",
+        "errorOutput": "Confirm the DR replica is `replicating` with near-zero lag before promoting \u2014 promoting a lagging replica loses unreplicated transactions."
+      },
+      {
+        "id": "c2",
+        "command": "aws rds promote-read-replica --db-instance-identifier orders-replica-dr --region us-east-1",
+        "successOutput": "{\n    \"DBInstance\": {\n        \"DBInstanceIdentifier\": \"orders-replica-dr\",\n        \"DBInstanceStatus\": \"modifying\",\n        \"ReadReplicaSourceDBInstanceIdentifier\": \"\"\n    }\n}",
+        "errorOutput": "Only promote the replica once you have confirmed it is `replicating` cleanly.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "aws rds describe-db-instances --db-instance-identifier orders-replica-dr --region us-east-1 --query \"DBInstances[0].DBInstanceStatus\"",
+        "successOutput": "\"available\"",
+        "errorOutput": "Poll DBInstanceStatus until it returns \"available\" before flipping DNS \u2014 otherwise traffic lands on an instance that is still promoting.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "aws route53 change-resource-record-sets --hosted-zone-id Z1234567890ABC --change-batch file://dr-failover.json",
+        "successOutput": "{\n    \"ChangeInfo\": {\n        \"Id\": \"/change/C01234567ABCDEF\",\n        \"Status\": \"PENDING\",\n        \"SubmittedAt\": \"2026-04-20T11:12:33.000Z\"\n    }\n}",
+        "errorOutput": "Flip the Route 53 failover record only after the DR instance is `available`.",
+        "mustFollowIds": [
+          "c3"
+        ]
+      },
+      {
+        "id": "c5",
+        "command": "aws route53 get-health-check-status --health-check-id abc-123",
+        "successOutput": "{\n    \"HealthCheckObservations\": [\n        {\"Region\": \"us-east-1\", \"IPAddress\": \"\u2026\", \"StatusReport\": {\"Status\": \"Success: HTTP Status Code 200\"}}\n    ]\n}",
+        "errorOutput": "Verify the health check is reporting healthy after the DNS flip to close out the failover.",
+        "mustFollowIds": [
+          "c4"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "aws rds delete-db-instance --db-instance-identifier orders-primary --skip-final-snapshot --region eu-west-1",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Deleting the primary with --skip-final-snapshot during a failover throws away the last known-good state. If the eu-west-1 outage proves transient you lose the option to fail back.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "aws route53 change-resource-record-sets --hosted-zone-id Z1234567890ABC --change-batch file://dr-failover.json",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Flipping DNS before the replica has finished promoting points live traffic at an instance that is still in `modifying` state. Wait for `available` first.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "aws rds promote-read-replica --db-instance-identifier orders-replica-dr --region eu-west-1",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: The DR replica lives in us-east-1, not eu-west-1. Promoting in the failed region is a no-op at best and confuses the runbook.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Skill 2.2.6 \u2014 Selecting an appropriate DR strategy.**\n\n**The pilot-light / warm-standby DR pattern:**\n1. **Verify replica health** \u2014 `describe-db-instances` on the replica confirms `read replication` status is `replicating` and lag is acceptable. A promoted lagging replica loses unreplicated transactions permanently.\n2. **Promote** \u2014 `promote-read-replica` is asynchronous and irreversible. The instance transitions through `modifying` before becoming a standalone primary.\n3. **Wait for `available`** \u2014 polling DBInstanceStatus is non-negotiable; DNS cutover before `available` routes real traffic to an instance that still rejects writes.\n4. **Flip DNS** \u2014 Route 53 failover records switch based on health-check state. Pushing a manual change forces the flip even if the primary health check has not yet marked unhealthy.\n5. **Verify** \u2014 `get-health-check-status` closes out the runbook by proving the failover target is healthy.\n\n**Irreversible / destructive operations to avoid under time pressure:**\n- Deleting the old primary removes the fail-back option if the outage proves transient.\n- Skipping the `available` check to save 30 seconds is a common cause of two-hour outages turning into six-hour ones.\n- Executing the promotion in the wrong region wastes minutes during an active incident.",
+    "learningOutcomes": [
+      "Execute the correct command order for an RDS + Route 53 cross-region failover",
+      "Verify replica state before and instance state after a promotion",
+      "Recognise irreversible operations that should be deferred until after recovery is confirmed"
+    ],
+    "realWorldValue": "Multi-region DR runbooks are the difference between a 15-minute RTO and a front-page incident; this is the exact sequence operators run under time pressure when an entire region goes dark."
   }
 ]

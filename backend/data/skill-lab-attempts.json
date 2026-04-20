@@ -577,5 +577,15 @@
     "correct": true,
     "timeTaken": 105,
     "createdAt": "2026-04-19T21:50:14.447Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "d69f4279-131f-4866-95a0-25711c58b183",
+    "labId": "comptia-hydra-ssh-brute",
+    "labType": "unknown",
+    "selectedAnswer": "a3",
+    "correct": false,
+    "timeTaken": 36,
+    "createdAt": "2026-04-20T07:29:53.277Z"
   }
 ]

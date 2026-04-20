@@ -16,8 +16,6 @@ interface TerminalLine {
   text: string
 }
 
-const PROMPT = 'aws-user@lab:~$ '
-
 interface CliProgress {
   lines: TerminalLine[]
   commandHistory: string[]
@@ -28,6 +26,8 @@ interface CliProgress {
 export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
   const { setRoute } = useExam()
   const session = useLabSession<CliProgress>({ lab, timed })
+
+  const PROMPT = lab.prompt ?? 'aws-user@lab:~$ '
 
   const defaultLines: TerminalLine[] = [
     { type: 'output', text: '# This is not a real terminal. A limited set of commands is available.' },
@@ -104,28 +104,29 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
     const newLines: TerminalLine[] = [{ type: 'prompt', text: `${PROMPT}${trimmed}` }]
 
     if (trimmed.toLowerCase() === 'help') {
-      newLines.push({ type: 'output', text: 'Available command categories:' })
+      const categorized = new Map<string, string[]>()
+      const uncategorized: string[] = []
+      for (const cmd of lab.commands) {
+        if (cmd.category) {
+          if (!categorized.has(cmd.category)) categorized.set(cmd.category, [])
+          categorized.get(cmd.category)!.push(cmd.command)
+        } else {
+          uncategorized.push(cmd.command)
+        }
+      }
+      const hasCategories = categorized.size > 0
+      newLines.push({ type: 'output', text: hasCategories ? 'Available command categories:' : 'Available commands:' })
       newLines.push({ type: 'output', text: '' })
-      newLines.push({ type: 'output', text: '  Identity & Caller' })
-      newLines.push({ type: 'output', text: '    aws sts get-caller-identity' })
-      newLines.push({ type: 'output', text: '' })
-      newLines.push({ type: 'output', text: '  IAM' })
-      newLines.push({ type: 'output', text: '    aws iam get-user' })
-      newLines.push({ type: 'output', text: '    aws iam list-attached-user-policies --user-name <username>' })
-      newLines.push({ type: 'output', text: '    aws iam simulate-principal-policy --policy-source-arn <arn> --action-names <action> --resource-arns <arn>' })
-      newLines.push({ type: 'output', text: '' })
-      newLines.push({ type: 'output', text: '  S3 Bucket Inspection' })
-      newLines.push({ type: 'output', text: '    aws s3 ls' })
-      newLines.push({ type: 'output', text: '    aws s3 ls s3://<bucket>' })
-      newLines.push({ type: 'output', text: '    aws s3api get-bucket-acl --bucket <bucket>' })
-      newLines.push({ type: 'output', text: '    aws s3api get-bucket-policy --bucket <bucket>' })
-      newLines.push({ type: 'output', text: '    aws s3api get-bucket-encryption --bucket <bucket>' })
-      newLines.push({ type: 'output', text: '    aws s3api get-public-access-block --bucket <bucket>' })
-      newLines.push({ type: 'output', text: '    aws s3api get-bucket-versioning --bucket <bucket>' })
-      newLines.push({ type: 'output', text: '' })
-      newLines.push({ type: 'output', text: '  Organizations' })
-      newLines.push({ type: 'output', text: '    aws organizations describe-organization' })
-      newLines.push({ type: 'output', text: '' })
+      for (const [cat, cmds] of categorized) {
+        newLines.push({ type: 'output', text: `  ${cat}` })
+        for (const cmd of cmds) newLines.push({ type: 'output', text: `    ${cmd}` })
+        newLines.push({ type: 'output', text: '' })
+      }
+      if (uncategorized.length > 0) {
+        if (hasCategories) newLines.push({ type: 'output', text: '  Other' })
+        for (const cmd of uncategorized) newLines.push({ type: 'output', text: `  ${cmd}` })
+        newLines.push({ type: 'output', text: '' })
+      }
       newLines.push({ type: 'output', text: 'Builtins: help, clear' })
     } else if (trimmed.toLowerCase() === 'clear') {
       setLines(defaultLines)

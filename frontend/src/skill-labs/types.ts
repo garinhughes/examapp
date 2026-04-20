@@ -64,11 +64,13 @@ export interface LabEdge {
 export interface CliCommand {
   command: string
   output: string
+  category?: string
 }
 
 export interface CliLabDefinition extends LabSummary {
   type: 'cli'
   scenario: string
+  prompt?: string
   commands: CliCommand[]
   expectedCommands: string[]
   answers: LabAnswer[]

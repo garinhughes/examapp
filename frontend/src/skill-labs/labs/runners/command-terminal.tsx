@@ -105,10 +105,14 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
   const session = useLabSession<Progress>({ lab, timed })
 
   const defaultLines: Line[] = [
-    { kind: 'info', text: '# RHEL 10 practice terminal. Type each command to complete the task.' },
+    { kind: 'info', text: '# Practice terminal. Type each command to complete the task.' },
     { kind: 'info', text: '# Tip: type `<command> --help` to list available flags. Not every flag you see is needed.' },
     { kind: 'output', text: '' },
   ]
+
+  const promptLines = lab.prompt.split('\n')
+  const promptPrefix = promptLines.length > 1 ? promptLines.slice(0, -1).join('\n') : ''
+  const promptSuffix = promptLines[promptLines.length - 1]
 
   const [lines, setLines] = useState<Line[]>(session.savedProgress?.lines ?? defaultLines)
   const [input, setInput] = useState('')
@@ -313,8 +317,12 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
           </div>
         ))}
         {!session.submitted && !allDone && (
-          <div className="flex items-center">
-            <span className="text-cyan-400 whitespace-pre">{lab.prompt} </span>
+          <div>
+            {promptPrefix && (
+              <div className="text-cyan-400 whitespace-pre">{promptPrefix}</div>
+            )}
+            <div className="flex items-center">
+            <span className="text-cyan-400 whitespace-pre">{promptSuffix} </span>
             <input
               ref={inputRef}
               className="flex-1 bg-transparent outline-none border-none text-green-300 font-mono text-sm caret-green-300"
@@ -326,6 +334,7 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
               autoComplete="off"
               autoCapitalize="off"
             />
+            </div>
           </div>
         )}
         <div ref={termEndRef} />

