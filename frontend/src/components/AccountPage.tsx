@@ -764,7 +764,7 @@ export default function AccountPage() {
             </div>
           )}
 
-          {/* Manage billing (Stripe only — PayPal users manage in PayPal) */}
+          {/* Manage billing */}
           {isPaidTier(tier) && entitlementDetails.some((e) => e.source === 'stripe' && e.status === 'active') && (
             <div className="p-4 rounded-lg border border-border bg-card">
               <h3 className="text-sm font-semibold mb-1 text-muted-foreground">Manage billing</h3>

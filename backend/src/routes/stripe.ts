@@ -18,7 +18,7 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import crypto from 'crypto'
 import { getProduct } from '../catalog.js'
-import { grantEntitlement, revokeEntitlement, getUserEntitlements, setEntitlementExpiresAt } from '../services/entitlements.js'
+import { grantEntitlement, revokeEntitlement, getUserEntitlements, setEntitlementExpiresAt, mergeEntitlementMeta } from '../services/entitlements.js'
 import { getUserBySub } from '../services/dynamo.js'
 import { sendPaymentConfirmedEmail, sendInternalAlert, sendRefundedEmail, sendSubscriptionCancelledEmail, sendSubscriptionChangedEmail, sendSubscriptionEndedEmail, sendPaymentFailedEmail } from '../services/ses.js'
 import { logEmailSend } from '../services/emailLogs.js'
@@ -145,15 +145,22 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         products.push(prod)
       }
 
-      const proto = (request.headers['x-forwarded-proto'] as string) || 'http'
-      const host = request.headers.host || `localhost:${process.env.PORT || 3000}`
-      const base = `${proto}://${host}`
-      const successRedirect = successUrl || `${base}/payments/success`
-      const cancelRedirect = cancelUrl || `${base}/payments/cancel`
+      const frontendBase = process.env.FRONTEND_ORIGIN || `http://localhost:${process.env.PORT || 5173}`
+      const successRedirect = successUrl || `${frontendBase}/?payment=success`
+      const cancelRedirect = cancelUrl || `${frontendBase}/?payment=cancel`
 
       const subProduct = products.find((p) => p.kind === 'subscription')
       if (!subProduct) {
         return reply.status(400).send({ message: 'Only subscription products are supported' })
+      }
+
+      // Block duplicate checkout for the same plan — prevents accidental double-charge.
+      // Cross-plan (e.g. pro → pro-plus) is allowed; use /upgrade-subscription for that.
+      if (userId) {
+        const existing = await getUserEntitlements(userId)
+        if (existing.some((e) => e.productId === subProduct.productId && e.status === 'active')) {
+          return reply.status(409).send({ message: `You already have an active ${subProduct.label} subscription.` })
+        }
       }
 
       try {
@@ -573,8 +580,37 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
               statusChanged,
             }, '[stripe] subscription.updated — state changed')
 
-            // Only alert on changes that likely came from the Stripe dashboard (i.e. not matching
-            // what our /upgrade-subscription + /cancel-subscription flows already log).
+            // User cancelled via the Stripe Customer Portal (cancel_at_period_end flipped to true).
+            // Skip if the in-app cancel route already sent the email (stamped cancelNotifiedAt).
+            if (cancelFlagChanged && sub.cancel_at_period_end === true && userId) {
+              try {
+                const ents = await getUserEntitlements(userId)
+                const subEnt = ents.find((e) => e.stripeSubscriptionId === sub.id)
+                if (subEnt && !subEnt.meta?.cancelNotifiedAt) {
+                  const user = await getUserBySub(userId)
+                  if (user?.email) {
+                    const prod = getProduct(subEnt.productId)
+                    const periodEnd = getSubscriptionPeriodEnd(sub)
+                    const accessUntil = periodEnd ? new Date(periodEnd * 1000).toISOString() : null
+                    sendSubscriptionCancelledEmail({
+                      to: user.email,
+                      name: user.name ?? user.email,
+                      userId,
+                      productLabel: prod?.label ?? subEnt.productId,
+                      productId: subEnt.productId,
+                      accessUntil,
+                      source: 'stripe',
+                    }).catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] portal cancellation email failed'))
+                  }
+                } else {
+                  server.log.info({ subscriptionId: sub.id, userId }, '[stripe] cancellation email already sent by in-app route — skipping')
+                }
+              } catch (e: any) {
+                server.log.warn({ err: e?.message }, '[stripe] portal cancellation email lookup failed')
+              }
+            }
+
+            // Alert ops on price changes that likely came from the Stripe dashboard.
             if (priceChanged) {
               sendInternalAlert({
                 subject: '[stripe] subscription price changed (review required)',
@@ -651,6 +687,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
               accessUntil,
               source: 'stripe',
             }).catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] cancellation email failed'))
+            // Stamp so the subscription.updated webhook doesn't send a duplicate email
+            mergeEntitlementMeta(userId, subEnt.productId, { cancelNotifiedAt: new Date().toISOString() })
+              .catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] mergeEntitlementMeta cancelNotifiedAt failed'))
           }
         } catch (e: any) {
           server.log.warn({ err: e?.message }, '[stripe] cancellation email lookup failed')
@@ -810,9 +849,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         if (!customerId) {
           return reply.status(502).send({ message: 'Could not determine Stripe customer' })
         }
-        const proto = (request.headers['x-forwarded-proto'] as string) || 'https'
-        const host = request.headers.host || 'certshack.com'
-        const returnUrl = `${proto}://${host}/account?tab=purchases`
+        const returnUrl = `${process.env.FRONTEND_ORIGIN || 'https://certshack.com'}/account?tab=purchases`
         const portalSession = await stripePost('/billing_portal/sessions', {
           customer: customerId,
           return_url: returnUrl,

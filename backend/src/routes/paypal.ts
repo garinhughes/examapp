@@ -166,8 +166,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             brand_name: 'certshack',
             shipping_preference: 'NO_SHIPPING',
             user_action: 'SUBSCRIBE_NOW',
-            return_url: 'https://certshack.com/?payment=success',
-            cancel_url: 'https://certshack.com/?payment=cancel',
+            return_url: `${process.env.FRONTEND_ORIGIN || 'https://certshack.com'}/?payment=success`,
+            cancel_url: `${process.env.FRONTEND_ORIGIN || 'https://certshack.com'}/?payment=cancel`,
           },
         }),
       })

@@ -3,7 +3,7 @@
  * and checkout options: Stripe (card / Apple Pay / Google Pay) and PayPal.
  */
 
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
 import { Trash2, ShoppingCart, ArrowRight, ArrowUp } from 'lucide-react'
@@ -32,11 +32,14 @@ export default function BasketPage() {
     clarityEvent('checkout_page_viewed')
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
+
   const handleCheckout = () => {
     if (!user) {
       navigate('/login')
       return
     }
+    setCheckoutError(null)
     doCheckout()
   }
 
@@ -66,8 +69,12 @@ export default function BasketPage() {
       })
 
       if (!res.ok) {
-        const text = await res.text()
-        alert('Checkout failed: ' + res.status + '\n' + text)
+        const data = await res.json().catch(() => ({})) as any
+        if (res.status === 409) {
+          setCheckoutError(data.message ?? 'You already have an active subscription for this plan. Visit Account → Purchases to manage it.')
+        } else {
+          setCheckoutError(data.message ?? `Checkout failed (${res.status})`)
+        }
         return
       }
 
@@ -78,10 +85,10 @@ export default function BasketPage() {
         return
       }
 
-      alert('Unexpected response from payments API')
+      setCheckoutError('Unexpected response from payments API')
     } catch (err: any) {
       console.error('Checkout error', err)
-      alert('Checkout error: ' + String(err))
+      setCheckoutError('Checkout error: ' + String(err))
     }
   }
 
@@ -174,6 +181,9 @@ export default function BasketPage() {
               <Icon icon="logos:google-pay" className="h-6 w-auto" />
             </div>
 
+            {checkoutError && (
+              <p className="text-sm text-red-500 text-center -mb-1">{checkoutError}</p>
+            )}
             <button
               onClick={handleCheckout}
               className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition inline-flex items-center justify-center gap-2"

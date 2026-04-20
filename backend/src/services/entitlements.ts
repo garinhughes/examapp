@@ -124,6 +124,27 @@ export async function grantEntitlement(params: {
   return item
 }
 
+/** Merge fields into an entitlement's meta map (e.g. to stamp cancelNotifiedAt) */
+export async function mergeEntitlementMeta(userId: string, productId: string, fields: Record<string, string>): Promise<void> {
+  const setClauses = Object.keys(fields).map((k, i) => `meta.#f${i} = :v${i}`).join(', ')
+  const names = Object.fromEntries(Object.keys(fields).map((k, i) => [`#f${i}`, k]))
+  const values = Object.fromEntries(Object.keys(fields).map((k, i) => [`:v${i}`, fields[k]]))
+  try {
+    await ddb.send(
+      new UpdateCommand({
+        TableName: ENTITLEMENTS_TABLE,
+        Key: { userId, productId },
+        UpdateExpression: `SET ${setClauses}`,
+        ExpressionAttributeNames: names,
+        ExpressionAttributeValues: values,
+      })
+    )
+  } catch (err) {
+    console.warn('[entitlements] mergeEntitlementMeta failed', err)
+    throw err
+  }
+}
+
 /** Set expiresAt on an existing entitlement (e.g. scheduled downgrade at period end) */
 export async function setEntitlementExpiresAt(userId: string, productId: string, expiresAt: string): Promise<void> {
   try {
