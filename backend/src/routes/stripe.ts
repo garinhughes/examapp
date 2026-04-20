@@ -610,19 +610,27 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
               }
             }
 
-            // Alert ops on price changes that likely came from the Stripe dashboard.
+            // Alert ops on price changes only when the new price isn't a known catalog price —
+            // in-app upgrades/downgrades switch to known prices, so those don't need review.
             if (priceChanged) {
-              sendInternalAlert({
-                subject: '[stripe] subscription price changed (review required)',
-                lines: [
-                  `Subscription: ${sub.id}`,
-                  `User ID:      ${userId ?? '(missing from metadata)'}`,
-                  `Status:       ${sub.status}`,
-                  `New items:    ${JSON.stringify(sub.items?.data?.map((i: any) => ({ id: i.id, price: i.price?.id })))}`,
-                  `Previous:     ${JSON.stringify(previous.items ?? previous.plan)}`,
-                  `Action:       verify DynamoDB entitlement productId matches Stripe plan`,
-                ],
-              })
+              const knownPriceIds = [
+                process.env.STRIPE_PRICE_ID_PRO_MONTHLY,
+                process.env.STRIPE_PRICE_ID_PRO_PLUS_MONTHLY,
+              ].filter(Boolean)
+              const newPriceId: string | undefined = sub.items?.data?.[0]?.price?.id
+              if (!newPriceId || !knownPriceIds.includes(newPriceId)) {
+                sendInternalAlert({
+                  subject: '[stripe] subscription price changed to unknown price (review required)',
+                  lines: [
+                    `Subscription: ${sub.id}`,
+                    `User ID:      ${userId ?? '(missing from metadata)'}`,
+                    `Status:       ${sub.status}`,
+                    `New price:    ${newPriceId ?? '(unknown)'}`,
+                    `Previous:     ${JSON.stringify(previous.items ?? previous.plan)}`,
+                    `Action:       verify DynamoDB entitlement productId matches Stripe plan`,
+                  ],
+                })
+              }
             }
           }
           break
