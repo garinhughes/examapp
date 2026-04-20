@@ -56,6 +56,27 @@ export default function AccountPage() {
   const [cancelDone, setCancelDone] = useState(false)
   const [cancelAccessUntil, setCancelAccessUntil] = useState<string | null>(null)
 
+  // ── Manage billing (Stripe Customer Portal) state ──
+  const [portalLoading, setPortalLoading] = useState(false)
+  const [portalError, setPortalError] = useState<string | null>(null)
+  const openBillingPortal = async () => {
+    setPortalLoading(true)
+    setPortalError(null)
+    try {
+      const res = await authFetch('/payments/portal-session', { method: 'POST' })
+      const data = await res.json().catch(() => ({})) as any
+      if (res.ok && data?.url) {
+        window.location.href = data.url
+        return
+      }
+      setPortalError(data?.message || 'Could not open billing portal')
+    } catch (e: any) {
+      setPortalError(e?.message || 'Could not open billing portal')
+    } finally {
+      setPortalLoading(false)
+    }
+  }
+
   // ── Change plan state ──
   const [changePlanConfirm, setChangePlanConfirm] = useState<'up' | 'down' | null>(null)
   const [changingPlan, setChangingPlan] = useState(false)
@@ -740,6 +761,24 @@ export default function AccountPage() {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Manage billing (Stripe only — PayPal users manage in PayPal) */}
+          {isPaidTier(tier) && entitlementDetails.some((e) => e.source === 'stripe' && e.status === 'active') && (
+            <div className="p-4 rounded-lg border border-border bg-card">
+              <h3 className="text-sm font-semibold mb-1 text-muted-foreground">Manage billing</h3>
+              <p className="text-xs text-muted-foreground mb-2">
+                Update your card, view invoices, or cancel on Stripe's secure billing portal.
+              </p>
+              {portalError && <p className="text-xs text-red-500 mb-2">{portalError}</p>}
+              <button
+                onClick={openBillingPortal}
+                disabled={portalLoading}
+                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors"
+              >
+                {portalLoading ? 'Opening…' : 'Manage billing'}
+              </button>
             </div>
           )}
 

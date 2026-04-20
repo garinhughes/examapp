@@ -12,7 +12,7 @@ import { ddb } from './dynamo.js'
 
 const EMAIL_LOGS_TABLE = process.env.EMAIL_LOGS_TABLE || 'examapp-email-logs'
 
-export type EmailLogType = 'welcome' | 'payment-confirmed' | 'expiry-reminder' | 'marketing'
+export type EmailLogType = 'welcome' | 'payment-confirmed' | 'payment-failed' | 'expiry-reminder' | 'marketing'
 
 export interface EmailLog {
   logId: string

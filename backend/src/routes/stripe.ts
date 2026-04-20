@@ -20,7 +20,7 @@ import crypto from 'crypto'
 import { getProduct } from '../catalog.js'
 import { grantEntitlement, revokeEntitlement, getUserEntitlements, setEntitlementExpiresAt } from '../services/entitlements.js'
 import { getUserBySub } from '../services/dynamo.js'
-import { sendPaymentConfirmedEmail, sendInternalAlert, sendRefundedEmail, sendSubscriptionCancelledEmail, sendSubscriptionChangedEmail, sendSubscriptionEndedEmail } from '../services/ses.js'
+import { sendPaymentConfirmedEmail, sendInternalAlert, sendRefundedEmail, sendSubscriptionCancelledEmail, sendSubscriptionChangedEmail, sendSubscriptionEndedEmail, sendPaymentFailedEmail } from '../services/ses.js'
 import { logEmailSend } from '../services/emailLogs.js'
 
 const STRIPE_API = 'https://api.stripe.com/v1'
@@ -84,14 +84,16 @@ function toStripeForm(obj: Record<string, any>, prefix = ''): string {
   return parts.join('&')
 }
 
-async function stripePost(path: string, params: Record<string, any>): Promise<any> {
+async function stripePost(path: string, params: Record<string, any>, opts?: { idempotencyKey?: string }): Promise<any> {
+  const headers: Record<string, string> = {
+    Authorization: stripeAuthHeader(),
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Stripe-Version': STRIPE_API_VERSION,
+  }
+  if (opts?.idempotencyKey) headers['Idempotency-Key'] = opts.idempotencyKey
   const res = await fetch(`${STRIPE_API}${path}`, {
     method: 'POST',
-    headers: {
-      Authorization: stripeAuthHeader(),
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Stripe-Version': STRIPE_API_VERSION,
-    },
+    headers,
     body: toStripeForm(params),
   })
   const body = (await res.json()) as any
@@ -193,7 +195,13 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           sessionParams.discounts = [{ coupon: couponId }]
         }
 
-        const session = await stripePost('/checkout/sessions', sessionParams)
+        // Idempotency key: shared across retries within a ~10-minute window for the same
+        // user+products, so a dropped-connection retry returns the existing session instead
+        // of creating a new one. Bucket coarse enough to absorb retries, fine enough that a
+        // genuine re-attempt after a long abandonment gets a fresh session.
+        const idemBucket = Math.floor(Date.now() / (10 * 60 * 1000))
+        const idempotencyKey = `checkout:${userId ?? 'anon'}:${productIds.join(',')}:${idemBucket}`
+        const session = await stripePost('/checkout/sessions', sessionParams, { idempotencyKey })
         server.log.info({ sessionId: session.id, userId }, '[stripe] checkout session created')
         return { url: session.url }
       } catch (err: any) {
@@ -499,7 +507,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         case 'invoice.payment_failed': {
           // Stripe will retry based on dunning settings. We don't revoke immediately — the existing
           // expiresAt (period_end + 1d grace) self-expires access if retries are exhausted.
-          // Log + alert so we can see the user before access lapses.
+          // Email the user so they can update their card before access lapses.
           const invoice = event.data.object
           const subscriptionId: string | null = getInvoiceSubscriptionId(invoice)
           let userId: string | null = null
@@ -514,6 +522,73 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             }
           }
           server.log.warn({ userId, subscriptionId, productIds, invoiceId: invoice.id, attemptCount: invoice.attempt_count, nextAttempt: invoice.next_payment_attempt }, '[stripe] invoice.payment_failed — access will lapse at period_end + 1d grace if not resolved')
+
+          if (userId && productIds.length > 0) {
+            try {
+              const user = await getUserBySub(userId)
+              if (user?.email) {
+                const prod = getProduct(productIds[0])
+                const nextAttempt = invoice.next_payment_attempt
+                  ? new Date(invoice.next_payment_attempt * 1000).toISOString()
+                  : null
+                const frontend = process.env.FRONTEND_ORIGIN || 'https://certshack.com'
+                sendPaymentFailedEmail({
+                  to: user.email,
+                  name: user.name ?? user.email,
+                  userId,
+                  productLabel: prod?.label ?? productIds[0],
+                  attemptCount: invoice.attempt_count ?? 1,
+                  nextAttempt,
+                  manageUrl: `${frontend}/account?tab=purchases`,
+                })
+                  .then(() => logEmailSend({ type: 'payment-failed', sentBy: 'stripe-webhook', templateId: 'payment-failed', recipientCount: 1, subject: 'Payment failed — please update your card', filters: { productIds } }))
+                  .catch((e: any) => server.log.warn({ err: e?.message }, '[stripe] payment_failed email send failed'))
+              }
+            } catch (e: any) {
+              server.log.warn({ err: e?.message }, '[stripe] payment_failed email lookup failed')
+            }
+          }
+          break
+        }
+
+        case 'customer.subscription.updated': {
+          // Plan changes via the Stripe dashboard (not through our /upgrade-subscription endpoint)
+          // would leave DynamoDB out of sync. We don't auto-mutate entitlements here — that races
+          // our own endpoint — but we alert ops so any drift can be reconciled manually.
+          const sub = event.data.object
+          const previous = event.data.previous_attributes ?? {}
+          const metadata = sub.metadata ?? {}
+          const userId: string | undefined = metadata.userId
+          const priceChanged = previous.items !== undefined || previous.plan !== undefined
+          const cancelFlagChanged = previous.cancel_at_period_end !== undefined
+          const statusChanged = previous.status !== undefined
+          if (priceChanged || cancelFlagChanged || statusChanged) {
+            server.log.info({
+              subscriptionId: sub.id,
+              userId,
+              status: sub.status,
+              cancelAtPeriodEnd: sub.cancel_at_period_end,
+              priceChanged,
+              cancelFlagChanged,
+              statusChanged,
+            }, '[stripe] subscription.updated — state changed')
+
+            // Only alert on changes that likely came from the Stripe dashboard (i.e. not matching
+            // what our /upgrade-subscription + /cancel-subscription flows already log).
+            if (priceChanged) {
+              sendInternalAlert({
+                subject: '[stripe] subscription price changed (review required)',
+                lines: [
+                  `Subscription: ${sub.id}`,
+                  `User ID:      ${userId ?? '(missing from metadata)'}`,
+                  `Status:       ${sub.status}`,
+                  `New items:    ${JSON.stringify(sub.items?.data?.map((i: any) => ({ id: i.id, price: i.price?.id })))}`,
+                  `Previous:     ${JSON.stringify(previous.items ?? previous.plan)}`,
+                  `Action:       verify DynamoDB entitlement productId matches Stripe plan`,
+                ],
+              })
+            }
+          }
           break
         }
 
@@ -709,6 +784,43 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       } catch (err: any) {
         server.log.error({ err }, '[stripe] upgrade-subscription error')
         return reply.status(502).send({ message: 'Failed to change subscription plan', details: err.stripeError })
+      }
+    }
+  )
+
+  /**
+   * Create a Stripe Customer Portal session so the user can manage their card,
+   * view invoices, and cancel their subscription on Stripe's hosted UI.
+   * Returns { url } — the caller redirects to it.
+   */
+  server.post(
+    '/portal-session',
+    { preHandler: [server.authenticate], config: { rateLimit: { max: 10, timeWindow: '1 minute' } } },
+    async (request: any, reply) => {
+      const userId = request.user?.sub as string
+      const ents = await getUserEntitlements(userId)
+      const subEnt = ents.find((e) => e.stripeSubscriptionId && e.meta?.source !== 'paypal')
+      if (!subEnt?.stripeSubscriptionId) {
+        return reply.status(404).send({ message: 'No active Stripe subscription found' })
+      }
+      try {
+        // Look up customer ID from the subscription; we don't store it in DynamoDB.
+        const sub = await stripeGet(`/subscriptions/${subEnt.stripeSubscriptionId}`)
+        const customerId: string | undefined = sub?.customer
+        if (!customerId) {
+          return reply.status(502).send({ message: 'Could not determine Stripe customer' })
+        }
+        const proto = (request.headers['x-forwarded-proto'] as string) || 'https'
+        const host = request.headers.host || 'certshack.com'
+        const returnUrl = `${proto}://${host}/account?tab=purchases`
+        const portalSession = await stripePost('/billing_portal/sessions', {
+          customer: customerId,
+          return_url: returnUrl,
+        })
+        return { url: portalSession.url }
+      } catch (err: any) {
+        server.log.error({ err }, '[stripe] portal-session error')
+        return reply.status(502).send({ message: 'Failed to create portal session', details: err.stripeError })
       }
     }
   )

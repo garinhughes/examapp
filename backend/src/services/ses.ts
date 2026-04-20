@@ -212,6 +212,15 @@ export async function sendPaymentConfirmedEmail(params: {
       )
       .join('')
 
+    const subtotalPence = params.products.reduce((s, p) => s + p.priceGBP, 0)
+    const discountPence = Math.max(0, subtotalPence - params.totalPence)
+    const discountRow = discountPence > 0
+      ? `<tr>
+          <td style="padding:8px 0;border-bottom:1px solid #eee;color:#555;">Discount applied</td>
+          <td style="padding:8px 0;border-bottom:1px solid #eee;color:#22863a;text-align:right;">−£${(discountPence / 100).toFixed(2)}</td>
+        </tr>`
+      : ''
+
     bodyHtml = `
       <p style="font-size:16px;color:#333;">Hi ${vars.name},</p>
       <p style="color:#555;">Thanks for your purchase — your access is now active.</p>
@@ -221,8 +230,9 @@ export async function sendPaymentConfirmedEmail(params: {
           <th style="text-align:right;padding:8px 0;border-bottom:2px solid #FF6B35;color:#333;">Price</th>
         </tr>
         ${rows}
+        ${discountRow}
         <tr>
-          <td style="padding:12px 0;font-weight:bold;color:#333;">Total</td>
+          <td style="padding:12px 0;font-weight:bold;color:#333;">Total charged today</td>
           <td style="padding:12px 0;font-weight:bold;color:#333;text-align:right;">
             £${(params.totalPence / 100).toFixed(2)}
           </td>
@@ -238,6 +248,53 @@ export async function sendPaymentConfirmedEmail(params: {
 
   const { html, text } = await renderEmail({ title: 'Order confirmed', body: bodyHtml })
   await sendHtml({ from: FROM, to: params.to, cc: [TO], subject, html, text })
+}
+
+/**
+ * Payment failed — Stripe couldn't take a subscription renewal payment. Stripe will retry
+ * based on dunning settings; we nudge the user to update their card before access lapses.
+ */
+export async function sendPaymentFailedEmail(params: {
+  to: string
+  name: string
+  userId: string
+  productLabel: string
+  attemptCount: number
+  nextAttempt: string | null
+  manageUrl: string
+}): Promise<void> {
+  const stored = await getTemplate('payment-failed')
+  let subject = stored?.subject || 'Payment failed — please update your card'
+  const vars = {
+    name: params.name || 'there',
+    frontendUrl: FRONTEND,
+    productLabel: params.productLabel,
+    attemptCount: String(params.attemptCount),
+    manageUrl: params.manageUrl,
+  }
+  let bodyHtml: string
+
+  if (stored?.htmlBody) {
+    bodyHtml = interpolate(stored.htmlBody, vars)
+    subject = interpolate(subject, vars)
+  } else {
+    const nextAttemptLine = params.nextAttempt
+      ? `<p style="color:#555;">We'll try again on <strong>${new Date(params.nextAttempt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.</p>`
+      : ''
+    bodyHtml = `
+      <p style="font-size:16px;color:#333;">Hi ${vars.name},</p>
+      <p style="color:#555;">We couldn't process the latest payment for your <strong>${params.productLabel}</strong> subscription (attempt ${params.attemptCount}).</p>
+      ${nextAttemptLine}
+      <p style="color:#555;">Please update your payment method to avoid losing access.</p>
+      <p style="margin:32px 0;">
+        <a href="${params.manageUrl}" style="background:${BRAND};color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:bold;">
+          Update payment method
+        </a>
+      </p>`
+  }
+
+  const { html, text } = await renderEmail({ title: 'Payment failed', body: bodyHtml })
+  await sendHtml({ from: FROM, to: params.to, subject, html, text })
 }
 
 /**
