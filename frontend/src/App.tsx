@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
 import { ExamProvider } from './exam/ExamContext'
-import { BasketProvider } from './basket/BasketContext'
 import ExamApp from './exam/ExamApp'
 import VerifyPage from './components/VerifyPage'
 import LoginPage from './components/LoginPage'
@@ -9,9 +8,7 @@ import { usePageTracking } from './hooks/usePageTracking'
 function ExamAppWrapped() {
   return (
     <ExamProvider>
-      <BasketProvider>
-        <ExamApp />
-      </BasketProvider>
+      <ExamApp />
     </ExamProvider>
   )
 }

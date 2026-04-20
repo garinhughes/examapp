@@ -156,20 +156,29 @@ export default function LoginPage() {
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-1">
           <h1 className="text-2xl font-bold tracking-tight">
-            {view === 'register' ? 'Create account' : view === 'confirm' ? 'Verify email' : view === 'forgot' ? 'Forgot password' : view === 'reset' ? 'Reset password' : 'Sign in'}
+            {view === 'confirm' ? 'Verify email' : view === 'forgot' ? 'Forgot password' : view === 'reset' ? 'Reset password' : 'Welcome'}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {view === 'register' ? 'Already have an account?' : view === 'signin' ? "Don't have an account?"  : null}
-            {(view === 'signin' || view === 'register') && (
-              <button
-                className="ml-1 underline underline-offset-4 hover:text-foreground"
-                onClick={() => { setView(view === 'signin' ? 'register' : 'signin'); setError(null); setInfo(null) }}
-              >
-                {view === 'signin' ? 'Register' : 'Sign in'}
-              </button>
-            )}
-          </p>
         </div>
+
+        {/* Sign in / Register toggle — only on main auth views */}
+        {(view === 'signin' || view === 'register') && (
+          <div className="flex rounded-lg overflow-hidden border border-border">
+            <button
+              type="button"
+              onClick={() => { setView('signin'); setError(null); setInfo(null) }}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${view === 'signin' ? 'bg-[#FF6B35] text-white' : 'bg-background text-muted-foreground hover:text-foreground'}`}
+            >
+              Sign in
+            </button>
+            <button
+              type="button"
+              onClick={() => { setView('register'); setError(null); setInfo(null) }}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${view === 'register' ? 'bg-[#FF6B35] text-white' : 'bg-background text-muted-foreground hover:text-foreground'}`}
+            >
+              Register
+            </button>
+          </div>
+        )}
 
         {info && (
           <div className="rounded-md bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 px-4 py-3 text-sm text-blue-800 dark:text-blue-200">
