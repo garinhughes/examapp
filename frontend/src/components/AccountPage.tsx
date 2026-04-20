@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { User, Trophy, Award, CreditCard, Flame } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { useAuthFetch } from '../auth/useAuthFetch'
@@ -23,7 +24,18 @@ export default function AccountPage() {
   const { user, refreshToken, updateUserName } = useAuth()
   const authFetch = useAuthFetch()
   const { state, toggleLeaderboard } = useGamification()
-  const [tab, setTab] = useState<'overview' | 'badges' | 'certificates' | 'purchases'>('overview')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialTab = (searchParams.get('tab') as 'overview' | 'badges' | 'certificates' | 'purchases' | null) ?? 'overview'
+  const [tab, setTabState] = useState<'overview' | 'badges' | 'certificates' | 'purchases'>(
+    initialTab === 'overview' || initialTab === 'badges' || initialTab === 'certificates' || initialTab === 'purchases' ? initialTab : 'overview'
+  )
+  const setTab = (t: 'overview' | 'badges' | 'certificates' | 'purchases') => {
+    setTabState(t)
+    const next = new URLSearchParams(searchParams)
+    if (t === 'overview') next.delete('tab')
+    else next.set('tab', t)
+    setSearchParams(next, { replace: true })
+  }
   const { level, currentXP, nextLevelXP, progress: levelProgress } = levelFromXP(state.xp)
   const { tier, entitlements, entitlementDetails, products, loading: entLoading, refresh: refreshEntitlements } = useEntitlements()
 

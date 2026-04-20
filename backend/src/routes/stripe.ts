@@ -24,9 +24,37 @@ import { sendPaymentConfirmedEmail, sendInternalAlert, sendRefundedEmail, sendSu
 import { logEmailSend } from '../services/emailLogs.js'
 
 const STRIPE_API = 'https://api.stripe.com/v1'
+// Pin API version so schema changes (like basil removing invoice.subscription) can't
+// silently break us if the account's default version bumps.
+const STRIPE_API_VERSION = '2025-03-31.basil'
 
 function stripeAuthHeader() {
   return `Bearer ${process.env.STRIPE_SECRET_KEY}`
+}
+
+/**
+ * Resolve a subscription ID from an Invoice object across API versions.
+ * basil (2025-03-31+) removed top-level `invoice.subscription`; it now lives at
+ * `invoice.parent.subscription_details.subscription`.
+ */
+function getInvoiceSubscriptionId(invoice: any): string | null {
+  return (
+    invoice?.parent?.subscription_details?.subscription ??
+    invoice?.subscription ??
+    invoice?.lines?.data?.[0]?.parent?.subscription_item_details?.subscription ??
+    null
+  )
+}
+
+/**
+ * Resolve a subscription's current_period_end across API versions.
+ * basil moved this from the Subscription root onto each item.
+ */
+function getSubscriptionPeriodEnd(sub: any): number | null {
+  const fromItem = sub?.items?.data?.[0]?.current_period_end
+  if (typeof fromItem === 'number') return fromItem
+  if (typeof sub?.current_period_end === 'number') return sub.current_period_end
+  return null
 }
 
 /**
@@ -62,6 +90,7 @@ async function stripePost(path: string, params: Record<string, any>): Promise<an
     headers: {
       Authorization: stripeAuthHeader(),
       'Content-Type': 'application/x-www-form-urlencoded',
+      'Stripe-Version': STRIPE_API_VERSION,
     },
     body: toStripeForm(params),
   })
@@ -77,7 +106,7 @@ async function stripePost(path: string, params: Record<string, any>): Promise<an
 
 async function stripeGet(path: string): Promise<any> {
   const res = await fetch(`${STRIPE_API}${path}`, {
-    headers: { Authorization: stripeAuthHeader() },
+    headers: { Authorization: stripeAuthHeader(), 'Stripe-Version': STRIPE_API_VERSION },
   })
   const body = (await res.json()) as any
   if (!res.ok) {
@@ -292,9 +321,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           // so we cannot rely on that event — subscription grants and the initial confirmation email are done here.
           const isCreate = invoice.billing_reason === 'subscription_create'
           const isCycle = invoice.billing_reason === 'subscription_cycle'
-          if (invoice.subscription && (isCreate || isCycle)) {
+          const subscriptionId = getInvoiceSubscriptionId(invoice)
+          if (subscriptionId && (isCreate || isCycle)) {
             try {
-              const sub = await stripeGet(`/subscriptions/${invoice.subscription}`)
+              const sub = await stripeGet(`/subscriptions/${subscriptionId}`)
               const metadata = sub.metadata ?? {}
               const userId: string = metadata.userId
               const productIds: string[] = JSON.parse(metadata.productIds ?? '[]')
@@ -303,13 +333,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
                   const prod = getProduct(pid)
                   // Set expiresAt to period_end + 1 day grace so access self-expires if billing stops.
                   // Each successful renewal pushes this forward.
-                  const expiresAt = new Date(((invoice.period_end as number) + 86400) * 1000).toISOString()
+                  const periodEnd = getSubscriptionPeriodEnd(sub) ?? (invoice.period_end as number)
+                  const expiresAt = new Date((periodEnd + 86400) * 1000).toISOString()
                   await grantEntitlement({
                     userId,
                     productId: pid,
                     kind: prod?.kind ?? 'subscription',
                     expiresAt,
-                    stripeSubscriptionId: invoice.subscription,
+                    stripeSubscriptionId: subscriptionId,
                     meta: { source: 'stripe.invoice.payment_succeeded', invoiceId: invoice.id, billingReason: invoice.billing_reason },
                   })
                 }
@@ -333,11 +364,13 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
                   }
                 }
               } else {
-                server.log.warn({ subscriptionId: invoice.subscription }, '[stripe] invoice.payment_succeeded — no userId/productIds in subscription metadata')
+                server.log.warn({ subscriptionId }, '[stripe] invoice.payment_succeeded — no userId/productIds in subscription metadata')
               }
             } catch (err) {
-              server.log.error({ err, subscriptionId: invoice.subscription }, '[stripe] failed to fetch subscription for invoice.payment_succeeded')
+              server.log.error({ err, subscriptionId }, '[stripe] failed to fetch subscription for invoice.payment_succeeded')
             }
+          } else {
+            server.log.info({ invoiceId: invoice.id, billingReason: invoice.billing_reason, subscriptionId }, '[stripe] invoice.payment_succeeded — skipped (no subscription or non-create/cycle billing reason)')
           }
           break
         }
@@ -345,12 +378,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         case 'customer.subscription.deleted': {
           const subscription = event.data.object
           const metadata = subscription.metadata ?? {}
-          const userId: string = metadata.userId
-          const productIds: string[] = JSON.parse(metadata.productIds ?? '[]')
+          const userId: string | undefined = metadata.userId
 
-          // Primary: revoke by subscriptionId (catches plan changes where metadata may differ from
-          // the currently-active entitlement, e.g. after a downgrade stamps sub:pro in metadata
-          // while the entitlement is still sub:pro-plus with a future expiresAt)
+          // Only revoke entitlements explicitly linked to this subscription via stripeSubscriptionId.
+          // We deliberately do NOT fall back to revoke-by-metadata: if a user has two subscriptions
+          // sharing a productId (e.g. mid-upgrade, or a duplicate purchase), the metadata path would
+          // wrongly revoke the *other* subscription's active entitlement.
           const revokedPids = new Set<string>()
           if (userId) {
             const allEnts = await getUserEntitlements(userId, true)
@@ -360,20 +393,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
               revokedPids.add(ent.productId)
             }
             if (subEnts.length > 0) {
-              server.log.info({ userId, revokedPids: [...revokedPids], subscriptionId: subscription.id }, '[stripe] subscription entitlements revoked by subscriptionId')
+              server.log.info({ userId, revokedPids: [...revokedPids], subscriptionId: subscription.id }, '[stripe] subscription entitlements revoked')
+            } else {
+              server.log.info({ userId, subscriptionId: subscription.id }, '[stripe] subscription.deleted — no entitlements linked to this subscriptionId, skipping revocation')
             }
-          }
-
-          // Fallback: metadata-based revoke for any products not caught above
-          if (userId && productIds.length > 0) {
-            for (const pid of productIds) {
-              if (!revokedPids.has(pid)) {
-                await revokeEntitlement(userId, pid)
-                revokedPids.add(pid)
-              }
-            }
-            server.log.info({ userId, productIds, subscriptionId: subscription.id }, '[stripe] subscription entitlements revoked by metadata')
-          } else if (!userId) {
+          } else {
             server.log.warn({ subscriptionId: subscription.id }, '[stripe] subscription.deleted — no userId in metadata, skipping revocation')
           }
 
@@ -421,7 +445,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
               const invoiceId = pi?.invoice
               if (invoiceId) {
                 const invoice = await stripeGet(`/invoices/${invoiceId}`)
-                subscriptionId = invoice?.subscription ?? null
+                subscriptionId = getInvoiceSubscriptionId(invoice)
                 if (subscriptionId) {
                   const sub = await stripeGet(`/subscriptions/${subscriptionId}`)
                   userId = sub?.metadata?.userId ?? null
@@ -477,7 +501,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           // expiresAt (period_end + 1d grace) self-expires access if retries are exhausted.
           // Log + alert so we can see the user before access lapses.
           const invoice = event.data.object
-          const subscriptionId: string | undefined = invoice.subscription
+          const subscriptionId: string | null = getInvoiceSubscriptionId(invoice)
           let userId: string | null = null
           let productIds: string[] = []
           if (subscriptionId) {
@@ -534,9 +558,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         const updatedSub = await stripePost(`/subscriptions/${subEnt.stripeSubscriptionId}`, {
           cancel_at_period_end: 'true',
         })
-        const accessUntil = updatedSub?.current_period_end
-          ? new Date((updatedSub.current_period_end as number) * 1000).toISOString()
-          : null
+        const updatedPeriodEnd = getSubscriptionPeriodEnd(updatedSub)
+        const accessUntil = updatedPeriodEnd ? new Date(updatedPeriodEnd * 1000).toISOString() : null
         server.log.info({ userId, subscriptionId: subEnt.stripeSubscriptionId, accessUntil }, '[stripe] subscription set to cancel at period end')
 
         // Send cancellation confirmation to the customer
@@ -610,7 +633,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         if (!itemId) {
           return reply.status(502).send({ message: 'Could not determine current subscription item' })
         }
-        const periodEnd: string = new Date((sub.current_period_end as number) * 1000).toISOString()
+        const periodEndTs = getSubscriptionPeriodEnd(sub)
+        if (!periodEndTs) {
+          return reply.status(502).send({ message: 'Could not determine current period end from subscription' })
+        }
+        const periodEnd: string = new Date(periodEndTs * 1000).toISOString()
 
         // Switch the Stripe plan
         await stripePost(`/subscriptions/${subEnt.stripeSubscriptionId}`, {
@@ -627,7 +654,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             userId,
             productId: targetProductId,
             kind: prod?.kind ?? 'subscription',
-            expiresAt: new Date((sub.current_period_end as number + 86400) * 1000).toISOString(),
+            expiresAt: new Date((periodEndTs + 86400) * 1000).toISOString(),
             stripeSubscriptionId: subEnt.stripeSubscriptionId,
             meta: { source: 'stripe.invoice.payment_succeeded', billingReason: 'upgrade' },
           })

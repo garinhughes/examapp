@@ -1,6 +1,7 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses'
 import { SignJWT } from 'jose'
 import { getTemplate } from './emailTemplates.js'
+import { LOGO_BASE64 } from './emailAssets.js'
 
 const ses = new SESClient({ region: process.env.AWS_REGION || 'eu-west-1' })
 const wrapName = (addr: string) => `"certshack" <${addr}>`
@@ -12,7 +13,7 @@ const BACKEND = process.env.BACKEND_ORIGIN || 'https://api.certshack.com'
 
 // ── Shared HTML helpers ────────────────────────────────────────────────────
 
-const LOGO_URL = `${FRONTEND}/favicon.png`
+const LOGO_URL = LOGO_BASE64
 const BRAND = '#FF6B35'
 
 /** Build a signed, one-click unsubscribe token (JWT). */
@@ -61,11 +62,11 @@ async function renderEmail(opts: {
           <td style="background:${BRAND};padding:24px 32px;">
             <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
               <tr>
-                <td style="padding:0 12px 0 0;vertical-align:middle;">
-                  <img src="${LOGO_URL}" alt="certshack" height="36" style="display:block;">
+                <td style="padding:0 10px 0 0;vertical-align:middle;">
+                  <img src="${LOGO_URL}" alt="" height="36" width="36" style="display:block;border-radius:6px;">
                 </td>
                 <td style="vertical-align:middle;">
-                  <span style="font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:0.5px;">certshack</span>
+                  <span style="font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:0.5px;font-family:Arial,sans-serif;">certshack</span>
                 </td>
               </tr>
             </table>
@@ -314,12 +315,7 @@ export async function sendSubscriptionCancelledEmail(params: {
         </tr>
       </table>
       ${accessLine}
-      <p style="color:#555;">Changed your mind? You can resubscribe at any time.</p>
-      <p style="margin:32px 0;">
-        <a href="${FRONTEND}/pricing" style="background:${BRAND};color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:bold;">
-          Resubscribe
-        </a>
-      </p>`
+      <p style="color:#555;">Changed your mind? Current plans and pricing are always available at <a href="${FRONTEND}/pricing" style="color:${BRAND};">certshack.com/pricing</a>.</p>`
   }
 
   const { html, text } = await renderEmail({ title: 'Subscription cancelled', body: bodyHtml })
@@ -417,12 +413,7 @@ export async function sendSubscriptionEndedEmail(params: {
           </td>
         </tr>
       </table>
-      <p style="color:#555;">We hope certshack has been valuable. You can resubscribe at any time to regain full access to all practice exams and skill labs.</p>
-      <p style="margin:32px 0;">
-        <a href="${FRONTEND}/pricing" style="background:${BRAND};color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:bold;">
-          Resubscribe
-        </a>
-      </p>`
+      <p style="color:#555;">Thank you for being a certshack customer. If you'd like to come back in the future, current plans and pricing are always available at <a href="${FRONTEND}/pricing" style="color:${BRAND};">certshack.com/pricing</a>.</p>`
   }
 
   const { html, text } = await renderEmail({ title: 'Subscription ended', body: bodyHtml })

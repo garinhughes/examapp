@@ -19,6 +19,7 @@ import { SkillLabsPage } from '../skill-labs/SkillLabsPage'
 import { SkillLabRunnerPage } from '../skill-labs/SkillLabRunnerPage'
 import { SkillLabDetailPage } from '../skill-labs/SkillLabDetailPage'
 import BasketPage from '../basket/BasketPage'
+import { PaymentResultModal } from '../basket/PaymentResultModal'
 import { FeedbackProvider } from '../feedback/FeedbackContext'
 import { PollWidget } from '../components/PollWidget'
 import { FeedbackPage } from '../feedback/FeedbackPage'
@@ -526,6 +527,7 @@ function ExamAppInner() {
       </div>
     </div>
     <TourBubble />
+    <PaymentResultModal />
     </FeedbackProvider>
   )
 }
