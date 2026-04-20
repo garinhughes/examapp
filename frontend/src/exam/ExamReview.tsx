@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Play, X, Check, BarChart3, ExternalLink, ChevronDown } from 'lucide-react'
+import { Play, X, Check, BarChart3, ExternalLink, ChevronDown, Lock } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { isAnswerCorrect, renderChoiceContent, MarkdownText } from './utils'
 import type { Question, QuestionType } from './types'
@@ -185,7 +185,11 @@ export function ExamReview() {
 
               <div className={`p-4 rounded-lg border-l-4 ${item.isCorrect ? 'border-l-green-500' : 'border-l-red-500'} border border-border bg-card`}>
                 <div className="flex items-start justify-between gap-3">
-                  <div className="font-medium text-base flex-1"><MarkdownText text={item.q.question} /></div>
+                  <div className="font-medium text-base flex-1">
+                    {(item.q as any).locked
+                      ? <span className="text-sm text-muted-foreground italic">Paid content</span>
+                      : <MarkdownText text={item.q.question} />}
+                  </div>
                   <span className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${item.isCorrect ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>
                     {item.isCorrect ? '✓ Correct' : '✗ Incorrect'}
                   </span>
@@ -194,6 +198,18 @@ export function ExamReview() {
 
                 {/* Type-specific rendering */}
                 {(() => {
+                  if ((item.q as any).locked) {
+                    return (
+                      <div className="mt-3 flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border/40">
+                        <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-muted-foreground">This question is from paid content.</p>
+                          <button onClick={() => setRoute('pricing')} className="text-xs text-primary hover:underline">Re-subscribe to unlock full review</button>
+                        </div>
+                      </div>
+                    )
+                  }
+
                   const reviewType: QuestionType = item.q.type ?? 'single-choice'
 
                   if (reviewType === 'matching') {

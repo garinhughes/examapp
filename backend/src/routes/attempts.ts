@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto'
 import { loadExam, shuffleQuestions, normaliseQuestion } from '../examLoader.js'
 import { attemptsStore } from '../services/attemptsStore.js'
 import { getActiveProductIds } from '../services/entitlements.js'
-import { resolveUserTier, TIERS } from '../catalog.js'
+import { resolveUserTier, TIERS, isPaidTier } from '../catalog.js'
 import { updateMetricsOnAttemptFinish } from '../services/metricsStore.js'
 import { touchUserActivity } from '../services/dynamo.js'
 
@@ -483,14 +483,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
     if (attempt.userId !== userId) return reply.status(403).send({ message: 'forbidden' })
     // Ensure returned attempt.questions are normalised to the current schema
+    let loadedExam: any = null
     try {
       if (Array.isArray(attempt.questions) && attempt.questions.length > 0) {
         // Build a lookup from the live exam so we can backfill fields (like skills)
         // that may be missing from older snapshotted question objects
         let examLookup: Map<string, any> | null = null
         try {
-          const exam = await loadExam(attempt.examCode)
-          if (exam) examLookup = new Map(exam.questions.map((q: any) => [String(q.id), q]))
+          loadedExam = await loadExam(attempt.examCode)
+          if (loadedExam) examLookup = new Map(loadedExam.questions.map((q: any) => [String(q.id), q]))
         } catch { /* ignore */ }
         attempt.questions = attempt.questions.map((q: any) => {
           const normalised = normaliseQuestion(q)
@@ -509,6 +510,20 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       // If normalization fails, return original attempt but log the error
       console.error('Failed to normalise attempt.questions', err)
     }
+
+    // Gate paid question content: strip non-showcase questions for non-paying users
+    const ownedProductIds = request.user?.sub ? await getActiveProductIds(request.user.sub) : []
+    const tier = resolveUserTier({ isAuthenticated: !!request.user?.sub, ownedProductIds })
+    if (!isPaidTier(tier) && Array.isArray(attempt.questions)) {
+      const showcaseIds = new Set<string>(
+        (loadedExam?.showcaseQuestionIds ?? []).map(String)
+      )
+      attempt.questions = attempt.questions.map((q: any) => {
+        if (showcaseIds.has(String(q.id))) return q
+        return { id: q.id, type: q.type, domain: q.domain, services: q.services, skills: q.skills, difficulty: q.difficulty, locked: true }
+      })
+    }
+
     return attempt
   })
 
