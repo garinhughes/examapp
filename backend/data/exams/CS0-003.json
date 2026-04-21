@@ -8609,6 +8609,1258 @@
       "domain": "Reporting and Communication",
       "difficulty": 2,
       "lastReviewed": "2026-04-20"
+    },
+    {
+      "id": "CS0-003-0181",
+      "type": "single-choice",
+      "docs": "https://www.ntp.org/documentation/",
+      "format": "text",
+      "services": [
+        "SIEM",
+        "NTP",
+        "Firewall"
+      ],
+      "skills": [
+        "1.1: Explain the importance of system and network architecture concepts in security operations."
+      ],
+      "question": "Triage in the SIEM shows that timestamps between a perimeter firewall and the Windows host under investigation are off by 43 minutes, and a draft timeline has already placed the firewall block event *before* the matching host process creation. The analyst confirms both devices are reachable and logging correctly. The desktop support team insists the host clock \"looked fine\" when they checked yesterday.\n\nWhat is the likely root cause of the timestamp discrepancy?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "The host is not synchronising against an authoritative NTP source, so its local clock has drifted relative to the firewall.",
+          "sequence": 1,
+          "explanation": "Unsynchronised hosts routinely drift by tens of minutes; a 43-minute offset is a classic symptom of a missing or broken `NTP` client."
+        },
+        {
+          "id": "c2",
+          "text": "The analyst is reading the wrong log fields and misinterpreting the event data entirely.",
+          "explanation": "A consistent 43-minute skew across every event points to clock drift, not a one-off reading error."
+        },
+        {
+          "id": "c3",
+          "text": "The firewall is recording times in UTC while the host records in local time, which happens to be 43 minutes off.",
+          "explanation": "Timezone offsets are whole or half hours (60 or 30 minutes), not 43 minutes, the shape of the skew rules this out."
+        },
+        {
+          "id": "c4",
+          "text": "The host that produced the logs is offline and forwarding stale events from a local buffer.",
+          "explanation": "Replay from a buffer would show a gap and then a burst, not a uniform 43-minute offset on every new event."
+        }
+      ],
+      "tip": "Think about what kind of offset timezone conversion can and cannot produce.",
+      "explanation": "Clock drift from missing time synchronisation produces arbitrary minute-level offsets.\n\n**Why it works:** Without `NTP` discipline, a PC's real-time clock drifts freely; 43 minutes is well within normal drift for a host left unsynchronised for weeks.\n\n**Why the others don't work:**\n- Wrong fields: the offset is consistent across events, not random.\n- UTC vs local: timezone shifts are never 43 minutes.\n- Host offline: would show gaps, not a uniform skew.",
+      "domain": "Security Operations",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0182",
+      "type": "single-choice",
+      "docs": "https://learn.microsoft.com/en-us/windows/security/hardware-security/tpm/tpm-fundamentals",
+      "format": "text",
+      "services": [
+        "TPM",
+        "HSM",
+        "Secure Boot"
+      ],
+      "skills": [
+        "1.1: Explain the importance of system and network architecture concepts in security operations."
+      ],
+      "question": "During a measured-boot design review, the architect wants a component on each laptop that will release disk-encryption keys only when the boot chain hashes match a known-good measurement, and that keeps the keys sealed to the hardware even if the OS is stolen offline. The solution must be built into every endpoint rather than provided as a shared appliance. The architect is explicitly comparing hardware options, not software key stores.\n\nWhich hardware component satisfies these requirements?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "A Trusted Platform Module soldered to each laptop, with disk keys sealed to platform configuration register values.",
+          "sequence": 1,
+          "explanation": "A `TPM` measures the boot chain into PCRs and seals keys so they only unseal when measurements match, exactly the described behaviour."
+        },
+        {
+          "id": "c2",
+          "text": "A centralised network hardware security module accessed over a dedicated management VLAN.",
+          "explanation": "An `HSM` is a shared appliance, not a per-endpoint component, and cannot measure each laptop's individual boot state."
+        },
+        {
+          "id": "c3",
+          "text": "A software-based credential vault running inside the operating system and protected by the user's login password.",
+          "explanation": "A software vault does not survive OS compromise and cannot seal keys to hardware measurements."
+        },
+        {
+          "id": "c4",
+          "text": "A smartcard reader wired to each laptop, requiring the user to insert a card before the disk decrypts.",
+          "explanation": "A smartcard provides user authentication but does not measure or attest the boot chain."
+        }
+      ],
+      "tip": "Focus on which component can both measure the boot chain and seal keys to those measurements.",
+      "explanation": "Measured boot and key sealing are the defining jobs of a `TPM`.\n\n**Why it works:** The `TPM` extends PCRs during boot, and keys sealed to those PCR values refuse to unseal if the measurements differ, defeating offline attacks.\n\n**Why the others don't work:**\n- Network HSM: shared, not per-endpoint, and blind to boot measurements.\n- Software vault: no hardware root of trust.\n- Smartcard: authenticates the user, not the platform.",
+      "domain": "Security Operations",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0183",
+      "type": "single-choice",
+      "docs": "https://attack.mitre.org/techniques/T1071/",
+      "format": "text",
+      "services": [
+        "Proxy",
+        "SIEM"
+      ],
+      "skills": [
+        "1.2: Given a scenario, analyze indicators of potentially malicious activity."
+      ],
+      "question": "Outbound proxy logs for a single finance workstation show the pattern below over a 24-hour window:\n\n```\n10:02:07  GET  https://cdn-status[.]io/ping?id=8f02a  198 bytes\n10:07:04  GET  https://cdn-status[.]io/ping?id=8f02a  198 bytes\n10:12:08  GET  https://cdn-status[.]io/ping?id=8f02a  198 bytes\n10:17:05  GET  https://cdn-status[.]io/ping?id=8f02a  201 bytes\n10:22:06  GET  https://cdn-status[.]io/ping?id=8f02a  198 bytes\n```\n\nUser activity on the host is concentrated around office hours, yet the pattern continues uninterrupted overnight.\n\nWhich indicator category describes this observation?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Beaconing to a command-and-control channel, characterised by near-fixed intervals and near-identical payload sizes.",
+          "sequence": 1,
+          "explanation": "Five-minute intervals, stable payload size and 24/7 continuation are textbook `C2` beaconing traits independent of user activity."
+        },
+        {
+          "id": "c2",
+          "text": "Bandwidth consumption spike from a misconfigured software update agent.",
+          "explanation": "Update agents produce bursty, larger transfers tied to release cadence, not sub-kilobyte checks every five minutes."
+        },
+        {
+          "id": "c3",
+          "text": "Irregular peer-to-peer communication from a file-sharing application running in the background.",
+          "explanation": "Peer-to-peer traffic is multi-destination and variable in size, not a single-URI periodic GET."
+        },
+        {
+          "id": "c4",
+          "text": "A rogue device on the network producing scanning traffic toward external hosts.",
+          "explanation": "Scans hit many destinations and ports; this pattern is a single host contacting a single URL on a schedule."
+        }
+      ],
+      "tip": "Focus on what stays constant (interval and size) rather than the destination domain.",
+      "explanation": "Periodicity plus payload-size regularity is the signature of beaconing.\n\n**Why it works:** Implants phone home on a fixed timer with short status payloads; the pattern persists regardless of user presence, which is exactly what the logs show.\n\n**Why the others don't work:**\n- Update agent: releases are infrequent and transfers are large.\n- P2P: many peers, variable size.\n- Rogue scanner: many destinations, not one URL.",
+      "domain": "Security Operations",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0184",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "Windows",
+        "Netstat"
+      ],
+      "skills": [
+        "1.2: Given a scenario, analyze indicators of potentially malicious activity."
+      ],
+      "question": "While triaging a Windows endpoint flagged by the EDR, an analyst runs `netstat -ano` and observes:\n\n```\nProto  Local Address     Foreign Address   State       PID\nTCP    0.0.0.0:4444      0.0.0.0:0         LISTENING   5872\nTCP    10.4.2.17:49732   203.0.113.44:443  ESTABLISHED 5872\n```\n\nThe PID `5872` resolves to `svch0st.exe` (note the zero) running under a standard user profile.\n\nWhich host-based indicator does this activity show?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Malicious process masquerading as a legitimate system binary with an unauthorised listening service.",
+          "sequence": 1,
+          "explanation": "`svch0st.exe` is a typosquat of `svchost.exe`, running from a user profile and opening a listener on `4444`, all characteristic of an implant."
+        },
+        {
+          "id": "c2",
+          "text": "Legitimate service host activity that should be whitelisted to reduce EDR noise.",
+          "explanation": "The real binary is `svchost.exe` and lives under `System32`, not a user profile; whitelisting would be an error."
+        },
+        {
+          "id": "c3",
+          "text": "Normal peer-to-peer gaming traffic on an ephemeral high port.",
+          "explanation": "The listener is on well-known Metasploit default port `4444`, bound to `0.0.0.0`, not ephemeral client behaviour."
+        },
+        {
+          "id": "c4",
+          "text": "An expected Windows Update session that uses port `4444` for delta downloads.",
+          "explanation": "Windows Update uses HTTPS to Microsoft CDNs on `443`, never inbound port `4444`."
+        }
+      ],
+      "tip": "Scrutinise the filename character by character and the port number against known defaults.",
+      "explanation": "Filename typosquatting plus a well-known attacker default port signals a malicious process.\n\n**Why it works:** Substituting a `0` for an `o` is a classic evasion, and port `4444` is the Metasploit meterpreter default, the combination is a high-confidence IoC.\n\n**Why the others don't work:**\n- Whitelisting: the name is wrong and the path is user-writable.\n- P2P gaming: doesn't listen on `0.0.0.0:4444` with that filename.\n- Windows Update: uses `443` outbound to Microsoft hosts.",
+      "domain": "Security Operations",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0185",
+      "type": "single-choice",
+      "docs": "https://www.virustotal.com/gui/home/search",
+      "format": "text",
+      "services": [
+        "EDR",
+        "VirusTotal"
+      ],
+      "skills": [
+        "1.3: Given a scenario, use appropriate tools or techniques to determine malicious activity."
+      ],
+      "question": "Following initial EDR isolation of a user laptop, the analyst enumerates three files dropped in the user's temp folder and records their fingerprints:\n\n```\nzipcontainer.dll   6C635BF98BD79102F6096458572...\nxwizard.dtd        20052F52C677845A63B2436952E...\nsvch0st.exe        0AD27DC6B692903C4E129B1AD7...\n```\n\nThe analyst plans to pivot across historic endpoint telemetry and query `VirusTotal` to identify the same artefacts on other hosts.\n\nWhich technique is the analyst applying?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "File hashing, using cryptographic digests as stable identifiers that survive filename changes.",
+          "sequence": 1,
+          "explanation": "Cryptographic hashes pin file identity regardless of path or name and are the standard pivot value on threat-intel platforms."
+        },
+        {
+          "id": "c2",
+          "text": "File-extension matching to detect unauthorised binaries by their suffix.",
+          "explanation": "Extensions are trivially renamed and give no identity beyond a guess at file type."
+        },
+        {
+          "id": "c3",
+          "text": "Pattern recognition on command-line invocations to detect living-off-the-land behaviour.",
+          "explanation": "Pattern recognition works on process-execution strings, not on the file digests the analyst recorded."
+        },
+        {
+          "id": "c4",
+          "text": "Interpreting suspicious commands embedded in PowerShell transcripts.",
+          "explanation": "This technique inspects script content; the analyst is pivoting on static file identifiers."
+        }
+      ],
+      "tip": "Consider what property of a file survives renaming and relocation.",
+      "explanation": "Hash-based pivots are the foundational file-identity technique.\n\n**Why it works:** Cryptographic digests uniquely identify file contents, so a single hash can be searched across telemetry, sandboxes, and `VirusTotal` with no false-identity risk from renames.\n\n**Why the others don't work:**\n- Extensions: cosmetic and easily spoofed.\n- Pattern recognition: operates on commands, not file digests.\n- Command interpretation: applies to scripts and cmdlines.",
+      "domain": "Security Operations",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0186",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "Linux",
+        "Grep"
+      ],
+      "skills": [
+        "1.3: Given a scenario, use appropriate tools or techniques to determine malicious activity."
+      ],
+      "question": "Investigating a possible brute-force attempt against an Internet-facing Linux jumphost, the analyst has direct console access and must quickly enumerate how many distinct source IPs produced failed SSH logins over the last day. The environment has no SIEM. The on-disk log is `/var/log/auth.log`.\n\nWhich one-liner produces the required count?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "`grep 'Failed password' /var/log/auth.log | awk '{print $11}' | sort -u | wc -l`",
+          "sequence": 1,
+          "explanation": "Filters failed logins, extracts the source IP field, deduplicates, and counts, exactly the count requested."
+        },
+        {
+          "id": "c2",
+          "text": "`grep 'Accepted password' /var/log/auth.log | wc -l`",
+          "explanation": "Counts successful logins, the opposite of what the analyst needs."
+        },
+        {
+          "id": "c3",
+          "text": "`tail -n 100 /var/log/auth.log`",
+          "explanation": "Shows only the last 100 lines with no filtering, extraction, deduplication, or counting."
+        },
+        {
+          "id": "c4",
+          "text": "`cat /var/log/auth.log | grep sshd | head -n 20`",
+          "explanation": "Returns the first twenty SSH lines without isolating failures or unique sources."
+        }
+      ],
+      "tip": "Think about each stage: filter, extract, deduplicate, count.",
+      "explanation": "A `grep`/`awk`/`sort -u`/`wc -l` pipeline is the canonical way to count distinct field values in a log.\n\n**Why it works:** Each stage performs exactly one of the required operations, and `sort -u` collapses duplicate source IPs before the count.\n\n**Why the others don't work:**\n- Accepted password: wrong event class.\n- `tail -n 100`: no filtering or counting.\n- `head -n 20` of sshd: truncates results and does not deduplicate.",
+      "domain": "Security Operations",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0187",
+      "type": "single-choice",
+      "docs": "https://www.cisa.gov/news-events/cybersecurity-advisories",
+      "format": "text",
+      "services": [
+        "CISA",
+        "ISAC"
+      ],
+      "skills": [
+        "1.4: Compare and contrast threat-intelligence and threat-hunting concepts."
+      ],
+      "question": "The SOC has been disrupted by repeated \"fake news\" posts on social media claiming imminent ransomware campaigns targeting the sector, causing leadership to request priority investigations that routinely find nothing. The CISO wants the team to anchor future threat-intel intake to sources that can be cited in governance reports. Vendor paid feeds are already in use and not in question here.\n\nWhich source should the team rely on for open-source threat intelligence?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Industry-related government bulletins and sector ISAC advisories.",
+          "sequence": 1,
+          "explanation": "Government CERT bulletins and sector ISACs publish vetted indicators and carry accountability appropriate for governance citation."
+        },
+        {
+          "id": "c2",
+          "text": "Popular hacker blogs where individuals narrate recent exploits.",
+          "explanation": "Blogs vary wildly in accuracy and carry no editorial accountability for governance-grade intake."
+        },
+        {
+          "id": "c3",
+          "text": "Public cybersecurity social-media groups and chat channels.",
+          "explanation": "Social-media chatter is exactly the medium producing the \"fake news\" the CISO is trying to escape."
+        },
+        {
+          "id": "c4",
+          "text": "Dark-web cyber resource forums offering recent exploit chatter.",
+          "explanation": "Dark-web forums can provide context but cannot be cited as vetted sources and carry high misinformation risk."
+        }
+      ],
+      "tip": "Weigh editorial accountability and citability, not volume or recency.",
+      "explanation": "Government and ISAC advisories combine vetting, sector relevance, and citability.\n\n**Why it works:** Bodies like CISA, national CERTs, and sector ISACs publish indicators and TTPs that are reviewed before release and can be referenced directly in risk reports.\n\n**Why the others don't work:**\n- Hacker blogs: no accountability.\n- Social media: unverified, source of the current problem.\n- Dark web: unvetted, high misinformation risk.",
+      "domain": "Security Operations",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0188",
+      "type": "single-choice",
+      "docs": "https://attack.mitre.org/",
+      "format": "text",
+      "services": [
+        "MITRE ATT&CK"
+      ],
+      "skills": [
+        "1.4: Compare and contrast threat-intelligence and threat-hunting concepts."
+      ],
+      "question": "Two separate threat-intel feeds identify different APT groups targeting the organisation's sector, and the CISO wants a single reference that maps each group's observed tactics, techniques, and procedures side-by-side so the hunt team can focus detections where the groups overlap. Comparing high-level attack phases is not sufficient, the CISO wants named techniques with sub-technique granularity.\n\nWhich framework supports this comparative TTP mapping?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "MITRE ATT&CK, which catalogues named techniques and sub-techniques with per-adversary group mappings.",
+          "sequence": 1,
+          "explanation": "`ATT&CK` is explicitly structured around techniques attributed to named groups, making overlap analysis straightforward."
+        },
+        {
+          "id": "c2",
+          "text": "The Cyber Kill Chain, which describes seven sequential phases of an intrusion.",
+          "explanation": "The Kill Chain is phase-level and does not catalogue named techniques per adversary."
+        },
+        {
+          "id": "c3",
+          "text": "The OWASP Top 10, which ranks web application risks.",
+          "explanation": "OWASP Top 10 addresses web application vulnerabilities, not adversary TTPs."
+        },
+        {
+          "id": "c4",
+          "text": "STIX/TAXII, which defines formats and transport for threat-intel sharing.",
+          "explanation": "STIX/TAXII standardises exchange of intel, but does not itself catalogue techniques or group attributions."
+        }
+      ],
+      "tip": "Identify which framework names techniques *and* attributes them to specific adversaries.",
+      "explanation": "`ATT&CK` is the de-facto TTP taxonomy with built-in group attribution.\n\n**Why it works:** Each adversary group page lists the techniques observed in the wild, so mapping two groups on the matrix immediately reveals shared techniques.\n\n**Why the others don't work:**\n- Kill Chain: seven phases, no per-group technique catalogue.\n- OWASP Top 10: web risks, not adversary TTPs.\n- STIX/TAXII: a transport and format, not a taxonomy.",
+      "domain": "Security Operations",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0189",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "SOAR",
+        "SIEM"
+      ],
+      "skills": [
+        "1.5: Explain the importance of efficiency and process improvement in security operations."
+      ],
+      "question": "Alert volume has surged and the Tier-1 queue is dominated by duplicate alarms, the same event reported by the `EDR`, the `SIEM` correlation rule, and the mail gateway. A SOC analyst has confirmed that removing duplicates would close a significant portion of the backlog, and the team lead wants an approach that can be rolled out without per-analyst scripting. Hiring more Tier-1 analysts is not on the table.\n\nWhich approach reduces the duplicate-driven workload with the least effort?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Implement a SOAR platform with a deduplication playbook that merges alarms sharing indicator and timestamp.",
+          "sequence": 1,
+          "explanation": "`SOAR` playbooks automate repeatable decisions like deduplication across feeds with central orchestration, exactly the use case."
+        },
+        {
+          "id": "c2",
+          "text": "Expose raw alerts through an API so every analyst can build their own filter.",
+          "explanation": "Per-analyst filters duplicate effort and create inconsistent triage outcomes."
+        },
+        {
+          "id": "c3",
+          "text": "Deploy an XDR suite to replace the existing EDR, SIEM and mail gateway entirely.",
+          "explanation": "Wholesale replacement is high-effort and unrelated to the specific deduplication problem."
+        },
+        {
+          "id": "c4",
+          "text": "Expose alerts via a REST interface and require analysts to re-query for each case.",
+          "explanation": "A REST interface is plumbing; it does not itself deduplicate alarms."
+        }
+      ],
+      "tip": "Focus on which option standardises and automates a repeatable triage decision.",
+      "explanation": "SOAR is purpose-built to automate repeatable triage actions like deduplication.\n\n**Why it works:** A single playbook applied at ingestion merges duplicate alarms consistently and frees analysts for genuine investigation.\n\n**Why the others don't work:**\n- API with per-analyst filters: inconsistent and not automated.\n- XDR swap-in: out of scope and disruptive.\n- REST interface alone: a protocol, not an automation.",
+      "domain": "Security Operations",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0190",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "API",
+        "SIEM",
+        "EDR"
+      ],
+      "skills": [
+        "1.5: Explain the importance of efficiency and process improvement in security operations."
+      ],
+      "question": "The platform team is building a single-pane-of-glass dashboard so Tier-1 analysts stop swivel-chairing between the `EDR`, `SIEM`, and ticketing portals. The dashboard must receive real-time alert updates from each tool and allow analysts to comment back without logging into each product. Each backend tool already exposes a documented authenticated `API`.\n\nWhich integration pattern supports both real-time push and bidirectional action?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Configure each tool to send webhooks on alert state change, and use each tool's API for analyst actions written from the dashboard.",
+          "sequence": 1,
+          "explanation": "Webhooks push events as they occur; the API handles write-back, giving real-time updates and bidirectional action."
+        },
+        {
+          "id": "c2",
+          "text": "Poll each tool's API every five minutes from the dashboard and ignore write-back entirely.",
+          "explanation": "Polling introduces latency and provides no way for analysts to comment back."
+        },
+        {
+          "id": "c3",
+          "text": "Export each tool's alert history to CSV nightly and import into the dashboard.",
+          "explanation": "Nightly CSV is neither real-time nor bidirectional."
+        },
+        {
+          "id": "c4",
+          "text": "Forward syslog from every tool to a shared file and tail the file in the dashboard.",
+          "explanation": "Syslog is one-way and loses structured context needed for analyst write-back."
+        }
+      ],
+      "tip": "Identify which option provides push on the read path and remote action on the write path.",
+      "explanation": "Webhooks plus authenticated APIs cover both directions with low latency.\n\n**Why it works:** Events arrive as webhooks at the moment of state change, and the dashboard calls each product's API when an analyst acts, no polling, no manual import.\n\n**Why the others don't work:**\n- Polling only: latent and read-only.\n- Nightly CSV: batch and one-way.\n- Syslog tail: one-way and unstructured.",
+      "domain": "Security Operations",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0191",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "Nessus"
+      ],
+      "skills": [
+        "2.1: Given a scenario, implement vulnerability scanning methods and concepts."
+      ],
+      "question": "Before the next monthly scan, the vulnerability manager wants to reduce the scan's false-positive rate on Windows servers without increasing network noise. The scanner currently fingerprints services by banner only, and the team has noticed that it over-reports patched services because banners are not always updated on hotfix. Domain credentials are available for the scan service account.\n\nWhich scanning configuration reduces the false-positive rate in this context?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Switch to authenticated (credentialed) scans that enumerate installed patches via the local registry and package database.",
+          "sequence": 1,
+          "explanation": "Credentialed scans read installed-update metadata directly, eliminating banner-based guesses and their false positives."
+        },
+        {
+          "id": "c2",
+          "text": "Increase the scan's packet-per-second rate to gather more banners per host.",
+          "explanation": "More packets yield more banners, not more accurate patch state, and add network noise."
+        },
+        {
+          "id": "c3",
+          "text": "Run the scan from a different source subnet to avoid caching.",
+          "explanation": "Source subnet has no bearing on banner-versus-patch accuracy."
+        },
+        {
+          "id": "c4",
+          "text": "Disable vulnerability checks for any plugin that has previously produced a false positive.",
+          "explanation": "Disabling checks hides vulnerabilities rather than validating them; it trades false positives for false negatives."
+        }
+      ],
+      "tip": "Consider what data source would unambiguously prove whether a patch is installed.",
+      "explanation": "Credentialed scans replace banner inference with authoritative host data.\n\n**Why it works:** With credentials the scanner reads the Windows update history and installed package list, so \"not patched\" means genuinely not patched, banner confusion disappears.\n\n**Why the others don't work:**\n- Higher packet rate: more noise, same guessing.\n- Different source subnet: irrelevant.\n- Disabling plugins: hides findings.",
+      "domain": "Vulnerability Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0192",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "SCADA",
+        "ICS"
+      ],
+      "skills": [
+        "2.1: Given a scenario, implement vulnerability scanning methods and concepts."
+      ],
+      "question": "The OT engineering team has agreed to one-off vulnerability coverage for a segmented `SCADA` network that runs a water-treatment process. Engineering insists that active scanning of control-plane devices has previously crashed a programmable logic controller. A maintenance window exists but only for passive monitoring, no active probing is permitted against the PLCs.\n\nWhich scanning approach satisfies both the coverage request and the engineering constraint?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Mirror the SCADA network traffic to a passive scanner that fingerprints devices from observed protocols without sending packets to the PLCs.",
+          "sequence": 1,
+          "explanation": "Passive fingerprinting from a span port respects the no-active-probing constraint while still identifying devices and firmware."
+        },
+        {
+          "id": "c2",
+          "text": "Run an unauthenticated active scan at low rate from a jumphost on the control VLAN.",
+          "explanation": "Any active probing violates the engineering constraint, regardless of rate."
+        },
+        {
+          "id": "c3",
+          "text": "Authenticate the scanner against every PLC and run a full credentialed sweep during the maintenance window.",
+          "explanation": "Credentialed scans still generate active traffic to each PLC and carry the stability risk the team refuses to accept."
+        },
+        {
+          "id": "c4",
+          "text": "Perform a map scan with `nmap -sT` to enumerate only open TCP ports on the PLCs.",
+          "explanation": "A TCP connect scan is active traffic to the PLCs, exactly what engineering prohibits."
+        }
+      ],
+      "tip": "Identify which option gathers evidence without touching the sensitive devices.",
+      "explanation": "Passive traffic analysis is the standard OT-safe coverage technique.\n\n**Why it works:** A span port mirror lets a scanner observe protocol fingerprints and device identifiers without sending packets toward the PLCs, so fragile firmware is never interrogated.\n\n**Why the others don't work:**\n- Low-rate active: still active.\n- Credentialed sweep: still generates probes.\n- `nmap -sT`: TCP connects are active probes.",
+      "domain": "Vulnerability Management",
+      "difficulty": 3,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0193",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "Nessus"
+      ],
+      "skills": [
+        "2.2: Given a scenario, analyze output from vulnerability assessment tools."
+      ],
+      "question": "`Nessus` has flagged a Windows file server with the following finding:\n\n```\nPlugin ID: 156032     Severity: Critical   CVSS v3: 9.8\nSMB Signing not required\nPort: 445/tcp          Protocol: SMBv2\n```\n\nThe file server is reachable from a user VLAN that carries domain-joined laptops. A change advisory board meets tomorrow.\n\nWhich remediation action addresses the finding reported?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Enforce `SMB` signing as required on the server via Group Policy and validate the setting survives a reboot.",
+          "sequence": 1,
+          "explanation": "The plugin specifically reports that signing is not required; the direct remediation is to require it on the server."
+        },
+        {
+          "id": "c2",
+          "text": "Block port `445/tcp` at the host firewall to all clients.",
+          "explanation": "Blocking `445` disables file sharing entirely and does not fix signing, it breaks the service instead."
+        },
+        {
+          "id": "c3",
+          "text": "Upgrade the server to SMBv3 on a non-standard port.",
+          "explanation": "Moving ports does not enable signing, and SMBv3 is already available, signing must still be required."
+        },
+        {
+          "id": "c4",
+          "text": "Mark the finding as a false positive because the server is domain-joined.",
+          "explanation": "Domain membership does not make SMB signing required; the finding is genuine."
+        }
+      ],
+      "tip": "Read the plugin text literally and remediate the exact condition it reports.",
+      "explanation": "The correct fix maps 1:1 to the deficient setting.\n\n**Why it works:** Requiring `SMB` signing closes the relay and downgrade vectors the plugin detects; verification after reboot confirms persistence.\n\n**Why the others don't work:**\n- Blocking `445`: removes the service instead of fixing it.\n- Non-standard port: doesn't enable signing.\n- False-positive dismissal: ignores a real misconfiguration.",
+      "domain": "Vulnerability Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0194",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "Nikto"
+      ],
+      "skills": [
+        "2.2: Given a scenario, analyze output from vulnerability assessment tools."
+      ],
+      "question": "Reviewing `Nikto` output against an internal marketing portal, an analyst sees:\n\n```\n+ /admin/: Admin login page/section found.\n+ OSVDB-3092: /backup/: This might be interesting...\n+ OSVDB-3268: /images/: Directory indexing found.\n+ Apache/2.4.54 appears to be outdated (current is at least 2.4.58).\n```\n\nThe portal owner swears the banner is wrong because their image of Apache was rebuilt last week.\n\nWhich validation step confirms whether the Apache finding is a true positive?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Run `httpd -v` directly on the server to read the installed binary version and compare it against the advisory.",
+          "sequence": 1,
+          "explanation": "Reading the installed binary version on-host is ground truth and settles banner-versus-reality disputes."
+        },
+        {
+          "id": "c2",
+          "text": "Re-run `Nikto` from a different scanner host and accept the second result.",
+          "explanation": "A second banner read does not resolve whether the banner itself is accurate."
+        },
+        {
+          "id": "c3",
+          "text": "Check the `/admin/` and `/backup/` paths for credentials instead.",
+          "explanation": "That investigates a different finding and does not validate the Apache version."
+        },
+        {
+          "id": "c4",
+          "text": "Trust the portal owner's claim because the image was rebuilt recently.",
+          "explanation": "Rebuild recency does not guarantee the latest package unless validated on the host."
+        }
+      ],
+      "tip": "Identify which source is authoritative for software version: the banner or the binary.",
+      "explanation": "Validation beats assertion: read the installed version directly.\n\n**Why it works:** `httpd -v` (or the equivalent package-manager query) returns the binary's actual version, independent of any banner customisation.\n\n**Why the others don't work:**\n- Second scan: same banner source.\n- Different finding: off-topic.\n- Trust the owner: not validation.",
+      "domain": "Vulnerability Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0195",
+      "docs": "https://www.first.org/cvss/v3.1/specification-document",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "CVSS"
+      ],
+      "skills": [
+        "2.3: Given a scenario, analyze data to prioritize vulnerabilities."
+      ],
+      "question": "CVSS base score for a remote code execution vulnerability is 9.8, but the vulnerable server in this environment sits on an isolated lab network that is unreachable from the Internet, unreachable from user VLANs, and holds no regulated data. The risk committee wants the scoring updated to reflect the real exposure. Base metrics cannot be changed.\n\nWhich CVSS component expresses the reduced exposure?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Environmental metrics, which adjust the score using the organisation's own network reachability and asset value.",
+          "sequence": 1,
+          "explanation": "Environmental metrics exist to restate base attack vector and impact in the context of the deploying organisation."
+        },
+        {
+          "id": "c2",
+          "text": "Temporal metrics, which reflect exploit maturity and availability of remediation.",
+          "explanation": "Temporal metrics track time-sensitive exploit and fix state, not local reachability or asset value."
+        },
+        {
+          "id": "c3",
+          "text": "Base metrics, which reflect the inherent characteristics of the vulnerability.",
+          "explanation": "Base metrics describe the vulnerability itself and by design do not vary per environment."
+        },
+        {
+          "id": "c4",
+          "text": "Severity rating, which is a qualitative label independent of the numeric components.",
+          "explanation": "Severity labels summarise the numeric score; they are an output, not an input."
+        }
+      ],
+      "tip": "Separate \"inherent to the vulnerability\" from \"specific to this deployment.\"",
+      "explanation": "Environmental metrics exist to re-weight base scores for local context.\n\n**Why it works:** Setting modified attack vector, modified requirement, and asset requirements lowers the overall CVSS in proportion to the reduced exposure.\n\n**Why the others don't work:**\n- Temporal: exploit-state axis, not environment.\n- Base: fixed to the vulnerability.\n- Severity label: derived, not input.",
+      "domain": "Vulnerability Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0196",
+      "docs": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "CISA KEV"
+      ],
+      "skills": [
+        "2.3: Given a scenario, analyze data to prioritize vulnerabilities."
+      ],
+      "question": "The CISA KEV catalogue was updated overnight with a new entry that matches a CVE already present on 18 Internet-facing web servers in this environment. The vulnerability has a modest CVSS base score of 7.5 and has been on the patch backlog for two weeks as \"medium\". Patch windows for this tier are normally monthly.\n\nHow should the vulnerability manager re-prioritise the work?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Escalate the CVE to top priority because confirmed in-the-wild exploitation outweighs the base score.",
+          "sequence": 1,
+          "explanation": "KEV inclusion is evidence of active exploitation, which should override moderate base scores in prioritisation."
+        },
+        {
+          "id": "c2",
+          "text": "Keep the monthly cadence because the CVSS is only 7.5.",
+          "explanation": "Base score alone under-weights real-world exploitation signals."
+        },
+        {
+          "id": "c3",
+          "text": "Defer until the next quarterly review to avoid disrupting release schedules.",
+          "explanation": "Deferral leaves actively exploited, Internet-exposed assets at risk."
+        },
+        {
+          "id": "c4",
+          "text": "Wait for the vendor to issue an out-of-band patch specifically citing KEV.",
+          "explanation": "Vendors do not gate patch release on KEV status; the patch is already available by the time KEV lists the CVE."
+        }
+      ],
+      "tip": "Weigh exploitation evidence against nominal severity.",
+      "explanation": "KEV escalations are designed to override moderate CVSS scores when exploitation is confirmed.\n\n**Why it works:** Active exploitation is a direct predictor of compromise likelihood; combined with Internet exposure and 18 affected assets, the work should move to the top of the queue.\n\n**Why the others don't work:**\n- Keep cadence: ignores exploitation evidence.\n- Defer to quarterly: leaves exposure open.\n- Wait for vendor: patch already exists.",
+      "domain": "Vulnerability Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0197",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "VLAN",
+        "Firewall"
+      ],
+      "skills": [
+        "2.4: Given a scenario, recommend controls to mitigate attacks and software vulnerabilities."
+      ],
+      "question": "Legacy assembly-line machinery runs an end-of-life operating system with several unpatched, highly exploitable vulnerabilities. The vendor no longer ships updates, and replacing the machinery is a multi-year capital project. Production must continue.\n\nWhich mitigating control reduces the risk of the current condition?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Enforce strict network segmentation that isolates the legacy machinery from the corporate network and Internet, allowing only required engineering workstations through a jumphost.",
+          "sequence": 1,
+          "explanation": "Segmentation and access brokering shrink the exploitable attack surface to the minimum required for operations."
+        },
+        {
+          "id": "c2",
+          "text": "Increase the CPU and memory allocated to the legacy machines to absorb attack traffic.",
+          "explanation": "Resource sizing has no bearing on exploitability of unpatched vulnerabilities."
+        },
+        {
+          "id": "c3",
+          "text": "Commission in-house patches written by the internal engineering team.",
+          "explanation": "In-house patching of proprietary legacy systems is rarely viable and frequently voids support or safety approvals."
+        },
+        {
+          "id": "c4",
+          "text": "Conduct a penetration test to confirm whether the vulnerabilities are exploitable.",
+          "explanation": "A pen test validates risk but does not reduce it, exploitability is already known."
+        }
+      ],
+      "tip": "Focus on reducing exposure rather than eliminating the vulnerability.",
+      "explanation": "Segmentation is the textbook compensating control for unpatchable systems.\n\n**Why it works:** If an attacker cannot reach the vulnerable host, exploitability becomes moot; allow-lists through a jumphost preserve operations while closing the attack surface.\n\n**Why the others don't work:**\n- More resources: unrelated to vulnerability.\n- In-house patches: high risk, rarely feasible.\n- Pen test: measures risk, does not mitigate it.",
+      "domain": "Vulnerability Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0198",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "SQL"
+      ],
+      "skills": [
+        "2.4: Given a scenario, recommend controls to mitigate attacks and software vulnerabilities."
+      ],
+      "question": "Source review of a reporting microservice shows the following query construction:\n\n```python\nq = \"SELECT * FROM orders WHERE customer_id = '\" + request.args['cid'] + \"'\"\ndb.execute(q)\n```\n\nThe endpoint is reachable externally after authentication. Remediation must stop injection at the query layer, not solely at the input layer.\n\nWhich control eliminates the vulnerability class demonstrated?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Parameterised queries (prepared statements) that bind user input to placeholders instead of concatenating into the SQL string.",
+          "sequence": 1,
+          "explanation": "Parameterisation separates code from data at the driver level, which is the definitive fix for SQL injection."
+        },
+        {
+          "id": "c2",
+          "text": "An application-layer allow-list that rejects inputs containing single quotes or semicolons.",
+          "explanation": "Input filtering is a layered defence; it does not eliminate injection when bypassed and is not a query-layer fix."
+        },
+        {
+          "id": "c3",
+          "text": "Network-layer rate limiting on the reporting endpoint to slow exploitation.",
+          "explanation": "Rate limiting reduces throughput but leaves the injection primitive intact."
+        },
+        {
+          "id": "c4",
+          "text": "Output encoding of results rendered back to the user.",
+          "explanation": "Output encoding mitigates XSS, not SQL injection."
+        }
+      ],
+      "tip": "Identify which control changes how user input is combined with the SQL statement.",
+      "explanation": "Parameterisation is the canonical cure for SQL injection.\n\n**Why it works:** Bound parameters are treated as values by the driver, so no amount of input manipulation can change the statement's structure.\n\n**Why the others don't work:**\n- Input filter: layered mitigation, not query-layer fix.\n- Rate limiting: throughput control only.\n- Output encoding: wrong vulnerability class.",
+      "domain": "Vulnerability Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0199",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "2.5: Explain concepts related to vulnerability response, handling, and management."
+      ],
+      "question": "Operators of a proprietary medical imaging appliance cannot accept the vendor's latest firmware because validation and re-certification take six months, and the appliance is implicated in a recent advisory. The risk committee wants a documented interim control that maps to a named control category and is recorded as such in the GRC register.\n\nWhich control category describes the interim treatment?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "A compensating control that substitutes an equivalent protection while the primary fix is unavailable.",
+          "sequence": 1,
+          "explanation": "Compensating controls are explicitly defined as substitutes used when the direct fix is not yet feasible."
+        },
+        {
+          "id": "c2",
+          "text": "A corrective control that restores systems after an incident has occurred.",
+          "explanation": "Corrective controls act after an event; the scenario is about pre-incident risk treatment while patching is deferred."
+        },
+        {
+          "id": "c3",
+          "text": "A preventative control that blocks the vulnerability from existing.",
+          "explanation": "Preventative controls stop exploitation but the taxonomy here hinges on *substitution* for an unavailable fix."
+        },
+        {
+          "id": "c4",
+          "text": "A detective control that identifies exploitation when it occurs.",
+          "explanation": "Detective controls surface events; they do not substitute for the missing patch."
+        }
+      ],
+      "tip": "Focus on the word 'substitute' and ask which category is defined by that idea.",
+      "explanation": "Compensating controls are defined by substitution.\n\n**Why it works:** When the primary control (patching) is blocked for legitimate reasons, a compensating control documents the equivalent protection accepted in its place.\n\n**Why the others don't work:**\n- Corrective: post-event.\n- Preventative: general-purpose, not substitution-specific.\n- Detective: visibility, not substitution.",
+      "domain": "Vulnerability Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0200",
+      "docs": "https://attack.mitre.org/",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "MITRE ATT&CK",
+        "Diamond Model"
+      ],
+      "skills": [
+        "3.1: Explain concepts related to attack methodology frameworks."
+      ],
+      "question": "The threat-intel team is analysing a recent intrusion and wants to express the relationships between the adversary, the victim, the capability used, and the infrastructure so that analysts can pivot between any pair during investigation. Named techniques are already being tracked elsewhere; the team specifically wants a model whose four core vertices support pivoting.\n\nWhich framework supports this pivot analysis?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "The Diamond Model of Intrusion Analysis, organised around adversary, capability, infrastructure, and victim.",
+          "sequence": 1,
+          "explanation": "The Diamond Model's four vertices are designed precisely for pivoting between related intrusion attributes."
+        },
+        {
+          "id": "c2",
+          "text": "The Cyber Kill Chain, describing sequential intrusion phases.",
+          "explanation": "The Kill Chain is a linear phase model and does not formalise pivot relationships."
+        },
+        {
+          "id": "c3",
+          "text": "OWASP Testing Guide, covering web application test procedures.",
+          "explanation": "OWASP Testing Guide addresses application testing, not intrusion analysis."
+        },
+        {
+          "id": "c4",
+          "text": "OSSTMM, which measures operational security testing coverage.",
+          "explanation": "OSSTMM is an audit methodology, not an intrusion-analysis pivot model."
+        }
+      ],
+      "tip": "Count the axes each model offers and match to the requirement.",
+      "explanation": "Pivot analysis across four intrusion attributes is the signature of the Diamond Model.\n\n**Why it works:** Its four vertices (adversary, capability, infrastructure, victim) make relationships between any pair explicit, enabling pivoting.\n\n**Why the others don't work:**\n- Kill Chain: linear phases.\n- OWASP Testing Guide: web testing.\n- OSSTMM: audit methodology.",
+      "domain": "Incident Response and Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0201",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "Cyber Kill Chain"
+      ],
+      "skills": [
+        "3.1: Explain concepts related to attack methodology frameworks."
+      ],
+      "question": "Timeline reconstruction of an intrusion shows that the adversary embedded a malicious macro into a trojanised Office document *before* the document was ever sent to the target. The document was then emailed to a finance user. Leadership wants the pre-send stage mapped to a specific Cyber Kill Chain phase for the report.\n\nWhich Kill Chain phase corresponds to the pre-send activity?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Weaponisation: coupling the payload to a deliverable artefact.",
+          "sequence": 1,
+          "explanation": "Weaponisation is explicitly the step of combining an exploit or payload with a carrier, prior to delivery."
+        },
+        {
+          "id": "c2",
+          "text": "Delivery: transmitting the weaponised artefact to the target.",
+          "explanation": "Delivery is the send step, which happens after the pre-send work."
+        },
+        {
+          "id": "c3",
+          "text": "Exploitation: triggering code execution on the victim.",
+          "explanation": "Exploitation occurs on the victim host, not during artefact construction."
+        },
+        {
+          "id": "c4",
+          "text": "Reconnaissance: researching the target before the campaign.",
+          "explanation": "Reconnaissance gathers intelligence; constructing the carrier is a later stage."
+        }
+      ],
+      "tip": "Ask at what point the payload becomes a usable artefact in attacker hands.",
+      "explanation": "Building the artefact is the defining activity of weaponisation.\n\n**Why it works:** The Kill Chain separates *building* the deliverable (weaponisation) from *sending* it (delivery); macro embedding happens in the former.\n\n**Why the others don't work:**\n- Delivery: the subsequent send step.\n- Exploitation: victim-side.\n- Reconnaissance: earlier, before payload design.",
+      "domain": "Incident Response and Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0202",
+      "docs": "https://csrc.nist.gov/pubs/sp/800/61/r2/final",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "EDR"
+      ],
+      "skills": [
+        "3.2: Given a scenario, perform incident response activities."
+      ],
+      "question": "Ransomware has encrypted a perimeter web server and is actively exhibiting outbound traffic to an unknown destination. The incident commander wants to stop lateral spread and external beaconing immediately while preserving volatile evidence such as memory, network connections, and decryption keys still resident in RAM. A full forensic acquisition will follow.\n\nWhich action should be taken IMMEDIATELY?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Quarantine the server by network isolation while leaving it powered on.",
+          "sequence": 1,
+          "explanation": "Isolation halts lateral movement and outbound C2 while keeping RAM contents intact for subsequent acquisition."
+        },
+        {
+          "id": "c2",
+          "text": "Shut down the server immediately to stop the encryption process.",
+          "explanation": "Power-off destroys RAM contents, which may include encryption keys and attacker artefacts crucial to recovery."
+        },
+        {
+          "id": "c3",
+          "text": "Reimage the server from a clean gold build.",
+          "explanation": "Reimaging belongs in recovery, not immediate containment, and destroys evidence entirely."
+        },
+        {
+          "id": "c4",
+          "text": "Update the operating system to the latest version on the live host.",
+          "explanation": "Patching during an active incident complicates forensics and does not contain the compromise."
+        }
+      ],
+      "tip": "Balance stopping the bleeding with preserving what RAM can tell you.",
+      "explanation": "Network isolation is the standard immediate containment that preserves volatile evidence.\n\n**Why it works:** Cutting connectivity ends lateral movement and beaconing yet keeps the running process and memory available for acquisition.\n\n**Why the others don't work:**\n- Shut down: destroys RAM.\n- Reimage: recovery phase, erases evidence.\n- Patch live: wrong phase and contaminates state.",
+      "domain": "Incident Response and Management",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0203",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "3.2: Given a scenario, perform incident response activities."
+      ],
+      "question": "With a malicious scheduled task and two persistence registry entries already confirmed on an isolated host, the responder is actively deleting the scheduled task, removing the registry values, and deleting the dropper binary from disk. The host remains offline and will be returned to service only after a clean verification scan.\n\nWhich phase of the incident response lifecycle is the responder in?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Eradication: removing the adversary's artefacts and footholds from the system.",
+          "sequence": 1,
+          "explanation": "Removing the scheduled task, registry persistence, and dropper are textbook eradication actions."
+        },
+        {
+          "id": "c2",
+          "text": "Containment: limiting the impact without removing artefacts.",
+          "explanation": "Containment was already achieved by taking the host offline; the responder has moved past it."
+        },
+        {
+          "id": "c3",
+          "text": "Recovery: restoring normal operations after eradication.",
+          "explanation": "Recovery happens after eradication, once the system is verified clean and ready to return."
+        },
+        {
+          "id": "c4",
+          "text": "Preparation: getting people and tools ready before incidents.",
+          "explanation": "Preparation occurs in peacetime and is unrelated to active artefact removal."
+        }
+      ],
+      "tip": "Distinguish \"stop it from spreading\" from \"remove it from the system.\"",
+      "explanation": "Eradication is defined by the removal of adversary artefacts.\n\n**Why it works:** Deleting persistence, scheduled tasks, and droppers are the defining actions of the eradication phase as described in NIST SP 800-61r2.\n\n**Why the others don't work:**\n- Containment: limit impact, not remove.\n- Recovery: return to service.\n- Preparation: pre-incident.",
+      "domain": "Incident Response and Management",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0204",
+      "docs": "https://csrc.nist.gov/pubs/sp/800/61/r2/final",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "3.3: Explain the preparation and post-incident activity phases of the incident management life cycle."
+      ],
+      "question": "Six weeks after a contained phishing-driven incident, the incident manager is leading an exercise to determine *why* the malicious email bypassed the mail gateway and *why* the user opened it despite recent training. The resulting findings will feed gateway rule changes and training updates.\n\nIn which phase of the incident management lifecycle does this activity occur?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Post-incident activity, which includes root cause analysis and lessons learned.",
+          "sequence": 1,
+          "explanation": "Root cause analysis is explicitly a post-incident activity intended to prevent recurrence."
+        },
+        {
+          "id": "c2",
+          "text": "Containment, eradication, and recovery.",
+          "explanation": "That phase focuses on stopping and removing the current threat, not on root-cause reflection."
+        },
+        {
+          "id": "c3",
+          "text": "Preparation, which readies the team before incidents occur.",
+          "explanation": "Preparation is peacetime work; the scenario is explicitly post-event."
+        },
+        {
+          "id": "c4",
+          "text": "Detection and analysis, which identifies and scopes active threats.",
+          "explanation": "Detection and analysis runs during the incident, not six weeks afterward."
+        }
+      ],
+      "tip": "Locate RCA in the lifecycle by its retrospective purpose.",
+      "explanation": "RCA sits in the post-incident phase of NIST SP 800-61r2.\n\n**Why it works:** The phase is defined by retrospective activities (RCA, lessons learned, evidence retention) that feed improvements back into preparation.\n\n**Why the others don't work:**\n- Containment/eradication/recovery: active response.\n- Preparation: pre-event.\n- Detection and analysis: during-event.",
+      "domain": "Incident Response and Management",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0205",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "3.3: Explain the preparation and post-incident activity phases of the incident management life cycle."
+      ],
+      "question": "Immediately after the conclusion of a contained security incident, the incident manager wants a single action that MOST strongly improves the organisation's response to similar incidents in the future. The response team, IT operations, and the business owner are all available within the next week.\n\nWhich action achieves that outcome?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Schedule a lessons-learned review with all involved teams to identify what worked, what failed, and what to change.",
+          "sequence": 1,
+          "explanation": "A structured lessons-learned review is the canonical post-incident improvement mechanism and produces concrete changes."
+        },
+        {
+          "id": "c2",
+          "text": "Develop a phone-tree call list to notify impacted users.",
+          "explanation": "A call tree supports communication but does not itself drive structural improvements."
+        },
+        {
+          "id": "c3",
+          "text": "Draft an executive summary to update company leadership.",
+          "explanation": "An exec summary informs leadership but is not the forum where the response is actually improved."
+        },
+        {
+          "id": "c4",
+          "text": "Review regulatory compliance with public relations for official notification.",
+          "explanation": "Regulatory and PR coordination address disclosure obligations, not response improvement."
+        }
+      ],
+      "tip": "Identify which activity directly produces changes the team will apply next time.",
+      "explanation": "Lessons-learned reviews convert experience into process change.\n\n**Why it works:** Bringing response, IT, and business stakeholders together to examine the incident surfaces the gaps that produce action items for playbooks, tooling, and training.\n\n**Why the others don't work:**\n- Call tree: communication artefact.\n- Exec summary: informs, does not improve.\n- PR/regulatory review: disclosure, not improvement.",
+      "domain": "Incident Response and Management",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0206",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "4.1: Explain the importance of vulnerability management reporting and communication."
+      ],
+      "question": "Executive briefing on the quarter's vulnerability posture is due next week. The vulnerability manager's draft contains CVE lists, plugin IDs, and raw host counts. The CISO has asked that the content be re-tailored for a board audience that does not operate security tooling but cares about business exposure and remediation trend.\n\nWhich change tailors the report to the board audience?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Replace plugin-level detail with business-risk themes, top-10 exposures, and quarterly trend metrics tied to SLOs.",
+          "sequence": 1,
+          "explanation": "Board audiences consume risk, trend, and SLO-aligned metrics; plugin-level data is the wrong granularity."
+        },
+        {
+          "id": "c2",
+          "text": "Add more plugin IDs to demonstrate scanning thoroughness.",
+          "explanation": "More technical detail makes the report less useful to a business audience."
+        },
+        {
+          "id": "c3",
+          "text": "Remove all metrics and summarise each finding as a paragraph.",
+          "explanation": "Narrative-only reports lose the trend and exposure signals boards need."
+        },
+        {
+          "id": "c4",
+          "text": "Hand the existing technical report to the board unchanged to preserve accuracy.",
+          "explanation": "Accuracy is not at issue; relevance and abstraction level are."
+        }
+      ],
+      "tip": "Match detail level to what the audience is accountable for.",
+      "explanation": "Board-level reports summarise exposure and trend tied to business objectives.\n\n**Why it works:** Business-risk themes, top-10 exposure, and SLO-aligned trend give the board a basis to make investment and risk-appetite decisions.\n\n**Why the others don't work:**\n- More plugin IDs: wrong level of detail.\n- Narrative only: loses measurability.\n- Unchanged technical report: irrelevant to the audience.",
+      "domain": "Reporting and Communication",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0207",
+      "type": "single-choice",
+      "format": "text",
+      "services": [
+        "SLA"
+      ],
+      "skills": [
+        "4.1: Explain the importance of vulnerability management reporting and communication."
+      ],
+      "question": "Remediation of a critical finding on a revenue-generating application is blocked because the application is operated by a third-party managed-service provider whose contract restricts change windows to two weekends per quarter. The vulnerability manager is drafting the remediation-inhibitor section of the quarterly report.\n\nWhich inhibitor describes the obstacle?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Service-level agreement terms with the managed-service provider restricting change frequency.",
+          "sequence": 1,
+          "explanation": "Contractual change-window constraints are a classic SLA-driven inhibitor to remediation."
+        },
+        {
+          "id": "c2",
+          "text": "Legacy system incompatibility with the patch binary.",
+          "explanation": "The blocker is contractual, not technical incompatibility."
+        },
+        {
+          "id": "c3",
+          "text": "Business process interruption during business hours.",
+          "explanation": "The provider already refuses out-of-SLA windows regardless of business hours."
+        },
+        {
+          "id": "c4",
+          "text": "Degrading functionality after the patch is applied.",
+          "explanation": "Functionality regressions are a different inhibitor; here the issue is when the change can occur."
+        }
+      ],
+      "tip": "Identify who controls the blocker and by what mechanism.",
+      "explanation": "SLA-constrained change windows are a governance-layer inhibitor.\n\n**Why it works:** The restriction is defined in the third-party contract and operates regardless of the technical characteristics of the patch.\n\n**Why the others don't work:**\n- Legacy incompatibility: not asserted here.\n- Business-hours interruption: not the binding constraint.\n- Functional degradation: would appear post-patch, not pre-patch.",
+      "domain": "Reporting and Communication",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0208",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "4.1: Explain the importance of vulnerability management reporting and communication."
+      ],
+      "question": "The board has asked for a leading indicator that will signal whether vulnerability-risk appetite is being exceeded *before* breaches occur, rather than a lagging measure of workload. The vulnerability manager already reports patch-compliance counts and open-ticket ages. The new metric should directly trigger governance escalation when a threshold is crossed.\n\nWhich metric type fits the board's request?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "A key risk indicator (KRI) tied to a defined risk-appetite threshold.",
+          "sequence": 1,
+          "explanation": "KRIs are leading indicators with thresholds that drive governance action when breached."
+        },
+        {
+          "id": "c2",
+          "text": "A key performance indicator (KPI) such as the number of patches shipped per week.",
+          "explanation": "KPIs measure activity and outcomes, not risk appetite, and tend to be lagging."
+        },
+        {
+          "id": "c3",
+          "text": "A mean time to remediate (MTTR) trend line.",
+          "explanation": "MTTR is useful but is an outcome metric, not a leading risk indicator."
+        },
+        {
+          "id": "c4",
+          "text": "A plain count of open critical vulnerabilities.",
+          "explanation": "A raw count lacks the appetite threshold that converts it into a risk indicator."
+        }
+      ],
+      "tip": "Separate \"how much work are we doing\" from \"are we drifting past our appetite.\"",
+      "explanation": "KRIs are purpose-built for leading, threshold-driven risk governance.\n\n**Why it works:** A KRI with a defined appetite threshold converts technical data into a signal the board can act on before losses occur.\n\n**Why the others don't work:**\n- KPI: performance, not risk appetite.\n- MTTR trend: outcome measure.\n- Raw count: no threshold.",
+      "domain": "Reporting and Communication",
+      "difficulty": 2,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0209",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "4.2: Explain the importance of incident response reporting and communication."
+      ],
+      "question": "Drafting the executive summary section of an incident response report, the incident manager needs to decide what to include and what to defer to appendices. Leadership will read only the summary. Legal and PR will consume other sections separately.\n\nWhich content belongs in the executive summary?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "A concise statement of who, what, when, where, why, scope, impact, and recommended next steps.",
+          "sequence": 1,
+          "explanation": "Executive summaries capture the essential facts and recommendations at a glance, without technical appendices."
+        },
+        {
+          "id": "c2",
+          "text": "Packet captures, EDR process trees, and full log excerpts.",
+          "explanation": "Raw artefacts belong in appendices or evidence sections, not the summary."
+        },
+        {
+          "id": "c3",
+          "text": "A verbatim timeline of every analyst action with timestamps to the second.",
+          "explanation": "Detailed action logs support forensic review but are not summary content."
+        },
+        {
+          "id": "c4",
+          "text": "The full list of regulatory citations the legal team is evaluating.",
+          "explanation": "Regulatory citations live in the legal section tailored for that audience."
+        }
+      ],
+      "tip": "Consider what a leader needs in ten lines to decide and delegate.",
+      "explanation": "Executive summaries distil the incident into decision-ready content.\n\n**Why it works:** Who/what/when/where/why plus impact, scope, and recommendations give leadership what they need to direct resources without wading through appendices.\n\n**Why the others don't work:**\n- Raw captures: appendix material.\n- Verbatim timelines: forensic, not summary.\n- Full regulatory citations: legal section.",
+      "domain": "Reporting and Communication",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-21"
+    },
+    {
+      "id": "CS0-003-0210",
+      "type": "single-choice",
+      "format": "text",
+      "services": [],
+      "skills": [
+        "4.2: Explain the importance of incident response reporting and communication."
+      ],
+      "question": "Stakeholder interviews after a malware incident reveal that leadership cares most about *how quickly the SOC noticed the compromise* rather than how long it took to resolve. The incident manager needs to pick the single metric most aligned with that question for the next report cycle, then track it quarter-on-quarter.\n\nWhich metric matches the stakeholders' concern?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Mean time to detect (MTTD), measured from first adversary action to first SOC alert acknowledgement.",
+          "sequence": 1,
+          "explanation": "MTTD directly answers \"how quickly did we notice\", exactly what the stakeholders asked about."
+        },
+        {
+          "id": "c2",
+          "text": "Mean time to respond (MTTR), measured from alert acknowledgement to containment.",
+          "explanation": "MTTR captures responsiveness after detection, not the detection delay itself."
+        },
+        {
+          "id": "c3",
+          "text": "Mean time to remediate, measured from containment to full recovery.",
+          "explanation": "Remediation time answers the question about resolution, not detection."
+        },
+        {
+          "id": "c4",
+          "text": "Alert volume per shift.",
+          "explanation": "Alert volume is a workload measure and says nothing about detection latency."
+        }
+      ],
+      "tip": "Match the metric name to the precise question being asked.",
+      "explanation": "MTTD is the direct measure of detection latency.\n\n**Why it works:** Measured from adversary action to first alert, MTTD expresses how quickly the SOC noticed the compromise, the exact stakeholder concern.\n\n**Why the others don't work:**\n- MTTR: responsiveness, not detection.\n- MTT-remediate: post-containment.\n- Alert volume: workload, not latency.",
+      "domain": "Reporting and Communication",
+      "difficulty": 1,
+      "lastReviewed": "2026-04-21"
     }
+  ],
+  "showcaseQuestionIds": [
+    "CS0-003-0002",
+    "CS0-003-0025",
+    "CS0-003-0026",
+    "CS0-003-0027",
+    "CS0-003-0184",
+    "CS0-003-0186",
+    "CS0-003-0001",
+    "CS0-003-0003",
+    "CS0-003-0004",
+    "CS0-003-0005",
+    "CS0-003-0006",
+    "CS0-003-0013",
+    "CS0-003-0014",
+    "CS0-003-0064",
+    "CS0-003-0073",
+    "CS0-003-0074",
+    "CS0-003-0075",
+    "CS0-003-0077",
+    "CS0-003-0078",
+    "CS0-003-0097",
+    "CS0-003-0099",
+    "CS0-003-0100",
+    "CS0-003-0102",
+    "CS0-003-0192",
+    "CS0-003-0193",
+    "CS0-003-0194",
+    "CS0-003-0121",
+    "CS0-003-0122",
+    "CS0-003-0123",
+    "CS0-003-0124",
+    "CS0-003-0125",
+    "CS0-003-0126",
+    "CS0-003-0133",
+    "CS0-003-0134",
+    "CS0-003-0157",
+    "CS0-003-0158",
+    "CS0-003-0159",
+    "CS0-003-0160",
+    "CS0-003-0161",
+    "CS0-003-0162"
   ]
 }
