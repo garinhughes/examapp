@@ -258,7 +258,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
       const registeredUnlocked = await buildUnlockedIdsForLab(lab, showCount)
 
-      if (!lab.showcase || !registeredUnlocked.has(lab.id)) {
+      if (!registeredUnlocked.has(lab.id)) {
         return reply.status(403).send({ message: 'Upgrade to access more labs.' })
       }
       return reply.send(lab)
@@ -268,7 +268,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const visitorCount = effectiveLabShowcaseCount('visitor') ?? 6
     const visitorUnlocked = await buildUnlockedIdsForLab(lab, visitorCount)
 
-    if (!lab.showcase || !visitorUnlocked.has(lab.id)) {
+    if (!visitorUnlocked.has(lab.id)) {
       return reply.status(403).send({ message: 'Sign in to access more labs.' })
     }
     return reply.send(lab)
