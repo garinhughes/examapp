@@ -107,9 +107,7 @@
         "text": "TLS handshake failure"
       }
     ],
-    "explanation": "The S3 bucket policy is missing. When using CloudFront Origin Access Control (OAC), the S3 bucket must have a policy that explicitly grants s3:GetObject permission to the CloudFront service principal. Without this policy, S3 denies all requests from CloudFront, resulting in a 403 Access Denied error.",
-    "showcase": true,
-    "showcaseOrder": 1
+    "explanation": "The S3 bucket policy is missing. When using CloudFront Origin Access Control (OAC), the S3 bucket must have a policy that explicitly grants s3:GetObject permission to the CloudFront service principal. Without this policy, S3 denies all requests from CloudFront, resulting in a 403 Access Denied error."
   },
   {
     "id": "aws-s3-access-denied-cli",
@@ -267,9 +265,7 @@
         "expected": "arn:aws:s3:::my-app-bucket"
       }
     ],
-    "explanation": "Three issues needed fixing:\n\n1. Resource was arn:aws:s3:::* - far too broad. Object operations require the objects ARN arn:aws:s3:::my-app-bucket/*.\n2. s3:PutObject was missing - the role needs to upload, not just read.\n3. s3:ListBucket was missing and requires the bucket ARN (no /*) as the Resource - a common mistake is using the objects ARN for ListBucket, which silently fails.\n\nThe correct policy has two statements: one for object operations on the /* ARN, and one for ListBucket on the bare bucket ARN.",
-    "showcase": true,
-    "showcaseOrder": 4
+    "explanation": "Three issues needed fixing:\n\n1. Resource was arn:aws:s3:::* - far too broad. Object operations require the objects ARN arn:aws:s3:::my-app-bucket/*.\n2. s3:PutObject was missing - the role needs to upload, not just read.\n3. s3:ListBucket was missing and requires the bucket ARN (no /*) as the Resource - a common mistake is using the objects ARN for ListBucket, which silently fails.\n\nThe correct policy has two statements: one for object operations on the /* ARN, and one for ListBucket on the bare bucket ARN."
   },
   {
     "id": "aws-ha-web-app-builder",
@@ -299,49 +295,49 @@
       {
         "id": "alb",
         "label": "Application Load Balancer",
-        "icon": "\u2696\ufe0f",
+        "icon": "⚖️",
         "category": "Networking"
       },
       {
         "id": "ec2-a",
         "label": "EC2 (AZ-a)",
-        "icon": "\ud83d\udda5\ufe0f",
+        "icon": "🖥️",
         "category": "Compute"
       },
       {
         "id": "ec2-b",
         "label": "EC2 (AZ-b)",
-        "icon": "\ud83d\udda5\ufe0f",
+        "icon": "🖥️",
         "category": "Compute"
       },
       {
         "id": "rds-primary",
         "label": "RDS Primary",
-        "icon": "\ud83d\uddc4\ufe0f",
+        "icon": "🗄️",
         "category": "Database"
       },
       {
         "id": "rds-replica",
         "label": "RDS Standby (Multi-AZ)",
-        "icon": "\ud83d\uddc4\ufe0f",
+        "icon": "🗄️",
         "category": "Database"
       },
       {
         "id": "cloudfront",
         "label": "CloudFront",
-        "icon": "\ud83c\udf10",
+        "icon": "🌐",
         "category": "CDN"
       },
       {
         "id": "elasticache",
         "label": "ElastiCache",
-        "icon": "\u26a1",
+        "icon": "⚡",
         "category": "Cache"
       },
       {
         "id": "nat-gw",
         "label": "NAT Gateway",
-        "icon": "\ud83d\udd12",
+        "icon": "🔒",
         "category": "Networking"
       }
     ],
@@ -379,9 +375,7 @@
       "Both EC2 instances connect to RDS Primary",
       "RDS Primary replicates synchronously to RDS Standby for automatic failover"
     ],
-    "explanation": "The minimum HA setup needs:\n\n- **ALB** - distributes incoming traffic across both AZs. If AZ-a goes down, all traffic automatically shifts to AZ-b.\n- **EC2 in AZ-a and AZ-b** - running the same app in two AZs means no single AZ outage takes the application offline.\n- **RDS Primary** - handles all reads and writes during normal operation.\n- **RDS Standby (Multi-AZ)** - RDS keeps a synchronous replica in a second AZ. If the primary fails, RDS automatically promotes the standby in under 60 seconds with no data loss.\n\nThe decoys (CloudFront, ElastiCache, NAT Gateway) are useful in production but do not contribute to surviving an AZ failure.",
-    "showcase": true,
-    "showcaseOrder": 7
+    "explanation": "The minimum HA setup needs:\n\n- **ALB** - distributes incoming traffic across both AZs. If AZ-a goes down, all traffic automatically shifts to AZ-b.\n- **EC2 in AZ-a and AZ-b** - running the same app in two AZs means no single AZ outage takes the application offline.\n- **RDS Primary** - handles all reads and writes during normal operation.\n- **RDS Standby (Multi-AZ)** - RDS keeps a synchronous replica in a second AZ. If the primary fails, RDS automatically promotes the standby in under 60 seconds with no data loss.\n\nThe decoys (CloudFront, ElastiCache, NAT Gateway) are useful in production but do not contribute to surviving an AZ failure."
   },
   {
     "id": "aws-lambda-timeout-logs",
@@ -620,9 +614,7 @@
         "text": "A slow DynamoDB query (1847ms) is accumulating to cause the timeout"
       }
     ],
-    "explanation": "The logs show DDB:PROV_THROUGHPUT_EXCEEDED errors from the OrderProcessor function with exponential backoff retries. The SDK retries consume the entire 30-second Lambda timeout.\n\nTwo red herrings to discard:\n- VPC ENI cold start (4.2s) belongs to UserRecommendationFunction - it completes successfully\n- Slow 1847ms query at 10:07 - the request still completes in 3.2s, well within the timeout\n\nThe fix is to switch the DynamoDB table to on-demand capacity mode or increase provisioned read capacity units.",
-    "showcase": true,
-    "showcaseOrder": 5
+    "explanation": "The logs show DDB:PROV_THROUGHPUT_EXCEEDED errors from the OrderProcessor function with exponential backoff retries. The SDK retries consume the entire 30-second Lambda timeout.\n\nTwo red herrings to discard:\n- VPC ENI cold start (4.2s) belongs to UserRecommendationFunction - it completes successfully\n- Slow 1847ms query at 10:07 - the request still completes in 3.2s, well within the timeout\n\nThe fix is to switch the DynamoDB table to on-demand capacity mode or increase provisioned read capacity units."
   },
   {
     "id": "aws-api-request-network-debug",
@@ -755,9 +747,7 @@
         "text": "Application process has crashed"
       }
     ],
-    "explanation": "The EC2 security group allows inbound traffic on port 80, but the ALB target group forwards to port 8080. Since the security group doesn't allow port 8080, the ALB health checks fail and requests time out with 504 errors.\n\nThe fix is to update the EC2 security group to allow inbound traffic on port 8080 from the ALB security group.",
-    "showcase": true,
-    "showcaseOrder": 2
+    "explanation": "The EC2 security group allows inbound traffic on port 80, but the ALB target group forwards to port 8080. Since the security group doesn't allow port 8080, the ALB health checks fail and requests time out with 504 errors.\n\nThe fix is to update the EC2 security group to allow inbound traffic on port 8080 from the ALB security group."
   },
   {
     "id": "aws-incident-response-ordering",
@@ -830,8 +820,7 @@
         "correctPosition": 9
       }
     ],
-    "explanation": "The correct order:\n\n1. Disable the compromised keys immediately - this is the fastest containment.\n2. Apply deny-all to catch any active sessions still using the principal.\n3. Notify stakeholders before deep investigation so they are aware.\n4. Check GuardDuty for lateral movement signals first - it provides a broader threat picture.\n5. Deep dive into CloudTrail for the full action scope.\n6. Isolate affected EC2 instances once you understand what was accessed.\n7. Revert unauthorized changes.\n8. Issue fresh credentials once containment is confirmed.\n9. Document and improve policies last.",
-    "showcase": false
+    "explanation": "The correct order:\n\n1. Disable the compromised keys immediately - this is the fastest containment.\n2. Apply deny-all to catch any active sessions still using the principal.\n3. Notify stakeholders before deep investigation so they are aware.\n4. Check GuardDuty for lateral movement signals first - it provides a broader threat picture.\n5. Deep dive into CloudTrail for the full action scope.\n6. Isolate affected EC2 instances once you understand what was accessed.\n7. Revert unauthorized changes.\n8. Issue fresh credentials once containment is confirmed.\n9. Document and improve policies last."
   },
   {
     "id": "aws-fix-alb-health-check",
@@ -945,9 +934,7 @@
         ]
       }
     ],
-    "explanation": "Four settings need fixing:\n\n1. Protocol must be HTTP - the backend does not terminate TLS.\n2. Port must match the application's listening port, not the default 80.\n3. Path must match the actual health endpoint, not a generic /health.\n4. Healthy Threshold of 5 means a target needs 5 consecutive passes before it's considered healthy - 2 is the AWS recommended minimum for faster recovery.\n\nResponse codes should be 200-299 to accept any success code, not just 200. Deregistration delay of 300s is too long for rapid failover; 60s is appropriate for most APIs.",
-    "showcase": true,
-    "showcaseOrder": 3
+    "explanation": "Four settings need fixing:\n\n1. Protocol must be HTTP - the backend does not terminate TLS.\n2. Port must match the application's listening port, not the default 80.\n3. Path must match the actual health endpoint, not a generic /health.\n4. Healthy Threshold of 5 means a target needs 5 consecutive passes before it's considered healthy - 2 is the AWS recommended minimum for faster recovery.\n\nResponse codes should be 200-299 to accept any success code, not just 200. Deregistration delay of 300s is too long for rapid failover; 60s is appropriate for most APIs."
   },
   {
     "id": "aws-reduce-monthly-aws-cost",
@@ -1063,7 +1050,7 @@
             "cost": 210
           },
           {
-            "service": "S3 Lifecycle: 30d Standard \u2192 IA \u2192 Glacier ($65/mo)",
+            "service": "S3 Lifecycle: 30d Standard → IA → Glacier ($65/mo)",
             "cost": 65
           },
           {
@@ -1075,7 +1062,7 @@
             "cost": 600
           }
         ],
-        "correctService": "S3 Lifecycle: 30d Standard \u2192 IA \u2192 Glacier ($65/mo)"
+        "correctService": "S3 Lifecycle: 30d Standard → IA → Glacier ($65/mo)"
       },
       {
         "id": "logging",
@@ -1128,9 +1115,7 @@
         "correctService": "70% Fargate Spot + 30% On-Demand tasks ($95/mo)"
       }
     ],
-    "explanation": "The optimal strategy brings costs to ~$615/mo:\n\n1. Lambda replaces always-on EC2 for variable API traffic ($45 vs $520).\n2. Aurora Serverless v2 scales to demand instead of a fixed oversized RDS ($350 vs $1200).\n3. VPC Endpoints eliminate NAT data fees for AWS service traffic ($20 vs $210).\n4. S3 Lifecycle moves aging objects to cheaper tiers automatically ($65 vs $220).\n5. Exporting CloudWatch logs to S3 and querying with Athena is far cheaper than high-volume log ingestion ($40 vs $320).\n6. Fargate Spot is suitable for interruptible batch workers - EC2 Spot is cheaper still but requires managing instances ($95 vs $380).\n\nAvoid disabling logging (breaks audit trail) and avoid pure Spot for latency-sensitive APIs.",
-    "showcase": true,
-    "showcaseOrder": 6
+    "explanation": "The optimal strategy brings costs to ~$615/mo:\n\n1. Lambda replaces always-on EC2 for variable API traffic ($45 vs $520).\n2. Aurora Serverless v2 scales to demand instead of a fixed oversized RDS ($350 vs $1200).\n3. VPC Endpoints eliminate NAT data fees for AWS service traffic ($20 vs $210).\n4. S3 Lifecycle moves aging objects to cheaper tiers automatically ($65 vs $220).\n5. Exporting CloudWatch logs to S3 and querying with Athena is far cheaper than high-volume log ingestion ($40 vs $320).\n6. Fargate Spot is suitable for interruptible batch workers - EC2 Spot is cheaper still but requires managing instances ($95 vs $380).\n\nAvoid disabling logging (breaks audit trail) and avoid pure Spot for latency-sensitive APIs."
   },
   {
     "id": "aws-secure-s3-app",
@@ -1272,7 +1257,7 @@
       "SAA-C03"
     ],
     "scenario": "Your serverless API (API Gateway -> Lambda -> DynamoDB) has a P99 latency of **4.2 seconds**. The SLA requires P99 under **500ms**.\n\nIdentify the correct optimization for each performance bottleneck.",
-    "architectureDescription": "Client \u2192 CloudFront (not configured) \u2192 API Gateway (REST) \u2192 Lambda (1024MB, Python 3.12, no provisioned concurrency) \u2192 DynamoDB (on-demand, no caching layer)",
+    "architectureDescription": "Client → CloudFront (not configured) → API Gateway (REST) → Lambda (1024MB, Python 3.12, no provisioned concurrency) → DynamoDB (on-demand, no caching layer)",
     "problems": [
       {
         "id": "cold-start",
@@ -1541,9 +1526,7 @@
         "correctOption": "Enable CloudFront Origin Shield and increase origin response timeout"
       }
     ],
-    "explanation": "The correct actions:\n\n1. Increase ASG max capacity - the current limit prevents scaling out; target tracking at 60% CPU provides headroom.\n2. Request Lambda concurrency increase via AWS Support, and set reserved concurrency to protect critical functions.\n3. DynamoDB on-demand mode auto-scales without pre-provisioning.\n4. Increasing Lambda batch size and concurrency for SQS consumers drains the queue faster.\n5. API Gateway account-level throttle must be raised via Support - caching helps but doesn't solve a hard limit.\n6. Scaling up ElastiCache nodes and enabling cluster mode distributes keyspace and reduces eviction pressure.\n7. RDS Proxy pools persistent application connections and multiplexes them to RDS, allowing far more concurrent connections without resizing the instance.\n8. CloudFront Origin Shield adds an extra caching layer between edge nodes and the origin; increasing origin timeout handles slow responses under spike load.",
-    "showcase": true,
-    "showcaseOrder": 12
+    "explanation": "The correct actions:\n\n1. Increase ASG max capacity - the current limit prevents scaling out; target tracking at 60% CPU provides headroom.\n2. Request Lambda concurrency increase via AWS Support, and set reserved concurrency to protect critical functions.\n3. DynamoDB on-demand mode auto-scales without pre-provisioning.\n4. Increasing Lambda batch size and concurrency for SQS consumers drains the queue faster.\n5. API Gateway account-level throttle must be raised via Support - caching helps but doesn't solve a hard limit.\n6. Scaling up ElastiCache nodes and enabling cluster mode distributes keyspace and reduces eviction pressure.\n7. RDS Proxy pools persistent application connections and multiplexes them to RDS, allowing far more concurrent connections without resizing the instance.\n8. CloudFront Origin Shield adds an extra caching layer between edge nodes and the origin; increasing origin timeout handles slow responses under spike load."
   },
   {
     "id": "aws-investigate-api-outage",
@@ -2222,7 +2205,7 @@
         "drifted": false
       }
     ],
-    "explanation": "Four resources have drifted from the Terraform state:\n\n1. Security Group (sg-web-app) - Port 22 (SSH) was added manually for debugging during the incident. This is a security risk and should be removed, then the Terraform state updated if SSH access is needed.\n\n2. RDS Instance (prod-db) - Instance class was upgraded from db.t3.medium to db.t3.large during the incident for more capacity. The Terraform configuration should be updated to reflect the new size if the upgrade is desired, or the instance should be downgraded.\n\n3. IAM Role (lambda-execution-role) - AmazonS3FullAccess was attached manually. This violates least-privilege and should be replaced with a scoped policy granting only the specific S3 permissions needed.\n\n4. Lambda Function (api-handler) - Memory was doubled (256\u2192512MB), timeout increased (30\u219260s), and LOG_LEVEL changed from 'warn' to 'debug'. These were emergency changes to handle elevated load and improve debugging. The Terraform config should be updated to keep the memory increase if helpful, but LOG_LEVEL should revert to 'warn' for production."
+    "explanation": "Four resources have drifted from the Terraform state:\n\n1. Security Group (sg-web-app) - Port 22 (SSH) was added manually for debugging during the incident. This is a security risk and should be removed, then the Terraform state updated if SSH access is needed.\n\n2. RDS Instance (prod-db) - Instance class was upgraded from db.t3.medium to db.t3.large during the incident for more capacity. The Terraform configuration should be updated to reflect the new size if the upgrade is desired, or the instance should be downgraded.\n\n3. IAM Role (lambda-execution-role) - AmazonS3FullAccess was attached manually. This violates least-privilege and should be replaced with a scoped policy granting only the specific S3 permissions needed.\n\n4. Lambda Function (api-handler) - Memory was doubled (256→512MB), timeout increased (30→60s), and LOG_LEVEL changed from 'warn' to 'debug'. These were emergency changes to handle elevated load and improve debugging. The Terraform config should be updated to keep the memory increase if helpful, but LOG_LEVEL should revert to 'warn' for production."
   },
   {
     "id": "aws-migration-service-mapping",
@@ -2306,7 +2289,7 @@
         "definition": "Amazon Route 53 - Scalable DNS with health checks, failover routing, latency-based routing, and domain registration"
       }
     ],
-    "explanation": "The key AWS service mappings for lift-and-shift migration:\n\n\u2022 VMware VMs \u2192 EC2: Direct VM-to-instance migration using AWS Application Migration Service (MGN)\n\u2022 SAN storage \u2192 EBS: Block storage attached to instances; choose gp3 for general purpose, io2 for high IOPS\n\u2022 PostgreSQL \u2192 RDS: Managed DB eliminates patching/backup overhead; use DMS for data migration\n\u2022 NFS \u2192 EFS: Elastic shared file system with NFS v4 protocol compatibility\n\u2022 F5 \u2192 ALB/NLB: ALB for HTTP/HTTPS (Layer 7), NLB for TCP/UDP (Layer 4)\n\u2022 Nagios \u2192 CloudWatch: Native monitoring with custom metrics, alarms, and integration with SNS for alerting\n\u2022 RabbitMQ \u2192 SQS: Managed queuing; consider Amazon MQ if AMQP protocol compatibility is required\n\u2022 Active Directory \u2192 Directory Service: AWS Managed Microsoft AD provides full AD compatibility\n\u2022 Veeam \u2192 AWS Backup: Centralised backup with retention policies and cross-account/cross-region support\n\u2022 BIND DNS \u2192 Route 53: Managed DNS with 100% SLA and advanced routing policies"
+    "explanation": "The key AWS service mappings for lift-and-shift migration:\n\n• VMware VMs → EC2: Direct VM-to-instance migration using AWS Application Migration Service (MGN)\n• SAN storage → EBS: Block storage attached to instances; choose gp3 for general purpose, io2 for high IOPS\n• PostgreSQL → RDS: Managed DB eliminates patching/backup overhead; use DMS for data migration\n• NFS → EFS: Elastic shared file system with NFS v4 protocol compatibility\n• F5 → ALB/NLB: ALB for HTTP/HTTPS (Layer 7), NLB for TCP/UDP (Layer 4)\n• Nagios → CloudWatch: Native monitoring with custom metrics, alarms, and integration with SNS for alerting\n• RabbitMQ → SQS: Managed queuing; consider Amazon MQ if AMQP protocol compatibility is required\n• Active Directory → Directory Service: AWS Managed Microsoft AD provides full AD compatibility\n• Veeam → AWS Backup: Centralised backup with retention policies and cross-account/cross-region support\n• BIND DNS → Route 53: Managed DNS with 100% SLA and advanced routing policies"
   },
   {
     "id": "aws-disaster-recovery-runbook",
@@ -2419,9 +2402,7 @@
         "hint": "Send a message to an SNS topic"
       }
     ],
-    "explanation": "Disaster recovery failover procedure:\n\n1. Promote Aurora read replica - The cross-region read replica becomes a standalone primary cluster in eu-west-2. For Aurora, use promote-read-replica-db-cluster (not promote-read-replica which is for non-Aurora RDS).\n\n2. Scale ECS in DR - The DR cluster keeps a minimal task count (0 or 1) during normal operation. Scale to match primary (4 tasks) during failover.\n\n3. Route 53 UPSERT - Updates the DNS alias record to point to the DR region's ALB. UPSERT is preferred over CREATE because it handles both new and existing records.\n\n4. S3 sync - Copies only objects that are new or modified since the last cross-region replication. This catches any objects uploaded between the last replication and the outage.\n\n5. CloudFront invalidation - Forces edge caches to fetch from the new origin (DR region). The path '/*' invalidates all cached content.\n\n6. SNS publish - Sends a notification to the ops team confirming failover is complete. Critical for incident communication.",
-    "showcase": true,
-    "showcaseOrder": 8
+    "explanation": "Disaster recovery failover procedure:\n\n1. Promote Aurora read replica - The cross-region read replica becomes a standalone primary cluster in eu-west-2. For Aurora, use promote-read-replica-db-cluster (not promote-read-replica which is for non-Aurora RDS).\n\n2. Scale ECS in DR - The DR cluster keeps a minimal task count (0 or 1) during normal operation. Scale to match primary (4 tasks) during failover.\n\n3. Route 53 UPSERT - Updates the DNS alias record to point to the DR region's ALB. UPSERT is preferred over CREATE because it handles both new and existing records.\n\n4. S3 sync - Copies only objects that are new or modified since the last cross-region replication. This catches any objects uploaded between the last replication and the outage.\n\n5. CloudFront invalidation - Forces edge caches to fetch from the new origin (DR region). The path '/*' invalidates all cached content.\n\n6. SNS publish - Sends a notification to the ops team confirming failover is complete. Critical for incident communication."
   },
   {
     "id": "aws-fix-terraform-s3",
@@ -2473,7 +2454,7 @@
         "expected": "days          = 90"
       }
     ],
-    "explanation": "The Terraform configuration had four security issues:\n\n1. Versioning Disabled \u2192 Enabled: Required for audit trail and accidental deletion protection. Without versioning, deleted or overwritten log files are unrecoverable.\n\n2. AES256 \u2192 aws:kms: AES256 uses Amazon-managed keys with no audit trail. KMS provides key rotation, access policies, and CloudTrail logging of key usage - required for compliance.\n\n3. restrict_public_buckets = false \u2192 true: This was the only public access block setting not enabled. Even if bucket policies don't grant public access today, this setting prevents any future policy from making the bucket public.\n\n4. Missing lifecycle rule: Without a lifecycle configuration, logs accumulate indefinitely in Standard storage. Transitioning to Glacier after 90 days reduces storage costs by ~80% while maintaining compliance retention."
+    "explanation": "The Terraform configuration had four security issues:\n\n1. Versioning Disabled → Enabled: Required for audit trail and accidental deletion protection. Without versioning, deleted or overwritten log files are unrecoverable.\n\n2. AES256 → aws:kms: AES256 uses Amazon-managed keys with no audit trail. KMS provides key rotation, access policies, and CloudTrail logging of key usage - required for compliance.\n\n3. restrict_public_buckets = false → true: This was the only public access block setting not enabled. Even if bucket policies don't grant public access today, this setting prevents any future policy from making the bucket public.\n\n4. Missing lifecycle rule: Without a lifecycle configuration, logs accumulate indefinitely in Standard storage. Transitioning to Glacier after 90 days reduces storage costs by ~80% while maintaining compliance retention."
   },
   {
     "id": "aws-detect-iam-escalation",
@@ -2831,8 +2812,7 @@
         "correctPosition": 9
       }
     ],
-    "explanation": "AZ failure recovery follows a verify \u2192 validate \u2192 communicate \u2192 plan sequence:\n\n1-2. ALB + ASG verification: These are the fastest auto-recovery mechanisms. ALB health checks detect failures within seconds, and ASG launches replacements within minutes. Verify these are working before checking database layer.\n\n3-4. Data tier failover: RDS Multi-AZ failover typically completes in 60-120 seconds. ElastiCache automatic failover depends on configuration but should complete within minutes. Verify these before running end-to-end tests.\n\n5-6. Validation: Smoke tests verify the full request path works. CloudWatch metrics confirm stable operation - look for error rates returning to baseline, latency normalising, and throughput recovering. Don't skip this - auto-recovery succeeding doesn't mean the application is fully healthy.\n\n7. Route 53 adjustment: If using health-check-based failover, the thresholds may need temporary adjustment since you're running at reduced capacity in a single AZ.\n\n8. Communication: Only notify stakeholders after you have confirmed facts - current health, remaining capacity, and whether manual intervention is needed.\n\n9. Resilience planning: Don't wait for eu-west-1a to recover - plan capacity in eu-west-1c so you're not single-AZ for an extended period. This is non-urgent but should be scheduled.",
-    "showcase": false
+    "explanation": "AZ failure recovery follows a verify → validate → communicate → plan sequence:\n\n1-2. ALB + ASG verification: These are the fastest auto-recovery mechanisms. ALB health checks detect failures within seconds, and ASG launches replacements within minutes. Verify these are working before checking database layer.\n\n3-4. Data tier failover: RDS Multi-AZ failover typically completes in 60-120 seconds. ElastiCache automatic failover depends on configuration but should complete within minutes. Verify these before running end-to-end tests.\n\n5-6. Validation: Smoke tests verify the full request path works. CloudWatch metrics confirm stable operation - look for error rates returning to baseline, latency normalising, and throughput recovering. Don't skip this - auto-recovery succeeding doesn't mean the application is fully healthy.\n\n7. Route 53 adjustment: If using health-check-based failover, the thresholds may need temporary adjustment since you're running at reduced capacity in a single AZ.\n\n8. Communication: Only notify stakeholders after you have confirmed facts - current health, remaining capacity, and whether manual intervention is needed.\n\n9. Resilience planning: Don't wait for eu-west-1a to recover - plan capacity in eu-west-1c so you're not single-AZ for an extended period. This is non-urgent but should be scheduled."
   },
   {
     "id": "aws-tune-rds-performance",
@@ -2935,9 +2915,7 @@
         ]
       }
     ],
-    "explanation": "Optimal parameter tuning for Aurora MySQL db.r6g.xlarge (32GB RAM):\n\n1. innodb_buffer_pool_size \u2192 20GB (21474836480): The buffer pool should be approximately 60-75% of total instance memory. At 128MB (default), the database constantly reads from disk. 20GB allows most active data to reside in memory, dramatically reducing I/O.\n\n2. max_connections \u2192 200: 50 connections is far too low for production workloads. With connection pooling, 200 provides adequate headroom. Setting to 1000 wastes memory (each connection consumes ~10MB) and risks resource exhaustion.\n\n3. slow_query_log \u2192 1 (enabled): Essential for identifying performance bottlenecks. Without this, you're blind to which queries are slow. Combine with Performance Insights for query-level analysis.\n\n4. long_query_time \u2192 2 seconds: Captures queries taking more than 2 seconds. The default of 10 seconds misses many problematic queries. 1 second may log too many routine queries in high-throughput systems.\n\n5. query_cache_type \u2192 0 (disabled): The MySQL query cache is deprecated and removed in MySQL 8.0. Even in 5.7, it causes mutex contention under concurrent writes. Disable it - use application-level caching (ElastiCache) instead.\n\n6. innodb_io_capacity \u2192 2000: This tells InnoDB how many IOPS the storage can handle. Aurora's storage can deliver thousands of IOPS; the default of 200 (designed for spinning disks) artificially throttles background I/O operations like flushing dirty pages and merge operations.",
-    "showcase": true,
-    "showcaseOrder": 10
+    "explanation": "Optimal parameter tuning for Aurora MySQL db.r6g.xlarge (32GB RAM):\n\n1. innodb_buffer_pool_size → 20GB (21474836480): The buffer pool should be approximately 60-75% of total instance memory. At 128MB (default), the database constantly reads from disk. 20GB allows most active data to reside in memory, dramatically reducing I/O.\n\n2. max_connections → 200: 50 connections is far too low for production workloads. With connection pooling, 200 provides adequate headroom. Setting to 1000 wastes memory (each connection consumes ~10MB) and risks resource exhaustion.\n\n3. slow_query_log → 1 (enabled): Essential for identifying performance bottlenecks. Without this, you're blind to which queries are slow. Combine with Performance Insights for query-level analysis.\n\n4. long_query_time → 2 seconds: Captures queries taking more than 2 seconds. The default of 10 seconds misses many problematic queries. 1 second may log too many routine queries in high-throughput systems.\n\n5. query_cache_type → 0 (disabled): The MySQL query cache is deprecated and removed in MySQL 8.0. Even in 5.7, it causes mutex contention under concurrent writes. Disable it - use application-level caching (ElastiCache) instead.\n\n6. innodb_io_capacity → 2000: This tells InnoDB how many IOPS the storage can handle. Aurora's storage can deliver thousands of IOPS; the default of 200 (designed for spinning disks) artificially throttles background I/O operations like flushing dirty pages and merge operations."
   },
   {
     "id": "aws-build-serverless-pipeline",
@@ -3039,7 +3017,7 @@
       "Lambda writes processed data to DynamoDB",
       "Lambda publishes a completion notification to SNS"
     ],
-    "explanation": "This is the simplest serverless pipeline on AWS:\n\n1. **S3 \u2192 Lambda**: S3 event notifications fire automatically whenever a file is uploaded, invoking the Lambda function with no polling required.\n2. **Lambda \u2192 DynamoDB**: Lambda parses the file and writes structured records. DynamoDB scales automatically and needs no server management.\n3. **Lambda \u2192 SNS**: After writing the data, Lambda publishes to an SNS topic. Any subscribers (email, webhook, other Lambdas) receive the notification.\n\nThe decoys:\n- **SQS**: Useful for decoupling at high scale but unnecessary for this simple trigger-process-notify flow.\n- **EC2**: Server management overhead - Lambda handles the compute without provisioning instances.\n- **Step Functions**: Adds orchestration complexity that is not required here.\n- **API Gateway**: There is no user-facing API - files go directly to S3 via presigned URLs or the console."
+    "explanation": "This is the simplest serverless pipeline on AWS:\n\n1. **S3 → Lambda**: S3 event notifications fire automatically whenever a file is uploaded, invoking the Lambda function with no polling required.\n2. **Lambda → DynamoDB**: Lambda parses the file and writes structured records. DynamoDB scales automatically and needs no server management.\n3. **Lambda → SNS**: After writing the data, Lambda publishes to an SNS topic. Any subscribers (email, webhook, other Lambdas) receive the notification.\n\nThe decoys:\n- **SQS**: Useful for decoupling at high scale but unnecessary for this simple trigger-process-notify flow.\n- **EC2**: Server management overhead - Lambda handles the compute without provisioning instances.\n- **Step Functions**: Adds orchestration complexity that is not required here.\n- **API Gateway**: There is no user-facing API - files go directly to S3 via presigned URLs or the console."
   },
   {
     "id": "aws-label-vpc-architecture",
@@ -3071,7 +3049,7 @@
     "hotspots": [
       {
         "id": "h1",
-        "x": 50.0,
+        "x": 50,
         "y": 14.4,
         "options": [
           "Internet Gateway",
@@ -3165,12 +3143,12 @@
         "x": 23.3,
         "y": 84.4,
         "options": [
-          "0.0.0.0/0 \u2192 igw-xxxx",
-          "0.0.0.0/0 \u2192 nat-xxxx",
-          "10.0.0.0/16 \u2192 local",
-          "0.0.0.0/0 \u2192 vgw-xxxx"
+          "0.0.0.0/0 → igw-xxxx",
+          "0.0.0.0/0 → nat-xxxx",
+          "10.0.0.0/16 → local",
+          "0.0.0.0/0 → vgw-xxxx"
         ],
-        "answer": "0.0.0.0/0 \u2192 igw-xxxx",
+        "answer": "0.0.0.0/0 → igw-xxxx",
         "label": "Public subnet routes internet traffic via IGW"
       },
       {
@@ -3178,23 +3156,21 @@
         "x": 72.2,
         "y": 84.4,
         "options": [
-          "0.0.0.0/0 \u2192 nat-xxxx",
-          "0.0.0.0/0 \u2192 igw-xxxx",
-          "10.0.0.0/16 \u2192 local",
-          "0.0.0.0/0 \u2192 eni-xxxx"
+          "0.0.0.0/0 → nat-xxxx",
+          "0.0.0.0/0 → igw-xxxx",
+          "10.0.0.0/16 → local",
+          "0.0.0.0/0 → eni-xxxx"
         ],
-        "answer": "0.0.0.0/0 \u2192 nat-xxxx",
+        "answer": "0.0.0.0/0 → nat-xxxx",
         "label": "Private subnet routes internet traffic via NAT"
       }
     ],
-    "explanation": "VPC architecture components:\n\n\u2022 Internet Gateway (IGW): The only component that connects a VPC directly to the internet. It\u2019s horizontally scaled, redundant, and HA by default. Not to be confused with NAT Gateway (outbound-only) or Virtual Private Gateway (VPN/Direct Connect).\n\n\u2022 Public vs Private Subnets: A subnet is \"public\" if its route table has a route to an IGW (0.0.0.0/0 \u2192 igw-xxxx). A \"private\" subnet has no such route - it can only access the internet outbound via a NAT Gateway.\n\n\u2022 Bastion Host: An EC2 instance in the public subnet used as an SSH jump box to reach instances in private subnets. It has an Elastic IP and strict security group rules (SSH from known IPs only).\n\n\u2022 NAT Gateway: Sits in the public subnet and allows instances in private subnets to initiate outbound connections (e.g. software updates, API calls) without being directly reachable from the internet. Requires an Elastic IP.\n\n\u2022 Application Server: Runs in the private subnet with no public IP. Accessible only from the bastion host via SSH or from the load balancer. This isolation is a security best practice.\n\n\u2022 Amazon RDS (MySQL): Managed relational database in the private subnet with Multi-AZ for high availability. Never placed in a public subnet in production.\n\n\u2022 Route Tables: The public route table needs 0.0.0.0/0 \u2192 igw-xxxx so instances can reach the internet directly. The private route table needs 0.0.0.0/0 \u2192 nat-xxxx so outbound traffic goes through the NAT Gateway. Both route tables automatically include 10.0.0.0/16 \u2192 local for intra-VPC traffic.",
-    "showcase": true,
-    "showcaseOrder": 9
+    "explanation": "VPC architecture components:\n\n• Internet Gateway (IGW): The only component that connects a VPC directly to the internet. It’s horizontally scaled, redundant, and HA by default. Not to be confused with NAT Gateway (outbound-only) or Virtual Private Gateway (VPN/Direct Connect).\n\n• Public vs Private Subnets: A subnet is \"public\" if its route table has a route to an IGW (0.0.0.0/0 → igw-xxxx). A \"private\" subnet has no such route - it can only access the internet outbound via a NAT Gateway.\n\n• Bastion Host: An EC2 instance in the public subnet used as an SSH jump box to reach instances in private subnets. It has an Elastic IP and strict security group rules (SSH from known IPs only).\n\n• NAT Gateway: Sits in the public subnet and allows instances in private subnets to initiate outbound connections (e.g. software updates, API calls) without being directly reachable from the internet. Requires an Elastic IP.\n\n• Application Server: Runs in the private subnet with no public IP. Accessible only from the bastion host via SSH or from the load balancer. This isolation is a security best practice.\n\n• Amazon RDS (MySQL): Managed relational database in the private subnet with Multi-AZ for high availability. Never placed in a public subnet in production.\n\n• Route Tables: The public route table needs 0.0.0.0/0 → igw-xxxx so instances can reach the internet directly. The private route table needs 0.0.0.0/0 → nat-xxxx so outbound traffic goes through the NAT Gateway. Both route tables automatically include 10.0.0.0/16 → local for intra-VPC traffic."
   },
   {
     "id": "aws-wire-up-ec2-access",
     "title": "Wire Up EC2 Network Access",
-    "description": "You\u2019ve been handed a VPC with EC2 instances, an RDS database, and networking components already provisioned - but none of the security groups or route tables are configured. Set up the correct rules to enable secure access.",
+    "description": "You’ve been handed a VPC with EC2 instances, an RDS database, and networking components already provisioned - but none of the security groups or route tables are configured. Set up the correct rules to enable secure access.",
     "type": "config-toggle",
     "difficulty": "intermediate",
     "platform": "AWS",
@@ -3332,7 +3308,7 @@
         "shortLabel": "0.0.0.0/0 Target"
       }
     ],
-    "explanation": "Security group and route table configuration explained:\n\n1. Bastion SSH Source \u2192 203.0.113.0/24: Never open SSH to 0.0.0.0/0 (the entire internet). Restrict to your office IP range. Using 10.0.0.0/16 would allow any VPC instance to SSH in, which is too broad. 10.0.1.0/24 would only allow the subnet itself.\n\n2. Bastion Inbound Port \u2192 22: Port 22 is SSH (Linux). Port 3389 is RDP (Windows). Port 443 is HTTPS and port 80 is HTTP - neither is for remote shell access.\n\n3. App Server SSH Source \u2192 sg-bastion: Referencing a security group (not an IP) is the AWS best practice. It allows any instance in the bastion SG to connect, even if IPs change. Using 10.0.1.10/32 would work but is fragile - if the bastion IP changes, access breaks. Never use 0.0.0.0/0 for private subnet SSH.\n\n4. App Server Port \u2192 8080: The application runs on port 8080. Port 80/443 would only work if a reverse proxy is configured. Port 3000 is for Node.js development servers, not production.\n\n5. Database Source \u2192 sg-app-server: Only the application server should access the database. Using 0.0.0.0/0 exposes the database to the internet (critical vulnerability). Using sg-bastion would allow the bastion to connect directly, bypassing the application layer. 10.0.0.0/16 is too broad.\n\n6. Database Port \u2192 3306: MySQL uses port 3306. Port 5432 is PostgreSQL, 1433 is SQL Server, and 27017 is MongoDB. Using the wrong port means the app server can\u2019t reach the database.\n\n7. Public RT Target \u2192 igw-xxxx: Public subnets need a route to the Internet Gateway for direct internet access. Routing to NAT is for private subnets. Routing to VPN Gateway (vgw) is for hybrid connectivity. \"local\" only allows VPC-internal traffic.\n\n8. Private RT Target \u2192 nat-xxxx: Private subnets route outbound internet traffic through the NAT Gateway. Routing to IGW would make the subnet effectively public (security risk). VPN Gateway is for on-premises connectivity.",
+    "explanation": "Security group and route table configuration explained:\n\n1. Bastion SSH Source → 203.0.113.0/24: Never open SSH to 0.0.0.0/0 (the entire internet). Restrict to your office IP range. Using 10.0.0.0/16 would allow any VPC instance to SSH in, which is too broad. 10.0.1.0/24 would only allow the subnet itself.\n\n2. Bastion Inbound Port → 22: Port 22 is SSH (Linux). Port 3389 is RDP (Windows). Port 443 is HTTPS and port 80 is HTTP - neither is for remote shell access.\n\n3. App Server SSH Source → sg-bastion: Referencing a security group (not an IP) is the AWS best practice. It allows any instance in the bastion SG to connect, even if IPs change. Using 10.0.1.10/32 would work but is fragile - if the bastion IP changes, access breaks. Never use 0.0.0.0/0 for private subnet SSH.\n\n4. App Server Port → 8080: The application runs on port 8080. Port 80/443 would only work if a reverse proxy is configured. Port 3000 is for Node.js development servers, not production.\n\n5. Database Source → sg-app-server: Only the application server should access the database. Using 0.0.0.0/0 exposes the database to the internet (critical vulnerability). Using sg-bastion would allow the bastion to connect directly, bypassing the application layer. 10.0.0.0/16 is too broad.\n\n6. Database Port → 3306: MySQL uses port 3306. Port 5432 is PostgreSQL, 1433 is SQL Server, and 27017 is MongoDB. Using the wrong port means the app server can’t reach the database.\n\n7. Public RT Target → igw-xxxx: Public subnets need a route to the Internet Gateway for direct internet access. Routing to NAT is for private subnets. Routing to VPN Gateway (vgw) is for hybrid connectivity. \"local\" only allows VPC-internal traffic.\n\n8. Private RT Target → nat-xxxx: Private subnets route outbound internet traffic through the NAT Gateway. Routing to IGW would make the subnet effectively public (security risk). VPN Gateway is for on-premises connectivity.",
     "visualContainerLabel": "VPC - 10.0.0.0/16",
     "visualZones": [
       {
@@ -3656,7 +3632,7 @@
       "SAA-C03"
     ],
     "scenario": "Your analytics team runs ad-hoc and scheduled Athena queries against a **10 TB** clickstream dataset in S3.\n\n**Current state:**\n- Uncompressed CSV files (~800 KB each, no partitioning)\n- Full dataset scanned per query\n- Cost: $50/day ($5 per TB scanned)\n- P95 query time: 90 seconds\n\n**Targets:**\n- Cost: under $10/day\n- P95 query time: under 10 seconds\n\nMost queries filter by date range and select 3-5 columns out of 45.",
-    "architectureDescription": "S3 (10 TB uncompressed CSV, ~12 million files) \u2192 Glue Crawler \u2192 Glue Data Catalog \u2192 Athena \u2192 QuickSight",
+    "architectureDescription": "S3 (10 TB uncompressed CSV, ~12 million files) → Glue Crawler → Glue Data Catalog → Athena → QuickSight",
     "problems": [
       {
         "id": "table-format",
@@ -3719,7 +3695,7 @@
         "correctOption": "Enforce column projection (SELECT only needed columns) and replace LIKE with equality filters or pre-computed search columns"
       }
     ],
-    "explanation": "Five optimisations bring the 10 TB dataset from $50/day and 90s P95 latency to under $10/day and under 10s:\n\n1. Convert to Parquet - Columnar format enables Athena to read only the 3-5 requested columns instead of all 45, reducing data scanned by ~90%. Snappy compression further reduces file size by 3-5\u00d7.\n\n2. Partition by date - With year/month/day partitions and a 7-day query window, Athena scans 7/730 \u2248 1% of the data. Combined with Parquet, this reduces scans from 10 TB to ~10 GB per query.\n\n3. Compact to 128-256 MB files - Eliminates the S3 listing overhead of 12 million tiny files. Larger files allow Parquet row-group pruning to work efficiently and reduce S3 GET request costs.\n\n4. Enable partition projection - Eliminates the 45-minute crawler dependency. Athena computes partition locations mathematically using projection configuration in the table properties, providing instant access to new partitions.\n\n5. Enforce column projection - SELECT * on Parquet still reads all columns from the row groups. Selecting only needed columns enables true columnar pruning. Replacing LIKE '%x%' with pre-computed columns or equality filters enables predicate pushdown at the Parquet level."
+    "explanation": "Five optimisations bring the 10 TB dataset from $50/day and 90s P95 latency to under $10/day and under 10s:\n\n1. Convert to Parquet - Columnar format enables Athena to read only the 3-5 requested columns instead of all 45, reducing data scanned by ~90%. Snappy compression further reduces file size by 3-5×.\n\n2. Partition by date - With year/month/day partitions and a 7-day query window, Athena scans 7/730 ≈ 1% of the data. Combined with Parquet, this reduces scans from 10 TB to ~10 GB per query.\n\n3. Compact to 128-256 MB files - Eliminates the S3 listing overhead of 12 million tiny files. Larger files allow Parquet row-group pruning to work efficiently and reduce S3 GET request costs.\n\n4. Enable partition projection - Eliminates the 45-minute crawler dependency. Athena computes partition locations mathematically using projection configuration in the table properties, providing instant access to new partitions.\n\n5. Enforce column projection - SELECT * on Parquet still reads all columns from the row groups. Selecting only needed columns enables true columnar pruning. Replacing LIKE '%x%' with pre-computed columns or equality filters enables predicate pushdown at the Parquet level."
   },
   {
     "id": "aws-redshift-slow-query-diagnose",
@@ -4400,11 +4376,11 @@
         "values": [
           {
             "time": "Apr 02 14:00",
-            "value": 0.0
+            "value": 0
           },
           {
             "time": "Apr 03 02:00",
-            "value": 0.0
+            "value": 0
           },
           {
             "time": "Apr 03 14:00",
@@ -5284,55 +5260,55 @@
       {
         "id": "api-gateway",
         "label": "API Gateway",
-        "icon": "\ud83c\udf10",
+        "icon": "🌐",
         "category": "Networking"
       },
       {
         "id": "bedrock-kb",
         "label": "Bedrock Knowledge Base",
-        "icon": "\ud83d\udcda",
+        "icon": "📚",
         "category": "AI"
       },
       {
         "id": "s3-docs",
         "label": "S3 Document Bucket",
-        "icon": "\ud83d\udce6",
+        "icon": "📦",
         "category": "Storage"
       },
       {
         "id": "opensearch-serverless",
         "label": "OpenSearch Serverless (Vector Store)",
-        "icon": "\ud83d\udd0d",
+        "icon": "🔍",
         "category": "Database"
       },
       {
         "id": "claude-fm",
         "label": "Claude (Foundation Model)",
-        "icon": "\ud83e\udde0",
+        "icon": "🧠",
         "category": "AI"
       },
       {
         "id": "lambda-postprocess",
         "label": "Lambda Function",
-        "icon": "\u26a1",
+        "icon": "⚡",
         "category": "Compute"
       },
       {
         "id": "dynamodb-audit",
         "label": "DynamoDB Table",
-        "icon": "\ud83d\udccb",
+        "icon": "📋",
         "category": "Database"
       },
       {
         "id": "kendra",
         "label": "Amazon Kendra",
-        "icon": "\ud83d\udd0e",
+        "icon": "🔎",
         "category": "AI"
       },
       {
         "id": "sagemaker-endpoint",
         "label": "SageMaker Endpoint",
-        "icon": "\ud83d\udda5\ufe0f",
+        "icon": "🖥️",
         "category": "AI"
       }
     ],
@@ -6448,7 +6424,7 @@
         "description": "No decoy components placed (QuickSight, DMS, EMR, OpenSearch, DynamoDB not required)"
       }
     ],
-    "explanation": "A three-tier data lake (Raw \u2192 Curated \u2192 Serving) separates landing, transformation, and analytics concerns. Kinesis Firehose handles streaming ingestion to Raw. Step Functions orchestrates Glue ETL transformations between tiers. Glue Crawler maintains the Data Catalog. Lake Formation enforces column/row-level security. Athena provides serverless SQL access; Redshift Spectrum enables federated queries joining the data lake with warehouse tables."
+    "explanation": "A three-tier data lake (Raw → Curated → Serving) separates landing, transformation, and analytics concerns. Kinesis Firehose handles streaming ingestion to Raw. Step Functions orchestrates Glue ETL transformations between tiers. Glue Crawler maintains the Data Catalog. Lake Formation enforces column/row-level security. Athena provides serverless SQL access; Redshift Spectrum enables federated queries joining the data lake with warehouse tables."
   },
   {
     "id": "aws-redshift-distribution-style",
@@ -6545,7 +6521,7 @@
       {
         "id": "core-instance",
         "metric": "Core Node Instance Type (r5.4xlarge on-demand - 8 nodes)",
-        "currentValue": "$1.008/hr \u00d7 8 \u00d7 6hr = $48.38 on-demand cost",
+        "currentValue": "$1.008/hr × 8 × 6hr = $48.38 on-demand cost",
         "targetValue": "Reduce core compute cost without losing data durability",
         "options": [
           "Replace r5.4xlarge with r5.2xlarge on-demand (halve per-node cost)",
@@ -6708,7 +6684,7 @@
         "correctPosition": 10
       }
     ],
-    "explanation": "The correct pipeline order is: data validation \u2192 feature engineering \u2192 train/val/test split \u2192 model training \u2192 model evaluation \u2192 conditional threshold check \u2192 model registration \u2192 endpoint deployment \u2192 smoke test \u2192 team notification. The ConditionStep must come after evaluation (needs PropertyFile output) and before registration (gating on quality). The smoke test must run after deployment to validate the live endpoint before declaring success."
+    "explanation": "The correct pipeline order is: data validation → feature engineering → train/val/test split → model training → model evaluation → conditional threshold check → model registration → endpoint deployment → smoke test → team notification. The ConditionStep must come after evaluation (needs PropertyFile output) and before registration (gating on quality). The smoke test must run after deployment to validate the live endpoint before declaring success."
   },
   {
     "id": "aws-sagemaker-pipeline-design",
@@ -6755,7 +6731,7 @@
       },
       {
         "id": "condition-step",
-        "label": "ConditionStep: Accuracy \u2265 0.85",
+        "label": "ConditionStep: Accuracy ≥ 0.85",
         "icon": "condition",
         "category": "SageMaker Step"
       },
@@ -6822,7 +6798,7 @@
       "RegisterModel is on the true branch of ConditionStep only",
       "No decoy steps used (TransformStep, TuningStep, LambdaStep, Glue Job not required)"
     ],
-    "explanation": "A basic SageMaker MLOps Pipeline follows this sequence:\n\n1. **ProcessingStep (Preprocess)** - A Scikit-Learn container reads raw CSV data from S3 and outputs train/test splits. This must run first so the training job has clean inputs.\n2. **TrainingStep** - XGBoost trains on the preprocessed data. SageMaker manages the compute instance and saves model artifacts to S3 automatically.\n3. **ProcessingStep (Evaluate)** - A second processor runs the model against the test split and writes an `evaluation.json` file containing the accuracy score. SageMaker reads this via a PropertyFile.\n4. **ConditionStep** - Reads the accuracy from the PropertyFile. If accuracy \u2265 0.85, the pipeline follows the true branch. Otherwise it stops.\n5. **RegisterModel** - Registers the model package in the SageMaker Model Registry with an Approved status, making it available for deployment.\n\nThe decoys (TransformStep, TuningStep, LambdaStep, Glue Job) are all valid SageMaker steps but are not part of this basic train-evaluate-register pipeline."
+    "explanation": "A basic SageMaker MLOps Pipeline follows this sequence:\n\n1. **ProcessingStep (Preprocess)** - A Scikit-Learn container reads raw CSV data from S3 and outputs train/test splits. This must run first so the training job has clean inputs.\n2. **TrainingStep** - XGBoost trains on the preprocessed data. SageMaker manages the compute instance and saves model artifacts to S3 automatically.\n3. **ProcessingStep (Evaluate)** - A second processor runs the model against the test split and writes an `evaluation.json` file containing the accuracy score. SageMaker reads this via a PropertyFile.\n4. **ConditionStep** - Reads the accuracy from the PropertyFile. If accuracy ≥ 0.85, the pipeline follows the true branch. Otherwise it stops.\n5. **RegisterModel** - Registers the model package in the SageMaker Model Registry with an Approved status, making it available for deployment.\n\nThe decoys (TransformStep, TuningStep, LambdaStep, Glue Job) are all valid SageMaker steps but are not part of this basic train-evaluate-register pipeline."
   },
   {
     "id": "aws-mlops-deployment-steps",
@@ -6896,7 +6872,7 @@
         "correctPosition": 9
       }
     ],
-    "explanation": "The safe MLOps deployment sequence is: approve model in registry \u2192 create new endpoint config \u2192 add shadow variant (0% traffic) \u2192 validate shadow metrics \u2192 canary at 10% \u2192 monitor \u2192 increase to 50% \u2192 shift to 100% \u2192 clean up old variant \u2192 update monitoring. Shadow testing at 0% traffic validates the model's behaviour without any user impact. The canary progression allows rollback at any stage if metrics degrade."
+    "explanation": "The safe MLOps deployment sequence is: approve model in registry → create new endpoint config → add shadow variant (0% traffic) → validate shadow metrics → canary at 10% → monitor → increase to 50% → shift to 100% → clean up old variant → update monitoring. Shadow testing at 0% traffic validates the model's behaviour without any user impact. The canary progression allows rollback at any stage if metrics degrade."
   },
   {
     "id": "aws-textract-iam-policy",
@@ -7127,7 +7103,7 @@
     "relatedExamCodes": [
       "SAA-C03"
     ],
-    "scenario": "The production `api-service` in your ECS cluster has had 0 running tasks for the past 10 minutes.\n\n**Stack:** ECS Fargate \u2192 ECR (private image) \u2192 CloudWatch Logs\n\nUsers are getting connection refused errors. Use the simulated AWS CLI to investigate and identify the root cause.",
+    "scenario": "The production `api-service` in your ECS cluster has had 0 running tasks for the past 10 minutes.\n\n**Stack:** ECS Fargate → ECR (private image) → CloudWatch Logs\n\nUsers are getting connection refused errors. Use the simulated AWS CLI to investigate and identify the root cause.",
     "commands": [
       {
         "command": "aws ecs describe-services --cluster prod-cluster --services api-service",
@@ -7312,7 +7288,7 @@
       },
       {
         "id": "nacl-inbound-ephemeral",
-        "label": "Private NACL - Inbound Rule 200 (ports 1024\u201365535, ephemeral)",
+        "label": "Private NACL - Inbound Rule 200 (ports 1024–65535, ephemeral)",
         "currentValue": "DENY",
         "correctValue": "ALLOW",
         "inputType": "select",
@@ -7322,9 +7298,7 @@
         ]
       }
     ],
-    "explanation": "Four issues needed fixing:\n\n1. **Route table target** - the private route table's default route (`0.0.0.0/0`) points to the Internet Gateway (`igw-*`). An IGW route in a private subnet bypasses the NAT Gateway entirely and causes the instance to try to route outbound traffic directly to the internet (which fails as it has no public IP). The target must be the NAT Gateway (`nat-*`).\n\n2. **NAT Gateway location** - a NAT Gateway must reside in a *public* subnet (one whose route table has a direct `0.0.0.0/0 \u2192 igw-*` route). If placed in a private subnet, the NAT Gateway itself cannot reach the internet, making it useless. Move it to `public-subnet-1a`.\n\n3. **Outbound NACL for port 443** - NACLs are stateless and evaluated for every packet. An outbound DENY on port 443 blocks all HTTPS traffic leaving the subnet, which is needed for `yum update` and most software download traffic.\n\n4. **Inbound ephemeral port NACL** - NACLs are stateless, so return traffic from internet servers comes *back* to the instance on ephemeral ports (1024\u201365535). Without an explicit inbound ALLOW for this port range, responses from external servers are dropped even though the outbound request succeeded. Security groups are stateful (they track connections automatically), but NACLs are not.",
-    "showcase": true,
-    "showcaseOrder": 11
+    "explanation": "Four issues needed fixing:\n\n1. **Route table target** - the private route table's default route (`0.0.0.0/0`) points to the Internet Gateway (`igw-*`). An IGW route in a private subnet bypasses the NAT Gateway entirely and causes the instance to try to route outbound traffic directly to the internet (which fails as it has no public IP). The target must be the NAT Gateway (`nat-*`).\n\n2. **NAT Gateway location** - a NAT Gateway must reside in a *public* subnet (one whose route table has a direct `0.0.0.0/0 → igw-*` route). If placed in a private subnet, the NAT Gateway itself cannot reach the internet, making it useless. Move it to `public-subnet-1a`.\n\n3. **Outbound NACL for port 443** - NACLs are stateless and evaluated for every packet. An outbound DENY on port 443 blocks all HTTPS traffic leaving the subnet, which is needed for `yum update` and most software download traffic.\n\n4. **Inbound ephemeral port NACL** - NACLs are stateless, so return traffic from internet servers comes *back* to the instance on ephemeral ports (1024–65535). Without an explicit inbound ALLOW for this port range, responses from external servers are dropped even though the outbound request succeeded. Security groups are stateful (they track connections automatically), but NACLs are not."
   },
   {
     "id": "aws-ssm-patch-runbook",
@@ -7462,7 +7436,7 @@
       "S3 Standard-IA",
       "Lifecycle Policies"
     ],
-    "scenario": "The `logs-prod` bucket now holds 40 TB of application logs. Finance wants Standard \u2192 Standard-IA at 30 days, Glacier Flexible Retrieval at 90 days, and full expiration at 365 days. A JSON document is already prepared at `lc.json`. Issue the single command that applies it.",
+    "scenario": "The `logs-prod` bucket now holds 40 TB of application logs. Finance wants Standard → Standard-IA at 30 days, Glacier Flexible Retrieval at 90 days, and full expiration at 365 days. A JSON document is already prepared at `lc.json`. Issue the single command that applies it.",
     "prompt": "aws-user@lab:~$",
     "steps": [
       {
@@ -7528,13 +7502,13 @@
         "canonicalCommand": "aws s3api put-bucket-lifecycle-configuration --bucket logs-prod --lifecycle-configuration file://lc.json"
       }
     ],
-    "explanation": "**Skill 4.1.5 \u2014 Managing S3 object lifecycles.**\n\n- `put-bucket-lifecycle-configuration` is the **v2** API; the older `put-bucket-lifecycle` (no `-configuration` suffix) only supports the deprecated v1 rule format and will reject modern transitions like Glacier Instant Retrieval.\n- The JSON body must be supplied via `--lifecycle-configuration file://\u2026`; inline JSON on the command line is error-prone across shells.\n- Lifecycle rules are evaluated daily at midnight UTC. Transitions to IA require objects to be **at least 30 days old** by design, so the 30-day IA rule here is the earliest allowed.\n- For cost-optimised log archives the classic tier ladder is Standard \u2192 Standard-IA \u2192 Glacier Flexible \u2192 expiry; pick Glacier Instant only when occasional millisecond reads are required.",
+    "explanation": "**Skill 4.1.5 — Managing S3 object lifecycles.**\n\n- `put-bucket-lifecycle-configuration` is the **v2** API; the older `put-bucket-lifecycle` (no `-configuration` suffix) only supports the deprecated v1 rule format and will reject modern transitions like Glacier Instant Retrieval.\n- The JSON body must be supplied via `--lifecycle-configuration file://…`; inline JSON on the command line is error-prone across shells.\n- Lifecycle rules are evaluated daily at midnight UTC. Transitions to IA require objects to be **at least 30 days old** by design, so the 30-day IA rule here is the earliest allowed.\n- For cost-optimised log archives the classic tier ladder is Standard → Standard-IA → Glacier Flexible → expiry; pick Glacier Instant only when occasional millisecond reads are required.",
     "learningOutcomes": [
       "Attach a lifecycle configuration to an S3 bucket via the AWS CLI",
       "Distinguish the v2 `put-bucket-lifecycle-configuration` API from the deprecated v1 call",
       "Recognise the 30-day minimum before Standard-IA transitions are permitted"
     ],
-    "realWorldValue": "Applying lifecycle rules at the bucket level is one of the single highest-leverage cost controls on AWS \u2014 a one-line CLI call can cut 60\u201380% off log-storage bills without touching application code."
+    "realWorldValue": "Applying lifecycle rules at the bucket level is one of the single highest-leverage cost controls on AWS — a one-line CLI call can cut 60–80% off log-storage bills without touching application code."
   },
   {
     "id": "aws-cloudfront-invalidation-command-terminal",
@@ -7560,7 +7534,7 @@
       {
         "id": "s1",
         "task": "Create a CloudFront invalidation for distribution `E1ABCDEF123GH` against the path `/index.html`.",
-        "hint": "The command group is `cloudfront`, the subcommand is `create-invalidation`, and paths are supplied with `--paths`. Do not use `--invalidation-batch` \u2014 that flag is for the batch-file form of the same API and is not needed here.",
+        "hint": "The command group is `cloudfront`, the subcommand is `create-invalidation`, and paths are supplied with `--paths`. Do not use `--invalidation-batch` — that flag is for the batch-file form of the same API and is not needed here.",
         "program": "aws",
         "requirements": [
           {
@@ -7616,7 +7590,7 @@
         "canonicalCommand": "aws cloudfront create-invalidation --distribution-id E1ABCDEF123GH --paths /index.html"
       }
     ],
-    "explanation": "**Skill 3.4.4 / 4.4.4 \u2014 CDN cache invalidation.**\n\n- CloudFront invalidations are billed per path after the first 1,000 free per month; prefer versioned asset filenames over broad `/*` invalidations where possible.\n- `create-invalidation` returns immediately with `Status: \"InProgress\"`. Propagation to all edges typically completes in 60\u201390 seconds.\n- `--invalidation-batch` is the alternative form used when supplying a JSON file; it is mutually exclusive with the direct `--paths` form used here.\n- `--caller-reference` is automatically generated by the CLI when you use `--paths`; it only needs explicit control if you are de-duplicating identical requests from a pipeline.",
+    "explanation": "**Skill 3.4.4 / 4.4.4 — CDN cache invalidation.**\n\n- CloudFront invalidations are billed per path after the first 1,000 free per month; prefer versioned asset filenames over broad `/*` invalidations where possible.\n- `create-invalidation` returns immediately with `Status: \"InProgress\"`. Propagation to all edges typically completes in 60–90 seconds.\n- `--invalidation-batch` is the alternative form used when supplying a JSON file; it is mutually exclusive with the direct `--paths` form used here.\n- `--caller-reference` is automatically generated by the CLI when you use `--paths`; it only needs explicit control if you are de-duplicating identical requests from a pipeline.",
     "learningOutcomes": [
       "Trigger a CloudFront invalidation via the AWS CLI",
       "Distinguish the direct `--paths` form from the `--invalidation-batch` file form",
@@ -7649,7 +7623,7 @@
       {
         "id": "s1",
         "task": "Enable automatic rotation on the customer-managed key `alias/app-data-key`.",
-        "hint": "Use `kms enable-key-rotation` with `--key-id`. Do NOT pass `--rotation-period-in-days` unless the key is a symmetric CMK that explicitly supports it \u2014 for most workloads the default 365-day cadence is what you want.",
+        "hint": "Use `kms enable-key-rotation` with `--key-id`. Do NOT pass `--rotation-period-in-days` unless the key is a symmetric CMK that explicitly supports it — for most workloads the default 365-day cadence is what you want.",
         "program": "aws",
         "requirements": [
           {
@@ -7754,7 +7728,7 @@
         "canonicalCommand": "aws kms tag-resource --key-id alias/app-data-key --tags TagKey=Compliance,TagValue=SOC2"
       }
     ],
-    "explanation": "**Skill 1.3.7 \u2014 Rotating encryption keys and renewing certificates.**\n\n- `enable-key-rotation` turns on **annual automatic** rotation of the key material for symmetric customer-managed keys. Rotation is transparent: ciphertext encrypted with prior key versions still decrypts correctly.\n- AWS-managed keys (e.g. `aws/s3`) rotate automatically on a ~1-year cadence and cannot be configured; only CMKs need the explicit call.\n- `--rotation-period-in-days` is supported only when the CMK was created with a custom period; leaving it unset gives the default 365 days, which satisfies most compliance frameworks.\n- Tagging is separate from rotation. SOC 2, PCI-DSS, and HIPAA audits commonly require the tag to drive automated evidence collection via Config or Audit Manager.",
+    "explanation": "**Skill 1.3.7 — Rotating encryption keys and renewing certificates.**\n\n- `enable-key-rotation` turns on **annual automatic** rotation of the key material for symmetric customer-managed keys. Rotation is transparent: ciphertext encrypted with prior key versions still decrypts correctly.\n- AWS-managed keys (e.g. `aws/s3`) rotate automatically on a ~1-year cadence and cannot be configured; only CMKs need the explicit call.\n- `--rotation-period-in-days` is supported only when the CMK was created with a custom period; leaving it unset gives the default 365 days, which satisfies most compliance frameworks.\n- Tagging is separate from rotation. SOC 2, PCI-DSS, and HIPAA audits commonly require the tag to drive automated evidence collection via Config or Audit Manager.",
     "learningOutcomes": [
       "Enable annual automatic rotation on a customer-managed KMS key",
       "Differentiate between AWS-managed and customer-managed key rotation behaviour",
@@ -7860,11 +7834,11 @@
             "description": "--adjustment-type <value>      ChangeInCapacity | ExactCapacity | PercentChangeInCapacity (SimpleScaling/StepScaling only)"
           }
         ],
-        "successOutput": "{\n    \"PolicyARN\": \"arn:aws:autoscaling:eu-west-1:123456789012:scalingPolicy:1f5b\u2026:autoScalingGroupName/web-asg:policyName/cpu50\",\n    \"Alarms\": [\n        {\"AlarmName\": \"TargetTracking-web-asg-AlarmHigh-\u2026\", \"AlarmARN\": \"arn:aws:cloudwatch:eu-west-1:123456789012:alarm:\u2026\"},\n        {\"AlarmName\": \"TargetTracking-web-asg-AlarmLow-\u2026\",  \"AlarmARN\": \"arn:aws:cloudwatch:eu-west-1:123456789012:alarm:\u2026\"}\n    ]\n}",
+        "successOutput": "{\n    \"PolicyARN\": \"arn:aws:autoscaling:eu-west-1:123456789012:scalingPolicy:1f5b…:autoScalingGroupName/web-asg:policyName/cpu50\",\n    \"Alarms\": [\n        {\"AlarmName\": \"TargetTracking-web-asg-AlarmHigh-…\", \"AlarmARN\": \"arn:aws:cloudwatch:eu-west-1:123456789012:alarm:…\"},\n        {\"AlarmName\": \"TargetTracking-web-asg-AlarmLow-…\",  \"AlarmARN\": \"arn:aws:cloudwatch:eu-west-1:123456789012:alarm:…\"}\n    ]\n}",
         "canonicalCommand": "aws autoscaling put-scaling-policy --auto-scaling-group-name web-asg --policy-name cpu50 --policy-type TargetTrackingScaling --target-tracking-configuration file://tt.json"
       }
     ],
-    "explanation": "**Skill 3.2.2 \u2014 Identifying metrics and conditions to perform scaling actions.**\n\n- **TargetTrackingScaling** is the default choice for most workloads: supply a target value for a single metric (ASG average CPU, ALB request count per target, \u2026) and AWS manages the step sizes and CloudWatch alarms for you.\n- The two alarms returned in the response (`AlarmHigh` / `AlarmLow`) are auto-created; you do **not** create them manually.\n- Simple and Step scaling require explicit `--scaling-adjustment` / `--step-adjustments` values and their own cooldowns; mixing those flags with a target-tracking policy is a common source of `ValidationError: \u2026` responses.\n- For ALB-based target tracking (e.g. `ALBRequestCountPerTarget`), the target group ARN is supplied **inside** the JSON body via `PredefinedMetricSpecification`.",
+    "explanation": "**Skill 3.2.2 — Identifying metrics and conditions to perform scaling actions.**\n\n- **TargetTrackingScaling** is the default choice for most workloads: supply a target value for a single metric (ASG average CPU, ALB request count per target, …) and AWS manages the step sizes and CloudWatch alarms for you.\n- The two alarms returned in the response (`AlarmHigh` / `AlarmLow`) are auto-created; you do **not** create them manually.\n- Simple and Step scaling require explicit `--scaling-adjustment` / `--step-adjustments` values and their own cooldowns; mixing those flags with a target-tracking policy is a common source of `ValidationError: …` responses.\n- For ALB-based target tracking (e.g. `ALBRequestCountPerTarget`), the target group ARN is supplied **inside** the JSON body via `PredefinedMetricSpecification`.",
     "learningOutcomes": [
       "Attach a target-tracking scaling policy to an Auto Scaling group via the CLI",
       "Identify which flags belong to SimpleScaling/StepScaling vs TargetTrackingScaling",
@@ -7890,13 +7864,13 @@
       "Multi-Region",
       "Backups"
     ],
-    "scenario": "The eu-west-1 region is being promoted to primary for the Orders service. The existing read replica `orders-replica-eu` must become a standalone primary with a 7-day backup retention and a preferred backup window of 02:00\u201303:00 UTC. Run the single command that performs the promotion.",
+    "scenario": "The eu-west-1 region is being promoted to primary for the Orders service. The existing read replica `orders-replica-eu` must become a standalone primary with a 7-day backup retention and a preferred backup window of 02:00–03:00 UTC. Run the single command that performs the promotion.",
     "prompt": "aws-user@lab:~$",
     "steps": [
       {
         "id": "s1",
         "task": "Promote `orders-replica-eu` with `--backup-retention-period 7` and `--preferred-backup-window 02:00-03:00`.",
-        "hint": "The call is `rds promote-read-replica`. Do NOT pass `--master-user-password`, `--skip-final-snapshot`, or `--apply-immediately` \u2014 none of those flags are accepted by this API.",
+        "hint": "The call is `rds promote-read-replica`. Do NOT pass `--master-user-password`, `--skip-final-snapshot`, or `--apply-immediately` — none of those flags are accepted by this API.",
         "program": "aws",
         "requirements": [
           {
@@ -7965,7 +7939,7 @@
         "canonicalCommand": "aws rds promote-read-replica --db-instance-identifier orders-replica-eu --backup-retention-period 7 --preferred-backup-window 02:00-03:00"
       }
     ],
-    "explanation": "**Skill 2.2.6 \u2014 Selecting an appropriate DR strategy.**\n\n- `promote-read-replica` is **asynchronous and irreversible**. Once promoted, the instance becomes a standalone primary and cannot be demoted back to a replica.\n- The API accepts only the three configuration flags used here plus `--db-instance-identifier`. Flags that look plausible (password rotation, storage sizing, snapshot control) live on `modify-db-instance` or `delete-db-instance` and will error if supplied here.\n- During promotion, applications pointing at the replica endpoint experience a brief read-only period (usually <60 s) while the instance detaches from the source.\n- For Multi-AZ DR designs, always promote **after** confirming `ReadReplicaStatus` is `replicating` with near-zero lag; promoting a lagging replica loses the unreplicated transactions permanently.",
+    "explanation": "**Skill 2.2.6 — Selecting an appropriate DR strategy.**\n\n- `promote-read-replica` is **asynchronous and irreversible**. Once promoted, the instance becomes a standalone primary and cannot be demoted back to a replica.\n- The API accepts only the three configuration flags used here plus `--db-instance-identifier`. Flags that look plausible (password rotation, storage sizing, snapshot control) live on `modify-db-instance` or `delete-db-instance` and will error if supplied here.\n- During promotion, applications pointing at the replica endpoint experience a brief read-only period (usually <60 s) while the instance detaches from the source.\n- For Multi-AZ DR designs, always promote **after** confirming `ReadReplicaStatus` is `replicating` with near-zero lag; promoting a lagging replica loses the unreplicated transactions permanently.",
     "learningOutcomes": [
       "Promote an RDS read replica to a standalone instance with correct post-promotion settings",
       "Identify which flags belong to `modify-db-instance` / `delete-db-instance` vs `promote-read-replica`",
@@ -7992,7 +7966,7 @@
       "Multi-Region",
       "IAM"
     ],
-    "scenario": "Compliance requires a cross-region copy of every object in `orders-primary`. Build the DR replication pipeline in the correct order: create the destination bucket in us-east-1, enable versioning on both buckets, attach the replication rule, then prove it works with a test object. Three distractors in the queue would either replicate into the wrong bucket, break versioning, or delete the source \u2014 do not run them.",
+    "scenario": "Compliance requires a cross-region copy of every object in `orders-primary`. Build the DR replication pipeline in the correct order: create the destination bucket in us-east-1, enable versioning on both buckets, attach the replication rule, then prove it works with a test object. Three distractors in the queue would either replicate into the wrong bucket, break versioning, or delete the source — do not run them.",
     "prompt": "aws-user@lab:~$",
     "commands": [
       {
@@ -8005,7 +7979,7 @@
         "id": "c2",
         "command": "aws s3api put-bucket-versioning --bucket orders-primary --versioning-configuration Status=Enabled",
         "successOutput": "",
-        "errorOutput": "Enable versioning on the source bucket before configuring replication \u2014 CRR requires versioning on both sides.",
+        "errorOutput": "Enable versioning on the source bucket before configuring replication — CRR requires versioning on both sides.",
         "mustFollowIds": [
           "c1"
         ]
@@ -8040,7 +8014,7 @@
       {
         "id": "c6",
         "command": "aws s3api head-object --bucket orders-backup-us --key test.txt",
-        "successOutput": "{\n    \"ContentLength\": 12,\n    \"ETag\": \"\\\"9e107d9d372bb6826bd81d3542a419d6\\\"\",\n    \"ReplicationStatus\": \"REPLICA\",\n    \"VersionId\": \"X2sNBZ\u2026\"\n}",
+        "successOutput": "{\n    \"ContentLength\": 12,\n    \"ETag\": \"\\\"9e107d9d372bb6826bd81d3542a419d6\\\"\",\n    \"ReplicationStatus\": \"REPLICA\",\n    \"VersionId\": \"X2sNBZ…\"\n}",
         "errorOutput": "head-object on the destination confirms replication completed; run the put-object first.",
         "mustFollowIds": [
           "c5"
@@ -8050,7 +8024,7 @@
         "id": "d1",
         "command": "aws s3api put-bucket-versioning --bucket orders-primary --versioning-configuration Status=Suspended",
         "successOutput": "",
-        "errorOutput": "DISTRACTOR: Suspending versioning on the source breaks CRR \u2014 AWS will stop replicating and existing versions become frozen. Never suspend versioning on a replication source.",
+        "errorOutput": "DISTRACTOR: Suspending versioning on the source breaks CRR — AWS will stop replicating and existing versions become frozen. Never suspend versioning on a replication source.",
         "isDistractor": true
       },
       {
@@ -8068,7 +8042,7 @@
         "isDistractor": true
       }
     ],
-    "explanation": "**Skill 2.2.5 \u2014 Implementing strategies to ensure the durability and availability of data.**\n\n**Prerequisites for CRR:**\n1. **Versioning on both buckets.** CRR operates on object versions; without versioning, there are no versions to replicate.\n2. **An IAM role** (referenced in the replication configuration JSON) with `s3:GetObjectVersionForReplication` on the source and `s3:ReplicateObject` on the destination.\n3. **Existing buckets in different regions** for CRR (same-region is SRR and uses the same API).\n\n**Why the order matters:**\n- Creating the destination first means the replication rule can be attached without the API rejecting an unknown bucket.\n- Enabling versioning on both buckets **before** attaching the rule prevents a partial-setup window where new objects would be missed.\n- Only new objects (those written **after** the rule is attached) replicate by default. Historical objects require a separate batch-replication job.",
+    "explanation": "**Skill 2.2.5 — Implementing strategies to ensure the durability and availability of data.**\n\n**Prerequisites for CRR:**\n1. **Versioning on both buckets.** CRR operates on object versions; without versioning, there are no versions to replicate.\n2. **An IAM role** (referenced in the replication configuration JSON) with `s3:GetObjectVersionForReplication` on the source and `s3:ReplicateObject` on the destination.\n3. **Existing buckets in different regions** for CRR (same-region is SRR and uses the same API).\n\n**Why the order matters:**\n- Creating the destination first means the replication rule can be attached without the API rejecting an unknown bucket.\n- Enabling versioning on both buckets **before** attaching the rule prevents a partial-setup window where new objects would be missed.\n- Only new objects (those written **after** the rule is attached) replicate by default. Historical objects require a separate batch-replication job.",
     "learningOutcomes": [
       "Sequence the AWS CLI calls required to configure Cross-Region Replication",
       "Recognise that versioning on both source and destination is non-negotiable for CRR",
@@ -8103,7 +8077,7 @@
         "id": "c1",
         "command": "aws secretsmanager create-secret --name prod/db/creds --secret-string file://creds.json",
         "successOutput": "{\n    \"ARN\": \"arn:aws:secretsmanager:eu-west-1:123456789012:secret:prod/db/creds-aB3Xy9\",\n    \"Name\": \"prod/db/creds\",\n    \"VersionId\": \"EXAMPLE1-90ab-cdef-fedc-ba987SECRET1\"\n}",
-        "errorOutput": "Create the secret first \u2014 rotation can only be attached to an existing secret."
+        "errorOutput": "Create the secret first — rotation can only be attached to an existing secret."
       },
       {
         "id": "c2",
@@ -8154,7 +8128,7 @@
         "isDistractor": true
       }
     ],
-    "explanation": "**Skill 1.3.7 \u2014 Rotating encryption keys and renewing certificates.**\n\n**Why Secrets Manager over SSM Parameter Store for credentials:**\n- Built-in rotation via managed or custom Lambda functions.\n- Cross-account sharing via resource policy.\n- Audit trail in CloudTrail with full request context.\n\n**The four-step pattern:**\n1. `create-secret` registers the credential and (optionally) encrypts it with a customer-managed CMK.\n2. `rotate-secret` with `--rotation-lambda-arn` + `--rotation-rules` schedules rotation; the first manual rotation runs as part of this call only if `--rotation-rules` is omitted \u2014 best practice is to trigger a separate explicit rotation afterwards.\n3. The second `rotate-secret` (no schedule flags) forces an immediate rotation so you can verify end-to-end wiring before leaving it to the schedule.\n4. `get-secret-value` with `--version-stage AWSCURRENT` confirms the new version is now current (previous version moves to `AWSPREVIOUS`).\n\n**The distractors:**\n- `ssm put-parameter --type String` is the classic credential-in-plaintext antipattern.\n- `--force-delete-without-recovery` bypasses the 7\u201330 day recovery window and is only appropriate for ephemeral test secrets.",
+    "explanation": "**Skill 1.3.7 — Rotating encryption keys and renewing certificates.**\n\n**Why Secrets Manager over SSM Parameter Store for credentials:**\n- Built-in rotation via managed or custom Lambda functions.\n- Cross-account sharing via resource policy.\n- Audit trail in CloudTrail with full request context.\n\n**The four-step pattern:**\n1. `create-secret` registers the credential and (optionally) encrypts it with a customer-managed CMK.\n2. `rotate-secret` with `--rotation-lambda-arn` + `--rotation-rules` schedules rotation; the first manual rotation runs as part of this call only if `--rotation-rules` is omitted — best practice is to trigger a separate explicit rotation afterwards.\n3. The second `rotate-secret` (no schedule flags) forces an immediate rotation so you can verify end-to-end wiring before leaving it to the schedule.\n4. `get-secret-value` with `--version-stage AWSCURRENT` confirms the new version is now current (previous version moves to `AWSPREVIOUS`).\n\n**The distractors:**\n- `ssm put-parameter --type String` is the classic credential-in-plaintext antipattern.\n- `--force-delete-without-recovery` bypasses the 7–30 day recovery window and is only appropriate for ephemeral test secrets.",
     "learningOutcomes": [
       "Stand up a Secrets Manager secret with automatic rotation via the CLI",
       "Trigger and verify a manual rotation before leaving rotation to the schedule",
@@ -8165,7 +8139,7 @@
   {
     "id": "aws-vpc-peering-cross-account-terminal-replay",
     "title": "Stand Up a Cross-Account VPC Peering Connection",
-    "description": "Queue the correct sequence of `aws ec2` commands that creates a cross-account VPC peering connection and wires the routing tables on both sides \u2014 without opening the routes to 0.0.0.0/0 or deleting the peer VPC.",
+    "description": "Queue the correct sequence of `aws ec2` commands that creates a cross-account VPC peering connection and wires the routing tables on both sides — without opening the routes to 0.0.0.0/0 or deleting the peer VPC.",
     "type": "terminal-replay",
     "difficulty": "intermediate",
     "platform": "AWS",
@@ -8181,14 +8155,14 @@
       "Route Tables",
       "IAM"
     ],
-    "scenario": "Account A (requester, 111111111111, `vpc-0aaaa1111`, 10.10.0.0/16) needs a peering connection with Account B (accepter, 222222222222, `vpc-0bbbb2222`, 10.20.0.0/16). CLI profiles `requester` and `accepter` are already configured. Build the peering, accept it from the other side, and add only the specific CIDR routes needed \u2014 nothing wider.",
+    "scenario": "Account A (requester, 111111111111, `vpc-0aaaa1111`, 10.10.0.0/16) needs a peering connection with Account B (accepter, 222222222222, `vpc-0bbbb2222`, 10.20.0.0/16). CLI profiles `requester` and `accepter` are already configured. Build the peering, accept it from the other side, and add only the specific CIDR routes needed — nothing wider.",
     "prompt": "aws-user@lab:~$",
     "commands": [
       {
         "id": "c1",
         "command": "aws ec2 describe-vpcs --vpc-ids vpc-0aaaa1111 --profile requester",
         "successOutput": "{\n    \"Vpcs\": [{\"VpcId\": \"vpc-0aaaa1111\", \"CidrBlock\": \"10.10.0.0/16\", \"OwnerId\": \"111111111111\"}]\n}",
-        "errorOutput": "Confirm the requester VPC CIDR before creating a peering connection \u2014 overlapping CIDRs cannot be peered."
+        "errorOutput": "Confirm the requester VPC CIDR before creating a peering connection — overlapping CIDRs cannot be peered."
       },
       {
         "id": "c2",
@@ -8221,7 +8195,7 @@
         "id": "c5",
         "command": "aws ec2 create-route --route-table-id rtb-0aaaaaaa --destination-cidr-block 10.20.0.0/16 --vpc-peering-connection-id pcx-0ccc33334444 --profile requester",
         "successOutput": "{\n    \"Return\": true\n}",
-        "errorOutput": "Add the route on the requester side pointing at the accepter CIDR only \u2014 do not widen it.",
+        "errorOutput": "Add the route on the requester side pointing at the accepter CIDR only — do not widen it.",
         "mustFollowIds": [
           "c4"
         ]
@@ -8230,7 +8204,7 @@
         "id": "c6",
         "command": "aws ec2 create-route --route-table-id rtb-0bbbbbbb --destination-cidr-block 10.10.0.0/16 --vpc-peering-connection-id pcx-0ccc33334444 --profile accepter",
         "successOutput": "{\n    \"Return\": true\n}",
-        "errorOutput": "Add the symmetric route on the accepter side \u2014 peering is not transitive, both sides must have their own route.",
+        "errorOutput": "Add the symmetric route on the accepter side — peering is not transitive, both sides must have their own route.",
         "mustFollowIds": [
           "c5"
         ]
@@ -8239,7 +8213,7 @@
         "id": "d1",
         "command": "aws ec2 create-route --route-table-id rtb-0aaaaaaa --destination-cidr-block 0.0.0.0/0 --vpc-peering-connection-id pcx-0ccc33334444 --profile requester",
         "successOutput": "",
-        "errorOutput": "DISTRACTOR: A 0.0.0.0/0 route through a peering connection is a broad misconfiguration \u2014 peering does not carry internet traffic and this would silently black-hole egress. Scope routes to the specific peer CIDR only.",
+        "errorOutput": "DISTRACTOR: A 0.0.0.0/0 route through a peering connection is a broad misconfiguration — peering does not carry internet traffic and this would silently black-hole egress. Scope routes to the specific peer CIDR only.",
         "isDistractor": true
       },
       {
@@ -8257,7 +8231,7 @@
         "isDistractor": true
       }
     ],
-    "explanation": "**Skill 1.2.1 \u2014 VPC architectures with security components. Skill 3.4.1 \u2014 Network topology for hybrid/multi-tier architectures.**\n\n**Cross-account peering mechanics:**\n- Initiation is from the requester (`create-vpc-peering-connection --peer-owner-id --peer-vpc-id --peer-region`).\n- Acceptance must be from the accepter account (`accept-vpc-peering-connection`). The requester cannot self-accept.\n- Both route tables need explicit entries pointing at the peer CIDR. VPC peering is **non-transitive**: a route on one side does not automatically create the reverse.\n\n**Security scoping rules:**\n- Route destinations should be the specific peer CIDR (10.20.0.0/16 here), never a widened 0.0.0.0/0.\n- CIDR blocks on both sides must not overlap; overlapping blocks make peering impossible.\n- Security groups can reference security groups in the peer VPC via the peer account ID + security group ID \u2014 prefer this over CIDR-based SG rules for east-west traffic.",
+    "explanation": "**Skill 1.2.1 — VPC architectures with security components. Skill 3.4.1 — Network topology for hybrid/multi-tier architectures.**\n\n**Cross-account peering mechanics:**\n- Initiation is from the requester (`create-vpc-peering-connection --peer-owner-id --peer-vpc-id --peer-region`).\n- Acceptance must be from the accepter account (`accept-vpc-peering-connection`). The requester cannot self-accept.\n- Both route tables need explicit entries pointing at the peer CIDR. VPC peering is **non-transitive**: a route on one side does not automatically create the reverse.\n\n**Security scoping rules:**\n- Route destinations should be the specific peer CIDR (10.20.0.0/16 here), never a widened 0.0.0.0/0.\n- CIDR blocks on both sides must not overlap; overlapping blocks make peering impossible.\n- Security groups can reference security groups in the peer VPC via the peer account ID + security group ID — prefer this over CIDR-based SG rules for east-west traffic.",
     "learningOutcomes": [
       "Create and accept a cross-account VPC peering connection from the correct account profiles",
       "Wire symmetric peer-scoped routes on both sides without widening to the internet",
@@ -8290,7 +8264,7 @@
         "id": "c1",
         "command": "aws rds describe-db-instances --db-instance-identifier orders-replica-dr --region us-east-1 --query \"DBInstances[0].StatusInfos\"",
         "successOutput": "[\n    {\"StatusType\": \"read replication\", \"Normal\": true, \"Status\": \"replicating\", \"Message\": \"\"}\n]",
-        "errorOutput": "Confirm the DR replica is `replicating` with near-zero lag before promoting \u2014 promoting a lagging replica loses unreplicated transactions."
+        "errorOutput": "Confirm the DR replica is `replicating` with near-zero lag before promoting — promoting a lagging replica loses unreplicated transactions."
       },
       {
         "id": "c2",
@@ -8305,7 +8279,7 @@
         "id": "c3",
         "command": "aws rds describe-db-instances --db-instance-identifier orders-replica-dr --region us-east-1 --query \"DBInstances[0].DBInstanceStatus\"",
         "successOutput": "\"available\"",
-        "errorOutput": "Poll DBInstanceStatus until it returns \"available\" before flipping DNS \u2014 otherwise traffic lands on an instance that is still promoting.",
+        "errorOutput": "Poll DBInstanceStatus until it returns \"available\" before flipping DNS — otherwise traffic lands on an instance that is still promoting.",
         "mustFollowIds": [
           "c2"
         ]
@@ -8322,7 +8296,7 @@
       {
         "id": "c5",
         "command": "aws route53 get-health-check-status --health-check-id abc-123",
-        "successOutput": "{\n    \"HealthCheckObservations\": [\n        {\"Region\": \"us-east-1\", \"IPAddress\": \"\u2026\", \"StatusReport\": {\"Status\": \"Success: HTTP Status Code 200\"}}\n    ]\n}",
+        "successOutput": "{\n    \"HealthCheckObservations\": [\n        {\"Region\": \"us-east-1\", \"IPAddress\": \"…\", \"StatusReport\": {\"Status\": \"Success: HTTP Status Code 200\"}}\n    ]\n}",
         "errorOutput": "Verify the health check is reporting healthy after the DNS flip to close out the failover.",
         "mustFollowIds": [
           "c4"
@@ -8350,7 +8324,7 @@
         "isDistractor": true
       }
     ],
-    "explanation": "**Skill 2.2.6 \u2014 Selecting an appropriate DR strategy.**\n\n**The pilot-light / warm-standby DR pattern:**\n1. **Verify replica health** \u2014 `describe-db-instances` on the replica confirms `read replication` status is `replicating` and lag is acceptable. A promoted lagging replica loses unreplicated transactions permanently.\n2. **Promote** \u2014 `promote-read-replica` is asynchronous and irreversible. The instance transitions through `modifying` before becoming a standalone primary.\n3. **Wait for `available`** \u2014 polling DBInstanceStatus is non-negotiable; DNS cutover before `available` routes real traffic to an instance that still rejects writes.\n4. **Flip DNS** \u2014 Route 53 failover records switch based on health-check state. Pushing a manual change forces the flip even if the primary health check has not yet marked unhealthy.\n5. **Verify** \u2014 `get-health-check-status` closes out the runbook by proving the failover target is healthy.\n\n**Irreversible / destructive operations to avoid under time pressure:**\n- Deleting the old primary removes the fail-back option if the outage proves transient.\n- Skipping the `available` check to save 30 seconds is a common cause of two-hour outages turning into six-hour ones.\n- Executing the promotion in the wrong region wastes minutes during an active incident.",
+    "explanation": "**Skill 2.2.6 — Selecting an appropriate DR strategy.**\n\n**The pilot-light / warm-standby DR pattern:**\n1. **Verify replica health** — `describe-db-instances` on the replica confirms `read replication` status is `replicating` and lag is acceptable. A promoted lagging replica loses unreplicated transactions permanently.\n2. **Promote** — `promote-read-replica` is asynchronous and irreversible. The instance transitions through `modifying` before becoming a standalone primary.\n3. **Wait for `available`** — polling DBInstanceStatus is non-negotiable; DNS cutover before `available` routes real traffic to an instance that still rejects writes.\n4. **Flip DNS** — Route 53 failover records switch based on health-check state. Pushing a manual change forces the flip even if the primary health check has not yet marked unhealthy.\n5. **Verify** — `get-health-check-status` closes out the runbook by proving the failover target is healthy.\n\n**Irreversible / destructive operations to avoid under time pressure:**\n- Deleting the old primary removes the fail-back option if the outage proves transient.\n- Skipping the `available` check to save 30 seconds is a common cause of two-hour outages turning into six-hour ones.\n- Executing the promotion in the wrong region wastes minutes during an active incident.",
     "learningOutcomes": [
       "Execute the correct command order for an RDS + Route 53 cross-region failover",
       "Verify replica state before and instance state after a promotion",

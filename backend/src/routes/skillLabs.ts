@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { randomUUID } from 'crypto'
 import fs from 'fs/promises'
+import { readFileSync } from 'fs'
 import path from 'path'
 import { skillLabAttemptsStore } from '../services/skillLabAttemptsStore.js'
 import {
@@ -13,6 +14,12 @@ import { touchUserActivity } from '../services/dynamo.js'
 import { TIERS, type Tier } from '../catalog.js'
 
 const LABS_DIR = path.join(process.cwd(), 'data', 'skill-labs')
+
+const PROVIDER_SHOWCASE: Map<string, string[]> = new Map(
+  Object.entries(
+    JSON.parse(readFileSync(path.join(LABS_DIR, 'providers.json'), 'utf-8')) as Record<string, string[]>
+  )
+)
 
 /**
  * Skill lab source switch — mirrors EXAM_SOURCE pattern.
@@ -37,7 +44,7 @@ async function loadLabsLocal(): Promise<any[]> {
   try {
     const files = await fs.readdir(LABS_DIR)
     const arrays = await Promise.all(
-      files.filter((f) => f.endsWith('.json')).map(async (f) => {
+      files.filter((f) => f.endsWith('.json') && f !== 'providers.json').map(async (f) => {
         const raw = await fs.readFile(path.join(LABS_DIR, f), 'utf-8')
         return JSON.parse(raw) as any[]
       })
@@ -111,6 +118,19 @@ function effectiveLabShowcaseCount(tier: Tier): number | null {
 }
 
 /**
+ * Overlay showcase: true / showcaseOrder from providers.json onto each lab,
+ * overriding any fields already present on the lab object.
+ */
+function withShowcaseFields(labs: any[]): any[] {
+  return labs.map((lab) => {
+    const platform = (lab.platform ?? 'Other').toString().trim() || 'Other'
+    const ids = PROVIDER_SHOWCASE.get(platform) ?? []
+    const idx = ids.indexOf(lab.id)
+    return { ...lab, showcase: idx !== -1, showcaseOrder: idx !== -1 ? idx : 99 }
+  })
+}
+
+/**
  * Build the set of unlocked lab IDs by picking the top `count` showcase labs
  * per platform/provider (ordered by showcaseOrder), rather than globally.
  */
@@ -152,7 +172,7 @@ async function buildUnlockedIdsForLab(lab: any, count: number): Promise<Set<stri
     showcaseOrder: l.showcaseOrder ?? 99,
     platform: l.platform ?? 'AWS',
   }))
-  return unlockedShowcaseIds(allLabs, count)
+  return unlockedShowcaseIds(withShowcaseFields(allLabs), count)
 }
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
@@ -192,12 +212,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         // pro_plus: all labs unlocked
         return reply.send(withLocked(allLabs, null))
       }
-      return reply.send(withLocked(allLabs, unlockedShowcaseIds(allLabs, showcaseCount)))
+      return reply.send(withLocked(allLabs, unlockedShowcaseIds(withShowcaseFields(allLabs), showcaseCount)))
     }
 
     // Unauthenticated: visitor showcase unlocked (per provider)
     const count = effectiveLabShowcaseCount('visitor') ?? 6
-    return reply.send(withLocked(allLabs, unlockedShowcaseIds(allLabs, count)))
+    return reply.send(withLocked(allLabs, unlockedShowcaseIds(withShowcaseFields(allLabs), count)))
   })
 
   // GET /skill-labs/my-attempts — get current user's lab attempts

@@ -1,0 +1,58 @@
+{
+  "AWS": [
+    "aws-cloudfront-403",
+    "aws-lambda-timeout-logs",
+    "aws-s3-lifecycle-command-terminal",
+    "aws-s3-crr-setup-terminal-replay",
+    "aws-kinesis-firehose-s3-delivery-failure",
+    "aws-secure-s3-app",
+    "aws-detect-iam-escalation",
+    "aws-kms-key-rotation-command-terminal",
+    "aws-multi-region-dr-failover-terminal-replay",
+    "aws-investigate-api-outage",
+    "aws-ha-web-app-builder",
+    "aws-reduce-monthly-aws-cost"
+  ],
+  "CompTIA": [
+    "comptia-nmap-enumeration",
+    "comptia-phishing-email-headers-log-analysis",
+    "comptia-ransomware-response",
+    "comptia-virustotal-ioc-enrichment-command-terminal",
+    "comptia-smb-enum-terminal-replay",
+    "comptia-tshark-pcap-analysis-command-terminal",
+    "comptia-lateral-movement-logs",
+    "comptia-xss-incident-response",
+    "comptia-bloodhound-collection-terminal-replay",
+    "comptia-sigma-rule-authoring-command-terminal",
+    "comptia-volatility-memory-forensics-terminal-replay",
+    "comptia-yara-malware-scan-command-terminal"
+  ],
+  "Anthropic": [
+    "anthropic-sequence-agentic-loop",
+    "anthropic-fix-tool-result-id",
+    "anthropic-diagnose-multi-agent-routing",
+    "anthropic-fill-claude-md-hierarchy",
+    "anthropic-fix-agent-definition-task-tool",
+    "anthropic-diagnose-cache-miss",
+    "anthropic-fix-agentic-loop-stop-reason",
+    "anthropic-fill-pause-turn-loop",
+    "anthropic-fix-sequential-to-parallel-subagents",
+    "anthropic-diagnose-context-window-degradation",
+    "anthropic-policy-fix-subagent-model",
+    "anthropic-fix-prompt-gate-to-programmatic-gate"
+  ],
+  "RedHat": [
+    "rhel-nginx-command-terminal",
+    "rhel-chrony-terminal-replay",
+    "rhel-journal-log-analysis",
+    "rhel-user-mgmt-command-terminal",
+    "rhel-nmcli-terminal-replay",
+    "rhel-apache-phased-pipeline",
+    "rhel-disk-full-incident-response",
+    "rhel-firewalld-command-terminal",
+    "rhel-selinux-phased-pipeline",
+    "rhel-nfs-terminal-replay",
+    "rhel-ssh-keyauth-phased-pipeline",
+    "rhel-selinux-security-hardening"
+  ]
+}
