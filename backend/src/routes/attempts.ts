@@ -59,27 +59,41 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const exam = await loadExam(lc)
     if (!exam) return reply.status(400).send({ message: 'exam not found' })
 
+    // Resolve tier once — drives both the attempt limit and the source question pool.
+    const isAuthenticated = !userId.startsWith('visitor:')
+    const ownedProductIds = isAuthenticated ? await getActiveProductIds(userId).catch(() => []) : []
+    const tier = resolveUserTier({ isAuthenticated, ownedProductIds, examCode })
+    const tierConfig = TIERS[tier]
+
     // Enforce per-exam attempt limit for authenticated users only (visitors are anonymous)
-    if (!userId.startsWith('visitor:')) {
-      const ownedProductIds = await getActiveProductIds(userId).catch(() => [])
-      const tier = resolveUserTier({ isAuthenticated: true, ownedProductIds, examCode })
-      const tierConfig = TIERS[tier]
-      if (tierConfig.attemptLimit !== null) {
-        const userAttempts = await attemptsStore.listByUser(userId)
-        const finishedForExam = userAttempts.filter((a: any) => a.examCode === examCode && a.finishedAt)
-        if (finishedForExam.length >= tierConfig.attemptLimit) {
-          request.log.info({ userId, examCode, tier, limit: tierConfig.attemptLimit, used: finishedForExam.length }, '[attempts] 403 — attempt limit reached')
-          return reply.status(403).send({
-            error: 'attempt-limit-reached',
-            message: `Attempt limit reached. You can save up to ${tierConfig.attemptLimit} attempt${tierConfig.attemptLimit === 1 ? '' : 's'} per exam on your current plan.`,
-            limit: tierConfig.attemptLimit,
-            tier,
-          })
-        }
+    if (isAuthenticated && tierConfig.attemptLimit !== null) {
+      const userAttempts = await attemptsStore.listByUser(userId)
+      const finishedForExam = userAttempts.filter((a: any) => a.examCode === examCode && a.finishedAt)
+      if (finishedForExam.length >= tierConfig.attemptLimit) {
+        request.log.info({ userId, examCode, tier, limit: tierConfig.attemptLimit, used: finishedForExam.length }, '[attempts] 403 — attempt limit reached')
+        return reply.status(403).send({
+          error: 'attempt-limit-reached',
+          message: `Attempt limit reached. You can save up to ${tierConfig.attemptLimit} attempt${tierConfig.attemptLimit === 1 ? '' : 's'} per exam on your current plan.`,
+          limit: tierConfig.attemptLimit,
+          tier,
+        })
       }
     }
 
-    let filteredQuestions = exam.questions.slice()
+    // Non-paying tiers see only showcase questions. Mirrors /exams/:code/questions and
+    // keeps the finished-attempt gate (which strips non-showcase ids) from locking
+    // questions the user just answered.
+    const sourcePool: any[] = (() => {
+      if (isPaidTier(tier)) return exam.questions.slice()
+      const showcaseIds: (number | string)[] = Array.isArray((exam as any).showcaseQuestionIds)
+        ? (exam as any).showcaseQuestionIds
+        : []
+      if (showcaseIds.length === 0) return exam.questions.slice()
+      const byId = new Map(exam.questions.map((q: any) => [String(q.id), q]))
+      return showcaseIds.map((id) => byId.get(String(id))).filter(Boolean) as any[]
+    })()
+
+    let filteredQuestions = sourcePool.slice()
 
     // ── Pre-selected questions (used by weakest-link mode) ──
     // When body.questions is provided (full question objects from the weakest-link
@@ -94,13 +108,13 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       : null
 
     if (inlineQuestions) {
-      // Validate that every supplied question exists in the exam bank
-      const validIds = new Set(exam.questions.map((q: any) => q.id))
-      filteredQuestions = inlineQuestions.filter((q: any) => validIds.has(q.id))
+      // Validate that every supplied question exists in the accessible pool
+      const validIds = new Set(sourcePool.map((q: any) => String(q.id)))
+      filteredQuestions = inlineQuestions.filter((q: any) => validIds.has(String(q.id)))
     } else if (questionIds && questionIds.length > 0) {
-      const byId = new Map(exam.questions.map((q: any) => [q.id, q]))
+      const byId = new Map(sourcePool.map((q: any) => [String(q.id), q]))
       // preserve the requested order
-      filteredQuestions = questionIds.map((id: number) => byId.get(id)).filter(Boolean)
+      filteredQuestions = questionIds.map((id: number) => byId.get(String(id))).filter(Boolean)
     } else {
     const keywords: string[] = Array.isArray(body?.metadata?.serviceKeywords)
       ? body.metadata.serviceKeywords.map((k: string) => String(k).trim().toLowerCase()).filter(Boolean)
@@ -509,21 +523,6 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err) {
       // If normalization fails, return original attempt but log the error
       console.error('Failed to normalise attempt.questions', err)
-    }
-
-    // Gate paid question content: strip non-showcase questions for non-paying users.
-    // Only applied to finished attempts (review) — in-progress attempts must keep full
-    // question content so the user can continue answering.
-    const ownedProductIds = request.user?.sub ? await getActiveProductIds(request.user.sub) : []
-    const tier = resolveUserTier({ isAuthenticated: !!request.user?.sub, ownedProductIds })
-    if (!isPaidTier(tier) && attempt.finishedAt && Array.isArray(attempt.questions)) {
-      const showcaseIds = new Set<string>(
-        (loadedExam?.showcaseQuestionIds ?? []).map(String)
-      )
-      attempt.questions = attempt.questions.map((q: any) => {
-        if (showcaseIds.has(String(q.id))) return q
-        return { id: q.id, type: q.type, domain: q.domain, services: q.services, skills: q.skills, difficulty: q.difficulty, locked: true }
-      })
     }
 
     return attempt
