@@ -7,6 +7,7 @@ import type { Question } from './types'
 /** Check if an answer is correct for any question type */
 export function isAnswerCorrect(q: Question, sel: string | string[] | undefined): boolean {
   if (sel === undefined) return false
+  if ((q as any).locked) return false
   const qType = q.type ?? 'single-choice'
   if (qType === 'matching') {
     try {
@@ -18,14 +19,14 @@ export function isAnswerCorrect(q: Question, sel: string | string[] | undefined)
   if (qType === 'ordering') {
     try {
       const order: string[] = typeof sel === 'string' ? JSON.parse(sel) : []
-      const correctOrder = [...q.choices]
+      const correctOrder = [...(q.choices ?? [])]
         .filter((c) => typeof c.sequence === 'number')
         .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0))
         .map((c) => c.id)
       return correctOrder.length === order.length && correctOrder.every((id, idx) => id === order[idx])
     } catch { return false }
   }
-  const correctIds = q.choices.filter((c) => c.isCorrect).map((c) => c.id)
+  const correctIds = (q.choices ?? []).filter((c) => c.isCorrect).map((c) => c.id)
   if (Array.isArray(sel)) {
     return sel.length === correctIds.length && sel.every((v) => correctIds.includes(v))
   }

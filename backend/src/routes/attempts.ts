@@ -252,9 +252,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
   // Delete an attempt (owner only). In-progress attempts can always be cancelled;
   // finished attempts may only be deleted when they have 0 answers.
-  server.delete('/:id', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
+  server.delete('/:id', { preHandler: [server.optionalAuth], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
-    const userId = request.user?.sub
+    const userId = extractUserId(request)
     if (!userId) return reply.status(401).send({ message: 'unauthorized' })
     const attempt = await attemptsStore.get(userId, id)
     if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
@@ -511,10 +511,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       console.error('Failed to normalise attempt.questions', err)
     }
 
-    // Gate paid question content: strip non-showcase questions for non-paying users
+    // Gate paid question content: strip non-showcase questions for non-paying users.
+    // Only applied to finished attempts (review) — in-progress attempts must keep full
+    // question content so the user can continue answering.
     const ownedProductIds = request.user?.sub ? await getActiveProductIds(request.user.sub) : []
     const tier = resolveUserTier({ isAuthenticated: !!request.user?.sub, ownedProductIds })
-    if (!isPaidTier(tier) && Array.isArray(attempt.questions)) {
+    if (!isPaidTier(tier) && attempt.finishedAt && Array.isArray(attempt.questions)) {
       const showcaseIds = new Set<string>(
         (loadedExam?.showcaseQuestionIds ?? []).map(String)
       )

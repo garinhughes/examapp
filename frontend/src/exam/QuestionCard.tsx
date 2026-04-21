@@ -68,6 +68,7 @@ export function QuestionCard({ focusMode = false }: { focusMode?: boolean }) {
   return (
     <div className={`${displayQuestions.length > 0 ? '!mt-2' : ''} space-y-4`}>
       {visible.map((q) => {
+        if (!q || !Array.isArray(q.choices)) return null
         const chosen = selectedAnswers[q.id]
         const answered = chosen !== undefined
         const qType: QuestionType = q.type ?? 'single-choice'
