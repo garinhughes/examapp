@@ -11,7 +11,9 @@
       "id": "PT0-003-0001",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "OSINT"
+      ],
       "skills": [
         "1.1: Planning and scoping: defining rules of engagement, testing windows, and target selection."
       ],
@@ -50,7 +52,9 @@
       "id": "PT0-003-0002",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "RoE"
+      ],
       "skills": [
         "1.1: Planning and scoping: defining rules of engagement, testing windows, and target selection."
       ],
@@ -89,7 +93,12 @@
       "id": "PT0-003-0003",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "DNS",
+        "HTTP",
+        "HTTPS",
+        "IP"
+      ],
       "skills": [
         "1.1: Planning and scoping: defining rules of engagement, testing windows, and target selection."
       ],
@@ -173,7 +182,9 @@
     {
       "id": "PT0-003-0005",
       "type": "ordering",
-      "services": [],
+      "services": [
+        "Windows"
+      ],
       "skills": [
         "1.1: Planning and scoping: defining rules of engagement, testing windows, and target selection."
       ],
@@ -204,7 +215,7 @@
           "explanation": "Countersignatures make the engagement legally authorized. Distributing contact lists before testing begins ensures the team can halt activity and escalate correctly if an unexpected incident occurs during the assessment."
         }
       ],
-      "tip": "Consider which activity must logically precede the others — authorization cannot be finalized until scope is defined, and scope cannot be defined until the client's objectives are understood.",
+      "tip": "Consider which activity must logically precede the others, as authorization cannot be finalized until scope is defined, and scope cannot be defined until the client's objectives are understood.",
       "explanation": "Pre-engagement planning follows a logical dependency chain: understanding the client's context and assets comes first, which informs target selection, which informs the rules of engagement, and all of this must be formally countersigned before active testing is authorized. Each step depends on the output of the one before it.",
       "domain": "Engagement Management",
       "difficulty": 2,
@@ -224,7 +235,7 @@
         {
           "id": "c1",
           "text": "Begin passive reconnaissance activities only, since these do not generate traffic directed at client systems and fall outside the scope of activities that require written authorization.",
-          "explanation": "Passive reconnaissance still requires prior written authorization. Any engagement activity — active or passive — must have documented consent before it begins; without it, the tester lacks legal protection if the engagement is later disputed."
+          "explanation": "Passive reconnaissance still requires prior written authorization. Any engagement activity, active or passive, must have documented consent before it begins; without it, the tester lacks legal protection if the engagement is later disputed."
         },
         {
           "id": "c2",
@@ -283,7 +294,7 @@
         }
       ],
       "tip": "Consider whether the discovery of an active compromise changes the tester's reporting obligations compared to a vulnerability that has not yet been exploited.",
-      "explanation": "The discovery of an active, pre-existing compromise during a penetration test creates an immediate reporting obligation. This is distinct from documenting a hypothetical vulnerability — an unauthorized web shell represents a live breach requiring the client to act without delay.\n\n**Why it works:** Immediately notifying the emergency escalation contact allows the client to initiate incident response while the tester retains first-hand knowledge of the finding's evidence and location.\n\n**Why the others don't work:**\n- Including the finding in the final report delays client action by the remaining engagement period, allowing the breach to persist.\n- Raising it in two days at the scheduled update treats an active breach as routine status information.\n- Internally deliberating over whether to notify the client is the client's decision, not the tester's — escalation is not optional.",
+      "explanation": "The discovery of an active, pre-existing compromise during a penetration test creates an immediate reporting obligation. This is distinct from documenting a hypothetical vulnerability; an unauthorized web shell represents a live breach requiring the client to act without delay.\n\n**Why it works:** Immediately notifying the emergency escalation contact allows the client to initiate incident response while the tester retains first-hand knowledge of the finding's evidence and location.\n\n**Why the others don't work:**\n- Including the finding in the final report delays client action by the remaining engagement period, allowing the breach to persist.\n- Raising it in two days at the scheduled update treats an active breach as routine status information.\n- Internally deliberating over whether to notify the client is the client's decision, not the tester's, and escalation is not optional.",
       "domain": "Engagement Management",
       "difficulty": 2,
       "lastReviewed": "2026-04-15",
@@ -294,7 +305,9 @@
       "type": "multiple-choice",
       "selectCount": 2,
       "format": "text",
-      "services": [],
+      "services": [
+        "PCI-DSS"
+      ],
       "skills": [
         "1.2: Legal and ethical compliance: ensuring authorization letters, mandatory reporting, and adherence to regulations."
       ],
@@ -339,7 +352,9 @@
       "id": "PT0-003-0009",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "IP"
+      ],
       "skills": [
         "1.2: Legal and ethical compliance: ensuring authorization letters, mandatory reporting, and adherence to regulations."
       ],
@@ -367,7 +382,7 @@
           "explanation": "Cloud provider `AUP` compliance is necessary but does not resolve the dedicated vs. shared tenancy question. Even if the provider permits testing, the tester must still confirm the instance is exclusively the client's before active testing to avoid inadvertent third-party access."
         }
       ],
-      "tip": "Scope authorization covers what the client owns — it does not automatically resolve questions about who else may share the underlying infrastructure at a listed IP address.",
+      "tip": "Scope authorization covers what the client owns, and it does not automatically resolve questions about who else may share the underlying infrastructure at a listed IP address.",
       "explanation": "IP addresses in a shared cloud environment may serve systems belonging to multiple tenants. Testing an in-scope IP without confirming the instance is exclusively the client's introduces the risk of unauthorized access to third-party systems, which may constitute a criminal offense regardless of the IP appearing in the agreed scope.\n\n**Why it works:** Client confirmation of dedicated tenancy eliminates the legal ambiguity before any active engagement activity begins, ensuring authorization genuinely covers the target.\n\n**Why the others don't work:**\n- Scope inclusion does not transfer liability to the cloud provider when the tester actively tests a system that may serve third parties.\n- Restricting the technique to port scanning removes neither the legal risk nor the obligation to confirm ownership.\n- Cloud provider `AUP` compliance does not address whether the specific instance is exclusively the client's.",
       "domain": "Engagement Management",
       "difficulty": 3,
@@ -377,7 +392,10 @@
     {
       "id": "PT0-003-0010",
       "type": "ordering",
-      "services": [],
+      "services": [
+        "IP",
+        "Windows"
+      ],
       "skills": [
         "1.2: Legal and ethical compliance: ensuring authorization letters, mandatory reporting, and adherence to regulations."
       ],
@@ -454,7 +472,7 @@
         }
       ],
       "tip": "Consider whether the agreed reporting timeline is intended to cover all findings equally, or whether certain severity levels create obligations that override the standard schedule.",
-      "explanation": "Critical vulnerabilities on internet-facing systems present an immediate risk that cannot be managed through a delayed reporting cycle. Most rules of engagement implicitly — and best practice explicitly — require real-time escalation of critical findings via a designated emergency contact.\n\n**Why it works:** Directly notifying the designated contact immediately allows the client to begin emergency patching or compensating controls while the engagement continues, limiting the window of exposure.\n\n**Why the others don't work:**\n- Routing the finding through a weekly status summary introduces avoidable days of delay while a critical vulnerability remains exploitable.\n- Waiting for the next scheduled update treats a critical active risk the same as a routine low-severity finding.\n- Requiring internal consensus before notification delays disclosure of an urgent finding and prioritizes process over client safety.",
+      "explanation": "Critical vulnerabilities on internet-facing systems present an immediate risk that cannot be managed through a delayed reporting cycle. Most rules of engagement and best practice, implicitly or explicitly, require real-time escalation of critical findings via a designated emergency contact.\n\n**Why it works:** Directly notifying the designated contact immediately allows the client to begin emergency patching or compensating controls while the engagement continues, limiting the window of exposure.\n\n**Why the others don't work:**\n- Routing the finding through a weekly status summary introduces avoidable days of delay while a critical vulnerability remains exploitable.\n- Waiting for the next scheduled update treats a critical active risk the same as a routine low-severity finding.\n- Requiring internal consensus before notification delays disclosure of an urgent finding and prioritizes process over client safety.",
       "domain": "Engagement Management",
       "difficulty": 2,
       "lastReviewed": "2026-04-15",
@@ -493,7 +511,7 @@
         }
       ],
       "tip": "Consider how the attacker's required access level changes the realistic business risk, and how that change should be communicated to a non-technical audience making investment decisions.",
-      "explanation": "Effective risk articulation means providing the board with an accurate picture of business risk — which requires explaining not just severity ratings but the conditions under which a vulnerability could be exploited. `CVSS` base scores are designed for technical comparison, not executive decision-making.\n\n**Why it works:** Describing the attacker prerequisites in plain language allows a non-technical board to correctly calibrate risk against their threat model without misinterpreting a critical `CVSS` score as an emergency when exploitation requires privileged internal access.\n\n**Why the others don't work:**\n- Unmodified `CVSS` base scores without context overstate risk for findings that require internal privileged access for a purely external threat landscape.\n- Omitting findings from the executive summary deprives the board of information relevant to risk governance decisions.\n- Speculative financial loss estimates without an actuarial basis can mislead rather than inform.",
+      "explanation": "Effective risk articulation means providing the board with an accurate picture of business risk, which requires explaining not just severity ratings but the conditions under which a vulnerability could be exploited. `CVSS` base scores are designed for technical comparison, not executive decision-making.\n\n**Why it works:** Describing the attacker prerequisites in plain language allows a non-technical board to correctly calibrate risk against their threat model without misinterpreting a critical `CVSS` score as an emergency when exploitation requires privileged internal access.\n\n**Why the others don't work:**\n- Unmodified `CVSS` base scores without context overstate risk for findings that require internal privileged access for a purely external threat landscape.\n- Omitting findings from the executive summary deprives the board of information relevant to risk governance decisions.\n- Speculative financial loss estimates without an actuarial basis can mislead rather than inform.",
       "domain": "Engagement Management",
       "difficulty": 3,
       "lastReviewed": "2026-04-15",
@@ -528,11 +546,11 @@
           "id": "c4",
           "text": "Discuss the technical basis for each severity position using a defined framework such as `CVSS`, reach a documented consensus on the rating that best reflects the finding's exploitability and impact, and update the report before delivery.",
           "sequence": 1,
-          "explanation": "Using a structured severity framework as a common reference allows both reviewers to evaluate the disputed factors — exploitability, access requirements, and impact — against consistent criteria and reach a defensible, documented consensus."
+          "explanation": "Using a structured severity framework as a common reference allows both reviewers to evaluate the disputed factors, including exploitability, access requirements, and impact, against consistent criteria and reach a defensible, documented consensus."
         }
       ],
       "tip": "Consider what a peer review is designed to achieve, and whether accepting or escalating is a better use of the available time than structured collaborative resolution.",
-      "explanation": "Peer review is a quality assurance mechanism designed to catch errors and ensure defensible severity ratings through structured technical discussion. When a disagreement arises, the correct approach is to return to a shared severity framework and work toward a documented consensus.\n\n**Why it works:** Evaluating both positions against `CVSS` criteria or an equivalent rubric grounds the disagreement in observable technical factors — exploitability conditions, scope, and impact — rather than seniority or opinion.\n\n**Why the others don't work:**\n- Accepting the senior rating without technical discussion does not validate which assessment is correct.\n- Delivering a report with an unresolved internal disagreement documented transfers the decision to the client, which is not appropriate.\n- Escalating to management without attempting resolution at the technical level skips the primary purpose of the peer review process.",
+      "explanation": "Peer review is a quality assurance mechanism designed to catch errors and ensure defensible severity ratings through structured technical discussion. When a disagreement arises, the correct approach is to return to a shared severity framework and work toward a documented consensus.\n\n**Why it works:** Evaluating both positions against `CVSS` criteria or an equivalent rubric grounds the disagreement in observable technical factors, including exploitability conditions, scope, and impact, rather than seniority or opinion.\n\n**Why the others don't work:**\n- Accepting the senior rating without technical discussion does not validate which assessment is correct.\n- Delivering a report with an unresolved internal disagreement documented transfers the decision to the client, which is not appropriate.\n- Escalating to management without attempting resolution at the technical level skips the primary purpose of the peer review process.",
       "domain": "Engagement Management",
       "difficulty": 2,
       "lastReviewed": "2026-04-15",
@@ -672,11 +690,11 @@
         {
           "id": "c4",
           "text": "Reproduce the technical findings section verbatim in the executive summary to ensure complete consistency between the two sections of the report, and append a glossary of security terminology to allow board members to self-interpret the technical language.",
-          "explanation": "Reproducing the technical section verbatim defeats the purpose of an executive summary. A glossary does not make technical content appropriate for a board audience — narrative translation of findings into business risk terms is required."
+          "explanation": "Reproducing the technical section verbatim defeats the purpose of an executive summary. A glossary does not make technical content appropriate for a board audience; narrative translation of findings into business risk terms is required."
         }
       ],
       "tip": "Consider what information a board member needs to make governance and investment decisions, and whether technical metrics serve that purpose directly.",
-      "explanation": "The executive summary must serve a non-technical audience making business and governance decisions. This requires translating technical findings into the language of business consequence — data exposure, regulatory penalties, and operational impact — rather than presenting severity scores or vulnerability details.\n\n**Why it works:** Business consequence language allows board members to understand the relevance of findings to organizational risk and resource allocation without requiring them to interpret `CVSS` scores or security taxonomies.\n\n**Why the others don't work:**\n- A `CVE`/`CVSS` listing with a one-paragraph summary still requires technical literacy to interpret the severity table correctly.\n- Payload strings and parameter names are evidence artifacts appropriate for the technical findings section, not board-level communication.\n- Reproducing the technical section verbatim is the opposite of an executive summary and transfers the interpretation burden to the audience.",
+      "explanation": "The executive summary must serve a non-technical audience making business and governance decisions. This requires translating technical findings into the language of business consequence, including data exposure, regulatory penalties, and operational impact, rather than presenting severity scores or vulnerability details.\n\n**Why it works:** Business consequence language allows board members to understand the relevance of findings to organizational risk and resource allocation without requiring them to interpret `CVSS` scores or security taxonomies.\n\n**Why the others don't work:**\n- A `CVE`/`CVSS` listing with a one-paragraph summary still requires technical literacy to interpret the severity table correctly.\n- Payload strings and parameter names are evidence artifacts appropriate for the technical findings section, not board-level communication.\n- Reproducing the technical section verbatim is the opposite of an executive summary and transfers the interpretation burden to the audience.",
       "domain": "Engagement Management",
       "difficulty": 2,
       "lastReviewed": "2026-04-15",
@@ -686,7 +704,9 @@
       "id": "PT0-003-0017",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "XSS"
+      ],
       "skills": [
         "1.4: Penetration test reports: creating reports with executive summaries, findings, and remediation recommendations."
       ],
@@ -852,7 +872,7 @@
           "explanation": "Peer review is the final quality gate before client delivery. It catches errors in technical accuracy, severity calibration, and communication quality, and must follow the completion of all content sections to be effective."
         }
       ],
-      "tip": "Consider what information each step depends on from the step before it — what must exist before you can write each section.",
+      "tip": "Consider what information each step depends on from the step before it and what must exist before you can write each section.",
       "explanation": "Penetration test report production follows a dependency chain: evidence must be compiled before it can be rated, ratings must exist before the technical section can be written, findings must be documented before remediation can be recommended, and all sections must be complete before an executive summary can accurately synthesize them. Peer review is the final gate before client delivery.",
       "domain": "Engagement Management",
       "difficulty": 2,
@@ -864,8 +884,12 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "DNS",
+        "IP",
         "Nmap",
-        "Wireshark"
+        "OSINT",
+        "Wireshark",
+        "whois"
       ],
       "skills": [
         "2.1: Active and passive reconnaissance: gathering information using open-source intelligence (OSINT), network sniffing, and protocol scanning."
@@ -906,6 +930,15 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "ARP",
+        "DHCP",
+        "DNS",
+        "HTTP",
+        "ICMP",
+        "IP",
+        "TCP",
+        "VLAN",
+        "Windows",
         "Wireshark",
         "tcpdump"
       ],
@@ -948,7 +981,9 @@
       "type": "single-choice",
       "format": "text",
       "services": [
-        "Nmap"
+        "Nmap",
+        "TCP",
+        "UDP"
       ],
       "skills": [
         "2.1: Active and passive reconnaissance: gathering information using open-source intelligence (OSINT), network sniffing, and protocol scanning."
@@ -990,9 +1025,14 @@
       "selectCount": 2,
       "format": "text",
       "services": [
-        "Shodan",
+        "DNS",
+        "HTTP",
+        "IP",
+        "Nikto",
         "Nmap",
-        "Nikto"
+        "OSINT",
+        "Shodan",
+        "TLS"
       ],
       "skills": [
         "2.1: Active and passive reconnaissance: gathering information using open-source intelligence (OSINT), network sniffing, and protocol scanning."
@@ -1037,7 +1077,12 @@
     {
       "id": "PT0-003-0025",
       "type": "matching",
-      "services": [],
+      "services": [
+        "OSINT",
+        "TCP",
+        "UDP",
+        "whois"
+      ],
       "skills": [
         "2.1: Active and passive reconnaissance: gathering information using open-source intelligence (OSINT), network sniffing, and protocol scanning."
       ],
@@ -1098,6 +1143,8 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "DNS",
+        "IP",
         "dig",
         "dnsenum"
       ],
@@ -1139,6 +1186,9 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "HTTP",
+        "HTTPS",
+        "Nmap",
         "nmap"
       ],
       "skills": [
@@ -1179,8 +1229,9 @@
       "type": "single-choice",
       "format": "text",
       "services": [
-        "gobuster",
-        "dirb"
+        "Gobuster",
+        "dirb",
+        "gobuster"
       ],
       "skills": [
         "2.2: Enumeration techniques: performing DNS enumeration, service discovery, and directory enumeration."
@@ -1222,6 +1273,10 @@
       "selectCount": 2,
       "format": "text",
       "services": [
+        "DNS",
+        "HTTP",
+        "IP",
+        "Nmap",
         "fierce",
         "nmap"
       ],
@@ -1270,10 +1325,14 @@
       "type": "matching",
       "format": "text",
       "services": [
-        "gobuster",
+        "DNS",
+        "Gobuster",
+        "IP",
+        "Nmap",
         "dig",
-        "nmap",
-        "fierce"
+        "fierce",
+        "gobuster",
+        "nmap"
       ],
       "skills": [
         "2.2: Enumeration techniques: performing DNS enumeration, service discovery, and directory enumeration."
@@ -1335,7 +1394,10 @@
       "type": "single-choice",
       "format": "text",
       "services": [
-        "Nmap"
+        "ICMP",
+        "Nmap",
+        "TCP",
+        "UDP"
       ],
       "skills": [
         "2.3: Reconnaissance tools: using tools like Nmap, Wireshark, and Shodan for information gathering."
@@ -1376,6 +1438,9 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "FTP",
+        "HTTP",
+        "TCP",
         "Wireshark"
       ],
       "skills": [
@@ -1417,7 +1482,12 @@
       "type": "single-choice",
       "format": "text",
       "services": [
-        "Shodan"
+        "API",
+        "IP",
+        "Nmap",
+        "SSL",
+        "Shodan",
+        "XML"
       ],
       "skills": [
         "2.3: Reconnaissance tools: using tools like Nmap, Wireshark, and Shodan for information gathering."
@@ -1459,9 +1529,14 @@
       "selectCount": 2,
       "format": "text",
       "services": [
+        "FTP",
+        "HTTP",
+        "IP",
         "Nmap",
-        "Wireshark",
-        "Shodan"
+        "Shodan",
+        "TCP",
+        "UDP",
+        "Wireshark"
       ],
       "skills": [
         "2.3: Reconnaissance tools: using tools like Nmap, Wireshark, and Shodan for information gathering."
@@ -1508,9 +1583,13 @@
       "type": "matching",
       "format": "text",
       "services": [
+        "FTP",
+        "HTTP",
         "Nmap",
-        "Wireshark",
-        "Shodan"
+        "Shodan",
+        "TCP",
+        "UDP",
+        "Wireshark"
       ],
       "skills": [
         "2.3: Reconnaissance tools: using tools like Nmap, Wireshark, and Shodan for information gathering."
@@ -1561,7 +1640,11 @@
       "id": "PT0-003-0036",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "IP",
+        "Nmap",
+        "Python"
+      ],
       "skills": [
         "2.4: Script modification: customizing Python, PowerShell, and Bash scripts for reconnaissance and enumeration."
       ],
@@ -1601,8 +1684,12 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "Active Directory",
+        "BloodHound",
         "Get-ADUser",
-        "BloodHound"
+        "JSON",
+        "PowerShell",
+        "Windows"
       ],
       "skills": [
         "2.4: Script modification: customizing Python, PowerShell, and Bash scripts for reconnaissance and enumeration."
@@ -1644,8 +1731,14 @@
       "selectCount": 2,
       "format": "text",
       "services": [
-        "nmap",
-        "enum4linux"
+        "Base64",
+        "Bash",
+        "IP",
+        "Linux",
+        "Nmap",
+        "curl",
+        "enum4linux",
+        "nmap"
       ],
       "skills": [
         "2.4: Script modification: customizing Python, PowerShell, and Bash scripts for reconnaissance and enumeration."
@@ -1692,6 +1785,12 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "DNS",
+        "HTTP",
+        "IP",
+        "JSON",
+        "Nmap",
+        "Python",
         "nmap"
       ],
       "skills": [
@@ -1732,7 +1831,10 @@
       "id": "PT0-003-0040",
       "type": "ordering",
       "format": "text",
-      "services": [],
+      "services": [
+        "Bash",
+        "IP"
+      ],
       "skills": [
         "2.4: Script modification: customizing Python, PowerShell, and Bash scripts for reconnaissance and enumeration."
       ],
@@ -1781,6 +1883,10 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "ICMP",
+        "Nessus",
+        "WMI",
+        "Windows",
         "nessus"
       ],
       "skills": [
@@ -1821,6 +1927,9 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "FTP",
+        "HTTP",
+        "Nmap",
         "nmap"
       ],
       "skills": [
@@ -1861,7 +1970,11 @@
       "type": "multiple-choice",
       "selectCount": 2,
       "format": "text",
-      "services": [],
+      "services": [
+        "API",
+        "Python",
+        "REST API"
+      ],
       "skills": [
         "3.1: Vulnerability scans: conducting authenticated, unauthenticated, static application security testing (SAST) and dynamic application security testing (DAST)."
       ],
@@ -1907,6 +2020,8 @@
       "type": "matching",
       "format": "text",
       "services": [
+        "Path Traversal",
+        "XSS",
         "burpsuite"
       ],
       "skills": [
@@ -1965,6 +2080,11 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "ICMP",
+        "Linux",
+        "Nessus",
+        "Nmap",
+        "SSH",
         "nessus"
       ],
       "skills": [
@@ -2005,6 +2125,10 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "IP",
+        "Nmap",
+        "TCP",
+        "Windows",
         "nmap"
       ],
       "skills": [
@@ -2045,6 +2169,12 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "EternalBlue",
+        "Nessus",
+        "Nmap",
+        "SCADA",
+        "WMIC",
+        "Windows",
         "nessus"
       ],
       "skills": [
@@ -2086,6 +2216,11 @@
       "selectCount": 2,
       "format": "text",
       "services": [
+        "Nmap",
+        "SSL",
+        "TCP",
+        "TLS",
+        "Wireshark",
         "nmap",
         "wireshark"
       ],
@@ -2174,8 +2309,10 @@
       "type": "matching",
       "format": "text",
       "services": [
-        "nmap",
-        "nessus"
+        "Nessus",
+        "Nmap",
+        "nessus",
+        "nmap"
       ],
       "skills": [
         "3.2: Result analysis: validating findings, troubleshooting configurations, and identifying false positives."
@@ -2227,7 +2364,9 @@
       "type": "single-choice",
       "format": "text",
       "services": [
-        "Nessus"
+        "Metasploit",
+        "Nessus",
+        "Windows"
       ],
       "skills": [
         "3.3: Discovery tools: using tools like Nessus, Nikto, and OpenVAS for vulnerability discovery."
@@ -2268,6 +2407,7 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "Apache",
         "Nikto"
       ],
       "skills": [
@@ -2309,7 +2449,10 @@
       "type": "single-choice",
       "format": "text",
       "services": [
-        "OpenVAS"
+        "IP",
+        "Linux",
+        "OpenVAS",
+        "SSH"
       ],
       "skills": [
         "3.3: Discovery tools: using tools like Nessus, Nikto, and OpenVAS for vulnerability discovery."
@@ -2351,9 +2494,13 @@
       "format": "text",
       "selectCount": 2,
       "services": [
+        "HTTP",
+        "HTTPS",
+        "Linux",
         "Nessus",
         "Nikto",
-        "OpenVAS"
+        "OpenVAS",
+        "Windows"
       ],
       "skills": [
         "3.3: Discovery tools: using tools like Nessus, Nikto, and OpenVAS for vulnerability discovery."
@@ -2400,6 +2547,9 @@
       "type": "ordering",
       "format": "text",
       "services": [
+        "HTTP",
+        "HTTPS",
+        "IP",
         "Nessus",
         "Nikto",
         "OpenVAS"
@@ -2445,7 +2595,10 @@
       "id": "PT0-003-0056",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "ICMP",
+        "VLAN"
+      ],
       "skills": [
         "4.1: Network attacks: performing VLAN hopping, on-path attacks, and service exploitation."
       ],
@@ -2485,6 +2638,9 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "ARP",
+        "IP",
+        "Linux",
         "arpspoof"
       ],
       "skills": [
@@ -2526,8 +2682,15 @@
       "type": "single-choice",
       "format": "text",
       "services": [
-        "nmap",
-        "metasploit"
+        "EternalBlue",
+        "Metasploit",
+        "NTLM",
+        "Nmap",
+        "PsExec",
+        "TCP",
+        "Windows",
+        "metasploit",
+        "nmap"
       ],
       "skills": [
         "4.1: Network attacks: performing VLAN hopping, on-path attacks, and service exploitation."
@@ -2569,8 +2732,17 @@
       "format": "text",
       "selectCount": 2,
       "services": [
-        "wireshark",
-        "ettercap"
+        "ARP",
+        "DNS",
+        "FTP",
+        "HTTP",
+        "HTTPS",
+        "IP",
+        "SSL",
+        "TCP",
+        "Wireshark",
+        "ettercap",
+        "wireshark"
       ],
       "skills": [
         "4.1: Network attacks: performing VLAN hopping, on-path attacks, and service exploitation."
@@ -2616,7 +2788,12 @@
       "id": "PT0-003-0060",
       "type": "ordering",
       "format": "text",
-      "services": [],
+      "services": [
+        "BIND",
+        "IP",
+        "Nmap",
+        "VLAN"
+      ],
       "skills": [
         "4.1: Network attacks: performing VLAN hopping, on-path attacks, and service exploitation."
       ],
@@ -2665,6 +2842,8 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "Hydra",
+        "SSH",
         "hydra"
       ],
       "skills": [
@@ -2706,6 +2885,11 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "Kerberos",
+        "Mimikatz",
+        "NTLM",
+        "Pass-the-Hash",
+        "Windows",
         "mimikatz"
       ],
       "skills": [
@@ -2746,7 +2930,9 @@
       "id": "PT0-003-0063",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Hashcat"
+      ],
       "skills": [
         "4.2: Authentication attacks: executing brute-force attacks, pass-the-hash, and credential stuffing."
       ],
@@ -2787,6 +2973,9 @@
       "format": "text",
       "selectCount": 2,
       "services": [
+        "Hashcat",
+        "NTDS.dit",
+        "NTLM",
         "hashcat"
       ],
       "skills": [
@@ -2834,8 +3023,14 @@
       "type": "ordering",
       "format": "text",
       "services": [
-        "mimikatz",
-        "metasploit"
+        "Metasploit",
+        "Mimikatz",
+        "NTLM",
+        "Pass-the-Hash",
+        "PsExec",
+        "Windows",
+        "metasploit",
+        "mimikatz"
       ],
       "skills": [
         "4.2: Authentication attacks: executing brute-force attacks, pass-the-hash, and credential stuffing."
@@ -2885,6 +3080,8 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "Bash",
+        "Linux",
         "linpeas"
       ],
       "skills": [
@@ -2926,6 +3123,9 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "Mimikatz",
+        "NTLM",
+        "Windows",
         "mimikatz"
       ],
       "skills": [
@@ -2967,6 +3167,9 @@
       "type": "multiple-choice",
       "format": "text",
       "services": [
+        "DCOM",
+        "WMI",
+        "Windows",
         "metasploit"
       ],
       "skills": [
@@ -3015,6 +3218,13 @@
       "type": "ordering",
       "format": "text",
       "services": [
+        "Active Directory",
+        "Kerberos",
+        "Mimikatz",
+        "NTDS.dit",
+        "NTLM",
+        "Pass-the-Hash",
+        "Windows",
         "mimikatz"
       ],
       "skills": [
@@ -3064,7 +3274,12 @@
       "id": "PT0-003-0070",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "NTDS.dit",
+        "Pass-the-Hash",
+        "Windows",
+        "XML"
+      ],
       "skills": [
         "4.3: Host-based attacks: conducting privilege escalation, process injection, and credential dumping."
       ],
@@ -3104,6 +3319,8 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "DNS",
+        "HTTP",
         "sqlmap"
       ],
       "skills": [
@@ -3186,6 +3403,8 @@
       "type": "multiple-choice",
       "format": "text",
       "services": [
+        "HTTPS",
+        "PHP",
         "burpsuite"
       ],
       "skills": [
@@ -3234,8 +3453,9 @@
       "type": "ordering",
       "format": "text",
       "services": [
-        "sqlmap",
-        "burpsuite"
+        "SQLmap",
+        "burpsuite",
+        "sqlmap"
       ],
       "skills": [
         "4.4: Web application attacks: performing SQL injection, cross-site scripting (XSS), and directory traversal."
@@ -3279,6 +3499,10 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "API",
+        "HTTP",
+        "HTTPS",
+        "XSS",
         "burpsuite"
       ],
       "skills": [
@@ -3319,7 +3543,11 @@
       "id": "PT0-003-0076",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "API",
+        "Bash",
+        "Kubernetes"
+      ],
       "skills": [
         "4.5: Cloud-based attacks: exploiting container escapes, metadata service attacks, and identity and access management (IAM) misconfiguration."
       ],
@@ -3358,7 +3586,12 @@
       "id": "PT0-003-0077",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "API",
+        "AWS",
+        "HTTP",
+        "IP"
+      ],
       "skills": [
         "4.5: Cloud-based attacks: exploiting container escapes, metadata service attacks, and identity and access management (IAM) misconfiguration."
       ],
@@ -3398,6 +3631,8 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "API",
+        "AWS",
         "pacu"
       ],
       "skills": [
@@ -3439,7 +3674,11 @@
       "type": "multiple-choice",
       "format": "text",
       "selectCount": 2,
-      "services": [],
+      "services": [
+        "AWS",
+        "HTTP",
+        "SSRF"
+      ],
       "skills": [
         "4.5: Cloud-based attacks: exploiting container escapes, metadata service attacks, and identity and access management (IAM) misconfiguration."
       ],
@@ -3484,7 +3723,9 @@
       "id": "PT0-003-0080",
       "type": "ordering",
       "format": "text",
-      "services": [],
+      "services": [
+        "Docker"
+      ],
       "skills": [
         "4.5: Cloud-based attacks: exploiting container escapes, metadata service attacks, and identity and access management (IAM) misconfiguration."
       ],
@@ -3526,7 +3767,10 @@
       "id": "PT0-003-0081",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "API",
+        "JSON"
+      ],
       "skills": [
         "4.6: AI attacks: explaining prompt injection and model manipulation against artificial intelligence systems."
       ],
@@ -3564,7 +3808,10 @@
       "id": "PT0-003-0082",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "API",
+        "SSRF"
+      ],
       "skills": [
         "4.6: AI attacks: explaining prompt injection and model manipulation against artificial intelligence systems."
       ],
@@ -3603,7 +3850,10 @@
       "id": "PT0-003-0083",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "API",
+        "HTTP"
+      ],
       "skills": [
         "4.6: AI attacks: explaining prompt injection and model manipulation against artificial intelligence systems."
       ],
@@ -3642,7 +3892,12 @@
       "id": "PT0-003-0084",
       "type": "multiple-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "API",
+        "HTTPS",
+        "OAuth",
+        "TLS"
+      ],
       "skills": [
         "4.6: AI attacks: explaining prompt injection and model manipulation against artificial intelligence systems."
       ],
@@ -3730,7 +3985,9 @@
       "id": "PT0-003-0086",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "Windows"
+      ],
       "skills": [
         "5.1: Post-exploitation activities: establishing persistence, performing lateral movement, and cleaning up artifacts."
       ],
@@ -3770,7 +4027,11 @@
       "type": "single-choice",
       "format": "text",
       "services": [
-        "Mimikatz"
+        "Golden Ticket",
+        "Kerberos",
+        "Mimikatz",
+        "NTLM",
+        "Pass-the-Hash"
       ],
       "skills": [
         "5.1: Post-exploitation activities: establishing persistence, performing lateral movement, and cleaning up artifacts."
@@ -3811,6 +4072,9 @@
       "type": "single-choice",
       "format": "text",
       "services": [
+        "Bash",
+        "Linux",
+        "Syslog",
         "shred"
       ],
       "skills": [
@@ -3853,7 +4117,11 @@
       "selectCount": 2,
       "format": "text",
       "services": [
-        "WMI"
+        "Kerberoasting",
+        "Kerberos",
+        "Pass-the-Ticket",
+        "WMI",
+        "Windows"
       ],
       "skills": [
         "5.1: Post-exploitation activities: establishing persistence, performing lateral movement, and cleaning up artifacts."
@@ -3980,7 +4248,9 @@
       "id": "PT0-003-0092",
       "type": "single-choice",
       "format": "text",
-      "services": [],
+      "services": [
+        "WINS"
+      ],
       "skills": [
         "5.2: Documentation: creating attack narratives and providing remediation recommendations."
       ],
@@ -4059,7 +4329,9 @@
       "type": "multiple-choice",
       "selectCount": 2,
       "format": "text",
-      "services": [],
+      "services": [
+        "IP"
+      ],
       "skills": [
         "5.2: Documentation: creating attack narratives and providing remediation recommendations."
       ],
