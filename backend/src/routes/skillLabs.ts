@@ -20,6 +20,8 @@ const PROVIDER_SHOWCASE: Map<string, string[]> = new Map(
     JSON.parse(readFileSync(path.join(LABS_DIR, 'providers.json'), 'utf-8')) as Record<string, string[]>
   )
 )
+const PROVIDER_RANK = new Map([...PROVIDER_SHOWCASE.keys()].map((p, i) => [p, i]))
+const N_PROVIDERS = PROVIDER_SHOWCASE.size
 
 /**
  * Skill lab source switch — mirrors EXAM_SOURCE pattern.
@@ -126,7 +128,11 @@ function withShowcaseFields(labs: any[]): any[] {
     const platform = (lab.platform ?? 'Other').toString().trim() || 'Other'
     const ids = PROVIDER_SHOWCASE.get(platform) ?? []
     const idx = ids.indexOf(lab.id)
-    return { ...lab, showcase: idx !== -1, showcaseOrder: idx !== -1 ? idx : 99 }
+    if (idx === -1) return { ...lab, showcase: false, showcaseOrder: 9999 }
+    // Interleave providers: slot = withinProviderIndex * N_PROVIDERS + platformRank
+    // e.g. AWS#0=0, CompTIA#0=1, Anthropic#0=2, RedHat#0=3, AWS#1=4, ...
+    const platformRank = PROVIDER_RANK.get(platform) ?? 0
+    return { ...lab, showcase: true, showcaseOrder: idx * N_PROVIDERS + platformRank }
   })
 }
 
@@ -199,6 +205,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           ...(lab.relatedExamCodes ? { relatedExamCodes: lab.relatedExamCodes } : {}),
         }))
 
+    const enrichedLabs = withShowcaseFields(allLabs)
+
     if (request.user) {
       const userId = request.user.sub
       const { getActiveProductIds } = await import('../services/entitlements.js')
@@ -210,14 +218,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       const showcaseCount = effectiveLabShowcaseCount(tier)
       if (showcaseCount === null) {
         // pro_plus: all labs unlocked
-        return reply.send(withLocked(allLabs, null))
+        return reply.send(withLocked(enrichedLabs, null))
       }
-      return reply.send(withLocked(allLabs, unlockedShowcaseIds(withShowcaseFields(allLabs), showcaseCount)))
+      return reply.send(withLocked(enrichedLabs, unlockedShowcaseIds(enrichedLabs, showcaseCount)))
     }
 
     // Unauthenticated: visitor showcase unlocked (per provider)
     const count = effectiveLabShowcaseCount('visitor') ?? 6
-    return reply.send(withLocked(allLabs, unlockedShowcaseIds(withShowcaseFields(allLabs), count)))
+    return reply.send(withLocked(enrichedLabs, unlockedShowcaseIds(enrichedLabs, count)))
   })
 
   // GET /skill-labs/my-attempts — get current user's lab attempts

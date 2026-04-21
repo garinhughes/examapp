@@ -48,7 +48,7 @@ async function main() {
   // Scan per-provider files and merge into one array
   const files = await fs.readdir(LABS_DIR)
   const allLabs: LabDef[] = (await Promise.all(
-    files.filter((f) => f.endsWith('.json')).map(async (f) => {
+    files.filter((f) => f.endsWith('.json') && f !== 'providers.json').map(async (f) => {
       const raw = await fs.readFile(path.join(LABS_DIR, f), 'utf-8')
       return JSON.parse(raw) as LabDef[]
     })
