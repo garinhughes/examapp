@@ -1,0 +1,2255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>examapp — developer guide</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --bg-alt: #171d25;
+    --panel: #1c232d;
+    --panel-2: #222b37;
+    --border: #2a3441;
+    --text: #e4e7eb;
+    --muted: #8b95a5;
+    --accent: #7cc6ff;
+    --accent-2: #b49aff;
+    --ok: #7ddf9c;
+    --warn: #ffc46b;
+    --danger: #ff8888;
+    --code-bg: #11161d;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f6f7f9;
+      --bg-alt: #eef1f5;
+      --panel: #ffffff;
+      --panel-2: #f3f5f8;
+      --border: #dde2ea;
+      --text: #1a1f26;
+      --muted: #5b6775;
+      --accent: #0969da;
+      --accent-2: #6639ba;
+      --ok: #1f7a3f;
+      --warn: #9a6700;
+      --danger: #b42318;
+      --code-bg: #f0f2f5;
+      --shadow: 0 1px 2px rgba(15,20,25,.08), 0 8px 24px rgba(15,20,25,.06);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+  body {
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px 24px 96px;
+  }
+  header.hero {
+    padding: 40px 32px;
+    margin-bottom: 32px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(124,198,255,.12), rgba(180,154,255,.08));
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  header.hero h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header.hero p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 16px;
+  }
+  nav.toc {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+  }
+  nav.toc strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  nav.toc ol {
+    margin: 0;
+    padding-left: 20px;
+    columns: 2;
+    column-gap: 32px;
+  }
+  nav.toc a {
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+  }
+  nav.toc a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+  h2 {
+    margin-top: 56px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 24px;
+    letter-spacing: -0.01em;
+  }
+  h3 { margin-top: 32px; font-size: 18px; color: var(--accent); }
+  p { color: var(--text); }
+  code, kbd {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font: 13px/1.55 "JetBrains Mono", ui-monospace, monospace;
+  }
+  pre code { background: transparent; border: 0; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+    background: var(--panel);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th { background: var(--panel-2); font-weight: 600; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  tr:last-child td { border-bottom: 0; }
+  td.num {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+    width: 44px;
+    text-align: center;
+    background: var(--panel-2);
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .card h4 { margin: 0 0 6px; font-size: 15px; color: var(--accent); }
+  .card p { margin: 0; color: var(--muted); font-size: 13px; }
+  .diagram {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .diagram svg { display: block; width: 100%; height: auto; max-width: 100%; }
+  .diagram figcaption {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    font-style: italic;
+  }
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .pill.node { background: rgba(124,198,255,.15); color: var(--accent); border: 1px solid rgba(124,198,255,.3); }
+  .pill.react { background: rgba(180,154,255,.15); color: var(--accent-2); border: 1px solid rgba(180,154,255,.3); }
+  .pill.aws { background: rgba(255,196,107,.15); color: var(--warn); border: 1px solid rgba(255,196,107,.3); }
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--panel);
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .callout.warn { border-left-color: var(--warn); }
+  .callout.danger { border-left-color: var(--danger); }
+  .callout strong { color: var(--accent); }
+  .callout.warn strong { color: var(--warn); }
+  .callout.danger strong { color: var(--danger); }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 720px) {
+    .two-col { grid-template-columns: 1fr; }
+    nav.toc ol { columns: 1; }
+    body { padding: 20px 14px 60px; }
+    header.hero { padding: 28px 20px; }
+  }
+  footer {
+    margin-top: 64px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+  }
+
+  /* SVG diagram shared styles */
+  .d-text { font: 600 12px -apple-system, "Segoe UI", Roboto, sans-serif; fill: var(--text); }
+  .d-text-sm { font: 500 10.5px -apple-system, sans-serif; fill: var(--muted); }
+  .d-box { fill: var(--panel-2); stroke: var(--border); stroke-width: 1.2; rx: 8; }
+  .d-box-accent { fill: rgba(124,198,255,.12); stroke: var(--accent); stroke-width: 1.4; rx: 8; }
+  .d-box-warn   { fill: rgba(255,196,107,.12); stroke: var(--warn); stroke-width: 1.4; rx: 8; }
+  .d-box-react  { fill: rgba(180,154,255,.12); stroke: var(--accent-2); stroke-width: 1.4; rx: 8; }
+  .d-arrow { stroke: var(--muted); stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+  .d-arrow-accent { stroke: var(--accent); stroke-width: 1.8; fill: none; marker-end: url(#arrow-accent); stroke-dasharray: none; }
+  .d-arrow-dashed { stroke: var(--muted); stroke-width: 1.3; fill: none; marker-end: url(#arrow); stroke-dasharray: 5 4; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>examapp — developer guide</h1>
+  <p>A practical walkthrough of the frontend SPA, the Fastify backend, and how the two talk to each other.</p>
+  <div style="margin-top:14px">
+    <span class="pill node">Node 20 ESM</span>
+    <span class="pill node">Fastify 4</span>
+    <span class="pill react">React 18</span>
+    <span class="pill react">Vite 5</span>
+    <span class="pill aws">AWS · ECS · DynamoDB · Cognito · S3</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#overview">Repo overview</a></li>
+    <li><a href="#stack">Stack at a glance</a></li>
+    <li><a href="#arch">System architecture</a></li>
+    <li><a href="#backend">Backend tour</a></li>
+    <li><a href="#request">Request lifecycle</a></li>
+    <li><a href="#auth">Auth flow (Cognito + JWT)</a></li>
+    <li><a href="#frontend">Frontend tour</a></li>
+    <li><a href="#api">Frontend ↔ backend</a></li>
+    <li><a href="#dev">Local dev loop</a></li>
+    <li><a href="#recipes">Common recipes</a></li>
+    <li><a href="#testing">UI testing (Playwright)</a></li>
+    <li><a href="#improvements">Roadmap to enterprise scale</a></li>
+    <li><a href="#rate-limits">Rate limits for shared-NAT users</a></li>
+    <li><a href="#marketing">Marketing &amp; growth</a></li>
+    <li><a href="#learning-plan">Product: Learning Plan</a></li>
+    <li><a href="#lab-lifecycle">Skill-lab lifecycle redesign</a></li>
+    <li><a href="#exam-review">Exam review flow redesign</a></li>
+  </ol>
+</nav>
+
+<h2 id="overview">1. Repo overview</h2>
+<p>
+  <code>examapp</code> is a monorepo containing a practice-exam &amp; skill-lab web app deployed on AWS.
+  Three top-level folders, each self-contained:
+</p>
+<div class="cards">
+  <div class="card"><h4>frontend/</h4><p>React 18 + Vite + Tailwind SPA. Runs locally on <code>:5173</code>.</p></div>
+  <div class="card"><h4>backend/</h4><p>Fastify 4 TypeScript API (Node ESM). Runs locally on <code>:3000</code>.</p></div>
+  <div class="card"><h4>infra/terraform/</h4><p>AWS infra modules — ECS, DynamoDB, S3, CloudFront, WAF, SES, Route53.</p></div>
+</div>
+
+<h2 id="stack">2. Stack at a glance</h2>
+<table>
+  <thead><tr><th>Layer</th><th>Choice</th><th>Why it matters</th></tr></thead>
+  <tbody>
+    <tr><td>Language</td><td>TypeScript 5 (ESM)</td><td>Backend is <code>"type":"module"</code>. Always <code>import</code>, never <code>require</code>.</td></tr>
+    <tr><td>Server</td><td>Fastify 4 + plugins</td><td><code>@fastify/jwt · cors · rate-limit · cookie</code>.</td></tr>
+    <tr><td>UI</td><td>React 18 + React Router 7</td><td>SPA with context-based state (no Redux).</td></tr>
+    <tr><td>Styling</td><td>Tailwind 3 + Radix UI</td><td>Utility classes; Radix for accessible primitives.</td></tr>
+    <tr><td>Data</td><td>DynamoDB</td><td>Users, attempts, entitlements, metrics, emails.</td></tr>
+    <tr><td>Auth</td><td>Cognito (mgmt acct)</td><td>Hosted UI + JWT; backend verifies via JWKS.</td></tr>
+    <tr><td>Packages</td><td>pnpm</td><td>Do not use npm/yarn.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="arch">3. System architecture</h2>
+<figure class="diagram">
+<svg viewBox="0 0 960 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="System architecture diagram">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--muted)"/>
+    </marker>
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+
+  <!-- Browser -->
+  <rect class="d-box-react" x="30" y="150" width="170" height="110"/>
+  <text class="d-text" x="115" y="180" text-anchor="middle">Browser (SPA)</text>
+  <text class="d-text-sm" x="115" y="200" text-anchor="middle">React 18 + Vite</text>
+  <text class="d-text-sm" x="115" y="216" text-anchor="middle">AuthContext · ExamContext</text>
+  <text class="d-text-sm" x="115" y="232" text-anchor="middle">useAuthFetch()</text>
+
+  <!-- CloudFront -->
+  <rect class="d-box-warn" x="260" y="40" width="150" height="70"/>
+  <text class="d-text" x="335" y="68" text-anchor="middle">CloudFront + WAF</text>
+  <text class="d-text-sm" x="335" y="88" text-anchor="middle">static assets · edge cache</text>
+
+  <!-- S3 static -->
+  <rect class="d-box-warn" x="440" y="40" width="130" height="70"/>
+  <text class="d-text" x="505" y="68" text-anchor="middle">S3 (static site)</text>
+  <text class="d-text-sm" x="505" y="88" text-anchor="middle">built frontend</text>
+
+  <!-- ECS / Fastify -->
+  <rect class="d-box-accent" x="260" y="170" width="180" height="110"/>
+  <text class="d-text" x="350" y="200" text-anchor="middle">ECS Fargate — Fastify</text>
+  <text class="d-text-sm" x="350" y="220" text-anchor="middle">plugins · routes · services</text>
+  <text class="d-text-sm" x="350" y="236" text-anchor="middle">api.certshack.com</text>
+  <text class="d-text-sm" x="350" y="254" text-anchor="middle">:3000 (container)</text>
+
+  <!-- Cognito -->
+  <rect class="d-box-warn" x="500" y="170" width="150" height="70"/>
+  <text class="d-text" x="575" y="198" text-anchor="middle">Cognito</text>
+  <text class="d-text-sm" x="575" y="218" text-anchor="middle">ExamAppPool (mgmt acct)</text>
+
+  <!-- DynamoDB -->
+  <rect class="d-box-warn" x="710" y="90" width="210" height="80"/>
+  <text class="d-text" x="815" y="118" text-anchor="middle">DynamoDB</text>
+  <text class="d-text-sm" x="815" y="136" text-anchor="middle">users · attempts · entitlements</text>
+  <text class="d-text-sm" x="815" y="152" text-anchor="middle">metrics · emails · interactions</text>
+
+  <!-- S3 data -->
+  <rect class="d-box-warn" x="710" y="190" width="210" height="60"/>
+  <text class="d-text" x="815" y="215" text-anchor="middle">S3 (data &amp; images)</text>
+  <text class="d-text-sm" x="815" y="233" text-anchor="middle">exam JSON · diagrams</text>
+
+  <!-- SES -->
+  <rect class="d-box-warn" x="710" y="270" width="210" height="60"/>
+  <text class="d-text" x="815" y="295" text-anchor="middle">SES</text>
+  <text class="d-text-sm" x="815" y="313" text-anchor="middle">transactional email</text>
+
+  <!-- Stripe / PayPal -->
+  <rect class="d-box" x="260" y="310" width="180" height="60"/>
+  <text class="d-text" x="350" y="335" text-anchor="middle">Stripe · PayPal</text>
+  <text class="d-text-sm" x="350" y="353" text-anchor="middle">checkout + webhooks</text>
+
+  <!-- arrows -->
+  <path class="d-arrow-accent" d="M200 190 L260 210"/>
+  <path class="d-arrow" d="M200 180 Q230 120 260 100"/>
+  <path class="d-arrow" d="M410 75 L440 75"/>
+  <path class="d-arrow" d="M440 200 L500 200"/>
+  <path class="d-arrow-accent" d="M440 215 L710 130"/>
+  <path class="d-arrow-accent" d="M440 235 L710 220"/>
+  <path class="d-arrow" d="M440 260 L710 295"/>
+  <path class="d-arrow-dashed" d="M350 310 L350 280"/>
+  <path class="d-arrow-dashed" d="M440 340 L260 340" />
+</svg>
+<figcaption>SPA served from CloudFront/S3; API calls go to Fastify on ECS; data &amp; auth live in separate AWS accounts.</figcaption>
+</figure>
+
+<h2 id="backend">4. Backend tour</h2>
+
+<h3>Entry point</h3>
+<p>
+  <code>backend/src/index.ts</code> boots Fastify and registers plugins in this order:
+</p>
+<ol>
+  <li>Raw-body capture (needed for Stripe/PayPal webhook signature verification).</li>
+  <li><code>@fastify/cors</code> — origin from <code>FRONTEND_ORIGIN</code> (default <code>https://certshack.com</code>).</li>
+  <li><code>@fastify/rate-limit</code> — 100 req/min/IP, overridable via <code>RATE_LIMIT_MAX</code>.</li>
+  <li><code>@fastify/cookie</code> — session cookies.</li>
+  <li><code>plugins/auth.ts</code> — decorates <code>request.user</code>, exposes <code>server.authenticate</code> and <code>server.optionalAuth</code>.</li>
+  <li><code>plugins/entitlements.ts</code> — decorates <code>request.tier</code>, <code>request.tierConfig</code>, <code>request.entitlements</code>.</li>
+  <li>Route modules are mounted by prefix.</li>
+</ol>
+
+<h3>Layout — <code>backend/src/</code></h3>
+<table>
+  <thead><tr><th>Folder</th><th>Purpose</th><th>Notable files</th></tr></thead>
+  <tbody>
+    <tr><td><code>routes/</code></td><td>HTTP handlers, one module per feature prefix</td><td><code>auth.ts · exams.ts · attempts.ts · skillLabs.ts · stripe.ts · paypal.ts · admin.ts · analytics.ts · gamification.ts · certificates.ts · ratings.ts · feedback.ts · reports.ts · username.ts · metrics.ts · polls.ts · images.ts · pricing.ts · unsubscribe.ts · internal/cron.ts</code></td></tr>
+    <tr><td><code>services/</code></td><td>Data + business logic (DynamoDB/S3/SES wrappers)</td><td><code>dynamo.ts · examStore.ts · attemptsStore.ts · skillLabStore.ts · entitlements.ts · ses.ts · cognitoAdmin.ts · erasureService.ts · emailTemplates.ts · paypalSessions.ts</code></td></tr>
+    <tr><td><code>plugins/</code></td><td>Fastify decorators run on every request</td><td><code>auth.ts · entitlements.ts</code></td></tr>
+    <tr><td><code>data/</code></td><td>Local JSON source when <code>EXAM_SOURCE=local</code></td><td><code>exams/*.json · skill-labs/*.json</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Route prefixes</h3>
+<div class="cards">
+  <div class="card"><h4>/auth</h4><p>Cognito code exchange, profile, password reset.</p></div>
+  <div class="card"><h4>/exams &amp; /attempts</h4><p>Catalog, question fetch, submission, history.</p></div>
+  <div class="card"><h4>/skill-labs</h4><p>Lab definitions &amp; session tracking.</p></div>
+  <div class="card"><h4>/payments</h4><p>Stripe Checkout, PayPal Orders &amp; Subscriptions, webhooks.</p></div>
+  <div class="card"><h4>/admin</h4><p>User mgmt, metrics, GDPR erasure.</p></div>
+  <div class="card"><h4>/internal/cron</h4><p>EventBridge-triggered jobs (expiry emails). Guarded by <code>x-cron-secret</code>.</p></div>
+</div>
+
+<h2 id="request">5. Request lifecycle</h2>
+<figure class="diagram">
+<svg viewBox="0 0 960 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Request lifecycle">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+  <g font-family="-apple-system, Segoe UI, sans-serif">
+    <!-- steps -->
+    <g>
+      <rect x="20"  y="80" width="120" height="60" rx="8" fill="rgba(124,198,255,.1)" stroke="var(--accent)"/>
+      <text x="80"  y="105" text-anchor="middle" class="d-text">Raw body</text>
+      <text x="80"  y="122" text-anchor="middle" class="d-text-sm">webhook prep</text>
+    </g>
+    <g>
+      <rect x="160" y="80" width="120" height="60" rx="8" fill="rgba(124,198,255,.1)" stroke="var(--accent)"/>
+      <text x="220" y="105" text-anchor="middle" class="d-text">CORS</text>
+      <text x="220" y="122" text-anchor="middle" class="d-text-sm">origin check</text>
+    </g>
+    <g>
+      <rect x="300" y="80" width="120" height="60" rx="8" fill="rgba(124,198,255,.1)" stroke="var(--accent)"/>
+      <text x="360" y="105" text-anchor="middle" class="d-text">Rate limit</text>
+      <text x="360" y="122" text-anchor="middle" class="d-text-sm">100/min/IP</text>
+    </g>
+    <g>
+      <rect x="440" y="80" width="120" height="60" rx="8" fill="rgba(180,154,255,.1)" stroke="var(--accent-2)"/>
+      <text x="500" y="105" text-anchor="middle" class="d-text">auth plugin</text>
+      <text x="500" y="122" text-anchor="middle" class="d-text-sm">JWT → req.user</text>
+    </g>
+    <g>
+      <rect x="580" y="80" width="130" height="60" rx="8" fill="rgba(180,154,255,.1)" stroke="var(--accent-2)"/>
+      <text x="645" y="105" text-anchor="middle" class="d-text">entitlements</text>
+      <text x="645" y="122" text-anchor="middle" class="d-text-sm">tier + products</text>
+    </g>
+    <g>
+      <rect x="730" y="80" width="210" height="60" rx="8" fill="rgba(255,196,107,.12)" stroke="var(--warn)"/>
+      <text x="835" y="105" text-anchor="middle" class="d-text">route handler</text>
+      <text x="835" y="122" text-anchor="middle" class="d-text-sm">services → Dynamo / S3 / SES</text>
+    </g>
+
+    <!-- arrows -->
+    <line x1="140" y1="110" x2="160" y2="110" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <line x1="280" y1="110" x2="300" y2="110" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <line x1="420" y1="110" x2="440" y2="110" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <line x1="560" y1="110" x2="580" y2="110" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <line x1="710" y1="110" x2="730" y2="110" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+    <text x="480" y="40" text-anchor="middle" class="d-text" style="font-size:13px">HTTP request</text>
+    <line x1="440" y1="50" x2="520" y2="50" stroke="var(--muted)" stroke-width="1"/>
+    <line x1="480" y1="50" x2="480" y2="75" stroke="var(--muted)" stroke-width="1" marker-end="url(#arrow2)"/>
+
+    <text x="480" y="190" text-anchor="middle" class="d-text-sm">Only <tspan fill="var(--accent-2)">auth</tspan> and <tspan fill="var(--accent-2)">entitlements</tspan> are route-level preHandlers; others are global.</text>
+  </g>
+</svg>
+<figcaption>Every API request flows through these stages before reaching a route handler.</figcaption>
+</figure>
+
+<h2 id="auth">6. Auth flow — Cognito + JWT + cookies</h2>
+<figure class="diagram">
+<svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Auth flow">
+  <defs>
+    <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/>
+    </marker>
+    <marker id="arrow3d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <!-- swimlanes -->
+  <rect x="20"  y="30" width="220" height="330" rx="10" fill="var(--panel-2)" stroke="var(--border)"/>
+  <rect x="260" y="30" width="220" height="330" rx="10" fill="var(--panel-2)" stroke="var(--border)"/>
+  <rect x="500" y="30" width="220" height="330" rx="10" fill="var(--panel-2)" stroke="var(--border)"/>
+  <rect x="740" y="30" width="200" height="330" rx="10" fill="var(--panel-2)" stroke="var(--border)"/>
+
+  <text class="d-text" x="130" y="54" text-anchor="middle">Browser</text>
+  <text class="d-text" x="370" y="54" text-anchor="middle">Cognito hosted UI</text>
+  <text class="d-text" x="610" y="54" text-anchor="middle">Fastify /auth</text>
+  <text class="d-text" x="840" y="54" text-anchor="middle">DynamoDB</text>
+
+  <!-- steps -->
+  <g class="d-text-sm">
+    <text x="130" y="90" text-anchor="middle" fill="var(--text)">1. click “log in”</text>
+    <text x="370" y="128" text-anchor="middle" fill="var(--text)">2. user authenticates</text>
+    <text x="610" y="170" text-anchor="middle" fill="var(--text)">3. exchange code → tokens</text>
+    <text x="370" y="210" text-anchor="middle" fill="var(--text)">4. JWKS (cached)</text>
+    <text x="610" y="250" text-anchor="middle" fill="var(--text)">5. set cookies, resp w/ ID token</text>
+    <text x="130" y="290" text-anchor="middle" fill="var(--text)">6. useAuthFetch adds Bearer</text>
+    <text x="610" y="320" text-anchor="middle" fill="var(--text)">7. verify &amp; resolve tier</text>
+  </g>
+
+  <!-- arrows -->
+  <line x1="240" y1="95"  x2="260" y2="95"  stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow3)"/>
+  <line x1="370" y1="140" x2="370" y2="170" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow3)"/>
+  <line x1="480" y1="175" x2="500" y2="175" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow3)"/>
+  <line x1="500" y1="215" x2="480" y2="215" stroke="var(--muted)"  stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow3d)"/>
+  <line x1="500" y1="255" x2="240" y2="255" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow3)"/>
+  <line x1="240" y1="295" x2="500" y2="295" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow3)"/>
+  <line x1="720" y1="325" x2="740" y2="325" stroke="var(--muted)"  stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow3d)"/>
+</svg>
+<figcaption>The backend never trusts the frontend’s identity claim — JWKS-verified JWT is the source of truth.</figcaption>
+</figure>
+
+<h3>Where it lives</h3>
+<ul>
+  <li><code>backend/src/plugins/auth.ts</code> — JWKS fetch + cache, JWT verify, dev-mode mock user (<code>AUTH_MODE=dev</code>), admin impersonation via backend-signed token.</li>
+  <li><code>backend/src/routes/auth.ts</code> — <code>POST /auth/token</code> (code exchange), <code>GET /auth/token</code> (refresh).</li>
+  <li><code>frontend/src/auth/AuthContext.tsx</code> — holds user, tokens, login/logout/refresh.</li>
+  <li><code>frontend/src/auth/useAuthFetch.ts</code> — fetch wrapper; adds <code>Authorization: Bearer &lt;id_token&gt;</code>, auto-refreshes on 401.</li>
+</ul>
+
+<div class="callout warn">
+  <strong>Impersonation:</strong> admins can generate a backend-signed token (using <code>CRON_SECRET</code>) to browse as another user. The <code>ImpersonationBanner</code> component makes this visually obvious — don’t remove it.
+</div>
+
+<h2 id="frontend">7. Frontend tour</h2>
+
+<h3>Entry &amp; routing</h3>
+<p>
+  <code>frontend/src/main.tsx</code> wires providers:
+  <code>HelmetProvider</code> → <code>BrowserRouter</code> → <code>AuthProvider</code> → <code>GamificationProvider</code> → <code>BasketProvider</code> → <code>App</code>.
+</p>
+<p><code>App.tsx</code> declares the routes:</p>
+<pre><code>/                    HomePage
+/login               LoginPage
+/verify/:token       VerifyPage
+/exams               ExamSetup
+/exams/:examCode     ExamApp           (wrapped in ExamProvider)
+/skill-labs          SkillLabsPage
+/skill-labs/:labId   SkillLabRunnerPage
+/pricing /basket /account /admin /metrics /feedback /diagrams /analytics
+/privacy /terms /refund
+*                    NotFound</code></pre>
+
+<h3>Folder map</h3>
+<div class="two-col">
+  <div>
+    <h3>Top-level</h3>
+    <ul>
+      <li><code>auth/</code> — <code>AuthContext.tsx</code>, <code>useAuthFetch.ts</code>, <code>useIsAdmin.ts</code>, <code>visitorId.ts</code></li>
+      <li><code>exam/</code> — <code>ExamContext.tsx</code> (~160 props!), <code>ExamApp.tsx</code>, <code>QuestionCard.tsx</code>, <code>ExamReview.tsx</code>, <code>downloads.ts</code></li>
+      <li><code>skill-labs/</code> — runner pages + <code>labs/</code> with 19 runner implementations (CLI, code-fix, diagnose/ReactFlow, architecture-builder, …)</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Supporting</h3>
+    <ul>
+      <li><code>components/</code> (UI, nav, admin, account)</li>
+      <li><code>hooks/</code> (<code>usePageTracking</code>, <code>useEntitlements</code>, <code>useTour</code>)</li>
+      <li><code>lib/utils.ts</code> (<code>cn()</code> for classnames)</li>
+      <li><code>apiBase.ts</code> — API base URL resolver</li>
+      <li><code>analytics.ts</code>, <code>clarity.ts</code></li>
+    </ul>
+  </div>
+</div>
+
+<h3>State management</h3>
+<p>
+  No Redux, no Zustand. State is held in React contexts:
+</p>
+<table>
+  <thead><tr><th>Context</th><th>Owns</th></tr></thead>
+  <tbody>
+    <tr><td><code>AuthContext</code></td><td>user, tokens, login/logout/refresh, impersonation</td></tr>
+    <tr><td><code>ExamContext</code></td><td>exam metadata, questions, answers, timer, review mode, score history</td></tr>
+    <tr><td><code>BasketContext</code></td><td>cart items, Stripe/PayPal session state</td></tr>
+    <tr><td><code>GamificationContext</code></td><td>badges, XP, leaderboard</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>Read before editing exam flow.</strong> <code>ExamContext</code> has ~160 props — adding state ad hoc will bite you. Check what already exists first.
+</div>
+
+<h2 id="api">8. Frontend ↔ backend</h2>
+<figure class="diagram">
+<svg viewBox="0 0 960 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Frontend to backend call flow">
+  <defs>
+    <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+
+  <rect x="30"  y="60" width="170" height="100" rx="10" fill="rgba(180,154,255,.1)" stroke="var(--accent-2)"/>
+  <text class="d-text"    x="115" y="90"  text-anchor="middle">Component</text>
+  <text class="d-text-sm" x="115" y="110" text-anchor="middle">calls useAuthFetch()</text>
+
+  <rect x="240" y="60" width="170" height="100" rx="10" fill="rgba(180,154,255,.1)" stroke="var(--accent-2)"/>
+  <text class="d-text"    x="325" y="90"  text-anchor="middle">useAuthFetch</text>
+  <text class="d-text-sm" x="325" y="108" text-anchor="middle">inject Bearer / X-Visitor-Id</text>
+  <text class="d-text-sm" x="325" y="126" text-anchor="middle">refresh on 401 + retry</text>
+
+  <rect x="450" y="60" width="170" height="100" rx="10" fill="rgba(124,198,255,.1)" stroke="var(--accent)"/>
+  <text class="d-text"    x="535" y="90"  text-anchor="middle">Vite dev proxy</text>
+  <text class="d-text-sm" x="535" y="108" text-anchor="middle">(dev only)</text>
+  <text class="d-text-sm" x="535" y="126" text-anchor="middle">/exams /auth /…</text>
+
+  <rect x="660" y="60" width="270" height="100" rx="10" fill="rgba(255,196,107,.12)" stroke="var(--warn)"/>
+  <text class="d-text"    x="795" y="90"  text-anchor="middle">Fastify on :3000 (dev) / ECS (prod)</text>
+  <text class="d-text-sm" x="795" y="110" text-anchor="middle">auth plugin → entitlements → route</text>
+  <text class="d-text-sm" x="795" y="128" text-anchor="middle">VITE_API_URL overrides in prod</text>
+
+  <line x1="200" y1="110" x2="240" y2="110" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arr4)"/>
+  <line x1="410" y1="110" x2="450" y2="110" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arr4)"/>
+  <line x1="620" y1="110" x2="660" y2="110" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arr4)"/>
+</svg>
+<figcaption>In dev, Vite proxies API paths to <code>localhost:3000</code>. In prod, <code>VITE_API_URL=https://api.certshack.com</code>.</figcaption>
+</figure>
+
+<h3>API base URL</h3>
+<p>
+  <code>frontend/src/apiBase.ts</code> exports <code>API_BASE</code> from <code>VITE_API_URL</code> and an <code>apiUrl(path)</code> helper.
+  Leave blank in dev; Vite’s proxy forwards <code>/exams</code>, <code>/attempts</code>, <code>/auth</code>, <code>/payments</code>, <code>/admin</code> etc. to the backend.
+</p>
+
+<h3>Token storage &amp; refresh</h3>
+<ul>
+  <li>ID token → <code>localStorage['examapp_id_token']</code></li>
+  <li>Refresh token → <code>localStorage['examapp_refresh_token']</code></li>
+  <li>Anonymous visitors → <code>X-Visitor-Id</code> header (see <code>visitorId.ts</code>)</li>
+  <li>Proactive refresh: 30s buffer before expiry, fall back to re-login on failure.</li>
+</ul>
+
+<h2 id="dev">9. Local dev loop</h2>
+<div class="two-col">
+  <div>
+    <h3>Backend</h3>
+<pre><code>cd backend
+pnpm install
+cp .env.example .env   # set AUTH_MODE=dev
+pnpm dev               # → http://localhost:3000</code></pre>
+    <p>Key env vars:</p>
+    <ul>
+      <li><code>AUTH_MODE=dev</code> — skip real Cognito, use <code>DEV_USER_ID</code> / <code>DEV_USER_EMAIL</code> / <code>DEV_USER_NAME</code></li>
+      <li><code>EXAM_SOURCE=local</code>, <code>SKILL_LAB_SOURCE=local</code> — read from <code>data/</code></li>
+      <li><code>FRONTEND_ORIGIN=http://localhost:5173</code></li>
+      <li><code>RATE_LIMIT_MAX=1000</code> — bump while testing</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Frontend</h3>
+<pre><code>cd frontend
+pnpm install
+cp .env.example .env
+pnpm dev               # → http://localhost:5173</code></pre>
+    <p>Key env vars:</p>
+    <ul>
+      <li><code>VITE_AUTH_MODE=dev</code> — bypass Cognito</li>
+      <li><code>VITE_API_URL=</code> (blank, use proxy)</li>
+      <li><code>VITE_PAYPAL_CLIENT_ID=…</code> — for checkout testing</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout danger">
+  <strong>pnpm only.</strong> No npm, no yarn. ESM only — never <code>require()</code>.
+</div>
+<div class="callout warn">
+  <strong>Mobile responsive is a hard requirement.</strong> Test every frontend change at a mobile viewport before marking it done.
+</div>
+<div class="callout">
+  <strong>No test framework.</strong> Validate with <code>pnpm dev</code>. TypeScript + browser are the safety net.
+</div>
+
+<h2 id="recipes">10. Common recipes</h2>
+
+<h3>Add a new backend route</h3>
+<ol>
+  <li>Create <code>backend/src/routes/&lt;feature&gt;.ts</code> exporting <code>async function routes(server)</code>.</li>
+  <li>Use <code>server.authenticate</code> (required) or <code>server.optionalAuth</code> (anon OK) as preHandler.</li>
+  <li>For paid gating, add <code>server.resolveEntitlements</code> and check <code>request.tier</code>.</li>
+  <li>Register it in <code>src/index.ts</code> with a prefix: <code>server.register(routes, { prefix: '/feature' })</code>.</li>
+  <li>For dev proxy, add the prefix to <code>frontend/vite.config.ts</code>’s proxy list.</li>
+</ol>
+
+<h3>Add a new frontend page</h3>
+<ol>
+  <li>Create the component under <code>frontend/src/components/</code> or a feature folder.</li>
+  <li>Add a <code>&lt;Route&gt;</code> in <code>App.tsx</code>.</li>
+  <li>Use <code>useAuthFetch()</code> for any backend call — don’t use raw <code>fetch</code>.</li>
+  <li>Wrap the page with <code>&lt;PageMeta&gt;</code> for SEO tags; check at a mobile viewport before shipping.</li>
+</ol>
+
+<h3>Add env vars / secrets</h3>
+<p>
+  Deployed ECS task definition is owned by GitHub Actions (Terraform ignores it). Update <strong>both</strong>:
+</p>
+<ul>
+  <li><code>infra/terraform/modules/ecs/main.tf</code></li>
+  <li><code>backend/infra/ecs-task-def.json</code></li>
+</ul>
+
+<h3>Where to look next</h3>
+<table>
+  <tbody>
+    <tr><td><code>backend/CLAUDE.md</code></td><td>routes, services, schema, Cognito, payments</td></tr>
+    <tr><td><code>frontend/CLAUDE.md</code></td><td>component tree, state, skill-lab runners, mobile rules</td></tr>
+    <tr><td><code>infra/terraform/CLAUDE.md</code></td><td>Terraform ops, modules, DynamoDB tables</td></tr>
+    <tr><td><code>backend/data/CLAUDE.md</code></td><td>exam / skill-lab publishing workflow</td></tr>
+  </tbody>
+</table>
+
+<h2 id="testing">11. UI testing (Playwright)</h2>
+<p>
+  There is no unit-test framework; validation is manual via <code>pnpm dev</code>. For browser-flow
+  coverage — exam runs, skill labs, paywall gating, admin impersonation — use <strong>Playwright</strong>.
+  It handles the things Cypress struggles with here: file downloads (<code>downloads.ts</code> PDF export),
+  multi-tab flows (impersonation banner), <code>@dnd-kit</code> drag interactions, and Monaco / ReactFlow canvases.
+</p>
+
+<h3>Why Playwright fits examapp specifically</h3>
+<ul>
+  <li>Backend already exposes <code>AUTH_MODE=dev</code> with <code>DEV_USER_ID / EMAIL / NAME</code> — tests boot as any identity without touching Cognito.</li>
+  <li>Tier differences come from <code>/entitlements</code> + an admin claim — <code>page.route()</code> can stub these per-test to flip between <code>visitor · registered · pro · pro_plus · admin</code> without DynamoDB writes.</li>
+  <li>Playwright’s parallel workers map naturally onto per-user-type fixtures (<code>asVisitor</code>, <code>asPro</code>, <code>asAdmin</code>).</li>
+</ul>
+
+<figure class="diagram">
+<svg viewBox="0 0 960 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Playwright test flow">
+  <defs>
+    <marker id="arrT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/>
+    </marker>
+    <marker id="arrTm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <rect class="d-box-react" x="30"  y="30" width="180" height="80"/>
+  <text class="d-text"    x="120" y="58"  text-anchor="middle">test fixture</text>
+  <text class="d-text-sm" x="120" y="78"  text-anchor="middle">asVisitor · asRegistered</text>
+  <text class="d-text-sm" x="120" y="94"  text-anchor="middle">asPro · asAdmin</text>
+
+  <rect class="d-box-accent" x="270" y="30" width="200" height="80"/>
+  <text class="d-text"    x="370" y="58"  text-anchor="middle">page.route() mocks</text>
+  <text class="d-text-sm" x="370" y="78"  text-anchor="middle">/auth/config → devUser</text>
+  <text class="d-text-sm" x="370" y="94"  text-anchor="middle">/entitlements → tier</text>
+
+  <rect class="d-box-react" x="530" y="30" width="190" height="80"/>
+  <text class="d-text"    x="625" y="58"  text-anchor="middle">Vite dev server</text>
+  <text class="d-text-sm" x="625" y="78"  text-anchor="middle">localhost:5173</text>
+  <text class="d-text-sm" x="625" y="94"  text-anchor="middle">proxy → :3000</text>
+
+  <rect class="d-box-warn" x="770" y="30" width="170" height="80"/>
+  <text class="d-text"    x="855" y="58"  text-anchor="middle">Fastify dev</text>
+  <text class="d-text-sm" x="855" y="78"  text-anchor="middle">AUTH_MODE=dev</text>
+  <text class="d-text-sm" x="855" y="94"  text-anchor="middle">EXAM_SOURCE=local</text>
+
+  <line x1="210" y1="70"  x2="270" y2="70"  stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrT)"/>
+  <line x1="470" y1="70"  x2="530" y2="70"  stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrT)"/>
+  <line x1="720" y1="70"  x2="770" y2="70"  stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrT)"/>
+
+  <!-- assertions lane -->
+  <rect class="d-box" x="30"  y="160" width="910" height="70"/>
+  <text class="d-text"    x="485" y="188" text-anchor="middle">assertions</text>
+  <text class="d-text-sm" x="485" y="208" text-anchor="middle">visible paywall · timer counts down · submit writes attempt · review shows score · PDF download resolves</text>
+  <line x1="485" y1="110" x2="485" y2="160" stroke="var(--muted)" stroke-width="1.3" stroke-dasharray="5 4" marker-end="url(#arrTm)"/>
+</svg>
+<figcaption>Each test picks a user-tier fixture, which injects route mocks before navigation. The backend stays in <code>AUTH_MODE=dev</code> throughout.</figcaption>
+</figure>
+
+<h3>Suggested layout — <code>frontend/e2e/</code></h3>
+<pre><code>e2e/
+  playwright.config.ts         # webServer: pnpm dev (frontend) ; reuseExistingServer
+  fixtures/
+    auth.ts                    # test.extend: asVisitor / asRegistered / asPro / asAdmin
+    api-mocks.ts               # page.route helpers for /auth/config, /entitlements
+  tests/
+    exam-flow.spec.ts          # registered user: start → answer → submit → review
+    exam-gated.spec.ts         # visitor hits paid exam → paywall; pro walks through
+    skill-lab-cli.spec.ts      # pro user: complete a CLI lab
+    admin-impersonation.spec.ts</code></pre>
+
+<h3>Fixture sketch</h3>
+<pre><code>// e2e/fixtures/auth.ts
+import { test as base } from '@playwright/test'
+
+type Tier = 'visitor' | 'registered' | 'pro' | 'pro_plus' | 'admin'
+
+const mockTier = (tier: Tier) =&gt; async ({ page }, use) =&gt; {
+  await page.route('**/entitlements', (route) =&gt;
+    route.fulfill({ json: { tier, products: tier === 'pro' ? ['pro-annual'] : [] } }))
+  await page.route('**/auth/config', (route) =&gt;
+    route.fulfill({ json: { devUser: {
+      sub: `test-${tier}`, email: `${tier}@test.local`, name: tier,
+      isAdmin: tier === 'admin',
+    } } }))
+  await use(page)
+}
+
+export const test = base.extend&lt;{ asVisitor: void; asPro: void; asAdmin: void }&gt;({
+  asVisitor:   [mockTier('visitor'),   { auto: false }],
+  asPro:       [mockTier('pro'),       { auto: false }],
+  asAdmin:     [mockTier('admin'),     { auto: false }],
+})</code></pre>
+
+<h3>Example flow test</h3>
+<pre><code>// e2e/tests/exam-flow.spec.ts
+import { test } from '../fixtures/auth'
+import { expect } from '@playwright/test'
+
+test('pro user completes an exam and sees their score', async ({ page, asPro }) =&gt; {
+  await page.goto('/exams/aws-saa-c03')
+  await page.getByRole('button', { name: /start/i }).click()
+
+  for (let i = 0; i &lt; 5; i++) {
+    await page.getByRole('radio').first().check()
+    await page.getByRole('button', { name: /next|submit/i }).click()
+  }
+
+  await expect(page.getByText(/score/i)).toBeVisible()
+  await expect(page).toHaveURL(/review/)
+})
+
+test('visitor hits paywall on paid exam', async ({ page, asVisitor }) =&gt; {
+  await page.goto('/exams/aws-saa-c03')
+  await expect(page.getByText(/upgrade|subscribe|pro/i)).toBeVisible()
+})</code></pre>
+
+<h3>Other testing layers (optional)</h3>
+<table>
+  <thead><tr><th>Layer</th><th>Tool</th><th>Use when…</th></tr></thead>
+  <tbody>
+    <tr><td>Component / visual</td><td>Storybook + Chromatic</td><td>Iterating on <code>QuestionCard</code>, badges, pricing cards in isolation</td></tr>
+    <tr><td>Accessibility</td><td><code>@axe-core/playwright</code></td><td>Add an <code>axe()</code> call per major page — runs inside the same Playwright specs</td></tr>
+    <tr><td>Load</td><td>k6 (already in <code>tests/k6/</code>)</td><td>Scale-out / rate-limit validation; not a browser flow</td></tr>
+    <tr><td>Backend smoke</td><td>Playwright <code>request</code> fixture</td><td>Hit <code>/exams</code>, <code>/attempts</code> directly without a browser — reuses the same runner</td></tr>
+  </tbody>
+</table>
+
+<div class="callout warn">
+  <strong>Mobile viewports matter.</strong> Mobile responsiveness is a hard project rule — configure Playwright <code>projects</code> for <code>Desktop Chrome</code>, <code>iPhone 13</code>, and <code>Pixel 7</code> so every flow runs on all three.
+</div>
+<div class="callout">
+  <strong>Data hygiene:</strong> run with <code>AUTH_MODE=dev</code> and <code>EXAM_SOURCE=local</code>. Never point the test runner at a real AWS profile — a misfired <code>/admin/erasure</code> spec would wipe real users.
+</div>
+
+<h3>Wire-up commands</h3>
+<pre><code>cd frontend
+pnpm add -D @playwright/test @axe-core/playwright
+pnpm exec playwright install --with-deps
+# add to package.json scripts:
+#   "test:e2e":      "playwright test"
+#   "test:e2e:ui":   "playwright test --ui"
+#   "test:e2e:debug":"PWDEBUG=1 playwright test"</code></pre>
+
+<h2 id="improvements">12. Roadmap to enterprise scale</h2>
+<p>
+  What would this codebase look like run by a platform team at ~1,000 daily-active users? That’s
+  roughly <strong>20–50 req/s peak</strong>, 5–15k exam attempts/day, and a support burden where a single
+  unhandled bug affects dozens of paying customers within an hour. Below is a gap-analysis of the
+  current shape vs. an enterprise target, grouped by blast-radius.
+</p>
+<div class="callout">
+  <strong>Already in place</strong> (don’t re-do): ECS service autoscaling (CPU 70/30%, min 1 / max 5),
+  2-AZ VPC, Secrets Manager wired into the ECS task definition, AWS WAF with OWASP Common Rule Set
+  + a 400-requests-per-5-min per-IP rate rule, CloudWatch dashboard covering ALB/ECS/Dynamo/CloudFront.
+  The roadmap below focuses on real gaps on top of that foundation.
+</div>
+
+<figure class="diagram">
+<svg viewBox="0 0 960 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Maturity roadmap">
+  <defs>
+    <linearGradient id="gradR" x1="0" x2="1">
+      <stop offset="0" stop-color="var(--danger)" stop-opacity=".35"/>
+      <stop offset=".5" stop-color="var(--warn)" stop-opacity=".35"/>
+      <stop offset="1" stop-color="var(--ok)" stop-opacity=".35"/>
+    </linearGradient>
+  </defs>
+  <rect x="40" y="90" width="880" height="26" rx="13" fill="url(#gradR)" stroke="var(--border)"/>
+  <circle cx="120"  cy="103" r="10" fill="var(--danger)"/>
+  <circle cx="360"  cy="103" r="10" fill="var(--warn)"/>
+  <circle cx="600"  cy="103" r="10" fill="var(--accent)"/>
+  <circle cx="840"  cy="103" r="10" fill="var(--ok)"/>
+
+  <text class="d-text"    x="120" y="60"  text-anchor="middle">Phase 0 — today</text>
+  <text class="d-text-sm" x="120" y="78"  text-anchor="middle">solo-dev, ship-fast</text>
+  <text class="d-text-sm" x="120" y="150" text-anchor="middle">no tests · no error tracking</text>
+  <text class="d-text-sm" x="120" y="166" text-anchor="middle">min=1 ECS · no PITR · no bot rules</text>
+
+  <text class="d-text"    x="360" y="60"  text-anchor="middle">Phase 1 — harden</text>
+  <text class="d-text-sm" x="360" y="78"  text-anchor="middle">100 → 300 DAU</text>
+  <text class="d-text-sm" x="360" y="150" text-anchor="middle">Sentry · Playwright CI</text>
+  <text class="d-text-sm" x="360" y="166" text-anchor="middle">autoscale · secrets manager</text>
+
+  <text class="d-text"    x="600" y="60"  text-anchor="middle">Phase 2 — scale</text>
+  <text class="d-text-sm" x="600" y="78"  text-anchor="middle">300 → 1k DAU</text>
+  <text class="d-text-sm" x="600" y="150" text-anchor="middle">OTel traces · feature flags</text>
+  <text class="d-text-sm" x="600" y="166" text-anchor="middle">PITR · canary deploys</text>
+
+  <text class="d-text"    x="840" y="60"  text-anchor="middle">Phase 3 — enterprise</text>
+  <text class="d-text-sm" x="840" y="78"  text-anchor="middle">1k+ DAU</text>
+  <text class="d-text-sm" x="840" y="150" text-anchor="middle">SLOs · multi-AZ · DR drills</text>
+  <text class="d-text-sm" x="840" y="166" text-anchor="middle">SOC2 evidence automation</text>
+</svg>
+<figcaption>A realistic order: you don’t need OpenTelemetry on day one, but you do need Sentry before you have 100 real users.</figcaption>
+</figure>
+
+<h3>12.1 Quality gates &amp; CI</h3>
+<table>
+  <thead><tr><th>#</th><th>Today</th><th>Target</th><th>Why at 1k DAU</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">1.1</td>
+      <td>No test framework; <code>pnpm dev</code> is the validator.</td>
+      <td>Playwright (section 11) in GitHub Actions on every PR; smoke suite after deploy; <code>tsc --noEmit</code> gate; ESLint with <code>--max-warnings=0</code>.</td>
+      <td>One bad deploy at 1k DAU = 50+ broken sessions before you notice. A 3-minute smoke suite pays for itself the first time it catches a Cognito or DynamoDB misconfig.</td>
+      <td><strong>£0</strong> — GitHub Actions free tier (2k min/mo) covers a 3-min smoke suite with room to spare.</td>
+    </tr>
+    <tr>
+      <td class="num">1.2</td>
+      <td>Single <code>main</code> branch; no preview envs.</td>
+      <td>PR preview environments (ECS per-PR task or Vercel for FE + shared dev API).</td>
+      <td>Lets support/QA reproduce a bug on the exact PR; reviewers click instead of pulling a branch.</td>
+      <td><strong>£0–20</strong> — Vercel Pro ~£16/mo covers FE previews. ECS per-PR tasks add ~£1–2 per env-hour.</td>
+    </tr>
+    <tr>
+      <td class="num">1.3</td>
+      <td>Dependabot not configured.</td>
+      <td>Renovate with grouped weekly PRs; auto-merge on green for patch bumps.</td>
+      <td>AWS SDKs and Fastify move fast — stale versions become the source of 70% of prod bugs by year two.</td>
+      <td><strong>£0</strong> — Renovate is open source; free GitHub App.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>12.2 Observability</h3>
+<table>
+  <thead><tr><th>#</th><th>Today</th><th>Target</th><th>Why at 1k DAU</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">2.1</td>
+      <td>CloudWatch logs (unstructured), no error tracking, no tracing.</td>
+      <td>Structured logs with <code>pino</code> <code>requestId</code> + <code>userId</code>; <strong>Sentry</strong> for frontend &amp; backend; <strong>OpenTelemetry</strong> traces exported to Grafana Tempo / Honeycomb.</td>
+      <td>At 20 req/s a single bad query blends into noise without a trace ID. Sentry’s release-to-error link tells you which commit broke the exam runner within minutes, not hours.</td>
+      <td><strong>£0–20</strong> — Sentry Developer (free, 5k errors/mo) covers this scale. Team plan ~£20/mo if you outgrow it. Grafana Cloud free tier covers 10k traces/mo. pino = £0.</td>
+    </tr>
+    <tr>
+      <td class="num">2.2</td>
+      <td>CloudWatch dashboard exists (ALB / ECS / Dynamo / CloudFront) plus ad-hoc metrics via <code>metricsStore.ts</code>.</td>
+      <td>Extend the existing dashboard with p50/p95/p99 per route, Cognito auth-failure rate, and Dynamo consumed-capacity per table. Publish with CloudWatch EMF from Fastify.</td>
+      <td>1k DAU = real SLO conversations. Without percentiles you can’t promise “exam load &lt; 2s p95” to an enterprise buyer.</td>
+      <td><strong>£5–15</strong> — CloudWatch custom metrics ~£0.30/metric/mo; 20 metrics + ~5 GB logs/mo lands here. Adds to what you already pay.</td>
+    </tr>
+    <tr>
+      <td class=”num”>2.3</td>
+      <td>No SLOs, no runbooks.</td>
+      <td>Published SLOs (99.5% availability, 2s p95 for <code>/exams</code>, 5s p95 for <code>/attempts</code>), error-budget burn alerts, per-alert runbook link in PagerDuty.</td>
+      <td>An oncall who isn’t you needs the runbook. Without it, 2am pages become “wake up the owner” and MTTR balloons.</td>
+      <td><strong>£0–15</strong> — CloudWatch alarms + SNS email alerts = ~£0. PagerDuty individual plan ~£15/user/mo if you want phone escalation.</td>
+    </tr>
+    <tr>
+      <td class=”num”>2.4</td>
+      <td>Visitor geography only via Microsoft Clarity heatmaps and whatever Google Analytics surfaces (sampled, cookie-gated, country-level only).</td>
+      <td><strong>Grafana Cloud Faro</strong> (RUM) → <strong>Geomap</strong> panel showing active visitor locations, exam-load p95 keyed by country/city, and error-rate-by-region. Correlates to Sentry issues via a shared <code>trace_id</code>.</td>
+      <td>Real-time, unsampled data you own. Answers questions GA4 cannot: “is the exam slow for users in Australia right now?” and “which universities are driving today’s traffic?” Useful visual when demoing to stakeholders.</td>
+      <td><strong>£0</strong> up to 500 RUM sessions/mo on the Grafana Cloud free tier; then ~£16/mo on the Pro plan. Keep GA4 for marketing attribution if you need it.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>What else lives under a single Grafana Cloud free tier</h4>
+<p>
+  If you adopt Grafana Cloud for RUM (<strong>2.4</strong>), the same free account covers several other
+  items in this roadmap at no extra cost — cheaper than assembling the AWS-native equivalents:
+</p>
+<table>
+  <thead><tr><th>Feature</th><th>Free tier</th><th>What it replaces / complements</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Loki</strong> (logs)</td><td>50 GB/mo, 14-day retention</td><td>CloudWatch Logs for Fastify; <code>LogQL</code> queries are far nicer than Logs Insights.</td></tr>
+    <tr><td><strong>Tempo</strong> (traces)</td><td>50 GB/mo</td><td>The OTel target mentioned in <strong>2.1</strong>. Trace a request from Faro (browser) → Fastify → DynamoDB in one view.</td></tr>
+    <tr><td><strong>Mimir</strong> (metrics)</td><td>10k series</td><td>p50/p95/p99 per route (<strong>2.2</strong>) without paying CloudWatch per-metric rates.</td></tr>
+    <tr><td><strong>Synthetic Monitoring</strong></td><td>3 checks, probed from 20+ regions</td><td>Uptime + TLS expiry from outside AWS. Independent check on the ALB — would have caught a Route53 misconfig that CloudWatch couldn’t see.</td></tr>
+    <tr><td><strong>k6 Cloud</strong></td><td>500 VU-hours/mo</td><td>Run the existing <code>tests/k6/</code> scripts from Grafana’s runners and see results in the same dashboard.</td></tr>
+    <tr><td><strong>OnCall</strong> (incident)</td><td>Free for small teams</td><td>The PagerDuty alternative in <strong>2.3</strong>; escalation, schedules, Slack integration.</td></tr>
+  </tbody>
+</table>
+
+<div class=”callout”>
+  <strong>Privacy note for the geomap:</strong> Faro IP-geolocates at the edge and discards the raw IP
+  unless you opt in. Still mention it in your privacy policy alongside Clarity (it’s a US sub-processor
+  under Raintank Inc/Grafana Labs) and sign their DPA. Consent-wise it’s the same category as Clarity —
+  if Clarity is already covered by your banner, Faro adds no new friction.
+</div>
+
+<h3>12.3 Security</h3>
+<table>
+  <thead><tr><th>#</th><th>Today</th><th>Target</th><th>Why at 1k DAU</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">3.1</td>
+      <td>ID + refresh tokens in <code>localStorage</code> (<code>AuthContext</code>).</td>
+      <td>HTTP-only, <code>Secure</code>, <code>SameSite=Lax</code> cookies <em>only</em> — drop localStorage fallback. CSRF token on state-changing routes.</td>
+      <td>Any XSS in any dependency (Monaco, Markdown, Mermaid — all rich surfaces) becomes account takeover when tokens live in JS. Cookie-only auth makes that category extinct.</td>
+      <td><strong>£0</strong> — code change only; no new services.</td>
+    </tr>
+    <tr>
+      <td class="num">3.2</td>
+      <td>Secrets already in AWS Secrets Manager (Cognito, Stripe, PayPal, cron) — <em>rotation not configured</em>.</td>
+      <td>Enable automatic rotation for the Stripe/PayPal webhook secrets and Cognito client secret; add a dated-version naming convention so rollbacks are cheap.</td>
+      <td>Breach response without rotation = a full redeploy and shared-key panic. Enterprise buyers ask for “rotation policy” as a yes/no question.</td>
+      <td><strong>£4–8</strong> — already paying ~£0.40/secret/mo × ~8 secrets. Rotation Lambdas run on schedule; a few pennies/mo.</td>
+    </tr>
+    <tr>
+      <td class="num">3.3</td>
+      <td>WAF has OWASP Common Rule Set + a <strong>400 req / 5 min per-IP</strong> rate rule (~80/min). Fastify app-level limit is 100/min/IP.</td>
+      <td>Path-scoped WAF rules: tight budget on <code>/auth/*</code> (50 / 5 min / IP), generous default (5,000 / 5 min / IP) for read routes. Add <code>AWSManagedRulesATPRuleSet</code> (account-takeover prevention) scoped to Cognito. Turnstile / hCaptcha on registration.</td>
+      <td>Current per-IP limit is fine for one person on home broadband but falls over for any classroom/office on shared NAT. At 1k users <em>some</em> will sit behind shared egress — see §12.9.</td>
+      <td><strong>+£5–10</strong> on top of current WAF (already ~£5/mo base + £0.60/M req). ATP managed rule group ~£8/mo. Turnstile = free.</td>
+    </tr>
+    <tr>
+      <td class="num">3.4</td>
+      <td>All rate limiting today is keyed on source IP (both WAF and Fastify). No per-authenticated-user budget.</td>
+      <td>Add <strong>per-authenticated-user</strong> limits in Fastify using <code>keyGenerator: req =&gt; req.user?.sub ?? req.ip</code>. 60 req/min general, 10 req/min on <code>/auth/*</code>, 20 req/min on <code>/attempts</code> POST. Fall back to IP only for anonymous requests.</td>
+      <td>This is the real feature-level limit at 1k DAU. IP becomes a DDoS backstop; user-level stops one logged-in client hammering the app (bug, script, or compromised account) without punishing the rest of the NAT.</td>
+      <td><strong>£0</strong> — <code>@fastify/rate-limit</code> already installed; single config change plus a <code>keyGenerator</code>. Store can stay in-memory per task (already sticky enough at min=2 tasks).</td>
+    </tr>
+    <tr>
+      <td class="num">3.5</td>
+      <td>No CSP, no SRI, no dependency scanning.</td>
+      <td>Strict CSP (nonce-based), Subresource Integrity on CDN scripts, <code>pnpm audit</code> + Snyk/Socket in CI, <code>npm-lockfile-lint</code>.</td>
+      <td>Rich content (Markdown, diagrams, code snippets) means a supply-chain compromise one layer deep becomes script injection into every exam. CSP is the last line of defence.</td>
+      <td><strong>£0</strong> — <code>pnpm audit</code> is built-in; Snyk free tier covers open source; Socket.dev free for public repos. CSP is a header change.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>12.4 Reliability &amp; scale</h3>
+<table>
+  <thead><tr><th>#</th><th>Today</th><th>Target</th><th>Why at 1k DAU</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">4.1</td>
+      <td>ECS autoscaling is wired (min=1, max=5, scale-out at CPU 70%, scale-in at 30%) and the VPC has 2 public subnets across 2 AZs — but <strong>min_capacity=1</strong> means single-task most of the time.</td>
+      <td>Raise <code>min_capacity</code> to 2 so there is always a task in each AZ; add an ALB <code>RequestCountPerTarget</code> target-tracking policy alongside CPU; add a <code>deployment_circuit_breaker</code> to the ECS service.</td>
+      <td>One task = every deploy has a window of zero-capacity. At 1k DAU, a 20-second rollover loses dozens of mid-exam submissions. Circuit breaker auto-rollback turns bad deploys into non-events.</td>
+      <td><strong>+£15</strong> — a second 0.5 vCPU / 1 GB Fargate task adds ~£15/mo. Cheapest availability win on this list.</td>
+    </tr>
+    <tr>
+      <td class="num">4.2</td>
+      <td>Default ECS rolling deploy via GitHub Actions (task_definition is ignored in Terraform).</td>
+      <td>ECS <strong>blue/green with CodeDeploy</strong> or weighted ALB canary; auto-rollback on 5xx or CloudWatch alarm. Keep GitHub Actions as the image-build driver.</td>
+      <td>Rolling deploys don’t <em>test</em> the new tasks before sending traffic — blue/green lets you run the Playwright smoke suite against the green set first.</td>
+      <td><strong>£0</strong> — CodeDeploy is free for ECS deployments. Uses the ALB you already pay for.</td>
+    </tr>
+    <tr>
+      <td class="num">4.3</td>
+      <td>DynamoDB on-demand, no PITR mentioned.</td>
+      <td>Enable <strong>PITR</strong> on every table; DynamoDB Streams → audit-log table for <code>users</code>, <code>entitlements</code>, <code>attempts</code>; monthly cross-region backup.</td>
+      <td>One bad erasure script or one <code>UpdateItem</code> bug corrupts paid customers’ attempt history. PITR gives 35-day recovery; audit stream gives forensic trail.</td>
+      <td><strong>£3–10</strong> — PITR ~£0.22/GB/mo per table; 10 tables at ~0.5 GB each ≈ £1/mo. Cross-region backup adds S3 storage costs.</td>
+    </tr>
+    <tr>
+      <td class="num">4.4</td>
+      <td>Hot entitlements read per request.</td>
+      <td>Cache tier in-memory per task with 30–60s TTL, keyed on <code>sub</code>; or move to a signed claim inside the JWT at login.</td>
+      <td>At 30 req/s every authenticated request hits DynamoDB for entitlements — avoidable RCU and latency. A claim in the JWT eliminates the read entirely for most paths.</td>
+      <td><strong>£0</strong> — in-process Map cache; no new infrastructure. Saves DynamoDB RCU costs as a bonus.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>12.5 Frontend architecture &amp; performance</h3>
+<table>
+  <thead><tr><th>#</th><th>Today</th><th>Target</th><th>Why at 1k DAU</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">5.1</td>
+      <td><code>ExamContext</code> with ~160 props (god object).</td>
+      <td>Split into <code>useExamSession</code>, <code>useQuestionState</code>, <code>useTimer</code>, <code>useReview</code> hooks backed by a small store (Zustand or Jotai). Derive, don’t duplicate.</td>
+      <td>160-prop contexts re-render the entire subtree on any change — fine at 10 DAU, noticeable jank at 1k. More importantly: nobody onboarding can safely touch it.</td>
+      <td><strong>£0</strong> — Zustand/Jotai are open source. Pure refactor cost.</td>
+    </tr>
+    <tr>
+      <td class="num">5.2</td>
+      <td>No data-fetching layer — raw <code>useAuthFetch</code> in components.</td>
+      <td><strong>TanStack Query</strong> (React Query) with <code>queryKey</code> per resource; shared retry/stale/invalidation policy.</td>
+      <td>Caching, request de-dup, and background refetch for free. Removes dozens of <code>useEffect + useState</code> pairs that each drift independently.</td>
+      <td><strong>£0</strong> — open source; reduces backend request volume as a bonus (fewer duplicate fetches).</td>
+    </tr>
+    <tr>
+      <td class="num">5.3</td>
+      <td>Monaco, ReactFlow, Mermaid, jsPDF all in the main bundle (likely).</td>
+      <td>Route-level <code>React.lazy</code> splits; bundle budget enforced in CI (<code>size-limit</code>); critical CSS inlined.</td>
+      <td>Those four libs together are &gt;1.5 MB gzipped. On mobile 4G that’s a 6–8s first paint — directly costs signups.</td>
+      <td><strong>£0</strong> — tooling is open source. Faster loads reduce CloudFront data-transfer costs slightly.</td>
+    </tr>
+    <tr>
+      <td class="num">5.4</td>
+      <td>Ad-hoc <code>localStorage</code> for prefs.</td>
+      <td>Typed storage wrapper with schema + migrations; sync critical prefs (theme, viewed-tour) to backend profile.</td>
+      <td>Users switching devices lose progress today. At 1k DAU you’ll get support tickets for it weekly.</td>
+      <td><strong>£0</strong> — uses the existing DynamoDB users table; negligible extra WCU.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>12.6 Delivery &amp; experimentation</h3>
+<table>
+  <thead><tr><th>#</th><th>Today</th><th>Target</th><th>Why at 1k DAU</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">6.1</td>
+      <td>No feature flags; risky changes ship behind branches.</td>
+      <td><strong>Feature flag service</strong> (LaunchDarkly / GrowthBook / Unleash self-hosted) with per-user and percentage rollouts; flags scoped by tier.</td>
+      <td>1k users is enough for statistically meaningful A/B tests (pricing page, exam UI changes). It’s also enough that “roll back” needs to be instant — flags beat redeploys every time.</td>
+      <td><strong>£0–80</strong> — GrowthBook cloud free up to 1k MAU; self-hosted = £0 + ~£5/mo t3.micro. LaunchDarkly starts at ~£80/mo — overkill at this scale.</td>
+    </tr>
+    <tr>
+      <td class="num">6.2</td>
+      <td>No analytics funnel beyond Clarity.</td>
+      <td>Product analytics (PostHog / Amplitude) with event schema in a typed <code>track()</code> helper; funnel from visit → signup → first-attempt → purchase.</td>
+      <td>You can’t improve conversion without measuring it. Clarity tells you <em>what</em> happened; PostHog tells you <em>how many</em> and <em>where it breaks</em>.</td>
+      <td><strong>£0–20</strong> — PostHog cloud free up to 1M events/mo (generous at 1k DAU). Amplitude free tier is 10M events/mo. Both have paid plans around £20–40/mo if you want data retention beyond 1 year.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>12.7 Data &amp; compliance</h3>
+<table>
+  <thead><tr><th>#</th><th>Today</th><th>Target</th><th>Why at 1k DAU</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">7.1</td>
+      <td><code>erasureService.ts</code> exists; audit trail unclear.</td>
+      <td>Append-only audit log (DynamoDB Streams → <code>examapp-audit</code>) for every admin action, erasure, and entitlement change; 7-year retention on a separate account.</td>
+      <td>GDPR Art. 30 and SOC2 CC6.3 both require it. Also: when a customer disputes a refund or a data-deletion, you need receipts.</td>
+      <td><strong>£1–3</strong> — DynamoDB Streams ~£0.02/100k records; S3 Glacier for long-term archive ~£0.004/GB/mo. Essentially free at this scale.</td>
+    </tr>
+    <tr>
+      <td class="num">7.2</td>
+      <td>SES from one region, no bounce/complaint automation.</td>
+      <td>SNS topic wired to SES events → suppression list in DynamoDB; <code>emailLogs.ts</code> updated to check suppression before send.</td>
+      <td>Hit the 5% bounce threshold and SES puts you in review — all transactional email halts. At 1k DAU this is a weekly risk without automation.</td>
+      <td><strong>£0</strong> — SNS email notifications are free tier; Lambda or direct DynamoDB write to suppression list adds pennies.</td>
+    </tr>
+    <tr>
+      <td class="num">7.3</td>
+      <td>Prod and dev share one AWS org; limited IAM scoping visible.</td>
+      <td>Separate <code>prod</code> / <code>staging</code> / <code>dev</code> accounts under Control Tower; SCPs blocking <code>iam:*</code> in prod from engineer roles; break-glass role with alerting.</td>
+      <td>Enterprise procurement <em>will</em> ask for this. It’s also the only way to sleep through a hack-a-thon weekend without worrying about a junior dev typo-ing into prod.</td>
+      <td><strong>£0</strong> — AWS Control Tower setup is free; additional accounts have no fixed cost. You’ll duplicate some resource costs (small dev instances) but that’s manageable.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>12.8 Sequenced plan (6 months)</h3>
+<p>Item IDs reference the <code>#</code> column in the tables above.</p>
+<ol>
+  <li><strong>Month 1 — stop the bleeding.</strong> Sentry (<strong>2.1</strong>), DynamoDB PITR (<strong>4.3</strong>), ECS <code>min_capacity</code>=2 + circuit breaker (<strong>4.1</strong>, <strong>4.2</strong>), secret rotation (<strong>3.2</strong>). &lt;1 week of work.</li>
+  <li><strong>Month 2 — quality gate.</strong> Playwright smoke suite (<strong>1.1</strong>), Renovate (<strong>1.3</strong>), bundle-size budget (<strong>5.3</strong>).</li>
+  <li><strong>Month 3 — auth hardening.</strong> Cookie-only JWT (<strong>3.1</strong>), path-scoped WAF + ATP (<strong>3.3</strong>), per-authenticated-user rate limits (<strong>3.4</strong>), CSP (<strong>3.5</strong>). <em>Prerequisite before promoting to students.</em></li>
+  <li><strong>Month 4 — observability.</strong> Structured logs &amp; OTel (<strong>2.1</strong> cont.), p95 widgets on the dashboard (<strong>2.2</strong>), first SLO + runbook (<strong>2.3</strong>), Grafana Cloud Faro RUM + Geomap (<strong>2.4</strong>).</li>
+  <li><strong>Month 5 — frontend refactor.</strong> Split <code>ExamContext</code> (<strong>5.1</strong>), TanStack Query on busiest routes (<strong>5.2</strong>), code-split heavy libs (<strong>5.3</strong>).</li>
+  <li><strong>Month 6 — delivery maturity.</strong> Feature flags (<strong>6.1</strong>), analytics funnel (<strong>6.2</strong>), preview envs (<strong>1.2</strong>), canary deploys (<strong>4.2</strong> cont.).</li>
+</ol>
+
+<h3 id="rate-limits">12.9 Sizing rate limits for shared-NAT users (universities, schools, offices)</h3>
+<p>
+  Current limits today:
+</p>
+<ul>
+  <li><strong>AWS WAF</strong>: 400 requests per 5-minute window per IP (~80/min).</li>
+  <li><strong>Fastify</strong> (<code>@fastify/rate-limit</code>): 100/min per IP, app-level.</li>
+</ul>
+<p>
+  The WAF rule is the hard ceiling — IPs over it get 403s for the remainder of the window. Both
+  limits key on the source IP, so every user behind a single NAT / corporate egress shares the
+  same bucket.
+</p>
+
+<h4>What a typical user does per minute</h4>
+<p>
+  Measured against the app’s actual flows, a user mid-exam generates roughly:
+</p>
+<table>
+  <thead><tr><th>Flow</th><th>Requests / min</th></tr></thead>
+  <tbody>
+    <tr><td>Idle on dashboard</td><td>~2 (analytics ping + keep-alive)</td></tr>
+    <tr><td>Active exam — answering</td><td>~6–10 (next/prev, answer autosave, timer sync)</td></tr>
+    <tr><td>Active skill lab (CLI / architecture builder)</td><td>~10–20 (frequent state saves)</td></tr>
+    <tr><td>Review mode with analytics</td><td>~4–6 (chart data, weakest-link queries)</td></tr>
+    <tr><td>Admin navigating the panel</td><td>~10–15 (user lists, metrics)</td></tr>
+  </tbody>
+</table>
+<p>
+  Call it <strong>10 req/min/user</strong> for planning. This includes a lot of background cruft
+  (gamification polls, rating fetches, <code>/entitlements</code> resolves) — tightening those
+  alone would halve it.
+</p>
+
+<h4>University scenario — back-of-envelope</h4>
+<p>
+  If 50 students from the same institution all take a mock exam at the same time, behind
+  one university NAT egress IP:
+</p>
+<pre><code>50 students × 10 req/min = 500 req/min from one IP
+                         = 2,500 req per 5-min window
+</code></pre>
+<p>
+  That is <strong>6× the WAF ceiling</strong>. The first ~8 students land fine; the rest get
+  403s, often mid-exam. If you also promote to a full class of 200, it’s 25× over.
+</p>
+
+<h4>Options, cheapest first</h4>
+<ol>
+  <li>
+    <strong>Raise the WAF IP limit to a classroom-safe number.</strong> Something like
+    <code>5,000 requests / 5 min / IP</code> (= 1,000/min) comfortably handles 100 concurrent
+    users per egress at 10 req/min/user. You lose some brute-force protection at the IP layer
+    — fine if you add the next two.
+  </li>
+  <li>
+    <strong>Move the hot per-user limit to Fastify, keyed on <code>request.user.sub</code>.</strong>
+    <code>@fastify/rate-limit</code> supports <code>keyGenerator</code>. 60 req/min/user is generous
+    for the exam flow; 10 req/min for <code>/auth/token</code> and <code>/admin/*</code>.
+    This is the real limit at 1k DAU — per-IP becomes a DDoS backstop, not a feature limit.
+  </li>
+  <li>
+    <strong>Path-scoped WAF rules for sensitive endpoints.</strong> Keep <code>/auth/*</code>
+    at a tight 50 / 5 min / IP (credential-stuffing protection) while letting <code>/exams</code>
+    and <code>/attempts</code> breathe at 5,000 / 5 min / IP.
+  </li>
+  <li>
+    <strong>Institution allow-list.</strong> For the university, put their known egress CIDR into
+    a WAF IP set and exempt it from the IP rate rule entirely. Combine with (2) so per-user
+    limits still protect you from a runaway client inside the institution.
+  </li>
+</ol>
+
+<h4>Recommended target numbers</h4>
+<table>
+  <thead><tr><th>Layer</th><th>Key</th><th>Budget</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>WAF</td><td>IP, default</td><td>5,000 / 5 min (~1,000/min)</td><td>Classroom-safe; still blocks single-host scrapers.</td></tr>
+    <tr><td>WAF</td><td>IP, scope = <code>/auth/*</code></td><td>50 / 5 min (~10/min)</td><td>Credential-stuffing ceiling; legitimate login traffic is tiny.</td></tr>
+    <tr><td>WAF</td><td>IP, allow-list = university CIDR</td><td>exempt from IP rule</td><td>Optional; only if you pilot at an institution.</td></tr>
+    <tr><td>Fastify</td><td>user.sub (authed) / visitorId (anon)</td><td>60/min general, 10/min on <code>/auth/*</code></td><td>The real feature-level limit at 1k DAU.</td></tr>
+    <tr><td>Fastify</td><td>user.sub on <code>/attempts</code> POST</td><td>20/min</td><td>A human cannot submit answers faster than this.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  The ATP (Account-Takeover Prevention) managed rule group is a better fit than raw rate limits
+  for <code>/auth/*</code> — it scores requests on actual attack heuristics (credential-stuffing
+  patterns, leaked-password matches) rather than blunt counting, which matters when a whole
+  university is sharing an IP.
+</p>
+
+<div class="callout">
+  <strong>Before promoting to students:</strong> confirm the university’s egress CIDR with their
+  IT team and add it to a WAF IP set. Then raise the default IP rule to 5,000/5 min and add
+  per-user limits in Fastify. That's 1–2 hours of work and avoids an embarrassing first-lecture
+  outage.
+</div>
+
+<div class="callout">
+  <strong>Don't do it all at once.</strong> Each row above earns its keep independently. Pick the one whose <em>absence</em> would embarrass you most in front of the next enterprise customer — that's the right next step.
+</div>
+
+<h2 id="marketing">13. Marketing &amp; growth</h2>
+<p>
+  The app already has a signal that the product works — Reddit launches have produced real user
+  feedback and some content. This section translates that signal into a repeatable growth loop
+  without burning money on ads prematurely. Item IDs continue the numbering from §12, so
+  <strong>8.x</strong> = SEO hardening, <strong>9.x</strong> = content engine,
+  <strong>10.x</strong> = community &amp; social, <strong>11.x</strong> = paid experiment.
+</p>
+
+<h3 id="seo-review">13.1 SEO review — current state</h3>
+<p>
+  Factual audit of what's already in place (don't re-do these):
+</p>
+<div class="cards">
+  <div class="card"><h4>Meta tags</h4><p><code>PageMeta.tsx</code> sets title, description, canonical, Open Graph and Twitter cards per route. <code>noindex</code> on <code>/account</code> and <code>/analytics</code>.</p></div>
+  <div class="card"><h4>Sitemap</h4><p><code>scripts/generate-sitemap.js</code> auto-generates from <code>backend/data/exams/*.json</code> and <code>skill-labs/*.json</code>. Run via <code>pnpm sitemap</code>.</p></div>
+  <div class="card"><h4>robots.txt</h4><p>Allows public routes, disallows <code>/account</code>, <code>/admin</code>, <code>/basket</code>, <code>/verify/</code>, etc. Sitemap referenced.</p></div>
+  <div class="card"><h4>Structured data</h4><p>Homepage emits <code>WebSite</code>, <code>Organization</code>, <code>SearchAction</code>, and <code>FAQPage</code> JSON-LD. No per-exam schema yet.</p></div>
+  <div class="card"><h4>URLs</h4><p>Clean path-based (<code>/exams/SAA-C03</code>). No hash routing. Exam codes are human-readable.</p></div>
+  <div class="card"><h4>Semantics</h4><p>h1/h2 hierarchy used on major pages. <code>QuestionImage</code> alt is generic (<code>"Question diagram"</code>).</p></div>
+</div>
+
+<h4>Gaps to close — 13.1 SEO hardening</h4>
+<table>
+  <thead><tr><th>#</th><th>Today</th><th>Target</th><th>Why it matters</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">8.1</td>
+      <td>Pure SPA (Vite) — initial HTML is a near-empty shell. Googlebot renders JS but older crawlers and social scrapers (LinkedIn, Slack, Reddit preview) often don't.</td>
+      <td>Add <strong>static prerender</strong> for public routes (<code>/</code>, <code>/exams/*</code>, <code>/skill-labs/*</code>, <code>/pricing</code>, <code>/news/*</code>) using <code>vite-plugin-prerender</code> or <code>react-snap</code>. Keeps the SPA dev loop, ships static HTML with real meta/OG tags for crawlers.</td>
+      <td>LinkedIn/Reddit link previews currently show the shell's fallback title. Prerender = every shared link gets a proper card with exam-specific image and description.</td>
+      <td><strong>£0</strong> — build-time only; no runtime infra.</td>
+    </tr>
+    <tr>
+      <td class="num">8.2</td>
+      <td>Homepage has <code>FAQPage</code> JSON-LD. Per-exam pages have no schema.</td>
+      <td>Emit <code>Course</code> or <code>EducationalOccupationalCredential</code> schema per exam, plus a per-exam <code>FAQPage</code> derived from the exam JSON metadata. Same for skill labs as <code>LearningResource</code>.</td>
+      <td>Rich SERP results (star ratings, course badges, Q&amp;A expansion) — direct CTR lift of 10–30% on relevant queries with no new content needed.</td>
+      <td><strong>£0</strong> — extend <code>PageMeta.tsx</code>.</td>
+    </tr>
+    <tr>
+      <td class="num">8.3</td>
+      <td>Question diagram alt text is hard-coded <code>"Question diagram"</code>.</td>
+      <td>Store an <code>alt</code> or <code>caption</code> per question image in the exam JSON; fall back to exam name + question number.</td>
+      <td>Accessibility (WCAG 1.1.1) and image-search traffic. Also future-proofs when/if exam content is indexed by the question.</td>
+      <td><strong>£0</strong> — schema change + small backfill in exam JSON.</td>
+    </tr>
+    <tr>
+      <td class="num">8.4</td>
+      <td>Thin landing copy on <code>/exams/:examCode</code>: title + "start" button.</td>
+      <td>Generate ~300 words of exam-specific copy from the exam JSON (topic breakdown, recommended study time, who it's for). Render above the fold, crawlable via prerender (<strong>8.1</strong>).</td>
+      <td>Thin pages don't rank. A structured 300-word description per exam is the cheapest way to compete with established competitors on long-tail queries like "AWS SAA-C03 practice questions".</td>
+      <td><strong>£0</strong> — template once, applies to all ~20 exams.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>13.2 Content engine</h3>
+<p>
+  Organic growth needs a reason for someone to arrive every week. A news page + YouTube channel +
+  LinkedIn feed form a minimum-viable content engine that cross-promotes itself.
+</p>
+<table>
+  <thead><tr><th>#</th><th>Channel</th><th>What to ship</th><th>Cadence</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">9.1</td>
+      <td><strong>/news page</strong> (on-site)</td>
+      <td>Markdown-backed blog under <code>frontend/src/news/</code>; one post per release (new exam, provider-version bump, new skill lab). Emit <code>Article</code> JSON-LD; RSS feed at <code>/news/rss.xml</code>; link from footer. Re-used as the email digest source (<strong>10.3</strong>).</td>
+      <td>1–2 posts/week, 300–600 words</td>
+      <td><strong>£0</strong> — static Markdown, built at deploy.</td>
+    </tr>
+    <tr>
+      <td class="num">9.2</td>
+      <td><strong>YouTube</strong></td>
+      <td>Walkthrough series: pick a cert, take an exam live with commentary, then do a skill lab. 8–15 min per video. Every video's description links to the matching exam/lab page on the site (UTM-tagged). Embed the video on that page — helps dwell time and SEO.</td>
+      <td>1 video/week once warmed up; start at 1/fortnight</td>
+      <td><strong>£0–20</strong> — OBS + DaVinci Resolve = free. Descript optional at £20/mo for faster editing.</td>
+    </tr>
+    <tr>
+      <td class="num">9.3</td>
+      <td><strong>LinkedIn</strong></td>
+      <td>Repost new exam announcements, share short insights ("what most people get wrong on NACL vs SG"), student milestones (with consent). Company page + personal page — personal reach outperforms company on LinkedIn.</td>
+      <td>2 posts/week</td>
+      <td><strong>£0</strong> — no Premium/Sales Navigator needed yet.</td>
+    </tr>
+    <tr>
+      <td class="num">9.4</td>
+      <td><strong>Exam pages as content hubs</strong></td>
+      <td>Each <code>/exams/:code</code> page gets: 300-word description (<strong>8.4</strong>), embedded walkthrough video (<strong>9.2</strong>), FAQ JSON-LD (<strong>8.2</strong>), and a "last updated" date tied to provider-version bumps. Internal link from every news post about that cert.</td>
+      <td>One-time, then maintained</td>
+      <td><strong>£0</strong> — composes previous items.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>Screen-capture toolkit (for 9.2 YouTube)</h4>
+<table>
+  <thead><tr><th>Setup</th><th>Record</th><th>Audio</th><th>Edit</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Windows gaming PC</strong> (preferred)</td>
+      <td><strong>OBS Studio</strong> — NVENC H.264, 1080p60, record to <strong>MKV</strong> (crash-safe), remux to MP4 in OBS. Two audio tracks: mic on track 2, desktop on track 1.</td>
+      <td>Gaming headset mic — best input available across both setups.</td>
+      <td><strong>DaVinci Resolve</strong> (free) or <strong>Shotcut</strong> if Resolve feels heavy.</td>
+    </tr>
+    <tr>
+      <td><strong>Ubuntu XPS</strong> (fallback)</td>
+      <td>OBS via Flatpak (<code>flatpak install flathub com.obsproject.Studio</code>). x264 software encoder, 1080p30 to keep the laptop cool.</td>
+      <td>Bluetooth earbud mic drops to telephony quality when active — skip. Use the XPS built-in mic, or record voiceover separately in <strong>Audacity</strong> (noise reduction + high-pass at 80 Hz) and sync in post.</td>
+      <td>Same — DaVinci Resolve or Shotcut (both Linux-native).</td>
+    </tr>
+  </tbody>
+</table>
+<p style="margin-top:-6px">
+  Cost: <strong>£0</strong>. One optional upgrade when it starts to matter — a FIFINE K669 USB mic (~£25) lifts voiceover quality noticeably without touching the rest of the setup.
+</p>
+
+<h3>13.3 Community &amp; social</h3>
+<table>
+  <thead><tr><th>#</th><th>Channel</th><th>Play</th><th>Risk / caution</th><th>Approx cost (£/mo)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">10.1</td>
+      <td><strong>Reddit</strong> (r/AWSCertifications, r/CompTIA, r/ccna, r/Azure, r/ITCareerQuestions)</td>
+      <td>Keep the playbook that's already working: value-first posts, AMAs, asking for feedback on new content. Mods are allergic to drive-by self-promotion — a 5:1 comment-to-link ratio keeps accounts in good standing.</td>
+      <td>Each sub has its own promo rules; read the wiki before posting a link. Use your own posts to solicit feedback, not to sell.</td>
+      <td><strong>£0</strong></td>
+    </tr>
+    <tr>
+      <td class="num">10.2</td>
+      <td><strong>X / Twitter</strong></td>
+      <td>Build-in-public thread per major release. Reply to cert-study questions with a short answer + optional link. Pin a tweet showcasing the skill-lab architecture-builder (visual content travels).</td>
+      <td>Lower conversion than Reddit for cert learners, but good for networking with other creators &amp; SaaS founders. Treat as brand, not acquisition.</td>
+      <td><strong>£0</strong></td>
+    </tr>
+    <tr>
+      <td class="num">10.3</td>
+      <td><strong>Email digest</strong> (SES, already wired)</td>
+      <td>Monthly digest drawing from <strong>9.1</strong> news posts. Opt-in on signup, clear unsubscribe (you already have <code>/unsubscribe</code> and <code>emailLogs.ts</code>). Segment by studied-cert if possible.</td>
+      <td>Hit the 5% bounce / 0.1% complaint ceiling and SES pauses you — tie to <strong>7.2</strong> (bounce automation) before scaling.</td>
+      <td><strong>£0</strong> — SES at this volume is pennies.</td>
+    </tr>
+    <tr>
+      <td class="num">10.4</td>
+      <td><strong>Owned community</strong> (Discord or subreddit)</td>
+      <td>Only worth creating once you've got ~200 active weekly users. Premature = a dead room, which signals the wrong thing. Discord has better retention for learning cohorts; a subreddit feeds SEO back to the site.</td>
+      <td>Moderation time is real. Don't start until you can commit ~30 min/day.</td>
+      <td><strong>£0</strong></td>
+    </tr>
+    <tr>
+      <td class="num">10.5</td>
+      <td><strong>University pilot</strong> (you mentioned)</td>
+      <td>Offer a cohort-level free tier to CS/IT students; in exchange, ask for 1-page written feedback and permission to quote. Coordinate with their IT team for the NAT allow-list (§12.9).</td>
+      <td>Handle entitlements carefully — bulk provisioning needs a simple admin flow. Consider a "cohort code" signup path.</td>
+      <td><strong>£0</strong> — time cost only.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>13.4 Paid acquisition experiment (1-month test)</h3>
+<p>
+  Reasonable to test paid channels once the organic foundations (8.x / 9.x) are in place, so the
+  traffic has somewhere good to land. Cap the test, measure, decide.
+</p>
+<table>
+  <thead><tr><th>#</th><th>Channel</th><th>Why</th><th>Suggested test budget (1 month)</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">11.1</td>
+      <td><strong>Reddit Ads</strong> — subreddit targeting</td>
+      <td>Highest audience-fit of any paid channel for cert learners. You already know these subs convert organically, which is the strongest possible pre-signal.</td>
+      <td><strong>£200</strong></td>
+      <td>Target r/AWSCertifications, r/CompTIA, r/ccna. Creative: a single screenshot of the skill-lab architecture-builder + "free tier". £5–10/day, 30 days.</td>
+    </tr>
+    <tr>
+      <td class="num">11.2</td>
+      <td><strong>Google Search Ads</strong> — exact-match keywords</td>
+      <td>High-intent ("aws saa-c03 practice exam"). Pricey per click but the user is already comparing options.</td>
+      <td><strong>£150</strong></td>
+      <td>CPCs in this niche are £1.50–4. Keep it narrow: 5–8 exact-match terms only, your top-performing cert. Land on the per-exam page, not the homepage.</td>
+    </tr>
+    <tr>
+      <td class="num">11.3</td>
+      <td><strong>YouTube pre-roll</strong> on cert-study videos</td>
+      <td>Cheapest CPM of the paid channels; strong if your own walkthrough videos (<strong>9.2</strong>) exist — use a 15s cut as the ad creative.</td>
+      <td><strong>£100</strong></td>
+      <td>Target placements on specific cert-prep channels. Skippable in-stream, £0.01–0.03 per view.</td>
+    </tr>
+    <tr>
+      <td class="num">11.4</td>
+      <td><strong>LinkedIn Ads</strong></td>
+      <td>Skip for now.</td>
+      <td>£0</td>
+      <td>CPCs are £6–12. Not justifiable until B2B (enterprise training) is a real motion, not individual learners.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>Total test budget: £450 for one month.</strong> Enough to get statistically useful signal
+  across 3 channels without the wheels coming off if it flops. Gate it on prerequisites 8.1, 8.4,
+  and 9.2 — paid traffic landing on a thin SPA page with no video and generic copy converts
+  poorly, which would look like "paid doesn't work" when it's really "the landing page didn't
+  work."
+</div>
+
+<h3>13.5 Measurement — know what's working</h3>
+<table>
+  <thead><tr><th>#</th><th>Metric</th><th>Where to read it</th></tr></thead>
+  <tbody>
+    <tr><td class="num">12.1</td><td>Signups per channel / campaign</td><td>UTM parameters on every outbound link → GA4 acquisition report, or PostHog (see <strong>6.2</strong>)</td></tr>
+    <tr><td class="num">12.2</td><td>Visit → first-attempt conversion</td><td>PostHog funnel (<strong>6.2</strong>)</td></tr>
+    <tr><td class="num">12.3</td><td>Geographic distribution of active users</td><td>Grafana Cloud Faro geomap (<strong>2.4</strong>) — live view during a campaign</td></tr>
+    <tr><td class="num">12.4</td><td>SERP position for target keywords</td><td>Google Search Console (free, already likely verified)</td></tr>
+    <tr><td class="num">12.5</td><td>CAC per channel</td><td>Simple spreadsheet: channel spend / signups acquired. Enough while &lt;5 channels.</td></tr>
+  </tbody>
+</table>
+
+<div class="callout warn">
+  <strong>UTM everything, or you are guessing.</strong> Every outbound link (YouTube description,
+  LinkedIn post, Reddit comment, paid ad) needs <code>?utm_source=&amp;utm_medium=&amp;utm_campaign=</code>.
+  Without it, you'll spend £450 on ads and have no idea which channel delivered the signups.
+</div>
+
+<h3>13.6 Suggested 90-day sequence</h3>
+<ol>
+  <li><strong>Weeks 1–2 — foundations.</strong> Ship SEO hardening (<strong>8.1</strong>, <strong>8.2</strong>, <strong>8.4</strong>). Open the <code>/news</code> page (<strong>9.1</strong>) with 3 back-dated posts. Configure UTM shortlinks.</li>
+  <li><strong>Weeks 3–6 — organic momentum.</strong> Publish 2 YouTube walkthroughs (<strong>9.2</strong>), 4 news posts, weekly LinkedIn. Keep Reddit cadence. First email digest (<strong>10.3</strong>).</li>
+  <li><strong>Weeks 7–10 — paid experiment.</strong> Run the £450 paid test (<strong>11.1–11.3</strong>). Watch Faro geomap (<strong>2.4</strong>) in real time during Reddit campaigns — you should see a spike from the targeted subreddits' geos.</li>
+  <li><strong>Weeks 11–12 — decide.</strong> CAC per channel from <strong>12.5</strong>. Double down on whichever beat £X per signup (pick a number you'd be happy with in advance), kill the rest.</li>
+</ol>
+
+<div class="callout">
+  <strong>The leading indicator to watch:</strong> Reddit traffic you <em>didn't</em> pay for after the
+  paid month. If organic mentions go up — "saw this tool being used on r/… and wanted to try it" —
+  the paid spend is working beyond the direct-attribution window, and repeating is justified.
+</div>
+
+<h2 id="learning-plan">14. Product: Learning Plan</h2>
+<p>
+  The biggest unbuilt feature on the roadmap. Today the site is a <em>catalogue</em> — users pick an
+  exam, take it, and leave. Learning Plan converts it into a <em>course</em>: the user picks a
+  destination role, the system sequences exams and skill labs into a personalised path, and the
+  path adapts as the user progresses or changes direction. Item IDs continue as <strong>13.x</strong>.
+</p>
+<div class="callout warn">
+  <strong>Not now, but next.</strong> Needs a critical mass of content to be worth building —
+  realistically ~6 certs per major role track and ~40 skill labs. Until then, a flat catalogue
+  serves users better than a sparse path. Treat this section as the blueprint to have ready when
+  content crosses that threshold.
+</div>
+
+<h3>14.1 Concept</h3>
+<p>
+  A user arrives knowing their destination (role or platform) — maybe not their starting point.
+  Learning Plan:
+</p>
+<ol>
+  <li>Asks the user's target (e.g. "Cloud Security Engineer on AWS") and current experience.</li>
+  <li>Generates a path of exams + skill labs in a sensible real-world order, honouring prerequisites even when the user didn't ask for them.</li>
+  <li>Lets the user commit to the path (gated content unlocks progressively) or browse it loosely (hands-on skill labs available immediately for motivation).</li>
+  <li>Adapts when the user changes target, fails an exam, or spends weeks idle on a step — the plan re-sequences rather than forcing a restart.</li>
+</ol>
+
+<figure class="diagram">
+<svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Learning plan dependency graph">
+  <defs>
+    <marker id="arrLP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/>
+    </marker>
+    <marker id="arrLPm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <!-- target -->
+  <rect class="d-box-warn" x="750" y="150" width="180" height="70"/>
+  <text class="d-text"    x="840" y="180" text-anchor="middle">🎯 Target</text>
+  <text class="d-text-sm" x="840" y="200" text-anchor="middle">Cloud Security Engineer (AWS)</text>
+
+  <!-- user input: wants linux first -->
+  <rect class="d-box" x="30" y="30" width="220" height="60"/>
+  <text class="d-text"    x="140" y="55" text-anchor="middle">👤 User says</text>
+  <text class="d-text-sm" x="140" y="73" text-anchor="middle">"I want to learn Linux first"</text>
+
+  <!-- L1 prereq foundations -->
+  <rect class="d-box-accent" x="30" y="140" width="160" height="60"/>
+  <text class="d-text"    x="110" y="165" text-anchor="middle">Network+</text>
+  <text class="d-text-sm" x="110" y="183" text-anchor="middle">exam · L1</text>
+
+  <rect class="d-box-accent" x="30" y="220" width="160" height="60"/>
+  <text class="d-text"    x="110" y="245" text-anchor="middle">RHCSA</text>
+  <text class="d-text-sm" x="110" y="263" text-anchor="middle">exam · L1 (user-requested)</text>
+
+  <!-- L2 cloud fundamentals -->
+  <rect class="d-box-accent" x="260" y="140" width="160" height="60"/>
+  <text class="d-text"    x="340" y="165" text-anchor="middle">CLF-C02</text>
+  <text class="d-text-sm" x="340" y="183" text-anchor="middle">exam · L2</text>
+
+  <rect class="d-box-accent" x="260" y="220" width="160" height="60"/>
+  <text class="d-text"    x="340" y="245" text-anchor="middle">Security+</text>
+  <text class="d-text-sm" x="340" y="263" text-anchor="middle">exam · L2</text>
+
+  <!-- L3 associate -->
+  <rect class="d-box-accent" x="490" y="180" width="160" height="60"/>
+  <text class="d-text"    x="570" y="205" text-anchor="middle">SAA-C03</text>
+  <text class="d-text-sm" x="570" y="223" text-anchor="middle">exam · L3</text>
+
+  <!-- L4 specialty -->
+  <rect class="d-box-warn" x="720" y="260" width="180" height="60"/>
+  <text class="d-text"    x="810" y="285" text-anchor="middle">SCS-C02</text>
+  <text class="d-text-sm" x="810" y="303" text-anchor="middle">exam · L4 (destination)</text>
+
+  <!-- parallel skill lab track -->
+  <rect class="d-box-react" x="280" y="310" width="400" height="50"/>
+  <text class="d-text"    x="480" y="332" text-anchor="middle">🧪 Skill labs — available from day 1 (taster track)</text>
+  <text class="d-text-sm" x="480" y="350" text-anchor="middle">cli · policy-fix · diagnose · architecture-builder</text>
+
+  <!-- edges: prereq chain -->
+  <line x1="190" y1="170" x2="260" y2="170" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLP)"/>
+  <line x1="190" y1="250" x2="260" y2="250" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLP)"/>
+  <line x1="420" y1="170" x2="490" y2="200" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLP)"/>
+  <line x1="420" y1="250" x2="490" y2="220" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLP)"/>
+  <line x1="650" y1="210" x2="720" y2="280" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLP)"/>
+  <line x1="900" y1="260" x2="870" y2="220" stroke="var(--muted)" stroke-width="1.3" stroke-dasharray="5 4"/>
+
+  <!-- user input edge -->
+  <line x1="140" y1="90" x2="120" y2="140" stroke="var(--muted)" stroke-width="1.3" stroke-dasharray="5 4" marker-end="url(#arrLPm)"/>
+
+  <!-- skill labs float up to any stage -->
+  <line x1="370" y1="310" x2="340" y2="280" stroke="var(--accent-2)" stroke-width="1.3" stroke-dasharray="3 3"/>
+  <line x1="480" y1="310" x2="570" y2="240" stroke="var(--accent-2)" stroke-width="1.3" stroke-dasharray="3 3"/>
+  <line x1="600" y1="310" x2="810" y2="260" stroke="var(--accent-2)" stroke-width="1.3" stroke-dasharray="3 3"/>
+</svg>
+<figcaption>
+  Even though the user opted in on Linux first, the plan still routes Network+ before touching cloud infra —
+  because Cloud Security without networking ends badly. Skill labs are unlocked from day one so the user
+  has something hands-on while working through the slow exam track.
+</figcaption>
+</figure>
+
+<h3>14.2 Design decisions</h3>
+<table>
+  <thead><tr><th>#</th><th>Decision</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">13.1</td>
+      <td><strong>Prerequisite graph, not a fixed curriculum.</strong> Each exam/lab declares prereqs + tags (topics, provider, level). Plan = shortest path from "known" to "target" through the DAG.</td>
+      <td>Fixed curricula don't survive the first user who already has Network+. A graph handles "skip anything you can prove" cleanly.</td>
+    </tr>
+    <tr>
+      <td class="num">13.2</td>
+      <td><strong>Levels are an attribute, not a gate.</strong> L1 foundations → L2 fundamentals → L3 associate → L4 specialty. Users see their current level rise as they pass exams; this feeds gamification (§5 already uses badges/XP).</td>
+      <td>Levels communicate progress without blocking a user from jumping ahead if they want to try. Gate hard only on paid content, never on level.</td>
+    </tr>
+    <tr>
+      <td class="num">13.3</td>
+      <td><strong>Skill labs always unlocked.</strong> Labs are short and motivating; use them as the "something to play with today" while exams sit as week-long commitments.</td>
+      <td>Retention at day 2 is the single biggest drop-off. Letting a new user break something in a CLI lab within 5 minutes is worth more than any onboarding carousel.</td>
+    </tr>
+    <tr>
+      <td class="num">13.4</td>
+      <td><strong>Soft nudges on order, not enforcement.</strong> If a user opens SCS-C02 without having passed prerequisites, show a banner ("Learners who passed SAA-C03 first scored 23% higher. Continue anyway?") — don't block them.</td>
+      <td>Paying users resent being told they can't access what they paid for. Social proof &gt; hard gate for order-of-operations advice.</td>
+    </tr>
+    <tr>
+      <td class="num">13.5</td>
+      <td><strong>Adaptive re-plan on signals.</strong> Triggers: user fails an exam twice (insert a targeted skill-lab; suggest revisiting a prereq topic), user hasn't logged in for 14 days (email with the next 30-min step), user changes target role (re-plan with overlap credit).</td>
+      <td>A plan that doesn't react looks broken the first time life interferes. Three specific triggers is enough to feel intelligent without over-engineering.</td>
+    </tr>
+    <tr>
+      <td class="num">13.6</td>
+      <td><strong>Role templates, not freeform goals.</strong> Start with 4–6 curated target roles ("Cloud Security Engineer", "SRE", "Cloud Architect", "DevOps", "Network Engineer", "Linux SysAdmin"). Each is a tag set against the catalogue.</td>
+      <td>"Build me a plan" is paralysing. "Pick your destination" is concrete. Expand templates as content grows.</td>
+    </tr>
+    <tr>
+      <td class="num">13.7</td>
+      <td><strong>Plan is a first-class entity</strong> — a row in DynamoDB (<code>examapp-learning-plans</code>), keyed on <code>userId</code>, versioned on each re-plan so history is preserved.</td>
+      <td>Lets users compare "where I thought I'd be" with "where I am" — good retention/UX. Also enables <strong>7.1</strong> audit trail.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>14.3 Technical sketch</h3>
+<p>
+  Roughly how the pieces fit together — none of this exists yet, but each piece is small on its own:
+</p>
+<ul>
+  <li>
+    <strong>Content metadata</strong> — extend each exam JSON and skill-lab JSON with
+    <code>level</code>, <code>topics[]</code>, <code>prerequisites[]</code>, <code>roleTags[]</code>.
+    Validation at publish time (§12.7 already has a publishing workflow).
+  </li>
+  <li>
+    <strong>Role templates</strong> — <code>backend/data/roles/*.json</code>:
+    <code>{ id, title, description, targetExam, skillLabEmphasis[], summary }</code>.
+  </li>
+  <li>
+    <strong>Plan generator</strong> — a service in <code>backend/src/services/learningPlan.ts</code>.
+    Input: <code>userId</code>, <code>targetRoleId</code>, prior-skill hints. Output: ordered sequence.
+    Algorithm is topological sort on the prereq DAG with the target exam as the sink, then decorate
+    with skill labs keyed on matching topics.
+  </li>
+  <li>
+    <strong>New routes</strong> — <code>/learning-plan</code> (GET current plan, POST to generate,
+    PATCH to change target or mark step complete). Plan is server-authoritative (prevents the user
+    skipping a paid exam by editing localStorage).
+  </li>
+  <li>
+    <strong>Frontend</strong> — new page <code>/plan</code> (vertical timeline: done / current / upcoming).
+    Integrates with existing <code>GamificationContext</code> for badges on step completion.
+    Per-step banners nudging toward <strong>13.4</strong>.
+  </li>
+  <li>
+    <strong>Adaptive triggers (13.5)</strong> — cron job (<code>/internal/cron</code> already exists)
+    that evaluates users daily: any matching a trigger gets a plan-update event written to their
+    plan row and an email via SES.
+  </li>
+</ul>
+
+<h3>14.4 How it ties into what already exists</h3>
+<table>
+  <tbody>
+    <tr><td><strong>§5 gamification</strong></td><td>Step completion = XP + badge. Level-up on transitioning L1→L2, etc.</td></tr>
+    <tr><td><strong>§6 entitlements</strong></td><td>A plan can cross free and paid exams. Locked steps show the price with a "part of your plan" framing rather than a cold paywall — higher conversion.</td></tr>
+    <tr><td><strong>§7.1 audit log</strong></td><td>Plan version history feeds straight in; also supports "certified learner" credentials later.</td></tr>
+    <tr><td><strong>§12.2 / 2.4 Faro</strong></td><td>Track funnel: plan-created → first-step-started → first-step-complete → target-reached. This is the product's real conversion metric.</td></tr>
+    <tr><td><strong>§13 marketing</strong></td><td>Role templates are marketing landing pages for free. "Become a Cloud Security Engineer" is a better SEO target than "AWS practice exam".</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>When to build:</strong> when you have 6+ exams in two role tracks and ~40 skill labs.
+  Building earlier means most generated plans are trivially short and the feature doesn't justify
+  its complexity. Until then, the roadmap above is the spec — so the day you cross the threshold,
+  implementation is measured in weeks, not months.
+</div>
+
+<h2 id="lab-lifecycle">15. Skill-lab lifecycle redesign</h2>
+<p>
+  Near-term product work and a prerequisite for <a href="#learning-plan">§14 Learning Plan</a> — the plan
+  can only light up "step complete" on something that properly understands <em>completed</em>. Today the
+  concept doesn't really exist: labs have one terminal event (finalize → DynamoDB write) and everything
+  before that is localStorage. This section documents the redesign target. Item IDs continue as
+  <strong>14.x</strong>.
+</p>
+
+<h3>15.1 What exists today</h3>
+<p>
+  Audit facts (so the redesign is grounded, not guessed):
+</p>
+<ul>
+  <li><strong>No DynamoDB auto-save.</strong> Lab progress lives only in <code>localStorage['skillLabProgress:{labId}']</code> with a 24h TTL.</li>
+  <li><strong>One server mutation</strong>: <code>POST /skill-labs/:id/attempt</code> in <code>backend/src/routes/skillLabs.ts</code>, called once when <code>session.finalize(correct, answer)</code> fires. Append-only row in <code>examapp-skill-lab-attempts</code>.</li>
+  <li><strong>No "cancel" endpoint.</strong> Cancel is purely <code>clearLabProgress(labId)</code> on localStorage (<code>SkillLabDetailPage.tsx</code>:282).</li>
+  <li><strong>In-progress banner</strong> is driven by the mere presence of the localStorage key — "You have saved progress for this lab." — regardless of whether the user actually changed anything.</li>
+  <li><strong>Attempt schema</strong> is flat: <code>{ userId, attemptId, labId, labType, selectedAnswer, correct, timeTaken, createdAt }</code>. No <code>status</code>, no lifecycle, no <code>lastSeenAt</code>.</li>
+  <li><strong>Rating exists but is orthogonal.</strong> <code>RatingModal.tsx</code> is launched from a "Rate" button in <code>LabHeader.tsx</code>; not coupled to completion.</li>
+</ul>
+
+<h3>15.2 The UX problem</h3>
+<p>
+  A user clicks <em>Start Lab</em>, scans the scaffolding, decides they're not ready — and now has a
+  persistent amber "in progress" banner on the detail page until they explicitly click <em>Cancel
+  progress</em>. That's friction for zero value: they didn't do anything. The system is treating
+  "opened the runner" identically to "half-finished an IAM policy."
+</p>
+<p>
+  Separately, there's no happy exit. Finishing a lab quietly writes to DynamoDB and drops the user
+  back on the detail page with no celebration, no rating prompt, no "next lab" nudge.
+</p>
+
+<h3>15.3 Target lifecycle</h3>
+<figure class="diagram">
+<svg viewBox="0 0 960 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Skill lab state machine">
+  <defs>
+    <marker id="arrLL" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/>
+    </marker>
+    <marker id="arrLLm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <!-- states -->
+  <rect class="d-box" x="30"  y="140" width="140" height="70"/>
+  <text class="d-text"    x="100" y="170" text-anchor="middle">Browsing</text>
+  <text class="d-text-sm" x="100" y="188" text-anchor="middle">detail page, no state</text>
+
+  <rect class="d-box-accent" x="220" y="140" width="140" height="70"/>
+  <text class="d-text"    x="290" y="170" text-anchor="middle">Preview</text>
+  <text class="d-text-sm" x="290" y="188" text-anchor="middle">runner open · untouched</text>
+
+  <rect class="d-box-warn" x="410" y="140" width="160" height="70"/>
+  <text class="d-text"    x="490" y="170" text-anchor="middle">In progress</text>
+  <text class="d-text-sm" x="490" y="188" text-anchor="middle">dirty · autosaved</text>
+
+  <rect class="d-box-react" x="620" y="60" width="160" height="70"/>
+  <text class="d-text"    x="700" y="90" text-anchor="middle">Completed ✓</text>
+  <text class="d-text-sm" x="700" y="108" text-anchor="middle">pass or give-up + outcome</text>
+
+  <rect class="d-box" x="620" y="220" width="160" height="70"/>
+  <text class="d-text"    x="700" y="250" text-anchor="middle">Abandoned</text>
+  <text class="d-text-sm" x="700" y="268" text-anchor="middle">explicit cancel</text>
+
+  <rect class="d-box-accent" x="820" y="60" width="120" height="70"/>
+  <text class="d-text"    x="880" y="90" text-anchor="middle">Rate (opt.)</text>
+  <text class="d-text-sm" x="880" y="108" text-anchor="middle">modal on complete</text>
+
+  <!-- edges -->
+  <line x1="170" y1="175" x2="220" y2="175" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLL)"/>
+  <text class="d-text-sm" x="195" y="165" text-anchor="middle">Start</text>
+
+  <!-- preview → browsing (no-op exit, no banner) -->
+  <path class="d-arrow" d="M290 140 C 290 80, 170 80, 130 140" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrLLm)"/>
+  <text class="d-text-sm" x="210" y="95" text-anchor="middle">Close · no banner (untouched)</text>
+
+  <!-- preview → in progress -->
+  <line x1="360" y1="175" x2="410" y2="175" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLL)"/>
+  <text class="d-text-sm" x="385" y="165" text-anchor="middle">first edit</text>
+
+  <!-- in progress → completed -->
+  <line x1="570" y1="155" x2="620" y2="100" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLL)"/>
+  <text class="d-text-sm" x="595" y="120" text-anchor="end">Complete (after pass)</text>
+
+  <!-- check / retest self-loop -->
+  <path d="M490 140 C 460 90, 400 90, 430 140" fill="none" stroke="var(--accent-2)" stroke-width="1.4" marker-end="url(#arrLL)"/>
+  <text class="d-text-sm" x="445" y="115" text-anchor="middle" fill="var(--accent-2)">Check / Retest</text>
+
+  <!-- completed → rate -->
+  <line x1="780" y1="95" x2="820" y2="95" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLL)"/>
+
+  <!-- in progress → abandoned -->
+  <line x1="570" y1="195" x2="620" y2="250" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrLL)"/>
+  <text class="d-text-sm" x="595" y="235" text-anchor="end">Cancel</text>
+
+  <!-- in progress → browsing (resume later - keep banner) -->
+  <path class="d-arrow" d="M490 210 C 490 330, 100 330, 100 210" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrLLm)"/>
+  <text class="d-text-sm" x="295" y="340" text-anchor="middle">Close · banner + Resume</text>
+</svg>
+<figcaption>
+  <strong>Preview</strong> is the new state that kills the nuisance banner. Leaving an untouched lab
+  returns you to Browsing silently; touching anything moves you to In progress and earns the banner.
+</figcaption>
+</figure>
+
+<h3>15.4 Design decisions</h3>
+<table>
+  <thead><tr><th>#</th><th>Decision</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">14.1</td>
+      <td><strong>Add a <code>dirty</code> flag</strong> on the runner session. It flips the first time the user mutates state (edits policy, runs a CLI command, drags a node). Until then, closing the tab or hitting back clears localStorage silently.</td>
+      <td>Eliminates the false-positive "in progress" banner that's the whole complaint. Zero server work — pure frontend.</td>
+    </tr>
+    <tr>
+      <td class="num">14.2</td>
+      <td><strong>Promote the attempt to a state machine</strong>: <code>status: 'in_progress' | 'completed' | 'abandoned'</code>. Add <code>startedAt</code>, <code>lastSavedAt</code>, <code>completedAt</code>. Keep the existing fields.</td>
+      <td>Learning Plan (§14) needs a durable "completed" signal that survives localStorage eviction. Also unlocks analytics like "average time to complete by lab type".</td>
+    </tr>
+    <tr>
+      <td class="num">14.3</td>
+      <td><strong>Server-side progress on transition to In progress</strong> — only once <code>dirty</code> becomes true, POST an <code>in_progress</code> row. Subsequent saves are PATCHes with debounced payload (5s) of the serialised session state.</td>
+      <td>Replaces the 24h localStorage TTL with durable multi-device resume. Cheap — Dynamo writes only fire when the user is actually working, not while idle.</td>
+    </tr>
+    <tr>
+      <td class="num">14.4</td>
+      <td><strong>Explicit <code>complete</code> endpoint</strong>: <code>POST /skill-labs/:id/attempt/:attemptId/complete</code> with <code>{ correct, outcome, timeTaken }</code>. Closes the in-progress row (transition to <code>completed</code>), not appends.</td>
+      <td>Reusing the current one-shot POST means you can't join "tried and abandoned" with "eventually completed". Splitting them gives Learning Plan a real event.</td>
+    </tr>
+    <tr>
+      <td class="num">14.5</td>
+      <td><strong>Explicit <code>cancel</code> endpoint</strong>: same pattern, transitions to <code>abandoned</code>. Button lives in the runner header (not just on detail page).</td>
+      <td>Makes the user's intent explicit and queryable ("users abandon <code>policy-fix</code> at a 40% rate — why?"). Also lets you exempt abandoned attempts from streak-breaking logic.</td>
+    </tr>
+    <tr>
+      <td class="num">14.6</td>
+      <td><strong>Rating modal on Complete</strong> — optional, dismissable, non-blocking. Prefilled with outcome ("You solved it! How was the difficulty?"). Wire <code>RatingModal.tsx</code> to the complete flow; write rating onto the same attempt row (<code>rating</code>, <code>ratingComment</code>).</td>
+      <td>Highest-signal moment to ask. Today's standalone Rate button is ignored because it's decoupled. Co-locate and conversion jumps.</td>
+    </tr>
+    <tr>
+      <td class="num">14.7</td>
+      <td><strong>Quick-exit on Preview</strong> — a subtle "Close" button in the runner header that, if <code>dirty === false</code>, routes back silently with no confirmation. If <code>dirty === true</code>, prompts "Save progress and come back later?" with Keep / Discard / Keep + go back.</td>
+      <td>Matches the lightweight feel of the app — scanning a lab should be as cheap as closing a tab.</td>
+    </tr>
+    <tr>
+      <td class="num">14.8</td>
+      <td><strong>Resume UX</strong> — if an <code>in_progress</code> row exists server-side, detail page shows "Resume (saved 3 hrs ago)" and hydrates runner from the server state. localStorage becomes a cache, not the source of truth.</td>
+      <td>Cross-device continuity. Also removes the 24h cliff where progress silently disappears.</td>
+    </tr>
+    <tr>
+      <td class="num">14.9</td>
+      <td><strong>No abandon-reason prompt on labs</strong> (deliberate asymmetry with exams <strong>15.15</strong>). Labs are short sandboxes — "just exploring" is the default reason and collecting it every time would be friction without signal.</td>
+      <td>Exams benefit from reason data <em>only</em> when abandonment is odd (user answered 20+ questions then quit). Labs don't have a meaningful equivalent threshold, so skip it entirely.</td>
+    </tr>
+    <tr>
+      <td class="num">14.10</td>
+      <td><strong>Runner action bar: Cancel + Check + Complete co-located.</strong> Replace the current small/scattered buttons with a single persistent action bar in the runner footer (or sticky header on mobile). Cancel (secondary, always enabled) · Check answer (primary while unvalidated) · Complete (primary, disabled until a passing check). Same visual weight; Cancel is no longer a tiny afterthought.</td>
+      <td>The lifecycle isn't actually visible today because the controls are spread across the runner chrome. Putting all three in one bar makes the flow self-documenting: user sees what actions exist without hunting.</td>
+    </tr>
+    <tr>
+      <td class="num">14.11</td>
+      <td>
+        <strong>Explicit Check / Retest / Complete loop</strong> for runners that validate (policy-fix, code-fix, architecture-builder, diagnose). User flow:
+        <ol style="margin:4px 0 4px 18px;padding:0">
+          <li><em>Check</em> — validates current state against lab expectations (existing <code>/validate-policy</code> / <code>/validate-code</code>). Inline feedback; attempt stays <code>in_progress</code>.</li>
+          <li>Failed check → <em>Retest</em> button (same action, relabelled) — user edits and checks again.</li>
+          <li>Passing check → <em>Complete</em> becomes enabled. Complete is a separate user action, not auto-triggered.</li>
+        </ol>
+        For runners without validation (free-exploration CLI labs), Check = Complete — the button labels collapse to just Cancel + Complete.
+      </td>
+      <td>Today's single-shot finalize conflates "I tried it" with "I succeeded". Separating Check (validation) from Complete (commitment) lets users iterate without accidentally ending the attempt, matches how real cert labs work, and gives the Learning Plan a clean <code>correct=true</code> signal instead of a muddy one.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>15.5 Backend changes</h3>
+<ul>
+  <li>
+    Extend the attempt schema in <code>services/skillLabAttemptsStore.ts</code>:
+    <code>status</code>, <code>startedAt</code>, <code>lastSavedAt</code>, <code>completedAt</code>,
+    <code>progressState</code> (opaque JSON for session), <code>rating</code>, <code>ratingComment</code>.
+  </li>
+  <li>
+    New routes in <code>routes/skillLabs.ts</code>:
+    <ul>
+      <li><code>POST /skill-labs/:id/attempt</code> — <em>start</em> (returns <code>attemptId</code>, status=<code>in_progress</code>). Called only on first dirty edit.</li>
+      <li><code>PATCH /skill-labs/:id/attempt/:attemptId</code> — <em>save progress</em> (debounced client-side to ~5s).</li>
+      <li><code>POST /skill-labs/:id/attempt/:attemptId/complete</code> — <em>finalise</em> with outcome.</li>
+      <li><code>POST /skill-labs/:id/attempt/:attemptId/cancel</code> — <em>abandon</em>.</li>
+      <li><code>GET /skill-labs/:id/attempt/active</code> — <em>hydrate</em> on detail/runner load.</li>
+    </ul>
+  </li>
+  <li>
+    Backfill: existing rows have no <code>status</code>. Treat missing as <code>completed</code>
+    (they all went through the old finalize-only path).
+  </li>
+  <li>
+    DynamoDB GSI on <code>userId + status</code> so "show me my in-progress labs" is a single query
+    instead of a table scan.
+  </li>
+</ul>
+
+<h3>15.6 Frontend changes</h3>
+<ul>
+  <li>
+    Add <code>dirty</code> and <code>attemptId</code> to the shared session hook (wherever
+    <code>session.saveProgress</code> lives). Flip <code>dirty</code> on first user input.
+  </li>
+  <li>
+    On <code>dirty</code> transition: POST <code>/attempt</code>, store <code>attemptId</code>, start
+    the debounced PATCH loop.
+  </li>
+  <li>
+    <strong>Runner action bar</strong> (<strong>14.10</strong>): a single footer/sticky bar with
+    <em>Cancel</em>, <em>Check answer</em> (or <em>Retest</em> once a check has run), and <em>Complete</em>.
+    Complete is disabled until <code>lastCheck.correct === true</code>. Cancel always enabled.
+    Close is a small chevron/back arrow, not a button (matches <strong>14.7</strong> quick-exit).
+  </li>
+  <li>
+    <strong>Check / Retest / Complete separation</strong> (<strong>14.11</strong>): each runner exposes
+    a <code>check()</code> callback; wired to the existing <code>/validate-policy</code> /
+    <code>/validate-code</code> endpoints where they exist, or to a lab-type-specific validator
+    otherwise. Store <code>lastCheck = { correct, checkedAt, feedback }</code> on the session.
+    Complete → opens <code>RatingModal</code> → redirects to next-step nudge. Cancel → confirm → server
+    abandon → back to detail page.
+  </li>
+  <li>
+    Detail page banner driven by server <code>active</code> endpoint, not localStorage. Shows
+    <code>lastSavedAt</code> relative time.
+  </li>
+  <li>
+    Minor save-indicator in the header ("Saved" / "Saving…") so the user knows the PATCH loop is
+    live — today's silent save feels lossy even though it works.
+  </li>
+</ul>
+
+<h3>15.7 Tie-ins</h3>
+<table>
+  <tbody>
+    <tr><td><strong>§14 Learning Plan (13.3)</strong></td><td>Skill labs always unlocked; <code>status='completed'</code> with <code>correct=true</code> is what flips a plan step done.</td></tr>
+    <tr><td><strong>§5 gamification</strong></td><td>Rate modal can award an XP bonus on submission — cheap nudge to fill it in.</td></tr>
+    <tr><td><strong>§7.1 audit log</strong></td><td>Lifecycle transitions are exactly what an audit log wants — free forensics on "what did this user actually do with this lab".</td></tr>
+    <tr><td><strong>§6.2 PostHog funnel</strong></td><td>Start → dirty → complete is the real skill-lab funnel. Drop-off between steps is the thing to optimise.</td></tr>
+    <tr><td><strong>§12.4 Entitlements cache (4.4)</strong></td><td>Active attempt hydration hits DynamoDB on every runner load — cache the <code>active</code> response in-memory per task to avoid RCU cost.</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>Build order.</strong> Ship <strong>14.1</strong> (the <code>dirty</code> flag) standalone first —
+  it's an afternoon of frontend work and fixes the banner complaint immediately. Then
+  <strong>14.2–14.4</strong> (state machine + new endpoints) as a single server-side release.
+  <strong>14.6</strong> (rating modal wired up) is a separate small PR. <strong>14.8</strong> (server-side
+  resume) last — it's the most invasive but also the most "enterprise-feel" change.
+</div>
+
+<h2 id="exam-review">16. Exam review flow redesign</h2>
+<p>
+  Sibling redesign to §15 — the navigation around exam results is currently split across two
+  parallel destinations (<code>/exams</code> and <code>/analytics</code>) that show overlapping data
+  with different framings. This section folds analytics into the exam flow so the catalogue, a
+  specific exam, and its history all live on one path. Item IDs continue as <strong>15.x</strong>.
+</p>
+
+<h3>16.1 What exists today</h3>
+<ul>
+  <li><strong>Sidebar</strong> (<code>components/Sidebar.tsx</code>:30–42) has <em>Analytics</em> as a top-level nav item alongside <em>Exams</em>.</li>
+  <li><strong><code>/analytics</code></strong> renders <code>exam/AnalyticsView.tsx</code> — its own exam picker, score-history chart, stats cards, domain-performance bars, and paginated "Previous Scores" table.</li>
+  <li><strong><code>/exams</code></strong> renders <code>exam/PracticeExams.tsx</code> — a catalogue with provider groups. Cards show question count and an "attempt count" badge but <em>no past scores</em>.</li>
+  <li><strong>Post-exam landing</strong> (<code>ExamApp.tsx</code>:397–503) stays on the same route with <code>isFinished=true</code>. The result card shows score + per-domain breakdown; <code>ExamReview.tsx</code> offers three CTAs: <em>Repeat Exam</em>, <em>Return to Exam</em>, and <em>Analytics</em> — the last of which routes to <code>/analytics</code>.</li>
+  <li><strong>Duplication</strong>: per-domain performance appears twice — once on the in-result card (single attempt) and once on <code>/analytics</code> (aggregated). Exam-picker UI appears twice (<code>/exams</code> and <code>/analytics</code>).</li>
+  <li><strong>URL structure</strong> is context-driven: <code>/exams</code>, <code>/exams/:examCode</code> and <code>/analytics</code> all render through <code>ExamContext</code>. There is <em>no</em> per-exam analytics URL today, so sharing a specific exam's history is impossible.</li>
+  <li><strong>Score history data</strong> comes from <code>GET /analytics/exam/:code/scores</code> with <code>GET /attempts</code> as fallback (<code>ExamContext.tsx</code>:1024).</li>
+</ul>
+
+<h3>16.2 The navigation problem</h3>
+<p>
+  After finishing an exam, the user has already seen their score and a per-domain breakdown on the
+  result card. The <em>Analytics</em> CTA takes them to a <em>different</em> page that shows the same
+  domains again (now aggregated), plus history they didn't ask for. They're now two clicks from the
+  catalogue, via a page whose URL doesn't even mention the exam they just took. Meanwhile
+  <em>Analytics</em> sits in the sidebar as if it were a first-class destination — but there is nothing
+  on it that isn't about one exam at a time.
+</p>
+
+<h3>16.3 Target navigation</h3>
+<figure class="diagram">
+<svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Exam review navigation redesign">
+  <defs>
+    <marker id="arrER" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/>
+    </marker>
+    <marker id="arrERm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <!-- lane -->
+  <rect x="30" y="30" width="900" height="320" rx="12" fill="var(--panel-2)" stroke="var(--border)"/>
+  <text class="d-text-sm" x="48" y="52" fill="var(--muted)">New navigation — everything under /exams</text>
+
+  <!-- /exams -->
+  <rect class="d-box" x="60" y="80" width="160" height="70"/>
+  <text class="d-text"    x="140" y="108" text-anchor="middle">/exams</text>
+  <text class="d-text-sm" x="140" y="128" text-anchor="middle">catalogue + my-attempts</text>
+
+  <!-- /exams/:code -->
+  <rect class="d-box-accent" x="280" y="80" width="180" height="70"/>
+  <text class="d-text"    x="370" y="108" text-anchor="middle">/exams/:code</text>
+  <text class="d-text-sm" x="370" y="128" text-anchor="middle">landing · start · tabs</text>
+
+  <!-- /exams/:code/attempt -->
+  <rect class="d-box-warn" x="520" y="80" width="180" height="70"/>
+  <text class="d-text"    x="610" y="108" text-anchor="middle">/exams/:code/attempt</text>
+  <text class="d-text-sm" x="610" y="128" text-anchor="middle">runner → result card</text>
+
+  <!-- /exams/:code/history -->
+  <rect class="d-box-accent" x="280" y="200" width="180" height="70"/>
+  <text class="d-text"    x="370" y="228" text-anchor="middle">/exams/:code/history</text>
+  <text class="d-text-sm" x="370" y="248" text-anchor="middle">score trend · domain agg</text>
+
+  <!-- /exams/:code/attempt/:attemptId -->
+  <rect class="d-box-react" x="520" y="200" width="220" height="70"/>
+  <text class="d-text"    x="630" y="228" text-anchor="middle">/exams/:code/attempt/:attemptId</text>
+  <text class="d-text-sm" x="630" y="248" text-anchor="middle">per-attempt question review</text>
+
+  <!-- finish state annotation -->
+  <rect class="d-box" x="760" y="80" width="160" height="70"/>
+  <text class="d-text"    x="840" y="108" text-anchor="middle">result card</text>
+  <text class="d-text-sm" x="840" y="128" text-anchor="middle">shown in /attempt (finished)</text>
+
+  <!-- arrows -->
+  <line x1="220" y1="115" x2="280" y2="115" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrER)"/>
+  <line x1="460" y1="115" x2="520" y2="115" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrER)"/>
+  <text class="d-text-sm" x="490" y="105" text-anchor="middle">Start</text>
+
+  <line x1="700" y1="115" x2="760" y2="115" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrER)"/>
+
+  <!-- /exams/:code tabs to history & review -->
+  <line x1="370" y1="150" x2="370" y2="200" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrER)"/>
+  <text class="d-text-sm" x="440" y="180" text-anchor="middle">History tab</text>
+
+  <line x1="460" y1="230" x2="520" y2="230" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrER)"/>
+  <text class="d-text-sm" x="490" y="222" text-anchor="middle">Open attempt</text>
+
+  <!-- result card CTAs -->
+  <line x1="840" y1="150" x2="690" y2="210" stroke="var(--muted)" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#arrERm)"/>
+  <line x1="840" y1="150" x2="450" y2="220" stroke="var(--muted)" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#arrERm)"/>
+  <text class="d-text-sm" x="830" y="175" text-anchor="end">Review · History · Repeat</text>
+
+  <!-- redirect note -->
+  <rect x="60" y="295" width="860" height="40" rx="8" fill="rgba(255,136,136,.1)" stroke="var(--danger)"/>
+  <text class="d-text-sm" x="490" y="320" text-anchor="middle" fill="var(--danger)">
+    /analytics → 301 → /exams/:code/history (last-attempted exam, or /exams if none)
+  </text>
+</svg>
+<figcaption>Everything exam-related lives under <code>/exams</code>. Analytics disappears as a top-level destination; its content is absorbed into the exam it was always about.</figcaption>
+</figure>
+
+<h3>16.4 Design decisions</h3>
+<table>
+  <thead><tr><th>#</th><th>Decision</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">15.1</td>
+      <td><strong>Drop Analytics from the sidebar.</strong> Remove the <code>TrendingUp</code> nav entry in <code>Sidebar.tsx</code>.</td>
+      <td>Nothing on <code>/analytics</code> is cross-exam — the page opens on "pick an exam" anyway. A top-level destination that exists only to dispatch to an exam is a false abstraction.</td>
+    </tr>
+    <tr>
+      <td class="num">15.2</td>
+      <td><strong>Promote <code>/exams/:code</code> to a real landing page</strong> — currently it just routes straight into <code>ExamApp</code>. Split into: overview (description, length, domains), CTAs (Start new / Resume / History / Review last), and a mode picker.</td>
+      <td>Gives the per-exam page an identity. Also unlocks SEO landing copy (<strong>8.4</strong>) — every URL a user could share now has real content.</td>
+    </tr>
+    <tr>
+      <td class="num">15.3</td>
+      <td><strong>New URL <code>/exams/:code/history</code></strong> hosts the score chart, stats cards, domain aggregation, and paginated attempt list currently on <code>/analytics</code>.</td>
+      <td>Shareable per-exam deep link. SEO-friendly. Mental model matches the user's: "I want to see how I'm doing on SAA-C03" is one place, not two.</td>
+    </tr>
+    <tr>
+      <td class="num">15.4</td>
+      <td><strong>Unify live and historical under <code>/attempt</code>.</strong> The live runner is <code>/exams/:code/attempt</code>; a specific historical attempt is <code>/exams/:code/attempt/:attemptId</code>. One concept, one namespace, matches the backend <code>examapp-attempts</code> table and <code>/attempts</code> endpoint.</td>
+      <td>The word "attempt" works as both noun and verb, reads naturally mid-exam ("your attempt of SAA-C03") and post-exam ("attempt #4 of SAA-C03"), and removes a second URL pattern (<code>/review/:id</code>) that would have meant the same thing.</td>
+    </tr>
+    <tr>
+      <td class="num">15.5</td>
+      <td><strong>Split landing from runner.</strong> The bare <code>/exams/:code</code> is the landing page (overview, CTAs, history tab); entering the runner is the explicit sub-route <code>/exams/:code/attempt</code>.</td>
+      <td>Clean separation of "I'm reading about this exam" and "I'm sitting the exam". Browser back button starts behaving sensibly — back from <code>/attempt</code> lands on the landing, not the catalogue.</td>
+    </tr>
+    <tr>
+      <td class="num">15.6</td>
+      <td><strong>De-duplicate domain performance.</strong> Result card (on <code>/attempt</code> after finish) shows <em>this attempt only</em>, framed as "your performance today". History page shows <em>all attempts aggregated</em> with a trend arrow. No overlap.</td>
+      <td>The complaint isn't that analytics is wrong — it's that the user sees the same numbers twice under different labels and can't tell which is which.</td>
+    </tr>
+    <tr>
+      <td class="num">15.7</td>
+      <td><strong>Post-exam CTAs</strong> (on the finished <code>/attempt</code> view): <em>Review questions</em> → <code>/exams/:code/attempt/:attemptId</code>, <em>View history</em> → <code>/exams/:code/history</code>, <em>Try again</em> → restart, <em>Back to exams</em> → <code>/exams</code>. Drop the "Analytics" button.</td>
+      <td>Every button is a specific next action with a specific URL. Today's "Analytics" button is effectively "vaguely somewhere more info might be".</td>
+    </tr>
+    <tr>
+      <td class="num">15.8</td>
+      <td><strong>Redirect <code>/analytics</code></strong> — 301 to <code>/exams/:code/history</code> using the user's most-recently-attempted exam, or <code>/exams</code> if none. Keep the redirect for ~6 months, then remove.</td>
+      <td>Inbound links from old emails, old YouTube video descriptions, or bookmarked tabs don't break. Cheap.</td>
+    </tr>
+    <tr>
+      <td class="num">15.9</td>
+      <td><strong>Show past scores on the catalogue.</strong> For each exam the user has attempted, surface "last score · best score · last attempted" on the card in <code>/exams</code>. Kills the need to drill just to remember whether you've done this one.</td>
+      <td>This is the single highest-value change on the list — answers "should I pick this one next?" without navigation.</td>
+    </tr>
+    <tr>
+      <td class="num">15.10</td>
+      <td><strong>Update the sitemap.</strong> Keep <code>/exams/:code</code> indexed (SEO landing). Keep <code>/exams/:code/history</code> out of the sitemap and add <code>Disallow: /exams/*/history</code> to <code>robots.txt</code> — user-specific, no value to crawlers.</td>
+      <td>Prevents Google indexing thousands of empty per-user pages and diluting the real landing pages.</td>
+    </tr>
+    <tr>
+      <td class="num">15.11</td>
+      <td><strong>Optional rating modal on completion</strong> — same pattern as skill labs (<strong>14.6</strong>). When the runner transitions to finished, open <code>RatingModal</code> pre-filled with outcome ("You passed SAA-C03 — how was the difficulty?"). Non-blocking, dismissable. Write <code>rating</code> and <code>ratingComment</code> onto the attempt row.</td>
+      <td>Highest-signal moment to ask for feedback. Also gives per-exam difficulty data over time — invaluable for spotting when a cert body updates the exam and your question bank drifts out of sync. Reuses the existing <code>RatingModal.tsx</code> component.</td>
+    </tr>
+    <tr>
+      <td class="num">15.12</td>
+      <td><strong>Add <code>abandoned</code> as a third attempt status.</strong> Today the exam state machine is only <code>'in-progress' | 'finished'</code> (<code>attemptsStore.ts</code>). Extend to <code>'in-progress' | 'finished' | 'abandoned'</code> plus an <code>abandonedAt</code> timestamp. Backfill is impossible (cancelled rows were hard-deleted) — just introduce going forward.</td>
+      <td>Brings exams in line with the labs state machine (<strong>14.2</strong>). Without this, you can't answer questions like "which exam do users bail out of most often?" or feed Learning Plan signals ("tried SAA-C03 twice, abandoned both → suggest revisiting Network+").</td>
+    </tr>
+    <tr>
+      <td class="num">15.13</td>
+      <td><strong>Replace destructive DELETE with soft-abandon.</strong> Current <code>DELETE /attempts/:id</code> hard-deletes in-progress rows. Add <code>POST /attempts/:id/abandon</code> that transitions <code>status → 'abandoned'</code> and writes <code>abandonedAt</code>. Keep DELETE for admin/GDPR use; the user-facing Cancel button calls the new endpoint.</td>
+      <td>Hard delete loses the signal the moment a user shows churn intent — exactly when you most want the data. Soft-abandon costs a few extra bytes per row for a massive analytics win.</td>
+    </tr>
+    <tr>
+      <td class="num">15.14</td>
+      <td><strong>Debounce UI-state progress to the server.</strong> Today per-answer saves (<code>POST /attempts/:id/answer</code>) are strong, but <code>currentIndex</code>, <code>timeLeft</code>, and <code>flags</code> only hit <code>PATCH /attempts/:id/progress</code> on explicit user actions. Add a ~10s debounced PATCH while the runner is active; flush on <code>visibilitychange=hidden</code> with <code>navigator.sendBeacon</code>.</td>
+      <td>Cross-device resume is already good (answers are server-side) but can be a few clicks stale on "where in the exam you were". 10s debounce + beacon on close tightens that without hammering Dynamo.</td>
+    </tr>
+    <tr>
+      <td class="num">15.15</td>
+      <td><strong>Conditional abandon-reason prompt on exams.</strong> When the user confirms Cancel, show a quick-chip prompt <em>only when</em> <code>answeredCount &gt; 20</code> (configurable). Chips: <em>Too hard</em> · <em>Ran out of time</em> · <em>Changed my mind</em> · <em>Technical issue</em> · <em>Prefer not to say</em>. One row of telemetry; non-blocking (Skip = save without reason). <strong>Not added to skill labs</strong> — user choice; labs are short sandboxes where reason collection is noise.</td>
+      <td>Abandoning after 20+ answered questions is the <em>odd</em> signal worth asking about — the user invested real time then quit, something is up. Below the threshold it's usually "just exploring", which isn't worth interrupting the flow to collect. Admin-facing only (aggregate in <code>/metrics</code>); not user-visible.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>16.5 Frontend changes</h3>
+<ul>
+  <li>
+    Remove the Analytics entry from <code>Sidebar.tsx</code> (<strong>15.1</strong>).
+  </li>
+  <li>
+    Split <code>ExamApp.tsx</code> into three routed components:
+    <code>ExamLanding</code> (<code>/exams/:code</code>), <code>ExamAttemptRunner</code>
+    (<code>/exams/:code/attempt</code>), <code>ExamAttemptReview</code> (<code>/exams/:code/attempt/:attemptId</code>).
+    They share <code>ExamContext</code> but each owns its own URL.
+  </li>
+  <li>
+    Move <code>AnalyticsView.tsx</code> contents into a new <code>ExamHistoryPage</code> routed at
+    <code>/exams/:code/history</code>; delete the exam-picker chrome at the top (the code is in
+    the URL).
+  </li>
+  <li>
+    <code>PracticeExams.tsx</code> cards gain a footer row with last/best/last-attempted when
+    attempt data exists. Fetch via <code>/attempts?summary=1</code> (one round trip for the
+    whole catalogue).
+  </li>
+  <li>
+    Update <code>ExamReview.tsx</code> CTAs (<strong>15.7</strong>); remove the "Analytics"
+    button.
+  </li>
+  <li>
+    Add the <code>/analytics</code> → per-exam redirect in <code>App.tsx</code> using the
+    user's last-attempted exam from <code>AuthContext</code> / <code>ExamContext</code>.
+  </li>
+  <li>
+    Cancel modal (<code>Modals.tsx</code>): switch from <code>DELETE</code> to
+    <code>POST /attempts/:id/abandon</code> (<strong>15.13</strong>); render the conditional
+    reason-chip prompt when <code>answeredCount &gt; 20</code> (<strong>15.15</strong>).
+  </li>
+  <li>
+    Runner: start a debounced (~10s) PATCH of <code>currentIndex</code> /
+    <code>timeLeft</code> / <code>flags</code> whenever they change
+    (<strong>15.14</strong>); flush on <code>visibilitychange=hidden</code> via
+    <code>navigator.sendBeacon</code>.
+  </li>
+</ul>
+
+<h3>16.6 Backend changes</h3>
+<ul>
+  <li>
+    <strong>Summary endpoint</strong>: <code>GET /attempts?summary=1</code> returns
+    <code>{ examCode, lastScore, bestScore, lastAttemptAt, attemptCount }[]</code> — one cheap
+    fetch for the catalogue (<strong>15.9</strong>).
+  </li>
+  <li>
+    <strong>Per-attempt fetch</strong>: confirm <code>GET /attempts/:attemptId</code> exists (for
+    <code>/exams/:code/attempt/:attemptId</code> hydration); add if not.
+  </li>
+  <li>
+    <strong>Soft-abandon endpoint</strong>: <code>POST /attempts/:id/abandon</code> accepting
+    optional <code>{ reason }</code>. Transitions <code>status → 'abandoned'</code>, sets
+    <code>abandonedAt</code>, stores <code>abandonReason</code> on the row. Authed user must own
+    the attempt.
+  </li>
+  <li>
+    <strong>Schema extension</strong>: add <code>status: 'in-progress' | 'finished' | 'abandoned'</code>,
+    <code>abandonedAt?: string</code>, <code>abandonReason?: string</code> to the attempt type in
+    <code>attemptsStore.ts</code>. Keep <code>DELETE /attempts/:id</code> for admin / GDPR use —
+    user-facing Cancel no longer calls it.
+  </li>
+  <li>
+    <strong>Admin surface</strong>: aggregate abandon-reason counts by exam in <code>/metrics</code>
+    so you can see "SCS-C03 abandoned by 40 users, 60% cited <em>Too hard</em>".
+  </li>
+  <li>
+    Existing <code>GET /analytics/exam/:code/scores</code> stays — rename optional, the URL is
+    internal.
+  </li>
+</ul>
+
+<h3>16.7 Tie-ins</h3>
+<table>
+  <tbody>
+    <tr><td><strong>§8 SEO</strong></td><td><code>/exams/:code</code> becomes the real landing page for 8.4 (300-word copy) and 8.2 (<code>Course</code> schema).</td></tr>
+    <tr><td><strong>§14 Learning Plan</strong></td><td>Plan steps can deep-link: "continue your SAA-C03 attempts" → <code>/exams/SAA-C03/history</code>.</td></tr>
+    <tr><td><strong>§13.6 (9.4) Content hubs</strong></td><td>The per-exam YouTube walkthrough embeds naturally on <code>/exams/:code</code>, not on a picker page.</td></tr>
+    <tr><td><strong>§5 State management (ExamContext)</strong></td><td>Good forcing function to chip away at <code>ExamContext</code>'s 160 props — three separate pages don't each need all 160.</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>Build order.</strong> <strong>15.9</strong> (past scores on the catalogue) first — highest
+  user value, no new routes needed. Then <strong>15.1</strong>, <strong>15.3</strong>,
+  <strong>15.8</strong> as one release (move analytics content under <code>/exams/:code/history</code>,
+  remove sidebar entry, add redirect). <strong>15.2</strong> and <strong>15.4–15.7</strong> as a
+  second release — the URL split and the post-exam CTA rewrite. <strong>15.10</strong> trivial,
+  ship any time after.
+</div>
+
+<footer>
+  Generated dev guide · examapp monorepo · open in a browser for best rendering.
+</footer>
+
+</body>
+</html>
