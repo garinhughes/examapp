@@ -742,8 +742,9 @@ pnpm dev               # → http://localhost:5173</code></pre>
 <h3>Why Playwright fits examapp specifically</h3>
 <ul>
   <li>Backend already exposes <code>AUTH_MODE=dev</code> with <code>DEV_USER_ID / EMAIL / NAME</code> — tests boot as any identity without touching Cognito.</li>
-  <li>Tier differences come from <code>/entitlements</code> + an admin claim — <code>page.route()</code> can stub these per-test to flip between <code>visitor · registered · pro · pro_plus · admin</code> without DynamoDB writes.</li>
-  <li>Playwright’s parallel workers map naturally onto per-user-type fixtures (<code>asVisitor</code>, <code>asPro</code>, <code>asAdmin</code>).</li>
+  <li>Tier differences come from <code>/auth/me</code> + <code>/pricing</code> — <code>page.route()</code> stubs these per-test to flip between <code>visitor · registered · pro · pro_plus · admin</code> without DynamoDB writes.</li>
+  <li>Parallel workers map onto per-user-type fixtures (<code>asVisitor</code>, <code>asRegistered</code>, <code>asPaying</code>).</li>
+  <li><code>RATE_LIMIT_DISABLED=true</code> in the webServer command removes the 100 req/min IP bucket so parallel workers don’t 429 each other.</li>
 </ul>
 
 <figure class="diagram">
@@ -760,12 +761,12 @@ pnpm dev               # → http://localhost:5173</code></pre>
   <rect class="d-box-react" x="30"  y="30" width="180" height="80"/>
   <text class="d-text"    x="120" y="58"  text-anchor="middle">test fixture</text>
   <text class="d-text-sm" x="120" y="78"  text-anchor="middle">asVisitor · asRegistered</text>
-  <text class="d-text-sm" x="120" y="94"  text-anchor="middle">asPro · asAdmin</text>
+  <text class="d-text-sm" x="120" y="94"  text-anchor="middle">asPaying · asAdmin</text>
 
   <rect class="d-box-accent" x="270" y="30" width="200" height="80"/>
   <text class="d-text"    x="370" y="58"  text-anchor="middle">page.route() mocks</text>
   <text class="d-text-sm" x="370" y="78"  text-anchor="middle">/auth/config → devUser</text>
-  <text class="d-text-sm" x="370" y="94"  text-anchor="middle">/entitlements → tier</text>
+  <text class="d-text-sm" x="370" y="94"  text-anchor="middle">/auth/me + /pricing → tier</text>
 
   <rect class="d-box-react" x="530" y="30" width="190" height="80"/>
   <text class="d-text"    x="625" y="58"  text-anchor="middle">Vite dev server</text>
@@ -775,7 +776,7 @@ pnpm dev               # → http://localhost:5173</code></pre>
   <rect class="d-box-warn" x="770" y="30" width="170" height="80"/>
   <text class="d-text"    x="855" y="58"  text-anchor="middle">Fastify dev</text>
   <text class="d-text-sm" x="855" y="78"  text-anchor="middle">AUTH_MODE=dev</text>
-  <text class="d-text-sm" x="855" y="94"  text-anchor="middle">EXAM_SOURCE=local</text>
+  <text class="d-text-sm" x="855" y="94"  text-anchor="middle">RATE_LIMIT_DISABLED=true</text>
 
   <line x1="210" y1="70"  x2="270" y2="70"  stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrT)"/>
   <line x1="470" y1="70"  x2="530" y2="70"  stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arrT)"/>
@@ -784,69 +785,279 @@ pnpm dev               # → http://localhost:5173</code></pre>
   <!-- assertions lane -->
   <rect class="d-box" x="30"  y="160" width="910" height="70"/>
   <text class="d-text"    x="485" y="188" text-anchor="middle">assertions</text>
-  <text class="d-text-sm" x="485" y="208" text-anchor="middle">visible paywall · timer counts down · submit writes attempt · review shows score · PDF download resolves</text>
+  <text class="d-text-sm" x="485" y="208" text-anchor="middle">visible paywall · timer counts down · submit writes attempt · review shows score · lab step advances</text>
   <line x1="485" y1="110" x2="485" y2="160" stroke="var(--muted)" stroke-width="1.3" stroke-dasharray="5 4" marker-end="url(#arrTm)"/>
 </svg>
 <figcaption>Each test picks a user-tier fixture, which injects route mocks before navigation. The backend stays in <code>AUTH_MODE=dev</code> throughout.</figcaption>
 </figure>
 
-<h3>Suggested layout — <code>frontend/e2e/</code></h3>
+<h3>Live layout — <code>frontend/e2e/</code></h3>
 <pre><code>e2e/
-  playwright.config.ts         # webServer: pnpm dev (frontend) ; reuseExistingServer
+  playwright.config.ts         # fullyParallel; webServer boots both servers with RATE_LIMIT_DISABLED=true
   fixtures/
-    auth.ts                    # test.extend: asVisitor / asRegistered / asPro / asAdmin
-    api-mocks.ts               # page.route helpers for /auth/config, /entitlements
+    base.ts                    # test.extend: asVisitor / asRegistered / asPaying
   tests/
-    exam-flow.spec.ts          # registered user: start → answer → submit → review
-    exam-gated.spec.ts         # visitor hits paid exam → paywall; pro walks through
-    skill-lab-cli.spec.ts      # pro user: complete a CLI lab
-    admin-impersonation.spec.ts</code></pre>
+    exam-casual.spec.ts        # registered: navigate → setup → start → answer → submit → score
+    exam-gating.spec.ts        # visitor sees sign-up CTA; registered sees upgrade CTA
+    exam-resume.spec.ts        # save-for-later → banner → resume → attempt restored
+    exam-timed.spec.ts         # timed mode: timer visible, pause stops it, submit scores
+    lab-flow.spec.ts           # paying: command-terminal / cli / policy-fix runners end-to-end
+    lab-gating.spec.ts         # visitor can browse; locked lab → upgrade prompt; unlocked → Start Lab
+    lab-resume.spec.ts         # pause-and-exit → localStorage progress → resume notice</code></pre>
 
-<h3>Fixture sketch</h3>
-<pre><code>// e2e/fixtures/auth.ts
-import { test as base } from '@playwright/test'
+<h3>Actual fixture — <code>e2e/fixtures/base.ts</code></h3>
+<p>
+  The visitor fixture removes the dev user from <code>/auth/config</code> so <code>AuthContext</code> stays null.
+  Registered and paying fixtures mock <code>/auth/me</code> (tier + sub) and, for paying,
+  <code>/pricing</code> (entitlements). The backend runs as <code>dev-user-001</code> for all calls —
+  <strong>these mocks are frontend-only</strong>; backend entitlement checks still apply.
+</p>
+<pre><code>// e2e/fixtures/base.ts
+import { test as base, expect, type Page } from ‘@playwright/test’
 
-type Tier = 'visitor' | 'registered' | 'pro' | 'pro_plus' | 'admin'
-
-const mockTier = (tier: Tier) =&gt; async ({ page }, use) =&gt; {
-  await page.route('**/entitlements', (route) =&gt;
-    route.fulfill({ json: { tier, products: tier === 'pro' ? ['pro-annual'] : [] } }))
-  await page.route('**/auth/config', (route) =&gt;
-    route.fulfill({ json: { devUser: {
-      sub: `test-${tier}`, email: `${tier}@test.local`, name: tier,
-      isAdmin: tier === 'admin',
-    } } }))
-  await use(page)
+// visitor: /auth/config returns no devUser → AuthContext stays null
+async function mockVisitor(page: Page) {
+  await page.route(‘**/auth/config’, (route) =&gt;
+    route.fulfill({ json: { authMode: ‘dev’ } }))
 }
 
-export const test = base.extend&lt;{ asVisitor: void; asPro: void; asAdmin: void }&gt;({
-  asVisitor:   [mockTier('visitor'),   { auto: false }],
-  asPro:       [mockTier('pro'),       { auto: false }],
-  asAdmin:     [mockTier('admin'),     { auto: false }],
+// registered / paying: mock /auth/me and optionally /pricing
+async function mockTier(page: Page, tier: ‘registered’ | ‘pro’) {
+  const me = tier === ‘pro’
+    ? { tier: ‘pro’, sub: ‘test-paying-001’, email: ‘pro@test.local’, name: ‘Pro User’ }
+    : { tier: ‘registered’, sub: ‘test-reg-001’, email: ‘reg@test.local’, name: ‘Reg User’ }
+  await page.route(‘**/auth/me’, (route) =&gt; route.fulfill({ json: me }))
+  if (tier === ‘pro’) {
+    await page.route(‘**/pricing’, (route) =&gt; route.fulfill({
+      json: { tier: ‘pro’, entitlements: [‘sub:all-access’], products: [], tiers: [], discountActive: false }
+    }))
+  }
+}
+
+export const test = base.extend&lt;{ asVisitor: void; asRegistered: void; asPaying: void }&gt;({
+  asVisitor:    [async ({ page }, use) =&gt; { await mockVisitor(page); await use() }, { auto: false }],
+  asRegistered: [async ({ page }, use) =&gt; { await mockTier(page, ‘registered’); await use() }, { auto: false }],
+  asPaying:     [async ({ page }, use) =&gt; { await mockTier(page, ‘pro’); await use() }, { auto: false }],
 })</code></pre>
 
-<h3>Example flow test</h3>
-<pre><code>// e2e/tests/exam-flow.spec.ts
-import { test } from '../fixtures/auth'
-import { expect } from '@playwright/test'
+<h3>Example flow tests (correct locators)</h3>
+<pre><code>// QuestionCard renders custom &lt;button&gt; elements in &lt;ol class="list-none"&gt;
+// — there are NO radio or checkbox inputs.
+const firstChoice = (page: Page) =&gt; page.locator(‘ol.list-none li button’).first()
 
-test('pro user completes an exam and sees their score', async ({ page, asPro }) =&gt; {
-  await page.goto('/exams/aws-saa-c03')
-  await page.getByRole('button', { name: /start/i }).click()
-
-  for (let i = 0; i &lt; 5; i++) {
-    await page.getByRole('radio').first().check()
-    await page.getByRole('button', { name: /next|submit/i }).click()
-  }
-
-  await expect(page.getByText(/score/i)).toBeVisible()
-  await expect(page).toHaveURL(/review/)
+test(‘registered user starts exam and sees a choice’, async ({ page, asRegistered }) =&gt; {
+  await page.goto(‘/exams/AIF-C01’)
+  await page.getByRole(‘button’, { name: /start exam/i }).click()
+  await expect(page).toHaveURL(‘/exams/AIF-C01/attempt’)
+  await expect(firstChoice(page)).toBeVisible({ timeout: 10_000 })
 })
 
-test('visitor hits paywall on paid exam', async ({ page, asVisitor }) =&gt; {
-  await page.goto('/exams/aws-saa-c03')
-  await expect(page.getByText(/upgrade|subscribe|pro/i)).toBeVisible()
+test(‘visitor sees sign-up CTA on a limited exam’, async ({ page, asVisitor }) =&gt; {
+  await page.route(‘**/exams/AIF-C01/questions**’, (route) =&gt;
+    route.fulfill({ json: { tier: ‘visitor’, limited: true, questions: [], totalAvailable: 65 } }))
+  await page.goto(‘/exams/AIF-C01’)
+  // Target the button directly — the banner &lt;span&gt; also contains "free account" text
+  // and would cause a strict-mode violation with .or(getByText(...))
+  await expect(page.getByRole(‘button’, { name: ‘Sign up free’ })).toBeVisible()
 })</code></pre>
+
+<h3>Isolation patterns for shared-state tests</h3>
+<p>
+  Both exams and skill labs enforce <strong>one active session per user</strong>. All tests share
+  <code>dev-user-001</code> as the backend identity. Violations cause 409s, "another session active"
+  states, and flaky assertions. Two patterns fix this:
+</p>
+<dl>
+  <dt><strong>Mock the in-progress check</strong></dt>
+  <dd>
+    For tests that don’t need to assert resume state, prevent leftover sessions from other parallel
+    workers bleeding in:
+<pre><code>// exam tests that just need a clean setup page
+test.beforeEach(async ({ page }) =&gt; {
+  await page.route(‘**/attempts/in-progress**’, async (route) =&gt; {
+    if (route.request().method() === ‘GET’)
+      await route.fulfill({ json: { attempts: [] } })
+    else
+      await route.continue()
+  })
+})
+
+// lab tests: also cancel any real active session before each test
+test.beforeEach(async ({ page }) =&gt; {
+  const r = await page.request.get(‘http://localhost:3000/skill-labs/my-active-attempt’).catch(() =&gt; null)
+  if (r?.ok()) {
+    const d = await r.json().catch(() =&gt; ({}))
+    if (d?.active?.labId)
+      await page.request.post(
+        `http://localhost:3000/skill-labs/${encodeURIComponent(d.active.labId)}/attempt/cancel-active`
+      ).catch(() =&gt; {})
+  }
+})</code></pre>
+  </dd>
+  <dt><strong>Serial mode for stateful flows</strong></dt>
+  <dd>
+    For tests that <em>depend</em> on a persisted session (resume flows), use
+    <code>test.describe.configure({ mode: ‘serial’ })</code> at the top of the file.
+    Playwright serial mode runs tests sequentially in the same browser context per project —
+    localStorage and in-memory React state persist between tests, but each test still gets a
+    fresh <code>page</code>.
+<pre><code>// exam-resume.spec.ts — tests build on each other’s AIF-C01 attempt slot
+test.describe.configure({ mode: ‘serial’ })
+
+// lab-flow.spec.ts — one active lab at a time per user
+test.describe.configure({ mode: ‘serial’ })</code></pre>
+  </dd>
+</dl>
+
+<h3>Mocking skill lab endpoints correctly</h3>
+<p>
+  Two architectural details matter when mocking skill lab state for tests:
+</p>
+<ol>
+  <li>
+    <strong><code>SkillLabDetailPage</code> fetches the <em>list</em>, not the individual lab.</strong>
+    It calls <code>GET /skill-labs</code> and finds the lab by ID client-side.
+    Mocks must intercept the list endpoint — intercepting <code>/skill-labs/:id</code> alone has no effect on the detail page.
+<pre><code>// Intercept only the list, not sub-paths or session endpoints
+await page.route(‘**/skill-labs**’, async (route) =&gt; {
+  const url = new URL(route.request().url())
+  if (url.pathname === ‘/skill-labs’ &amp;&amp; route.request().method() === ‘GET’) {
+    await route.fulfill({ json: [{ ...labDefinition, locked: false }] })
+  } else {
+    await route.continue()
+  }
+})</code></pre>
+  </li>
+  <li>
+    <strong><code>SkillLabRunnerPage</code> fetches <code>GET /skill-labs/:id</code> individually.</strong>
+    In local dev (<code>SKILL_LAB_SOURCE=local</code>) this endpoint uses S3 and fails — it returns
+    <code>{ message: "..." }</code> for labs not in the showcase. The runner then shows "Unable to load
+    skill lab" rather than the terminal. Workaround: serve the full definition from the local JSON files
+    inside the mock:
+<pre><code>import * as fs from ‘fs’; import * as path from ‘path’
+
+function readLocalLabDef(labId: string): Record&lt;string, unknown&gt; | null {
+  const dir = path.join(process.cwd(), ‘../backend/data/skill-labs’)
+  for (const file of fs.readdirSync(dir)) {
+    if (!file.endsWith(‘.json’) || file === ‘providers.json’) continue
+    const labs = JSON.parse(fs.readFileSync(path.join(dir, file), ‘utf-8’))
+    const found = (Array.isArray(labs) ? labs : labs.labs ?? []).find(l =&gt; l.id === labId)
+    if (found) return found
+  }
+  return null
+}
+
+// In the unlockLab route handler (resourceType check prevents catching page.goto navigations):
+if (url.pathname === `/skill-labs/${labId}` &amp;&amp;
+    method === ‘GET’ &amp;&amp;
+    route.request().resourceType() !== ‘document’) {
+  const def = readLocalLabDef(labId)
+  await route.fulfill({ json: { ...(def ?? {}), locked: false } })
+}</code></pre>
+  </li>
+  <li>
+    <strong>Paid labs need session creation mocked too.</strong>
+    <code>asPaying</code> only mocks the frontend tier. The backend’s <code>POST /skill-labs/:id/attempt</code>
+    still enforces real entitlements against <code>dev-user-001</code>, which has none in local mode (no
+    DynamoDB). Labs not in the showcase return 403 and the runner never initialises. Mock the POST:
+<pre><code>if (url.pathname === `/skill-labs/${labId}/attempt` &amp;&amp; method === ‘POST’) {
+  await route.fulfill({
+    json: { attemptId: `test-${Date.now()}`, labId, mode: ‘casual’, timed: false, locked: false }
+  })
+}</code></pre>
+  </li>
+</ol>
+
+<h3>Playwright route LIFO ordering — a common trap</h3>
+<p>
+  Routes are matched in <strong>reverse registration order</strong> (last added wins). When a handler
+  calls <code>route.continue()</code>, the request goes to the <strong>network</strong> — it does
+  <em>not</em> fall through to an earlier handler. This means a broad glob added after a specific one
+  will shadow the specific one for overlapping URLs:
+</p>
+<pre><code>// beforeEach registers first:
+await page.route(‘**/skill-labs/my-active-attempt**’, handler_A)
+
+// then unlockLab registers second (checked FIRST by Playwright):
+await page.route(‘**/skill-labs**’, handler_B)
+
+// A request for /skill-labs/my-active-attempt hits handler_B first.
+// If handler_B calls route.continue(), it goes to the network — handler_A is NEVER called.
+// Fix: handle my-active-attempt explicitly inside handler_B.</code></pre>
+
+<h3>Known limitations of the current test setup</h3>
+<ul>
+  <li>
+    <strong>Backend entitlements are not tested end-to-end.</strong>
+    <code>asPaying</code> mocks the frontend only; the backend always runs as <code>dev-user-001</code>
+    with dev-mode entitlements. The real entitlement path (DynamoDB product lookup → tier resolution)
+    is only exercised against staging/prod. To close this gap, add a backend integration test that
+    posts a real <code>/skill-labs/:id/attempt</code> as an authenticated user with a known entitlement
+    record, or use seeded DynamoDB local.
+  </li>
+  <li>
+    <strong>Exam and lab answer order is deterministic in local mode</strong> but may be shuffled in
+    prod (if shuffling is ever added). Tests select answers by position (<code>.first()</code>) or by
+    text content — verify this holds if shuffling is introduced.
+  </li>
+  <li>
+    <strong>WebKit (mobile Safari) does not load the app.</strong>
+    <code>page.goto</code> throws "WebKit encountered an internal error" on all routes.
+    Likely cause: a JavaScript feature or module format that Vite’s dev server sends but WebKit’s
+    version in the installed Playwright bundle rejects. To investigate: run
+    <code>pnpm exec playwright test --project=mobile-safari --headed</code> and check the browser
+    console; look for ES2022+ syntax, top-level <code>await</code>, or missing <code>import.meta</code>
+    polyfills. This is an <strong>app compatibility gap</strong>, not a test configuration issue.
+  </li>
+  <li>
+    <strong>Timer UI is hidden on mobile viewports</strong> (<code>hidden sm:flex</code> —
+    only visible ≥ 640 px). Timer tests are skipped for mobile projects with
+    <code>test.skip((page.viewportSize()?.width ?? 0) &lt; 640, ‘Timer hidden on mobile’)</code>.
+    Consider surfacing the timer in a mobile-friendly position (e.g., the focus-mode compact bar
+    is already shown on mobile) or accepting the skip.
+  </li>
+  <li>
+    <strong>Cross-project parallelism still shares <code>dev-user-001</code>.</strong>
+    Desktop Chrome and Pixel 7 run the same spec file concurrently in separate worker processes,
+    both hitting the same Fastify instance. Serial mode within a file prevents within-project
+    conflicts, but two projects can still stomp on the same in-progress session.
+    The real fix is per-test user isolation: derive a unique <code>DEV_USER_ID</code> from
+    <code>testInfo.workerIndex</code> (passed as an env var to the webServer). This requires
+    backend support for multiple concurrent dev users.
+  </li>
+</ul>
+
+<h3>Testability improvements worth making</h3>
+<table>
+  <thead><tr><th>Change</th><th>Benefit</th><th>Effort</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Add a local fallback to <code>GET /skill-labs/:id</code></td>
+      <td>Runner page loads in local dev without needing a mock; removes the <code>readLocalLabDef</code> workaround from tests</td>
+      <td>Low — <code>skillLabStore.ts</code> already has local JSON reading; replicate the S3 path with a local fallback identical to the list endpoint</td>
+    </tr>
+    <tr>
+      <td><code>data-testid</code> on key interactive elements</td>
+      <td>Decouples tests from CSS classes and visual structure; locators survive UI refactors</td>
+      <td>Low — add <code>data-testid="choice-btn"</code> to <code>QuestionCard</code> choice <code>&lt;button&gt;</code>, <code>data-testid="lab-card"</code> already exists, extend to runner inputs</td>
+    </tr>
+    <tr>
+      <td>Per-test user isolation via <code>workerIndex</code></td>
+      <td>Eliminates all shared-state flakiness; enables truly parallel execution across all projects</td>
+      <td>Medium — backend needs to accept <code>DEV_USER_ID_${n}</code> or a range; webServer startup uses <code>PLAYWRIGHT_WORKER_INDEX</code> env var</td>
+    </tr>
+    <tr>
+      <td>Seed DynamoDB Local for integration tests</td>
+      <td>Tests the real entitlement path (product lookup → tier resolution) rather than mocking around it</td>
+      <td>Medium — add <code>docker-compose.test.yml</code> with DynamoDB Local; seed with known user/product records; toggle via <code>DYNAMO_ENDPOINT</code></td>
+    </tr>
+    <tr>
+      <td>Deterministic answer ordering via env var</td>
+      <td>If answer shuffling is ever added, tests selecting by <code>.first()</code> will break silently</td>
+      <td>Low — <code>SHUFFLE_ANSWERS=false</code> in dev/test webServer command; no-op in current code</td>
+    </tr>
+  </tbody>
+</table>
 
 <h3>Other testing layers (optional)</h3>
 <table>
@@ -860,20 +1071,25 @@ test('visitor hits paywall on paid exam', async ({ page, asVisitor }) =&gt; {
 </table>
 
 <div class="callout warn">
-  <strong>Mobile viewports matter.</strong> Mobile responsiveness is a hard project rule — configure Playwright <code>projects</code> for <code>Desktop Chrome</code>, <code>iPhone 13</code>, and <code>Pixel 7</code> so every flow runs on all three.
+  <strong>Mobile viewports matter.</strong> Desktop Chrome, iPhone 13, and Pixel 7 are all configured.
+  Note that some UI elements are hidden below 640 px by design (e.g., the timed-exam timer bar).
+  Confirm whether mobile users need equivalent access to those features before removing the skip guards.
 </div>
 <div class="callout">
-  <strong>Data hygiene:</strong> run with <code>AUTH_MODE=dev</code> and <code>EXAM_SOURCE=local</code>. Never point the test runner at a real AWS profile — a misfired <code>/admin/erasure</code> spec would wipe real users.
+  <strong>Data hygiene:</strong> run with <code>AUTH_MODE=dev</code> and <code>EXAM_SOURCE=local</code>. Never point the test runner at a real AWS profile — a misfired <code>/admin/erasure</code> spec would wipe real users. <code>backend/data/attempts.json</code> and <code>skill-lab-attempts.json</code> are gitignored; they accumulate test data and should not be committed.
 </div>
 
-<h3>Wire-up commands</h3>
+<h3>Run commands</h3>
 <pre><code>cd frontend
-pnpm add -D @playwright/test @axe-core/playwright
-pnpm exec playwright install --with-deps
-# add to package.json scripts:
-#   "test:e2e":      "playwright test"
-#   "test:e2e:ui":   "playwright test --ui"
-#   "test:e2e:debug":"PWDEBUG=1 playwright test"</code></pre>
+pnpm test:e2e          # parallel, all three projects (Chrome + iPhone 13 + Pixel 7)
+pnpm test:e2e:ui       # Playwright UI mode — trace viewer, step-through
+pnpm test:e2e:debug    # PWDEBUG=1 — step through with browser DevTools open
+
+# Chromium only (fastest, all 34 tests in ~18 s)
+pnpm exec playwright test --project=chromium
+
+# Single spec
+pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></pre>
 
 <h2 id="improvements">12. Roadmap to enterprise scale</h2>
 <p>
