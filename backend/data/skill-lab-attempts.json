@@ -837,13 +837,14 @@
     "correct": false,
     "timeTaken": 0,
     "createdAt": "2026-04-25T12:36:42.326Z",
-    "status": "in_progress",
+    "status": "cancelled",
     "startedAt": "2026-04-25T12:36:42.326Z",
-    "lastSavedAt": "2026-04-25T12:36:47.752Z",
+    "lastSavedAt": "2026-04-26T16:57:51.457Z",
     "progressState": {
       "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::*\"\n    }\n  ]\n}wdwdwd",
       "timeLeft": 600
-    }
+    },
+    "abandonedAt": "2026-04-26T16:57:51.457Z"
   },
   {
     "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
@@ -2452,5 +2453,110 @@
     },
     "timed": true,
     "completedAt": "2026-04-26T13:01:54.150Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "421bb825-3b34-4bb1-928b-cdd73266a14d",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T16:58:11.714Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T16:58:11.714Z",
+    "lastSavedAt": "2026-04-26T16:59:10.461Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "123456",
+      "timeLeft": 263
+    },
+    "timed": true,
+    "abandonedAt": "2026-04-26T16:59:10.461Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "8650f3b1-5743-4423-b076-9031b3b13b04",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T17:02:03.638Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T17:02:03.638Z",
+    "lastSavedAt": "2026-04-26T17:02:09.551Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "e",
+      "timeLeft": 298
+    },
+    "timed": true,
+    "abandonedAt": "2026-04-26T17:02:09.551Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "34e77a6c-bc6b-4d59-816b-0dd1ccdac1e8",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T17:02:14.794Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T17:02:14.794Z",
+    "lastSavedAt": "2026-04-26T17:02:35.512Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "123",
+      "timeLeft": 296
+    },
+    "timed": true,
+    "abandonedAt": "2026-04-26T17:02:35.512Z"
   }
 ]

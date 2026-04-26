@@ -45,10 +45,9 @@ function pathnameToRoute(pathname: string): AppRoute | null {
         const parts = rest.split('/')
         const labId = parts[0]
         if (!labId) return null
-        // /skill-labs/{id}/attempt/{mode} → runner
-        if (parts.length >= 2 && parts[1] === 'attempt') {
-          const mode = parts[2] === 'casual' ? 'casual' : 'timed'
-          return `skill-lab:${labId}:${mode}` as AppRoute
+        // /skill-labs/{id}/attempt → runner
+        if (parts.length === 2 && parts[1] === 'attempt') {
+          return `skill-lab:${labId}:timed` as AppRoute
         }
         // /skill-labs/{id} → detail page
         return `skill-lab-detail:${labId}` as AppRoute
@@ -148,13 +147,12 @@ export function useRouteSync(): void {
       if (location.pathname !== target) navigate(target, { replace: true })
       return
     }
-    // skill-lab runner: /skill-labs/:labId/attempt/:mode
+    // skill-lab runner: /skill-labs/:labId/attempt
     if (route.startsWith('skill-lab:')) {
       const parts = route.slice('skill-lab:'.length)
       const lastColon = parts.lastIndexOf(':')
       const labId = lastColon > 0 ? parts.slice(0, lastColon) : parts
-      const mode = lastColon > 0 ? parts.slice(lastColon + 1) : 'timed'
-      const target = `/skill-labs/${labId}/attempt/${mode}`
+      const target = `/skill-labs/${labId}/attempt`
       if (location.pathname !== target) navigate(target, { replace: true })
       return
     }
