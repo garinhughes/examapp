@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect } from 'react'
-import { useExam } from '@/exam/ExamContext'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import type { NetworkPathLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface NetworkPathProgress {
   checkedSteps: Record<string, boolean>
@@ -23,7 +24,16 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
 
   const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>(session.savedProgress?.checkedSteps ?? {})
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(session.savedProgress?.selectedAnswer ?? null)
+  const [checked, setChecked] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    setCheckedSteps({})
+    setSelectedAnswer(null)
+    setChecked(false)
+    setIsCorrect(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -31,34 +41,31 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
   }, [checkedSteps, selectedAnswer, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   const runCheck = useCallback((stepId: string) => {
-    if (session.submitted || checkedSteps[stepId] !== undefined) return
+    if (checked || checkedSteps[stepId] !== undefined) return
     const step = lab.steps.find((s) => s.id === stepId)
     if (!step) return
+    session.markDirty()
     setCheckedSteps((prev) => ({ ...prev, [stepId]: step.status === 'pass' }))
-  }, [session.submitted, checkedSteps, lab.steps])
+  }, [checked, checkedSteps, lab.steps])
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const correctAnswer = lab.answers.find((a) => a.correct)
     const correct = selectedAnswer === correctAnswer?.id
     setIsCorrect(correct)
-    await session.finalize(correct, selectedAnswer || '')
-  }, [lab, selectedAnswer, session.finalize])
+    setChecked(true)
+  }, [checked, lab, selectedAnswer])
+
+  const handleComplete = useCallback(async () => {
+    await session.finalize(isCorrect, selectedAnswer || '')
+  }, [session.finalize, selectedAnswer, isCorrect])
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal
-          title={lab.title}
-          timeTaken={session.timeLimit - session.timeLeft}
-          timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => session.setShowConfirmModal(false)}
-        />
-      )}
       <LabHeader
         title={lab.title}
         timed={timed}
@@ -67,7 +74,7 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
         labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ checkedSteps, selectedAnswer, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onRatingClose={() => setRoute('skill-labs')}
       />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
@@ -104,13 +111,13 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
           <p className="text-xs text-muted-foreground mb-4">Click each check to run the diagnostic and reveal its output. You decide where the failure lies.</p>
           <div className="space-y-2">
             {lab.steps.map((step) => {
-              const checked = checkedSteps[step.id]
-              const run = checked !== undefined
+              const stepChecked = checkedSteps[step.id]
+              const run = stepChecked !== undefined
               return (
                 <div key={step.id}>
                   <button
                     onClick={() => runCheck(step.id)}
-                    disabled={session.submitted || run}
+                    disabled={checked || run}
                     className={`w-full text-left px-3 py-2.5 rounded-md border text-sm transition ${
                       run
                         ? 'border-border bg-muted/40'
@@ -140,7 +147,7 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
           {lab.answers.map((answer) => {
             let cls = 'border border-border rounded-md px-4 py-2.5 text-sm text-left transition '
-            if (session.submitted) {
+            if (checked) {
               if (answer.correct) cls += 'border-green-500 bg-green-500/10 text-green-700 dark:text-green-400'
               else if (answer.id === selectedAnswer && !answer.correct) cls += 'border-destructive bg-destructive/10 text-destructive'
               else cls += 'bg-muted/30 text-muted-foreground'
@@ -150,32 +157,33 @@ export function NetworkPathRunner({ lab, timed = true }: Props) {
               cls += 'hover:bg-muted/50 cursor-pointer'
             }
             return (
-              <button key={answer.id} className={cls} disabled={session.submitted} onClick={() => !session.submitted && setSelectedAnswer(answer.id)}>
+              <button key={answer.id} className={cls} disabled={checked} onClick={() => { if (!checked) { session.markDirty(); setSelectedAnswer(answer.id) } }}>
                 {answer.text}
               </button>
             )
           })}
         </div>
-        {!session.submitted ? (
-          <button
-            className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!selectedAnswer}
-            onClick={() => session.setShowConfirmModal(true)}
-          >
-            Submit Answer
-          </button>
-        ) : (
+        {checked && (
           <div className="space-y-3">
-            <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+            <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+              {isCorrect ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+              {isCorrect ? 'Correct!' : 'Incorrect'}
             </div>
             <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
           </div>
         )}
       </div>
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={isCorrect}
+        submitted={session.submitted}
+        canCheck={!!selectedAnswer}
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

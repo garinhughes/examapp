@@ -587,5 +587,1870 @@
     "correct": false,
     "timeTaken": 36,
     "createdAt": "2026-04-20T07:29:53.277Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "88a0cec5-8ab9-4ca2-95ac-6563dda390b9",
+    "labId": "aws-write-s3-readonly-policy",
+    "labType": "code-fix",
+    "selectedAnswer": "gave-up",
+    "correct": false,
+    "timeTaken": 62,
+    "createdAt": "2026-04-25T11:20:59.606Z",
+    "status": "completed",
+    "startedAt": "2026-04-25T11:20:59.606Z",
+    "lastSavedAt": "2026-04-25T11:21:56.996Z",
+    "progressState": {
+      "code": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:*\",\n      \"Resource\": \"s3:getObject\"\n    }\n  ]\n}",
+      "timeLeft": 900
+    },
+    "completedAt": "2026-04-25T11:21:56.996Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "3c60433b-8686-48dd-b782-9d37259a3a06",
+    "labId": "aws-write-s3-readonly-policy",
+    "labType": "code-fix",
+    "selectedAnswer": "gave-up",
+    "correct": false,
+    "timeTaken": 2,
+    "createdAt": "2026-04-25T11:22:11.427Z",
+    "status": "completed",
+    "startedAt": "2026-04-25T11:22:11.427Z",
+    "lastSavedAt": "2026-04-25T11:22:11.471Z",
+    "progressState": {
+      "code": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+      "timeLeft": 900
+    },
+    "completedAt": "2026-04-25T11:22:11.471Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "ce133e2a-7001-477c-87cd-0bfe777404ec",
+    "labId": "aws-write-s3-readonly-policy",
+    "labType": "code-fix",
+    "selectedAnswer": "solved",
+    "correct": true,
+    "timeTaken": 10,
+    "createdAt": "2026-04-25T11:22:19.184Z",
+    "status": "completed",
+    "startedAt": "2026-04-25T11:22:19.184Z",
+    "lastSavedAt": "2026-04-25T11:22:28.356Z",
+    "progressState": {
+      "code": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"ReadSharedBucketObjects\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"s3:GetObject\",\n        \"s3:GetObjectVersion\"\n      ],\n      \"Resource\": \"arn:aws:s3:::shared-data-bucket/*\"\n    },\n    {\n      \"Sid\": \"ListSharedBucket\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::shared-data-bucket\"\n    },\n    {\n      \"Sid\": \"DenyAccountEnumeration\",\n      \"Effect\": \"Deny\",\n      \"Action\": \"s3:ListAllMyBuckets\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+      "timeLeft": 900
+    },
+    "completedAt": "2026-04-25T11:22:28.356Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "51741cc4-9bc2-46cd-b2e7-c21eebbccd21",
+    "labId": "aws-write-s3-readonly-policy",
+    "labType": "code-fix",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-25T11:23:28.480Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-25T11:23:28.480Z",
+    "lastSavedAt": "2026-04-25T11:23:52.462Z",
+    "progressState": {
+      "code": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}awdwadawdawd",
+      "timeLeft": 900
+    },
+    "abandonedAt": "2026-04-25T11:23:52.462Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "d47ff11f-3100-4217-910a-50129256cb69",
+    "labId": "aws-write-s3-readonly-policy",
+    "labType": "code-fix",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-25T11:24:12.578Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-25T11:24:12.578Z",
+    "lastSavedAt": "2026-04-25T11:25:34.887Z",
+    "progressState": {
+      "code": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:*\",\n      \"Resource\": \"*\"\n    }\n  ]wadwad\n}",
+      "timeLeft": 900
+    },
+    "abandonedAt": "2026-04-25T11:25:34.887Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "09ab2e91-8e22-49a7-9663-d79f4bfa46e6",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-25T11:26:51.214Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-25T11:26:51.214Z",
+    "lastSavedAt": "2026-04-25T11:27:03.666Z",
+    "progressState": {
+      "stepIndex": 1,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "[root@rhel10 ~]# dnf install -y nginx"
+        },
+        {
+          "kind": "output",
+          "text": "Installed:"
+        },
+        {
+          "kind": "output",
+          "text": "  nginx-1.24.0-4.el10.x86_64"
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "output",
+          "text": "Complete!"
+        },
+        {
+          "kind": "success",
+          "text": "✓ Step 1 complete. The next step is available above."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [
+        "dnf install -y nginx"
+      ],
+      "timeLeft": 300
+    },
+    "abandonedAt": "2026-04-25T11:27:03.666Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "0d0346df-15dc-4419-922b-9b44a24101d5",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-25T11:27:10.837Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-25T11:27:10.837Z",
+    "lastSavedAt": "2026-04-25T11:27:16.439Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "[root@rhel10 ~]# dnf"
+        },
+        {
+          "kind": "error",
+          "text": "Missing required argument: install                        install a package"
+        },
+        {
+          "kind": "info",
+          "text": "# Try again. Use `dnf --help` to list available flags."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [
+        "dnf"
+      ],
+      "timeLeft": 300
+    },
+    "abandonedAt": "2026-04-25T11:27:16.439Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "365d331f-ee79-433e-833f-55dff8336dad",
+    "labId": "aws-s3-iam-policy-fix",
+    "labType": "policy-fix",
+    "selectedAnswer": "gave-up",
+    "correct": false,
+    "timeTaken": 8,
+    "createdAt": "2026-04-25T11:28:54.585Z",
+    "status": "completed",
+    "startedAt": "2026-04-25T11:28:54.585Z",
+    "lastSavedAt": "2026-04-25T11:28:54.617Z",
+    "progressState": {
+      "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::*\"\n    }\n  ]\n}",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-25T11:28:54.617Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "51bb9f09-d150-44c9-96ed-e934992c8f20",
+    "labId": "aws-s3-iam-policy-fix",
+    "labType": "policy-fix",
+    "selectedAnswer": "solved",
+    "correct": true,
+    "timeTaken": 7,
+    "createdAt": "2026-04-25T11:29:06.968Z",
+    "status": "completed",
+    "startedAt": "2026-04-25T11:29:06.968Z",
+    "lastSavedAt": "2026-04-25T11:29:08.229Z",
+    "progressState": {
+      "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\"s3:GetObject\", \"s3:PutObject\"],\n      \"Resource\": \"arn:aws:s3:::my-app-bucket/*\"\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::my-app-bucket\"\n    }\n  ]\n}",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-25T11:29:08.229Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "873c3111-86b9-4a33-91a2-37ada890aee2",
+    "labId": "aws-s3-iam-policy-fix",
+    "labType": "policy-fix",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-25T12:36:42.326Z",
+    "status": "in_progress",
+    "startedAt": "2026-04-25T12:36:42.326Z",
+    "lastSavedAt": "2026-04-25T12:36:47.752Z",
+    "progressState": {
+      "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:GetObject\",\n      \"Resource\": \"arn:aws:s3:::*\"\n    }\n  ]\n}wdwdwd",
+      "timeLeft": 600
+    }
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "f40dd383-d4c6-4bf9-98ad-c46962da194f",
+    "labId": "aws-cloudfront-403",
+    "labType": "network-path",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-25T13:03:11.056Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-25T13:03:11.056Z",
+    "lastSavedAt": "2026-04-26T08:36:44.294Z",
+    "progressState": {
+      "checkedSteps": {
+        "client": true
+      },
+      "selectedAnswer": "route53",
+      "timeLeft": 300
+    },
+    "abandonedAt": "2026-04-26T08:36:44.294Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "7e499018-3c3d-43f3-8526-363771b33332",
+    "labId": "aws-cloudfront-403",
+    "labType": "network-path",
+    "selectedAnswer": "cache",
+    "correct": false,
+    "timeTaken": 33,
+    "createdAt": "2026-04-26T08:37:12.453Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T08:37:12.453Z",
+    "lastSavedAt": "2026-04-26T08:37:24.540Z",
+    "progressState": {
+      "checkedSteps": {
+        "client": true,
+        "cloudfront": true,
+        "oac-config": true,
+        "s3": false
+      },
+      "selectedAnswer": null,
+      "timeLeft": 300
+    },
+    "completedAt": "2026-04-26T08:37:24.540Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "e4a69f17-cdaf-4483-bd50-2b263451df6c",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 18,
+    "createdAt": "2026-04-26T08:38:19.004Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T08:38:19.004Z",
+    "lastSavedAt": "2026-04-26T08:38:25.202Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "dynamo-throttle",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-26T08:38:25.202Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "509d4361-6b79-4d44-a503-6aa780f5b94a",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 21,
+    "createdAt": "2026-04-26T08:42:00.867Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T08:42:00.867Z",
+    "lastSavedAt": "2026-04-26T08:49:01.351Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "dynamo-throttle",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-26T08:49:01.351Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "e41f27eb-e5cf-448b-b054-06a39dd402b0",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 3,
+    "createdAt": "2026-04-26T08:49:14.916Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T08:49:14.916Z",
+    "lastSavedAt": "2026-04-26T08:50:01.001Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "auth-delay",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-26T08:50:01.001Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "3937e340-481c-482f-8f45-8c25260b2730",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 3,
+    "createdAt": "2026-04-26T08:50:55.388Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T08:50:55.388Z",
+    "lastSavedAt": "2026-04-26T08:51:11.047Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "cold-start",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-26T08:51:11.047Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "7fc28657-6c44-49a5-968b-424673119b46",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 5,
+    "createdAt": "2026-04-26T08:52:10.073Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T08:52:10.073Z",
+    "lastSavedAt": "2026-04-26T08:52:12.991Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "dynamo-throttle",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-26T08:52:12.991Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "2a43a780-e7fd-42c9-830c-4ba910b93008",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "slow-query",
+    "correct": false,
+    "timeTaken": 7,
+    "createdAt": "2026-04-26T08:52:24.541Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T08:52:24.541Z",
+    "lastSavedAt": "2026-04-26T08:52:29.909Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "slow-query",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-26T08:52:29.909Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "6b494bed-0650-44bb-9572-3a4031a629c3",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 5,
+    "createdAt": "2026-04-26T08:53:16.312Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T08:53:16.312Z",
+    "lastSavedAt": "2026-04-26T08:53:19.727Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "dynamo-throttle",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-26T08:53:19.727Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "48d9d266-3c4b-4de3-8598-b86aec87bd45",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "cold-start",
+    "correct": false,
+    "timeTaken": 10,
+    "createdAt": "2026-04-26T08:55:55.041Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T08:55:55.041Z",
+    "lastSavedAt": "2026-04-26T08:56:03.633Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "cold-start",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-26T08:56:03.633Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "6cc94e58-6080-4dc0-8528-41aa4a120d8e",
+    "labId": "anthropic-diagnose-cache-miss",
+    "labType": "network-path",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T08:59:08.444Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T08:59:08.444Z",
+    "lastSavedAt": "2026-04-26T10:10:55.177Z",
+    "progressState": {
+      "checkedSteps": {
+        "client": true
+      },
+      "selectedAnswer": null,
+      "timeLeft": 600
+    },
+    "abandonedAt": "2026-04-26T10:10:55.177Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "cf543a63-e01f-4a94-9df2-845492acb76a",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "gave-up@step2",
+    "correct": false,
+    "timeTaken": 8,
+    "createdAt": "2026-04-26T09:01:24.050Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T09:01:24.050Z",
+    "lastSavedAt": "2026-04-26T09:01:26.230Z",
+    "progressState": {
+      "stepIndex": 1,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "[root@rhel10 ~]# dnf install -y nginx"
+        },
+        {
+          "kind": "output",
+          "text": "Installed:"
+        },
+        {
+          "kind": "output",
+          "text": "  nginx-1.24.0-4.el10.x86_64"
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "output",
+          "text": "Complete!"
+        },
+        {
+          "kind": "success",
+          "text": "✓ Step 1 complete. The next step is available above."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [
+        "dnf install -y nginx"
+      ],
+      "timeLeft": 300
+    },
+    "completedAt": "2026-04-26T09:01:26.230Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "d6b010c6-c4ae-486a-b805-9974ce968016",
+    "labId": "aws-cloudfront-403",
+    "labType": "network-path",
+    "selectedAnswer": "tls",
+    "correct": false,
+    "timeTaken": 4,
+    "createdAt": "2026-04-26T09:31:53.114Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T09:31:53.114Z",
+    "lastSavedAt": "2026-04-26T09:32:12.698Z",
+    "progressState": {
+      "checkedSteps": {
+        "client": true
+      },
+      "selectedAnswer": "cache",
+      "timeLeft": 300
+    },
+    "completedAt": "2026-04-26T09:32:12.698Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "e56c9624-385f-416a-8c96-36e171ab973b",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "gave-up@step1",
+    "correct": false,
+    "timeTaken": 17,
+    "createdAt": "2026-04-26T09:32:36.977Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T09:32:36.977Z",
+    "lastSavedAt": "2026-04-26T09:32:37.025Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "timeLeft": 300
+    },
+    "completedAt": "2026-04-26T09:32:37.025Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "697bd7bb-3e1b-4b65-b0fb-7eb83b4ccd44",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T09:35:50.775Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T09:35:50.775Z",
+    "lastSavedAt": "2026-04-26T09:35:52.188Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "cold-start",
+      "timeLeft": 600
+    },
+    "abandonedAt": "2026-04-26T09:35:52.188Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "ba83845c-b31c-4f76-9dc4-800cb81348c6",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "dynamo-throttle",
+    "correct": true,
+    "timeTaken": 4,
+    "createdAt": "2026-04-26T09:35:59.862Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T09:35:59.862Z",
+    "lastSavedAt": "2026-04-26T09:36:06.965Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "slow-query",
+      "timeLeft": 600
+    },
+    "completedAt": "2026-04-26T09:36:06.965Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "a675ef19-07fb-46b0-84ad-eafabe01bdb4",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "gave-up@step2",
+    "correct": false,
+    "timeTaken": 148,
+    "createdAt": "2026-04-26T09:37:45.887Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T09:37:45.887Z",
+    "lastSavedAt": "2026-04-26T09:38:49.180Z",
+    "progressState": {
+      "stepIndex": 1,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "[root@rhel10 ~]# dnf install -y nginx"
+        },
+        {
+          "kind": "output",
+          "text": "Installed:"
+        },
+        {
+          "kind": "output",
+          "text": "  nginx-1.24.0-4.el10.x86_64"
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "output",
+          "text": "Complete!"
+        },
+        {
+          "kind": "success",
+          "text": "✓ Step 1 complete. The next step is available above."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [
+        "dnf install -y nginx"
+      ],
+      "timeLeft": 300
+    },
+    "completedAt": "2026-04-26T09:38:49.180Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "2b3a934d-0424-4fd4-9d6b-f36f449f90c8",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "gave-up@step1",
+    "correct": false,
+    "timeTaken": 18,
+    "createdAt": "2026-04-26T09:41:24.262Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T09:41:24.262Z",
+    "lastSavedAt": "2026-04-26T09:41:38.688Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "[root@rhel10 ~]# dnf"
+        },
+        {
+          "kind": "error",
+          "text": "Missing required argument: install                        install a package"
+        },
+        {
+          "kind": "info",
+          "text": "# Try again. Use `dnf --help` to list available flags."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [
+        "dnf"
+      ],
+      "timeLeft": 300
+    },
+    "completedAt": "2026-04-26T09:41:38.688Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "62be40f8-cf1d-4b55-82b3-decf2c7d7699",
+    "labId": "rhel-nginx-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "gave-up@step1",
+    "correct": false,
+    "timeTaken": 8,
+    "createdAt": "2026-04-26T09:44:34.869Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T09:44:34.869Z",
+    "lastSavedAt": "2026-04-26T09:44:59.477Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "[root@rhel10 ~]# ikm"
+        },
+        {
+          "kind": "error",
+          "text": "Expected the command to start with `dnf`."
+        },
+        {
+          "kind": "info",
+          "text": "# Try again. Use `dnf --help` to list available flags."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [
+        "ikm"
+      ],
+      "timeLeft": 300
+    },
+    "completedAt": "2026-04-26T09:44:59.477Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "698e9241-cd32-4bad-8a74-85e9eea35c64",
+    "labId": "comptia-phishing-email-headers-log-analysis",
+    "labType": "log-analysis",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T09:45:13.081Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T09:45:13.081Z",
+    "lastSavedAt": "2026-04-26T09:46:01.886Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "a1",
+      "timeLeft": 300
+    },
+    "abandonedAt": "2026-04-26T09:46:01.886Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "efe2d253-ff1f-4983-abca-cb1558820339",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T09:46:07.258Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T09:46:07.258Z",
+    "lastSavedAt": "2026-04-26T09:46:13.576Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "cold-start",
+      "timeLeft": 600
+    },
+    "abandonedAt": "2026-04-26T09:46:13.576Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "9617e962-5f50-4fbc-8063-5c7f08e473b0",
+    "labId": "comptia-phishing-email-headers-log-analysis",
+    "labType": "log-analysis",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T09:46:43.774Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T09:46:43.774Z",
+    "lastSavedAt": "2026-04-26T09:48:37.910Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "a1",
+      "timeLeft": 300
+    },
+    "abandonedAt": "2026-04-26T09:48:37.910Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "c635afd3-8126-458a-a8b9-eda7643a5992",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T09:48:44.443Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T09:48:44.443Z",
+    "lastSavedAt": "2026-04-26T09:48:51.710Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "dynamo-throttle",
+      "timeLeft": 600
+    },
+    "abandonedAt": "2026-04-26T09:48:51.710Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "9ccf1686-e951-4f72-94ea-f0bb02c17790",
+    "labId": "aws-lambda-timeout-logs",
+    "labType": "log-analysis",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T09:48:55.338Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T09:48:55.338Z",
+    "lastSavedAt": "2026-04-26T10:09:57.604Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "auth-delay",
+      "timeLeft": 600
+    },
+    "abandonedAt": "2026-04-26T10:09:57.604Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "3167451a-c353-4500-8411-6d60e09475a5",
+    "labId": "comptia-phishing-email-headers-log-analysis",
+    "labType": "log-analysis",
+    "selectedAnswer": "a3",
+    "correct": true,
+    "timeTaken": 12,
+    "createdAt": "2026-04-26T09:49:26.396Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T09:49:26.396Z",
+    "lastSavedAt": "2026-04-26T09:55:20.787Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "a3",
+      "timeLeft": 300
+    },
+    "completedAt": "2026-04-26T09:55:20.787Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "f63023bf-143a-4831-a3f5-524023e978c6",
+    "labId": "comptia-phishing-email-headers-log-analysis",
+    "labType": "log-analysis",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T09:55:27.376Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T09:55:27.376Z",
+    "lastSavedAt": "2026-04-26T09:55:35.187Z",
+    "progressState": {
+      "highlightedLines": [],
+      "selectedAnswer": "a4",
+      "timeLeft": 300
+    },
+    "abandonedAt": "2026-04-26T09:55:35.187Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "2006c6a8-fe03-4056-b7e5-e1ee87a5d0bc",
+    "labId": "rhel-apache-phased-pipeline",
+    "labType": "phased-pipeline",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T10:45:32.156Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T10:45:32.156Z",
+    "lastSavedAt": "2026-04-26T10:45:39.003Z",
+    "progressState": {
+      "containers": {
+        "pool": [
+          "s7",
+          "s4",
+          "s9",
+          "s8",
+          "s3",
+          "s1",
+          "s2",
+          "s6",
+          "s5"
+        ],
+        "prepare": [
+          "s10"
+        ],
+        "install": [],
+        "configure": [],
+        "harden": []
+      },
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T10:45:39.003Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "7fa4e930-eb38-40b9-bd6e-55c2b50620dd",
+    "labId": "aws-s3-crr-setup-terminal-replay",
+    "labType": "terminal-replay",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T10:45:55.758Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T10:45:55.758Z",
+    "lastSavedAt": "2026-04-26T10:46:38.270Z",
+    "progressState": {
+      "pool": [
+        "c5",
+        "d1",
+        "d3",
+        "c1"
+      ],
+      "queue": [
+        "c6",
+        "c3",
+        "c4",
+        "c2",
+        "d2"
+      ],
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T10:46:38.270Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "10e950d1-fd63-4fcd-a749-fbdf77847e1d",
+    "labId": "anthropic-fill-claude-md-hierarchy",
+    "labType": "fill-command",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T10:46:53.882Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T10:46:53.882Z",
+    "lastSavedAt": "2026-04-26T10:48:13.830Z",
+    "progressState": {
+      "answers": {
+        "q1:b1": "hi"
+      },
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T10:48:13.830Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "5b580193-12ff-4374-9841-4d2770daa8d0",
+    "labId": "anthropic-fill-claude-md-hierarchy",
+    "labType": "fill-command",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T10:50:26.157Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T10:50:26.157Z",
+    "lastSavedAt": "2026-04-26T10:50:48.023Z",
+    "progressState": {
+      "answers": {
+        "q1:b1": "1"
+      },
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T10:50:48.023Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "85cac4b1-05fd-4098-b64d-c84623630877",
+    "labId": "anthropic-fill-claude-md-hierarchy",
+    "labType": "fill-command",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T10:50:59.372Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T10:50:59.372Z",
+    "lastSavedAt": "2026-04-26T10:53:01.109Z",
+    "progressState": {
+      "answers": {
+        "q1:b1": ""
+      },
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T10:53:01.109Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "34ef1ce2-b690-40bb-92a5-b67999a00328",
+    "labId": "rhel-user-mgmt-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T11:43:14.384Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T11:43:14.384Z",
+    "lastSavedAt": "2026-04-26T11:45:03.656Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "1222",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T11:45:03.656Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "9ada20d3-a945-43d7-8de2-0afb83ae0ee9",
+    "labId": "rhel-user-mgmt-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T11:45:07.592Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T11:45:07.592Z",
+    "lastSavedAt": "2026-04-26T11:46:45.630Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "1",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T11:46:45.630Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "5bac4c99-a2c3-49c7-ad35-db0abb82c0ac",
+    "labId": "rhel-user-mgmt-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T11:46:51.483Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T11:46:51.483Z",
+    "lastSavedAt": "2026-04-26T11:47:02.500Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "waawdwaaaaa",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T11:47:02.500Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "fb2478ba-c18b-455e-ae1d-a52761391be5",
+    "labId": "rhel-user-mgmt-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:00:04.807Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:00:04.807Z",
+    "lastSavedAt": "2026-04-26T12:00:25.526Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "h",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:00:25.526Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "6423430e-ead1-4677-afdd-e5fe7fe65af5",
+    "labId": "rhel-user-mgmt-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:00:31.069Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:00:31.069Z",
+    "lastSavedAt": "2026-04-26T12:00:33.121Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "1",
+      "timeLeft": 600
+    },
+    "timed": true,
+    "abandonedAt": "2026-04-26T12:00:33.121Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "50621fb5-13de-4a62-851b-cf80674f2c67",
+    "labId": "rhel-user-mgmt-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:00:36.002Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:00:36.002Z",
+    "lastSavedAt": "2026-04-26T12:02:26.516Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "wa",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:02:26.516Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "4b1e7dbf-be53-4bd6-834a-5c82467da259",
+    "labId": "rhel-user-mgmt-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:10:05.432Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T12:10:05.432Z",
+    "lastSavedAt": "2026-04-26T12:11:56.188Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "1233344444444445555555511111111222",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:11:56.188Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "d7c4557f-7841-44fb-9efb-ae79967220c1",
+    "labId": "comptia-smb-enum-terminal-replay",
+    "labType": "terminal-replay",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:12:04.860Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:12:04.860Z",
+    "lastSavedAt": "2026-04-26T12:15:34.728Z",
+    "progressState": {
+      "pool": [
+        "c4",
+        "c2"
+      ],
+      "queue": [
+        "d3",
+        "c3",
+        "d2",
+        "c1",
+        "d1"
+      ],
+      "timeLeft": 300
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:15:34.728Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "6fd982f7-776e-42a5-bf4f-c77f8b007e7a",
+    "labId": "rhel-apache-phased-pipeline",
+    "labType": "phased-pipeline",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:15:43.205Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:15:43.205Z",
+    "lastSavedAt": "2026-04-26T12:15:46.707Z",
+    "progressState": {
+      "containers": {
+        "pool": [
+          "s7",
+          "s4",
+          "s9",
+          "s8",
+          "s3",
+          "s1",
+          "s2",
+          "s6",
+          "s5"
+        ],
+        "prepare": [
+          "s10"
+        ],
+        "install": [],
+        "configure": [],
+        "harden": []
+      },
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:15:46.707Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "40e93541-d95f-4975-b078-4ec005e20588",
+    "labId": "anthropic-fill-claude-md-hierarchy",
+    "labType": "fill-command",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:15:56.391Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:15:56.391Z",
+    "lastSavedAt": "2026-04-26T12:16:17.155Z",
+    "progressState": {
+      "answers": {
+        "q1:b1": ""
+      },
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:16:17.155Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "a4e52d4e-3c57-4f10-84d0-8813904bebe0",
+    "labId": "comptia-smb-enum-terminal-replay",
+    "labType": "terminal-replay",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:16:27.579Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T12:16:27.579Z",
+    "lastSavedAt": "2026-04-26T12:16:56.125Z",
+    "progressState": {
+      "pool": [
+        "d2",
+        "c1",
+        "c3",
+        "c2"
+      ],
+      "queue": [
+        "d1",
+        "c4",
+        "d3"
+      ],
+      "timeLeft": 300
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:16:56.125Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "9ec77f3f-e135-4ffa-b48b-28cb138d2b41",
+    "labId": "anthropic-fix-agent-definition-task-tool",
+    "labType": "policy-fix",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:17:18.772Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:17:18.772Z",
+    "lastSavedAt": "2026-04-26T12:19:29.323Z",
+    "progressState": {
+      "policy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"WebSearch\",\n    \"FileRead\"\n  ],\n  \"Task\": \"spawn-subagents\"\n}",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:19:29.323Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "242b2ae8-78b9-4f29-b62e-a7fc7fabf501",
+    "labId": "anthropic-fix-agent-definition-task-tool",
+    "labType": "policy-fix",
+    "selectedAnswer": "solved",
+    "correct": true,
+    "timeTaken": 60,
+    "createdAt": "2026-04-26T12:20:22.746Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T12:20:22.746Z",
+    "lastSavedAt": "2026-04-26T12:37:00.304Z",
+    "progressState": {
+      "policy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"WebSearch\",\n    \"FileRead\",\n    \"Task\"\n  ]\n}",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "completedAt": "2026-04-26T12:37:00.304Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "8caadd6e-c172-445e-ad0f-05604d8ec61b",
+    "labId": "anthropic-fix-agent-definition-task-tool",
+    "labType": "policy-fix",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:54:57.081Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:54:57.081Z",
+    "lastSavedAt": "2026-04-26T12:55:10.456Z",
+    "progressState": {
+      "policy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"WebSearch\",\n    \"Task\",\n    \"FileRead\"\n  ]\n}",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:55:10.456Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "88cc931a-ccd4-46e9-ae8e-d297d27b9306",
+    "labId": "anthropic-fix-agent-definition-task-tool",
+    "labType": "policy-fix",
+    "selectedAnswer": "gave-up",
+    "correct": false,
+    "timeTaken": 18,
+    "createdAt": "2026-04-26T12:55:23.611Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T12:55:23.611Z",
+    "lastSavedAt": "2026-04-26T12:55:31.357Z",
+    "progressState": {
+      "policy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"Task\",\n    \"WebSearch\",\n    \"FileRead\"\n  ]\n}",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "completedAt": "2026-04-26T12:55:31.357Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "e5cd7a5c-b395-4ff8-a331-d80c74c134e7",
+    "labId": "anthropic-fill-claude-md-hierarchy",
+    "labType": "fill-command",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:55:51.748Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:55:51.748Z",
+    "lastSavedAt": "2026-04-26T12:56:31.791Z",
+    "progressState": {
+      "answers": {
+        "q1:b1": "a",
+        "q2:b2": "b",
+        "q3:b3": "c"
+      },
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:56:31.791Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "bd1bfd48-2eaf-4a76-8f12-62366df1b814",
+    "labId": "comptia-tshark-pcap-analysis-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:56:47.690Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T12:56:47.690Z",
+    "lastSavedAt": "2026-04-26T12:58:12.291Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "┌──(kali㉿kali)-[~]\n└─$ l"
+        },
+        {
+          "kind": "error",
+          "text": "Expected the command to start with `tshark`."
+        },
+        {
+          "kind": "info",
+          "text": "# Try again. Use `tshark --help` to list available flags."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "┌──(kali㉿kali)-[~]\n└─$ tshark -h"
+        },
+        {
+          "kind": "error",
+          "text": "Missing required argument: -r <infile>                    read packet data from infile"
+        },
+        {
+          "kind": "info",
+          "text": "# Try again. Use `tshark --help` to list available flags."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "┌──(kali㉿kali)-[~]\n└─$ tshark --help"
+        },
+        {
+          "kind": "output",
+          "text": "Usage: tshark [OPTIONS] ..."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "output",
+          "text": "Options:"
+        },
+        {
+          "kind": "output",
+          "text": "  -T pdml|ps|psml|json|jsonraw|ek|tabs|text|fields   format of text output"
+        },
+        {
+          "kind": "output",
+          "text": "  -V                             add packet tree information to the output (verbose)"
+        },
+        {
+          "kind": "output",
+          "text": "  -Y <display filter>            packet display filter in Wireshark display filter syntax"
+        },
+        {
+          "kind": "output",
+          "text": "  -e <field>                     field to print (repeatable)"
+        },
+        {
+          "kind": "output",
+          "text": "  -e <field>                     field to print (repeatable)"
+        },
+        {
+          "kind": "output",
+          "text": "  -e <field>                     field to print (repeatable)"
+        },
+        {
+          "kind": "output",
+          "text": "  -f <capture filter>            capture filter in libpcap syntax (for live capture only)"
+        },
+        {
+          "kind": "output",
+          "text": "  -q                             quiet - do not print packets, print summary only"
+        },
+        {
+          "kind": "output",
+          "text": "  -r <infile>                    read packet data from infile"
+        },
+        {
+          "kind": "output",
+          "text": "  -x                             add hex and ASCII dump to the output"
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "info",
+          "text": "# Only a subset of these flags is required for the current task."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "┌──(kali㉿kali)-[~]\n└─$ tshark -r capture.pcap"
+        },
+        {
+          "kind": "error",
+          "text": "Missing required argument: -Y <display filter>            packet display filter in Wireshark display filter syntax"
+        },
+        {
+          "kind": "info",
+          "text": "# Try again. Use `tshark --help` to list available flags."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "┌──(kali㉿kali)-[~]\n└─$ tshark -r capture.pcap -Y"
+        },
+        {
+          "kind": "error",
+          "text": "Missing required argument: -Y <display filter>            packet display filter in Wireshark display filter syntax"
+        },
+        {
+          "kind": "info",
+          "text": "# Try again. Use `tshark --help` to list available flags."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        },
+        {
+          "kind": "input",
+          "text": "┌──(kali㉿kali)-[~]\n└─$ tshark -r capture.pcap -Y ip.src,http.host,http.request.uri"
+        },
+        {
+          "kind": "error",
+          "text": "Missing required argument: -Y <display filter>            packet display filter in Wireshark display filter syntax"
+        },
+        {
+          "kind": "info",
+          "text": "# Try again. Use `tshark --help` to list available flags."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [
+        "l",
+        "tshark -h",
+        "tshark --help",
+        "tshark -r capture.pcap",
+        "tshark -r capture.pcap -Y",
+        "tshark -r capture.pcap -Y ip.src,http.host,http.request.uri"
+      ],
+      "input": "",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:58:12.291Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "e47bd00b-9ceb-4633-915e-5accd11174c3",
+    "labId": "anthropic-fix-agent-definition-task-tool",
+    "labType": "policy-fix",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:58:31.397Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:58:31.397Z",
+    "lastSavedAt": "2026-04-26T12:58:46.416Z",
+    "progressState": {
+      "policy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"Task\",\n    \"WebSearch\",\n    \"FileRead\"\n  ]\n}",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:58:46.416Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "0e845100-c373-41f6-a13e-393ca495d9c4",
+    "labId": "comptia-tshark-pcap-analysis-command-terminal",
+    "labType": "command-terminal",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:58:52.196Z",
+    "status": "cancelled",
+    "startedAt": "2026-04-26T12:58:52.196Z",
+    "lastSavedAt": "2026-04-26T12:59:34.634Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "wada",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T12:59:34.634Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "e1d153e0-4a06-4609-86fa-8fbf4993e7b3",
+    "labId": "anthropic-fix-agent-definition-task-tool",
+    "labType": "policy-fix",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T12:59:59.975Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T12:59:59.975Z",
+    "lastSavedAt": "2026-04-26T13:00:17.892Z",
+    "progressState": {
+      "policy": "{\n  \"name\": \"Research Coordinator\",\n  \"description\": \"Coordinates research tasks by delegating to specialist subagents\",\n  \"model\": \"claude-opus-4-6\",\n  \"system\": \"You are a research coordinator. Delegate tasks to subagents using the Task tool.\",\n  \"allowedTools\": [\n    \"Task\",\n    \"WebSearch\",\n    \"FileRead\"\n  ]\n}",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T13:00:17.892Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "842995e2-0cd6-4d3a-b841-44d083ef09a1",
+    "labId": "rhel-apache-phased-pipeline",
+    "labType": "phased-pipeline",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T13:00:34.482Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T13:00:34.482Z",
+    "lastSavedAt": "2026-04-26T13:00:58.650Z",
+    "progressState": {
+      "containers": {
+        "pool": [],
+        "prepare": [
+          "s9",
+          "s6",
+          "s1"
+        ],
+        "install": [
+          "s10",
+          "s8"
+        ],
+        "configure": [
+          "s3",
+          "s7",
+          "s5"
+        ],
+        "harden": [
+          "s4",
+          "s2"
+        ]
+      },
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T13:00:58.650Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "2f120253-ca70-49b6-91e0-dbab44589a1a",
+    "labId": "anthropic-diagnose-multi-agent-routing",
+    "labType": "network-path",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-26T13:01:20.369Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-26T13:01:20.369Z",
+    "lastSavedAt": "2026-04-26T13:01:31.633Z",
+    "progressState": {
+      "checkedSteps": {
+        "coordinator": true
+      },
+      "selectedAnswer": "a2",
+      "timeLeft": 600
+    },
+    "timed": false,
+    "abandonedAt": "2026-04-26T13:01:31.633Z"
+  },
+  {
+    "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+    "attemptId": "8f7270e1-229f-478b-9ade-82f44de354fd",
+    "labId": "anthropic-diagnose-multi-agent-routing",
+    "labType": "network-path",
+    "selectedAnswer": "a4",
+    "correct": false,
+    "timeTaken": 5,
+    "createdAt": "2026-04-26T13:01:40.559Z",
+    "status": "completed",
+    "startedAt": "2026-04-26T13:01:40.559Z",
+    "lastSavedAt": "2026-04-26T13:01:54.150Z",
+    "progressState": {
+      "checkedSteps": {
+        "peer-edge": false
+      },
+      "selectedAnswer": "a4",
+      "timeLeft": 600
+    },
+    "timed": true,
+    "completedAt": "2026-04-26T13:01:54.150Z"
   }
 ]

@@ -225,29 +225,6 @@ export function HomePage() {
           </button>
         </div>
 
-        {/* Limited time offer + Compare Plans */}
-        <div className="mt-6 flex flex-col items-center gap-3">
-          {discountActive && (
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-sm font-medium">
-              <Hourglass className="w-4 h-4 flex-shrink-0" />
-              Limited time offer - save £2/month on all plans
-              <button
-                onClick={() => navigate('/pricing')}
-                className="ml-1 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/80 transition-all"
-              >
-                Compare Plans
-              </button>
-            </div>
-          )}
-          {!discountActive && (
-            <button
-              onClick={() => navigate('/pricing')}
-              className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm inline-flex items-center gap-2 hover:bg-primary/80 transition-all"
-            >
-              Compare Plans
-            </button>
-          )}
-        </div>
       </section>
 
       {/* ── Two-panel: Exams & Skill Labs ─────────────────────── */}

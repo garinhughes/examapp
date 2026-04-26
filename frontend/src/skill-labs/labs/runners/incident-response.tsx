@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect, useMemo } from 'react'
-import { useExam } from '@/exam/ExamContext'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import type { IncidentResponseLabDefinition, LabAnswer } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface IncidentProgress {
   selectedActions: string[]
@@ -54,6 +55,20 @@ export function IncidentResponseRunner({ lab, timed = true }: Props) {
   const [logSearch, setLogSearch] = useState('')
   const [logLevelFilter, setLogLevelFilter] = useState<string>('all')
   const [results, setResults] = useState<{ actions: Record<string, boolean>; rootCause: boolean } | null>(null)
+  const [checked, setChecked] = useState(false)
+  const [isCorrect, setIsCorrect] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    setActiveTab('alerts')
+    setSelectedActions([])
+    setSelectedAnswer('')
+    setLogSearch('')
+    setLogLevelFilter('all')
+    setResults(null)
+    setChecked(false)
+    setIsCorrect(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -61,15 +76,16 @@ export function IncidentResponseRunner({ lab, timed = true }: Props) {
   }, [selectedActions, selectedAnswer, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   const toggleAction = useCallback((actionId: string) => {
-    if (session.submitted) return
+    if (checked) return
+    session.markDirty()
     setSelectedActions(prev =>
       prev.includes(actionId) ? prev.filter(id => id !== actionId) : [...prev, actionId]
     )
-  }, [session.submitted])
+  }, [checked])
 
   const filteredLogs = useMemo(() => {
     let items = lab.logs
@@ -81,7 +97,8 @@ export function IncidentResponseRunner({ lab, timed = true }: Props) {
     return items
   }, [lab.logs, logSearch, logLevelFilter])
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const actionResults: Record<string, boolean> = {}
     for (const action of lab.actions) {
       if (action.correct) {
@@ -94,22 +111,18 @@ export function IncidentResponseRunner({ lab, timed = true }: Props) {
     const rootCauseCorrect = selectedAnswer === correctAnswer?.id
     const allCorrect = rootCauseCorrect && Object.values(actionResults).every(Boolean)
     setResults({ actions: actionResults, rootCause: rootCauseCorrect })
-    await session.finalize(allCorrect, selectedAnswer)
-  }, [lab, selectedActions, selectedAnswer, session.finalize])
+    setIsCorrect(allCorrect)
+    setChecked(true)
+  }, [checked, lab, selectedActions, selectedAnswer])
+
+  const handleComplete = useCallback(async () => {
+    await session.finalize(isCorrect, selectedAnswer)
+  }, [session.finalize, selectedAnswer, isCorrect])
 
   const canSubmit = selectedAnswer && selectedActions.length > 0
 
   return (
     <div className="flex flex-col h-full gap-3">
-      {session.showConfirmModal && (
-        <LabCompleteModal
-          title={lab.title}
-          timeTaken={session.timeLimit - session.timeLeft}
-          timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => session.setShowConfirmModal(false)}
-        />
-      )}
       <LabHeader
         title={lab.title}
         timed={timed}
@@ -118,7 +131,7 @@ export function IncidentResponseRunner({ lab, timed = true }: Props) {
         labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ selectedActions, selectedAnswer, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onRatingClose={() => setRoute('skill-labs')}
       />
 
       {session.resumeNotice && (
@@ -275,12 +288,12 @@ export function IncidentResponseRunner({ lab, timed = true }: Props) {
               <div className="space-y-2">
                 {lab.answers.map(answer => {
                   const isSelected = selectedAnswer === answer.id
-                  const showResult = session.submitted && results
+                  const showResult = checked && results
                   return (
                     <button
                       key={answer.id}
-                      onClick={() => !session.submitted && setSelectedAnswer(answer.id)}
-                      disabled={session.submitted}
+                      onClick={() => { if (!checked) { session.markDirty(); setSelectedAnswer(answer.id) } }}
+                      disabled={checked}
                       className={`w-full text-left px-3 py-2 rounded-md border text-sm transition ${
                         showResult
                           ? answer.correct
@@ -307,13 +320,13 @@ export function IncidentResponseRunner({ lab, timed = true }: Props) {
               <div className="space-y-2">
                 {lab.actions.map(action => {
                   const isSelected = selectedActions.includes(action.id)
-                  const showResult = session.submitted && results
+                  const showResult = checked && results
                   const isCorrechtChoice = showResult ? results.actions[action.id] : undefined
                   return (
                     <button
                       key={action.id}
                       onClick={() => toggleAction(action.id)}
-                      disabled={session.submitted}
+                      disabled={checked}
                       className={`w-full text-left px-3 py-2 rounded-md border text-sm transition flex items-center gap-2 ${
                         showResult
                           ? isCorrechtChoice
@@ -339,37 +352,30 @@ export function IncidentResponseRunner({ lab, timed = true }: Props) {
         )}
       </div>
 
-      {/* Bottom bar */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!session.submitted ? (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Investigate the incident across all tabs. Select root cause and remediation actions in the Response tab.
-            </p>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
-              disabled={!canSubmit}
-              onClick={() => session.setShowConfirmModal(true)}
-            >
-              Submit Response
-            </button>
+      {checked && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-2">
+          <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+            {isCorrect ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            {isCorrect
+              ? 'Incident resolved correctly!'
+              : results?.rootCause
+                ? 'Root cause identified but remediation actions were incorrect'
+                : 'Incorrect root cause identification'}
           </div>
-        ) : (
-          <div className="space-y-2">
-            <div className={`font-semibold text-sm ${results?.rootCause && Object.values(results.actions).every(Boolean) ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {results?.rootCause && Object.values(results.actions).every(Boolean)
-                ? '✓ Incident resolved correctly!'
-                : results?.rootCause
-                  ? '✗ Root cause identified but remediation actions were incorrect'
-                  : '✗ Incorrect root cause identification'}
-            </div>
-            <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
-          </div>
-        )}
-      </div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={isCorrect}
+        submitted={session.submitted}
+        canCheck={!!canSubmit}
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

@@ -11,7 +11,6 @@ import {
   X,
   CreditCard,
   User,
-  TrendingUp,
   BarChart2,
   Network,
   Terminal,
@@ -30,7 +29,6 @@ import type { AuthUser } from "@/auth/AuthContext";
 const navItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/", key: 'home' },
   { icon: BookOpen, label: "Exams", href: "/exams", key: 'practice' },
-  { icon: TrendingUp, label: "Analytics", href: "/analytics", key: 'analytics' },
   { icon: Terminal, label: "Skill Labs", href: "/skill-labs", key: 'skill-labs' },
   { icon: MessageSquare, label: "Feedback", href: "/feedback", key: 'feedback' },
   { icon: CreditCard, label: "Pricing", href: "/pricing", key: 'pricing' },

@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Lightbulb } from 'lucide-react'
-import { useExam } from '@/exam/ExamContext'
+import { Lightbulb, Play, RotateCcw } from 'lucide-react'
 import { MarkdownText } from '@/exam/utils'
 import type {
   CommandTerminalLabDefinition,
@@ -9,7 +8,7 @@ import type {
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { useExam } from '@/exam/ExamContext'
 
 interface Line {
   kind: 'input' | 'output' | 'error' | 'success' | 'info'
@@ -20,6 +19,7 @@ interface Progress {
   stepIndex: number
   lines: Line[]
   history: string[]
+  input: string
   timeLeft: number
 }
 
@@ -115,11 +115,12 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
   const promptSuffix = promptLines[promptLines.length - 1]
 
   const [lines, setLines] = useState<Line[]>(session.savedProgress?.lines ?? defaultLines)
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState(session.savedProgress?.input ?? '')
   const [history, setHistory] = useState<string[]>(session.savedProgress?.history ?? [])
   const [historyIdx, setHistoryIdx] = useState(-1)
   const [stepIndex, setStepIndex] = useState<number>(session.savedProgress?.stepIndex ?? 0)
   const [hintOpen, setHintOpen] = useState(false)
+  const [showingAnswer, setShowingAnswer] = useState(false)
 
   const finalizedRef = useRef(false)
   const termEndRef = useRef<HTMLDivElement>(null)
@@ -129,9 +130,22 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
   const currentStep = allDone ? undefined : lab.steps[stepIndex]
 
   useEffect(() => {
+    if (session.restartKey === 0) return
+    setLines(defaultLines)
+    setInput('')
+    setHistory([])
+    setHistoryIdx(-1)
+    setStepIndex(0)
+    setHintOpen(false)
+    setShowingAnswer(false)
+    finalizedRef.current = false
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.restartKey])
+
+  useEffect(() => {
     if (session.submitted) return
-    session.saveProgress({ stepIndex, lines, history, timeLeft: session.timeLeft })
-  }, [stepIndex, lines, history, session.timeLeft, session.submitted])
+    session.saveProgress({ stepIndex, lines, history, input, timeLeft: session.timeLeft })
+  }, [stepIndex, lines, history, input, session.timeLeft, session.submitted])
 
   useEffect(() => {
     if (timed && session.timeLeft === 0 && !session.submitted && !finalizedRef.current) {
@@ -163,6 +177,7 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
   const handleSubmit = useCallback((raw: string) => {
     const trimmed = raw.trim()
     if (!trimmed || !currentStep || session.submitted) return
+    session.markDirty()
     setHistory((h) => [...h, trimmed])
     setHistoryIdx(-1)
     setInput('')
@@ -236,22 +251,6 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal
-          title={lab.title}
-          timeTaken={session.timeLimit - session.timeLeft}
-          timed={timed}
-          onConfirm={() => {
-            session.setShowConfirmModal(false)
-            if (!finalizedRef.current) {
-              finalizedRef.current = true
-              session.finalize(allDone, allDone ? 'all-steps-complete' : `gave-up@step${stepIndex + 1}`)
-            }
-          }}
-          onCancel={() => session.setShowConfirmModal(false)}
-        />
-      )}
-
       <LabHeader
         title={lab.title}
         timed={timed}
@@ -259,8 +258,8 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
         subtitle={lab.scenario}
         labId={lab.id}
         onPauseChange={session.setLabPaused}
-        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ stepIndex, lines, history, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ stepIndex, lines, history, input, timeLeft: session.timeLeft })}
+        onRatingClose={() => setRoute('skill-labs')}
       />
 
       {session.resumeNotice && (
@@ -340,7 +339,7 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
         <div ref={termEndRef} />
       </div>
 
-      {session.submitted && (
+      {(session.submitted || showingAnswer) && (
         <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-3">
           <div className={`font-semibold text-sm ${allDone ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
             {allDone ? '✓ Lab complete' : `Lab ended at step ${stepIndex + 1} of ${lab.steps.length}`}
@@ -356,11 +355,61 @@ export function CommandTerminalRunner({ lab, timed = true }: Props) {
             </div>
           )}
           <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      {/* Pre-answer: normal in-progress actions */}
+      {!session.submitted && !showingAnswer && (
+        <div className="flex items-center gap-2 flex-wrap pt-1">
+          <span className="text-xs text-muted-foreground mr-auto">
+            {allDone ? 'All steps complete.' : `Step ${stepIndex + 1} of ${lab.steps.length}.`}
+          </span>
           <button
-            onClick={() => setRoute('skill-labs')}
-            className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition"
+            onClick={session.handleCancelLab}
+            className="px-3 py-2 rounded-md text-sm border border-border bg-card text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
           >
-            Back to Skill Labs
+            Cancel Lab
+          </button>
+          <button
+            onClick={() => {
+              if (allDone) {
+                if (!finalizedRef.current) {
+                  finalizedRef.current = true
+                  session.finalize(true, 'all-steps-complete')
+                }
+              } else {
+                setShowingAnswer(true)
+              }
+            }}
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition inline-flex items-center gap-1.5"
+          >
+            <Play className="w-4 h-4" />
+            {allDone ? 'Complete Lab' : 'Show Answer'}
+          </button>
+        </div>
+      )}
+
+      {/* Post-answer: Retry or Complete */}
+      {!session.submitted && showingAnswer && (
+        <div className="flex items-center justify-end gap-2 flex-wrap pt-1">
+          <button
+            onClick={session.restart}
+            className="px-4 py-2 rounded-md text-sm font-semibold border border-border bg-card hover:bg-muted/50 transition inline-flex items-center gap-1.5"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Retry Lab
+          </button>
+          <button
+            onClick={() => {
+              if (!finalizedRef.current) {
+                finalizedRef.current = true
+                session.finalize(false, `gave-up@step${stepIndex + 1}`)
+              }
+            }}
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition inline-flex items-center gap-1.5"
+          >
+            <Play className="w-4 h-4" />
+            Complete Lab
           </button>
         </div>
       )}

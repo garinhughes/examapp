@@ -3,16 +3,55 @@ import { ProviderLogo } from '@/components/ProviderLogo'
 import { Info, ChevronDown, ChevronRight, Search, BookOpen, SlidersHorizontal, ListOrdered, TrendingUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTourContext } from '@/components/TourProvider'
+import { apiUrl } from '@/apiBase'
+
+type AttemptSummary = {
+  examCode: string
+  lastScore: number | null
+  bestScore: number | null
+  lastAttemptAt: string | null
+  attemptCount: number
+}
+
+function formatRelative(iso: string | null): string {
+  if (!iso) return ''
+  const then = Date.parse(iso)
+  if (!Number.isFinite(then)) return ''
+  const diff = Date.now() - then
+  const day = 24 * 60 * 60 * 1000
+  if (diff < 60 * 60 * 1000) return 'just now'
+  if (diff < day) return `${Math.round(diff / (60 * 60 * 1000))}h ago`
+  if (diff < 30 * day) return `${Math.round(diff / day)}d ago`
+  if (diff < 365 * day) return `${Math.round(diff / (30 * day))}mo ago`
+  return `${Math.round(diff / (365 * day))}y ago`
+}
 
 export function PracticeExams() {
   const {
     providers, examStarted, anySavedExam, selected, savedProgress,
     setupExamFromMeta,
-    user, authLoading,
+    user, authLoading, authFetch,
   } = useExam()
   const tour = useTourContext()
   const [collapsedProviders, setCollapsedProviders] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState('')
+  const [summaries, setSummaries] = useState<Map<string, AttemptSummary>>(new Map())
+
+  useEffect(() => {
+    if (authLoading || !user) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const r = await authFetch(apiUrl('/attempts?summary=1'))
+        if (!r.ok) return
+        const d = await r.json()
+        if (cancelled) return
+        const list = Array.isArray(d?.summaries) ? (d.summaries as AttemptSummary[]) : []
+        setSummaries(new Map(list.map((s) => [s.examCode, s])))
+      } catch { /* non-critical — card just hides the footer */ }
+    })()
+    return () => { cancelled = true }
+  }, [authLoading, user, authFetch])
 
   function toggleProvider(name: string) {
     setCollapsedProviders(prev => {
@@ -99,6 +138,7 @@ export function PracticeExams() {
               {filteredExams.map((ex: any, exIndex) => {
                 const cardDisabled = !!(examStarted || anySavedExam || (selected && savedProgress))
                 const handleCardActivate = () => { if (cardDisabled) return; setupExamFromMeta(ex) }
+                const summary = summaries.get(ex.code)
                 return (
                 <div
                   key={ex.code}
@@ -106,6 +146,8 @@ export function PracticeExams() {
                   role="button"
                   tabIndex={cardDisabled ? -1 : 0}
                   aria-disabled={cardDisabled}
+                  data-testid="exam-card"
+                  data-exam-code={ex.code}
                   title={cardDisabled ? 'Complete or cancel your current exam first' : `Setup ${ex.title ?? ex.code}`}
                   onClick={handleCardActivate}
                   onKeyDown={(e) => { if (!cardDisabled && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); handleCardActivate() } }}
@@ -120,6 +162,19 @@ export function PracticeExams() {
                         <span className="bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm">
                           {ex.questionCount} questions
                         </span>
+                      </div>
+                    )}
+                    {summary && summary.attemptCount > 0 && (
+                      <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                        {summary.lastScore !== null && (
+                          <span>Last <span className="font-semibold text-foreground">{summary.lastScore}%</span></span>
+                        )}
+                        {summary.bestScore !== null && (
+                          <span>Best <span className="font-semibold text-foreground">{summary.bestScore}%</span></span>
+                        )}
+                        {summary.lastAttemptAt && (
+                          <span>{formatRelative(summary.lastAttemptAt)}</span>
+                        )}
                       </div>
                     )}
                   </div>

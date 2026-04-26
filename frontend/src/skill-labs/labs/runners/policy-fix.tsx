@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import Editor from '@monaco-editor/react'
+import { Play, RotateCcw } from 'lucide-react'
 import { useExam } from '@/exam/ExamContext'
 import { apiUrl } from '@/apiBase'
 import type { PolicyFixLabDefinition } from '../../types'
@@ -31,6 +32,16 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
   const [policy, setPolicy] = useState(session.savedProgress?.policy ?? lab.brokenPolicy)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
   const [validating, setValidating] = useState(false)
+  const [showingAnswer, setShowingAnswer] = useState(false)
+
+  // Reset local state on Retry
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    setPolicy(lab.brokenPolicy)
+    setValidationResult(null)
+    setValidating(false)
+    setShowingAnswer(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -38,10 +49,10 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
   }, [policy, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) handleTestPolicy()
+    if (timed && session.timeLeft === 0 && !session.submitted) handleCheck()
   }, [session.timeLeft])
 
-  const handleTestPolicy = useCallback(async () => {
+  const handleCheck = useCallback(async () => {
     setValidating(true)
     try {
       const res = await fetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/validate-policy`), {
@@ -51,22 +62,20 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
       })
       const result: ValidationResult = await res.json()
       setValidationResult(result)
-
-      if (result.success) {
-        await session.finalize(true, 'solved')
-      }
+      session.recordCheck(result.success, result.success ? null : result.errors)
     } catch {
-      setValidationResult({ success: false, errors: ['Failed to validate. Please try again.'] })
+      const errs = ['Failed to validate. Please try again.']
+      setValidationResult({ success: false, errors: errs })
+      session.recordCheck(false, errs)
     } finally {
       setValidating(false)
     }
-  }, [policy, lab.id, session.finalize])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [policy, lab.id])
 
-  const handleGiveUp = useCallback(async () => {
-    setPolicy(lab.correctPolicy)
-    setValidationResult({ success: false, errors: ['You gave up. The correct policy is now shown.'] })
-    await session.finalize(false, 'gave-up')
-  }, [lab, session.finalize])
+  const handleComplete = useCallback(async () => {
+    await session.finalize(true, 'solved')
+  }, [session.finalize])
 
   return (
     <div className="flex flex-col h-full gap-4">
@@ -77,7 +86,7 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
         labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ policy, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onRatingClose={() => setRoute('skill-labs')}
       />
 
       {session.resumeNotice && (
@@ -108,8 +117,8 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
           <Editor
             height="100%"
             defaultLanguage="json"
-            value={policy}
-            onChange={(value) => !session.submitted && setPolicy(value || '')}
+            value={showingAnswer ? lab.correctPolicy : policy}
+            onChange={(value) => { if (!session.submitted && !showingAnswer) { session.markDirty(); setPolicy(value || '') } }}
             theme="vs-dark"
             options={{
               minimap: { enabled: false },
@@ -117,73 +126,104 @@ export function PolicyFixLabRunner({ lab, timed = true }: PolicyFixLabRunnerProp
               lineNumbers: 'on',
               scrollBeyondLastLine: false,
               wordWrap: 'on',
-              readOnly: session.submitted,
+              readOnly: session.submitted || showingAnswer,
               formatOnPaste: true,
             }}
           />
       </div>
 
-      {/* Bottom row: Test Results (full width) */}
-      <div className="shrink-0 rounded-lg border border-border bg-card p-4">
-        <div className="flex items-start gap-4">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-base mb-2">Test Results</h3>
-
-            {!validationResult && !session.submitted && (
-              <p className="text-sm text-muted-foreground">
-                Edit the policy and click "Test Policy" to validate your changes.
-              </p>
-            )}
-
-            {validationResult && (
-              <div className="space-y-2">
-                <div className={`flex items-center gap-2 font-semibold text-sm ${validationResult.success ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-                  {validationResult.success ? '✓ All checks passed!' : '✗ Validation failed'}
-                </div>
-                {validationResult.errors.length > 0 && (
-                  <ul className="flex flex-wrap gap-2">
-                    {validationResult.errors.map((err, i) => (
-                      <li key={i} className="text-xs text-destructive bg-destructive/10 rounded px-2 py-1">
-                        {err}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {validationResult.success && (
-                  <ExplanationBlock text={lab.explanation} />
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="shrink-0 flex flex-col gap-2 min-w-40">
-            {!session.submitted ? (
-              <>
-                <button
-                  className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
-                  disabled={validating}
-                  onClick={handleTestPolicy}
-                >
-                  {validating ? 'Validating…' : 'Test Policy'}
-                </button>
-                <button
-                  className="px-4 py-2 rounded-md border border-border text-muted-foreground font-medium text-sm hover:bg-muted/50 transition"
-                  onClick={handleGiveUp}
-                >
-                  Give Up & Show Answer
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setRoute('skill-labs')}
-                className="px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition"
-              >
-                Back to Skill Labs
-              </button>
-            )}
-          </div>
+      {/* Answer view */}
+      {showingAnswer && !session.submitted && (
+        <div className="shrink-0 rounded-lg border border-border bg-card p-4 shadow-sm space-y-3">
+          <div className="font-semibold text-sm text-destructive">Reference answer shown above</div>
+          <ExplanationBlock text={lab.explanation} />
         </div>
-      </div>
+      )}
+
+      {/* Test feedback (only shown when there's a result and exam not yet submitted) */}
+      {validationResult && !session.submitted && validationResult.success && (
+        <div className="shrink-0 rounded-lg border border-emerald-300/50 bg-emerald-50 dark:bg-emerald-900/10 dark:border-emerald-700/40 p-4">
+          <div className="font-semibold text-sm text-emerald-700 dark:text-emerald-300 mb-1">✓ All checks passed</div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      {session.submitted && (
+        <div className="shrink-0 rounded-lg border border-emerald-300/50 bg-emerald-50 dark:bg-emerald-900/10 dark:border-emerald-700/40 p-4">
+          <div className="font-semibold text-sm text-emerald-700 dark:text-emerald-300 mb-1">Lab completed</div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      {!session.submitted && session.lastCheck && !session.lastCheck.correct && session.lastCheck.feedback && (
+        <div className="text-xs text-destructive">
+          {Array.isArray(session.lastCheck.feedback)
+            ? <ul className="list-disc list-inside space-y-0.5">{session.lastCheck.feedback.map((f, i) => <li key={i}>{f}</li>)}</ul>
+            : session.lastCheck.feedback}
+        </div>
+      )}
+
+      {!session.submitted && !showingAnswer && (
+        <div className="flex items-center justify-end gap-2 flex-wrap pt-1">
+          <button
+            onClick={session.handleCancelLab}
+            className="px-3 py-2 rounded-md text-sm border border-border bg-card text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
+          >
+            Cancel Lab
+          </button>
+          {session.lastCheck && !session.lastCheck.correct && (
+            <button
+              onClick={() => setShowingAnswer(true)}
+              className="px-3 py-2 rounded-md text-sm border border-border bg-card text-muted-foreground hover:bg-muted/50 transition"
+            >
+              Show Answer
+            </button>
+          )}
+          {!session.lastCheck?.correct && (
+            <button
+              onClick={handleCheck}
+              disabled={validating}
+              className="px-4 py-2 rounded-md bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition disabled:opacity-50"
+            >
+              {validating ? 'Checking…' : (session.lastCheck && !session.lastCheck.correct ? 'Retest' : 'Check')}
+            </button>
+          )}
+          {session.lastCheck?.correct && (
+            <button
+              onClick={handleComplete}
+              className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition inline-flex items-center gap-1.5"
+            >
+              <Play className="w-4 h-4" />
+              Complete Lab
+            </button>
+          )}
+        </div>
+      )}
+
+      {!session.submitted && showingAnswer && (
+        <div className="flex items-center justify-end gap-2 flex-wrap pt-1">
+          <button
+            onClick={session.handleCancelLab}
+            className="px-3 py-2 rounded-md text-sm border border-border bg-card text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
+          >
+            Cancel Lab
+          </button>
+          <button
+            onClick={session.restart}
+            className="px-4 py-2 rounded-md text-sm font-semibold border border-border bg-card hover:bg-muted/50 transition inline-flex items-center gap-1.5"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Retry Lab
+          </button>
+          <button
+            onClick={() => session.finalize(false, 'gave-up')}
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition inline-flex items-center gap-1.5"
+          >
+            <Play className="w-4 h-4" />
+            Complete Lab
+          </button>
+        </div>
+      )}
     </div>
   )
 }

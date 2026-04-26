@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect } from 'react'
-import { useExam } from '@/exam/ExamContext'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import type { DriftDetectionLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { LabDiagram } from '../LabDiagram'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface DriftProgress {
   selections: Record<string, boolean>   // resourceId → user thinks it drifted
@@ -25,6 +26,14 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
     () => session.savedProgress?.selections ?? {}
   )
   const [results, setResults] = useState<Record<string, boolean> | null>(null)
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    setSelections({})
+    setResults(null)
+    setChecked(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -32,26 +41,30 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
   }, [selections, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   const toggleSelection = useCallback((resourceId: string) => {
-    if (session.submitted) return
+    if (checked) return
+    session.markDirty()
     setSelections(prev => ({ ...prev, [resourceId]: !prev[resourceId] }))
-  }, [session.submitted])
+  }, [checked])
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const res: Record<string, boolean> = {}
-    let allCorrect = true
     for (const resource of lab.resources) {
       const userSaysDrifted = !!selections[resource.id]
-      const correct = userSaysDrifted === resource.drifted
-      res[resource.id] = correct
-      if (!correct) allCorrect = false
+      res[resource.id] = userSaysDrifted === resource.drifted
     }
     setResults(res)
+    setChecked(true)
+  }, [checked, lab, selections])
+
+  const handleComplete = useCallback(async () => {
     await session.finalize(allCorrect, JSON.stringify(selections))
-  }, [lab, selections, session.finalize])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.finalize, selections, results])
 
   const totalResources = lab.resources.length
   const markedCount = Object.values(selections).filter(Boolean).length
@@ -60,15 +73,6 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
 
   return (
     <div className="flex flex-col h-full gap-3">
-      {session.showConfirmModal && (
-        <LabCompleteModal
-          title={lab.title}
-          timeTaken={session.timeLimit - session.timeLeft}
-          timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => session.setShowConfirmModal(false)}
-        />
-      )}
       <LabHeader
         title={lab.title}
         timed={timed}
@@ -77,7 +81,7 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
         labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ selections, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onRatingClose={() => setRoute('skill-labs')}
       />
 
       {session.resumeNotice && (
@@ -102,7 +106,7 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
         <span className="text-muted-foreground">
           {totalResources} live resources • {markedCount} marked as drifted
         </span>
-        {session.submitted && results && (
+        {checked && results && (
           <span className={`font-semibold ${allCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
             {correctCount}/{totalResources} correct
           </span>
@@ -113,8 +117,8 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
       <div className="flex-1 overflow-y-auto space-y-2">
         {lab.resources.map(resource => {
           const userMarkedDrifted = !!selections[resource.id]
-          const showResult = session.submitted && results
-          const isCorrect = showResult ? results[resource.id] : undefined
+          const showResult = checked && results
+          const isResourceCorrect = showResult ? results[resource.id] : undefined
 
           // With a mermaid diagram, the diagram is the source of truth — show actual only.
           // Without one, show expected alongside actual so users can still spot the drift.
@@ -126,7 +130,7 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
               key={resource.id}
               className={`rounded-lg border p-3 transition ${
                 showResult
-                  ? isCorrect
+                  ? isResourceCorrect
                     ? 'border-green-500/50 bg-green-500/5'
                     : 'border-destructive/50 bg-destructive/5'
                   : userMarkedDrifted
@@ -142,8 +146,8 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
                     </span>
                     <span className="font-medium text-sm">{resource.resourceName}</span>
                     {showResult && (
-                      <span className={`text-xs font-bold ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-                        {isCorrect ? '✓' : `✗ ${resource.drifted ? 'actually drifted' : 'no drift'}`}
+                      <span className={`text-xs font-bold ${isResourceCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+                        {isResourceCorrect ? '✓' : `✗ ${resource.drifted ? 'actually drifted' : 'no drift'}`}
                       </span>
                     )}
                   </div>
@@ -179,7 +183,7 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
                 </div>
                 <button
                   onClick={() => toggleSelection(resource.id)}
-                  disabled={session.submitted}
+                  disabled={checked}
                   className={`shrink-0 px-3 py-1.5 rounded-md border text-xs font-medium transition ${
                     userMarkedDrifted
                       ? 'border-amber-400 bg-amber-500/10 text-amber-700 dark:text-amber-400'
@@ -194,32 +198,26 @@ export function DriftDetectionRunner({ lab, timed = true }: Props) {
         })}
       </div>
 
-      {/* Bottom bar */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!session.submitted ? (
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <p className="text-sm text-muted-foreground">
-              Compare each live resource against the expected Terraform state, then mark the ones that have drifted.
-            </p>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
-              onClick={() => session.setShowConfirmModal(true)}
-            >
-              Submit Assessment
-            </button>
+      {checked && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-2">
+          <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${allCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+            {allCorrect ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            {allCorrect ? 'All drift assessments correct!' : `${correctCount}/${totalResources} correct`}
           </div>
-        ) : (
-          <div className="space-y-2">
-            <div className={`font-semibold text-sm ${allCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {allCorrect ? '✓ All drift assessments correct!' : `✗ ${correctCount}/${totalResources} correct`}
-            </div>
-            <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
-          </div>
-        )}
-      </div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={allCorrect}
+        submitted={session.submitted}
+        canCheck
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

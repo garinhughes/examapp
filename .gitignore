@@ -40,6 +40,12 @@ coverage/
 .cache/
 .parcel-cache/
 
+# Playwright
+/frontend/test-results/
+/frontend/playwright-report/
+/frontend/blob-report/
+/frontend/playwright/.cache/
+
 # TypeScript
 *.tsbuildinfo
 
@@ -59,6 +65,8 @@ coverage/
 
 # Persisted JSON used by runtime (may contain user data)
 /backend/data/gamification.json
+/backend/data/attempts.json
+/backend/data/skill-lab-attempts.json
 /backend/data/*.db
 /backend/data/*.sqlite
 

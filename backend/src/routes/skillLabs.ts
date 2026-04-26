@@ -228,12 +228,18 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     return reply.send(withLocked(enrichedLabs, unlockedShowcaseIds(enrichedLabs, count)))
   })
 
-  // GET /skill-labs/my-attempts — get current user's lab attempts
+  // GET /skill-labs/my-attempts — get current user's lab attempts.
+  // Filters out in_progress / abandoned rows so the UI's "completed" list is honest
+  // (dev-guide §15 / 14.2 — legacy rows have no status, treat as completed).
   server.get('/my-attempts', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'Unauthorized' })
     const attempts = await skillLabAttemptsStore.listByUser(userId)
-    const completedLabIds = [...new Set(attempts.map((a) => a.labId))]
+    const completedLabIds = [...new Set(
+      attempts
+        .filter((a) => a.status === undefined || a.status === 'completed')
+        .map((a) => a.labId)
+    )]
     return reply.send({ completedLabIds })
   })
 
@@ -313,19 +319,28 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       return reply.send({ success: errors.length === 0, errors })
     }
 
-    // Generic JSON policy (e.g. AgentDefinition): check that each expected value
-    // appears somewhere in the parsed object (deep value search)
-    function deepIncludes(obj: any, expected: string): boolean {
-      if (obj === null || obj === undefined) return false
-      if (typeof obj === 'string') return obj === expected || obj.includes(expected)
-      if (Array.isArray(obj)) return obj.some((item) => deepIncludes(item, expected))
-      if (typeof obj === 'object') return Object.values(obj).some((v) => deepIncludes(v, expected))
-      return String(obj) === expected
+    // Generic JSON policy (e.g. AgentDefinition): validate each field by name.
+    // expected may be stored as a JSON-quoted string literal (e.g. `"Task"`) —
+    // unwrap it so array-order differences don't cause false failures.
+    function unwrapExpected(expected: string): string {
+      if (expected.startsWith('"') && expected.endsWith('"')) {
+        try { return JSON.parse(expected) } catch { /* fall through */ }
+      }
+      return expected
+    }
+
+    function fieldContains(fieldValue: any, needle: string): boolean {
+      if (fieldValue === null || fieldValue === undefined) return false
+      if (Array.isArray(fieldValue)) return fieldValue.some((item: any) => String(item) === needle)
+      if (typeof fieldValue === 'string') return fieldValue === needle
+      return String(fieldValue) === needle
     }
 
     for (const v of lab.validations) {
-      if (!deepIncludes(parsed, v.expected)) {
-        errors.push(`Expected ${v.field} to include "${v.expected}"`)
+      const needle = unwrapExpected(v.expected)
+      const fieldValue = parsed?.[v.field]
+      if (!fieldContains(fieldValue, needle)) {
+        errors.push(`Expected ${v.field} to include "${needle}"`)
       }
     }
 
@@ -358,36 +373,193 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     return reply.send({ success: errors.length === 0, errors })
   })
 
-  // POST /skill-labs/:id/attempt — store result
+  // POST /skill-labs/:id/attempt — start a new attempt OR (legacy one-shot) finalise.
+  //
+  // Lifecycle redesign (dev-guide §15 / 14.3-4):
+  //   * Body with no `correct`           → start an in_progress attempt; returns { attemptId, status, startedAt }
+  //   * Body with `correct` (legacy)     → write a completed row immediately; preserves
+  //                                        backward-compat for any client still on the one-shot flow
   server.post('/:id/attempt', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const { id: labId } = request.params as { id: string }
     const userId = request.user?.sub
     if (!userId) return reply.status(401).send({ message: 'Unauthorized' })
 
-    const body = request.body as any
-    const { selectedAnswer, correct, timeTaken, labType } = body || {}
+    const body = (request.body as any) ?? {}
+    const { selectedAnswer, correct, timeTaken, labType, progressState } = body
+    const timed = typeof body.timed === 'boolean' ? body.timed : false
+    const isLegacyOneShot = typeof correct === 'boolean' && typeof timeTaken === 'number'
 
-    if (typeof correct !== 'boolean' || typeof timeTaken !== 'number') {
-      return reply.status(400).send({ message: 'correct (boolean) and timeTaken (number) are required' })
+    const now = new Date().toISOString()
+    const attemptId = randomUUID()
+
+    if (isLegacyOneShot) {
+      const attempt = {
+        userId,
+        attemptId,
+        labId,
+        labType: labType || 'unknown',
+        selectedAnswer: selectedAnswer || '',
+        correct,
+        timeTaken,
+        createdAt: now,
+        status: 'completed' as const,
+        startedAt: now,
+        completedAt: now,
+      }
+      await skillLabAttemptsStore.put(attempt)
+      void touchUserActivity(userId)
+      updateMetricsOnLabAttempt({ labId, labType: attempt.labType, correct, timeTaken })
+        .catch((err) => console.error('[metrics] updateMetricsOnLabAttempt failed', err))
+      return reply.status(201).send(attempt)
+    }
+
+    // Idempotent start: if there's already an active in_progress for this user+lab, return it.
+    const existing = await skillLabAttemptsStore.findActiveForLab(userId, labId)
+    if (existing) {
+      return reply.status(200).send({ attemptId: existing.attemptId, status: existing.status, startedAt: existing.startedAt, timed: existing.timed ?? false, resumed: true })
+    }
+
+    // Enforce one in-progress lab per account: if another lab is active, refuse.
+    const otherActive = await skillLabAttemptsStore.findAnyActive(userId)
+    if (otherActive && otherActive.labId !== labId) {
+      return reply.status(409).send({ message: 'another lab in progress', activeLabId: otherActive.labId })
     }
 
     const attempt = {
       userId,
-      attemptId: randomUUID(),
+      attemptId,
       labId,
       labType: labType || 'unknown',
-      selectedAnswer: selectedAnswer || '',
-      correct,
-      timeTaken,
-      createdAt: new Date().toISOString(),
+      selectedAnswer: '',
+      correct: false,
+      timeTaken: 0,
+      createdAt: now,
+      status: 'in_progress' as const,
+      startedAt: now,
+      lastSavedAt: now,
+      progressState: progressState ?? null,
+      timed,
     }
-
     await skillLabAttemptsStore.put(attempt)
     void touchUserActivity(userId)
+    request.log.info({ userId, labId, attemptId }, '[skill-labs] attempt started')
+    return reply.status(201).send({ attemptId, status: attempt.status, startedAt: now, timed })
+  })
 
-    updateMetricsOnLabAttempt({ labId, labType: attempt.labType, correct, timeTaken })
+  // PATCH /skill-labs/:id/attempt/:attemptId — save progress (debounced ~5s client-side).
+  server.patch('/:id/attempt/:attemptId', { preHandler: [server.authenticate], config: { rateLimit: { max: 240, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
+    const { id: labId, attemptId } = request.params as { id: string; attemptId: string }
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' })
+    const attempt = await skillLabAttemptsStore.get(userId, attemptId)
+    if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
+    if (attempt.userId !== userId || attempt.labId !== labId) return reply.status(403).send({ message: 'forbidden' })
+    if (attempt.status && attempt.status !== 'in_progress') return reply.status(400).send({ message: 'attempt is no longer in progress' })
+
+    const body = (request.body as any) ?? {}
+    const fields: Record<string, any> = { lastSavedAt: new Date().toISOString() }
+    if (body.progressState !== undefined) fields.progressState = body.progressState
+    if (!attempt.status) fields.status = 'in_progress'
+    await skillLabAttemptsStore.update(userId, attemptId, fields)
+    return { updated: true, lastSavedAt: fields.lastSavedAt }
+  })
+
+  // POST /skill-labs/:id/attempt/:attemptId/complete — finalise attempt.
+  server.post('/:id/attempt/:attemptId/complete', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
+    const { id: labId, attemptId } = request.params as { id: string; attemptId: string }
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' })
+    const attempt = await skillLabAttemptsStore.get(userId, attemptId)
+    if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
+    if (attempt.userId !== userId || attempt.labId !== labId) return reply.status(403).send({ message: 'forbidden' })
+    if (attempt.status === 'completed') return { completed: true, alreadyCompleted: true, attemptId }
+    if (attempt.status === 'abandoned') return reply.status(400).send({ message: 'attempt was abandoned' })
+
+    const body = (request.body as any) ?? {}
+    const correct = !!body.correct
+    const timeTaken = typeof body.timeTaken === 'number' ? body.timeTaken : 0
+    const selectedAnswer = typeof body.selectedAnswer === 'string' ? body.selectedAnswer : ''
+    const labType = typeof body.labType === 'string' && body.labType ? body.labType : (attempt.labType || 'unknown')
+    const now = new Date().toISOString()
+
+    await skillLabAttemptsStore.update(userId, attemptId, {
+      status: 'completed',
+      correct,
+      timeTaken,
+      selectedAnswer,
+      labType,
+      completedAt: now,
+      lastSavedAt: now,
+    })
+    void touchUserActivity(userId)
+    updateMetricsOnLabAttempt({ labId, labType, correct, timeTaken })
       .catch((err) => console.error('[metrics] updateMetricsOnLabAttempt failed', err))
 
-    return reply.status(201).send(attempt)
+    request.log.info({ userId, labId, attemptId, correct, timeTaken }, '[skill-labs] attempt completed')
+    return { completed: true, attemptId, completedAt: now, correct }
+  })
+
+  // POST /skill-labs/:id/attempt/:attemptId/cancel — soft-abandon.
+  server.post('/:id/attempt/:attemptId/cancel', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
+    const { id: labId, attemptId } = request.params as { id: string; attemptId: string }
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' })
+    const attempt = await skillLabAttemptsStore.get(userId, attemptId)
+    if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
+    if (attempt.userId !== userId || attempt.labId !== labId) return reply.status(403).send({ message: 'forbidden' })
+    if (attempt.status === 'abandoned') return { abandoned: true, alreadyAbandoned: true, attemptId }
+    if (attempt.status === 'completed') return reply.status(400).send({ message: 'attempt already completed' })
+
+    const now = new Date().toISOString()
+    await skillLabAttemptsStore.update(userId, attemptId, {
+      status: 'abandoned',
+      abandonedAt: now,
+      lastSavedAt: now,
+    })
+    request.log.info({ userId, labId, attemptId }, '[skill-labs] attempt abandoned')
+    return { abandoned: true, attemptId, abandonedAt: now }
+  })
+
+  // GET /skill-labs/:id/attempt/active — hydrate latest in_progress attempt for this user+lab.
+  server.get('/:id/attempt/active', { preHandler: [server.authenticate], config: { rateLimit: { max: 240, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
+    const { id: labId } = request.params as { id: string }
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' })
+    const active = await skillLabAttemptsStore.findActiveForLab(userId, labId)
+    if (!active) return { active: null }
+    return {
+      active: {
+        attemptId: active.attemptId,
+        startedAt: active.startedAt,
+        lastSavedAt: active.lastSavedAt,
+        progressState: active.progressState ?? null,
+        timed: active.timed ?? false,
+      },
+    }
+  })
+
+  // GET /skill-labs/my-active-attempt — returns the first in_progress attempt across all labs.
+  server.get('/my-active-attempt', { preHandler: [server.authenticate], config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' })
+    const active = await skillLabAttemptsStore.findAnyActive(userId)
+    return { active: active ?? null }
+  })
+
+  // POST /skill-labs/:id/attempt/cancel-active — cancel the active in_progress attempt for this user+lab.
+  server.post('/:id/attempt/cancel-active', { preHandler: [server.authenticate], config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
+    const { id: labId } = request.params as { id: string }
+    const userId = request.user?.sub
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' })
+    const active = await skillLabAttemptsStore.findActiveForLab(userId, labId)
+    if (!active) return reply.status(204).send()
+    const now = new Date().toISOString()
+    await skillLabAttemptsStore.update(userId, active.attemptId, {
+      status: 'cancelled' as any,
+      abandonedAt: now,
+      lastSavedAt: now,
+    })
+    request.log.info({ userId, labId, attemptId: active.attemptId }, '[skill-labs] attempt cancel-active')
+    return { cancelled: true, attemptId: active.attemptId }
   })
 }

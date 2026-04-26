@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useExam } from '@/exam/ExamContext'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import type { CliLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface CliLabRunnerProps {
   lab: CliLabDefinition
@@ -20,6 +21,7 @@ interface CliProgress {
   lines: TerminalLine[]
   commandHistory: string[]
   selectedAnswer: string | null
+  input: string
   timeLeft: number
 }
 
@@ -36,10 +38,11 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
   ]
 
   const [lines, setLines] = useState<TerminalLine[]>(session.savedProgress?.lines ?? defaultLines)
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState(session.savedProgress?.input ?? '')
   const [commandHistory, setCommandHistory] = useState<string[]>(session.savedProgress?.commandHistory ?? [])
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(session.savedProgress?.selectedAnswer ?? null)
+  const [checked, setChecked] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
 
   const terminalEndRef = useRef<HTMLDivElement>(null)
@@ -50,12 +53,24 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
   ).current
 
   useEffect(() => {
-    if (session.submitted) return
-    session.saveProgress({ lines, commandHistory, selectedAnswer, timeLeft: session.timeLeft })
-  }, [lines, commandHistory, selectedAnswer, session.timeLeft, session.submitted])
+    if (session.restartKey === 0) return
+    setLines(defaultLines)
+    setInput('')
+    setCommandHistory([])
+    setHistoryIndex(-1)
+    setSelectedAnswer(null)
+    setChecked(false)
+    setIsCorrect(false)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.restartKey])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (session.submitted) return
+    session.saveProgress({ lines, commandHistory, selectedAnswer, input, timeLeft: session.timeLeft })
+  }, [lines, commandHistory, selectedAnswer, input, session.timeLeft, session.submitted])
+
+  useEffect(() => {
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   useEffect(() => {
@@ -97,6 +112,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
   const handleCommand = useCallback((cmd: string) => {
     const trimmed = cmd.trim()
     if (!trimmed) return
+    session.markDirty()
 
     setCommandHistory((prev) => [...prev, trimmed])
     setHistoryIndex(-1)
@@ -172,25 +188,20 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
     }
   }
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const correctAnswer = lab.answers.find((a) => a.correct)
     const correct = selectedAnswer === correctAnswer?.id
     setIsCorrect(correct)
-    await session.finalize(correct, selectedAnswer || '')
-  }, [lab, selectedAnswer, session.finalize])
+    setChecked(true)
+  }, [checked, lab, selectedAnswer])
+
+  const handleComplete = useCallback(async () => {
+    await session.finalize(isCorrect, selectedAnswer || '')
+  }, [session.finalize, selectedAnswer, isCorrect])
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal
-          title={lab.title}
-          timeTaken={session.timeLimit - session.timeLeft}
-          timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => session.setShowConfirmModal(false)}
-        />
-      )}
-
       <LabHeader
         title={lab.title}
         timed={timed}
@@ -198,8 +209,8 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
         subtitle={lab.scenario}
         labId={lab.id}
         onPauseChange={session.setLabPaused}
-        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ lines, commandHistory, selectedAnswer, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ lines, commandHistory, selectedAnswer, input, timeLeft: session.timeLeft })}
+        onRatingClose={() => setRoute('skill-labs')}
       />
 
       {session.resumeNotice && (
@@ -222,7 +233,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
             {line.text}
           </div>
         ))}
-        {!session.submitted && (
+        {!checked && (
           <div className="flex items-center">
             <span className="text-cyan-400 whitespace-pre">{PROMPT}</span>
             <input
@@ -246,7 +257,7 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
           {lab.answers.map((answer) => {
             let cls = 'border border-border rounded-md px-4 py-2.5 text-sm text-left transition '
-            if (session.submitted) {
+            if (checked) {
               if (answer.correct) {
                 cls += 'border-green-500 bg-green-500/10 text-green-700 dark:text-green-400'
               } else if (answer.id === selectedAnswer && !answer.correct) {
@@ -263,8 +274,8 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
               <button
                 key={answer.id}
                 className={cls}
-                disabled={session.submitted}
-                onClick={() => !session.submitted && setSelectedAnswer(answer.id)}
+                disabled={checked}
+                onClick={() => { if (!checked) { session.markDirty(); setSelectedAnswer(answer.id) } }}
               >
                 {answer.text}
               </button>
@@ -272,29 +283,27 @@ export function CliLabRunner({ lab, timed = true }: CliLabRunnerProps) {
           })}
         </div>
 
-        {!session.submitted ? (
-          <button
-            className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!selectedAnswer}
-            onClick={() => session.setShowConfirmModal(true)}
-          >
-            Submit Answer
-          </button>
-        ) : (
+        {checked && (
           <div className="space-y-3">
-            <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+            <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+              {isCorrect ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+              {isCorrect ? 'Correct!' : 'Incorrect'}
             </div>
             <ExplanationBlock text={lab.explanation} />
-            <button
-              onClick={() => setRoute('skill-labs')}
-              className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition"
-            >
-              Back to Skill Labs
-            </button>
           </div>
         )}
       </div>
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={isCorrect}
+        submitted={session.submitted}
+        canCheck={!!selectedAnswer}
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

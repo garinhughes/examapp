@@ -239,8 +239,11 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       if (labId) return `skill-lab-detail:${labId}`
     }
     if (p.startsWith('/exams/')) {
-      const examCode = p.slice('/exams/'.length)
-      if (examCode && !examCode.includes('/')) return 'home'
+      const rest = p.slice('/exams/'.length)
+      if (rest && !rest.includes('/')) return 'exam-landing'
+      if (rest.match(/^[^/]+\/attempt\/[^/]+$/)) return 'exam-attempt-review'
+      if (rest.match(/^[^/]+\/attempt$/)) return 'home'
+      if (rest.match(/^[^/]+\/history$/)) return 'exam-history'
     }
     if (p === '/analytics') return 'analytics'
     if (p === '/pricing') return 'pricing'
@@ -259,8 +262,10 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const [selected, setSelected] = useState<string | null>(() => {
     const p = window.location.pathname
     if (p.startsWith('/exams/')) {
-      const examCode = p.slice('/exams/'.length)
-      if (examCode && !examCode.includes('/')) return examCode
+      const rest = p.slice('/exams/'.length)
+      // Extract exam code from: /exams/:code, /exams/:code/attempt, /exams/:code/attempt/:id, /exams/:code/history
+      const code = rest.split('/')[0]
+      if (code) return code
     }
     return null
   })
@@ -589,6 +594,8 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     setSelected(ex.code)
     setSelectedAnswers({})
     setAttemptData(null)
+    setAttemptId(null)
+    setExamStarted(false)
     setWeakestLinkInfo(null)
     setExamMode('casual')
     setRevealAnswers('immediately')
@@ -604,7 +611,8 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         setTakeDomains(['All'])
       }
     } catch { setNumQuestions(10) }
-    setRoute('home')
+    // Route to landing page so user can configure before starting (dev-guide §16 / 15.2)
+    setRoute('exam-landing')
   }
 
   async function fetchScoreHistory(code: string) {
@@ -1125,9 +1133,9 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     if (selected) fetchScoreHistory(selected); else setScoreHistory(null)
   }, [selected])
 
-  // Analytics page data
+  // Analytics / per-exam history page data
   useEffect(() => {
-    if (route !== 'analytics') return
+    if (route !== 'analytics' && route !== 'exam-history') return
     if (!selected) return
     setAnalyticsAttempts(null); setAnalyticsDomains(null)
     void fetchScoreHistory(selected)

@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, lazy, ComponentType } from 'react'
+import { useState, useEffect, useMemo, Suspense, lazy, ComponentType } from 'react'
 import Loader from '@/components/Loader'
 import { apiUrl } from '@/apiBase'
 import { useExam } from '@/exam/ExamContext'
@@ -63,6 +63,16 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
     return () => { cancelled = true }
   }, [labId])
 
+  const platform = (lab?.platform ?? '').toLowerCase()
+  const labType = lab?.type
+  const runnerKey = labType ? `${platform}:${labType}` : null
+  const LazyRunner = useMemo(() => {
+    if (!labType || !runnerKey) return null
+    const importer = providerRunnerImports[runnerKey] ?? genericRunnerImports[labType]
+    if (!importer) return null
+    return lazy(importer)
+  }, [runnerKey, labType])
+
   if (loading) return <Loader text="Loading lab…" />
   if (error || !lab) return (
     <div className="flex flex-col items-start gap-3 p-4">
@@ -76,13 +86,9 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
     </div>
   )
 
-  const platform = (lab.platform ?? '').toLowerCase()
-  const importer = providerRunnerImports[`${platform}:${lab.type}`] ?? genericRunnerImports[lab.type]
-  if (!importer) {
+  if (!LazyRunner) {
     return <div className="text-destructive p-4">Unknown lab type: {(lab as any).type}</div>
   }
-
-  const LazyRunner = lazy(importer)
 
   return (
     <Suspense fallback={<Loader text="Loading runner…" />}>

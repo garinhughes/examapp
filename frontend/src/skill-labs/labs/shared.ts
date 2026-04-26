@@ -2,6 +2,12 @@ import { useCallback } from 'react'
 import { useGamification } from '@/gamification/GamificationContext'
 import type { LabSummary } from '../types'
 
+export const LAB_CANCELLED_EVENT = 'lab-cancelled'
+
+export function signalLabCancelled(labId: string) {
+  try { window.dispatchEvent(new CustomEvent(LAB_CANCELLED_EVENT, { detail: { labId } })) } catch {}
+}
+
 export function markLabCompleted(labId: string) {
   const stored = JSON.parse(localStorage.getItem('skill-labs-completed') || '[]')
   if (!stored.includes(labId)) {

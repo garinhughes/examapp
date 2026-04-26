@@ -10,12 +10,12 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Lightbulb, Play, Plus, RotateCcw, Terminal, X } from 'lucide-react'
-import { useExam } from '@/exam/ExamContext'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { MarkdownText } from '@/exam/utils'
 import type { TerminalReplayLabDefinition, TerminalReplayCommand } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabSession } from '../useLabSession'
+import { useExam } from '@/exam/ExamContext'
 
 type TerminalLine = { type: 'input' | 'output' | 'error' | 'success'; text: string }
 type AnimState = 'idle' | 'running' | 'failed' | 'complete'
@@ -205,6 +205,17 @@ export function TerminalReplayRunner({ lab, timed = true }: Props) {
   const [tipOpen, setTipOpen] = useState(false)
 
   useEffect(() => {
+    if (session.restartKey === 0) return
+    setContainers({ pool: shuffleArray(lab.commands.map((c) => c.id)), queue: [] })
+    setActiveId(null)
+    setTermLines([])
+    setAnimState('idle')
+    setAttempts(0)
+    setTipOpen(false)
+    cancelRef.current = false
+  }, [session.restartKey])
+
+  useEffect(() => {
     if (session.submitted) return
     session.saveProgress({ pool: containers.pool, queue: containers.queue, timeLeft: session.timeLeft })
   }, [containers, session.timeLeft, session.submitted])
@@ -248,6 +259,7 @@ export function TerminalReplayRunner({ lab, timed = true }: Props) {
     if (!src) return
     const dst = (overId === 'pool' || overId === 'queue') ? overId : findContainer(overId)
     if (!dst) return
+    session.markDirty()
 
     setContainers((prev) => {
       const pool  = [...prev.pool]
@@ -334,7 +346,6 @@ export function TerminalReplayRunner({ lab, timed = true }: Props) {
         lines.push({ type: 'success', text: '✓ All commands completed successfully.' })
         setTermLines([...lines])
         setAnimState('complete')
-        await session.finalize(true, containers.queue.join(','))
       }
     } else {
       setAnimState('failed')
@@ -347,6 +358,10 @@ export function TerminalReplayRunner({ lab, timed = true }: Props) {
     setAnimState('idle')
     setTipOpen(false)
     session.setLabPaused(false)
+    setContainers((prev) => ({
+      pool: shuffleArray([...prev.pool, ...prev.queue]),
+      queue: [],
+    }))
   }, [session])
 
   const activeCmd = activeId ? lab.commands.find((c) => c.id === activeId) : null
@@ -361,7 +376,7 @@ export function TerminalReplayRunner({ lab, timed = true }: Props) {
         labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ pool: containers.pool, queue: containers.queue, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onRatingClose={() => setRoute('skill-labs')}
       />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
@@ -435,73 +450,98 @@ export function TerminalReplayRunner({ lab, timed = true }: Props) {
         </div>
       )}
 
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {session.submitted ? (
-          <div className="space-y-3">
-            <div className={`font-semibold text-sm ${animState === 'complete' ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {animState === 'complete' ? '✓ All commands executed in the correct order!' : '✗ Time expired before completing'}
-            </div>
-            <ExplanationBlock text={lab.explanation} />
-            <button
-              onClick={() => setRoute('skill-labs')}
-              className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition"
-            >
-              Back to Skill Labs
-            </button>
+      {session.submitted && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-3">
+          <div className={`font-semibold text-sm ${animState === 'complete' ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+            {animState === 'complete' ? '✓ All commands executed in the correct order!' : '✗ Time expired before completing'}
           </div>
-        ) : animState === 'failed' ? (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm text-destructive font-medium">
-                Command failed. Rearrange the queue and try again{attempts > 1 ? ` (attempt ${attempts})` : ''}.
-              </p>
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-md border border-border bg-card font-medium text-sm hover:bg-muted/50 transition text-muted-foreground"
-                  onClick={() => setTipOpen((o) => !o)}
-                >
-                  <Lightbulb className="w-4 h-4" />
-                  {tipOpen ? 'Hide tip' : 'Show tip'}
-                </button>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-card font-medium text-sm hover:bg-muted/50 transition"
-                  onClick={handleReset}
-                >
-                  <RotateCcw className="w-4 h-4" /> Reset
-                </button>
-              </div>
-            </div>
-            {tipOpen && (
-              <div className="rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-3 text-sm text-amber-800 dark:text-amber-300 space-y-1">
-                <p className="font-medium">Things to check:</p>
-                <ul className="list-disc list-inside space-y-1 text-xs">
-                  <li>Read the error output in the terminal — it describes what was missing at that point.</li>
-                  <li>Is the failed command in the right position, or does something else need to run first?</li>
-                  <li>Have you included any distractors? Not every listed command should be in the queue.</li>
-                  <li>Dependencies must be satisfied before you run a command that relies on them.</li>
-                </ul>
-              </div>
-            )}
-          </div>
-        ) : animState === 'running' ? (
-          <p className="text-sm text-muted-foreground animate-pulse">Running commands…</p>
-        ) : (
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      {!session.submitted && animState === 'failed' && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-3">
           <div className="flex items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              {containers.queue.length === 0
-                ? 'Drag the commands you need into the queue, in order. Watch out for distractors.'
-                : `${containers.queue.length} command${containers.queue.length !== 1 ? 's' : ''} queued`}
+            <p className="text-sm text-destructive font-medium">
+              Command failed. Rearrange the queue and try again{attempts > 1 ? ` (attempt ${attempts})` : ''}.
             </p>
-            <button
-              className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 shrink-0"
-              disabled={containers.queue.length === 0}
-              onClick={runAnimation}
-            >
-              <Play className="w-4 h-4" /> Run
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                className="flex items-center gap-1.5 px-3 py-2 rounded-md border border-border bg-card font-medium text-sm hover:bg-muted/50 transition text-muted-foreground"
+                onClick={() => setTipOpen((o) => !o)}
+              >
+                <Lightbulb className="w-4 h-4" />
+                {tipOpen ? 'Hide tip' : 'Show tip'}
+              </button>
+              <button
+                className="flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-card font-medium text-sm hover:bg-muted/50 transition"
+                onClick={handleReset}
+              >
+                <RotateCcw className="w-4 h-4" /> Reset
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+          {tipOpen && (
+            <div className="rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-3 text-sm text-amber-800 dark:text-amber-300 space-y-1">
+              <p className="font-medium">Things to check:</p>
+              <ul className="list-disc list-inside space-y-1 text-xs">
+                <li>Read the error output in the terminal — it describes what was missing at that point.</li>
+                <li>Is the failed command in the right position, or does something else need to run first?</li>
+                <li>Have you included any distractors? Not every listed command should be in the queue.</li>
+                <li>Dependencies must be satisfied before you run a command that relies on them.</li>
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!session.submitted && animState === 'running' && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+          <p className="text-sm text-muted-foreground animate-pulse">Running commands…</p>
+        </div>
+      )}
+
+      {!session.submitted && animState !== 'complete' && (
+        <div className="flex items-center gap-2 flex-wrap pt-1">
+          <span className="text-xs text-muted-foreground mr-auto">
+            {containers.queue.length === 0
+              ? 'Drag commands into the queue, in order.'
+              : `${containers.queue.length} command${containers.queue.length !== 1 ? 's' : ''} queued.`}
+          </span>
+          <button
+            onClick={session.handleCancelLab}
+            className="px-3 py-2 rounded-md text-sm border border-border bg-card text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
+          >
+            Cancel Lab
+          </button>
+          <button
+            onClick={runAnimation}
+            disabled={containers.queue.length === 0 || animState === 'running'}
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition disabled:opacity-50 inline-flex items-center gap-1.5"
+          >
+            <Play className="w-4 h-4" />
+            {animState === 'running' ? 'Running…' : 'Run'}
+          </button>
+        </div>
+      )}
+
+      {!session.submitted && animState === 'complete' && (
+        <div className="flex items-center justify-end gap-2 flex-wrap pt-1">
+          <button
+            onClick={session.handleCancelLab}
+            className="px-3 py-2 rounded-md text-sm border border-border bg-card text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
+          >
+            Cancel Lab
+          </button>
+          <button
+            onClick={() => session.finalize(true, containers.queue.join(','))}
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition inline-flex items-center gap-1.5"
+          >
+            <Play className="w-4 h-4" />
+            Complete Lab
+          </button>
+        </div>
+      )}
     </div>
   )
 }

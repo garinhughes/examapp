@@ -123,6 +123,15 @@ export function QuestionNav({ focusMode = false, reviewingFlagged = false }: { f
   const curShowFeedback = isFinished || (curQ && revealedQuestions.has(curQ.id))
   const immediateMode = revealAnswers === 'immediately'
 
+  function scrollToTop() {
+    const el = document.getElementById('exam-scroll-container')
+    if (el) el.scrollTop = 0
+    // Fallbacks for mobile browsers that scroll window/body instead of the inner container
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }
+
   function getNextIndex(current: number) {
     if (reviewingFlagged) {
       const next = displayQuestions.findIndex((q, idx) => idx > current && flaggedQuestions.has(q.id))
@@ -214,7 +223,7 @@ export function QuestionNav({ focusMode = false, reviewingFlagged = false }: { f
             </>
           )}
           <button
-            onClick={() => setCurrentQuestionIndex((i) => getPrevIndex(i))}
+            onClick={() => { setCurrentQuestionIndex((i) => getPrevIndex(i)); scrollToTop() }}
             disabled={currentQuestionIndex <= 0}
             title="Previous question"
             className={`rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 whitespace-nowrap inline-flex items-center justify-center ${focusMode ? 'p-1.5' : 'px-3 py-1'}`}
@@ -223,7 +232,7 @@ export function QuestionNav({ focusMode = false, reviewingFlagged = false }: { f
           </button>
           {immediateMode && curShowFeedback && curAnswered ? (
             <button
-              onClick={() => setCurrentQuestionIndex((i) => getNextIndex(i))}
+              onClick={() => { setCurrentQuestionIndex((i) => getNextIndex(i)); scrollToTop() }}
               disabled={currentQuestionIndex >= displayQuestions.length - 1}
               title="Next question"
               className={`rounded-md bg-primary text-white text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors whitespace-nowrap inline-flex items-center justify-center ${focusMode ? 'p-1.5' : 'px-3 py-1'}`}
@@ -232,7 +241,7 @@ export function QuestionNav({ focusMode = false, reviewingFlagged = false }: { f
             </button>
           ) : (
             <button
-              onClick={() => setCurrentQuestionIndex((i) => getNextIndex(i))}
+              onClick={() => { setCurrentQuestionIndex((i) => getNextIndex(i)); scrollToTop() }}
               disabled={currentQuestionIndex >= displayQuestions.length - 1}
               title="Next question"
               className={`rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 whitespace-nowrap inline-flex items-center justify-center ${focusMode ? 'p-1.5' : 'px-3 py-1'}`}

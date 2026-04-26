@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect } from 'react'
-import { Activity } from 'lucide-react'
-import { useExam } from '@/exam/ExamContext'
+import { Activity, CheckCircle2, XCircle } from 'lucide-react'
 import type { ServiceLimitsLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface ServiceLimitsProgress { selections: Record<string, string>; timeLeft: number }
 
@@ -26,6 +26,19 @@ export function ServiceLimitsRunner({ lab, timed = true }: Props) {
   })
   const [results, setResults] = useState<Record<string, boolean>>({})
   const [simPhase, setSimPhase] = useState(session.savedProgress ? 1 : 0)
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    const init: Record<string, string> = {}
+    for (const m of lab.metrics) init[m.id] = ''
+    setSelections(init)
+    setResults({})
+    setSimPhase(0)
+    setChecked(false)
+    const t = setTimeout(() => setSimPhase(1), 2000)
+    return () => clearTimeout(t)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -33,7 +46,7 @@ export function ServiceLimitsRunner({ lab, timed = true }: Props) {
   }, [selections, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   // Auto-start the traffic spike simulation after 2 seconds (skip if resuming)
@@ -44,36 +57,36 @@ export function ServiceLimitsRunner({ lab, timed = true }: Props) {
   }, [])
 
   const handleSelect = useCallback((metricId: string, option: string) => {
-    if (session.submitted) return
+    if (checked) return
+    session.markDirty()
     setSelections((prev) => ({ ...prev, [metricId]: option }))
-  }, [session.submitted])
+  }, [checked])
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     setSimPhase(2)
     const res: Record<string, boolean> = {}
-    let allCorrect = true
     for (const m of lab.metrics) {
-      const pass = selections[m.id] === m.correctOption
-      res[m.id] = pass
-      if (!pass) allCorrect = false
+      res[m.id] = selections[m.id] === m.correctOption
     }
     setResults(res)
-    await session.finalize(allCorrect, JSON.stringify(selections))
-  }, [lab, selections, session.finalize])
+    setChecked(true)
+  }, [checked, lab, selections])
 
-  const allCorrect = session.submitted && lab.metrics.every((m) => results[m.id])
+  const handleComplete = useCallback(async () => {
+    await session.finalize(allCorrect, JSON.stringify(selections))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.finalize, selections, results])
+
+  const allCorrect = checked && lab.metrics.every((m) => results[m.id])
   const answeredCount = Object.values(selections).filter(Boolean).length
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={session.timeLimit - session.timeLeft} timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }} onCancel={() => session.setShowConfirmModal(false)} />
-      )}
       <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={lab.scenario} labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ selections, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+        onRatingClose={() => setRoute('skill-labs')} />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
@@ -103,7 +116,7 @@ export function ServiceLimitsRunner({ lab, timed = true }: Props) {
           <div
             key={metric.id}
             className={`rounded-lg border p-4 ${
-              session.submitted
+              checked
                 ? results[metric.id] ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'
                 : 'border-border bg-card'
             }`}
@@ -122,11 +135,11 @@ export function ServiceLimitsRunner({ lab, timed = true }: Props) {
                 <button
                   key={option}
                   onClick={() => handleSelect(metric.id, option)}
-                  disabled={session.submitted}
+                  disabled={checked}
                   className={`w-full text-left px-3 py-2 rounded-md border text-sm transition ${
-                    session.submitted && option === metric.correctOption
+                    checked && option === metric.correctOption
                       ? 'border-green-500 bg-green-500/10 text-green-700 dark:text-green-400'
-                      : session.submitted && selections[metric.id] === option && option !== metric.correctOption
+                      : checked && selections[metric.id] === option && option !== metric.correctOption
                         ? 'border-destructive bg-destructive/10 text-destructive'
                         : selections[metric.id] === option
                           ? 'border-primary bg-primary/10 text-primary'
@@ -141,33 +154,28 @@ export function ServiceLimitsRunner({ lab, timed = true }: Props) {
         ))}
       </div>
 
-      {/* Submit / Result */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!session.submitted ? (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Choose the correct scaling action for each metric.</p>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
-              disabled={answeredCount < lab.metrics.length}
-              onClick={() => session.setShowConfirmModal(true)}
-            >
-              Apply Scaling Actions
-            </button>
+      {checked && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-2">
+          <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${allCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+            {allCorrect ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            {allCorrect
+              ? 'All scaling actions correct — system stabilized!'
+              : `${Object.values(results).filter(Boolean).length}/${lab.metrics.length} correct`}
           </div>
-        ) : (
-          <div className="space-y-2">
-            <div className={`font-semibold text-sm ${allCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {allCorrect
-                ? '✓ All scaling actions correct - system stabilized!'
-                : `✗ ${Object.values(results).filter(Boolean).length}/${lab.metrics.length} correct`}
-            </div>
-            <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
-          </div>
-        )}
-      </div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={allCorrect}
+        submitted={session.submitted}
+        canCheck={answeredCount >= lab.metrics.length}
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { getBookmarkedLabs, toggleBookmark } from './shared'
 import { ReportIssueModal } from '@/components/ReportIssueModal'
 import { RatingModal } from '@/feedback/RatingModal'
 import { MarkdownText } from '@/exam/utils'
+import { LAB_RATING_PROMPT_EVENT } from './useLabSession'
 
 interface LabHeaderProps {
   title: string
@@ -19,19 +20,48 @@ interface LabHeaderProps {
   onPauseAndExit?: () => void
   /** Called to discard saved progress and exit. When provided, a "Cancel Lab" option is shown. */
   onCancelLab?: () => void
+  /** Called when the auto-prompted rating modal closes. Useful for navigating away after a complete. */
+  onRatingClose?: () => void
 }
 
-export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChange, onPauseAndExit, onCancelLab }: LabHeaderProps) {
+export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChange, onPauseAndExit, onCancelLab, onRatingClose }: LabHeaderProps) {
   const { setRoute, userTier } = useExam()
   const canReport = userTier !== 'visitor'
   const [isBookmarked, setIsBookmarked] = useState(() => labId ? getBookmarkedLabs().has(labId) : false)
   const [reporting, setReporting] = useState(false)
   const [rating, setRating] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
-
   useEffect(() => {
     onPauseChange?.(reporting || rating)
   }, [reporting, rating])
+
+  const RATINGS_IGNORED_KEY = 'lab_ratings_ignored'
+
+  const handleIgnoreAll = useCallback(() => {
+    try { sessionStorage.setItem(RATINGS_IGNORED_KEY, '1') } catch { /* ignore */ }
+    setRating(false)
+    onRatingClose?.()
+  }, [onRatingClose])
+
+  // Auto-open rating prompt when useLabSession signals a complete.
+  // Skipped if user has chosen "Ignore all ratings" this session.
+  useEffect(() => {
+    if (!labId || !canReport) return
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail
+      if (!detail || detail.labId !== labId) return
+      try { if (sessionStorage.getItem(RATINGS_IGNORED_KEY)) return } catch { /* ignore */ }
+      const t = setTimeout(() => setRating(true), 400)
+      // Stash on the listener so we can clear if labId changes
+      ;(handler as any)._timer = t
+    }
+    window.addEventListener(LAB_RATING_PROMPT_EVENT, handler)
+    return () => {
+      window.removeEventListener(LAB_RATING_PROMPT_EVENT, handler)
+      const t = (handler as any)._timer
+      if (t) clearTimeout(t)
+    }
+  }, [labId, canReport])
 
   useEffect(() => {
     if (!confirmCancel) return
@@ -76,14 +106,14 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
             <h2 className="font-semibold text-lg leading-snug">{title}</h2>
             {subtitle && <MarkdownText text={subtitle} className="text-sm text-muted-foreground mt-1" />}
           </div>
-          <div className="shrink-0">
-          {timed ? (
-            <div className={`font-mono text-sm font-semibold px-3 py-1 rounded-md ${timeLeft <= 30 ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
-              {formatTime(timeLeft)}
-            </div>
-          ) : (
-            <span className="px-3 py-1 rounded-md bg-muted text-muted-foreground text-sm font-medium">Casual</span>
-          )}
+          <div className="shrink-0 flex items-center gap-2">
+            {timed ? (
+              <div className={`font-mono text-sm font-semibold px-3 py-1 rounded-md ${timeLeft <= 30 ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
+                {formatTime(timeLeft)}
+              </div>
+            ) : (
+              <span className="px-3 py-1 rounded-md bg-muted text-muted-foreground text-sm font-medium">Casual</span>
+            )}
           </div>
         </div>
         {/* Action buttons row */}
@@ -136,7 +166,8 @@ export function LabHeader({ title, timed, timeLeft, subtitle, labId, onPauseChan
             <RatingModal
               contentType="lab"
               contentId={labId}
-              onClose={() => setRating(false)}
+              onClose={() => { setRating(false); onRatingClose?.() }}
+              onIgnoreAll={handleIgnoreAll}
             />
           )}
           {confirmCancel && onCancelLab && createPortal(

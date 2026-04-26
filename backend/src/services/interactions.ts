@@ -12,7 +12,7 @@ export interface RatingItem {
   userId: string
   SK: string
   interactionType: 'RATING'
-  contentType: 'question' | 'lab'
+  contentType: 'question' | 'lab' | 'exam'
   contentId: string
   userEmail?: string
   stars: number

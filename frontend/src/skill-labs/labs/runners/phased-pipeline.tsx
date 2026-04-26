@@ -9,13 +9,13 @@ import {
   SortableContext, verticalListSortingStrategy, arrayMove, useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical } from 'lucide-react'
-import { useExam } from '@/exam/ExamContext'
+import { GripVertical, CheckCircle2, XCircle } from 'lucide-react'
 import { ExplanationBlock } from '../ExplanationBlock'
 import type { PhasedPipelineLabDefinition, PipelinePhase } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface PhasedPipelineProgress {
   containers: Record<string, string[]>
@@ -160,6 +160,17 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
   const [containers, setContainers] = useState<Record<string, string[]>>(initContainers)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [stepResults, setStepResults] = useState<Record<string, boolean>>({})
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    const c: Record<string, string[]> = { pool: shuffleArray(lab.steps.map((s) => s.id)) }
+    for (const p of lab.phases) c[p.id] = []
+    setContainers(c)
+    setActiveId(null)
+    setStepResults({})
+    setChecked(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -167,7 +178,7 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
   }, [containers, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   const findContainer = useCallback((id: string) => {
@@ -181,9 +192,10 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
 
   const onDragEnd = useCallback((e: DragEndEvent) => {
     setActiveId(null)
-    if (session.submitted) return
+    if (checked) return
     const { active, over } = e
     if (!over) return
+    session.markDirty()
 
     const activeId = String(active.id)
     const overId   = String(over.id)
@@ -214,11 +226,12 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
       }
       return next
     })
-  }, [containers, findContainer, session.submitted])
+  }, [containers, findContainer, checked])
 
   const allAssigned = containers.pool.length === 0
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const results: Record<string, boolean> = {}
     for (const phaseId of Object.keys(containers)) {
       if (phaseId === 'pool') continue
@@ -231,7 +244,6 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
         if (ok && step.mustFollowIds) {
           for (const prereq of step.mustFollowIds) {
             const prereqStep = lab.steps.find((s) => s.id === prereq)
-            // Prereq only binds when it is in the same (correct) phase.
             if (prereqStep && prereqStep.correctPhaseId === phaseId && !seen.has(prereq)) {
               ok = false
               break
@@ -244,24 +256,19 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
     }
     for (const stepId of containers.pool) results[stepId] = false
     setStepResults(results)
-    const allCorrect = Object.values(results).every(Boolean)
+    setChecked(true)
+  }, [checked, containers, lab.steps])
+
+  const handleComplete = useCallback(async () => {
+    const allCorrect = Object.values(stepResults).every(Boolean) && Object.keys(stepResults).length === lab.steps.length
     await session.finalize(allCorrect, JSON.stringify(containers))
-  }, [containers, lab.steps, session.finalize])
+  }, [session.finalize, containers, stepResults, lab.steps.length])
 
   const activeStep = activeId ? lab.steps.find((s) => s.id === activeId) : null
   const correctCount = Object.values(stepResults).filter(Boolean).length
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal
-          title={lab.title}
-          timeTaken={session.timeLimit - session.timeLeft}
-          timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => session.setShowConfirmModal(false)}
-        />
-      )}
       <LabHeader
         title={lab.title}
         timed={timed}
@@ -270,7 +277,7 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
         labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ containers, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onRatingClose={() => setRoute('skill-labs')}
       />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
@@ -283,7 +290,7 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
           <PoolArea
             items={containers.pool}
             stepText={(id) => lab.steps.find((s) => s.id === id)!.text}
-            disabled={session.submitted}
+            disabled={checked}
           />
           <div className="flex flex-col sm:flex-row gap-3 flex-1">
             {lab.phases.map((phase, idx) => (
@@ -293,9 +300,9 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
                 phaseNumber={idx + 1}
                 items={containers[phase.id] ?? []}
                 stepText={(id) => lab.steps.find((s) => s.id === id)!.text}
-                submitted={session.submitted}
+                submitted={checked}
                 stepResults={stepResults}
-                disabled={session.submitted}
+                disabled={checked}
               />
             ))}
           </div>
@@ -311,28 +318,14 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
         </DragOverlay>
       </DndContext>
 
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!session.submitted ? (
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              {allAssigned
-                ? 'All steps assigned. Check the order within each phase, then submit.'
-                : `${containers.pool.length} step${containers.pool.length !== 1 ? 's' : ''} not yet assigned`}
-            </p>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 shrink-0"
-              disabled={!allAssigned}
-              onClick={() => session.setShowConfirmModal(true)}
-            >
-              Submit
-            </button>
-          </div>
-        ) : (
+      {checked && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <div className="space-y-3">
-            <div className={`font-semibold text-sm ${correctCount === lab.steps.length ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+            <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${correctCount === lab.steps.length ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+              {correctCount === lab.steps.length ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
               {correctCount === lab.steps.length
-                ? `✓ Perfect! All ${lab.steps.length} steps in the correct phase and position.`
-                : `✗ ${correctCount}/${lab.steps.length} steps in the correct phase and position`}
+                ? `Perfect! All ${lab.steps.length} steps in the correct phase and position.`
+                : `${correctCount}/${lab.steps.length} steps in the correct phase and position`}
             </div>
             {correctCount !== lab.steps.length && (
               <div className="rounded-md border border-border bg-muted/30 p-3 space-y-3">
@@ -385,15 +378,20 @@ export function PhasedPipelineRunner({ lab, timed = true }: Props) {
               </div>
             )}
             <ExplanationBlock text={lab.explanation} />
-            <button
-              onClick={() => setRoute('skill-labs')}
-              className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition"
-            >
-              Back to Skill Labs
-            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={correctCount === lab.steps.length}
+        submitted={session.submitted}
+        canCheck={allAssigned}
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

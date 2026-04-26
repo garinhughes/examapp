@@ -12,12 +12,13 @@ import ReactFlow, {
   type Connection,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { useExam } from '@/exam/ExamContext'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import type { ArchitectureBuilderLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { LabDiagram } from '../LabDiagram'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 import { ExplanationBlock } from '../ExplanationBlock'
 
 interface ArchProgress {
@@ -52,6 +53,17 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
   const [edges, setEdges, onEdgesChange] = useEdgesState(session.savedProgress?.edges ?? [])
   const nodeCountRef = useRef(session.savedProgress?.nodes?.length ?? 0)
   const [validationResults, setValidationResults] = useState<{ check: string; pass: boolean }[]>([])
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    setPlacedComponents(new Set())
+    setNodes([])
+    setEdges([])
+    nodeCountRef.current = 0
+    setValidationResults([])
+    setChecked(false)
+  }, [session.restartKey])
 
   // Fit view when nodes are added
   const prevNodeCount = useRef(nodes.length)
@@ -68,7 +80,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
   }, [placedComponents, nodes, edges, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doValidate()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   const removeComponent = useCallback((id: string) => {
@@ -82,7 +94,8 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
   }, [setNodes, setEdges])
 
   const toggleComponent = useCallback((comp: typeof lab.availableComponents[0]) => {
-    if (session.submitted) return
+    if (checked) return
+    session.markDirty()
     if (placedComponents.has(comp.id)) {
       removeComponent(comp.id)
       return
@@ -106,24 +119,27 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
       },
     }
     setNodes((prev) => [...prev, newNode])
-  }, [placedComponents, session.submitted, removeComponent, setNodes])
+  }, [placedComponents, checked, removeComponent, setNodes])
 
   const onNodesDelete = useCallback((deleted: Node[]) => {
-    if (session.submitted) return
+    if (checked) return
     for (const n of deleted) removeComponent(n.id)
-  }, [session.submitted, removeComponent])
+  }, [checked, removeComponent])
 
   const onConnect = useCallback((connection: Connection) => {
-    if (session.submitted) return
+    if (checked) return
+    session.markDirty()
     setEdges((prev) => addEdge({ ...connection, animated: true }, prev))
-  }, [session.submitted, setEdges])
+  }, [checked, setEdges])
 
   const onEdgeClick = useCallback((_event: React.MouseEvent, edge: Edge) => {
-    if (session.submitted) return
+    if (checked) return
+    session.markDirty()
     setEdges((prev) => prev.filter((e) => e.id !== edge.id))
-  }, [session.submitted, setEdges])
+  }, [checked, setEdges])
 
-  const doValidate = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const results: { check: string; pass: boolean }[] = []
 
     const missingComps = lab.requiredComponents.filter((id) => !placedComponents.has(id))
@@ -150,9 +166,13 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
     }
 
     setValidationResults(results)
-    const allPass = results.every((r) => r.pass)
+    setChecked(true)
+  }, [checked, lab, placedComponents, edges])
+
+  const handleComplete = useCallback(async () => {
+    const allPass = validationResults.every((r) => r.pass)
     await session.finalize(allPass)
-  }, [lab, placedComponents, edges, session.finalize])
+  }, [session.finalize, validationResults])
 
   const allPass = validationResults.length > 0 && validationResults.every((r) => r.pass)
 
@@ -168,14 +188,10 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={session.timeLimit - session.timeLeft} timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doValidate() }} onCancel={() => session.setShowConfirmModal(false)} />
-      )}
       <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={displayScenario} labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ placedComponents: [...placedComponents], nodes, edges, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+        onRatingClose={() => setRoute('skill-labs')} />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
@@ -199,7 +215,7 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
                       <button
                         key={comp.id}
                         onClick={() => toggleComponent(comp)}
-                        disabled={session.submitted}
+                        disabled={checked}
                         title={placed ? 'Click to remove from canvas' : 'Click to add to canvas'}
                         className={`w-full flex items-center justify-between gap-2 text-left px-2.5 py-1.5 rounded-md text-sm transition ${
                           placed
@@ -239,8 +255,8 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
             deleteKeyCode={['Delete', 'Backspace']}
             fitView
             proOptions={{ hideAttribution: true }}
-            nodesConnectable={!session.submitted}
-            nodesDraggable={!session.submitted}
+            nodesConnectable={!checked}
+            nodesDraggable={!checked}
           >
             <Background />
             <Controls showInteractive={false} />
@@ -248,43 +264,34 @@ function ArchitectureBuilderInner({ lab, timed = true }: Props) {
         </div>
       </div>
 
-      {/* Validation / Submit */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!session.submitted ? (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Place components and connect them, then validate your architecture.
-            </p>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
-              disabled={nodes.length === 0}
-              onClick={() => session.setShowConfirmModal(true)}
-            >
-              Validate Architecture
-            </button>
+      {checked && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-3">
+          <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${allPass ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+            {allPass ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            {allPass ? 'Architecture validated successfully!' : 'Some checks failed'}
           </div>
-        ) : (
-          <div className="space-y-3">
-            <div className={`font-semibold text-sm ${allPass ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {allPass ? '✓ Architecture validated successfully!' : '✗ Some checks failed'}
-            </div>
-            <div className="space-y-1.5">
-              {validationResults.map((r, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm">
-                  <span className={r.pass ? 'text-green-600 dark:text-green-400' : 'text-destructive'}>
-                    {r.pass ? '✓' : '✗'}
-                  </span>
-                  <span className={r.pass ? '' : 'text-muted-foreground'}>{r.check}</span>
-                </div>
-              ))}
-            </div>
-            <ExplanationBlock text={lab.explanation} className="mt-2" />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
+          <div className="space-y-1.5">
+            {validationResults.map((r, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <span className={r.pass ? 'text-green-600 dark:text-green-400' : 'text-destructive'}>{r.pass ? '✓' : '✗'}</span>
+                <span className={r.pass ? '' : 'text-muted-foreground'}>{r.check}</span>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+          <ExplanationBlock text={lab.explanation} className="mt-2" />
+        </div>
+      )}
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={allPass}
+        submitted={session.submitted}
+        canCheck={nodes.length > 0}
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

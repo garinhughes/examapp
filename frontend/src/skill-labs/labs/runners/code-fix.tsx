@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import Editor from '@monaco-editor/react'
-import { useExam } from '@/exam/ExamContext'
+import { Play } from 'lucide-react'
 import { apiUrl } from '@/apiBase'
 import type { CodeFixLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { LabDiagram } from '../LabDiagram'
 import { useLabSession } from '../useLabSession'
+import { useExam } from '@/exam/ExamContext'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { MarkdownText } from '@/exam/utils'
 
@@ -32,6 +33,14 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
   const [validating, setValidating] = useState(false)
 
+  // Reset on Retry
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    setCode(lab.brokenCode)
+    setValidationResult(null)
+    setValidating(false)
+  }, [session.restartKey])
+
   useEffect(() => {
     if (session.submitted) return
     session.saveProgress({ code, timeLeft: session.timeLeft })
@@ -43,7 +52,7 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
     }
   }, [session.timeLeft])
 
-  const handleTest = useCallback(async () => {
+  const handleCheck = useCallback(async () => {
     setValidating(true)
     try {
       const res = await fetch(apiUrl(`/skill-labs/${encodeURIComponent(lab.id)}/validate-code`), {
@@ -53,22 +62,20 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
       })
       const result: ValidationResult = await res.json()
       setValidationResult(result)
+      session.recordCheck(result.success, result.success ? null : result.errors)
     } catch {
-      setValidationResult({ success: false, errors: ['Failed to validate. Please try again.'] })
+      const errs = ['Failed to validate. Please try again.']
+      setValidationResult({ success: false, errors: errs })
+      session.recordCheck(false, errs)
     } finally {
       setValidating(false)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code, lab.id])
 
   const handleComplete = useCallback(async () => {
     await session.finalize(true, 'solved')
   }, [session.finalize])
-
-  const handleGiveUp = useCallback(async () => {
-    setCode(lab.correctCode)
-    setValidationResult({ success: false, errors: ['You gave up. The correct code is now shown.'] })
-    await session.finalize(false, 'gave-up')
-  }, [lab, session.finalize])
 
   return (
     <div className="flex flex-col h-full gap-4">
@@ -79,7 +86,7 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
         labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ code, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onRatingClose={() => setRoute('skill-labs')}
       />
 
       {session.resumeNotice && (
@@ -111,7 +118,7 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
             height="100%"
             language={lab.language}
             value={code}
-            onChange={(value) => !session.submitted && setCode(value || '')}
+            onChange={(value) => { if (!session.submitted) { session.markDirty(); setCode(value || '') } }}
             theme="vs-dark"
             options={{
               minimap: { enabled: false },
@@ -125,75 +132,53 @@ export function CodeFixLabRunner({ lab, timed = true }: Props) {
           />
       </div>
 
-      {/* Bottom row: Test Results (full width) */}
-      <div className="shrink-0 rounded-lg border border-border bg-card p-4">
-        <div className="flex items-start gap-4">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-base mb-2">Test Results</h3>
-
-            {!validationResult && !session.submitted && (
-              <p className="text-sm text-muted-foreground">
-                Edit the code and click "Test Code" to validate your changes. Keep iterating — tests can be run as many times as you like.
-              </p>
-            )}
-
-            {validationResult && (
-              <div className="space-y-2">
-                <div className={`flex items-center gap-2 font-semibold text-sm ${validationResult.success ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-                  {validationResult.success
-                    ? '✓ All checks passed — click Complete Lab to finish.'
-                    : `✗ ${validationResult.errors.length} check${validationResult.errors.length === 1 ? '' : 's'} still failing`}
-                </div>
-                {validationResult.errors.length > 0 && (
-                  <ul className="flex flex-wrap gap-2">
-                    {validationResult.errors.map((err, i) => (
-                      <li key={i} className="text-xs text-destructive bg-destructive/10 rounded px-2 py-1">
-                        {err}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {session.submitted && <ExplanationBlock text={lab.explanation} />}
-              </div>
-            )}
-          </div>
-
-          <div className="shrink-0 flex flex-col gap-2 min-w-40">
-            {!session.submitted ? (
-              <>
-                <button
-                  className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
-                  disabled={validating}
-                  onClick={handleTest}
-                >
-                  {validating ? 'Validating…' : 'Test Code'}
-                </button>
-                {validationResult?.success && (
-                  <button
-                    className="px-4 py-2 rounded-md bg-green-600 text-white font-medium text-sm hover:bg-green-700 transition"
-                    onClick={handleComplete}
-                  >
-                    Complete Lab
-                  </button>
-                )}
-                <button
-                  className="px-4 py-2 rounded-md border border-border text-muted-foreground font-medium text-sm hover:bg-muted/50 transition"
-                  onClick={handleGiveUp}
-                >
-                  Give Up & Show Answer
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setRoute('skill-labs')}
-                className="px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition"
-              >
-                Back to Skill Labs
-              </button>
-            )}
-          </div>
+      {validationResult?.success && !session.submitted && (
+        <div className="shrink-0 rounded-lg border border-emerald-300/50 bg-emerald-50 dark:bg-emerald-900/10 dark:border-emerald-700/40 p-4">
+          <div className="font-semibold text-sm text-emerald-700 dark:text-emerald-300 mb-1">✓ All checks passed</div>
+          <ExplanationBlock text={lab.explanation} />
         </div>
-      </div>
+      )}
+
+      {session.submitted && (
+        <div className="shrink-0 rounded-lg border border-emerald-300/50 bg-emerald-50 dark:bg-emerald-900/10 dark:border-emerald-700/40 p-4">
+          <div className="font-semibold text-sm text-emerald-700 dark:text-emerald-300 mb-1">Lab completed</div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      {!session.submitted && session.lastCheck && !session.lastCheck.correct && session.lastCheck.feedback && (
+        <div className="text-xs text-destructive">
+          {Array.isArray(session.lastCheck.feedback)
+            ? <ul className="list-disc list-inside space-y-0.5">{session.lastCheck.feedback.map((f, i) => <li key={i}>{f}</li>)}</ul>
+            : session.lastCheck.feedback}
+        </div>
+      )}
+
+      {!session.submitted && (
+        <div className="flex items-center justify-end gap-2 flex-wrap pt-1">
+          <button
+            onClick={session.handleCancelLab}
+            className="px-3 py-2 rounded-md text-sm border border-border bg-card text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
+          >
+            Cancel Lab
+          </button>
+          <button
+            onClick={handleCheck}
+            disabled={validating}
+            className="px-4 py-2 rounded-md bg-accent text-foreground text-sm font-medium hover:bg-accent/80 transition disabled:opacity-50"
+          >
+            {validating ? 'Checking…' : (session.lastCheck && !session.lastCheck.correct ? 'Retest' : 'Check')}
+          </button>
+          <button
+            onClick={handleComplete}
+            disabled={!session.lastCheck?.correct}
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition disabled:opacity-50 inline-flex items-center gap-1.5"
+          >
+            <Play className="w-4 h-4" />
+            Complete Lab
+          </button>
+        </div>
+      )}
     </div>
   )
 }

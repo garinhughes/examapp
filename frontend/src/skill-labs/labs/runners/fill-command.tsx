@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect } from 'react'
 import type React from 'react'
-import { useExam } from '@/exam/ExamContext'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import type { FillCommandLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 // Matches, in priority order:
 // 1. Comment lines   2. --flags   3. single-quoted strings   4. double-quoted strings
@@ -69,6 +70,16 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
     () => session.savedProgress?.answers ?? {}
   )
   const [results, setResults] = useState<Record<string, boolean>>({})
+  const [checked, setChecked] = useState(false)
+  const [isCorrect, setIsCorrect] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    setAnswers({})
+    setResults({})
+    setChecked(false)
+    setIsCorrect(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -76,15 +87,17 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
   }, [answers, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   const setBlank = useCallback((qId: string, bId: string, value: string) => {
-    if (session.submitted) return
+    if (checked) return
+    session.markDirty()
     setAnswers((prev) => ({ ...prev, [`${qId}:${bId}`]: value }))
-  }, [session.submitted])
+  }, [checked])
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const res: Record<string, boolean> = {}
     let allCorrect = true
     for (const q of lab.questions) {
@@ -96,23 +109,19 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
       }
     }
     setResults(res)
-    await session.finalize(allCorrect, JSON.stringify(answers))
-  }, [lab, answers, session.finalize])
+    setIsCorrect(allCorrect)
+    setChecked(true)
+  }, [checked, lab, answers])
+
+  const handleComplete = useCallback(async () => {
+    await session.finalize(isCorrect, JSON.stringify(answers))
+  }, [session.finalize, answers, isCorrect])
 
   const totalBlanks = lab.questions.reduce((sum, q) => sum + q.blanks.length, 0)
   const filledBlanks = Object.values(answers).filter(Boolean).length
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal
-          title={lab.title}
-          timeTaken={session.timeLimit - session.timeLeft}
-          timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => session.setShowConfirmModal(false)}
-        />
-      )}
       <LabHeader
         title={lab.title}
         timed={timed}
@@ -121,7 +130,7 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
         labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ answers, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onRatingClose={() => setRoute('skill-labs')}
       />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
@@ -144,7 +153,7 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
                       {i < parts.length - 1 && blank && (() => {
                         const b = blank
                         const key = `${q.id}:${b.id}`
-                        const isCorrect = session.submitted ? results[key] : undefined
+                        const blankCorrect = checked ? results[key] : undefined
                         blankIdx++
                         return (
                           <input
@@ -153,13 +162,13 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
                             placeholder={b.placeholder}
                             value={answers[key] ?? ''}
                             onChange={(e) => setBlank(q.id, b.id, e.target.value)}
-                            disabled={session.submitted}
+                            disabled={checked}
                             spellCheck={false}
                             autoComplete="off"
                             className={`inline font-mono text-sm px-2 py-0.5 rounded border w-44 align-middle focus:outline-none focus:ring-1 focus:ring-primary ${
-                              isCorrect === true
+                              blankCorrect === true
                                 ? 'border-green-600 bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                                : isCorrect === false
+                                : blankCorrect === false
                                   ? 'border-red-600 bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300'
                                   : 'border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-800'
                             }`}
@@ -171,10 +180,10 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
                   return node
                 })}
               </div>
-              {q.hint && !session.submitted && (
+              {q.hint && !checked && (
                 <p className="text-xs text-muted-foreground mt-2">Hint: {q.hint}</p>
               )}
-              {session.submitted && (
+              {checked && (
                 <div className="mt-2 space-y-1">
                   {q.blanks.map((b) => {
                     const key = `${q.id}:${b.id}`
@@ -192,32 +201,28 @@ export function FillCommandRunner({ lab, timed = true }: Props) {
         })}
       </div>
 
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!session.submitted ? (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Fill in all blanks, then submit.</p>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
-              disabled={filledBlanks < totalBlanks}
-              onClick={() => session.setShowConfirmModal(true)}
-            >
-              Submit Commands
-            </button>
+      {checked && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-2">
+          <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+            {isCorrect ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            {isCorrect
+              ? 'All commands correct!'
+              : `${Object.values(results).filter(Boolean).length}/${totalBlanks} correct`}
           </div>
-        ) : (
-          <div className="space-y-2">
-            <div className={`font-semibold text-sm ${Object.values(results).every(Boolean) ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {Object.values(results).every(Boolean)
-                ? '✓ All commands correct!'
-                : `✗ ${Object.values(results).filter(Boolean).length}/${totalBlanks} correct`}
-            </div>
-            <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
-          </div>
-        )}
-      </div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={isCorrect}
+        submitted={session.submitted}
+        canCheck={filledBlanks >= totalBlanks}
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

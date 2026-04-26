@@ -7,13 +7,20 @@ import { ScoreHistoryChart } from './ScoreHistoryChart'
 
 export function AnalyticsView() {
   const {
-    selected, selectedMeta, exams, providers, scoreHistory, loadingScoreHistory,
+    route, selected, selectedMeta, exams, providers, scoreHistory, loadingScoreHistory,
     analyticsAttempts, analyticsDomains, deletingAttemptId, setDeletingAttemptId,
     gamState, fetchScoreHistory, setupExamFromMeta,
     setRoute, authFetch, setAttemptData, setSelected, questions, setQuestions,
     attemptId, setAttemptId, showToast, setExamStarted,
     examStarted, anySavedExam, savedProgress, user,
   } = useExam()
+
+  // When mounted via /exams/:code/history (route='exam-history') the URL already
+  // scopes us to one exam — hide the provider picker + "step icons" chrome so we
+  // don't render redundant navigation. Legacy /analytics still shows the picker
+  // when no exam is selected (it's redirected in App.tsx, but keep the path live
+  // for safety).
+  const perExamMode = route === 'exam-history'
 
   const passMark = typeof selectedMeta?.passMark === 'number' ? selectedMeta.passMark : 70
 
@@ -87,27 +94,29 @@ export function AnalyticsView() {
 
   return (
     <div className="mb-6">
-      <div className="flex items-start gap-0 mb-4 -mx-1">
-        {[
-          { icon: BookOpen,   label: 'Pick an exam',  desc: 'Choose a certification below'  },
-          { icon: TrendingUp, label: 'Score history', desc: 'See pass/fail over time'        },
-          { icon: BarChart2,  label: 'Domains',       desc: 'Spot strengths & weak areas'   },
-          { icon: Eye,        label: 'Review',        desc: 'Replay any past attempt'        },
-        ].map(({ icon: Icon, label, desc }, i, arr) => (
-          <div key={label} className="flex items-center flex-1 min-w-0">
-            <div className="flex flex-col items-center flex-1 min-w-0 px-1">
-              <Icon className="w-6 h-6 text-primary flex-shrink-0" />
-              <span className="mt-1.5 text-sm font-semibold text-foreground text-center leading-tight">{label}</span>
-              <span className="text-xs text-muted-foreground text-center leading-tight mt-0.5 hidden sm:block">{desc}</span>
-            </div>
-            {i < arr.length - 1 && (
-              <div className="flex-shrink-0 flex flex-col items-center">
-                <ChevronRight className="w-3.5 h-3.5 text-primary" />
+      {!perExamMode && (
+        <div className="flex items-start gap-0 mb-4 -mx-1">
+          {[
+            { icon: BookOpen,   label: 'Pick an exam',  desc: 'Choose a certification below'  },
+            { icon: TrendingUp, label: 'Score history', desc: 'See pass/fail over time'        },
+            { icon: BarChart2,  label: 'Domains',       desc: 'Spot strengths & weak areas'   },
+            { icon: Eye,        label: 'Review',        desc: 'Replay any past attempt'        },
+          ].map(({ icon: Icon, label, desc }, i, arr) => (
+            <div key={label} className="flex items-center flex-1 min-w-0">
+              <div className="flex flex-col items-center flex-1 min-w-0 px-1">
+                <Icon className="w-6 h-6 text-primary flex-shrink-0" />
+                <span className="mt-1.5 text-sm font-semibold text-foreground text-center leading-tight">{label}</span>
+                <span className="text-xs text-muted-foreground text-center leading-tight mt-0.5 hidden sm:block">{desc}</span>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+              {i < arr.length - 1 && (
+                <div className="flex-shrink-0 flex flex-col items-center">
+                  <ChevronRight className="w-3.5 h-3.5 text-primary" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -121,7 +130,11 @@ export function AnalyticsView() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {selected ? (
+          {perExamMode ? (
+            <button className="inline-flex items-center gap-1 px-3 py-1 rounded bg-accent text-sm" onClick={() => { setSelected(null); setRoute('practice') }}>
+              <ChevronLeft className="w-3.5 h-3.5" /> Exams
+            </button>
+          ) : selected ? (
             <button className="inline-flex items-center gap-1 px-3 py-1 rounded bg-accent text-sm" onClick={() => setSelected(null)}>
               <ChevronLeft className="w-3.5 h-3.5" /> Analytics
             </button>
@@ -156,7 +169,7 @@ export function AnalyticsView() {
         </div>
       </div>
 
-      {!selected && providers.length > 0 && (
+      {!perExamMode && !selected && providers.length > 0 && (
         <div className="mt-4 space-y-4">
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />

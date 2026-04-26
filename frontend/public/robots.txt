@@ -12,5 +12,6 @@ Disallow: /diagrams
 Disallow: /feedback
 Disallow: /basket
 Disallow: /verify/
+Disallow: /exams/*/history
 
 Sitemap: https://certshack.com/sitemap.xml

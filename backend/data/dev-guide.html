@@ -233,6 +233,23 @@
   .d-arrow { stroke: var(--muted); stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
   .d-arrow-accent { stroke: var(--accent); stroke-width: 1.8; fill: none; marker-end: url(#arrow-accent); stroke-dasharray: none; }
   .d-arrow-dashed { stroke: var(--muted); stroke-width: 1.3; fill: none; marker-end: url(#arrow); stroke-dasharray: 5 4; }
+
+  /* Implementation status badges (added 2026-04-25) */
+  .status {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    vertical-align: middle;
+    line-height: 1.4;
+  }
+  .status.done     { background: rgba(63,185,80,.15);  color: #3fb950; border: 1px solid rgba(63,185,80,.35); }
+  .status.partial  { background: rgba(255,196,107,.15); color: var(--warn); border: 1px solid rgba(255,196,107,.35); }
+  .status.deferred { background: rgba(180,154,255,.12); color: var(--accent-2); border: 1px solid rgba(180,154,255,.30); }
 </style>
 </head>
 <body>
@@ -648,6 +665,7 @@ pnpm dev               # → http://localhost:3000</code></pre>
       <li><code>EXAM_SOURCE=local</code>, <code>SKILL_LAB_SOURCE=local</code> — read from <code>data/</code></li>
       <li><code>FRONTEND_ORIGIN=http://localhost:5173</code></li>
       <li><code>RATE_LIMIT_MAX=1000</code> — bump while testing</li>
+      <li><code>RATE_LIMIT_DISABLED=true</code> — bypass the limiter entirely (test runs only; never set in prod)</li>
     </ul>
   </div>
   <div>
@@ -1719,6 +1737,14 @@ pnpm exec playwright install --with-deps
   <strong>14.x</strong>.
 </p>
 
+<div class="callout">
+  <strong>Implementation status (2026-04-25).</strong> Each item in §15 and §16 carries a badge:
+  <span class="status done">done</span> shipped,
+  <span class="status partial">partial</span> partially shipped,
+  <span class="status deferred">deferred</span> intentionally postponed (best done as its own focused PR).
+  Hover any badge for the specific phase / reason. Additional UI/UX polish work is documented in §17.
+</div>
+
 <h3>15.1 What exists today</h3>
 <p>
   Audit facts (so the redesign is grounded, not guessed):
@@ -1823,57 +1849,57 @@ pnpm exec playwright install --with-deps
   <thead><tr><th>#</th><th>Decision</th><th>Rationale</th></tr></thead>
   <tbody>
     <tr>
-      <td class="num">14.1</td>
+      <td class="num">14.1 <span class="status done" title="Shipped — Phase 1">done</span></td>
       <td><strong>Add a <code>dirty</code> flag</strong> on the runner session. It flips the first time the user mutates state (edits policy, runs a CLI command, drags a node). Until then, closing the tab or hitting back clears localStorage silently.</td>
       <td>Eliminates the false-positive "in progress" banner that's the whole complaint. Zero server work — pure frontend.</td>
     </tr>
     <tr>
-      <td class="num">14.2</td>
+      <td class="num">14.2 <span class="status done" title="Shipped — Phase 5a">done</span></td>
       <td><strong>Promote the attempt to a state machine</strong>: <code>status: 'in_progress' | 'completed' | 'abandoned'</code>. Add <code>startedAt</code>, <code>lastSavedAt</code>, <code>completedAt</code>. Keep the existing fields.</td>
       <td>Learning Plan (§14) needs a durable "completed" signal that survives localStorage eviction. Also unlocks analytics like "average time to complete by lab type".</td>
     </tr>
     <tr>
-      <td class="num">14.3</td>
+      <td class="num">14.3 <span class="status done" title="Shipped — Phase 5a">done</span></td>
       <td><strong>Server-side progress on transition to In progress</strong> — only once <code>dirty</code> becomes true, POST an <code>in_progress</code> row. Subsequent saves are PATCHes with debounced payload (5s) of the serialised session state.</td>
       <td>Replaces the 24h localStorage TTL with durable multi-device resume. Cheap — Dynamo writes only fire when the user is actually working, not while idle.</td>
     </tr>
     <tr>
-      <td class="num">14.4</td>
+      <td class="num">14.4 <span class="status done" title="Shipped — Phase 5a">done</span></td>
       <td><strong>Explicit <code>complete</code> endpoint</strong>: <code>POST /skill-labs/:id/attempt/:attemptId/complete</code> with <code>{ correct, outcome, timeTaken }</code>. Closes the in-progress row (transition to <code>completed</code>), not appends.</td>
       <td>Reusing the current one-shot POST means you can't join "tried and abandoned" with "eventually completed". Splitting them gives Learning Plan a real event.</td>
     </tr>
     <tr>
-      <td class="num">14.5</td>
+      <td class="num">14.5 <span class="status done" title="Shipped — Phase 5a">done</span></td>
       <td><strong>Explicit <code>cancel</code> endpoint</strong>: same pattern, transitions to <code>abandoned</code>. Button lives in the runner header (not just on detail page).</td>
       <td>Makes the user's intent explicit and queryable ("users abandon <code>policy-fix</code> at a 40% rate — why?"). Also lets you exempt abandoned attempts from streak-breaking logic.</td>
     </tr>
     <tr>
-      <td class="num">14.6</td>
+      <td class="num">14.6 <span class="status done" title="Shipped — Phase 5b (auto-prompt via CustomEvent)">done</span></td>
       <td><strong>Rating modal on Complete</strong> — optional, dismissable, non-blocking. Prefilled with outcome ("You solved it! How was the difficulty?"). Wire <code>RatingModal.tsx</code> to the complete flow; write rating onto the same attempt row (<code>rating</code>, <code>ratingComment</code>).</td>
       <td>Highest-signal moment to ask. Today's standalone Rate button is ignored because it's decoupled. Co-locate and conversion jumps.</td>
     </tr>
     <tr>
-      <td class="num">14.7</td>
+      <td class="num">14.7 <span class="status done" title="Done (2026-04-26) — dirty flag in useLabProgress gates all persistence; opening a lab and returning without interacting leaves no localStorage entry and fires no server POST">done</span></td>
       <td><strong>Quick-exit on Preview</strong> — a subtle "Close" button in the runner header that, if <code>dirty === false</code>, routes back silently with no confirmation. If <code>dirty === true</code>, prompts "Save progress and come back later?" with Keep / Discard / Keep + go back.</td>
       <td>Matches the lightweight feel of the app — scanning a lab should be as cheap as closing a tab.</td>
     </tr>
     <tr>
-      <td class="num">14.8</td>
+      <td class="num">14.8 <span class="status done" title="Shipped — Phase 6 (cross-device resume on detail page)">done</span></td>
       <td><strong>Resume UX</strong> — if an <code>in_progress</code> row exists server-side, detail page shows "Resume (saved 3 hrs ago)" and hydrates runner from the server state. localStorage becomes a cache, not the source of truth.</td>
       <td>Cross-device continuity. Also removes the 24h cliff where progress silently disappears.</td>
     </tr>
     <tr>
-      <td class="num">14.9</td>
+      <td class="num">14.9 <span class="status done" title="By design — labs do not collect abandon reasons (asymmetric with exams)">done</span></td>
       <td><strong>No abandon-reason prompt on labs</strong> (deliberate asymmetry with exams <strong>15.15</strong>). Labs are short sandboxes — "just exploring" is the default reason and collecting it every time would be friction without signal.</td>
       <td>Exams benefit from reason data <em>only</em> when abandonment is odd (user answered 20+ questions then quit). Labs don't have a meaningful equivalent threshold, so skip it entirely.</td>
     </tr>
     <tr>
-      <td class="num">14.10</td>
+      <td class="num">14.10 <span class="status done" title="Shipped — LabActionBar across all 19 runners; Cancel · Check/Retest · Complete · Retry Lab co-located in a sticky footer">done</span></td>
       <td><strong>Runner action bar: Cancel + Check + Complete co-located.</strong> Replace the current small/scattered buttons with a single persistent action bar in the runner footer (or sticky header on mobile). Cancel (secondary, always enabled) · Check answer (primary while unvalidated) · Complete (primary, disabled until a passing check). Same visual weight; Cancel is no longer a tiny afterthought.</td>
       <td>The lifecycle isn't actually visible today because the controls are spread across the runner chrome. Putting all three in one bar makes the flow self-documenting: user sees what actions exist without hunting.</td>
     </tr>
     <tr>
-      <td class="num">14.11</td>
+      <td class="num">14.11 <span class="status done" title="Shipped — Validation runners (policy-fix, code-fix) now have separate Check/Retest before Complete; non-validation runners collapse Check into Complete">done</span></td>
       <td>
         <strong>Explicit Check / Retest / Complete loop</strong> for runners that validate (policy-fix, code-fix, architecture-builder, diagnose). User flow:
         <ol style="margin:4px 0 4px 18px;padding:0">
@@ -2076,77 +2102,77 @@ pnpm exec playwright install --with-deps
   <thead><tr><th>#</th><th>Decision</th><th>Rationale</th></tr></thead>
   <tbody>
     <tr>
-      <td class="num">15.1</td>
+      <td class="num">15.1 <span class="status done" title="Shipped — Phase 3 (Sidebar Analytics entry removed)">done</span></td>
       <td><strong>Drop Analytics from the sidebar.</strong> Remove the <code>TrendingUp</code> nav entry in <code>Sidebar.tsx</code>.</td>
       <td>Nothing on <code>/analytics</code> is cross-exam — the page opens on "pick an exam" anyway. A top-level destination that exists only to dispatch to an exam is a false abstraction.</td>
     </tr>
     <tr>
-      <td class="num">15.2</td>
+      <td class="num">15.2 <span class="status done" title="Shipped — Phase 3b (ExamLanding at /exams/:code; Start button goes to /attempt)">done</span></td>
       <td><strong>Promote <code>/exams/:code</code> to a real landing page</strong> — currently it just routes straight into <code>ExamApp</code>. Split into: overview (description, length, domains), CTAs (Start new / Resume / History / Review last), and a mode picker.</td>
       <td>Gives the per-exam page an identity. Also unlocks SEO landing copy (<strong>8.4</strong>) — every URL a user could share now has real content.</td>
     </tr>
     <tr>
-      <td class="num">15.3</td>
+      <td class="num">15.3 <span class="status done" title="Shipped — Phase 3 (/exams/:code/history wired)">done</span></td>
       <td><strong>New URL <code>/exams/:code/history</code></strong> hosts the score chart, stats cards, domain aggregation, and paginated attempt list currently on <code>/analytics</code>.</td>
       <td>Shareable per-exam deep link. SEO-friendly. Mental model matches the user's: "I want to see how I'm doing on SAA-C03" is one place, not two.</td>
     </tr>
     <tr>
-      <td class="num">15.4</td>
+      <td class="num">15.4 <span class="status done" title="Shipped — Phase 3b (/exams/:code/attempt/:attemptId via ExamAttemptReview)">done</span></td>
       <td><strong>Unify live and historical under <code>/attempt</code>.</strong> The live runner is <code>/exams/:code/attempt</code>; a specific historical attempt is <code>/exams/:code/attempt/:attemptId</code>. One concept, one namespace, matches the backend <code>examapp-attempts</code> table and <code>/attempts</code> endpoint.</td>
       <td>The word "attempt" works as both noun and verb, reads naturally mid-exam ("your attempt of SAA-C03") and post-exam ("attempt #4 of SAA-C03"), and removes a second URL pattern (<code>/review/:id</code>) that would have meant the same thing.</td>
     </tr>
     <tr>
-      <td class="num">15.5</td>
+      <td class="num">15.5 <span class="status done" title="Shipped — Phase 3b (runner at /attempt, landing at /:code; browser back from runner lands on landing)">done</span></td>
       <td><strong>Split landing from runner.</strong> The bare <code>/exams/:code</code> is the landing page (overview, CTAs, history tab); entering the runner is the explicit sub-route <code>/exams/:code/attempt</code>.</td>
       <td>Clean separation of "I'm reading about this exam" and "I'm sitting the exam". Browser back button starts behaving sensibly — back from <code>/attempt</code> lands on the landing, not the catalogue.</td>
     </tr>
     <tr>
-      <td class="num">15.6</td>
+      <td class="num">15.6 <span class="status done" title="Shipped — result card already shows this attempt only; history page aggregates">done</span></td>
       <td><strong>De-duplicate domain performance.</strong> Result card (on <code>/attempt</code> after finish) shows <em>this attempt only</em>, framed as "your performance today". History page shows <em>all attempts aggregated</em> with a trend arrow. No overlap.</td>
       <td>The complaint isn't that analytics is wrong — it's that the user sees the same numbers twice under different labels and can't tell which is which.</td>
     </tr>
     <tr>
-      <td class="num">15.7</td>
+      <td class="num">15.7 <span class="status done" title="Shipped — Phase 3 (ExamReview CTAs: Try again · View history · Back to exams)">done</span></td>
       <td><strong>Post-exam CTAs</strong> (on the finished <code>/attempt</code> view): <em>Review questions</em> → <code>/exams/:code/attempt/:attemptId</code>, <em>View history</em> → <code>/exams/:code/history</code>, <em>Try again</em> → restart, <em>Back to exams</em> → <code>/exams</code>. Drop the "Analytics" button.</td>
       <td>Every button is a specific next action with a specific URL. Today's "Analytics" button is effectively "vaguely somewhere more info might be".</td>
     </tr>
     <tr>
-      <td class="num">15.8</td>
+      <td class="num">15.8 <span class="status done" title="Shipped — Phase 3 (/analytics → AnalyticsRedirect resolves last-attempted exam)">done</span></td>
       <td><strong>Redirect <code>/analytics</code></strong> — 301 to <code>/exams/:code/history</code> using the user's most-recently-attempted exam, or <code>/exams</code> if none. Keep the redirect for ~6 months, then remove.</td>
       <td>Inbound links from old emails, old YouTube video descriptions, or bookmarked tabs don't break. Cheap.</td>
     </tr>
     <tr>
-      <td class="num">15.9</td>
+      <td class="num">15.9 <span class="status done" title="Shipped — Phase 2 (last/best/lastAttemptedAt on PracticeExams cards)">done</span></td>
       <td><strong>Show past scores on the catalogue.</strong> For each exam the user has attempted, surface "last score · best score · last attempted" on the card in <code>/exams</code>. Kills the need to drill just to remember whether you've done this one.</td>
       <td>This is the single highest-value change on the list — answers "should I pick this one next?" without navigation.</td>
     </tr>
     <tr>
-      <td class="num">15.10</td>
+      <td class="num">15.10 <span class="status done" title="Shipped — Phase 1 (robots.txt Disallow /exams/*/history)">done</span></td>
       <td><strong>Update the sitemap.</strong> Keep <code>/exams/:code</code> indexed (SEO landing). Keep <code>/exams/:code/history</code> out of the sitemap and add <code>Disallow: /exams/*/history</code> to <code>robots.txt</code> — user-specific, no value to crawlers.</td>
       <td>Prevents Google indexing thousands of empty per-user pages and diluting the real landing pages.</td>
     </tr>
     <tr>
-      <td class="num">15.11</td>
+      <td class="num">15.11 <span class="status done" title="Shipped — Phase 4 (rating modal on result card; per-exam via existing /ratings, not per-attempt)">done</span></td>
       <td><strong>Optional rating modal on completion</strong> — same pattern as skill labs (<strong>14.6</strong>). When the runner transitions to finished, open <code>RatingModal</code> pre-filled with outcome ("You passed SAA-C03 — how was the difficulty?"). Non-blocking, dismissable. Write <code>rating</code> and <code>ratingComment</code> onto the attempt row.</td>
       <td>Highest-signal moment to ask for feedback. Also gives per-exam difficulty data over time — invaluable for spotting when a cert body updates the exam and your question bank drifts out of sync. Reuses the existing <code>RatingModal.tsx</code> component.</td>
     </tr>
     <tr>
-      <td class="num">15.12</td>
+      <td class="num">15.12 <span class="status done" title="Shipped — Phase 4 (status='abandoned' + abandonedAt + abandonReason)">done</span></td>
       <td><strong>Add <code>abandoned</code> as a third attempt status.</strong> Today the exam state machine is only <code>'in-progress' | 'finished'</code> (<code>attemptsStore.ts</code>). Extend to <code>'in-progress' | 'finished' | 'abandoned'</code> plus an <code>abandonedAt</code> timestamp. Backfill is impossible (cancelled rows were hard-deleted) — just introduce going forward.</td>
       <td>Brings exams in line with the labs state machine (<strong>14.2</strong>). Without this, you can't answer questions like "which exam do users bail out of most often?" or feed Learning Plan signals ("tried SAA-C03 twice, abandoned both → suggest revisiting Network+").</td>
     </tr>
     <tr>
-      <td class="num">15.13</td>
+      <td class="num">15.13 <span class="status done" title="Shipped — Phase 4 (POST /attempts/:id/abandon; Cancel modal switched off DELETE)">done</span></td>
       <td><strong>Replace destructive DELETE with soft-abandon.</strong> Current <code>DELETE /attempts/:id</code> hard-deletes in-progress rows. Add <code>POST /attempts/:id/abandon</code> that transitions <code>status → 'abandoned'</code> and writes <code>abandonedAt</code>. Keep DELETE for admin/GDPR use; the user-facing Cancel button calls the new endpoint.</td>
       <td>Hard delete loses the signal the moment a user shows churn intent — exactly when you most want the data. Soft-abandon costs a few extra bytes per row for a massive analytics win.</td>
     </tr>
     <tr>
-      <td class="num">15.14</td>
+      <td class="num">15.14 <span class="status done" title="Already implemented — 5s debounced PATCH + keepalive on visibilitychange/pagehide">done</span></td>
       <td><strong>Debounce UI-state progress to the server.</strong> Today per-answer saves (<code>POST /attempts/:id/answer</code>) are strong, but <code>currentIndex</code>, <code>timeLeft</code>, and <code>flags</code> only hit <code>PATCH /attempts/:id/progress</code> on explicit user actions. Add a ~10s debounced PATCH while the runner is active; flush on <code>visibilitychange=hidden</code> with <code>navigator.sendBeacon</code>.</td>
       <td>Cross-device resume is already good (answers are server-side) but can be a few clicks stale on "where in the exam you were". 10s debounce + beacon on close tightens that without hammering Dynamo.</td>
     </tr>
     <tr>
-      <td class="num">15.15</td>
+      <td class="num">15.15 <span class="status done" title="Shipped — Phase 4 (chips when answeredCount > 10; threshold lowered from plan's 20)">done</span></td>
       <td><strong>Conditional abandon-reason prompt on exams.</strong> When the user confirms Cancel, show a quick-chip prompt <em>only when</em> <code>answeredCount &gt; 20</code> (configurable). Chips: <em>Too hard</em> · <em>Ran out of time</em> · <em>Changed my mind</em> · <em>Technical issue</em> · <em>Prefer not to say</em>. One row of telemetry; non-blocking (Skip = save without reason). <strong>Not added to skill labs</strong> — user choice; labs are short sandboxes where reason collection is noise.</td>
       <td>Abandoning after 20+ answered questions is the <em>odd</em> signal worth asking about — the user invested real time then quit, something is up. Below the threshold it's usually "just exploring", which isn't worth interrupting the flow to collect. Admin-facing only (aggregate in <code>/metrics</code>); not user-visible.</td>
     </tr>
@@ -2246,6 +2272,214 @@ pnpm exec playwright install --with-deps
   second release — the URL split and the post-exam CTA rewrite. <strong>15.10</strong> trivial,
   ship any time after.
 </div>
+
+<h2 id="ui-polish">17. UI/UX polish (2026-04-25)</h2>
+<p>
+  Work done in the same session as §15–§16 but not directly mapped to those items.
+  These changes were driven by design review of the shipped features rather than the
+  original spec.
+</p>
+
+<h3>17.1 Exam landing page redesign</h3>
+<ul>
+  <li><strong>Route split</strong> — <code>/exams/:code</code> is now a proper landing page (<code>ExamLanding.tsx</code>). The exam runner lives at <code>/exams/:code/attempt</code>; back-nav from the runner lands on the landing, not the catalogue.</li>
+  <li><strong>Mode picker on landing</strong> — Casual / Timed cards (lifted from <code>ExamSetup</code>) are the primary CTA. Clicking a card applies defaults and calls <code>createAttempt()</code> directly, skipping the separate setup step. Advanced options (domain filter, question count) remain available via a collapsible link that routes to <code>/exams/:code/attempt</code>.</li>
+  <li><strong>Score history card</strong> — shown only when the user has finished ≥ 1 attempt. Header carries <em>Last / Best / Avg</em> score badges (colour-coded pass/fail). Below that, the latest 3 attempts are rendered as clickable rows (mini donut + Passed/Failed + correct/total + relative date) linking directly to <code>/exams/:code/attempt/:attemptId</code>. Footer: grey <em>View all scores</em> button routes to <code>/exams/:code/history</code>.</li>
+  <li><strong>avgScore</strong> — added to <code>GET /attempts?summary=1</code> response; computed server-side as <code>round(sum / count)</code> over finished attempts.</li>
+  <li><strong>setupExamFromMeta bug fix</strong> — clearing <code>attemptId</code> and <code>setExamStarted(false)</code> now happens in <code>setupExamFromMeta</code>; previously lingering post-exam state caused mode cards to appear locked when navigating history → Setup Exam.</li>
+</ul>
+
+<h3>17.2 Post-exam result redesign</h3>
+<ul>
+  <li><strong>ExamCompleteModal</strong> (<code>ExamCompleteModal.tsx</code>) — auto-opens once on finish (gated by <code>sessionStorage</code> per <code>attemptId</code>). Shows pass/fail icon, score donut, correct/total, pass-mark, inline rating widget (5 stars + optional comment), and <em>Review questions / View history</em> CTAs. Replaces the old confetti-adjacent result state.</li>
+  <li><strong>Udemy-style result card</strong> — replaces the gradient circle + Strong/Weak labels. 110 px SVG donut with Passed/Failed badge, clean domain bars (colour = pass/fail/warn, no text labels), tabular correct/total + completion timestamp.</li>
+  <li><strong>ExamReview CTA trim</strong> — reduced from 4 buttons (Try again · Review questions · View history · Back to exams) to 3 (Try again · View history · Back to exam). Review questions moved into ExamCompleteModal.</li>
+  <li><strong>Segmented filter toggle</strong> — replaced "Show incorrect only" checkbox with an <em>All N · Correct N · Incorrect N</em> pill toggle, primary colour on selected segment.</li>
+  <li><strong>Per-attempt review URL</strong> (<code>ExamAttemptReview.tsx</code>) — new page at <code>/exams/:code/attempt/:attemptId</code>; fetches attempt from <code>GET /attempts/:id</code>, hydrates context, and renders <code>ExamReview</code>.</li>
+</ul>
+
+<h3>17.3 Top-of-page context banners</h3>
+<p>All three banners use identical strip styling (<code>bg-card/80 border-b border-border backdrop-blur-sm</code>) at the top of <code>&lt;main&gt;</code>. On mobile, <code>pr-14</code> prevents the hamburger from clipping.</p>
+<table>
+  <thead><tr><th>Banner</th><th>Trigger</th><th>Routes</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Exam in progress</strong></td>
+      <td><code>anySavedExam &amp;&amp; !examStarted</code></td>
+      <td><code>/exams</code>, <code>/exams/:code</code>, <code>/exams/:code/attempt</code>, <code>/exams/:code/history</code>, <code>/exams/:code/attempt/:id</code></td>
+    </tr>
+    <tr>
+      <td><strong>Skill Lab in progress</strong></td>
+      <td><code>getInProgressLabs()[0]</code> (localStorage)</td>
+      <td><code>/skill-labs</code>, <code>/skill-labs/:id</code> (detail &amp; runner)</td>
+    </tr>
+    <tr>
+      <td><strong>Discount offer</strong></td>
+      <td><code>discountActive &amp;&amp; !isPaidTier</code></td>
+      <td>Overview (<code>/</code>), <code>/pricing</code>, <code>/basket</code></td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+  <li>Exam banner Cancel now calls <code>POST /attempts/:id/abandon</code> immediately (no modal, no chips) and resets state in one call.</li>
+  <li>Discount banner copy: <strong>"Limited-time offer · Save £2/month [· on Pro &amp; Pro Plus]"</strong>; second clause hidden on mobile.</li>
+  <li><code>DISCOUNT_ACTIVE=true</code> added to <code>backend/.env</code> for local testing.</li>
+</ul>
+
+<h3>17.4 Exam question navigation</h3>
+<ul>
+  <li>Prev / Next buttons in <code>QuestionNav.tsx</code> now scroll the inner container (<code>#exam-scroll-container</code>) and <code>window</code> / <code>document.documentElement</code> / <code>document.body</code> to top — covers both desktop and mobile browser scroll models.</li>
+  <li>ExamReview Prev/Next styled to match the in-exam buttons: Prev = <code>bg-muted-foreground text-white</code>, Next = <code>bg-primary text-white font-semibold</code>.</li>
+  <li>"X total (Y in bank)" count removed from the review filter row.</li>
+</ul>
+
+<h3>17.5 Runner action bar (14.10 + 14.11)</h3>
+<p>
+  Shipped end-to-end across all 19 runners. Each runner renders its own inline action row
+  (not a sticky footer — buttons sit below the lab content in normal document flow) with
+  Cancel · [Check/Retest] · Complete while editing, and Retry Lab · Complete Lab after
+  completion. <code>useLabSession</code> exposes <code>lastCheck</code>, <code>recordCheck()</code>,
+  <code>restart()</code>, and <code>restartKey</code>; each runner watches <code>restartKey</code>
+  to reset its own local state when Retry Lab fires.
+</p>
+<ul>
+  <li><strong>Validation-driven runners</strong> (<code>policy-fix</code>, <code>code-fix</code>) — Check posts to <code>/validate-policy</code> or <code>/validate-code</code>, records the result via <code>recordCheck</code>; Complete only enables once the check passes. Inline error feedback shows which validations are still failing.</li>
+  <li><strong>Selection-driven runners</strong> (drag-match, ordering, drift-detection, fill-command, security-hardening, service-limits, performance-optimization, cost-optimization, config-toggle, diagram-label, network-path, log-analysis, incident-response, architecture-builder, phased-pipeline) — Check collapses into Complete; <code>canComplete</code> tracks whether the answer is "ready" (e.g. all matches placed).</li>
+  <li><strong>Free-exploration runners</strong> (<code>cli</code>, <code>command-terminal</code>, <code>terminal-replay</code>) — same Cancel + Complete shape; <code>terminal-replay</code> keeps its existing failure feedback panel since users iterate within a single attempt.</li>
+  <li><strong>Retry Lab</strong> calls <code>session.restart()</code> which clears localStorage, resets the timer + attempt id, bumps <code>restartKey</code>, and lets each runner reset its own state via a useEffect on the key. The completed server attempt remains as <code>completed</code>; the next dirty edit creates a fresh in-progress attempt.</li>
+  <li><strong>Removed</strong>: <code>LabCompleteModal</code> ("are you sure?" pre-submit modal) — Complete is now an explicit user action and doesn't need a confirmation step.</li>
+</ul>
+
+<h2 id="lab-ux-2026-04-26">18. Skill-lab UX fixes (2026-04-26)</h2>
+<p>
+  A focused session of lab-runner polish driven by real play-through feedback.
+  No schema or API changes — all fixes are front-end or in the existing
+  <code>/validate-policy</code> route.
+</p>
+
+<h3>18.1 Terminal input focus lost on first save (root-cause fix)</h3>
+<p>
+  <strong>Symptom:</strong> typing in <code>command-terminal</code> labs caused the
+  input to blur after ~2 seconds, requiring a click to regain focus.
+</p>
+<p>
+  <strong>Root cause — two compounding issues:</strong>
+</p>
+<ol>
+  <li>
+    <code>lazy(importer)</code> was called inside the <code>SkillLabRunnerPage</code>
+    render body. Every re-render produced a <em>new</em> lazy component reference;
+    Suspense treated it as a new tree, unmounted the old runner, and remounted it —
+    blowing away DOM focus. The saved <code>localStorage</code> snapshot re-hydrated
+    the input <em>value</em>, so typing appeared to continue, but the cursor was gone.
+  </li>
+  <li>
+    On the first keystroke <code>useLabSession</code> POSTs to start a server attempt;
+    when it resolves it calls <code>setActive()</code> on <code>SkillLabContext</code>.
+    The provider's <code>value</code> object was rebuilt on every render, so every
+    consumer above the runner (including <code>ExamApp</code>) re-rendered, triggering
+    the lazy-recreation cascade.
+  </li>
+</ol>
+<p><strong>Fix:</strong></p>
+<ul>
+  <li>
+    <code>SkillLabRunnerPage</code> — wrap <code>lazy(importer)</code> in
+    <code>useMemo</code> keyed on <code>platform:type</code>. The
+    <code>useMemo</code> call is placed before the early loading/error returns so
+    hook order is always stable.
+  </li>
+  <li>
+    <code>SkillLabContext</code> — memoize the provider <code>value</code> object
+    with <code>useMemo</code> so <code>setActive()</code> resolving only triggers
+    renders in consumers that actually use the changed fields.
+  </li>
+</ul>
+
+<h3>18.2 Save-state indicator removed</h3>
+<p>
+  The "Saving…" / "Saved" text in <code>LabHeader</code> fired on every keystroke
+  (after the 2 s debounce) and was distracting. Removed the
+  <code>LAB_SAVE_STATE_EVENT</code> listener and the <code>saveState</code> display
+  from <code>LabHeader</code>. Progress still saves silently to both localStorage and
+  the server — the indicator was UI noise, not functional.
+</p>
+<p>
+  Resume notice duration also reduced from 3 s → 1.5 s (<code>useLabSession.ts</code>).
+</p>
+
+<h3>18.3 terminal-replay: Reset clears the queue</h3>
+<p>
+  The <strong>Reset</strong> button (shown after a failed run) previously only cleared
+  terminal output and reset <code>animState</code> to <code>'idle'</code>. The command
+  queue was left intact, which was confusing — users expected a full slate wipe.
+</p>
+<p>
+  <code>handleReset</code> now also moves all queued commands back to the pool
+  (reshuffled via <code>shuffleArray</code>) and empties the queue.
+</p>
+
+<h3>18.4 policy-fix runner: Show Answer flow</h3>
+<p>
+  The <code>policy-fix</code> runner previously offered only Retest and Cancel after
+  a failed check — no escape hatch. Added a Show Answer flow matching
+  <code>command-terminal</code>:
+</p>
+<ul>
+  <li>
+    <strong>Show Answer</strong> button appears after a failed check.
+    Clicking it loads <code>lab.correctPolicy</code> into the Monaco editor
+    (read-only) and shows the explanation in a white <code>bg-card</code> panel.
+  </li>
+  <li>
+    Action bar in Show Answer state: <strong>Cancel Lab · Retry Lab · Complete Lab</strong>.
+    Complete Lab here finalises with <code>correct = false, selectedAnswer = 'gave-up'</code>.
+  </li>
+  <li>
+    <strong>Complete Lab hidden until passing</strong> — the button only renders when
+    <code>session.lastCheck?.correct</code> is true. Previously it was always present
+    but disabled, which implied it was the next step regardless of result.
+  </li>
+  <li>
+    <strong>Check / Retest button</strong> is now orange (<code>bg-orange-500</code>)
+    and hidden once the check passes (Complete Lab takes over).
+  </li>
+  <li>
+    <strong>Answer card styling</strong> uses the standard white card
+    (<code>rounded-lg border border-border bg-card p-4 shadow-sm</code>) with a
+    destructive-red label, matching <code>command-terminal</code>. The previous amber
+    panel was inconsistent.
+  </li>
+  <li>
+    <strong>Cancel Lab always visible</strong> — added to the Show Answer action bar
+    (it was missing from that state).
+  </li>
+</ul>
+
+<h3>18.5 validate-policy: field-scoped JSON validation</h3>
+<p>
+  <strong>Bug:</strong> submitting the broken policy (with <code>"Task"</code> absent
+  from <code>allowedTools</code>) still passed validation because
+  <code>deepIncludes</code> searched the entire JSON tree. The string
+  <code>"Task"</code> appeared as a substring of the <code>system</code> field
+  (<em>"Delegate tasks to subagents using the <strong>Task</strong> tool."</em>),
+  giving a false positive.
+</p>
+<p><strong>Fix in <code>backend/src/routes/skillLabs.ts</code> (<code>POST /validate-policy</code>):</strong></p>
+<ul>
+  <li>
+    Replaced <code>deepIncludes(parsed, v.expected)</code> with
+    <code>fieldContains(parsed[v.field], needle)</code>. The check is now scoped to
+    the named field only — for arrays it requires exact element membership
+    (<code>String(item) === needle</code>), so array order is irrelevant.
+  </li>
+  <li>
+    Added <code>unwrapExpected()</code>: if <code>v.expected</code> is stored as a
+    JSON-quoted string literal (e.g. <code>"Task"</code> with surrounding quotes in
+    the JSON), it is parsed to the bare value before comparison. This lets existing
+    validation entries use either form without requiring a data migration.
+  </li>
+</ul>
 
 <footer>
   Generated dev guide · examapp monorepo · open in a browser for best rendering.

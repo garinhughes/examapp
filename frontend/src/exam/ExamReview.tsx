@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Play, X, Check, BarChart3, ExternalLink, ChevronDown, Lock } from 'lucide-react'
+import { Play, X, Check, TrendingUp, ChevronLeft, BookOpen, ExternalLink, ChevronDown, Lock } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useExam } from './ExamContext'
 import { isAnswerCorrect, renderChoiceContent, MarkdownText } from './utils'
 import type { Question, QuestionType } from './types'
@@ -7,12 +8,14 @@ import { QuestionImage } from './QuestionImage'
 import { QuestionDiagram } from './QuestionDiagram'
 
 export function ExamReview() {
+  const navigate = useNavigate()
   const {
-    attemptData, questions, selectedAnswers, selectedMeta,
+    attemptData, questions, selectedAnswers, selected, selectedMeta,
     reviewDomains, setReviewDomains, reviewDomainOpen, setReviewDomainOpen,
     reviewIndex, setReviewIndex, reviewDomainRef, reviewDomainToggleRef,
     incorrectOnly, setIncorrectOnly,
-    createAttempt, setAttemptData, setAttemptId, setExamStarted, setRoute,
+    createAttempt, setAttemptData, setAttemptId, setExamStarted, setRoute, setSelected,
+    setShowAttempts, setAttemptsList,
   } = useExam()
 
   const domains: string[] = attemptData?.perDomain ? Object.keys(attemptData.perDomain) : Array.from(new Set(questions.map((q) => (q as any).domain)))
@@ -47,7 +50,25 @@ export function ExamReview() {
   }
 
   const visibleAll = domainFiltered.map((q) => ({ q, ...deriveRecord(q) }))
-  const visible = incorrectOnly ? visibleAll.filter((v) => !v.isCorrect) : visibleAll
+  // Tri-state filter: 'all' | 'correct' | 'incorrect'. The flagged-questions panel
+  // (in ExamApp) flips `incorrectOnly` back to false to widen the filter — keep the
+  // toggle in sync with that for backward compat.
+  const [filterMode, setFilterMode] = useState<'all' | 'correct' | 'incorrect'>(incorrectOnly ? 'incorrect' : 'all')
+  // Bridge ExamApp's flagged-panel reset (`setIncorrectOnly(false)`) → 'all' here.
+  if (!incorrectOnly && filterMode === 'incorrect') setFilterMode('all')
+  const visible = filterMode === 'incorrect'
+    ? visibleAll.filter((v) => !v.isCorrect)
+    : filterMode === 'correct'
+      ? visibleAll.filter((v) => v.isCorrect)
+      : visibleAll
+  const correctCount = visibleAll.filter((v) => v.isCorrect).length
+  const incorrectCount = visibleAll.length - correctCount
+
+  function changeFilter(mode: 'all' | 'correct' | 'incorrect') {
+    setFilterMode(mode)
+    setIncorrectOnly(mode === 'incorrect')
+    setReviewIndex(0)
+  }
 
   const [expandedExplanations, setExpandedExplanations] = useState<Set<string>>(new Set())
   const toggleExplanation = (key: string) => setExpandedExplanations(prev => {
@@ -67,23 +88,30 @@ export function ExamReview() {
             title="Start another attempt with the same settings"
           >
             <Play className="w-4 h-4" />
-            Repeat Exam
+            Try again
           </button>
           <button
             className="px-3 py-1 rounded-md bg-accent text-foreground text-sm inline-flex items-center gap-2 hover:bg-accent/80 transition-colors"
-            onClick={() => { try { setAttemptData(null); setAttemptId(null); setExamStarted(false) } catch {} }}
-            title="Return to the exam start form"
+            onClick={() => { if (selected) navigate(`/exams/${selected}/history`); else setRoute('exam-history') }}
+            title="See your full score history for this exam"
+            disabled={!selected}
           >
-            Return to Exam
+            <TrendingUp className="w-4 h-4" />
+            View history
           </button>
-          <button
-            className="px-3 py-1 rounded-md bg-accent text-foreground text-sm inline-flex items-center gap-2 hover:bg-accent/80 transition-colors"
-            onClick={() => setRoute('analytics')}
-            title="View your analytics"
-          >
-            <BarChart3 className="w-4 h-4" />
-            Analytics
-          </button>
+          {selected && (
+            <button
+              className="px-3 py-1 rounded-md bg-accent text-foreground text-sm inline-flex items-center gap-2 hover:bg-accent/80 transition-colors"
+              onClick={() => {
+                try { setAttemptData(null); setAttemptId(null); setExamStarted(false); setShowAttempts(false); setAttemptsList(null) } catch {}
+                navigate(`/exams/${selected}`)
+              }}
+              title="Back to the exam landing page"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back to exam
+            </button>
+          )}
         </div>
       </div>
 
@@ -160,12 +188,33 @@ export function ExamReview() {
 
       {/* Review questions */}
       <div className="space-y-3">
-        <div className="flex items-center gap-3 mb-2">
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={incorrectOnly} onChange={(e) => setIncorrectOnly(e.target.checked)} />
-            <span className="text-sm text-muted-foreground">Show incorrect only</span>
-          </label>
-          <div className="ml-auto text-sm text-muted-foreground">{baseQuestions.length} total{attemptData?.earlyComplete ? ` (${questions.length} in bank)` : ''}</div>
+        <div className="flex items-center gap-3 mb-2 flex-wrap">
+          {/* Segmented filter — tinted-orange selected pill, neutral unselected. */}
+          <div className="inline-flex rounded-md border border-border bg-muted/30 p-0.5" role="tablist" aria-label="Filter questions">
+            {([
+              { v: 'all',       label: 'All',       count: visibleAll.length },
+              { v: 'correct',   label: 'Correct',   count: correctCount },
+              { v: 'incorrect', label: 'Incorrect', count: incorrectCount },
+            ] as const).map(({ v, label, count }) => {
+              const active = filterMode === v
+              return (
+                <button
+                  key={v}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => changeFilter(v)}
+                  className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                    active
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {label} <span className={`ml-1 tabular-nums ${active ? 'opacity-90' : 'opacity-60'}`}>{count}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {visible.length === 0 ? <div className="text-sm text-muted-foreground p-3">No questions to review.</div> : (() => {
@@ -178,8 +227,8 @@ export function ExamReview() {
               <div className="flex items-center justify-between mb-2">
                 <div className="text-sm text-muted-foreground">Question {idx + 1} / {visible.length}</div>
                 <div className="flex items-center gap-2">
-                  <button className="px-2 py-1 rounded bg-accent text-sm" onClick={() => setReviewIndex((i) => Math.max(0, i - 1))} disabled={idx === 0}>Prev</button>
-                  <button className="px-2 py-1 rounded bg-accent text-sm" onClick={() => setReviewIndex((i) => Math.min(visible.length - 1, i + 1))} disabled={idx >= visible.length - 1}>Next</button>
+                  <button className="px-3 py-1 rounded-md bg-muted-foreground text-white text-sm disabled:opacity-40 whitespace-nowrap inline-flex items-center gap-1" onClick={() => setReviewIndex((i) => Math.max(0, i - 1))} disabled={idx === 0}>← Prev</button>
+                  <button className="px-3 py-1 rounded-md bg-primary text-white text-sm font-semibold disabled:opacity-40 hover:bg-primary/80 transition-colors whitespace-nowrap inline-flex items-center gap-1" onClick={() => setReviewIndex((i) => Math.min(visible.length - 1, i + 1))} disabled={idx >= visible.length - 1}>Next →</button>
                 </div>
               </div>
 

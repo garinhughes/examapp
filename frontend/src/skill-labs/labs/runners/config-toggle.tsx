@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect } from 'react'
-import { useExam } from '@/exam/ExamContext'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import type { ConfigToggleLabDefinition, ConfigItem, ConfigVisualZone } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface ConfigToggleProgress { values: Record<string, string>; timeLeft: number }
 
@@ -31,6 +32,18 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
     return init
   })
   const [results, setResults] = useState<Record<string, boolean>>({})
+  const [checked, setChecked] = useState(false)
+  const [isCorrect, setIsCorrect] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    const init: Record<string, string> = {}
+    for (const item of lab.configItems) init[item.id] = item.currentValue
+    setValues(init)
+    setResults({})
+    setChecked(false)
+    setIsCorrect(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -38,15 +51,17 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
   }, [values, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   const updateValue = useCallback((id: string, value: string) => {
-    if (session.submitted) return
+    if (checked) return
+    session.markDirty()
     setValues((prev) => ({ ...prev, [id]: value }))
-  }, [session.submitted])
+  }, [checked])
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const res: Record<string, boolean> = {}
     let allCorrect = true
     for (const item of lab.configItems) {
@@ -55,10 +70,13 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
       if (!pass) allCorrect = false
     }
     setResults(res)
-    await session.finalize(allCorrect, JSON.stringify(values))
-  }, [lab, values, session.finalize])
+    setIsCorrect(allCorrect)
+    setChecked(true)
+  }, [checked, lab, values])
 
-  const allCorrect = session.submitted && lab.configItems.every((item) => results[item.id])
+  const handleComplete = useCallback(async () => {
+    await session.finalize(isCorrect, JSON.stringify(values))
+  }, [session.finalize, values, isCorrect])
 
   function renderItem(item: ConfigItem, compact = false) {
     const displayLabel = compact && item.shortLabel ? item.shortLabel : item.label
@@ -67,7 +85,7 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
       <div key={item.id} className={compact ? 'space-y-0.5' : undefined}>
         <label className={labelClass}>
           {displayLabel}
-          {session.submitted && (
+          {checked && (
             <span className={`ml-2 text-xs font-bold ${results[item.id] ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
               {results[item.id] ? '✓' : '✗'}
             </span>
@@ -77,9 +95,9 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
           <select
             value={values[item.id] || ''}
             onChange={(e) => updateValue(item.id, e.target.value)}
-            disabled={session.submitted}
+            disabled={checked}
             className={`w-full px-2 py-1.5 rounded-md border text-sm bg-card focus:outline-none focus:ring-1 focus:ring-primary ${
-              session.submitted
+              checked
                 ? results[item.id] ? 'border-green-500' : 'border-destructive'
                 : 'border-border'
             }`}
@@ -93,15 +111,15 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
             type="text"
             value={values[item.id] || ''}
             onChange={(e) => updateValue(item.id, e.target.value)}
-            disabled={session.submitted}
+            disabled={checked}
             className={`w-full px-2 py-1.5 rounded-md border text-sm font-mono bg-card focus:outline-none focus:ring-1 focus:ring-primary ${
-              session.submitted
+              checked
                 ? results[item.id] ? 'border-green-500' : 'border-destructive'
                 : 'border-border'
             }`}
           />
         )}
-        {session.submitted && !results[item.id] && (
+        {checked && !results[item.id] && (
           <div className="text-xs text-muted-foreground mt-0.5">
             Expected: <span className="font-mono text-foreground">{item.correctValue}</span>
           </div>
@@ -165,14 +183,10 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={session.timeLimit - session.timeLeft} timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }} onCancel={() => session.setShowConfirmModal(false)} />
-      )}
       <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={lab.scenario} labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ values, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+        onRatingClose={() => setRoute('skill-labs')} />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
@@ -190,30 +204,26 @@ export function ConfigToggleRunner({ lab, timed = true }: Props) {
         )}
       </div>
 
-      {/* Submit / Result */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!session.submitted ? (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Fix the configuration values, then test your changes.</p>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
-              onClick={() => session.setShowConfirmModal(true)}
-            >
-              Test Configuration
-            </button>
+      {checked && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-2">
+          <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+            {isCorrect ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            {isCorrect ? 'All configuration values are correct!' : 'Some configuration values are incorrect'}
           </div>
-        ) : (
-          <div className="space-y-2">
-            <div className={`font-semibold text-sm ${allCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {allCorrect ? '✓ All configuration values are correct!' : '✗ Some configuration values are incorrect'}
-            </div>
-            <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
-          </div>
-        )}
-      </div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={isCorrect}
+        submitted={session.submitted}
+        canCheck
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

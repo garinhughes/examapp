@@ -12,7 +12,9 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import {
   DynamoDBDocumentClient,
   PutCommand,
+  GetCommand,
   QueryCommand,
+  UpdateCommand,
   DeleteCommand,
 } from '@aws-sdk/lib-dynamodb'
 
@@ -23,6 +25,8 @@ const TABLE = process.env.SKILL_LAB_ATTEMPTS_TABLE || ''
 const REGION = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'eu-west-1'
 const useDynamo = TABLE.length > 0
 
+export type SkillLabAttemptStatus = 'in_progress' | 'completed' | 'abandoned'
+
 export interface SkillLabAttempt {
   userId: string
   attemptId: string
@@ -32,11 +36,27 @@ export interface SkillLabAttempt {
   correct: boolean
   timeTaken: number
   createdAt: string
+  // Lifecycle (dev-guide §15 / 14.2). Undefined on legacy rows → treat as completed.
+  status?: SkillLabAttemptStatus
+  startedAt?: string
+  lastSavedAt?: string
+  completedAt?: string
+  abandonedAt?: string
+  progressState?: any
+  timed?: boolean
+  rating?: number
+  ratingComment?: string
 }
 
 export interface SkillLabAttemptsStore {
   listByUser(userId: string): Promise<SkillLabAttempt[]>
+  get(userId: string, attemptId: string): Promise<SkillLabAttempt | null>
   put(attempt: SkillLabAttempt): Promise<void>
+  update(userId: string, attemptId: string, fields: Partial<SkillLabAttempt>): Promise<void>
+  /** Latest in_progress attempt for this user+lab, if any. */
+  findActiveForLab(userId: string, labId: string): Promise<SkillLabAttempt | null>
+  /** First in_progress attempt across all labs (sorted by startedAt desc), if any. */
+  findAnyActive(userId: string): Promise<{ attemptId: string; labId: string; startedAt?: string; timed?: boolean; lastSavedAt?: string } | null>
   deleteAllForUser(userId: string): Promise<number>
 }
 
@@ -56,8 +76,56 @@ function createDynamoStore(): SkillLabAttemptsStore {
       return (res.Items as SkillLabAttempt[]) ?? []
     },
 
+    async get(userId: string, attemptId: string) {
+      const res = await ddb.send(new GetCommand({ TableName: TABLE, Key: { userId, attemptId } }))
+      return (res.Item as SkillLabAttempt) ?? null
+    },
+
     async put(attempt: SkillLabAttempt) {
       await ddb.send(new PutCommand({ TableName: TABLE, Item: attempt }))
+    },
+
+    async update(userId: string, attemptId: string, fields: Partial<SkillLabAttempt>) {
+      const keys = Object.keys(fields)
+      if (keys.length === 0) return
+      const names: Record<string, string> = {}
+      const values: Record<string, any> = {}
+      const sets: string[] = []
+      keys.forEach((k, i) => {
+        const nk = `#f${i}`
+        const vk = `:v${i}`
+        names[nk] = k
+        values[vk] = (fields as any)[k]
+        sets.push(`${nk} = ${vk}`)
+      })
+      await ddb.send(
+        new UpdateCommand({
+          TableName: TABLE,
+          Key: { userId, attemptId },
+          UpdateExpression: `SET ${sets.join(', ')}`,
+          ExpressionAttributeNames: names,
+          ExpressionAttributeValues: values,
+          ConditionExpression: 'attribute_exists(attemptId)',
+        }),
+      )
+    },
+
+    async findActiveForLab(userId: string, labId: string) {
+      // Without a GSI, scan-then-filter the user partition. Volume per user is small.
+      const items = await this.listByUser(userId)
+      const active = items
+        .filter((a) => a.labId === labId && a.status === 'in_progress')
+        .sort((a, b) => String(b.startedAt ?? b.createdAt).localeCompare(String(a.startedAt ?? a.createdAt)))
+      return active[0] ?? null
+    },
+
+    async findAnyActive(userId: string) {
+      const items = await this.listByUser(userId)
+      const active = items
+        .filter((a) => a.status === 'in_progress')
+        .sort((a, b) => String(b.startedAt ?? b.createdAt).localeCompare(String(a.startedAt ?? a.createdAt)))
+      if (!active[0]) return null
+      return { attemptId: active[0].attemptId, labId: active[0].labId, startedAt: active[0].startedAt, timed: active[0].timed, lastSavedAt: active[0].lastSavedAt }
     },
 
     async deleteAllForUser(userId: string) {
@@ -90,10 +158,42 @@ function createLocalStore(): SkillLabAttemptsStore {
       return all.filter((a) => a.userId === userId)
     },
 
+    async get(userId: string, attemptId: string) {
+      const all = await loadAll()
+      return all.find((a) => a.userId === userId && a.attemptId === attemptId) ?? null
+    },
+
     async put(attempt: SkillLabAttempt) {
       const all = await loadAll()
-      all.push(attempt)
+      const idx = all.findIndex((a) => a.attemptId === attempt.attemptId)
+      if (idx >= 0) all[idx] = attempt
+      else all.push(attempt)
       await saveAll(all)
+    },
+
+    async update(userId: string, attemptId: string, fields: Partial<SkillLabAttempt>) {
+      const all = await loadAll()
+      const idx = all.findIndex((a) => a.userId === userId && a.attemptId === attemptId)
+      if (idx < 0) return
+      all[idx] = { ...all[idx], ...fields }
+      await saveAll(all)
+    },
+
+    async findActiveForLab(userId: string, labId: string) {
+      const all = await loadAll()
+      const active = all
+        .filter((a) => a.userId === userId && a.labId === labId && a.status === 'in_progress')
+        .sort((a, b) => String(b.startedAt ?? b.createdAt).localeCompare(String(a.startedAt ?? a.createdAt)))
+      return active[0] ?? null
+    },
+
+    async findAnyActive(userId: string) {
+      const items = await this.listByUser(userId)
+      const active = items
+        .filter((a) => a.status === 'in_progress')
+        .sort((a, b) => String(b.startedAt ?? b.createdAt).localeCompare(String(a.startedAt ?? a.createdAt)))
+      if (!active[0]) return null
+      return { attemptId: active[0].attemptId, labId: active[0].labId, startedAt: active[0].startedAt, timed: active[0].timed, lastSavedAt: active[0].lastSavedAt }
     },
 
     async deleteAllForUser(userId: string) {

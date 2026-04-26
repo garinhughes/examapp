@@ -57,6 +57,7 @@ await server.register(rateLimit, {
   max: parseInt(process.env.RATE_LIMIT_MAX ?? '100'),
   timeWindow: '1 minute',
   keyGenerator: (req) => req.ip,
+  allowList: () => process.env.RATE_LIMIT_DISABLED === 'true',
 })
 
 await server.register(cookie)

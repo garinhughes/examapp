@@ -9,7 +9,7 @@ import { useAuth } from '../auth/AuthContext'
 import { useEntitlements, isPaidTier, type CatalogProduct } from '../hooks/useEntitlements'
 import { useBasket } from '../basket/BasketContext'
 import { useExam } from '../exam/ExamContext'
-import { Check, X, ShoppingCart, Hourglass, ChevronRight } from 'lucide-react'
+import { Check, X, ShoppingCart, Tag, ChevronRight } from 'lucide-react'
 import { clarityEvent, clarityTag } from '../clarity'
 
 /* ------------------------------------------------------------------ */
@@ -327,10 +327,10 @@ export default function PricingPage() {
 
       {/* Discount banner */}
       {discountActive && (
-        <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700">
-          <Hourglass className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-          <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
-            Limited time offer - Discounted prices applied automatically at checkout.
+        <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-card border border-border">
+          <Tag className="w-4 h-4 text-primary flex-shrink-0" />
+          <p className="text-sm font-semibold text-foreground">
+            Limited-time offer <span className="font-normal text-muted-foreground">— Save £2/month · discounted prices applied automatically at checkout</span>
           </p>
         </div>
       )}

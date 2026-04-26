@@ -248,11 +248,45 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     return { updated: true, updatedAt: allowed.updatedAt }
   })
 
-  // List all attempts (filtered to current user)
+  // List all attempts (filtered to current user). With ?summary=1, returns one row
+  // per exam code (last/best/count) — used by the catalogue cards (dev-guide §16 / 15.9).
   server.get('/', { preHandler: [server.authenticate], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const userId = request.user?.sub
     if (!userId) return { attempts: [] }
     const userAttempts = await attemptsStore.listByUser(userId)
+
+    const q = (request.query as any) ?? {}
+    if (q.summary === '1' || q.summary === 'true') {
+      const byExam = new Map<string, { examCode: string; lastScore: number | null; bestScore: number | null; lastAttemptAt: string | null; attemptCount: number; _scoreSum: number }>()
+      for (const a of userAttempts) {
+        const code = a?.examCode
+        if (!code) continue
+        const finishedAt = typeof a.finishedAt === 'string' ? a.finishedAt : null
+        const score = typeof a.score === 'number' ? a.score : null
+        const cur = byExam.get(code) ?? { examCode: code, lastScore: null, bestScore: null, lastAttemptAt: null, attemptCount: 0, _scoreSum: 0 }
+        // Only finished attempts contribute to score/count — abandoned/in-progress noise excluded.
+        if (finishedAt) {
+          cur.attemptCount += 1
+          if (score !== null) {
+            cur._scoreSum += score
+            if (cur.bestScore === null || score > cur.bestScore) cur.bestScore = score
+          }
+          if (cur.lastAttemptAt === null || finishedAt > cur.lastAttemptAt) {
+            cur.lastAttemptAt = finishedAt
+            cur.lastScore = score
+          }
+        }
+        byExam.set(code, cur)
+      }
+      const summaries = [...byExam.values()]
+        .filter((s) => s.attemptCount > 0)
+        .map(({ _scoreSum, ...s }) => ({
+          ...s,
+          avgScore: s.attemptCount > 0 ? Math.round(_scoreSum / s.attemptCount) : null,
+        }))
+      return { summaries }
+    }
+
     return { attempts: userAttempts }
   })
 
@@ -279,6 +313,33 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     }
     await attemptsStore.delete(userId, id)
     return { deleted: true, attemptId: id }
+  })
+
+  // Soft-abandon an in-progress attempt (dev-guide §16 / 15.13).
+  // Replaces the user-facing DELETE flow — preserves the row + answers so the
+  // signal "user got 30 questions in then quit" survives. DELETE stays for admin/GDPR.
+  // Optional `reason` (chips) only collected when the client has 20+ answers (15.15).
+  const ABANDON_REASONS = new Set(['too-hard', 'ran-out-of-time', 'changed-my-mind', 'technical-issue', 'prefer-not-to-say'])
+  server.post('/:id/abandon', { preHandler: [server.optionalAuth], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { id } = request.params as any
+    const userId = extractUserId(request)
+    if (!userId) return reply.status(401).send({ message: 'unauthorized' })
+    const attempt = await attemptsStore.get(userId, id)
+    if (!attempt) return reply.status(404).send({ message: 'attempt not found' })
+    if (attempt.userId !== userId) return reply.status(403).send({ message: 'forbidden' })
+    if (attempt.finishedAt) return reply.status(400).send({ message: 'attempt already finished' })
+    if (attempt.status === 'abandoned') return { abandoned: true, attemptId: id, alreadyAbandoned: true }
+
+    const body = (request.body as any) ?? {}
+    const reason = typeof body.reason === 'string' && ABANDON_REASONS.has(body.reason) ? body.reason : null
+
+    const now = new Date().toISOString()
+    const fields: Record<string, any> = { status: 'abandoned', abandonedAt: now, updatedAt: now }
+    if (reason) fields.abandonReason = reason
+    await attemptsStore.updateProgress(userId, id, fields)
+
+    request.log.info({ userId, examCode: attempt.examCode, attemptId: id, reason: reason ?? 'none', answeredCount: Array.isArray(attempt.answers) ? attempt.answers.length : 0 }, '[attempts] abandoned')
+    return { abandoned: true, attemptId: id, abandonedAt: now, reason }
   })
 
   // Submit an answer for an attempt

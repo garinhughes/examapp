@@ -4455,9 +4455,9 @@
   },
   {
     "id": "comptia-phishing-email-headers-log-analysis",
-    "version": 1,
+    "version": 2,
     "title": "Triage a Reported Phishing Email: Header Analysis",
-    "description": "Analyse the raw headers of a user-reported phishing email and identify the authentication failures, display name spoofing, and reply-to mismatch that confirm the message is malicious.",
+    "description": "Analyse the raw headers of a user-reported phishing email and identify the single most authoritative authentication indicator that proves the message is impersonating corp-target.com.",
     "type": "log-analysis",
     "difficulty": "beginner",
     "platform": "CompTIA",
@@ -4479,7 +4479,7 @@
     "relatedExamCodes": [
       "CS0-003"
     ],
-    "scenario": "A finance user has reported an email claiming to be from the company CEO requesting an urgent wire transfer. You have pulled the raw headers from the reported message and need to determine whether the message is malicious and which indicators support that verdict.\n\nReview the email header fields below and select all correct indicators of phishing.",
+    "scenario": "A finance user has reported an email claiming to be from the company CEO requesting an urgent wire transfer. You have pulled the raw headers and need to identify the **single most authoritative technical indicator** that proves this message is impersonating corp-target.com.\n\nReview the headers below, then select the one answer that best explains the root cause of the domain impersonation.",
     "logs": [
       {
         "timestamp": "2026-04-21 09:14:02",
@@ -4539,36 +4539,36 @@
     "answers": [
       {
         "id": "a1",
-        "text": "SPF verdict is 'fail' - the sending IP (Google consumer mail) is not authorised to send for the envelope sender domain, a primary authentication failure",
-        "correct": true
+        "text": "spf=fail proves the sending IP is not authorised to send on behalf of corp-target.com, confirming domain impersonation",
+        "correct": false
       },
       {
         "id": "a2",
-        "text": "DKIM verdict is 'none' - there is no valid DKIM signature covering a corp-target.com identity, so the message cannot be cryptographically tied to the purported sending domain",
-        "correct": true
+        "text": "dkim=none proves the message was tampered with in transit because a legitimate corporate email would always carry a valid signature",
+        "correct": false
       },
       {
         "id": "a3",
-        "text": "DMARC verdict is 'fail' with policy p=quarantine because the From header domain (corp-target.com) does not align with the authenticated envelope-sender domain (gmail.com)",
+        "text": "dmarc=fail (p=quarantine) is the authoritative indicator — it explicitly checks whether the authenticated sending domain aligns with the From header's claimed domain (corp-target.com), and the alignment failure formally proves impersonation",
         "correct": true
       },
       {
         "id": "a4",
-        "text": "The From header shows display name spoofing: 'CEO Jane Smith' is rendered in the client while the underlying address is attacker-payouts@gmail.com - a classic executive impersonation pattern",
-        "correct": true
+        "text": "The From header display name ('CEO Jane Smith') is the root cause because it is the field the recipient sees and it directly misrepresents the sender's identity",
+        "correct": false
       },
       {
         "id": "a5",
-        "text": "The Reply-To points to a proton.me address that differs from the From address, so any reply is silently redirected to attacker-controlled infrastructure",
-        "correct": true
+        "text": "The Reply-To mismatch (proton.me vs gmail.com) is the definitive indicator because it shows the attacker needed a separate address to receive replies without being detected",
+        "correct": false
       },
       {
         "id": "a6",
-        "text": "The X-Mailer header (Gmail Web Client) is a phishing indicator on its own and is sufficient to classify the message as malicious",
+        "text": "The Message-ID domain (@mail.gmail.com) is the root cause because it reveals the message originated from Gmail infrastructure rather than corp-target.com mail servers",
         "correct": false
       }
     ],
-    "explanation": "**SPF fail**\n\nSPF (Sender Policy Framework) checks whether the IP that handed the message to your MX is listed as an authorised sender in the envelope-sender domain's DNS TXT record. A `spf=fail` verdict means the receiving server cannot find the sending IP in the published SPF record for `attacker-payouts@gmail.com` - or, more importantly in an impersonation case, that the message claiming to be from the CEO is not coming from an IP that corp-target.com has authorised. SPF fail alone is a strong indicator but must be read alongside DKIM and DMARC.\n\n**DKIM none**\n\nDKIM (DomainKeys Identified Mail) attaches a cryptographic signature to outbound mail. `dkim=none` means the message has no valid DKIM signature for `corp-target.com`. For a genuine CEO email you would expect a valid `dkim=pass header.d=corp-target.com` result. Its absence means no part of the message content or From header can be cryptographically tied to the company domain.\n\n**DMARC fail with p=quarantine**\n\nDMARC binds SPF and DKIM to the From header domain through an *alignment* check. The From header says `corp-target.com` but the authenticated envelope domain is `gmail.com` - they do not align, so DMARC reports `fail`. The published policy (`p=quarantine`) instructs receivers to hold the message for review. DMARC fail is the single most reliable header-level indicator of domain impersonation.\n\n**Display name spoofing**\n\nMail clients typically render only the display name (`CEO Jane Smith`) unless the user explicitly hovers or expands the header. The attacker exploits this by putting the executive's name in the display portion while the underlying address is a free-mail account. This technique bypasses SPF and DKIM entirely because the attacker is legitimately authenticating as the free-mail account - not as the spoofed brand.\n\n**Reply-To mismatch**\n\nSetting a different Reply-To address means the victim's reply is silently routed to an attacker-controlled mailbox even if the original From address is reported and blocked. It is a defining artefact of Business Email Compromise (BEC) because it lets the attacker continue the conversation from a different identity.\n\n**Why X-Mailer is not an indicator**\n\nThe `X-Mailer` header identifies the client that composed the message. Gmail Web Client, Outlook, Thunderbird, and many others are perfectly normal. Treating a specific mailer string as a phishing indicator generates huge false-positive volume. It is not part of the verdict chain."
+    "explanation": "## Why DMARC fail is the correct answer\n\nDMARC (`dmarc=fail`) is the only mechanism in the authentication chain that was specifically designed to answer the question: *does the domain in the From header match the domain that actually sent this message?* It performs an **alignment check** — comparing the domain in `header.from` (`corp-target.com`) against the domains authenticated by SPF and DKIM. Here, neither SPF nor DKIM can vouch for `corp-target.com` as the sender, so DMARC fails. The `p=quarantine` policy is corp-target.com's published instruction telling receivers to treat such messages with suspicion. This is the formal, standards-defined proof of impersonation.\n\n## Why the other answers are wrong\n\n**SPF fail (a1) — plausible but incomplete.** SPF checks the *envelope sender* (`smtp.mailfrom=attacker-payouts@gmail.com`), not the `From` header domain. A failed SPF result here means the sending IP is not authorised to send for `attacker-payouts@gmail.com` — it says nothing directly about `corp-target.com` impersonation. The attacker could fix the SPF result entirely by using a different envelope domain and the impersonation would continue. SPF is one input into DMARC, not the root cause on its own.\n\n**dkim=none (a2) — misinterprets what 'none' means.** `dkim=none` means no DKIM signature was present for `corp-target.com` — it does **not** mean the message was tampered with in transit. Tampering would produce a `dkim=fail` (signature present but invalid). Absence of a signature is a weakness, but many legitimate senders don't sign with DKIM. Like SPF, DKIM is an input into the DMARC alignment check, not a standalone proof of impersonation.\n\n**Display name spoofing (a4) — a consequence, not the cause.** The display name `CEO Jane Smith` is a social-engineering technique that exploits how mail clients render headers. It is visible evidence of the attacker's intent, but it is not an authentication mechanism. An attacker can spoof a display name on a perfectly SPF/DKIM/DMARC-passing email. The display name alone cannot be used to formally classify a message as impersonation — DMARC is what provides that verdict.\n\n**Reply-To mismatch (a5) — a BEC artefact, not the root cause.** The Reply-To redirect to a proton.me address is a Business Email Compromise (BEC) technique designed to route replies to attacker-controlled infrastructure. It is a strong secondary indicator, but it only becomes relevant once the message has already passed (or bypassed) delivery. It is not part of the authentication verdict chain and does not prove corp-target.com impersonation on its own.\n\n**Message-ID domain (a6) — not a reliable indicator.** The `@mail.gmail.com` domain in the Message-ID is assigned by Gmail's infrastructure and simply reflects where the message was composed. Many legitimate messages from organisations that use Google Workspace carry the same format. Message-ID is not an authentication field and generates significant false-positive volume if used as a phishing signal."
   },
   {
     "id": "comptia-ssh-brute-force-log-analysis",

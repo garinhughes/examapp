@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect, useMemo } from 'react'
-import { DollarSign, ArrowRight } from 'lucide-react'
-import { useExam } from '@/exam/ExamContext'
+import { DollarSign, ArrowRight, CheckCircle2, XCircle } from 'lucide-react'
 import type { CostOptimizationLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface CostOptProgress { selections: Record<string, string>; timeLeft: number }
 
@@ -24,6 +24,17 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
     for (const comp of lab.components) init[comp.id] = comp.currentService
     return init
   })
+  const [checked, setChecked] = useState(false)
+  const [isCorrect, setIsCorrect] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    const init: Record<string, string> = {}
+    for (const comp of lab.components) init[comp.id] = comp.currentService
+    setSelections(init)
+    setChecked(false)
+    setIsCorrect(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -31,7 +42,7 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
   }, [selections, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   const currentTotal = useMemo(() => {
@@ -48,27 +59,30 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
   }, [lab.components])
 
   const handleSelect = useCallback((compId: string, service: string) => {
-    if (session.submitted) return
+    if (checked) return
+    session.markDirty()
     setSelections((prev) => ({ ...prev, [compId]: service }))
-  }, [session.submitted])
+  }, [checked])
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const correct = currentTotal <= lab.targetCost
-    await session.finalize(correct, JSON.stringify(selections))
-  }, [lab, selections, currentTotal, session.finalize])
+    setIsCorrect(correct)
+    setChecked(true)
+  }, [checked, currentTotal, lab.targetCost])
+
+  const handleComplete = useCallback(async () => {
+    await session.finalize(isCorrect, JSON.stringify(selections))
+  }, [session.finalize, selections, isCorrect])
 
   const meetsTarget = currentTotal <= lab.targetCost
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={session.timeLimit - session.timeLeft} timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }} onCancel={() => session.setShowConfirmModal(false)} />
-      )}
       <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={lab.scenario} labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ selections, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+        onRatingClose={() => setRoute('skill-labs')} />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
@@ -106,12 +120,12 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
               { service: comp.currentService, cost: comp.currentCost },
               ...comp.alternatives,
             ]
-            const isCorrectChoice = session.submitted && selections[comp.id] === comp.correctService
-            const isWrongChoice = session.submitted && selections[comp.id] !== comp.correctService
+            const isCorrectChoice = checked && selections[comp.id] === comp.correctService
+            const isWrongChoice = checked && selections[comp.id] !== comp.correctService
 
             return (
               <div key={comp.id} className={`rounded-lg border p-4 ${
-                session.submitted
+                checked
                   ? isCorrectChoice ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'
                   : 'border-border bg-card'
               }`}>
@@ -124,7 +138,7 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
                     <button
                       key={opt.service}
                       onClick={() => handleSelect(comp.id, opt.service)}
-                      disabled={session.submitted}
+                      disabled={checked}
                       className={`w-full flex items-center justify-between px-3 py-2 rounded-md border text-sm transition ${
                         selections[comp.id] === opt.service
                           ? 'border-primary bg-primary/10 text-primary'
@@ -136,7 +150,7 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
                     </button>
                   ))}
                 </div>
-                {session.submitted && isWrongChoice && (
+                {checked && isWrongChoice && (
                   <div className="text-xs text-muted-foreground mt-2">
                     Recommended: <span className="font-mono text-foreground">{comp.correctService}</span>
                   </div>
@@ -147,34 +161,28 @@ export function CostOptimizationRunner({ lab, timed = true }: Props) {
         </div>
       </div>
 
-      {/* Submit / Result */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!session.submitted ? (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Swap services to reduce costs below ${lab.targetCost}/mo while keeping architecture functional.
-            </p>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
-              onClick={() => session.setShowConfirmModal(true)}
-            >
-              Submit Optimization
-            </button>
+      {checked && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-2">
+          <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${meetsTarget ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+            {meetsTarget ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            {meetsTarget
+              ? `Cost reduced to $${currentTotal}/mo — under target!`
+              : `Cost is $${currentTotal}/mo — still above $${lab.targetCost}/mo target`}
           </div>
-        ) : (
-          <div className="space-y-2">
-            <div className={`font-semibold text-sm ${meetsTarget ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {meetsTarget
-                ? `✓ Cost reduced to $${currentTotal}/mo - under target!`
-                : `✗ Cost is $${currentTotal}/mo - still above $${lab.targetCost}/mo target`}
-            </div>
-            <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
-          </div>
-        )}
-      </div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={isCorrect}
+        submitted={session.submitted}
+        canCheck
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

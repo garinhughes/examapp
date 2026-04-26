@@ -13,7 +13,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           type: 'object',
           required: ['contentType', 'contentId', 'stars', 'difficulty'],
           properties: {
-            contentType: { type: 'string', enum: ['question', 'lab'] },
+            contentType: { type: 'string', enum: ['question', 'lab', 'exam'] },
             contentId: { type: 'string', minLength: 1 },
             stars: { type: 'integer', minimum: 1, maximum: 5 },
             difficulty: { type: 'string', enum: ['too-easy', 'just-right', 'too-hard'] },
@@ -25,7 +25,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     async (request, reply) => {
       const user = request.user!
       const body = request.body as {
-        contentType: 'question' | 'lab'
+        contentType: 'question' | 'lab' | 'exam'
         contentId: string
         stars: number
         difficulty: 'too-easy' | 'just-right' | 'too-hard'
@@ -61,7 +61,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           type: 'object',
           required: ['contentType', 'contentId'],
           properties: {
-            contentType: { type: 'string', enum: ['question', 'lab'] },
+            contentType: { type: 'string', enum: ['question', 'lab', 'exam'] },
             contentId: { type: 'string', minLength: 1 },
           },
         },

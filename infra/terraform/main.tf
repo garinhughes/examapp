@@ -81,7 +81,16 @@ module "dynamodb" {
     audit              = { table_name = "${var.project}-audit", hash_key = "adminId", range_key = "createdAt" }
     sessions           = { table_name = "${var.project}-sessions", hash_key = "PK", range_key = "SK", ttl_attribute = "ttl" }
     skill_labs_index   = { table_name = "${var.project}-skill-labs-index", hash_key = "labId" }
-    skill_lab_attempts = { table_name = "${var.project}-skill-lab-attempts", hash_key = "userId", range_key = "attemptId" }
+    skill_lab_attempts = {
+      table_name = "${var.project}-skill-lab-attempts"
+      hash_key   = "userId"
+      range_key  = "attemptId"
+      gsis = [
+        # Lifecycle redesign (dev-guide §15 / 14.8) — find a user's in_progress
+        # attempts in one query instead of scanning all rows.
+        { name = "status-index", hash_key = "userId", range_key = "status", projection_type = "ALL" }
+      ]
+    }
     issue_reports      = { table_name = "${var.project}-issue-reports", hash_key = "reportId" }
     metrics            = { table_name = "${var.project}-metrics", hash_key = "pk", range_key = "sk" }
     interactions       = { table_name = "${var.project}-interactions", hash_key = "userId", range_key = "SK" }

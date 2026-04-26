@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect, useMemo } from 'react'
-import { Search } from 'lucide-react'
-import { useExam } from '@/exam/ExamContext'
+import { Search, CheckCircle2, XCircle } from 'lucide-react'
 import type { LogAnalysisLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { ExplanationBlock } from '../ExplanationBlock'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface LogAnalysisProgress {
   highlightedLines: number[]
@@ -35,7 +35,18 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
     () => new Set(session.savedProgress?.highlightedLines ?? [])
   )
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(session.savedProgress?.selectedAnswer ?? null)
+  const [checked, setChecked] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    setSearchTerm('')
+    setLevelFilter(null)
+    setHighlightedLines(new Set())
+    setSelectedAnswer(null)
+    setChecked(false)
+    setIsCorrect(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -43,7 +54,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
   }, [highlightedLines, selectedAnswer, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   const filteredLogs = useMemo(() => {
@@ -63,6 +74,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
 
   const toggleHighlight = useCallback((idx: number) => {
     if (session.submitted) return
+    session.markDirty()
     setHighlightedLines((prev) => {
       const next = new Set(prev)
       if (next.has(idx)) next.delete(idx)
@@ -71,26 +83,26 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
     })
   }, [session.submitted])
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const correctAnswer = lab.answers.find((a) => a.correct)
     const correct = selectedAnswer === correctAnswer?.id
     setIsCorrect(correct)
-    await session.finalize(correct, selectedAnswer || '')
-  }, [lab, selectedAnswer, session.finalize])
+    setChecked(true)
+  }, [checked, lab, selectedAnswer])
+
+  const handleComplete = useCallback(async () => {
+    await session.finalize(isCorrect, selectedAnswer || '')
+  }, [session.finalize, selectedAnswer, isCorrect])
 
   const levels = useMemo(() => [...new Set(lab.logs.map((l) => l.level))], [lab.logs])
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal title={lab.title} timeTaken={session.timeLimit - session.timeLeft} timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => session.setShowConfirmModal(false)} />
-      )}
       <LabHeader title={lab.title} timed={timed} timeLeft={session.timeLeft} subtitle={lab.scenario} labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ highlightedLines: [...highlightedLines], selectedAnswer, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab} />
+        onRatingClose={() => setRoute('skill-labs')} />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
           Resuming from saved progress
@@ -169,7 +181,7 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
           {lab.answers.map((answer) => {
             let cls = 'border border-border rounded-md px-4 py-2.5 text-sm text-left transition '
-            if (session.submitted) {
+            if (checked) {
               if (answer.correct) cls += 'border-green-500 bg-green-500/10 text-green-700 dark:text-green-400'
               else if (answer.id === selectedAnswer && !answer.correct) cls += 'border-destructive bg-destructive/10 text-destructive'
               else cls += 'bg-muted/30 text-muted-foreground'
@@ -179,32 +191,33 @@ export function LogAnalysisRunner({ lab, timed = true }: Props) {
               cls += 'hover:bg-muted/50 cursor-pointer'
             }
             return (
-              <button key={answer.id} className={cls} disabled={session.submitted} onClick={() => !session.submitted && setSelectedAnswer(answer.id)}>
+              <button key={answer.id} className={cls} disabled={checked} onClick={() => { if (!checked) { session.markDirty(); setSelectedAnswer(answer.id) } }}>
                 {answer.text}
               </button>
             )
           })}
         </div>
-        {!session.submitted ? (
-          <button
-            className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!selectedAnswer}
-            onClick={() => session.setShowConfirmModal(true)}
-          >
-            Submit Answer
-          </button>
-        ) : (
+        {checked && (
           <div className="space-y-3">
-            <div className={`font-semibold text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+            <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+              {isCorrect ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+              {isCorrect ? 'Correct!' : 'Incorrect'}
             </div>
             <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
           </div>
         )}
       </div>
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={isCorrect}
+        submitted={session.submitted}
+        canCheck={!!selectedAnswer}
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }

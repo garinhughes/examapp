@@ -4,9 +4,10 @@ import { Star } from 'lucide-react'
 import { useAuthFetch } from '../auth/useAuthFetch'
 
 interface Props {
-  contentType: 'question' | 'lab'
+  contentType: 'question' | 'lab' | 'exam'
   contentId: string
   onClose: () => void
+  onIgnoreAll?: () => void
 }
 
 type Difficulty = 'too-easy' | 'just-right' | 'too-hard'
@@ -17,7 +18,7 @@ const DIFFICULTY_LABELS: { value: Difficulty; label: string }[] = [
   { value: 'too-hard', label: 'Too Hard' },
 ]
 
-export function RatingModal({ contentType, contentId, onClose }: Props) {
+export function RatingModal({ contentType, contentId, onClose, onIgnoreAll }: Props) {
   const authFetch = useAuthFetch()
   const [stars, setStars] = useState<number | null>(null)
   const [hovered, setHovered] = useState<number | null>(null)
@@ -83,7 +84,7 @@ export function RatingModal({ contentType, contentId, onClose }: Props) {
           </div>
         ) : (
           <>
-            <h3 className="text-lg font-semibold mb-1">Rate this {contentType === 'lab' ? 'lab' : 'question'}</h3>
+            <h3 className="text-lg font-semibold mb-1">Rate this {contentType === 'lab' ? 'lab' : contentType === 'exam' ? 'exam' : 'question'}</h3>
             <p className="text-sm text-muted-foreground mb-4">Your feedback is private and helps us improve content quality.</p>
 
             {/* Star rating */}
@@ -156,12 +157,21 @@ export function RatingModal({ contentType, contentId, onClose }: Props) {
             )}
 
             <div className="flex items-center justify-end gap-3">
+              {onIgnoreAll && (
+                <button
+                  className="px-3 py-1 rounded-md text-xs text-muted-foreground hover:text-foreground transition mr-auto"
+                  onClick={onIgnoreAll}
+                  disabled={submitting}
+                >
+                  Ignore all ratings
+                </button>
+              )}
               <button
                 className="px-3 py-1 rounded-md bg-accent text-muted-foreground hover:bg-accent/80 transition text-sm"
                 onClick={onClose}
                 disabled={submitting}
               >
-                Cancel
+                Skip
               </button>
               <button
                 className="px-3 py-1 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition text-sm disabled:opacity-50"

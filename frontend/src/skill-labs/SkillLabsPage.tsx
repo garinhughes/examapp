@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import Loader from '@/components/Loader'
 import { useExam } from '@/exam/ExamContext'
 import { Clock, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Bookmark, Search, X, Lock, Play } from 'lucide-react'
@@ -7,7 +8,8 @@ import type { LabSummary, SkillLevel } from './types'
 import { LAB_TIME_LIMITS } from './types'
 import { apiUrl } from '@/apiBase'
 import { SearchableFilter } from './SearchableFilter'
-import { getBookmarkedLabs, toggleBookmark, getInProgressLabs, clearLabProgress } from './labs/shared'
+import { getBookmarkedLabs, toggleBookmark, clearLabProgress } from './labs/shared'
+import { useSkillLab } from './SkillLabContext'
 import { DIFFICULTY_COLORS } from './platformMeta'
 import { ProviderLogo } from '@/components/ProviderLogo'
 
@@ -32,6 +34,7 @@ function inlineMarkdown(text: string) {
 
 export function SkillLabsPage() {
   const { setRoute, authFetch, user } = useExam()
+  const { inProgressLab, cancelActive } = useSkillLab()
   const [labs, setLabs] = useState<LabSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -71,10 +74,6 @@ export function SkillLabsPage() {
     }
   })
 
-  // In-progress labs (from localStorage, read once on mount)
-  const [inProgressLabs, setInProgressLabs] = useState<Map<string, { timed: boolean | null }>>(() =>
-    new Map(getInProgressLabs().map((e) => [e.labId, { timed: e.timed }]))
-  )
   const [confirmCancelLabId, setConfirmCancelLabId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -86,7 +85,7 @@ export function SkillLabsPage() {
 
   function cancelLabProgress(labId: string) {
     clearLabProgress(labId)
-    setInProgressLabs((prev) => { const next = new Map(prev); next.delete(labId); return next })
+    void cancelActive()
     setConfirmCancelLabId(null)
   }
 
@@ -230,7 +229,12 @@ export function SkillLabsPage() {
   }, [labs, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, completionFilter, completedLabIds, showSavedOnly, bookmarkedLabIds, searchQuery])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / LABS_PER_PAGE))
-  const paginated = filtered.slice((page - 1) * LABS_PER_PAGE, page * LABS_PER_PAGE)
+  let paginated = filtered.slice((page - 1) * LABS_PER_PAGE, page * LABS_PER_PAGE)
+  const isLocked = inProgressLab !== null
+  if (isLocked) {
+    const activeLab = labs.find((l) => l.id === inProgressLab.labId)
+    paginated = activeLab ? [activeLab] : []
+  }
 
   const hasActiveFilters = Boolean(selectedDifficulty) || selectedPlatforms.size > 0 || selectedCategories.size > 0 || selectedTechnologies.size > 0 || searchQuery.trim().length > 0
 
@@ -267,12 +271,14 @@ export function SkillLabsPage() {
                 value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); setPage(1) }}
                 placeholder="Search labs..."
-                className="pl-8 w-full sm:w-64 md:w-80 px-3 py-1.5 rounded-md border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                disabled={isLocked}
+                className="pl-8 w-full sm:w-64 md:w-80 px-3 py-1.5 rounded-md border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             <button
               onClick={() => { setShowSavedOnly(!showSavedOnly); setPage(1) }}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition border ${
+              disabled={isLocked}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition border disabled:opacity-50 disabled:cursor-not-allowed ${
                 showSavedOnly
                   ? 'border-primary bg-primary/10 text-primary'
                   : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -288,7 +294,7 @@ export function SkillLabsPage() {
         </div>
 
         {/* Filter row */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className={`flex items-center gap-2 flex-wrap ${isLocked ? 'opacity-50 pointer-events-none' : ''}`} aria-disabled={isLocked}>
           {/* Difficulty: radio-style buttons */}
           <div className="flex items-center gap-1 p-0.5 rounded-md border border-border bg-card">
             {DIFFICULTY_LEVELS.map((level) => (
@@ -357,46 +363,12 @@ export function SkillLabsPage() {
         </div>
       </div>
 
-      {/* Resume banner - shown when a visible lab has saved progress */}
-      {(() => {
-        const resumable = filtered.find((l) => inProgressLabs.has(l.id))
-        if (!resumable) return null
-        return (
-          <div className="mb-4 p-4 rounded-lg bg-card border border-border shadow-sm flex items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-md flex items-center justify-center bg-primary/10 text-primary text-lg flex-shrink-0">
-                <Play className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="font-semibold text-foreground">Lab in progress</div>
-                <div className="text-sm text-muted-foreground">{resumable.title}</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                className="px-3 py-1 rounded-md bg-primary text-white text-sm inline-flex items-center gap-2 shadow-sm hover:opacity-95 transition"
-                onClick={() => {
-                  const savedTimed = inProgressLabs.get(resumable.id)?.timed
-                  const mode = (savedTimed === true) ? 'timed' : 'casual'
-                  clarityEvent('lab_resumed')
-                  clarityTag('lab_id', resumable.id)
-                  clarityTag('lab_mode', mode)
-                  setRoute(`skill-lab:${resumable.id}:${mode}` as any)
-                }}
-              >
-                <Play className="w-4 h-4" /> Resume
-              </button>
-              <button
-                className="px-3 py-1 rounded-md bg-muted text-muted-foreground border border-border text-sm inline-flex items-center gap-1.5 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition"
-                onClick={() => setConfirmCancelLabId(resumable.id)}
-                title="Cancel lab progress"
-              >
-                <X className="w-4 h-4" /> Cancel
-              </button>
-            </div>
-          </div>
-        )
-      })()}
+
+      {isLocked && (
+        <div className="text-xs text-muted-foreground">
+          You have a lab in progress. Complete or cancel it to access other labs.
+        </div>
+      )}
 
       {/* Lab cards grid: 3 across × 4 down */}
       {paginated.length === 0 ? (
@@ -406,8 +378,8 @@ export function SkillLabsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {paginated.map((lab) => {
-            const anyInProgress = inProgressLabs.size > 0
-            const thisInProgress = inProgressLabs.has(lab.id)
+            const anyInProgress = inProgressLab !== null
+            const thisInProgress = inProgressLab?.labId === lab.id
             const isCompleted = completedLabIds.has(lab.id) && !thisInProgress
             const blockedByOther = anyInProgress && !thisInProgress && !lab.locked
             const cardDisabled = blockedByOther
@@ -420,6 +392,8 @@ export function SkillLabsPage() {
             return (
               <div
                 key={lab.id}
+                data-testid="lab-card"
+                data-lab-id={lab.id}
                 role="button"
                 tabIndex={cardDisabled ? -1 : 0}
                 aria-disabled={cardDisabled}
@@ -516,9 +490,9 @@ export function SkillLabsPage() {
         </div>
       )}
 
-      {/* Cancel lab confirmation modal */}
-      {confirmCancelLabId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Cancel lab confirmation modal — portalled to body so it can't be obscured by stacking contexts */}
+      {confirmCancelLabId && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setConfirmCancelLabId(null)} />
           <div className="relative bg-card p-6 rounded max-w-lg w-full mx-4">
             <h3 className="text-lg font-semibold mb-2">Cancel lab?</h3>
@@ -528,11 +502,12 @@ export function SkillLabsPage() {
               <button className="px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition" onClick={() => cancelLabProgress(confirmCancelLabId)}>Yes, cancel</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!isLocked && totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 pt-2">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}

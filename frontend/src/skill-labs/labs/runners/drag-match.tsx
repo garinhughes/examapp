@@ -11,11 +11,12 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core'
 import { useDroppable, useDraggable } from '@dnd-kit/core'
-import { useExam } from '@/exam/ExamContext'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import type { DragMatchLabDefinition } from '../../types'
 import { LabHeader } from '../LabHeader'
 import { useLabSession } from '../useLabSession'
-import { LabCompleteModal } from '../LabCompleteModal'
+import { LabCheckActions } from '../LabCheckActions'
+import { useExam } from '@/exam/ExamContext'
 
 interface DragMatchProgress {
   matches: Record<string, string>   // termId → definitionId
@@ -93,6 +94,17 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
   )
   const [activeId, setActiveId] = useState<string | null>(null)
   const [results, setResults] = useState<Record<string, boolean>>({})
+  const [checked, setChecked] = useState(false)
+  const [isCorrect, setIsCorrect] = useState(false)
+
+  useEffect(() => {
+    if (session.restartKey === 0) return
+    setMatches({})
+    setResults({})
+    setActiveId(null)
+    setChecked(false)
+    setIsCorrect(false)
+  }, [session.restartKey])
 
   useEffect(() => {
     if (session.submitted) return
@@ -100,7 +112,7 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
   }, [matches, session.timeLeft, session.submitted])
 
   useEffect(() => {
-    if (timed && session.timeLeft === 0 && !session.submitted) doSubmit()
+    if (timed && session.timeLeft === 0 && !checked) handleCheck()
   }, [session.timeLeft])
 
   // termId → definitionId (reverse of matches)
@@ -121,7 +133,8 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
 
   const onDragEnd = useCallback((e: DragEndEvent) => {
     setActiveId(null)
-    if (!e.over || session.submitted) return
+    if (!e.over || checked) return
+    session.markDirty()
     const termId = String(e.active.id)
     const defId = String(e.over.id)
     setMatches((prev) => {
@@ -134,9 +147,10 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
       next[termId] = defId
       return next
     })
-  }, [session.submitted, definitionToTerm])
+  }, [checked, definitionToTerm])
 
-  const doSubmit = useCallback(async () => {
+  const handleCheck = useCallback(() => {
+    if (checked) return
     const res: Record<string, boolean> = {}
     let allCorrect = true
     for (const pair of lab.pairs) {
@@ -145,23 +159,19 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
       if (!pass) allCorrect = false
     }
     setResults(res)
-    await session.finalize(allCorrect, JSON.stringify(matches))
-  }, [lab, termToDefinition, matches, session.finalize])
+    setIsCorrect(allCorrect)
+    setChecked(true)
+  }, [checked, lab, termToDefinition])
+
+  const handleComplete = useCallback(async () => {
+    await session.finalize(isCorrect, JSON.stringify(matches))
+  }, [session.finalize, matches, isCorrect])
 
   const activeTerm = activeId ? lab.pairs.find((p) => p.id === activeId) : null
   const allMatched = unmatchedTermIds.length === 0
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {session.showConfirmModal && (
-        <LabCompleteModal
-          title={lab.title}
-          timeTaken={session.timeLimit - session.timeLeft}
-          timed={timed}
-          onConfirm={() => { session.setShowConfirmModal(false); doSubmit() }}
-          onCancel={() => session.setShowConfirmModal(false)}
-        />
-      )}
       <LabHeader
         title={lab.title}
         timed={timed}
@@ -170,7 +180,7 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
         labId={lab.id}
         onPauseChange={session.setLabPaused}
         onPauseAndExit={session.submitted ? undefined : () => session.handlePauseAndExit({ matches, timeLeft: session.timeLeft })}
-        onCancelLab={session.submitted ? undefined : session.handleCancelLab}
+        onRatingClose={() => setRoute('skill-labs')}
       />
       {session.resumeNotice && (
         <div className="px-3 py-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300/50 text-amber-800 dark:text-amber-300 text-xs font-medium">
@@ -186,17 +196,17 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
             <div className="space-y-2">
               {lab.pairs.map((pair) => {
                 const isMatched = !!termToDefinition[pair.id]
-                if (isMatched && !session.submitted) return null
+                if (isMatched && !checked) return null
                 return (
                   <DraggableTerm
                     key={pair.id}
                     id={pair.id}
                     label={pair.term}
-                    disabled={session.submitted || isMatched}
+                    disabled={checked || isMatched}
                   />
                 )
               })}
-              {unmatchedTermIds.length === 0 && !session.submitted && (
+              {unmatchedTermIds.length === 0 && !checked && (
                 <p className="text-xs text-muted-foreground italic">All terms placed</p>
               )}
             </div>
@@ -214,8 +224,8 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
                   const termId = definitionToTerm[pair.id]
                   return termId ? lab.pairs.find((p) => p.id === termId)?.term : undefined
                 })()}
-                correct={session.submitted ? results[definitionToTerm[pair.id] ?? ''] : undefined}
-                submitted={session.submitted}
+                correct={checked ? results[definitionToTerm[pair.id] ?? ''] : undefined}
+                submitted={checked}
               />
             ))}
           </div>
@@ -230,32 +240,28 @@ export function DragMatchRunner({ lab, timed = true }: Props) {
         </DragOverlay>
       </DndContext>
 
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        {!session.submitted ? (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Drag each term to its matching definition.</p>
-            <button
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition disabled:opacity-50"
-              disabled={!allMatched}
-              onClick={() => session.setShowConfirmModal(true)}
-            >
-              Submit Matches
-            </button>
+      {checked && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm space-y-2">
+          <div className={`inline-flex items-center gap-1.5 font-semibold text-sm ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+            {isCorrect ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            {isCorrect
+              ? 'All matches correct!'
+              : `${Object.values(results).filter(Boolean).length}/${lab.pairs.length} correct`}
           </div>
-        ) : (
-          <div className="space-y-2">
-            <div className={`font-semibold text-sm ${Object.values(results).every(Boolean) ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
-              {Object.values(results).every(Boolean)
-                ? '✓ All matches correct!'
-                : `✗ ${Object.values(results).filter(Boolean).length}/${lab.pairs.length} correct`}
-            </div>
-            <ExplanationBlock text={lab.explanation} />
-            <button onClick={() => setRoute('skill-labs')} className="mt-2 px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition">
-              Back to Skill Labs
-            </button>
-          </div>
-        )}
-      </div>
+          <ExplanationBlock text={lab.explanation} />
+        </div>
+      )}
+
+      <LabCheckActions
+        checked={checked}
+        isCorrect={isCorrect}
+        submitted={session.submitted}
+        canCheck={allMatched}
+        onCheck={handleCheck}
+        onComplete={handleComplete}
+        onRetry={session.restart}
+        onCancel={session.handleCancelLab}
+      />
     </div>
   )
 }
