@@ -166,14 +166,14 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => { setView('signin'); setError(null); setInfo(null) }}
-              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${view === 'signin' ? 'bg-[#FF6B35] text-white' : 'bg-background text-muted-foreground hover:text-foreground'}`}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${view === 'signin' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'}`}
             >
               Sign in
             </button>
             <button
               type="button"
               onClick={() => { setView('register'); setError(null); setInfo(null) }}
-              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${view === 'register' ? 'bg-[#FF6B35] text-white' : 'bg-background text-muted-foreground hover:text-foreground'}`}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${view === 'register' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'}`}
             >
               Register
             </button>

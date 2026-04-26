@@ -39,9 +39,10 @@ resource "aws_wafv2_web_acl" "main" {
     }
   }
 
-  # Rule 2: Rate limiting — 400 requests per 5 minutes per IP
+  # Rule 2: Auth rate limiting — 100 req/5min/IP on /auth/* (WAFv2 minimum; credential-stuffing ceiling)
+  # Evaluated before the general rule so auth endpoints are held to the tighter budget.
   rule {
-    name     = "rate-limit"
+    name     = "rate-limit-auth"
     priority = 1
 
     action {
@@ -50,7 +51,45 @@ resource "aws_wafv2_web_acl" "main" {
 
     statement {
       rate_based_statement {
-        limit              = 400
+        limit              = 100
+        aggregate_key_type = "IP"
+
+        scope_down_statement {
+          byte_match_statement {
+            search_string = "/auth/"
+            field_to_match {
+              uri_path {}
+            }
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+            positional_constraint = "STARTS_WITH"
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${var.project}-rate-limit-auth"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Rule 3: General rate limiting — 2000 req/5min/IP (~400/min); DDoS backstop.
+  # Fastify's per-user limits are the real budget; WAF only catches floods from a single IP.
+  rule {
+    name     = "rate-limit"
+    priority = 2
+
+    action {
+      block {}
+    }
+
+    statement {
+      rate_based_statement {
+        limit              = 2000
         aggregate_key_type = "IP"
       }
     }

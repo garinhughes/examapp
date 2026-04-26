@@ -183,7 +183,7 @@ async function buildUnlockedIdsForLab(lab: any, count: number): Promise<Set<stri
 
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   // GET /skill-labs — list all labs; locked:true on labs the user cannot access
-  server.get('/', async (request, reply) => {
+  server.get('/', { config: { rateLimit: { max: 300, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     await server.optionalAuth(request, reply)
 
     const allLabs = USE_S3
@@ -244,7 +244,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   })
 
   // GET /skill-labs/:id — full lab definition
-  server.get('/:id', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
+  server.get('/:id', { config: { rateLimit: { max: 300, timeWindow: '1 minute' } } }, async (request, reply) => { // codeql[js/missing-rate-limiting]
     const { id } = request.params as { id: string }
     const lab = USE_S3 ? await findLabS3(id) : await findLabLocal(id)
     if (!lab) return reply.status(404).send({ message: 'Lab not found' })

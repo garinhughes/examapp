@@ -399,7 +399,7 @@
 <ol>
   <li>Raw-body capture (needed for Stripe/PayPal webhook signature verification).</li>
   <li><code>@fastify/cors</code> — origin from <code>FRONTEND_ORIGIN</code> (default <code>https://certshack.com</code>).</li>
-  <li><code>@fastify/rate-limit</code> — 100 req/min/IP, overridable via <code>RATE_LIMIT_MAX</code>.</li>
+  <li><code>@fastify/rate-limit</code> — 120 req/min per user (<code>JWT sub</code>) or IP for anonymous requests, overridable via <code>RATE_LIMIT_MAX</code>. Skipped entirely when <code>RATE_LIMIT_DISABLED=true</code> (local dev / Playwright). Browsing routes (<code>/exams</code>, <code>/skill-labs</code>) allow 300/min to accommodate shared-NAT visitors.</li>
   <li><code>@fastify/cookie</code> — session cookies.</li>
   <li><code>plugins/auth.ts</code> — decorates <code>request.user</code>, exposes <code>server.authenticate</code> and <code>server.optionalAuth</code>.</li>
   <li><code>plugins/entitlements.ts</code> — decorates <code>request.tier</code>, <code>request.tierConfig</code>, <code>request.entitlements</code>.</li>
@@ -450,7 +450,7 @@
     <g>
       <rect x="300" y="80" width="120" height="60" rx="8" fill="rgba(124,198,255,.1)" stroke="var(--accent)"/>
       <text x="360" y="105" text-anchor="middle" class="d-text">Rate limit</text>
-      <text x="360" y="122" text-anchor="middle" class="d-text-sm">100/min/IP</text>
+      <text x="360" y="122" text-anchor="middle" class="d-text-sm">120/min/user</text>
     </g>
     <g>
       <rect x="440" y="80" width="120" height="60" rx="8" fill="rgba(180,154,255,.1)" stroke="var(--accent-2)"/>
@@ -1101,7 +1101,7 @@ pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></
 <div class="callout">
   <strong>Already in place</strong> (don’t re-do): ECS service autoscaling (CPU 70/30%, min 1 / max 5),
   2-AZ VPC, Secrets Manager wired into the ECS task definition, AWS WAF with OWASP Common Rule Set
-  + a 400-requests-per-5-min per-IP rate rule, CloudWatch dashboard covering ALB/ECS/Dynamo/CloudFront.
+  + auth-scoped rate rule (100 req/5min/IP on <code>/auth/*</code>) + general rate rule (2,000 req/5min/IP), CloudWatch dashboard covering ALB/ECS/Dynamo/CloudFront.
   The roadmap below focuses on real gaps on top of that foundation.
 </div>
 
@@ -1250,17 +1250,17 @@ pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></
     </tr>
     <tr>
       <td class="num">3.3</td>
-      <td>WAF has OWASP Common Rule Set + a <strong>400 req / 5 min per-IP</strong> rate rule (~80/min). Fastify app-level limit is 100/min/IP.</td>
-      <td>Path-scoped WAF rules: tight budget on <code>/auth/*</code> (50 / 5 min / IP), generous default (5,000 / 5 min / IP) for read routes. Add <code>AWSManagedRulesATPRuleSet</code> (account-takeover prevention) scoped to Cognito. Turnstile / hCaptcha on registration.</td>
-      <td>Current per-IP limit is fine for one person on home broadband but falls over for any classroom/office on shared NAT. At 1k users <em>some</em> will sit behind shared egress — see §12.9.</td>
-      <td><strong>+£5–10</strong> on top of current WAF (already ~£5/mo base + £0.60/M req). ATP managed rule group ~£8/mo. Turnstile = free.</td>
+      <td>WAF has OWASP Common Rule Set + auth-scoped rate rule (100 req/5min/IP on <code>/auth/*</code>) + general rate rule (2,000 req/5min/IP). Fastify: 120 req/min per <code>user.sub</code> (anon falls back to IP); browsing routes 300/min. <strong>Done.</strong></td>
+      <td>Remaining: add <code>AWSManagedRulesATPRuleSet</code> (account-takeover prevention) scoped to Cognito. Turnstile / hCaptcha on registration.</td>
+      <td>WAF is now a DDoS backstop only; per-user Fastify limits are the real budget. Shared-NAT users (offices, conferences) are no longer penalised once authenticated. Remaining ATP rule would catch credential-stuffing patterns the blunt count-based rule misses.</td>
+      <td>ATP managed rule group ~£8/mo. Turnstile = free.</td>
     </tr>
     <tr>
       <td class="num">3.4</td>
-      <td>All rate limiting today is keyed on source IP (both WAF and Fastify). No per-authenticated-user budget.</td>
-      <td>Add <strong>per-authenticated-user</strong> limits in Fastify using <code>keyGenerator: req =&gt; req.user?.sub ?? req.ip</code>. 60 req/min general, 10 req/min on <code>/auth/*</code>, 20 req/min on <code>/attempts</code> POST. Fall back to IP only for anonymous requests.</td>
-      <td>This is the real feature-level limit at 1k DAU. IP becomes a DDoS backstop; user-level stops one logged-in client hammering the app (bug, script, or compromised account) without punishing the rest of the NAT.</td>
-      <td><strong>£0</strong> — <code>@fastify/rate-limit</code> already installed; single config change plus a <code>keyGenerator</code>. Store can stay in-memory per task (already sticky enough at min=2 tasks).</td>
+      <td>Per-authenticated-user rate limits shipped. Fastify <code>keyGenerator</code> decodes the bearer JWT (without verification) to extract <code>sub</code>; falls back to IP for anonymous requests. <strong>Done.</strong></td>
+      <td>If ECS scales beyond ~4 tasks, move the rate-limit store to Redis so all tasks share one counter per user (currently in-process, so effective limit is up to tasks × configured rate).</td>
+      <td>In-memory store with 2 tasks gives up to 2× the configured limit — acceptable imprecision at current scale.</td>
+      <td><strong>£0</strong> — done. Redis store would add ~£15–20/mo if needed at scale.</td>
     </tr>
     <tr>
       <td class="num">3.5</td>
@@ -1396,25 +1396,26 @@ pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></
 <ol>
   <li><strong>Month 1 — stop the bleeding.</strong> Sentry (<strong>2.1</strong>), DynamoDB PITR (<strong>4.3</strong>), ECS <code>min_capacity</code>=2 + circuit breaker (<strong>4.1</strong>, <strong>4.2</strong>), secret rotation (<strong>3.2</strong>). &lt;1 week of work.</li>
   <li><strong>Month 2 — quality gate.</strong> Playwright smoke suite (<strong>1.1</strong>), Renovate (<strong>1.3</strong>), bundle-size budget (<strong>5.3</strong>).</li>
-  <li><strong>Month 3 — auth hardening.</strong> Cookie-only JWT (<strong>3.1</strong>), path-scoped WAF + ATP (<strong>3.3</strong>), per-authenticated-user rate limits (<strong>3.4</strong>), CSP (<strong>3.5</strong>). <em>Prerequisite before promoting to students.</em></li>
+  <li><strong>Month 3 — auth hardening.</strong> Cookie-only JWT (<strong>3.1</strong>), ATP managed rule + hCaptcha on registration (<strong>3.3</strong> remainder), CSP (<strong>3.5</strong>). <em>Prerequisite before promoting to students.</em> (Path-scoped WAF + per-user rate limits — <strong>3.3/3.4</strong> — shipped.)</li>
   <li><strong>Month 4 — observability.</strong> Structured logs &amp; OTel (<strong>2.1</strong> cont.), p95 widgets on the dashboard (<strong>2.2</strong>), first SLO + runbook (<strong>2.3</strong>), Grafana Cloud Faro RUM + Geomap (<strong>2.4</strong>).</li>
   <li><strong>Month 5 — frontend refactor.</strong> Split <code>ExamContext</code> (<strong>5.1</strong>), TanStack Query on busiest routes (<strong>5.2</strong>), code-split heavy libs (<strong>5.3</strong>).</li>
   <li><strong>Month 6 — delivery maturity.</strong> Feature flags (<strong>6.1</strong>), analytics funnel (<strong>6.2</strong>), preview envs (<strong>1.2</strong>), canary deploys (<strong>4.2</strong> cont.).</li>
 </ol>
 
-<h3 id="rate-limits">12.9 Sizing rate limits for shared-NAT users (universities, schools, offices)</h3>
+<h3 id="rate-limits">12.9 Rate limits for shared-NAT users (universities, schools, offices)</h3>
 <p>
-  Current limits today:
+  Shipped limits:
 </p>
-<ul>
-  <li><strong>AWS WAF</strong>: 400 requests per 5-minute window per IP (~80/min).</li>
-  <li><strong>Fastify</strong> (<code>@fastify/rate-limit</code>): 100/min per IP, app-level.</li>
-</ul>
-<p>
-  The WAF rule is the hard ceiling — IPs over it get 403s for the remainder of the window. Both
-  limits key on the source IP, so every user behind a single NAT / corporate egress shares the
-  same bucket.
-</p>
+<table>
+  <thead><tr><th>Layer</th><th>Key</th><th>Budget</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>WAF</td><td>IP, scope = <code>/auth/*</code></td><td>100 / 5 min (~20/min)</td><td>WAFv2 minimum; credential-stuffing ceiling at the network edge.</td></tr>
+    <tr><td>WAF</td><td>IP, default</td><td>2,000 / 5 min (~400/min)</td><td>DDoS backstop only — handles ~30–40 concurrent users from the same egress.</td></tr>
+    <tr><td>Fastify</td><td><code>user.sub</code> (authed) / IP (anon)</td><td>120/min general</td><td>The real per-user budget. Authenticated users on shared NAT are fully isolated from each other.</td></tr>
+    <tr><td>Fastify</td><td><code>user.sub</code> / IP</td><td>300/min on <code>GET /exams*</code>, <code>GET /skill-labs*</code></td><td>Generous for anonymous visitors browsing from a shared office or conference IP.</td></tr>
+    <tr><td>Fastify</td><td>IP</td><td>10–20/min on <code>/auth/*</code></td><td>Per-route overrides; auth endpoints always fall back to IP (no bearer token yet).</td></tr>
+  </tbody>
+</table>
 
 <h4>What a typical user does per minute</h4>
 <p>
@@ -1431,78 +1432,35 @@ pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></
   </tbody>
 </table>
 <p>
-  Call it <strong>10 req/min/user</strong> for planning. This includes a lot of background cruft
-  (gamification polls, rating fetches, <code>/entitlements</code> resolves) — tightening those
-  alone would halve it.
+  Call it <strong>10 req/min/user</strong> for planning. At 120/min per user that’s 12× headroom
+  for the busiest flows. A 65-question exam generates at most ~20 req/min even at full pace —
+  well within budget.
 </p>
 
-<h4>University scenario — back-of-envelope</h4>
+<h4>How the keyGenerator works</h4>
 <p>
-  If 50 students from the same institution all take a mock exam at the same time, behind
-  one university NAT egress IP:
-</p>
-<pre><code>50 students × 10 req/min = 500 req/min from one IP
-                         = 2,500 req per 5-min window
-</code></pre>
-<p>
-  That is <strong>6× the WAF ceiling</strong>. The first ~8 students land fine; the rest get
-  403s, often mid-exam. If you also promote to a full class of 200, it’s 25× over.
+  <code>@fastify/rate-limit</code> hooks at <code>onRequest</code>, before the auth plugin’s
+  <code>preHandler</code> runs. <code>request.user</code> is therefore not available at rate-limit
+  time. The <code>keyGenerator</code> decodes the bearer JWT payload <em>without verification</em>
+  to extract <code>sub</code> — verification is intentionally skipped here because the sub is only
+  used as a bucket key, not for access control. A forged sub just lands in that user’s bucket;
+  a malformed token falls back to IP.
 </p>
 
-<h4>Options, cheapest first</h4>
-<ol>
-  <li>
-    <strong>Raise the WAF IP limit to a classroom-safe number.</strong> Something like
-    <code>5,000 requests / 5 min / IP</code> (= 1,000/min) comfortably handles 100 concurrent
-    users per egress at 10 req/min/user. You lose some brute-force protection at the IP layer
-    — fine if you add the next two.
-  </li>
-  <li>
-    <strong>Move the hot per-user limit to Fastify, keyed on <code>request.user.sub</code>.</strong>
-    <code>@fastify/rate-limit</code> supports <code>keyGenerator</code>. 60 req/min/user is generous
-    for the exam flow; 10 req/min for <code>/auth/token</code> and <code>/admin/*</code>.
-    This is the real limit at 1k DAU — per-IP becomes a DDoS backstop, not a feature limit.
-  </li>
-  <li>
-    <strong>Path-scoped WAF rules for sensitive endpoints.</strong> Keep <code>/auth/*</code>
-    at a tight 50 / 5 min / IP (credential-stuffing protection) while letting <code>/exams</code>
-    and <code>/attempts</code> breathe at 5,000 / 5 min / IP.
-  </li>
-  <li>
-    <strong>Institution allow-list.</strong> For the university, put their known egress CIDR into
-    a WAF IP set and exempt it from the IP rate rule entirely. Combine with (2) so per-user
-    limits still protect you from a runaway client inside the institution.
-  </li>
-</ol>
-
-<h4>Recommended target numbers</h4>
-<table>
-  <thead><tr><th>Layer</th><th>Key</th><th>Budget</th><th>Notes</th></tr></thead>
-  <tbody>
-    <tr><td>WAF</td><td>IP, default</td><td>5,000 / 5 min (~1,000/min)</td><td>Classroom-safe; still blocks single-host scrapers.</td></tr>
-    <tr><td>WAF</td><td>IP, scope = <code>/auth/*</code></td><td>50 / 5 min (~10/min)</td><td>Credential-stuffing ceiling; legitimate login traffic is tiny.</td></tr>
-    <tr><td>WAF</td><td>IP, allow-list = university CIDR</td><td>exempt from IP rule</td><td>Optional; only if you pilot at an institution.</td></tr>
-    <tr><td>Fastify</td><td>user.sub (authed) / visitorId (anon)</td><td>60/min general, 10/min on <code>/auth/*</code></td><td>The real feature-level limit at 1k DAU.</td></tr>
-    <tr><td>Fastify</td><td>user.sub on <code>/attempts</code> POST</td><td>20/min</td><td>A human cannot submit answers faster than this.</td></tr>
-  </tbody>
-</table>
-
+<h4>Known trade-off: in-memory store</h4>
 <p>
-  The ATP (Account-Takeover Prevention) managed rule group is a better fit than raw rate limits
-  for <code>/auth/*</code> — it scores requests on actual attack heuristics (credential-stuffing
-  patterns, leaked-password matches) rather than blunt counting, which matters when a whole
-  university is sharing an IP.
+  The rate-limit counters are in-process (default <code>@fastify/rate-limit</code> store). With
+  min=2 ECS tasks, a user whose requests spread across both tasks can exceed the configured rate
+  by up to 2×. This is acceptable at current scale. If ECS scales beyond ~4 tasks, add a shared
+  Redis store — see §3.4 for cost notes.
 </p>
 
 <div class="callout">
-  <strong>Before promoting to students:</strong> confirm the university’s egress CIDR with their
-  IT team and add it to a WAF IP set. Then raise the default IP rule to 5,000/5 min and add
-  per-user limits in Fastify. That's 1–2 hours of work and avoids an embarrassing first-lecture
-  outage.
-</div>
-
-<div class="callout">
-  <strong>Don't do it all at once.</strong> Each row above earns its keep independently. Pick the one whose <em>absence</em> would embarrass you most in front of the next enterprise customer — that's the right next step.
+  <strong>If you pilot at a university:</strong> the per-user Fastify limits already isolate
+  students from each other regardless of shared NAT. No WAF IP allowlist is needed unless the
+  WAF general rule (2,000/5min) becomes a ceiling — at 200 concurrent students that’s
+  200 × 10 req/min = 2,000/min = 10,000/5min, which would exceed it. At that point raise the
+  WAF general rule to 10,000/5min (+£0 — same rule, different number) before the first lecture.
 </div>
 
 <h2 id="marketing">13. Marketing &amp; growth</h2>

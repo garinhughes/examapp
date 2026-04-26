@@ -52,13 +52,30 @@ await server.register(cors, {
   credentials: true,
 })
 
-await server.register(rateLimit, {
-  global: true,
-  max: parseInt(process.env.RATE_LIMIT_MAX ?? '100'),
-  timeWindow: '1 minute',
-  keyGenerator: (req) => req.ip,
-  allowList: () => process.env.RATE_LIMIT_DISABLED === 'true',
-})
+if (process.env.RATE_LIMIT_DISABLED !== 'true') {
+  await server.register(rateLimit, {
+    global: true,
+    max: parseInt(process.env.RATE_LIMIT_MAX ?? '120'),
+    timeWindow: '1 minute',
+    // Use the authenticated user's sub as the rate-limit key so each user
+    // gets their own budget regardless of shared NAT / corporate egress.
+    // JWT is decoded without verification intentionally — sub is only a
+    // bucket key here, not used for access control. Falls back to IP for
+    // anonymous/unauthenticated requests (e.g. exam browsing, auth routes).
+    keyGenerator: (req) => {
+      const auth = (req.headers as any).authorization
+      if (auth?.startsWith('Bearer ')) {
+        try {
+          const payload = JSON.parse(
+            Buffer.from(auth.slice(7).split('.')[1], 'base64url').toString()
+          )
+          if (typeof payload.sub === 'string') return payload.sub
+        } catch { /* fall through to IP */ }
+      }
+      return req.ip
+    },
+  })
+}
 
 await server.register(cookie)
 
