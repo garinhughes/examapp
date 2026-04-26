@@ -87,6 +87,9 @@ export interface Exam {
   /** S3 VersionId of the object this exam was loaded from (null when loaded from filesystem). */
   s3VersionId?: string | null
   questions: Question[]
+  featuredLabIds?: string[]
+  realWorldValue?: string
+  jobRoles?: string[]
 }
 
 /**
@@ -168,6 +171,9 @@ function parseExamJson(raw: any, code: string, s3VersionId?: string | null): Exa
     predecessorCode: raw.predecessorCode ?? undefined,
     s3VersionId: s3VersionId ?? null,
     questions: (raw.questions ?? []).map(normaliseQuestion),
+    featuredLabIds: raw.featuredLabIds ?? undefined,
+    realWorldValue: raw.realWorldValue ?? undefined,
+    jobRoles: raw.jobRoles ?? undefined,
   }
 }
 

@@ -4462,5 +4462,19 @@
     "PT0-003-0087",
     "PT0-003-0088",
     "PT0-003-0091"
+  ],
+  "featuredLabIds": [
+    "comptia-nmap-enumeration",
+    "comptia-metasploit-eternalblue",
+    "comptia-pass-the-hash-sequence",
+    "comptia-sqli-payload-fix"
+  ],
+  "realWorldValue": "Passing the PenTest+ demonstrates you can plan, scope, and execute penetration tests across network, web, wireless, and cloud targets. It is a vendor-neutral credential accepted by government agencies and security consultancies.",
+  "jobRoles": [
+    "Penetration Tester",
+    "Red Team Operator",
+    "Security Consultant",
+    "Vulnerability Researcher",
+    "Ethical Hacker"
   ]
 }

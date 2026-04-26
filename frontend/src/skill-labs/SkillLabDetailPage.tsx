@@ -19,11 +19,20 @@ interface ExamMeta {
   questionCount?: number
 }
 
-interface SkillLabDetailPageProps {
-  labId: string
+interface LabPageMeta {
+  title: string
+  description: string
+  platform: string
+  difficulty: string
+  technologies: string[]
 }
 
-export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
+interface SkillLabDetailPageProps {
+  labId: string
+  onLabLoad?: (meta: LabPageMeta) => void
+}
+
+export function SkillLabDetailPage({ labId, onLabLoad }: SkillLabDetailPageProps) {
   const { setRoute, authFetch, setupExamFromMeta } = useExam()
   const { inProgressLab, cancelActive } = useSkillLab()
   const [lab, setLab] = useState<LabSummary | null>(null)
@@ -53,6 +62,7 @@ export function SkillLabDetailPage({ labId }: SkillLabDetailPageProps) {
           return
         }
         setLab(found)
+        onLabLoad?.({ title: found.title, description: found.description, platform: found.platform, difficulty: found.difficulty, technologies: found.technologies ?? [] })
 
         if (examsRes && examsRes.ok && (found.relatedExamCodes ?? []).length > 0) {
           const exams: ExamMeta[] = await examsRes.json()

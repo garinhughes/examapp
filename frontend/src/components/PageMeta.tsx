@@ -112,12 +112,126 @@ const HOME_JSONLD = JSON.stringify({
   ],
 })
 
-interface Props {
-  route: AppRoute
+interface ExamMetaProps {
+  code: string
+  title?: string
+  provider?: string
+  passMark?: number
+  defaultQuestions?: number
+  questionCount?: number
+  defaultDuration?: number
 }
 
-export function PageMeta({ route }: Props) {
-  const base = route.startsWith('skill-lab:') ? META['skill-labs'] : META[route]
+interface LabMetaProps {
+  title: string
+  description: string
+  platform: string
+  difficulty: string
+  technologies: string[]
+}
+
+interface Props {
+  route: AppRoute
+  examMeta?: ExamMetaProps | null
+  labMeta?: LabMetaProps | null
+}
+
+export function PageMeta({ route, examMeta, labMeta }: Props) {
+  // Exam landing pages get fully dynamic meta
+  if (route === 'exam-landing' && examMeta) {
+    const code = examMeta.code
+    const title = examMeta.title ?? code
+    const provider = examMeta.provider ?? 'certshack'
+    const passMark = examMeta.passMark ?? 70
+    const qCount = examMeta.questionCount ?? examMeta.defaultQuestions
+    const pageTitle = `certshack | ${title} (${code}) Practice Exam`
+    const description = `${title} (${code}) practice questions and mock exam. ${qCount ? `${qCount} questions` : 'Questions'} across multiple domains, pass mark ${passMark}%. Timed or casual mode — every question mapped to a specific exam objective with detailed explanations.`
+    const keywords = `${code} practice exam, ${code} mock exam, ${title} practice test, ${code} sample questions, ${code} practice questions, ${provider} certification prep, ${code} exam questions`
+    const canonical = `${SITE_URL}/exams/${code}`
+
+    const courseJsonLd = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Course',
+      name: `${title} (${code}) Practice Exam`,
+      description,
+      url: canonical,
+      provider: {
+        '@type': 'Organization',
+        name: 'certshack',
+        url: SITE_URL,
+      },
+      educationalCredentialAwarded: title,
+      ...(examMeta.defaultDuration ? { timeRequired: `PT${examMeta.defaultDuration}M` } : {}),
+    })
+
+    return (
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="certshack" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={OG_IMAGE} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={OG_IMAGE} />
+        <script type="application/ld+json">{courseJsonLd}</script>
+      </Helmet>
+    )
+  }
+
+  // Skill lab detail pages get per-lab dynamic meta once the lab data has loaded
+  if (route.startsWith('skill-lab-detail:') && labMeta) {
+    const labId = route.slice('skill-lab-detail:'.length)
+    const pageTitle = `certshack | ${labMeta.title} Skill Lab`
+    const techList = labMeta.technologies.slice(0, 4).join(', ')
+    const description = `${labMeta.description} Interactive ${labMeta.platform} skill lab. ${labMeta.difficulty} difficulty${techList ? ` — covering ${techList}` : ''}.`
+    const keywords = `${labMeta.title}, ${labMeta.platform} skill lab, hands-on lab, ${labMeta.difficulty} lab${techList ? `, ${techList}` : ''}, certification practice`
+    const canonical = `${SITE_URL}/skill-labs/${labId}`
+
+    const learningResourceJsonLd = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'LearningResource',
+      name: labMeta.title,
+      description: labMeta.description,
+      url: canonical,
+      educationalLevel: labMeta.difficulty,
+      learningResourceType: 'Simulation',
+      provider: {
+        '@type': 'Organization',
+        name: 'certshack',
+        url: SITE_URL,
+      },
+      ...(labMeta.technologies.length > 0 ? { teaches: labMeta.technologies } : {}),
+    })
+
+    return (
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="certshack" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={OG_IMAGE} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={OG_IMAGE} />
+        <script type="application/ld+json">{learningResourceJsonLd}</script>
+      </Helmet>
+    )
+  }
+
+  const base = route.startsWith('skill-lab:') || route.startsWith('skill-lab-detail:') ? META['skill-labs'] : META[route]
   if (!base) return null
 
   const canonical = `${SITE_URL}${base.path}`

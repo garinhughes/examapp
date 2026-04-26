@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { TrendingUp } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { ExamSetup } from './ExamSetup'
+import { ExamPageContent } from './ExamPageContent'
 import { apiUrl } from '@/apiBase'
 
 type AttemptSummary = {
@@ -164,6 +165,8 @@ export function ExamLanding() {
           </button>
         </div>
       )}
+
+      <ExamPageContent />
     </div>
   )
 }

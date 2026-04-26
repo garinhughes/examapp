@@ -3652,6 +3652,2603 @@
         }
       ],
       "abandonedAt": "2026-04-26T17:00:38.209Z"
+    },
+    {
+      "attemptId": "55349f78-97c9-4674-8482-84efa1aa8c75",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "CLF-C02",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-04-26T17:11:49.468Z",
+      "updatedAt": "2026-04-26T17:12:04.653Z",
+      "finishedAt": "2026-04-26T17:12:04.653Z",
+      "status": "finished",
+      "score": 0,
+      "answers": [
+        {
+          "questionId": "CLF-C02-0037",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": [
+            "c4",
+            "c1"
+          ],
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-26T17:11:53.486Z"
+        },
+        {
+          "questionId": "CLF-C02-0007",
+          "selectedChoiceId": "c3",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-26T17:11:59.646Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "CLF-C02-0037",
+          "type": "multiple-choice",
+          "question": "During an international expansion review, the team is comparing AWS to building its own private data centers in each target country.\n\nWhich TWO benefits does AWS global infrastructure provide that would be difficult or costly to replicate with private data centers?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Automatic compliance with every country's data residency and sovereignty regulations without any additional customer configuration or architecture decisions required",
+              "isCorrect": false,
+              "explanation": "AWS provides tools and controls for data residency, but compliance with local regulations is a shared responsibility. Customers must configure their deployments to meet specific regulatory requirements."
+            },
+            {
+              "id": "c1",
+              "text": "The ability to deploy applications in multiple geographic Regions within minutes, without procuring or installing any physical hardware",
+              "isCorrect": true,
+              "explanation": "Because AWS already manages the physical infrastructure globally, customers can enter new markets almost immediately by provisioning resources in additional Regions through the console or APIs.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Exclusive access to internet bandwidth that is technologically unavailable to privately operated data centers of any size or geographic footprint",
+              "isCorrect": false,
+              "explanation": "AWS does not offer exclusive bandwidth technology unavailable to private data centers. Its network advantages come from scale and optimization, not proprietary bandwidth exclusivity."
+            },
+            {
+              "id": "c3",
+              "text": "Guaranteed zero data transfer costs between all AWS Regions for customers running multi-region workloads, included at no charge in the standard pricing model",
+              "isCorrect": false,
+              "explanation": "AWS does charge for data transfer between Regions. Inter-Region data transfer costs vary by Region and are not included at no charge in standard pricing."
+            },
+            {
+              "id": "c2",
+              "text": "Low-latency delivery of content to global end users through AWS's worldwide network of edge locations, without building or operating any additional infrastructure",
+              "isCorrect": true,
+              "explanation": "Amazon CloudFront uses hundreds of edge locations worldwide to cache and serve content close to users, providing low latency that would require significant capital investment to replicate privately.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.2: Understanding the benefits of global infrastructure (for example, speed of deployment, global reach)."
+          ],
+          "services": [
+            "Amazon CloudFront",
+            "AWS Global Infrastructure",
+            "Amazon Route 53"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html",
+          "tip": "Focus on what AWS has already built globally and how quickly customers can make use of it, compared to starting from nothing.",
+          "explanation": "AWS global infrastructure removes the capital and time investment of building physical data centers in new countries. Customers benefit from instant access to Regions worldwide and from Amazon CloudFront's edge network for low-latency content delivery.\n\n**Why the others don't work:**\n- Zero inter-Region data transfer: AWS charges for data transferred between Regions.\n- Automatic compliance: Customers must still architect their deployments to meet local data residency laws.\n- Exclusive bandwidth: AWS's network advantages are based on scale and engineering, not proprietary exclusivity.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0007",
+          "type": "single-choice",
+          "question": "Continuous identification of vulnerabilities and network exposure across AWS resources is required, including automated scanning of EC2 instances and container images.\n\nWhich service best meets this requirement?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Amazon GuardDuty",
+              "isCorrect": false,
+              "explanation": "Amazon GuardDuty detects unusual account activity and potential threats but is not designed for vulnerability assessment."
+            },
+            {
+              "id": "c2",
+              "text": "AWS Shield",
+              "isCorrect": false,
+              "explanation": "AWS Shield is a managed DDoS protection service and does not scan for application vulnerabilities."
+            },
+            {
+              "id": "c4",
+              "text": "AWS Config",
+              "isCorrect": false,
+              "explanation": "AWS Config tracks resource configuration changes and compliance status, not vulnerability detection."
+            },
+            {
+              "id": "c1",
+              "text": "Amazon Inspector",
+              "isCorrect": true,
+              "explanation": "Amazon Inspector automatically scans EC2 instances and container images for vulnerabilities and misconfiguration.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "2.2.3: Describing how customers secure resources on AWS (for example, Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield)."
+          ],
+          "services": [
+            "Amazon Inspector",
+            "AWS Security Hub"
+          ],
+          "docs": "https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html",
+          "tip": "Consider which service is specifically designed to scan for software vulnerabilities and security flaws in infrastructure.",
+          "explanation": "Amazon Inspector is the service that automatically identifies vulnerabilities in EC2 instances, container images, and Lambda functions.\n\n**Why it works:** Inspector uses security assessment rules to scan resources and report vulnerabilities with severity ratings.\n\n**Why the others fail:**\n- AWS Shield: Focuses on DDoS protection, not vulnerability scanning\n- Amazon GuardDuty: Detects account-level threats and suspicious activity, not code vulnerabilities\n- AWS Config: Monitors resource configuration compliance, not security vulnerabilities\n\n**Implementation:** Enable Amazon Inspector in the AWS Management Console or via the Inspector API to begin automated scanning.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0017",
+          "type": "single-choice",
+          "question": "Compliance archives accessed approximately once per quarter for audits must be retained for 10 years under a limited storage budget.\n\nWhich storage option provides the lowest cost for this use case?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "EBS Snapshots",
+              "isCorrect": false,
+              "explanation": "EBS Snapshots are for block storage snapshots, not suitable for long-term archived data retention."
+            },
+            {
+              "id": "c1",
+              "text": "S3 Glacier Deep Archive",
+              "isCorrect": true,
+              "explanation": "Deep Archive offers the lowest storage cost ($1.26/TB/month) and supports compliance retention with quarterly retrieval patterns.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "S3 Standard",
+              "isCorrect": false,
+              "explanation": "Standard is significantly more expensive than Archive solutions for long-term retention."
+            },
+            {
+              "id": "c3",
+              "text": "S3 Intelligent-Tiering",
+              "isCorrect": false,
+              "explanation": "Intelligent-Tiering is more expensive than Deep Archive for data with infrequent predictable access."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Billing, Pricing, and Support",
+          "skills": [
+            "4.1.5: Understanding different pricing options for various storage options and tiers."
+          ],
+          "services": [
+            "Amazon S3",
+            "Storage Pricing"
+          ],
+          "docs": "https://aws.amazon.com/s3/storage-classes/",
+          "tip": "For long-term, infrequently accessed compliance data, consider the cheapest storage class even with retrieval delays.",
+          "explanation": "S3 Glacier Deep Archive minimizes storage costs for compliance archives with quarterly access.\n\n**Why it works:** Deep Archive charges approximately $1.26/TB/month with a 12-hour retrieval window, which is acceptable for quarterly compliance audits.\n\n**Why the others fail:**\n- S3 Standard: Costs 10x more than Deep Archive for inactive compliance data\n- Intelligent-Tiering: More expensive than Deep Archive for predictable infrequent access\n- EBS Snapshots: Designed for database backups, not long-term data retention\n\n**Implementation:** Move compliance archives to Deep Archive via lifecycle rules after initial access period to minimize 10-year retention costs.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0045",
+          "type": "multiple-choice",
+          "question": "Following a board decision to build a new customer-facing application on AWS, the architecture team reviews two key requirements: the system must automatically recover from component failures, and all customer data must meet regulatory requirements for encryption and access control.\n\nWhich TWO pillars of the AWS Well-Architected Framework directly address these requirements?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Security",
+              "isCorrect": true,
+              "explanation": "The Security pillar directly addresses regulatory requirements for data protection, providing guidance on encrypting data at rest and in transit, and implementing least-privilege access controls.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Performance Efficiency",
+              "isCorrect": false,
+              "explanation": "Performance Efficiency focuses on using resources efficiently for performance targets. It does not specifically address automatic recovery from failures or data encryption regulatory requirements."
+            },
+            {
+              "id": "c2",
+              "text": "Reliability",
+              "isCorrect": true,
+              "explanation": "Reliability directly addresses automatic recovery from component failures, covering fault isolation, workload recovery patterns, and dynamic resource provisioning to maintain continuous operation.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Operational Excellence",
+              "isCorrect": false,
+              "explanation": "Operational Excellence focuses on running and improving operational processes and monitoring. It does not specifically address automatic failure recovery architecture or encryption regulatory requirements."
+            },
+            {
+              "id": "c3",
+              "text": "Cost Optimization",
+              "isCorrect": false,
+              "explanation": "Cost Optimization is focused on reducing unnecessary cloud spending. It does not address failure recovery architecture or data protection regulatory compliance."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.2.1: Understanding the pillars of the Well-Architected Framework (for example, operational excellence, security, reliability, performance efficiency, cost optimization, sustainability)."
+          ],
+          "services": [
+            "AWS Well-Architected Framework"
+          ],
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+          "tip": "Match each stated requirement to the pillar whose primary focus directly and specifically aligns with it.",
+          "explanation": "Reliability and Security are the two correct pillars.\n\n**Why it works:** Reliability provides architecture guidance for automatic recovery from component failures, including fault isolation and workload recovery patterns. Security provides guidance on meeting regulatory data protection requirements, including encryption at rest and in transit and access control.\n\n**Why the others don't work:**\n- Performance Efficiency: Addresses efficient resource use for performance, not failure recovery or regulatory compliance.\n- Cost Optimization: Focused on financial efficiency, not on recovery architecture or data protection standards.\n- Operational Excellence: Guides operational processes and monitoring, not the specific architectural patterns for these two requirements.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0024",
+          "type": "multiple-choice",
+          "question": "Two distinct global performance requirements must be addressed using AWS edge infrastructure: (1) delivering static website content and media to end users worldwide, and (2) optimizing API responses from backend services across regions.\n\nWhich TWO edge services should be used for these scenarios?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "AWS Direct Connect for global performance optimization",
+              "isCorrect": false,
+              "explanation": "Direct Connect is for private network connections, not global edge performance optimization."
+            },
+            {
+              "id": "c1",
+              "text": "CloudFront for content delivery of static assets and media files",
+              "isCorrect": true,
+              "explanation": "CloudFront caches static content at edge locations, reducing latency for global content delivery.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Route 53 for both static content delivery and API routing",
+              "isCorrect": false,
+              "explanation": "Route 53 is DNS-only; it cannot cache content or optimize application routing like edge services."
+            },
+            {
+              "id": "c4",
+              "text": "Lambda@Edge for all content and API optimization",
+              "isCorrect": false,
+              "explanation": "Lambda@Edge executes code at edges but is not designed to handle all content delivery and routing scenarios."
+            },
+            {
+              "id": "c2",
+              "text": "Global Accelerator for optimizing API response times by routing to best regional endpoints",
+              "isCorrect": true,
+              "explanation": "Global Accelerator optimizes dynamic application traffic routing based on performance metrics.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Technology and Services",
+          "skills": [
+            "3.5.4: Identifying edge services (for example, CloudFront, Global Accelerator)."
+          ],
+          "services": [
+            "Amazon CloudFront",
+            "AWS Global Accelerator"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+          "tip": "CloudFront for static content; Global Accelerator for application/API performance optimization.",
+          "explanation": "CloudFront and Global Accelerator serve complementary purposes in AWS edge infrastructure.\n\n**Why they work:** CloudFront caches and serves content globally; Global Accelerator optimizes application routing for low-latency API responses.\n\n**Why the others fail:**\n- Route 53: DNS service only, not an edge service for content or performance optimization\n- Lambda@Edge: Executes code at edges but not a primary solution for content delivery or application routing\n- Direct Connect: Private network connection; not a global performance optimization service\n\n**Implementation:** Deploy CloudFront for static assets (images, JavaScript, CSS); use Global Accelerator for API backends in multiple regions.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0009",
+          "type": "multiple-choice",
+          "question": "Centralizing security findings from multiple AWS security services into a single dashboard (including compliance checks and security alerts) is a key operational requirement.\n\nWhich TWO options address this?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "AWS Config",
+              "isCorrect": false,
+              "explanation": "Config tracks resource configuration compliance but focuses on configuration management, not integrated security findings."
+            },
+            {
+              "id": "c4",
+              "text": "Amazon EventBridge",
+              "isCorrect": false,
+              "explanation": "EventBridge routes events between services but is not designed as a centralized security dashboard."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Trusted Advisor",
+              "isCorrect": false,
+              "explanation": "Trusted Advisor checks for cost optimization and basic security issues but does not aggregate findings from multiple services."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Security Hub",
+              "isCorrect": true,
+              "explanation": "Security Hub aggregates and prioritizes security findings from AWS services and third-party tools into a single view.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Amazon CloudWatch",
+              "isCorrect": true,
+              "explanation": "CloudWatch can monitor and display security-related metrics and logs when integrated with other security services.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "2.2.3: Describing how customers secure resources on AWS (for example, Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield)."
+          ],
+          "services": [
+            "AWS Security Hub",
+            "Amazon CloudWatch",
+            "AWS Config"
+          ],
+          "docs": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+          "tip": "Consider which services provide centralized visibility and aggregation of security findings across your AWS environment.",
+          "explanation": "AWS Security Hub and Amazon CloudWatch together provide centralized security monitoring and alerting capabilities.\n\n**Why they work:** Security Hub aggregates findings from GuardDuty, Inspector, and Config; CloudWatch displays metrics and logs in dashboards.\n\n**Why the others fail:**\n- Trusted Advisor: Provides limited best-practice recommendations, not comprehensive security aggregation\n- EventBridge: Routes events between services but lacks a built-in security dashboard\n- AWS Config: Focuses on compliance tracking, not integrated security finding aggregation\n\n**Implementation:** Enable Security Hub in the console to begin aggregating findings; use CloudWatch dashboards to visualize security metrics.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0038",
+          "type": "ordering",
+          "question": "The team needs to expand its application to serve users in a new geographic region using AWS global infrastructure.\n\nArrange the following steps in the correct order to complete the expansion.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Configure Amazon CloudFront to cache and deliver content to users from edge locations near the new Region",
+              "isCorrect": true,
+              "explanation": "Amazon CloudFront is set up after the origin resources exist in the Region, so the distribution can point to them and begin serving cached content closer to users.",
+              "sequence": 3
+            },
+            {
+              "id": "c1",
+              "text": "Select the target AWS Region geographically closest to the new user base to minimize network latency",
+              "isCorrect": true,
+              "explanation": "Choosing the right Region is the first decision. The Region must be selected before any resources can be provisioned within it.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Update Amazon Route 53 routing policies to direct user traffic to resources in the newly deployed Region",
+              "isCorrect": true,
+              "explanation": "DNS routing changes are the final step that makes the new Region live for users. Updating Amazon Route 53 before resources are ready would send traffic to an unavailable endpoint.",
+              "sequence": 4
+            },
+            {
+              "id": "c2",
+              "text": "Provision application resources such as Amazon EC2 instances and databases within the chosen Region",
+              "isCorrect": true,
+              "explanation": "With the Region selected, the application's compute and storage components can be deployed. This must happen before traffic can be directed to the new Region.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.2: Understanding the benefits of global infrastructure (for example, speed of deployment, global reach)."
+          ],
+          "services": [
+            "Amazon EC2",
+            "Amazon Route 53",
+            "Amazon CloudFront",
+            "Amazon CloudWatch"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html",
+          "tip": "Consider which actions must be complete before each subsequent step can take effect.",
+          "explanation": "Global expansion on AWS follows a logical sequence: first select the target Region to minimize latency, then provision the application resources that will serve traffic, then configure Amazon CloudFront to cache content at edge locations near users, and finally update Amazon Route 53 to route traffic to the new deployment. Each step depends on the previous one being complete.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0036",
+          "type": "single-choice",
+          "question": "Following a board decision to enter three new countries within the next month, the CTO explains that using AWS will make geographic expansion significantly faster than building private data centers in each country.\n\nWhat is the primary reason AWS global infrastructure enables faster geographic expansion compared to an on-premises approach?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "AWS automatically copies existing application workloads to every Region it launches, removing the need for customers to perform any deployment steps when entering new geographic markets",
+              "isCorrect": false,
+              "explanation": "AWS does not automatically replicate customer workloads to new Regions. Customers control where their resources are deployed and must configure cross-Region deployments explicitly."
+            },
+            {
+              "id": "c1",
+              "text": "AWS operates data centers in Regions worldwide that customers can access immediately via APIs and management tools, enabling deployment in new Regions within minutes or hours rather than months",
+              "isCorrect": true,
+              "explanation": "Because AWS already manages the physical infrastructure in each Region, customers can provision resources in a new Region almost instantly without procuring or installing any hardware.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "AWS ships pre-configured hardware appliances to each new geographic location the customer specifies, which teams install on-site, reducing typical deployment timelines from years to several weeks",
+              "isCorrect": false,
+              "explanation": "AWS does not ship hardware appliances for customers to install. AWS Outposts brings AWS infrastructure on-premises, but is not the reason global expansion is faster than building private data centers."
+            },
+            {
+              "id": "c3",
+              "text": "AWS holds exclusive agreements with national internet providers in each country it operates in, guaranteeing customers faster traffic routing compared to any locally hosted alternative",
+              "isCorrect": false,
+              "explanation": "AWS does not hold exclusive agreements with national internet providers. Its global network improves performance, but not through exclusive ISP arrangements."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.2: Understanding the benefits of global infrastructure (for example, speed of deployment, global reach)."
+          ],
+          "services": [
+            "Amazon EC2",
+            "AWS Global Infrastructure"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html",
+          "tip": "Consider what an organization would need to build and procure to open its own data center in a foreign country, versus what AWS has already built.",
+          "explanation": "AWS maintains ready-to-use infrastructure in Regions around the world. Customers can deploy into a new Region via the AWS Management Console, CLI, or APIs in minutes, bypassing the months or years needed to build and equip a private data center.\n\n**Why it works:** The physical infrastructure, power, cooling, and networking already exist. Customers only need to provision the logical resources they require.\n\n**Why the others don't work:**\n- Pre-configured appliances: AWS does not ship appliances for on-site installation as part of standard global expansion.\n- Exclusive ISP agreements: No such agreements form the basis of AWS's global reach.\n- Automatic replication: Customers must explicitly deploy into each Region they wish to use.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0025",
+          "type": "single-choice",
+          "question": "Migrating a legacy application to AWS requires detailed implementation guidance, including architecture diagrams, code examples, and step-by-step instructions.\n\nWhich AWS technical resource best provides this information?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "AWS re:Invent recordings",
+              "isCorrect": false,
+              "explanation": "While informative, re:Invent videos are presentation-based, not detailed implementation guides."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Prescriptive Guidance",
+              "isCorrect": true,
+              "explanation": "AWS Prescriptive Guidance provides implementation guidance, patterns, and code examples for specific use cases and migrations.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "AWS Support forums",
+              "isCorrect": false,
+              "explanation": "Forums are community-driven; they lack official patterns and may not provide comprehensive implementation guidance."
+            },
+            {
+              "id": "c2",
+              "text": "AWS Knowledge Center",
+              "isCorrect": false,
+              "explanation": "Knowledge Center provides answers to common questions but is more FAQ-focused than implementation guidance."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Billing, Pricing, and Support",
+          "skills": [
+            "4.3.2: Identifying and locating AWS technical resources (for example, AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post)."
+          ],
+          "services": [
+            "AWS Prescriptive Guidance",
+            "AWS Resources"
+          ],
+          "docs": "https://docs.aws.amazon.com/prescriptive-guidance/",
+          "tip": "Identify which resource provides structured, official implementation patterns with architecture and code examples.",
+          "explanation": "AWS Prescriptive Guidance offers detailed implementation patterns tailored for specific migration and architecture scenarios.\n\n**Why it works:** Prescriptive Guidance includes deployment models, architecture diagrams, sample code, and step-by-step implementation for real-world use cases.\n\n**Why the others fail:**\n- Knowledge Center: Q&A format for common issues; less detailed than implementation patterns\n- re:Invent videos: Educational talks; not step-by-step implementation guides\n- Support forums: Community-driven; varies in quality and may not reflect AWS best practices\n\n**Implementation:** Visit AWS Prescriptive Guidance site to search for migration patterns matching your application type.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0041",
+          "type": "multiple-choice",
+          "question": "The development team is planning to experiment with a new product feature. They need to quickly provision a test environment, evaluate results within a few days, and then decommission everything if the test is unsuccessful.\n\nWhich TWO AWS advantages make this rapid experimentation approach practical and cost-effective?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Agility, because AWS allows resources to be provisioned in minutes, enabling teams to test new ideas much faster than on-premises infrastructure procurement would allow",
+              "isCorrect": true,
+              "explanation": "Agility means a team can launch a full test environment in minutes using the AWS Management Console, CLI, or AWS CloudFormation, without any hardware purchase or installation delays.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Global reach, because deploying the experiment simultaneously across multiple AWS Regions provides statistically more representative test data from a geographically diverse user population",
+              "isCorrect": false,
+              "explanation": "Global reach benefits production applications serving international users, not a controlled internal feature experiment where geographic distribution would add unnecessary cost and complexity."
+            },
+            {
+              "id": "c3",
+              "text": "High availability, because running test environments across multiple Availability Zones ensures experiment results are not skewed by any infrastructure failure during the evaluation period",
+              "isCorrect": false,
+              "explanation": "High availability is valuable for production uptime, not for short-lived experimentation where multi-zone redundancy is not a cost-effective or necessary concern."
+            },
+            {
+              "id": "c2",
+              "text": "Elasticity, because resources can be terminated when experiments are complete, ensuring the team is only billed for the duration of the test rather than maintaining idle infrastructure",
+              "isCorrect": true,
+              "explanation": "Elastic, pay-as-you-go resources mean the team pays only while the test environment is running. Terminating instances immediately stops billing, making short-lived experiments inexpensive.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Reserved capacity commitment, because pre-purchasing `Reserved Instances` for the test environment guarantees the resources will be available and priced consistently when the test begins",
+              "isCorrect": false,
+              "explanation": "`Reserved Instances` require long-term commitments (one or three years) and are not appropriate for short-duration experiments. On-demand resources are more cost-effective for temporary use."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.3: Understanding the advantages of high availability, elasticity, and agility."
+          ],
+          "services": [
+            "AWS Auto Scaling",
+            "Amazon EC2",
+            "AWS CloudFormation"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Consider which properties help a team start quickly and then stop paying once the experiment is finished.",
+          "explanation": "Agility lets teams provision complete environments within minutes, and elasticity ensures they only pay for the time those resources are running. Together, these advantages make rapid, low-cost experimentation practical on AWS.\n\n**Why the others don't work:**\n- High availability: Multi-zone redundancy is a production concern, not a requirement for a short-lived test.\n- Reserved capacity: Long-term commitments are the opposite of what a temporary experiment needs.\n- Global reach: Deploying across multiple Regions adds unnecessary cost to an internal feature test.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0001",
+          "type": "single-choice",
+          "question": "Shared infrastructure across millions of AWS customers enables dramatically lower per-unit costs than any single company could achieve independently.\n\nWhich principle of AWS cloud computing best explains how this cost reduction is achieved?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "AWS automatically compresses data in transit to reduce bandwidth costs",
+              "isCorrect": false,
+              "explanation": "Data compression is a technical optimization, but it is not the principle of economies of scale. Economies of scale refers to cost advantages from scale and shared resource utilization, not compression techniques."
+            },
+            {
+              "id": "c4",
+              "text": "On-demand capacity provisioning allows customers to scale resources without capital expenditure",
+              "isCorrect": false,
+              "explanation": "On-demand provisioning provides flexibility but does not explain the underlying economies of scale. The cost reduction from economies of scale comes from AWS spreading infrastructure costs across millions of users, not just from avoiding capital expenditure."
+            },
+            {
+              "id": "c2",
+              "text": "Pay-as-you-go pricing eliminates all upfront infrastructure investment",
+              "isCorrect": false,
+              "explanation": "While pay-as-you-go is an advantage, it does not specifically address the economies of scale principle. This is about billing flexibility, not about cost reduction through shared resources across many customers."
+            },
+            {
+              "id": "c1",
+              "text": "Economies of scale reduce costs by distributing infrastructure expenses across a large number of customers",
+              "isCorrect": true,
+              "explanation": "This describes the core principle of economies of scale, where AWS infrastructure is shared across millions of customers, allowing the cost per user to be significantly lower than if a single company built its own data centers.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.1: Understanding the economies of scale (for example, cost savings)."
+          ],
+          "services": [
+            "Amazon EC2",
+            "AWS Lambda",
+            "Amazon RDS"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Think about how AWS achieves lower per-unit costs compared to a single company building its own infrastructure. What advantage comes from AWS serving millions of customers?",
+          "explanation": "AWS achieves economies of scale by building and maintaining shared infrastructure that serves millions of customers worldwide.\n\n**Why it works:** By distributing capital and operational costs across a massive customer base, AWS can achieve dramatically lower per-unit costs than any individual company could achieve independently. This allows customers to benefit from AWS's scale without bearing the full cost burden.\n\n**Why the others fail:**\n- Pay-as-you-go pricing describes a billing model, not the underlying cost advantage from scale and shared resources.\n- Automatic data compression is a technical feature, not the principle of economies of scale.\n- On-demand provisioning provides operational flexibility but does not explain how AWS achieves lower absolute costs through shared infrastructure.\n\n**Implementation:** AWS benefits all customers automatically through shared infrastructure; no specific configuration is required.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0003",
+          "type": "multiple-choice",
+          "question": "Understanding how AWS reduces costs for all customers is a key consideration when evaluating cloud adoption.\n\nWhich TWO factors directly enable AWS to offer lower costs through economies of scale?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Purchasing hardware and services at volume discounts that are passed to customers",
+              "isCorrect": true,
+              "explanation": "AWS's enormous scale gives it unprecedented purchasing power with component manufacturers and service providers. Volume discounts on CPUs, memory, power, and facilities are aggregated and ultimately reduce costs for all customers through lower service pricing.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Automating infrastructure management to reduce operational overhead and staffing costs",
+              "isCorrect": false,
+              "explanation": "Automation reduces AWS's operational costs, but it is not a direct mechanism of economies of scale in the sense of distributing shared infrastructure costs. This is more about operational efficiency than sharing costs across customers."
+            },
+            {
+              "id": "c1",
+              "text": "Distributing infrastructure costs across millions of customers globally",
+              "isCorrect": true,
+              "explanation": "This is a core mechanism of economies of scale. By spreading capital and operational expenses across a massive customer base, AWS achieves dramatically lower per-unit costs. A single customer benefits from the scale of millions of other customers using the same infrastructure.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Requiring customers to sign long-term contracts that lock in pricing",
+              "isCorrect": false,
+              "explanation": "While contracts can provide discounts, long-term commitments are not a driver of economies of scale. Economies of scale come from operational efficiency and shared resource distribution, not contractual obligations."
+            },
+            {
+              "id": "c3",
+              "text": "Guaranteeing that each customer's workload runs on dedicated physical servers",
+              "isCorrect": false,
+              "explanation": "Dedicated servers would actually increase costs per customer and contradict economies of scale. AWS uses virtualization and resource sharing to achieve scale economies, not isolation on dedicated hardware."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.1: Understanding the economies of scale (for example, cost savings)."
+          ],
+          "services": [
+            "AWS",
+            "Amazon EC2",
+            "Amazon RDS",
+            "AWS Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Focus on how AWS achieves lower absolute costs by leveraging massive scale, not on discounting or contract terms.",
+          "explanation": "AWS realizes economies of scale through two primary mechanisms: massive cost distribution and volume purchasing power.\n\n**Why they work:** First, distributing infrastructure, facilities, power, and staffing costs across millions of customers means each customer bears only a tiny fraction of the total cost. Second, AWS's enormous purchasing volume allows it to negotiate the lowest possible prices for hardware, bandwidth, and services, which translates directly to lower customer pricing. Together, these factors create a virtuous cycle where AWS can offer services far cheaper than any single organization could build independently.\n\n**Why the others fail:**\n- Dedicated servers contradict economies of scale; shared resources are essential to achieving per-unit cost reductions.\n- Long-term contracts are a pricing tool but not a mechanism of economies of scale itself.\n- Automation improves AWS's efficiency internally but is not the direct mechanism for distributing costs across customers.\n\n**Implementation:** AWS customers benefit automatically from economies of scale through standard pricing. Organizations can maximize these benefits by using managed services (RDS, Lambda, S3) rather than self-managed infrastructure.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0048",
+          "type": "single-choice",
+          "question": "After a database failure caused a multi-hour production outage, the architecture team implements Amazon RDS Multi-AZ for automatic database failover and configures Amazon Route 53 health checks to reroute traffic away from unhealthy endpoints.\n\nWhich pillar of the AWS Well-Architected Framework best describes these architectural changes?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Operational Excellence",
+              "isCorrect": false,
+              "explanation": "Operational Excellence addresses running, monitoring, and improving operational processes. Updating runbooks after an incident relates to Operational Excellence, but implementing Multi-AZ and health checks to achieve automatic recovery targets the Reliability pillar."
+            },
+            {
+              "id": "c4",
+              "text": "Reliability",
+              "isCorrect": true,
+              "explanation": "Reliability focuses on the ability of a workload to recover from failures and continue performing its intended function. Amazon RDS Multi-AZ enables automatic database failover and Route 53 health checks enable traffic rerouting - both are foundational reliability patterns.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Performance Efficiency",
+              "isCorrect": false,
+              "explanation": "Performance Efficiency is concerned with using resources efficiently to meet performance requirements. Amazon RDS Multi-AZ and Route 53 health checks provide availability and automatic recovery, not performance improvements."
+            },
+            {
+              "id": "c3",
+              "text": "Security",
+              "isCorrect": false,
+              "explanation": "The Security pillar focuses on protecting data and systems from unauthorized access and threats. Database failover and DNS health checks address availability, not security protection measures."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.2.2: Identifying differences between the pillars of the Well-Architected Framework."
+          ],
+          "services": [
+            "Amazon RDS",
+            "Amazon Route 53",
+            "AWS Well-Architected Framework"
+          ],
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
+          "tip": "Focus on the intended outcome of the changes - what type of problem are Multi-AZ and health checks designed to solve?",
+          "explanation": "Reliability is the correct pillar.\n\n**Why it works:** The Reliability pillar specifically addresses automatic recovery from infrastructure failures. Amazon RDS Multi-AZ provides automated failover when the primary database becomes unavailable, and Amazon Route 53 health checks reroute traffic away from unhealthy endpoints - both are core reliability mechanisms.\n\n**Why the others don't work:**\n- Operational Excellence: Concerned with running and improving operational procedures, not the architectural patterns for automatic failure recovery.\n- Performance Efficiency: Addresses efficient resource use for performance targets, not availability and fault tolerance.\n- Security: Focused on protecting against threats and unauthorized access, not recovering from infrastructure failures.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0010",
+          "type": "single-choice",
+          "question": "Evaluating the total cost of ownership (TCO) for migrating from an on-premises data center to AWS requires identifying the major capital expenditures unique to on-premises infrastructure.\n\nWhich of the following represents the largest ongoing cost in an on-premises environment?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "AWS data transfer fees",
+              "isCorrect": false,
+              "explanation": "Data transfer is an AWS cloud cost, not an on-premises cost."
+            },
+            {
+              "id": "c1",
+              "text": "Physical infrastructure maintenance and facility costs",
+              "isCorrect": true,
+              "explanation": "On-premises environments require continuous spending on physical servers, cooling, power, and facility management.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Reserved Instance commitments",
+              "isCorrect": false,
+              "explanation": "Reserved Instances are an AWS pricing option, not relevant to on-premises costs."
+            },
+            {
+              "id": "c4",
+              "text": "Subscription licensing for cloud services",
+              "isCorrect": false,
+              "explanation": "Cloud subscriptions are not applicable to on-premises environments."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.4.2: Understanding costs that are associated with on-premises environments."
+          ],
+          "services": [
+            "AWS",
+            "On-Premises"
+          ],
+          "docs": "https://aws.amazon.com/economics/",
+          "tip": "Consider the physical and operational expenses unique to managing hardware and facilities in a data center.",
+          "explanation": "On-premises infrastructure requires substantial ongoing costs for physical infrastructure maintenance, facility operations, and management.\n\n**Why it works:** Organizations must pay for server hardware deprecation, cooling systems, power consumption, physical space, and IT staff to manage the data center.\n\n**Why the others fail:**\n- AWS data transfer fees: These are cloud-specific costs, not on-premises costs\n- Reserved Instance commitments: AWS pricing model, not applicable to on-premises\n- Cloud service subscriptions: Only relevant to cloud-based operations, not on-premises\n\n**Implementation:** Compare on-premises capital and operational expenses with AWS monthly consumption costs to determine TCO benefits.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0013",
+          "type": "single-choice",
+          "question": "Log files in Amazon S3 are frequently accessed during the first month but rarely accessed afterward. Storage costs must be reduced while maintaining compliance with a 7-year retention requirement.\n\nWhich use case best describes the application of S3 lifecycle policies?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Automatically transitioning objects to cheaper storage classes and archiving old data",
+              "isCorrect": true,
+              "explanation": "Lifecycle policies can automatically move objects to Glacier or Deep Archive for long-term retention at lower costs.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Encrypting all objects in the bucket at rest",
+              "isCorrect": false,
+              "explanation": "Encryption is a separate S3 feature and not the purpose of lifecycle policies."
+            },
+            {
+              "id": "c3",
+              "text": "Restricting public access to objects based on age",
+              "isCorrect": false,
+              "explanation": "Access control is managed by bucket policies and IAM, not lifecycle policies."
+            },
+            {
+              "id": "c4",
+              "text": "Compressing objects to reduce bandwidth usage",
+              "isCorrect": false,
+              "explanation": "Object compression must be done before upload; lifecycle policies do not perform compression."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Technology and Services",
+          "skills": [
+            "3.6.6: Understanding use cases for lifecycle policies."
+          ],
+          "services": [
+            "Amazon S3",
+            "S3 Lifecycle Policy"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html",
+          "tip": "Consider how to optimize storage costs while meeting regulatory data retention requirements.",
+          "explanation": "S3 lifecycle policies automatically transition objects between storage classes to optimize costs based on access patterns.\n\n**Why it works:** Policies can move objects from S3 Standard (hot) → S3 Intelligent-Tiering → Glacier (warm) → Deep Archive (cold) as they age, reducing storage costs significantly.\n\n**Why the others fail:**\n- Encryption: Managed separately via server-side encryption settings, not lifecycle policies\n- Access restrictions: Controlled by bucket policies and IAM, not object age rules\n- Compression: Pre-processing task, not automated by lifecycle policies\n\n**Implementation:** Create an S3 lifecycle policy in the bucket settings to transition objects after 30 days to Glacier and after 1 year to Deep Archive.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0014",
+          "type": "single-choice",
+          "question": "Large volumes of backup data accumulate over time and must be kept for legal compliance, but the data is rarely accessed after the first few months. Manual deletion and archival are time-consuming and error-prone.\n\nHow can lifecycle policies improve this scenario?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Prevent accidental deletion of objects in the bucket",
+              "isCorrect": false,
+              "explanation": "Object protection is provided by MFA Delete or bucket versioning, not lifecycle policies."
+            },
+            {
+              "id": "c1",
+              "text": "Automatically delete or archive data based on configurable age rules without manual intervention",
+              "isCorrect": true,
+              "explanation": "Lifecycle policies eliminate manual archive and deletion tasks by automatically transitioning or removing objects based on time-based rules.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Increase the number of replicas stored across regions",
+              "isCorrect": false,
+              "explanation": "Data replication is controlled by cross-region replication settings, not lifecycle policies."
+            },
+            {
+              "id": "c3",
+              "text": "Enable real-time access to archived files instantly",
+              "isCorrect": false,
+              "explanation": "Archived data in Glacier requires retrieval time (minutes to hours); lifecycle policies do not provide instant access."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Technology and Services",
+          "skills": [
+            "3.6.6: Understanding use cases for lifecycle policies."
+          ],
+          "services": [
+            "Amazon S3",
+            "S3 Glacier"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html",
+          "tip": "Think about automating data management tasks to improve compliance and reduce operational overhead.",
+          "explanation": "Lifecycle policies automate data management by applying rules consistently without manual effort.\n\n**Why it works:** Rules can automatically transition old backups to cheaper tiers (Glacier) or delete them entirely when they reach a specified age, ensuring compliance and cost optimization.\n\n**Why the others fail:**\n- Replication: Configured separately via cross-region replication settings\n- Instant retrieval: Glacier requires restoration time; lifecycle policies cannot bypass this\n- Deletion protection: Managed through versioning and MFA Delete, separate from lifecycle rules\n\n**Implementation:** Define lifecycle rules to archive backups after 90 days and delete after 7 years to balance compliance and cost.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0019",
+          "type": "single-choice",
+          "question": "Technical support with a maximum 1-hour response time for production issues is required for a production web application on AWS. The team prefers cost-effective coverage.\n\nWhich AWS Support plan best meets these requirements?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "AWS Business Support",
+              "isCorrect": true,
+              "explanation": "Business Support provides 1-hour response time for production issues and includes unlimited TAMs with full AWS service support.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "AWS Basic Support",
+              "isCorrect": false,
+              "explanation": "Basic Support does not include phone/email support for production issues."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Enterprise Support",
+              "isCorrect": false,
+              "explanation": "Enterprise Support is more expensive than necessary for a startup and includes features not required."
+            },
+            {
+              "id": "c2",
+              "text": "AWS Developer Support",
+              "isCorrect": false,
+              "explanation": "Developer Support has 12-24 hour response time for production issues, not meeting the 1-hour requirement."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Technology and Services",
+          "skills": [
+            "3.8.4: Choosing the appropriate option for business support assistance."
+          ],
+          "services": [
+            "AWS Support",
+            "Support Plans"
+          ],
+          "docs": "https://aws.amazon.com/support/plans/",
+          "tip": "Match the support response time requirement with the appropriate support plan tier.",
+          "explanation": "AWS Business Support provides 1-hour response time for production issues, meeting the startup's requirements at a reasonable cost.\n\n**Why it works:** Business Support guarantees 1-hour response for production issues and includes API access, unlimited service tickets, and 24/7 support.\n\n**Why the others fail:**\n- Developer Support: Provides 12-24 hour response time, slower than required\n- Enterprise Support: Overkill for startup needs with much higher costs\n- Basic Support: No technical support for production issues\n\n**Implementation:** Upgrade to Business Support via the AWS console to enable production issue coverage with 1-hour SLA.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0031",
+          "type": "single-choice",
+          "question": "The infrastructure team is evaluating a migration to AWS. Their adviser explains that cloud providers like AWS can offer lower prices than most organizations could achieve by purchasing hardware independently.\n\nWhich AWS pricing principle best explains this cost advantage?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "AWS locks customers into long-term hardware contracts negotiated directly with manufacturers, guaranteeing discounted rates for a minimum three-year commitment period",
+              "isCorrect": false,
+              "explanation": "AWS manages infrastructure procurement internally. Customers are not locked into manufacturer hardware contracts; optional `Reserved Instances` are a separate customer-facing pricing model."
+            },
+            {
+              "id": "c2",
+              "text": "AWS purchases infrastructure in very large volumes, spreading fixed costs across millions of customers and reducing per-unit pricing",
+              "isCorrect": true,
+              "explanation": "Economies of scale allow AWS to buy hardware and services in bulk, distributing those costs across a massive customer base and passing the savings on through lower prices.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "AWS charges a flat monthly fee regardless of usage, ensuring all customers pay the same predictable amount for infrastructure regardless of workload size",
+              "isCorrect": false,
+              "explanation": "AWS uses consumption-based pricing, not flat fees. Customers pay based on what they actually consume."
+            },
+            {
+              "id": "c4",
+              "text": "AWS uses a shared pricing model where high-usage enterprise customers subsidize infrastructure costs for newer, smaller customers during the first year of service",
+              "isCorrect": false,
+              "explanation": "AWS does not redistribute costs between customer tiers. Pricing is driven by AWS's own purchasing efficiencies and operational scale, not by usage-based cross-subsidies."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.1: Understanding the economies of scale (for example, cost savings)."
+          ],
+          "services": [
+            "AWS Pricing"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Think about how large organizations are able to negotiate better prices than individuals when making the same purchase in much greater volume.",
+          "explanation": "AWS achieves lower prices by purchasing infrastructure at massive scale and distributing those costs across millions of customers worldwide, a principle known as economies of scale.\n\n**Why it works:** When a provider buys at enormous scale, per-unit costs fall significantly. AWS passes these savings to customers through regular price reductions.\n\n**Why the others don't work:**\n- Flat monthly fee: AWS pricing is pay-as-you-go based on consumption, not a fixed charge.\n- Hardware contracts: AWS manages procurement internally; customers are not bound to manufacturer agreements.\n- Cross-customer subsidies: AWS does not redistribute costs between enterprise and smaller customers.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0004",
+          "type": "single-choice",
+          "question": "Under the AWS Shared Responsibility Model, security responsibilities are divided between AWS and the customer. A web application is being deployed on Amazon EC2 to serve customer data.\n\nWhich of the following is the responsibility of AWS?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Configuring security groups and network access control lists (NACLs)",
+              "isCorrect": false,
+              "explanation": "Configuring security groups and NACLs is the customer's responsibility for their deployed resources."
+            },
+            {
+              "id": "c1",
+              "text": "Maintaining the physical security of data center facilities and hardware infrastructure",
+              "isCorrect": true,
+              "explanation": "AWS is responsible for the physical infrastructure, including data center security, power systems, and hardware maintenance.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Encrypting data stored in application databases",
+              "isCorrect": false,
+              "explanation": "While AWS provides encryption tools, customers are responsible for choosing and implementing encryption for their application data."
+            },
+            {
+              "id": "c3",
+              "text": "Installing and patching the operating system on EC2 instances",
+              "isCorrect": false,
+              "explanation": "Customers are responsible for patching the guest operating system and applications running on EC2 instances; AWS manages the hypervisor level."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Security and Compliance",
+          "skills": [
+            "2.1.1: Recognizing the components of the AWS shared responsibility model."
+          ],
+          "services": [
+            "AWS",
+            "Customer Responsibility"
+          ],
+          "docs": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "tip": "Consider what AWS controls at the infrastructure level versus what customers control on their deployed resources.",
+          "explanation": "AWS is responsible for the security OF the cloud: physical infrastructure, power, cooling, and host security. Customers are responsible for security IN the cloud, including OS patching, firewall rules, and application-level encryption.\n\n**Why it works:** AWS manages all physical data center components and hardware; this is fundamental to their infrastructure responsibility.\n\n**Why the others fail:**\n- Configuring security groups/NACLs: These are customer-managed network controls on deployed resources.\n- Installing/patching the OS: Customers manage the guest OS; AWS manages only the hypervisor level.\n- Encrypting application data: Customers choose and implement encryption strategies for their data.\n\n**Implementation:** Review AWS Shared Responsibility Model documentation at https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0006",
+          "type": "multiple-choice",
+          "question": "Designing a security strategy across multiple AWS services requires identifying which responsibilities belong to the customer versus AWS.\n\nWhich TWO of the following are customer responsibilities in the AWS Shared Responsibility Model?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Managing security patches for the host operating system and virtualization layer",
+              "isCorrect": false,
+              "explanation": "AWS manages the hypervisor, host OS patches, and virtualization infrastructure; this is AWS responsibility, not customer responsibility."
+            },
+            {
+              "id": "c1",
+              "text": "Configuring AWS Identity and Access Management (IAM) policies and user access controls",
+              "isCorrect": true,
+              "explanation": "Customers must design and implement IAM policies, user roles, and access control strategies appropriate for their organization.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Applying security updates to guest operating systems and applications running on EC2",
+              "isCorrect": true,
+              "explanation": "Customers are responsible for patching the guest OS and all applications they deploy on their instances.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Maintaining physical network infrastructure and connecting AWS data centers",
+              "isCorrect": false,
+              "explanation": "AWS maintains all physical network infrastructure, undersea cables, and inter-data center connections."
+            },
+            {
+              "id": "c5",
+              "text": "Encrypting data in transit between client applications and AWS services",
+              "isCorrect": false,
+              "explanation": "While AWS provides encryption tools like TLS/SSL, customers must enable and configure encryption for their specific data flows; this is primarily AWS responsibility for the transport layer between services."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Security and Compliance",
+          "skills": [
+            "2.1.1: Recognizing the components of the AWS shared responsibility model."
+          ],
+          "services": [
+            "AWS",
+            "IAM",
+            "Customer Responsibility"
+          ],
+          "docs": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "tip": "Focus on decisions and configurations customers make versus infrastructure AWS maintains.",
+          "explanation": "The shared responsibility model divides security concerns: AWS manages the infrastructure layer (physical facilities, hypervisors, networking), while customers manage access controls and their deployed resources.\n\n**Why the correct answers work:**\n- IAM configuration: Customers design and implement access control policies tailored to their organization.\n- Guest OS patching: Customers own responsibility for patching their deployed operating systems and applications.\n\n**Why the others fail:**\n- Host OS/hypervisor patches: AWS manages all host-level infrastructure and hypervisor updates.\n- Physical network infrastructure: AWS maintains data centers, cables, and inter-datacenter connections.\n- Client-to-AWS encryption: While customers enable encryption, the underlying transport infrastructure is AWS responsibility.\n\n**Implementation:** Set up IAM users and policies via AWS Console > IAM > Users/Roles or use `aws iam create-user` and `aws iam put-user-policy`. Update EC2 instances with `sudo yum update` or `sudo apt update && sudo apt upgrade` for guest OS patches.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0043",
+          "type": "single-choice",
+          "question": "The engineering team is evaluating their cloud architecture to ensure the system can automatically recover from infrastructure failures without manual intervention.\n\nWhich pillar of the AWS Well-Architected Framework primarily addresses this concern?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Operational Excellence",
+              "isCorrect": false,
+              "explanation": "Operational Excellence covers running and monitoring systems to deliver business value and continually improving processes. It does not specifically address automatic infrastructure failure recovery."
+            },
+            {
+              "id": "c4",
+              "text": "Security",
+              "isCorrect": false,
+              "explanation": "The Security pillar focuses on protecting information, systems, and assets while delivering business value through risk assessment and mitigation. It does not address infrastructure failure recovery."
+            },
+            {
+              "id": "c1",
+              "text": "Performance Efficiency",
+              "isCorrect": false,
+              "explanation": "Performance Efficiency focuses on using computing resources efficiently to meet system performance requirements. It does not primarily address automatic recovery from infrastructure failures."
+            },
+            {
+              "id": "c3",
+              "text": "Reliability",
+              "isCorrect": true,
+              "explanation": "Reliability is defined as the ability of a workload to perform its intended function correctly and consistently, including the ability to recover automatically from infrastructure or service disruptions.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.2.1: Understanding the pillars of the Well-Architected Framework (for example, operational excellence, security, reliability, performance efficiency, cost optimization, sustainability)."
+          ],
+          "services": [
+            "AWS Well-Architected Framework"
+          ],
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
+          "tip": "Consider which pillar focuses specifically on a workload's ability to withstand and recover automatically from disruptions.",
+          "explanation": "Reliability is the correct answer.\n\n**Why it works:** The Reliability pillar encompasses the ability to recover from infrastructure or service disruptions, dynamically acquire resources to meet demand, and mitigate disruptions from misconfigurations or transient failures - directly matching the team's requirement.\n\n**Why the others don't work:**\n- Performance Efficiency: Addresses efficient use of computing resources for performance targets, not failure recovery.\n- Operational Excellence: Focuses on operational monitoring and process improvement, not the architecture of failure recovery.\n- Security: Concerned with protecting data and systems from threats and unauthorized access, not infrastructure availability.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0046",
+          "type": "matching",
+          "question": "Match each AWS Well-Architected Framework pillar to its primary area of focus.",
+          "choices": [
+            {
+              "id": "c6",
+              "text": "Minimizing the environmental impact of running cloud workloads through efficient resource use and reduced consumption",
+              "isCorrect": false,
+              "explanation": "The Sustainability pillar addresses the long-term environmental impact of cloud workloads, focusing on reducing energy consumption and maximizing the efficiency of the underlying infrastructure."
+            },
+            {
+              "id": "c1",
+              "text": "Running and monitoring systems to deliver business value and continuously improve processes and procedures",
+              "isCorrect": false,
+              "explanation": "Operational Excellence is defined by the ability to support development and run workloads effectively, gain operational insights, and continuously improve supporting processes."
+            },
+            {
+              "id": "c3",
+              "text": "Ensuring a workload performs its intended function correctly and consistently, and recovers automatically from failures",
+              "isCorrect": false,
+              "explanation": "Reliability covers a workload's ability to recover from infrastructure disruptions, dynamically acquire resources to meet demand, and mitigate disruptions from misconfigurations or transient issues."
+            },
+            {
+              "id": "c4",
+              "text": "Using computing resources efficiently to meet system requirements and maintaining efficiency as demand and technology evolve",
+              "isCorrect": false,
+              "explanation": "Performance Efficiency is about selecting the right resource types and sizes, monitoring performance, and adapting as business needs and technology change."
+            },
+            {
+              "id": "c2",
+              "text": "Protecting information, systems, and assets while delivering business value through risk assessment and mitigation",
+              "isCorrect": false,
+              "explanation": "The Security pillar encompasses confidentiality and integrity of data, managing user permissions, and detecting and responding to security events."
+            },
+            {
+              "id": "c5",
+              "text": "Delivering business outcomes at the lowest possible financial cost by eliminating unnecessary cloud expenditure",
+              "isCorrect": false,
+              "explanation": "Cost Optimization focuses on understanding spending, using cost-effective resources, scaling to meet business needs, and avoiding unnecessary costs."
+            }
+          ],
+          "selectCount": 6,
+          "slots": [
+            {
+              "id": "s6",
+              "label": "Sustainability",
+              "correctChoiceId": "c6"
+            },
+            {
+              "id": "s4",
+              "label": "Performance Efficiency",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s3",
+              "label": "Reliability",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "Security",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s5",
+              "label": "Cost Optimization",
+              "correctChoiceId": "c5"
+            },
+            {
+              "id": "s1",
+              "label": "Operational Excellence",
+              "correctChoiceId": "c1"
+            }
+          ],
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.2.1: Understanding the pillars of the Well-Architected Framework (for example, operational excellence, security, reliability, performance efficiency, cost optimization, sustainability)."
+          ],
+          "services": [
+            "AWS Well-Architected Framework"
+          ],
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+          "tip": "Each pillar has a single most distinctive purpose - focus on the unique primary goal that separates it from the others.",
+          "explanation": "The six pillars of the AWS Well-Architected Framework each have a distinct primary focus: Operational Excellence runs and improves operations; Security protects data and systems; Reliability ensures consistent function and recovery from failures; Performance Efficiency uses resources efficiently for performance; Cost Optimization delivers value at the lowest financial cost; Sustainability minimizes environmental impact.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0039",
+          "type": "single-choice",
+          "question": "The operations team manages a patient-record application on Amazon EC2 for a healthcare organization. They want to ensure the application remains accessible to staff even if one part of the underlying infrastructure experiences an unexpected failure.\n\nWhich AWS approach best supports high availability for this application?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Running all Amazon EC2 instances in a single large instance type within one Availability Zone to simplify management and consolidate all workloads into one location",
+              "isCorrect": false,
+              "explanation": "Concentrating all workloads in a single Availability Zone creates a single point of failure. If that zone experiences issues, the entire application becomes unavailable."
+            },
+            {
+              "id": "c3",
+              "text": "Configuring Amazon EC2 instances with automated Amazon EBS snapshots every 24 hours so the application state can be fully restored from the previous day's backup if needed",
+              "isCorrect": false,
+              "explanation": "Daily Amazon EBS snapshots enable recovery from data loss but do not prevent downtime. Restoring from a snapshot takes time and cannot substitute for live redundancy."
+            },
+            {
+              "id": "c1",
+              "text": "Deploying Amazon EC2 instances across multiple Availability Zones within a Region so that a failure in one zone does not take the entire application offline",
+              "isCorrect": true,
+              "explanation": "Spreading instances across multiple Availability Zones means an infrastructure failure in one zone only affects that zone's resources while instances in other zones continue to serve traffic normally.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Enabling Amazon CloudWatch detailed monitoring on all Amazon EC2 instances to receive performance alerts within one minute of any degradation event occurring",
+              "isCorrect": false,
+              "explanation": "Amazon CloudWatch monitoring helps detect problems quickly but does not prevent or automatically recover from failures. Detection is not the same as availability."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.3: Understanding the advantages of high availability, elasticity, and agility."
+          ],
+          "services": [
+            "Amazon EC2",
+            "Elastic Load Balancing",
+            "AWS Auto Scaling"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Consider what would happen to service continuity if a single physical location or component failed.",
+          "explanation": "High availability on AWS is achieved by distributing resources across multiple Availability Zones. If one zone fails, traffic continues to be served by instances in the other zones, keeping the application online.\n\n**Why it works:** Each Availability Zone is physically isolated with independent power and networking. A failure in one does not cascade to others.\n\n**Why the others don't work:**\n- Single zone: Consolidating in one zone creates a single point of failure, removing high availability.\n- EBS snapshots: Snapshots support recovery but require downtime. They do not provide continuous availability.\n- CloudWatch monitoring: Alerts help identify problems but do not automatically keep the application running.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0035",
+          "type": "single-choice",
+          "question": "The engineering team serves customers across Europe, Asia, and North America and wants to reduce the latency users experience when loading the company's website.\n\nWhich feature of AWS global infrastructure directly enables companies to serve content from locations closer to their users?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "AWS provides dedicated satellite uplinks from each customer office to a centralized US-based data center, reducing network round-trip times through direct point-to-point connections",
+              "isCorrect": false,
+              "explanation": "AWS does not provide satellite uplinks to customer offices. Content is delivered over the public internet or AWS Direct Connect, not dedicated satellite links."
+            },
+            {
+              "id": "c4",
+              "text": "AWS uses a single Availability Zone per country to minimize infrastructure management complexity while maintaining international coverage for all customer workloads",
+              "isCorrect": false,
+              "explanation": "Each AWS Region contains multiple Availability Zones, not one per country. Single-zone deployments reduce redundancy rather than minimize latency."
+            },
+            {
+              "id": "c1",
+              "text": "AWS consolidates all customer workloads in a single central data center, providing consistent and uniform performance for users regardless of their geographic location",
+              "isCorrect": false,
+              "explanation": "AWS operates many geographically distributed data centers, not a single central one. Consolidating workloads in one location would increase latency for distant users."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Regions allow customers to deploy resources in specific geographic areas worldwide, and Amazon CloudFront delivers content from nearby edge locations to reduce network latency",
+              "isCorrect": true,
+              "explanation": "Deploying in multiple AWS Regions places compute closer to users, and Amazon CloudFront caches content at hundreds of edge locations globally to further reduce round-trip times.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.2: Understanding the benefits of global infrastructure (for example, speed of deployment, global reach)."
+          ],
+          "services": [
+            "Amazon CloudFront",
+            "Amazon EC2"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html",
+          "tip": "Think about how distributing resources geographically affects the distance data must travel to reach end users.",
+          "explanation": "AWS Regions and Amazon CloudFront edge locations allow companies to serve content from points geographically close to their users, directly reducing network latency.\n\n**Why it works:** Shorter physical distance between server and user means fewer network hops and lower round-trip times.\n\n**Why the others don't work:**\n- Single central data center: This increases latency for users far from that location.\n- Satellite uplinks: AWS does not offer customer-office satellite connections for content delivery.\n- One zone per country: Regions have multiple Availability Zones; this option conflates zone count with latency management.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0027",
+          "type": "multiple-choice",
+          "question": "Building AWS expertise requires access to multiple resource types: official documentation, best-practice patterns, and quick answers to common questions.\n\nWhich TWO resources should the team use to cover all these needs?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "AWS Marketplace for vendor-provided training materials",
+              "isCorrect": false,
+              "explanation": "Marketplace is for third-party tools and services, not primary AWS learning resources."
+            },
+            {
+              "id": "c3",
+              "text": "AWS re:Post exclusively for all troubleshooting and operational guidance",
+              "isCorrect": false,
+              "explanation": "re:Post is community-driven Q&A; it's excellent for peer support but should be supplemented with official documentation."
+            },
+            {
+              "id": "c4",
+              "text": "AWS official documentation site (docs.aws.amazon.com) for service API references",
+              "isCorrect": false,
+              "explanation": "Official docs are essential but are mentioned implicitly; Knowledge Center and Prescriptive Guidance are complementary resources."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Knowledge Center for FAQs and quick answers to common AWS questions",
+              "isCorrect": true,
+              "explanation": "Knowledge Center provides searchable Q&A format for frequently asked questions about AWS services.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "AWS Prescriptive Guidance for detailed implementation patterns and architecture recommendations",
+              "isCorrect": true,
+              "explanation": "Prescriptive Guidance provides structured patterns, diagrams, and code samples for specific use cases.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Billing, Pricing, and Support",
+          "skills": [
+            "4.3.2: Identifying and locating AWS technical resources (for example, AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post)."
+          ],
+          "services": [
+            "AWS Resources",
+            "Documentation"
+          ],
+          "docs": "https://repost.aws/knowledge-center",
+          "tip": "Combine FAQ/common questions with structured implementation patterns for comprehensive coverage.",
+          "explanation": "Knowledge Center and Prescriptive Guidance together provide both quick answers and detailed implementation guidance.\n\n**Why they work:** Knowledge Center answers common questions quickly; Prescriptive Guidance provides architecture and patterns for complex scenarios.\n\n**Why the others fail:**\n- re:Post only: Community resource should supplement official documentation, not replace it\n- Official docs: Important but already assumed; the question focuses on specific resources\n- Marketplace: For third-party tools, not AWS learning resources\n\n**Implementation:** Bookmark Knowledge Center for quick FAQs and Prescriptive Guidance for detailed patterns; supplement with official docs as needed.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0018",
+          "type": "multiple-choice",
+          "question": "Storage costs must be optimized across data sets with unpredictable access patterns: some objects are frequently accessed, while others vary in usage over time.\n\nWhich TWO pricing strategies help reduce total storage costs?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Enable cross-region replication to all objects",
+              "isCorrect": false,
+              "explanation": "Replication increases costs; it improves availability, not storage cost optimization."
+            },
+            {
+              "id": "c1",
+              "text": "Use S3 Intelligent-Tiering to automatically move objects between tiers based on access patterns",
+              "isCorrect": true,
+              "explanation": "Intelligent-Tiering eliminates the need to manually transition objects and saves 70% on storage for variable access patterns.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Implement lifecycle policies to transition objects to cheaper tiers as they age",
+              "isCorrect": true,
+              "explanation": "Lifecycle transitions reduce storage costs by moving infrequently accessed data from Standard to Standard-IA, Glacier, or Deep Archive.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Use AWS Backup for all S3 object storage",
+              "isCorrect": false,
+              "explanation": "AWS Backup is for incremental backup snapshots, not a storage cost optimization for S3 objects."
+            },
+            {
+              "id": "c3",
+              "text": "Store all data in S3 Standard and manually delete old files",
+              "isCorrect": false,
+              "explanation": "Manual deletion is error-prone and Standard doesn't optimize costs; lifecycle automation is better."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Billing, Pricing, and Support",
+          "skills": [
+            "4.1.5: Understanding different pricing options for various storage options and tiers."
+          ],
+          "services": [
+            "Amazon S3",
+            "Storage Classes",
+            "S3 Intelligent-Tiering"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html",
+          "tip": "Combine automatic tier management and age-based transitions for maximum cost savings across mixed access patterns.",
+          "explanation": "Intelligent-Tiering and lifecycle policies together optimize costs by automating storage class selection.\n\n**Why they work:** Intelligent-Tiering handles unpredictable access automatically; lifecycle policies provide predictable rules for aging data.\n\n**Why the others fail:**\n- Manual deletion: Error-prone and doesn't utilize cheaper storage classes\n- AWS Backup: Designed for incremental snapshots, not S3 object storage optimization\n- Cross-region replication: Doubles costs and is for disaster recovery, not optimization\n\n**Implementation:** Combine Intelligent-Tiering for active objects with lifecycle policies to transition older objects to cheaper classes.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0022",
+          "type": "single-choice",
+          "question": "Video content stored centrally in Amazon S3 must be distributed globally to end users with minimal latency, served from locations near each user.\n\nWhich AWS edge service best addresses this requirement?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Amazon CloudFront",
+              "isCorrect": true,
+              "explanation": "CloudFront is a content delivery network (CDN) that caches content at edge locations worldwide, reducing latency for end users.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "AWS Lambda@Edge",
+              "isCorrect": false,
+              "explanation": "Lambda@Edge executes code at edge locations but does not provide caching for static content delivery."
+            },
+            {
+              "id": "c2",
+              "text": "AWS Global Accelerator",
+              "isCorrect": false,
+              "explanation": "Global Accelerator optimizes application routing but is not a caching CDN; better for application performance than content delivery."
+            },
+            {
+              "id": "c4",
+              "text": "Amazon Route 53",
+              "isCorrect": false,
+              "explanation": "Route 53 is a DNS service and does not provide content caching or edge distribution."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Technology and Services",
+          "skills": [
+            "3.5.4: Identifying edge services (for example, CloudFront, Global Accelerator)."
+          ],
+          "services": [
+            "Amazon CloudFront",
+            "Edge Services"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+          "tip": "Identify which service specifically provides content caching and global distribution at AWS edge locations.",
+          "explanation": "Amazon CloudFront caches content at 400+ edge locations worldwide, reducing latency for global audiences.\n\n**Why it works:** CloudFront automatically caches S3 content at regional edge caches and edge locations, serving content from the nearest location to each user.\n\n**Why the others fail:**\n- Global Accelerator: Routes traffic optimally but doesn't cache content; for API/application performance\n- Lambda@Edge: Executes code at edges; not designed for caching static content\n- Route 53: DNS resolution service; doesn't deliver or cache content\n\n**Implementation:** Create a CloudFront distribution pointing to S3 origin; CloudFront automatically caches and serves content globally.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0030",
+          "type": "multiple-choice",
+          "question": "Sensitive customer information must be protected both when stored in AWS and when transmitted across networks. Comprehensive encryption coverage is required for both scenarios.\n\nWhich TWO encryption strategies provide complete coverage?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Encryption in transit using TLS/SSL for all network communications",
+              "isCorrect": true,
+              "explanation": "TLS encrypts data while transmitted between systems, preventing interception over the network.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "VPC isolation and security groups for encryption",
+              "isCorrect": false,
+              "explanation": "While important for access control, VPC isolation and security groups do not encrypt data; encryption mechanisms like KMS and TLS are required."
+            },
+            {
+              "id": "c1",
+              "text": "Encryption at rest using AWS KMS for stored data in S3 and RDS",
+              "isCorrect": true,
+              "explanation": "KMS encryption protects data when stored, ensuring unauthorized users cannot read files or databases even if they gain access.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "AWS WAF for encrypting web traffic",
+              "isCorrect": false,
+              "explanation": "WAF protects against web exploits but does not encrypt data; TLS is the encryption standard for web traffic."
+            },
+            {
+              "id": "c3",
+              "text": "AWS Shield for protecting against DDoS attacks",
+              "isCorrect": false,
+              "explanation": "Shield protects against DDoS attacks; it is not an encryption mechanism and does not protect data confidentiality."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "2.2.4: Identifying different encryption options (for example, encryption in transit, encryption at rest)."
+          ],
+          "services": [
+            "Encryption at Rest",
+            "Encryption in Transit"
+          ],
+          "docs": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+          "tip": "Protect data both at rest (stored) and in transit (moving between systems).",
+          "explanation": "KMS and TLS together provide encryption at both layers of data protection.\n\n**Why they work:** KMS protects stored data; TLS protects data during transmission. Together they provide comprehensive encryption coverage.\n\n**Why the others fail:**\n- AWS Shield: DDoS protection; not an encryption mechanism\n- VPC/Security groups: Access control measures; not encryption\n- AWS WAF: Web attack protection; not a data encryption solution\n\n**Implementation:** Enable KMS encryption in S3/RDS and enforce TLS for all API calls and database connections for complete data protection.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0008",
+          "type": "single-choice",
+          "question": "Protecting a web application from SQL injection and cross-site scripting (XSS) attacks requires a solution that operates at the application layer.\n\nWhich security service should be implemented?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "AWS WAF",
+              "isCorrect": true,
+              "explanation": "AWS WAF protects web applications from common web exploits by filtering malicious requests at the application layer.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Security Groups",
+              "isCorrect": false,
+              "explanation": "Security Groups control network-level access but cannot detect or prevent application-layer attacks like SQL injection."
+            },
+            {
+              "id": "c4",
+              "text": "AWS Shield Standard",
+              "isCorrect": false,
+              "explanation": "AWS Shield protects against DDoS attacks, not application vulnerabilities like SQL injection or XSS."
+            },
+            {
+              "id": "c3",
+              "text": "Network ACLs",
+              "isCorrect": false,
+              "explanation": "Network ACLs filter traffic at the network layer and cannot inspect application-layer attack patterns."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "2.2.3: Describing how customers secure resources on AWS (for example, Amazon Inspector, AWS Security Hub, Amazon GuardDuty, AWS Shield)."
+          ],
+          "services": [
+            "AWS WAF",
+            "Network ACLs"
+          ],
+          "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html",
+          "tip": "Think about which layer of the OSI model addresses application-specific threats like SQL injection.",
+          "explanation": "AWS WAF (Web Application Firewall) is designed to protect web applications from application-layer attacks.\n\n**Why it works:** WAF uses rules to inspect HTTP/HTTPS requests and block traffic matching malicious patterns before it reaches the application.\n\n**Why the others fail:**\n- Security Groups: Operate at network layer (Layer 4), cannot inspect application content\n- Network ACLs: Also operate at network layer, cannot detect web-specific attack patterns\n- AWS Shield: Defends against volumetric DDoS attacks, not targeted application exploits\n\n**Implementation:** Deploy AWS WAF in front of CloudFront distributions, ALBs, or API Gateway to filter web traffic.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0029",
+          "type": "single-choice",
+          "question": "Database queries transmitted over the network between application servers and Amazon RDS must be protected from eavesdropping.\n\nWhich encryption type is required for this scenario?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "VPC security group rules blocking all traffic",
+              "isCorrect": false,
+              "explanation": "Security groups control access but do not encrypt data; TLS is required for encryption in transit."
+            },
+            {
+              "id": "c1",
+              "text": "Encryption in transit using SSL/TLS",
+              "isCorrect": true,
+              "explanation": "TLS encrypts data during transmission, protecting database queries from being intercepted over the network.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Application-level encryption of query strings",
+              "isCorrect": false,
+              "explanation": "While possible, TLS is the standard and simpler approach for protecting network transmission."
+            },
+            {
+              "id": "c2",
+              "text": "Encryption at rest using AWS KMS",
+              "isCorrect": false,
+              "explanation": "KMS encryption protects stored database data; it does not protect data being transmitted over the network."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "2.2.4: Identifying different encryption options (for example, encryption in transit, encryption at rest)."
+          ],
+          "services": [
+            "Encryption in Transit",
+            "TLS/SSL"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html",
+          "tip": "Focus on protecting data while it moves between systems versus protecting data when it is stored.",
+          "explanation": "Encryption in transit using TLS protects data transmitted between application and database.\n\n**Why it works:** TLS/SSL creates an encrypted channel, preventing network eavesdropping and man-in-the-middle attacks on database queries.\n\n**Why the others fail:**\n- KMS (at rest): Protects stored data, not transmission\n- Application-level encryption: More complex; TLS is the standard network security layer\n- Security groups: Control access but do not encrypt; TLS is required for encryption\n\n**Implementation:** Enable SSL/TLS in RDS configuration and require SSL certificates for all database connections.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0032",
+          "type": "single-choice",
+          "question": "During a quarterly business review, the CTO highlights that AWS has reduced the price of Amazon S3 storage multiple times over the past decade. She asks her team to explain the underlying business reason for these recurring reductions.\n\nWhich factor most directly enables AWS to lower prices on a regular basis?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "AWS reduces prices by slowing the construction of new data centers each year, cutting capital expenditure and redirecting those savings directly to customer billing discounts",
+              "isCorrect": false,
+              "explanation": "AWS continuously expands its data center footprint globally. Limiting construction would reduce capacity and reliability, not primarily drive service price reductions."
+            },
+            {
+              "id": "c2",
+              "text": "AWS must reduce prices annually as part of its cloud service agreements with government regulatory bodies in each region where it holds an operating licence",
+              "isCorrect": false,
+              "explanation": "There is no regulatory requirement for AWS to reduce prices. Price changes are business decisions driven by operational efficiencies, not legal obligations."
+            },
+            {
+              "id": "c1",
+              "text": "As AWS grows, economies of scale improve operational efficiency and reduce per-unit infrastructure costs, enabling AWS to pass savings on to customers through price reductions",
+              "isCorrect": true,
+              "explanation": "Amazon S3 and other services become cheaper over time because AWS's growing scale reduces what it costs to store and serve each unit of data, and those savings are shared with customers.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "AWS offsets infrastructure costs by requiring all customers to purchase `Reserved Instance` contracts before they become eligible to benefit from any service price reductions",
+              "isCorrect": false,
+              "explanation": "`Reserved Instances` are an optional commitment mechanism offering separate discounts. Standard on-demand price reductions apply to all customers and are not conditional on purchasing reservations."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.1: Understanding the economies of scale (for example, cost savings)."
+          ],
+          "services": [
+            "Amazon S3",
+            "AWS Pricing"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Consider how a business that grows much larger than its competitors is able to reduce its own costs over time and what it does with those savings.",
+          "explanation": "As AWS's customer base and infrastructure grow, its operational efficiency improves and per-unit costs decline. AWS regularly passes these savings on to customers through price reductions across services like Amazon S3.\n\n**Why it works:** Economies of scale mean the cost of providing each unit of compute, storage, or bandwidth decreases as overall volume increases.\n\n**Why the others don't work:**\n- Regulatory requirement: No government mandate requires AWS to reduce prices.\n- Limiting construction: AWS's strategy involves expanding infrastructure to meet growing demand.\n- Reserved contracts: On-demand price reductions are not conditional on customers purchasing reservations.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0028",
+          "type": "single-choice",
+          "question": "Patient data stored in Amazon S3 must be encrypted at rest to meet HIPAA compliance requirements. The data should not be decrypted unless explicitly authorized.\n\nWhich encryption approach best addresses this requirement?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Password-protecting the S3 bucket",
+              "isCorrect": false,
+              "explanation": "Bucket passwords are not an AWS mechanism; encryption at rest is the proper approach for HIPAA compliance."
+            },
+            {
+              "id": "c2",
+              "text": "Encryption in transit using TLS",
+              "isCorrect": false,
+              "explanation": "TLS encrypts data during transmission; it does not protect stored data in S3."
+            },
+            {
+              "id": "c1",
+              "text": "Encryption at rest using AWS KMS",
+              "isCorrect": true,
+              "explanation": "AWS KMS provides server-side encryption at rest, protecting stored data and meeting compliance requirements for unauthorized access prevention.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Client-side encryption before upload",
+              "isCorrect": false,
+              "explanation": "While secure, this requires manual client implementation; AWS-managed encryption at rest is simpler and still HIPAA-compliant."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "2.2.4: Identifying different encryption options (for example, encryption in transit, encryption at rest)."
+          ],
+          "services": [
+            "AWS KMS",
+            "Encryption"
+          ],
+          "docs": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+          "tip": "Distinguish between encryption protecting data in storage versus encryption protecting data in transit.",
+          "explanation": "Encryption at rest using AWS KMS protects data when stored in S3, preventing unauthorized access to stored files.\n\n**Why it works:** AWS KMS encrypts S3 objects automatically with customer-managed or AWS-managed keys, ensuring HIPAA compliance for data protection.\n\n**Why the others fail:**\n- TLS: Protects data in transit only, not stored data\n- Client-side: Increases operational complexity vs. AWS-managed encryption\n- Bucket passwords: Not an AWS security mechanism; encryption is the standard\n\n**Implementation:** Enable default encryption in S3 bucket settings using KMS to automatically encrypt all uploads.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0021",
+          "type": "multiple-choice",
+          "question": "Choosing the right AWS Support plan depends on operational maturity and business needs. Guidance is needed on matching support tiers to different scenarios.\n\nWhich TWO support plan decisions are correct for their respective scenarios?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Use Business Support for production workloads that require response times faster than 1 hour",
+              "isCorrect": false,
+              "explanation": "Business Support has 1-hour response maximum; faster times require Enterprise or Enterprise On-Ramp."
+            },
+            {
+              "id": "c3",
+              "text": "Use Basic Support for all production environments to minimize costs",
+              "isCorrect": false,
+              "explanation": "Basic Support has no technical support for production issues; inappropriate for production use."
+            },
+            {
+              "id": "c2",
+              "text": "Use Enterprise Support for mission-critical production workloads requiring 15-minute response times",
+              "isCorrect": true,
+              "explanation": "Enterprise Support provides the fastest response times (15 minutes) and dedicated resources for critical workloads.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Use Developer Support for development/testing environments with non-critical issues",
+              "isCorrect": true,
+              "explanation": "Developer Support is cost-effective for development teams needing general AWS guidance without production SLAs.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Use AWS Support only for billing inquiries and AWS service launch notifications",
+              "isCorrect": false,
+              "explanation": "All AWS Support plans provide technical support, not just billing services."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Technology and Services",
+          "skills": [
+            "3.8.4: Choosing the appropriate option for business support assistance."
+          ],
+          "services": [
+            "AWS Support",
+            "Support Plans"
+          ],
+          "docs": "https://aws.amazon.com/support/plans/",
+          "tip": "Match support plans to environment type and response time requirements.",
+          "explanation": "Developer Support suits development, while Enterprise Support is necessary for mission-critical production with aggressive SLAs.\n\n**Why they work:** Developer Support provides adequate coverage for non-production at lower cost; Enterprise Support guarantees 15-minute response for critical issues.\n\n**Why the others fail:**\n- Basic Support: Lacks production support entirely\n- Business for faster than 1-hour: Business has 1-hour SLA; must upgrade to Enterprise/On-Ramp\n- Support for billing only: Underutilizes support plans; all include technical support\n\n**Implementation:** Use tiered approach: Developer for development, Business for production, Enterprise for mission-critical revenue-impacting systems.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0042",
+          "type": "matching",
+          "question": "Match each cloud computing advantage to the business problem it is primarily designed to solve.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "An application must continue serving users without interruption even when one data center location experiences a hardware or power failure",
+              "isCorrect": false,
+              "explanation": "High availability is achieved by distributing workloads across multiple Availability Zones so that a failure in one location does not take the application offline."
+            },
+            {
+              "id": "c1",
+              "text": "A team needs to launch a new application environment within hours rather than waiting weeks for hardware procurement and setup",
+              "isCorrect": false,
+              "explanation": "Agility refers to the speed at which resources can be provisioned. AWS CloudFormation and the AWS Management Console allow environments to be created in minutes rather than weeks."
+            },
+            {
+              "id": "c3",
+              "text": "A workload experiences large traffic fluctuations and the organization wants to avoid paying for unused capacity during quiet periods",
+              "isCorrect": false,
+              "explanation": "Elasticity, provided by AWS Auto Scaling, automatically adjusts the number of running resources to match real-time demand, eliminating the cost of over-provisioned idle capacity."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "Elasticity",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s3",
+              "label": "Agility",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s1",
+              "label": "High availability",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.3: Understanding the advantages of high availability, elasticity, and agility."
+          ],
+          "services": [
+            "AWS Auto Scaling",
+            "Amazon EC2",
+            "AWS CloudFormation"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Focus on the distinct problem each term solves: availability of service, matching capacity to demand, and speed of delivery.",
+          "explanation": "High availability, elasticity, and agility each address a different operational challenge. High availability ensures workloads survive infrastructure failures by using redundant, isolated locations. Elasticity automatically matches resource capacity to demand so organizations do not pay for idle resources. Agility enables rapid provisioning, allowing teams to deliver features and experiments in hours rather than weeks.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0011",
+          "type": "single-choice",
+          "question": "Comparing cloud costs with on-premises infrastructure expenses reveals hidden costs that exist on-premises but disappear in AWS.\n\nWhich hidden cost is typically NOT incurred in AWS but IS a significant expense in an on-premises data center?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Monthly storage service fees",
+              "isCorrect": false,
+              "explanation": "Storage fees are charged in both AWS and on-premises (for maintenance and space)."
+            },
+            {
+              "id": "c2",
+              "text": "Per-request API call charges",
+              "isCorrect": false,
+              "explanation": "API calls are charged in AWS, not a unique benefit over on-premises."
+            },
+            {
+              "id": "c1",
+              "text": "Hardware replacement and refresh cycles",
+              "isCorrect": true,
+              "explanation": "On-premises requires periodic hardware replacement due to obsolescence and technology cycles, but AWS provides automatically maintained infrastructure.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Data transfer between availability zones",
+              "isCorrect": false,
+              "explanation": "Zone transfer is an AWS cost that on-premises avoids, but it's typically minimal compared to infrastructure costs."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.4.2: Understanding costs that are associated with on-premises environments."
+          ],
+          "services": [
+            "On-Premises",
+            "AWS"
+          ],
+          "docs": "https://aws.amazon.com/economics/cost-of-ownership/",
+          "tip": "Think about the long-term capital expenses of maintaining physical equipment versus cloud's operational model.",
+          "explanation": "On-premises hardware requires regular replacement cycles, whereas AWS manages infrastructure updates transparently.\n\n**Why it works:** Organizations must budget for periodic server replacement (typically every 3-5 years) and upgrades to stay current with technology.\n\n**Why the others fail:**\n- Per-request API charges: AWS has these, on-premises does not; not a cost on-premises avoids\n- Storage fees: Both environments incur storage-related costs\n- Data transfer: On-premises avoids this, but it's typically a smaller cost component\n\n**Implementation:** Factor hardware refresh cycles into on-premises TCO calculations when comparing to AWS consumption-based pricing.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0044",
+          "type": "single-choice",
+          "question": "During a quarterly architecture review, the team identifies that several Amazon EC2 instances are consistently running at 5% CPU utilization. They want to reduce unnecessary cloud spending without impacting application performance.\n\nWhich pillar of the AWS Well-Architected Framework provides guidance for this type of decision?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Cost Optimization",
+              "isCorrect": true,
+              "explanation": "Cost Optimization focuses on avoiding unnecessary costs by running at the lowest price point that meets requirements, including identifying and rightsizing underutilized instances such as those running at 5% CPU.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "Performance Efficiency",
+              "isCorrect": false,
+              "explanation": "Performance Efficiency is about using resources efficiently to meet performance requirements. Choosing the right instance size to save money is a Cost Optimization concern, not a Performance Efficiency concern."
+            },
+            {
+              "id": "c3",
+              "text": "Operational Excellence",
+              "isCorrect": false,
+              "explanation": "Operational Excellence covers running and monitoring systems to deliver business value. It does not specifically address cloud cost management or instance right-sizing decisions."
+            },
+            {
+              "id": "c2",
+              "text": "Sustainability",
+              "isCorrect": false,
+              "explanation": "The Sustainability pillar focuses on minimizing the environmental impact of cloud workloads. While reducing overprovisioned instances can have sustainability benefits, the primary guidance for reducing spend comes from Cost Optimization."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.2.1: Understanding the pillars of the Well-Architected Framework (for example, operational excellence, security, reliability, performance efficiency, cost optimization, sustainability)."
+          ],
+          "services": [
+            "Amazon EC2",
+            "AWS Well-Architected Framework"
+          ],
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html",
+          "tip": "Identify the pillar whose primary objective is financial stewardship and avoiding unnecessary cloud expenditure.",
+          "explanation": "Cost Optimization is the correct pillar for this scenario.\n\n**Why it works:** The Cost Optimization pillar provides guidance on avoiding unnecessary costs, including identifying and rightsizing underutilized instances. Running Amazon EC2 instances at 5% CPU represents clear waste that this pillar addresses.\n\n**Why the others don't work:**\n- Performance Efficiency: Concerned with efficient resource use to meet performance targets, not financial cost reduction.\n- Sustainability: Addresses environmental impact, not financial cost as its primary concern.\n- Operational Excellence: Focuses on operational processes and monitoring, not cloud spend management.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0047",
+          "type": "single-choice",
+          "question": "To reduce their monthly AWS bill, the operations team is analyzing which Amazon EC2 instance types are oversized for their workload and considering Savings Plans for predictable usage patterns.\n\nWhich pillar of the AWS Well-Architected Framework is the team applying?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Performance Efficiency",
+              "isCorrect": false,
+              "explanation": "Performance Efficiency focuses on using resources efficiently to meet performance requirements. Choosing the right instance type to improve performance is distinct from choosing it to reduce financial cost."
+            },
+            {
+              "id": "c1",
+              "text": "Operational Excellence",
+              "isCorrect": false,
+              "explanation": "Operational Excellence focuses on running and monitoring systems to deliver business value and improve processes. It does not address cloud spending decisions or instance pricing models."
+            },
+            {
+              "id": "c4",
+              "text": "Sustainability",
+              "isCorrect": false,
+              "explanation": "The Sustainability pillar is focused on minimizing the environmental impact of cloud workloads. While rightsizing may benefit sustainability, the team's primary driver here is cost reduction, not environmental impact."
+            },
+            {
+              "id": "c2",
+              "text": "Cost Optimization",
+              "isCorrect": true,
+              "explanation": "Cost Optimization focuses on avoiding unnecessary costs, including rightsizing compute resources and selecting cost-effective pricing models such as Savings Plans for predictable workloads.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.2.2: Identifying differences between the pillars of the Well-Architected Framework."
+          ],
+          "services": [
+            "Amazon EC2",
+            "AWS Well-Architected Framework"
+          ],
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html",
+          "tip": "Distinguish between efficiency for performance goals and efficiency for financial goals - different pillars address these.",
+          "explanation": "Cost Optimization is the correct answer.\n\n**Why it works:** The Cost Optimization pillar provides guidance on avoiding unnecessary costs, which includes rightsizing oversized instances and using Savings Plans to reduce spend on predictable workloads - exactly what the team is doing.\n\n**Why the others don't work:**\n- Operational Excellence: Focused on operational processes and monitoring, not on cloud cost management or instance purchasing decisions.\n- Performance Efficiency: Concerned with resource efficiency for meeting performance targets, not financial expenditure reduction.\n- Sustainability: Addresses environmental impact, not financial cost reduction as a primary objective.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0034",
+          "type": "matching",
+          "question": "Match each aspect of AWS's economies of scale to the customer benefit it delivers.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Continuous development of more efficient services and technologies at a lower marginal cost per unit",
+              "isCorrect": false,
+              "explanation": "Large-scale revenue funds ongoing R&D and hardware innovation, such as custom AWS Graviton processors, improving performance per dollar spent."
+            },
+            {
+              "id": "c1",
+              "text": "Each customer's share of data center overhead decreases as the overall customer base grows",
+              "isCorrect": false,
+              "explanation": "Fixed costs such as facilities, power, and staffing are distributed across a growing customer base, reducing the effective overhead cost per customer."
+            },
+            {
+              "id": "c3",
+              "text": "Lower per-unit hardware costs that AWS passes on to customers through regular price reductions",
+              "isCorrect": false,
+              "explanation": "Purchasing in bulk allows AWS to secure lower prices per component, and those savings are reflected in periodically reduced prices for services like Amazon EC2 and Amazon S3."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s3",
+              "label": "Large-scale innovation investment",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s2",
+              "label": "Shared operational costs",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s1",
+              "label": "Bulk infrastructure purchasing",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.1: Understanding the economies of scale (for example, cost savings)."
+          ],
+          "services": [
+            "AWS Pricing"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Think about the three separate ways a very large organization benefits compared to a smaller one when managing shared infrastructure at scale.",
+          "explanation": "AWS economies of scale operate across three distinct dimensions: purchasing hardware in bulk reduces per-unit costs, which are passed on as price reductions; distributing fixed operational costs across millions of customers lowers each customer's overhead share; and large-scale revenue enables sustained R&D investment that produces more efficient technologies and further lowers costs over time.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0005",
+          "type": "single-choice",
+          "question": "Production database availability and backup management on Amazon RDS for PostgreSQL must be understood through the lens of the shared responsibility model.\n\nWhich statement correctly describes the shared responsibility for Amazon RDS?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "AWS manages everything; customers have no responsibility for database management",
+              "isCorrect": false,
+              "explanation": "Amazon RDS is a managed service but customers still own responsibility for access controls, performance tuning, and backup strategy decisions."
+            },
+            {
+              "id": "c1",
+              "text": "AWS manages database engine patching and automated backups; the customer is responsible for backup retention policies and point-in-time restore configuration",
+              "isCorrect": true,
+              "explanation": "AWS handles engine patches and automated backup infrastructure; customers configure retention and recovery options for their needs.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "The customer is fully responsible for all database patching, backups, and availability management",
+              "isCorrect": false,
+              "explanation": "AWS handles database engine patching and automated backups as part of the managed service; this is not the customer's responsibility."
+            },
+            {
+              "id": "c4",
+              "text": "AWS manages backups only; customers are responsible for both patching and availability",
+              "isCorrect": false,
+              "explanation": "AWS manages both automated patching and backups for RDS as part of the managed database service responsibility."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Security and Compliance",
+          "skills": [
+            "2.1.1: Recognizing the components of the AWS shared responsibility model."
+          ],
+          "services": [
+            "Amazon RDS",
+            "AWS",
+            "Customer Responsibility"
+          ],
+          "docs": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "tip": "Think about what 'managed service' means: AWS handles infrastructure concerns while customers focus on configuration and strategy decisions.",
+          "explanation": "Amazon RDS exemplifies a managed service where AWS handles operational tasks like patching and backups, but customers retain control over configuration, retention policies, and performance tuning.\n\n**Why it works:** AWS automates engine patches and backup execution; customers set retention policies and configure recovery objectives based on their requirements.\n\n**Why the others fail:**\n- AWS manages everything: RDS is managed but not fully autonomous; customers configure access, performance, and backup strategies.\n- Customer handles all patching/availability: AWS manages the database engine and infrastructure; customers focus on application-level concerns.\n- AWS handles backups only: AWS manages both automated backups and patching for RDS.\n\n**Implementation:** Configure RDS backup retention via AWS Console > RDS > Databases > Modify > Backup Retention Period or use `aws rds modify-db-instance --backup-retention-period`.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0020",
+          "type": "single-choice",
+          "question": "Mission-critical applications on AWS directly impact revenue. Required: a 15-minute response time for critical issues and a dedicated technical account manager (TAM) for AWS architecture guidance.\n\nWhich support plan provides the best fit?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "AWS Business Support",
+              "isCorrect": false,
+              "explanation": "Business Support has 1-hour response time for critical issues, slower than the 15-minute requirement."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Enterprise On-Ramp Support",
+              "isCorrect": true,
+              "explanation": "Enterprise On-Ramp provides 30-minute response for urgent issues and includes access to a TAM for architecture guidance.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "AWS Basic Support",
+              "isCorrect": false,
+              "explanation": "Basic Support does not include TAM or priority response times."
+            },
+            {
+              "id": "c4",
+              "text": "AWS Developer Support",
+              "isCorrect": false,
+              "explanation": "Developer Support does not include dedicated TAM or critical response time guarantees."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Technology and Services",
+          "skills": [
+            "3.8.4: Choosing the appropriate option for business support assistance."
+          ],
+          "services": [
+            "AWS Support",
+            "Enterprise Support"
+          ],
+          "docs": "https://aws.amazon.com/support/plans/enterprise/",
+          "tip": "Consider the balance between response time SLA and dedicated support resources like a TAM.",
+          "explanation": "AWS Enterprise On-Ramp Support balances cost and coverage, providing 30-minute response with TAM support.\n\n**Why it works:** Enterprise On-Ramp includes a dedicated TAM for proactive guidance and 30-minute response for urgent issues.\n\n**Why the others fail:**\n- Business Support: 1-hour response is slower; no dedicated TAM\n- Basic Support: No technical support or architecture guidance\n- Developer Support: No TAM or critical response guarantees\n\n**Implementation:** Evaluate both Enterprise On-Ramp (30-min SLA) and Enterprise (15-min SLA) based on your critical issue response needs.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0016",
+          "type": "single-choice",
+          "question": "Frequently accessed data requiring low-latency retrieval must be stored in S3. The data is accessed regularly throughout the week, and cost optimization is a concern.\n\nWhich S3 storage class offers the best balance between access speed and cost for this scenario?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "S3 Standard-IA",
+              "isCorrect": false,
+              "explanation": "Standard-IA has retrieval time delays and is designed for infrequent access with lower storage costs."
+            },
+            {
+              "id": "c2",
+              "text": "S3 Glacier Instant Retrieval",
+              "isCorrect": false,
+              "explanation": "Glacier Instant is cheaper but targets infrequent access (quarterly); not ideal for frequent weekly access."
+            },
+            {
+              "id": "c4",
+              "text": "S3 Glacier Deep Archive",
+              "isCorrect": false,
+              "explanation": "Deep Archive is the cheapest option but has 12-hour retrieval time; unsuitable for frequent access."
+            },
+            {
+              "id": "c1",
+              "text": "S3 Standard",
+              "isCorrect": true,
+              "explanation": "S3 Standard provides instant retrieval with the lowest access latency, ideal for frequently accessed data.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Billing, Pricing, and Support",
+          "skills": [
+            "4.1.5: Understanding different pricing options for various storage options and tiers."
+          ],
+          "services": [
+            "Amazon S3",
+            "Storage Classes"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html",
+          "tip": "Match the storage class to the access frequency: standard for frequent, infrequent-access tiers for older data.",
+          "explanation": "S3 Standard provides the fastest access with minimal latency, making it optimal for active workloads.\n\n**Why it works:** Standard-class objects are immediately available, providing millisecond latency for frequently accessed data.\n\n**Why the others fail:**\n- Glacier Instant: Lower cost but designed for quarterly access patterns, not weekly access\n- Standard-IA: Designed for infrequent access; retrieval takes time and incurs retrieval fees\n- Deep Archive: Lowest cost but 12-hour retrieval time makes it unsuitable for frequent access\n\n**Implementation:** Store frequently accessed data in S3 Standard; consider lifecycle transitions to Standard-IA after 30 days of inactivity.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0023",
+          "type": "single-choice",
+          "question": "Multiplayer game servers run in multiple AWS Regions, but players connecting to distant regions experience high latency. Traffic must be automatically routed to the region with the best network performance.\n\nWhich AWS service optimizes this routing scenario?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "AWS Direct Connect",
+              "isCorrect": false,
+              "explanation": "Direct Connect provides dedicated network connections but does not optimize routing to application endpoints."
+            },
+            {
+              "id": "c3",
+              "text": "Amazon Route 53",
+              "isCorrect": false,
+              "explanation": "Route 53 provides DNS routing but lacks the edge location optimization that Global Accelerator provides."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Global Accelerator",
+              "isCorrect": true,
+              "explanation": "Global Accelerator uses anycast IP and AWS edge locations to route traffic to optimal application endpoints based on performance.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Amazon CloudFront",
+              "isCorrect": false,
+              "explanation": "CloudFront is for content delivery/caching; it does not optimize application server routing based on performance."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Technology and Services",
+          "skills": [
+            "3.5.4: Identifying edge services (for example, CloudFront, Global Accelerator)."
+          ],
+          "services": [
+            "AWS Global Accelerator",
+            "Edge Services"
+          ],
+          "docs": "https://docs.aws.amazon.com/global-accelerator/latest/dg/introduction.html",
+          "tip": "Look for a service that optimizes application performance by routing traffic to the best endpoint globally.",
+          "explanation": "AWS Global Accelerator optimizes application performance by routing traffic through AWS edge locations to healthy endpoints.\n\n**Why it works:** Global Accelerator assigns static anycast IPs and routes traffic through optimal paths to regional game servers, reducing latency and improving performance.\n\n**Why the others fail:**\n- CloudFront: CDN for content caching; not designed for application server routing\n- Route 53: DNS service; doesn't provide global application optimization\n- Direct Connect: Private network connection; not for dynamic performance-based routing\n\n**Implementation:** Create a Global Accelerator pointing to game server endpoints in multiple regions; traffic automatically routes to the lowest-latency endpoint.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0002",
+          "type": "single-choice",
+          "question": "Two database options are under evaluation: purchasing and maintaining on-premises servers versus using Amazon RDS with reserved instances.\n\nHow does the economies of scale principle impact the total cost of ownership in this decision?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "AWS spreads infrastructure, power, and operational costs across millions of customers, reducing the per-instance cost",
+              "isCorrect": true,
+              "explanation": "This directly applies the economies of scale principle. AWS leverages the shared infrastructure model, where massive scale enables unit economics far better than on-premises solutions. The company benefits from AWS's ability to amortize costs across a global customer base.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "On-premises servers cost more because they require larger amounts of RAM and storage capacity",
+              "isCorrect": false,
+              "explanation": "This is incorrect. On-premises servers cost more primarily due to the lack of economies of scale, not because they require larger hardware specifications. The architect would size both solutions appropriately for the workload."
+            },
+            {
+              "id": "c4",
+              "text": "Cloud databases are always more expensive because AWS charges monthly subscription fees",
+              "isCorrect": false,
+              "explanation": "This contradicts the premise of economies of scale. Cloud databases are typically cheaper due to shared infrastructure and operational efficiency, and AWS pricing is typically lower than the equivalent on-premises total cost of ownership."
+            },
+            {
+              "id": "c2",
+              "text": "Reserved instances guarantee 100% uptime and eliminate the need for backup systems",
+              "isCorrect": false,
+              "explanation": "Reserved instances provide cost savings through commitment-based pricing, but they do not directly address economies of scale. Additionally, reserved instances do not provide a 100% uptime guarantee or eliminate the need for backups."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.1: Understanding the economies of scale (for example, cost savings)."
+          ],
+          "services": [
+            "Amazon EC2",
+            "Amazon RDS",
+            "AWS Lambda"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-cost-optimization-pillar/economies-of-scale.html",
+          "tip": "Consider how the cost per customer database instance changes when AWS runs databases for millions of customers versus a company running databases only for itself.",
+          "explanation": "The economies of scale principle is fundamental to AWS cost advantages over on-premises infrastructure.\n\n**Why it works:** AWS amortizes its massive infrastructure, real estate, power, cooling, and staffing costs across millions of customers globally. This allows the cost per customer to be significantly lower than any individual organization could achieve managing their own data centers. Amazon RDS exemplifies this by offering managed database instances at a fraction of the cost of equivalent on-premises deployments when total cost of ownership, including management, patching, backups, and redundancy, is calculated.\n\n**Why the others fail:**\n- Reserved instances provide pricing discounts through commitment, not through economies of scale.\n- On-premises infrastructure costs more due to lack of scale and shared resource distribution, not due to larger hardware requirements.\n- Cloud databases are typically cheaper than on-premises due to economies of scale, not more expensive.\n\n**Implementation:** Leverage AWS managed services and reserved instances to maximize the economies of scale benefits. Consult the AWS Pricing Calculator to compare on-premises TCO with RDS costs.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0050",
+          "type": "ordering",
+          "question": "Arrange the following steps in the correct order to conduct a workload review using the AWS Well-Architected Tool.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Answer the milestone questions for each of the six framework pillars",
+              "isCorrect": true,
+              "explanation": "Once the workload is defined, the team works through guiding questions for each pillar to assess the current architecture against Well-Architected best practices.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Review the identified high and medium risks and the improvement plan generated by the tool",
+              "isCorrect": true,
+              "explanation": "After completing the pillar questions, the tool surfaces identified risks and generates a prioritized improvement plan, which the team must review before taking action.",
+              "sequence": 3
+            },
+            {
+              "id": "c1",
+              "text": "Define the workload and its properties in the AWS Well-Architected Tool",
+              "isCorrect": true,
+              "explanation": "Defining the workload is always the first step - it establishes the review context, including workload name, environment, and team details, before any assessment can begin.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Prioritize the recommended improvements and implement changes to address identified risks",
+              "isCorrect": true,
+              "explanation": "The final step is to act on the improvement plan by prioritizing items by risk level and implementing the architectural changes needed to improve the workload.",
+              "sequence": 4
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.2.2: Identifying differences between the pillars of the Well-Architected Framework."
+          ],
+          "services": [
+            "AWS Well-Architected Tool"
+          ],
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/userguide/review-create.html",
+          "tip": "Consider the logical dependency between steps - you cannot assess a workload before it is defined, and cannot act on findings before they have been identified and reviewed.",
+          "explanation": "The correct sequence follows the natural flow of a Well-Architected Review: define the workload to establish context, answer pillar questions to assess the current architecture, review the generated risk findings and improvement plan, then prioritize and implement the recommended changes. Each step depends on the completion of the previous one.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0026",
+          "type": "single-choice",
+          "question": "During AWS SDK development, a team encounters an error and needs to quickly find community Q&A where other AWS customers have shared solutions to similar problems.\n\nWhich AWS technical resource is best suited for this scenario?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "AWS Prescriptive Guidance",
+              "isCorrect": false,
+              "explanation": "Prescriptive Guidance focuses on large-scale patterns, not troubleshooting individual SDK errors."
+            },
+            {
+              "id": "c4",
+              "text": "AWS Security Center",
+              "isCorrect": false,
+              "explanation": "Security Center focuses on security topics, not SDK troubleshooting."
+            },
+            {
+              "id": "c1",
+              "text": "AWS re:Post",
+              "isCorrect": true,
+              "explanation": "AWS re:Post is a community Q&A platform where AWS experts and customers share solutions to technical questions.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "AWS WhitePapers",
+              "isCorrect": false,
+              "explanation": "WhitePapers provide architectural best practices but not quick Q&A solutions to specific errors."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Billing, Pricing, and Support",
+          "skills": [
+            "4.3.2: Identifying and locating AWS technical resources (for example, AWS Prescriptive Guidance, AWS Knowledge Center, AWS re:Post)."
+          ],
+          "services": [
+            "AWS re:Post",
+            "AWS Resources"
+          ],
+          "docs": "https://repost.aws/",
+          "tip": "Look for a community-driven resource where developers ask and answer specific technical questions.",
+          "explanation": "AWS re:Post (formerly AWS Forums) is a community platform for peer-to-peer technical help.\n\n**Why it works:** re:Post includes tagged Q&A where AWS customers and experts quickly answer specific technical issues like SDK errors.\n\n**Why the others fail:**\n- Prescriptive Guidance: Architecture patterns, not quick troubleshooting\n- WhitePapers: Strategic guidance, not tactical problem solving\n- Security Center: Focused on security topics, not SDK/API issues\n\n**Implementation:** Search AWS re:Post by SDK error message or topic to find existing answers; post new questions if not found.",
+          "difficulty": 1,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0012",
+          "type": "multiple-choice",
+          "question": "Cost advantages emerge across several areas when migrating from on-premises to AWS.\n\nWhich TWO cost areas demonstrate significant savings?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Reduction of operational expenses for facility management and infrastructure maintenance",
+              "isCorrect": true,
+              "explanation": "AWS removes costs for power, cooling, space, security, and IT staff dedicated to hardware management.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Guaranteed reduction in network bandwidth costs",
+              "isCorrect": false,
+              "explanation": "Network costs may vary in AWS depending on data transfer patterns; not guaranteed to be lower."
+            },
+            {
+              "id": "c1",
+              "text": "Elimination of capital expenditure for physical hardware purchases",
+              "isCorrect": true,
+              "explanation": "AWS eliminates upfront costs for servers, storage arrays, and networking equipment that on-premises requires.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Lower costs from increased redundancy and backup solutions",
+              "isCorrect": false,
+              "explanation": "While AWS provides better availability, this is a benefit rather than a cost savings from reduced redundancy."
+            },
+            {
+              "id": "c4",
+              "text": "Elimination of software licensing fees",
+              "isCorrect": false,
+              "explanation": "AWS does not eliminate software licensing; some costs shift but licensing is still required for applications."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.4.2: Understanding costs that are associated with on-premises environments."
+          ],
+          "services": [
+            "On-Premises",
+            "AWS"
+          ],
+          "docs": "https://aws.amazon.com/architecture/well-architected/cost-optimization/",
+          "tip": "Focus on the structural cost differences between maintaining physical infrastructure and using cloud services.",
+          "explanation": "The primary cost advantages of cloud migration come from eliminating capital hardware costs and reducing operational infrastructure expenses.\n\n**Why they work:** On-premises requires upfront capital for hardware and ongoing facility/staffing costs that AWS converts to consumption-based operational expenses.\n\n**Why the others fail:**\n- Redundancy costs: AWS provides better availability but this is a feature benefit, not a cost reduction\n- Software licensing: Licensing requirements don't change with cloud migration\n- Bandwidth costs: These vary case-by-case and are not guaranteed to decrease\n\n**Implementation:** Build TCO models comparing on-premises capital and operational expenses against AWS monthly consumption costs to quantify savings.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        },
+        {
+          "id": "CLF-C02-0049",
+          "type": "multiple-choice",
+          "question": "The platform team is conducting a Well-Architected review and identifies two open issues: several Amazon EBS volumes attached to stopped instances have been unused for six months and continue to incur charges, and an Amazon S3 bucket containing customer records has a bucket policy that permits public read access.\n\nWhich TWO pillars of the AWS Well-Architected Framework do these issues fall under?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Security",
+              "isCorrect": true,
+              "explanation": "A public-read bucket policy on a bucket containing customer records is a data exposure risk, directly addressed by the Security pillar, which provides guidance on protecting data from unauthorized access.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Performance Efficiency",
+              "isCorrect": false,
+              "explanation": "Performance Efficiency focuses on using resources efficiently to meet performance requirements. Unused volumes and access control misconfiguration are not performance efficiency concerns."
+            },
+            {
+              "id": "c2",
+              "text": "Cost Optimization",
+              "isCorrect": true,
+              "explanation": "Unused EBS volumes continuing to incur charges represent unnecessary expenditure, a Cost Optimization concern. The pillar recommends identifying and deprovisioning unused resources to eliminate waste.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Operational Excellence",
+              "isCorrect": false,
+              "explanation": "Operational Excellence covers running and improving operational processes. While operational hygiene is related, these specific issues - unnecessary cost and data exposure - are each addressed by their respective dedicated pillars."
+            },
+            {
+              "id": "c1",
+              "text": "Reliability",
+              "isCorrect": false,
+              "explanation": "Reliability addresses the ability to recover from failures and maintain consistent operation. Unused storage volumes and overly permissive bucket policies are not reliability concerns."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.2.2: Identifying differences between the pillars of the Well-Architected Framework."
+          ],
+          "services": [
+            "Amazon EBS",
+            "Amazon S3",
+            "AWS Well-Architected Framework"
+          ],
+          "docs": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+          "tip": "Map each identified issue to the pillar whose primary concern most closely matches the nature of that specific problem.",
+          "explanation": "Cost Optimization and Security are the two correct pillars.\n\n**Why it works:** Unused EBS volumes generating charges represent wasted spend, which is the primary domain of Cost Optimization. An Amazon S3 bucket with public read access to customer data is a data protection failure, which is the primary domain of Security.\n\n**Why the others don't work:**\n- Reliability: Concerned with workload availability and failure recovery, not cost waste or access control misconfigurations.\n- Operational Excellence: Provides guidance on operational processes and improvement; these issues are categorized under their own specific pillars.\n- Performance Efficiency: Addresses efficient resource use for performance targets, not unnecessary charges or data exposure risks.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0040",
+          "type": "single-choice",
+          "question": "During the holiday season, traffic to the e-commerce platform spikes to up to 10 times its normal load, followed by months of significantly lower activity. The infrastructure team wants to handle peak demand without permanently paying for the extra capacity.\n\nWhich cloud advantage directly addresses this requirement?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Elasticity, which allows AWS resources to scale up automatically when traffic increases and scale back down when demand falls, with the customer paying only for what is in use",
+              "isCorrect": true,
+              "explanation": "AWS Auto Scaling and other elastic services match resource capacity to actual demand. During the holiday peak, more instances are added; after the peak, they are removed and billing decreases accordingly.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "High availability, which ensures the application runs across multiple Availability Zones to prevent downtime during high-traffic periods and routine infrastructure maintenance",
+              "isCorrect": false,
+              "explanation": "High availability addresses fault tolerance and uptime, not the ability to scale capacity up and down in response to traffic changes."
+            },
+            {
+              "id": "c2",
+              "text": "Agility, which allows the team to deploy entirely new application versions within hours rather than weeks, reducing the time needed to release seasonal features before peak traffic",
+              "isCorrect": false,
+              "explanation": "Agility relates to the speed of provisioning and releasing new resources or features, not to automatically matching capacity to real-time demand fluctuations."
+            },
+            {
+              "id": "c4",
+              "text": "Reserved capacity, which allows the retailer to commit to and pay for maximum-traffic capacity upfront at a discounted rate, ensuring resources are always available during the busiest periods",
+              "isCorrect": false,
+              "explanation": "`Reserved Instances` provide cost discounts for predictable workloads but require upfront commitments. They do not automatically scale with traffic, and paying for peak capacity year-round defeats the cost-saving goal."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.3: Understanding the advantages of high availability, elasticity, and agility."
+          ],
+          "services": [
+            "AWS Auto Scaling",
+            "Amazon EC2"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Think about which cloud property allows resources to grow and shrink with actual demand rather than being sized for the worst-case scenario at all times.",
+          "explanation": "Elasticity is the ability to automatically scale resources up during high-demand periods and scale them back down when demand drops. This means the retailer only pays for the extra Amazon EC2 capacity during the holiday peak rather than all year.\n\n**Why it works:** Services like AWS Auto Scaling monitor demand and adjust capacity in real time, matching resources to actual workload.\n\n**Why the others don't work:**\n- High availability: Focuses on fault tolerance and uptime across zones, not on matching capacity to demand.\n- Agility: Relates to provisioning speed and experimentation, not automatic demand-driven scaling.\n- Reserved capacity: A fixed commitment priced for peak usage year-round, which is what the team wants to avoid.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0033",
+          "type": "multiple-choice",
+          "question": "During an infrastructure cost review, a cloud consultant explains that economies of scale are a key driver of how AWS is able to sustain and improve its pricing model. The finance team wants to understand exactly what this delivers in practice.\n\nWhich TWO outcomes result directly from AWS economies of scale?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Customers pay lower per-unit costs as AWS distributes infrastructure expenses across its expanding global customer base",
+              "isCorrect": true,
+              "explanation": "When fixed infrastructure costs are shared across millions of customers, each customer's effective per-unit cost decreases - a direct benefit of economies of scale.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "AWS eliminates data transfer charges between all Regions for customers whose total monthly spend exceeds a predefined usage threshold in any billing period",
+              "isCorrect": false,
+              "explanation": "AWS does not waive inter-Region data transfer costs based on monthly spend thresholds. Data transfer pricing is based on the volume of data moved, not total account spend."
+            },
+            {
+              "id": "c2",
+              "text": "AWS can invest in research and innovation at scale, enabling the development of more efficient services that are offered at lower prices over time",
+              "isCorrect": true,
+              "explanation": "Large-scale revenue funds continuous innovation in hardware (such as custom AWS Graviton processors) and software, improving efficiency and reducing costs across services.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Individual customers receive access to dedicated private hardware at no additional cost because of bulk purchasing agreements AWS holds with its manufacturers",
+              "isCorrect": false,
+              "explanation": "`Dedicated Hosts` and `Dedicated Instances` are optional paid features, not a free entitlement available to all customers through bulk hardware agreements."
+            },
+            {
+              "id": "c4",
+              "text": "Customers are guaranteed that AWS will not increase prices for any service for the duration of their active account, regardless of changes in AWS operating costs",
+              "isCorrect": false,
+              "explanation": "AWS does not contractually guarantee static pricing for standard on-demand usage. Pricing can change, though efficiency gains typically push prices downward over time."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Concepts",
+          "skills": [
+            "1.1.1: Understanding the economies of scale (for example, cost savings)."
+          ],
+          "services": [
+            "AWS Pricing",
+            "Amazon EC2",
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "tip": "Focus on what a very large buyer gains over a small buyer when purchasing and operating the same goods or services at scale.",
+          "explanation": "AWS achieves economies of scale by aggregating infrastructure demand across millions of customers worldwide. This results in lower per-unit costs that AWS regularly passes on to customers, and it enables sustained investment in efficiency and innovation.\n\n**Why the others don't work:**\n- Dedicated hardware: `Dedicated Hosts` are a paid option, not a free benefit of scale for all customers.\n- Price guarantees: Standard on-demand pricing is not contractually locked; it typically decreases over time.\n- Data transfer waivers: No spend-based threshold eliminates inter-Region data transfer charges.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-13"
+        },
+        {
+          "id": "CLF-C02-0015",
+          "type": "multiple-choice",
+          "question": "Three distinct access tiers define the data lifecycle: frequently accessed databases (first 3 months), occasionally accessed archives (3–12 months), and rarely accessed long-term compliance records (beyond 1 year). Both cost and performance must be optimized.\n\nWhich TWO lifecycle policy strategies address this?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Implement cross-region replication to reduce access latency",
+              "isCorrect": false,
+              "explanation": "Replication improves availability but is not a lifecycle transition strategy."
+            },
+            {
+              "id": "c3",
+              "text": "Keep all data in S3 Standard to ensure instant access regardless of cost",
+              "isCorrect": false,
+              "explanation": "This defeats the purpose of lifecycle policies and does not optimize for cost savings."
+            },
+            {
+              "id": "c2",
+              "text": "Move objects older than 1 year to S3 Glacier Deep Archive for cost-effective long-term compliance storage",
+              "isCorrect": true,
+              "explanation": "Deep Archive provides 99.999999999% durability at minimal cost for data that rarely requires access.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Use versioning to maintain multiple copies of each object",
+              "isCorrect": false,
+              "explanation": "Versioning is a data protection feature, not a lifecycle management strategy for cost optimization."
+            },
+            {
+              "id": "c1",
+              "text": "Transition recent objects to S3 Intelligent-Tiering for automatic tier management based on access",
+              "isCorrect": true,
+              "explanation": "S3 Intelligent-Tiering automatically moves objects between tiers based on changing access patterns without manual rules.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Cloud Technology and Services",
+          "skills": [
+            "3.6.6: Understanding use cases for lifecycle policies."
+          ],
+          "services": [
+            "Amazon S3",
+            "S3 Glacier",
+            "S3 Intelligent-Tiering"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html",
+          "tip": "Consider combining automatic tier management with archival strategies to balance access performance and storage costs.",
+          "explanation": "Multi-tier lifecycle policies optimize cost and performance by matching storage class to access frequency.\n\n**Why they work:** S3 Intelligent-Tiering handles frequent/occasional access automatically; Deep Archive provides low-cost long-term storage when access is minimal.\n\n**Why the others fail:**\n- S3 Standard everywhere: Wastes money on expensive storage for rarely accessed data\n- Cross-region replication: Increases cost and doesn't automate tier transitions\n- Versioning: Provides protection but increases storage costs without cost optimization\n\n**Implementation:** Create lifecycle rules: transition to Intelligent-Tiering at 3 months, then move to Deep Archive at 12 months for multi-tier cost optimization.",
+          "difficulty": 2,
+          "lastReviewed": "2026-03-31"
+        }
+      ],
+      "perDomain": {
+        "Cloud Concepts": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        },
+        "Security": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      },
+      "earlyComplete": true,
+      "answeredCount": 2,
+      "totalQuestions": 50
     }
   ]
 }

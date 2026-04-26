@@ -164,19 +164,6 @@ export function PracticeExams() {
                         </span>
                       </div>
                     )}
-                    {summary && summary.attemptCount > 0 && (
-                      <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                        {summary.lastScore !== null && (
-                          <span>Last <span className="font-semibold text-foreground">{summary.lastScore}%</span></span>
-                        )}
-                        {summary.bestScore !== null && (
-                          <span>Best <span className="font-semibold text-foreground">{summary.bestScore}%</span></span>
-                        )}
-                        {summary.lastAttemptAt && (
-                          <span>{formatRelative(summary.lastAttemptAt)}</span>
-                        )}
-                      </div>
-                    )}
                   </div>
                 </div>
               )})}

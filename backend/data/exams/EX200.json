@@ -4,7 +4,7 @@
   "passMark": 70,
   "defaultQuestions": 65,
   "defaultDuration": 90,
-  "title": "RedHat Certified System Administrator (RHCSA)",
+  "title": "Red Hat Certified System Administrator (RHCSA)",
   "level": 0,
   "questions": [
     {
@@ -11598,5 +11598,19 @@
     "EX200-0221",
     "EX200-0222",
     "EX200-0225"
+  ],
+  "featuredLabIds": [
+    "rhel-dnf-fill-command",
+    "rhel-selinux-phased-pipeline",
+    "rhel-firewalld-command-terminal",
+    "rhel-disk-full-incident-response"
+  ],
+  "realWorldValue": "The RHCSA proves hands-on Linux system administration competency at an enterprise level. Red Hat certifications are performance-based and widely trusted by employers running RHEL, CentOS Stream, or Fedora infrastructure.",
+  "jobRoles": [
+    "Linux System Administrator",
+    "Site Reliability Engineer",
+    "DevOps Engineer",
+    "Infrastructure Engineer",
+    "Platform Engineer"
   ]
 }

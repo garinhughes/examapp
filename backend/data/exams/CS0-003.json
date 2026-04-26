@@ -9862,5 +9862,19 @@
     "CS0-003-0160",
     "CS0-003-0161",
     "CS0-003-0162"
+  ],
+  "featuredLabIds": [
+    "comptia-phishing-email-headers-log-analysis",
+    "comptia-ransomware-response",
+    "comptia-sigma-rule-authoring-command-terminal",
+    "comptia-splunk-spl-triage-command-terminal"
+  ],
+  "realWorldValue": "The CS0-003 validates your ability to perform continuous security monitoring, threat detection, and incident response. These skills are in high demand across enterprise security operations centres and compliance-driven organisations.",
+  "jobRoles": [
+    "Security Analyst (SOC)",
+    "Threat Intelligence Analyst",
+    "Incident Responder",
+    "Vulnerability Analyst",
+    "Cybersecurity Engineer"
   ]
 }

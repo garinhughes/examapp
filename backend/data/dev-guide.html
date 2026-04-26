@@ -554,10 +554,14 @@
 <pre><code>/                    HomePage
 /login               LoginPage
 /verify/:token       VerifyPage
-/exams               ExamSetup
-/exams/:examCode     ExamApp           (wrapped in ExamProvider)
-/skill-labs          SkillLabsPage
-/skill-labs/:labId   SkillLabRunnerPage
+/exams                          PracticeExams (list)
+/exams/:examCode                ExamLanding   (detail + mode picker)
+/exams/:examCode/attempt        ExamApp       (runner)
+/exams/:examCode/attempt/:id    ExamAttemptReview
+/exams/:examCode/history        AnalyticsView
+/skill-labs                     SkillLabsPage (list)
+/skill-labs/:labId              SkillLabDetailPage
+/skill-labs/:labId/attempt      SkillLabRunnerPage
 /pricing /basket /account /admin /metrics /feedback /diagrams /analytics
 /privacy /terms /refund
 *                    NotFound</code></pre>
@@ -1477,10 +1481,10 @@ pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></
   Factual audit of what's already in place (don't re-do these):
 </p>
 <div class="cards">
-  <div class="card"><h4>Meta tags</h4><p><code>PageMeta.tsx</code> sets title, description, canonical, Open Graph and Twitter cards per route. <code>noindex</code> on <code>/account</code> and <code>/analytics</code>.</p></div>
-  <div class="card"><h4>Sitemap</h4><p><code>scripts/generate-sitemap.js</code> auto-generates from <code>backend/data/exams/*.json</code> and <code>skill-labs/*.json</code>. Run via <code>pnpm sitemap</code>.</p></div>
-  <div class="card"><h4>robots.txt</h4><p>Allows public routes, disallows <code>/account</code>, <code>/admin</code>, <code>/basket</code>, <code>/verify/</code>, etc. Sitemap referenced.</p></div>
-  <div class="card"><h4>Structured data</h4><p>Homepage emits <code>WebSite</code>, <code>Organization</code>, <code>SearchAction</code>, and <code>FAQPage</code> JSON-LD. No per-exam schema yet.</p></div>
+  <div class="card"><h4>Meta tags</h4><p><code>PageMeta.tsx</code> sets title, description, canonical, OG and Twitter cards per route. Per-exam and per-lab dynamic meta generated from <code>selectedMeta</code> / <code>labPageMeta</code> state. <code>noindex</code> on <code>/account</code> and <code>/analytics</code>.</p></div>
+  <div class="card"><h4>Sitemap</h4><p><code>scripts/generate-sitemap.js</code> runs automatically as part of <code>pnpm build</code> (prebuild step). Generates 165+ URLs with <code>&lt;lastmod&gt;</code>, differentiated priorities (exams 0.9, labs 0.7), and <code>changefreq: monthly</code>.</p></div>
+  <div class="card"><h4>robots.txt</h4><p>Allows public routes, disallows <code>/account</code>, <code>/admin</code>, <code>/basket</code>, <code>/verify/</code>, <code>/exams/*/history</code>, etc. Sitemap referenced.</p></div>
+  <div class="card"><h4>Structured data</h4><p>Homepage: <code>WebSite</code>, <code>Organization</code>, <code>SearchAction</code>, <code>FAQPage</code>. Per-exam: <code>Course</code> JSON-LD. Per-lab: <code>LearningResource</code> JSON-LD. FAQ HTML section on every exam detail page (crawlable, collapsed by default).</p></div>
   <div class="card"><h4>URLs</h4><p>Clean path-based (<code>/exams/SAA-C03</code>). No hash routing. Exam codes are human-readable.</p></div>
   <div class="card"><h4>Semantics</h4><p>h1/h2 hierarchy used on major pages. <code>QuestionImage</code> alt is generic (<code>"Question diagram"</code>).</p></div>
 </div>
@@ -1490,14 +1494,14 @@ pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></
   <thead><tr><th>#</th><th>Today</th><th>Target</th><th>Why it matters</th><th>Approx cost (£/mo)</th></tr></thead>
   <tbody>
     <tr>
-      <td class="num">8.1</td>
+      <td class="num">8.1 <span class="status done" title="Done — scripts/generate-static-meta.mjs writes per-route index.html into dist/ for all 8 exams and 153 labs. Runs automatically as part of pnpm build via &amp;&amp; chain. Social crawlers and non-JS bots get correct OG tags without JS hydration.">done</span></td>
       <td>Pure SPA (Vite) — initial HTML is a near-empty shell. Googlebot renders JS but older crawlers and social scrapers (LinkedIn, Slack, Reddit preview) often don't.</td>
       <td>Add <strong>static prerender</strong> for public routes (<code>/</code>, <code>/exams/*</code>, <code>/skill-labs/*</code>, <code>/pricing</code>, <code>/news/*</code>) using <code>vite-plugin-prerender</code> or <code>react-snap</code>. Keeps the SPA dev loop, ships static HTML with real meta/OG tags for crawlers.</td>
       <td>LinkedIn/Reddit link previews currently show the shell's fallback title. Prerender = every shared link gets a proper card with exam-specific image and description.</td>
       <td><strong>£0</strong> — build-time only; no runtime infra.</td>
     </tr>
     <tr>
-      <td class="num">8.2</td>
+      <td class="num">8.2 <span class="status done" title="Done — Course JSON-LD emitted per exam via PageMeta.tsx (exam-landing route). LearningResource JSON-LD emitted per skill lab (skill-lab-detail route). FAQ HTML section on every exam detail page is crawlable (content always in DOM). FAQPage JSON-LD schema not yet emitted — follow-up if rich snippet results warrant it.">done</span></td>
       <td>Homepage has <code>FAQPage</code> JSON-LD. Per-exam pages have no schema.</td>
       <td>Emit <code>Course</code> or <code>EducationalOccupationalCredential</code> schema per exam, plus a per-exam <code>FAQPage</code> derived from the exam JSON metadata. Same for skill labs as <code>LearningResource</code>.</td>
       <td>Rich SERP results (star ratings, course badges, Q&amp;A expansion) — direct CTR lift of 10–30% on relevant queries with no new content needed.</td>
@@ -1511,7 +1515,7 @@ pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></
       <td><strong>£0</strong> — schema change + small backfill in exam JSON.</td>
     </tr>
     <tr>
-      <td class="num">8.4</td>
+      <td class="num">8.4 <span class="status done" title="Done — ExamPageContent.tsx renders below score history on every exam detail page. Includes: keyword prose (practice exam, mock exam, sample questions, exam guide), stat pills, collapsible domains &amp; skills (content always in DOM), career section with realWorldValue + jobRoles from exam JSON, related skill labs (hand-picked via featuredLabIds), and FAQ section. All content in DOM for crawlability. Static meta injected by generate-static-meta.mjs.">done</span></td>
       <td>Thin landing copy on <code>/exams/:examCode</code>: title + "start" button.</td>
       <td>Generate ~300 words of exam-specific copy from the exam JSON (topic breakdown, recommended study time, who it's for). Render above the fold, crawlable via prerender (<strong>8.1</strong>).</td>
       <td>Thin pages don't rank. A structured 300-word description per exam is the cheapest way to compete with established competitors on long-tail queries like "AWS SAA-C03 practice questions".</td>
@@ -1550,7 +1554,7 @@ pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></
       <td><strong>£0</strong> — no Premium/Sales Navigator needed yet.</td>
     </tr>
     <tr>
-      <td class="num">9.4</td>
+      <td class="num">9.4 <span class="status partial" title="Partial — description, FAQ, Course JSON-LD, career section, and related skill labs done. Video embed and 'last updated' date pending (depends on 9.2 YouTube content existing).">partial</span></td>
       <td><strong>Exam pages as content hubs</strong></td>
       <td>Each <code>/exams/:code</code> page gets: 300-word description (<strong>8.4</strong>), embedded walkthrough video (<strong>9.2</strong>), FAQ JSON-LD (<strong>8.2</strong>), and a "last updated" date tied to provider-version bumps. Internal link from every news post about that cert.</td>
       <td>One-time, then maintained</td>
@@ -2316,7 +2320,7 @@ pnpm exec playwright test --project=chromium e2e/tests/lab-flow.spec.ts</code></
       <td>Inbound links from old emails, old YouTube video descriptions, or bookmarked tabs don't break. Cheap.</td>
     </tr>
     <tr>
-      <td class="num">15.9 <span class="status done" title="Shipped — Phase 2 (last/best/lastAttemptedAt on PracticeExams cards)">done</span></td>
+      <td class="num">15.9 <span class="status done" title="Revised — last/best/ago row removed from catalogue cards (UX simplification, 2026-04-26). Cards now show question count badge only; score history accessible via exam detail page.">done</span></td>
       <td><strong>Show past scores on the catalogue.</strong> For each exam the user has attempted, surface "last score · best score · last attempted" on the card in <code>/exams</code>. Kills the need to drill just to remember whether you've done this one.</td>
       <td>This is the single highest-value change on the list — answers "should I pick this one next?" without navigation.</td>
     </tr>

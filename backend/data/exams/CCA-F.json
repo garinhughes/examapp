@@ -10552,5 +10552,19 @@
     "CCA-F-0234",
     "CCA-F-0235",
     "CCA-F-0236"
+  ],
+  "featuredLabIds": [
+    "anthropic-sequence-agentic-loop",
+    "anthropic-fix-agentic-loop-stop-reason",
+    "anthropic-diagnose-multi-agent-routing",
+    "anthropic-fix-sequential-to-parallel-subagents"
+  ],
+  "realWorldValue": "The CCA-F certifies your ability to design and build production-grade Claude integrations, covering prompt engineering, agentic loops, multi-agent orchestration, and tool use. It positions you at the leading edge of applied AI development.",
+  "jobRoles": [
+    "AI Engineer",
+    "Prompt Engineer",
+    "Full-Stack Developer (AI)",
+    "Solutions Architect (AI)",
+    "Product Engineer"
   ]
 }

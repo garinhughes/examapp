@@ -221,7 +221,7 @@
         }
       ],
       "tip": "Consider which step minimizes ongoing risk while preserving the information needed for a complete investigation, then work through the logical dependencies between steps.",
-      "explanation": "The correct sequence is: disable the key → investigate via CloudTrail → remediate affected resources → delete and replace the key.\n\nDisabling first stops active unauthorized use without losing the key ID for forensic correlation. CloudTrail investigation precedes remediation because you cannot know what to remediate until you understand the full scope. Remediating affected resources before issuing a new key ensures no backdoors remain active when the user returns to service. Deleting the old key and creating a replacement is the final restoration step.\n\n**Implementation:** `aws iam update-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --status Inactive --user-name username` → `aws cloudtrail lookup-events --lookup-attributes AttributeKey=AccessKeyId,AttributeValue=AKIAIOSFODNN7EXAMPLE` → remediate findings → `aws iam delete-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --user-name username` + `aws iam create-access-key --user-name username`.",
+      "explanation": "The correct sequence is: disable the key \u2192 investigate via CloudTrail \u2192 remediate affected resources \u2192 delete and replace the key.\n\nDisabling first stops active unauthorized use without losing the key ID for forensic correlation. CloudTrail investigation precedes remediation because you cannot know what to remediate until you understand the full scope. Remediating affected resources before issuing a new key ensures no backdoors remain active when the user returns to service. Deleting the old key and creating a replacement is the final restoration step.\n\n**Implementation:** `aws iam update-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --status Inactive --user-name username` \u2192 `aws cloudtrail lookup-events --lookup-attributes AttributeKey=AccessKeyId,AttributeValue=AKIAIOSFODNN7EXAMPLE` \u2192 remediate findings \u2192 `aws iam delete-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --user-name username` + `aws iam create-access-key --user-name username`.",
       "domain": "Design Secure Architectures",
       "difficulty": 3,
       "lastReviewed": "2026-03-30"
@@ -3977,5 +3977,19 @@
     "SAA-C03-0018",
     "SAA-C03-0019",
     "SAA-C03-0020"
+  ],
+  "featuredLabIds": [
+    "aws-ha-web-app-builder",
+    "aws-reduce-monthly-aws-cost",
+    "aws-recover-from-az-failure",
+    "aws-write-s3-readonly-policy"
+  ],
+  "realWorldValue": "Passing the SAA-C03 demonstrates you can design distributed, resilient, and cost-efficient systems on AWS. It is one of the most recognised cloud credentials globally and a standard requirement for architecture and engineering roles.",
+  "jobRoles": [
+    "Solutions Architect",
+    "Cloud Engineer",
+    "Platform Engineer",
+    "Infrastructure Engineer",
+    "DevOps Engineer"
   ]
 }

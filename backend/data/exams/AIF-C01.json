@@ -2346,5 +2346,19 @@
     "AIF-C01-0047",
     "AIF-C01-0048",
     "AIF-C01-0049"
+  ],
+  "featuredLabIds": [
+    "aws-bedrock-agent-debug",
+    "aws-bedrock-rag-architecture",
+    "aws-sagemaker-training-failure",
+    "aws-step-functions-ml-pipeline"
+  ],
+  "realWorldValue": "The AIF-C01 validates your understanding of AI and ML concepts, AWS AI services, and responsible AI practices. It is increasingly required as organisations integrate machine learning into their core products and workflows.",
+  "jobRoles": [
+    "AI/ML Engineer",
+    "Data Scientist",
+    "Cloud Architect",
+    "Solutions Architect",
+    "Product Manager (AI/ML)"
   ]
 }

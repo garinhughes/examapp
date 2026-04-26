@@ -13464,5 +13464,19 @@
     "SCS-C03-0253",
     "SCS-C03-0258",
     "SCS-C03-0237"
+  ],
+  "featuredLabIds": [
+    "aws-incident-response-ordering",
+    "aws-secure-s3-app",
+    "aws-write-s3-readonly-policy",
+    "aws-detect-iam-escalation"
+  ],
+  "realWorldValue": "The SCS-C03 validates deep AWS security expertise across identity, data protection, threat detection, and incident response. It is a senior-level credential required for security architecture roles in AWS-heavy organisations.",
+  "jobRoles": [
+    "Cloud Security Engineer",
+    "AWS Security Architect",
+    "Security Operations Engineer",
+    "DevSecOps Engineer",
+    "GRC Analyst (Cloud)"
   ]
 }

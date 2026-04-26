@@ -111,10 +111,13 @@ export function ExamSetup() {
 
   return (
     <>
-      <div className="flex justify-end mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2">
+        {selected && (
+          <span className="text-sm text-muted-foreground truncate">{selected}</span>
+        )}
         <button
           onClick={() => { setRoute('practice'); setSelected(null); setShowAttempts(false); setAttemptsList(null) }}
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition shrink-0 ml-auto"
         >
           <ChevronLeft className="w-4 h-4" />
           Practice Exams

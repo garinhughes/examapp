@@ -583,7 +583,7 @@
         }
       ],
       "tip": "Consider how to optimize storage costs while meeting regulatory data retention requirements.",
-      "explanation": "S3 lifecycle policies automatically transition objects between storage classes to optimize costs based on access patterns.\n\n**Why it works:** Policies can move objects from S3 Standard (hot) → S3 Intelligent-Tiering → Glacier (warm) → Deep Archive (cold) as they age, reducing storage costs significantly.\n\n**Why the others fail:**\n- Encryption: Managed separately via server-side encryption settings, not lifecycle policies\n- Access restrictions: Controlled by bucket policies and IAM, not object age rules\n- Compression: Pre-processing task, not automated by lifecycle policies\n\n**Implementation:** Create an S3 lifecycle policy in the bucket settings to transition objects after 30 days to Glacier and after 1 year to Deep Archive.",
+      "explanation": "S3 lifecycle policies automatically transition objects between storage classes to optimize costs based on access patterns.\n\n**Why it works:** Policies can move objects from S3 Standard (hot) \u2192 S3 Intelligent-Tiering \u2192 Glacier (warm) \u2192 Deep Archive (cold) as they age, reducing storage costs significantly.\n\n**Why the others fail:**\n- Encryption: Managed separately via server-side encryption settings, not lifecycle policies\n- Access restrictions: Controlled by bucket policies and IAM, not object age rules\n- Compression: Pre-processing task, not automated by lifecycle policies\n\n**Implementation:** Create an S3 lifecycle policy in the bucket settings to transition objects after 30 days to Glacier and after 1 year to Deep Archive.",
       "domain": "Cloud Technology and Services",
       "difficulty": 1,
       "lastReviewed": "2026-03-31"
@@ -643,7 +643,7 @@
       "skills": [
         "3.6.6: Understanding use cases for lifecycle policies."
       ],
-      "question": "Three distinct access tiers define the data lifecycle: frequently accessed databases (first 3 months), occasionally accessed archives (3–12 months), and rarely accessed long-term compliance records (beyond 1 year). Both cost and performance must be optimized.\n\nWhich TWO lifecycle policy strategies address this?",
+      "question": "Three distinct access tiers define the data lifecycle: frequently accessed databases (first 3 months), occasionally accessed archives (3\u201312 months), and rarely accessed long-term compliance records (beyond 1 year). Both cost and performance must be optimized.\n\nWhich TWO lifecycle policy strategies address this?",
       "choices": [
         {
           "id": "c1",
@@ -2310,5 +2310,19 @@
     "CLF-C02-0017",
     "CLF-C02-0018",
     "CLF-C02-0025"
+  ],
+  "featuredLabIds": [
+    "aws-s3-lifecycle-command-terminal",
+    "aws-fix-vpc-routing",
+    "aws-label-vpc-architecture",
+    "aws-reduce-monthly-aws-cost"
+  ],
+  "realWorldValue": "The CLF-C02 is the entry-point AWS credential, proving foundational cloud literacy. It signals to employers that you can work confidently within cloud-first organisations and communicate effectively with technical teams.",
+  "jobRoles": [
+    "Cloud Support Engineer",
+    "Junior Cloud Engineer",
+    "IT Administrator",
+    "Business Analyst (Cloud)",
+    "Technical Sales Engineer"
   ]
 }

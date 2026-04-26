@@ -4,6 +4,7 @@ import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS, isPaidTier } from '../catalog.js'
 import { computeDomainWeights, selectWeakestLinkQuestions, type DomainStats } from '../services/weakestLink.js'
 import { loadAllExams, loadExam, shuffleQuestions, getShowcaseQuestions, getDomainBalancedQuestions } from '../examLoader.js'
+import { listLabIndex } from '../services/skillLabStore.js'
 
 const attemptsFile = new URL('../../data/attempts.json', import.meta.url)
 
@@ -104,6 +105,61 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       tier,
       totalAvailable: allQuestions.length,
       limited: false,
+    }
+  })
+
+  // Public overview: domains, skills, and related labs — no auth, no DynamoDB per-user hits.
+  server.get('/:examCode/overview', { config: { rateLimit: { max: 300, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { examCode } = request.params as { examCode: string }
+    const exam = await loadExam(String(examCode || '').toLowerCase())
+    if (!exam) return reply.status(404).send({ message: 'exam not found' })
+
+    const questions: any[] = Array.isArray(exam.questions) ? exam.questions : []
+
+    const domainsSet = new Set<string>()
+    const skillsByDomain = new Map<string, Set<string>>()
+    for (const q of questions) {
+      const d: string = q.domain ?? 'General'
+      domainsSet.add(d)
+      if (!skillsByDomain.has(d)) skillsByDomain.set(d, new Set())
+      for (const s of (Array.isArray(q.skills) ? q.skills : [])) {
+        skillsByDomain.get(d)!.add(String(s))
+      }
+    }
+
+    const domains = [...domainsSet].map(d => ({
+      name: d,
+      skills: [...(skillsByDomain.get(d) ?? [])],
+    }))
+
+    const lc = String(examCode).toLowerCase()
+    const allLabs = await listLabIndex()
+    const labMap = new Map(allLabs.map(l => [l.labId, l]))
+    const featuredLabIds = exam.featuredLabIds
+    let relatedLabs
+    const toLabShape = (l: { labId: string; title?: string; difficulty?: string; category?: string; platform?: string }) =>
+      ({ id: l.labId, title: l.title, difficulty: l.difficulty, labCategory: l.category, platform: l.platform })
+
+    const diffOrder: Record<string, number> = { beginner: 0, intermediate: 1, advanced: 2 }
+    const sortByDifficulty = (labs: ReturnType<typeof toLabShape>[]) =>
+      labs.sort((a, b) => (diffOrder[a.difficulty ?? ''] ?? 99) - (diffOrder[b.difficulty ?? ''] ?? 99))
+
+    if (Array.isArray(featuredLabIds) && featuredLabIds.length > 0) {
+      relatedLabs = sortByDifficulty(
+        featuredLabIds.slice(0, 4).map(id => labMap.get(id)).filter(Boolean).map(l => toLabShape(l!))
+      )
+    } else {
+      relatedLabs = sortByDifficulty(
+        allLabs.filter(l => l.relatedExamCodes?.some(c => c.toLowerCase() === lc)).slice(0, 4).map(toLabShape)
+      )
+    }
+
+    return {
+      totalQuestions: questions.length,
+      domains,
+      relatedLabs,
+      realWorldValue: exam.realWorldValue ?? null,
+      jobRoles: exam.jobRoles ?? [],
     }
   })
 

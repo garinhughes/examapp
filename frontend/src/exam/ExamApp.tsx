@@ -77,6 +77,7 @@ function ExamAppInner() {
 
   const { tier: entitlementTier, discountActive } = useEntitlements()
   const [focusMode, setFocusMode] = useState(false)
+  const [labPageMeta, setLabPageMeta] = useState<{ title: string; description: string; platform: string; difficulty: string; technologies: string[] } | null>(null)
   const [reviewGrid, setReviewGrid] = useState(false)
   const [examRatingOpen, setExamRatingOpen] = useState(false)
 
@@ -155,7 +156,7 @@ function ExamAppInner() {
   return (
     <FeedbackProvider authFetch={authFetch} isAdmin={userIsAdmin}>
     <div className="flex flex-col h-screen w-full overflow-hidden bg-background text-foreground">
-      <PageMeta route={route} />
+      <PageMeta route={route} examMeta={selectedMeta && selected ? { ...selectedMeta, code: selected } : null} labMeta={labPageMeta} />
       <ImpersonationBanner />
       <CookieConsent />
       <div className="flex flex-1 overflow-hidden">
@@ -350,7 +351,7 @@ function ExamAppInner() {
             {/* Skill Labs pages */}
             {route === 'skill-labs' && <SkillLabsPage />}
             {route.startsWith('skill-lab-detail:') && (
-              <SkillLabDetailPage labId={route.slice('skill-lab-detail:'.length)} />
+              <SkillLabDetailPage labId={route.slice('skill-lab-detail:'.length)} onLabLoad={setLabPageMeta} />
             )}
             {route.startsWith('skill-lab:') && (() => {
               const parts = route.slice('skill-lab:'.length)

@@ -16,11 +16,13 @@ const EXAMS_DIR = join(ROOT, 'backend', 'data', 'exams')
 const SITEMAP_OUT = join(ROOT, 'frontend', 'public', 'sitemap.xml')
 const BASE_URL = 'https://certshack.com'
 
+const TODAY = new Date().toISOString().slice(0, 10)
+
 const STATIC_URLS = [
-  { loc: `${BASE_URL}/`,          changefreq: 'weekly',  priority: '1.0' },
-  { loc: `${BASE_URL}/exams`,     changefreq: 'weekly',  priority: '0.9' },
-  { loc: `${BASE_URL}/skill-labs`,changefreq: 'weekly',  priority: '0.9' },
-  { loc: `${BASE_URL}/pricing`,   changefreq: 'monthly', priority: '0.8' },
+  { loc: `${BASE_URL}/`,          changefreq: 'weekly',  priority: '1.0', lastmod: TODAY },
+  { loc: `${BASE_URL}/exams`,     changefreq: 'weekly',  priority: '0.9', lastmod: TODAY },
+  { loc: `${BASE_URL}/skill-labs`,changefreq: 'weekly',  priority: '0.9', lastmod: TODAY },
+  { loc: `${BASE_URL}/pricing`,   changefreq: 'monthly', priority: '0.8', lastmod: TODAY },
 ]
 
 async function collectLabIds() {
@@ -48,31 +50,40 @@ async function collectLabIds() {
   return ids
 }
 
-async function collectExamCodes() {
-  const codes = new Set()
+async function collectExams() {
+  const exams = []
   let files
   try {
     files = await readdir(EXAMS_DIR)
   } catch {
     console.warn(`[sitemap] exams dir not found: ${EXAMS_DIR}`)
-    return codes
+    return exams
   }
   for (const file of files.filter((f) => f.endsWith('.json'))) {
-    codes.add(file.replace('.json', ''))
+    try {
+      const raw = JSON.parse(await readFile(join(EXAMS_DIR, file), 'utf-8'))
+      const code = raw.code ?? file.replace('.json', '')
+      const lastmod = raw.publishedAt ? raw.publishedAt.slice(0, 10) : TODAY
+      exams.push({ code, lastmod })
+    } catch {
+      exams.push({ code: file.replace('.json', ''), lastmod: TODAY })
+    }
   }
-  return codes
+  return exams
 }
 
-function buildXml(staticUrls, labIds, examCodes) {
+function url({ loc, changefreq, priority, lastmod }) {
+  return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
+}
+
+function buildXml(staticUrls, labIds, exams) {
   const entries = [
-    ...staticUrls.map(({ loc, changefreq, priority }) =>
-      `  <url>\n    <loc>${loc}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
-    ),
-    ...[...examCodes].map((code) =>
-      `  <url>\n    <loc>${BASE_URL}/exams/${code}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>`
+    ...staticUrls.map((u) => url(u)),
+    ...exams.map(({ code, lastmod }) =>
+      url({ loc: `${BASE_URL}/exams/${code}`, changefreq: 'monthly', priority: '0.9', lastmod })
     ),
     ...[...labIds].map((id) =>
-      `  <url>\n    <loc>${BASE_URL}/skill-labs/${id}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>`
+      url({ loc: `${BASE_URL}/skill-labs/${id}`, changefreq: 'monthly', priority: '0.7', lastmod: TODAY })
     ),
   ]
 
@@ -85,7 +96,7 @@ function buildXml(staticUrls, labIds, examCodes) {
   ].join('\n')
 }
 
-const [labIds, examCodes] = await Promise.all([collectLabIds(), collectExamCodes()])
-const xml = buildXml(STATIC_URLS, labIds, examCodes)
+const [labIds, exams] = await Promise.all([collectLabIds(), collectExams()])
+const xml = buildXml(STATIC_URLS, labIds, exams)
 await writeFile(SITEMAP_OUT, xml, 'utf-8')
-console.log(`[sitemap] Written ${STATIC_URLS.length + examCodes.size + labIds.size} URLs to ${SITEMAP_OUT}`)
+console.log(`[sitemap] Written ${STATIC_URLS.length + exams.length + labIds.size} URLs to ${SITEMAP_OUT}`)
