@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { ChevronDown, ChevronRight, Terminal, Briefcase } from 'lucide-react'
+import { ChevronDown, ChevronRight, Terminal, Briefcase, Link2, Check } from 'lucide-react'
 import { useExam } from './ExamContext'
 import { apiUrl } from '@/apiBase'
 import { ProviderLogo } from '@/components/ProviderLogo'
+import { useIsAdmin } from '@/auth/useIsAdmin'
 import type { AppRoute } from './types'
 
 type DomainOverview = { name: string; skills: string[] }
@@ -46,9 +47,12 @@ const DIFFICULTY_STYLES: Record<string, string> = {
 
 export function ExamPageContent() {
   const { selected, selectedMeta, setRoute } = useExam()
+  const isAdminFn = useIsAdmin()
+  const isAdmin = isAdminFn()
   const [overview, setOverview] = useState<Overview | null>(null)
   const [domainsOpen, setDomainsOpen] = useState(false)
   const [faqOpen, setFaqOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (!selected) return
@@ -123,12 +127,27 @@ export function ExamPageContent() {
           {provider} exam guide, include detailed explanations for every answer, and are kept up
           to date with the current exam version.
         </p>
-        <div className="flex flex-wrap gap-1.5 pt-1">
+        <div className="flex flex-wrap items-center gap-1.5 pt-1">
           {pills.map(label => (
             <span key={label} className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs border border-border">
               {label}
             </span>
           ))}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                const url = `https://certshack.com/exams/${selected}?utm_source=linkedin&utm_medium=social&utm_campaign=${selected.toLowerCase()}`
+                navigator.clipboard.writeText(url)
+                setCopied(true)
+                setTimeout(() => setCopied(false), 2000)
+              }}
+              className="ml-auto flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              title="Copy share link"
+            >
+              {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Link2 className="w-3 h-3" />}
+              {copied ? 'Copied' : 'Share'}
+            </button>
+          )}
         </div>
       </div>
 
