@@ -29,6 +29,11 @@ const PROVIDER_LOGOS: Record<string, ProviderMeta> = {
     logoHref: 'https://www.redhat.com/',
     displayName: 'Red Hat',
   },
+  azure: {
+    logo: '/logos/azure.svg',
+    logoHref: 'https://azure.microsoft.com/',
+    displayName: 'Azure',
+  },
 }
 
 export function normalisePlatformKey(platform: string | undefined | null): string {

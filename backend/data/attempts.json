@@ -6249,6 +6249,2119 @@
       "earlyComplete": true,
       "answeredCount": 2,
       "totalQuestions": 50
+    },
+    {
+      "attemptId": "9317a255-3a39-4c28-93dc-5d2abc118282",
+      "userId": "82b5c474-1001-70d3-26a3-34bd49155810",
+      "examCode": "AI-901",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-04-28T13:30:37.093Z",
+      "updatedAt": "2026-04-28T13:31:54.943Z",
+      "finishedAt": "2026-04-28T13:31:54.943Z",
+      "status": "finished",
+      "score": 25,
+      "answers": [
+        {
+          "questionId": "AI-901-0033",
+          "selectedChoiceId": "c3",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-28T13:30:40.733Z"
+        },
+        {
+          "questionId": "AI-901-0030",
+          "selectedChoiceId": "c2",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-28T13:30:51.463Z"
+        },
+        {
+          "questionId": "AI-901-0013",
+          "selectedChoiceId": "c4",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-28T13:30:57.289Z"
+        },
+        {
+          "questionId": "AI-901-0016",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": null,
+          "selectedMappings": {
+            "s1": "c1",
+            "s2": "c2",
+            "s3": "c3"
+          },
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-28T13:31:38.921Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "AI-901-0033",
+          "type": "single-choice",
+          "question": "After reviewing quarterly spending, a startup running a low-traffic chatbot on Azure OpenAI wants the LEAST expensive deployment option that still allows them to call GPT-4 series models on demand without committing to provisioned capacity.\n\nWhich deployment option is the MOST cost-effective for this workload?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "A Provisioned Throughput Unit deployment reserved for guaranteed throughput at a fixed hourly cost",
+              "isCorrect": false,
+              "explanation": "PTU deployments require capacity commitment, which is poorly suited to low traffic."
+            },
+            {
+              "id": "c3",
+              "text": "A dedicated Azure Kubernetes Service cluster that hosts an open-source model fine-tuned to mimic GPT-4 responses",
+              "isCorrect": false,
+              "explanation": "Self-hosting an alternative model is operationally complex and not equivalent."
+            },
+            {
+              "id": "c4",
+              "text": "A Batch deployment configured to defer all real-time chat requests to overnight processing windows",
+              "isCorrect": false,
+              "explanation": "Batch is for asynchronous workloads, not interactive chat."
+            },
+            {
+              "id": "c1",
+              "text": "A Standard deployment that bills per processed token with no upfront capacity commitment",
+              "isCorrect": true,
+              "explanation": "Standard deployments are pay-per-token and best for variable, low-traffic workloads.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.3: Identify appropriate model deployment options and configuration parameters"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/deployment-types",
+          "tip": "Match the workload pattern to the billing model that fits.",
+          "explanation": "Low-traffic interactive workloads pay only for what they use under a Standard deployment.\n\n**Why it works:** Standard deployments charge per processed token with no upfront commitment, which keeps costs low when usage is sporadic.\n\n**Why the others don't work:**\n- PTU: charges for reserved capacity even when idle.\n- Self-hosted alternative: high operational overhead and not equivalent.\n- Batch: cannot serve interactive chat.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0030",
+          "type": "single-choice",
+          "question": "The organization is looking to build a knowledge retrieval workflow over a large corpus of internal policy documents. Each document is too long to fit in a chat completion prompt, so the team plans to retrieve only the most relevant passages at query time and pass those to a chat model.\n\nWhich type of model BEST supports the retrieval step?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "An embedding model that converts each document chunk and each query into vector representations so similarity search can rank the most relevant passages",
+              "isCorrect": true,
+              "explanation": "Embedding models power vector similarity retrieval.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "An image generation model that produces visualisations of policy clauses for the user",
+              "isCorrect": false,
+              "explanation": "Image generation does not perform retrieval over text."
+            },
+            {
+              "id": "c2",
+              "text": "A chat completion model that summarises every document in the corpus on each query so that the most relevant summary is selected",
+              "isCorrect": false,
+              "explanation": "Summarising every document per query is impractical and wasteful."
+            },
+            {
+              "id": "c4",
+              "text": "A speech-to-text model that transcribes the policy documents so that they can be indexed by keyword",
+              "isCorrect": false,
+              "explanation": "Speech-to-text applies to audio input, not text documents."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.2: Identify an appropriate AI model, based on capabilities"
+          ],
+          "services": [
+            "Azure OpenAI",
+            "Azure AI Search"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/understand-embeddings",
+          "tip": "Think about which kind of model produces the vectors used by similarity search.",
+          "explanation": "Embedding models produce dense vector representations that enable similarity search over large text corpora.\n\n**Why it works:** Each chunk and each query is embedded into the same vector space, and a vector store such as Azure AI Search returns the closest chunks to the query as retrieval results.\n\n**Why the others don't work:**\n- Chat completion summarising every document: not scalable as a retrieval mechanism.\n- Image generation: produces images, not retrievals.\n- Speech-to-text: applies to audio inputs.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0013",
+          "type": "single-choice",
+          "question": "The organization is looking to deploy a public-facing virtual assistant for a national transport authority. The product team wants the assistant to serve travellers who speak many different languages and travellers who have hearing or speech impairments. The lead designer is mapping each requirement to a responsible AI principle.\n\nWhich consideration most directly reflects the inclusiveness principle?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Implementing a fallback message when the assistant is unsure about an answer so that travellers are not given incorrect timetable information",
+              "isCorrect": false,
+              "explanation": "Graceful fallback addresses reliability and safety, not inclusiveness."
+            },
+            {
+              "id": "c1",
+              "text": "Ensuring the assistant supports multiple languages and offers both spoken and text-based interactions so that travellers with diverse abilities and backgrounds can use it effectively",
+              "isCorrect": true,
+              "explanation": "This matches Microsoft's definition of inclusiveness for AI systems.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Encrypting traveller queries in transit so that personal travel patterns cannot be intercepted by third parties",
+              "isCorrect": false,
+              "explanation": "Encryption maps to privacy and security."
+            },
+            {
+              "id": "c3",
+              "text": "Capturing detailed prompt and response logs so that auditors can trace why the assistant gave a particular recommendation",
+              "isCorrect": false,
+              "explanation": "Auditable logs map to accountability rather than inclusiveness."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.4: Describe considerations for inclusiveness in an AI solution"
+          ],
+          "services": [
+            "Azure AI Speech"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-translation",
+          "tip": "Match the described concern to the responsible AI principle it represents.",
+          "explanation": "Inclusiveness means AI systems should empower people with diverse backgrounds, abilities, and needs, including language and accessibility differences.\n\n**Why it works:** Supporting multiple languages and both speech and text channels ensures travellers with different abilities and language preferences can interact successfully.\n\n**Why the others don't work:**\n- Fallback messaging: maps to reliability and safety.\n- Detailed logs: maps to accountability.\n- Encryption in transit: maps to privacy and security.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0016",
+          "type": "matching",
+          "question": "Match each user need to the Azure AI capability that BEST addresses it from an inclusiveness perspective.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Azure AI Speech text-to-speech with neural voices",
+              "isCorrect": false,
+              "explanation": "Reads written content aloud with natural-sounding voices."
+            },
+            {
+              "id": "c2",
+              "text": "Azure AI Translator for real-time language translation",
+              "isCorrect": false,
+              "explanation": "Translates content into the user's preferred language."
+            },
+            {
+              "id": "c3",
+              "text": "Azure AI Immersive Reader for adjustable reading view",
+              "isCorrect": false,
+              "explanation": "Provides reading aids such as syllable breaks and line focus."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Users who prefer to listen to written content rather than read it",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "Users who read content in a language different from the source",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s3",
+              "label": "Users with dyslexia who benefit from syllable highlighting and line focus",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.4: Describe considerations for inclusiveness in an AI solution"
+          ],
+          "services": [
+            "Azure AI Speech",
+            "Azure AI Immersive Reader",
+            "Azure AI Translator"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai",
+          "tip": "Match each user need to the Azure capability designed for that specific accessibility outcome.",
+          "explanation": "Inclusiveness is achieved by combining capabilities so that each group of users has a path to engage with content.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0038",
+          "type": "single-choice",
+          "question": "Following a board decision, an insurance company is building an AI assistant that can take a customer claim, look up policy details from internal systems, send an email to the assessor, and update the claims database. Each task uses a different tool and the assistant decides which tool to call.\n\nWhich AI workload category BEST describes this assistant?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Agentic AI, where a model plans and invokes tools or actions to achieve a goal across multiple steps",
+              "isCorrect": true,
+              "explanation": "Agents plan and invoke tools, which matches this scenario.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Information extraction, focused on pulling structured fields from the claim form image",
+              "isCorrect": false,
+              "explanation": "Information extraction is a single capability, not multi-step tool orchestration."
+            },
+            {
+              "id": "c2",
+              "text": "Text analysis, focused on extracting entities and sentiment from the customer's claim text",
+              "isCorrect": false,
+              "explanation": "Text analysis processes text but does not orchestrate multi-step tool calls."
+            },
+            {
+              "id": "c4",
+              "text": "Computer vision, focused on classifying photographs of damaged property submitted with the claim",
+              "isCorrect": false,
+              "explanation": "Vision could be a tool the agent uses but is not the workload category itself."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.3.1: Identify scenarios for common AI workloads, including generative and agentic AI, text analysis, speech, computer vision, and information extraction"
+          ],
+          "services": [
+            "Azure AI Foundry"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview",
+          "tip": "Look at the verb the system performs across multiple systems, not just one input type.",
+          "explanation": "When a model plans and invokes multiple tools or systems to achieve a user goal, the workload is agentic AI.\n\n**Why it works:** Agents in Azure AI Foundry plan, call tools, observe results, and continue until the goal is met, which is exactly what the claims assistant does.\n\n**Why the others don't work:**\n- Text analysis: a single capability, not orchestration.\n- Information extraction: extracts fields rather than orchestrating actions.\n- Computer vision: a possible tool but not the overall workload category.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0034",
+          "type": "single-choice",
+          "question": "The engineering team is debugging an Azure OpenAI completion that frequently truncates long answers mid-sentence. The team has confirmed that the prompt itself is well within the model's context window.\n\nWhich configuration parameter should be adjusted to fix the truncation?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Reduce the top-p parameter so the model considers fewer candidate tokens at each step",
+              "isCorrect": false,
+              "explanation": "Top-p narrows the candidate set but does not lengthen output."
+            },
+            {
+              "id": "c2",
+              "text": "Increase the temperature parameter so the model commits more strongly to longer outputs",
+              "isCorrect": false,
+              "explanation": "Temperature controls randomness, not response length."
+            },
+            {
+              "id": "c4",
+              "text": "Set the frequency penalty to a negative value so the model can repeat itself until done",
+              "isCorrect": false,
+              "explanation": "Frequency penalty controls repetition, not maximum length."
+            },
+            {
+              "id": "c1",
+              "text": "Increase the max tokens parameter so the response has enough budget to complete sentences",
+              "isCorrect": true,
+              "explanation": "Max tokens directly controls how many tokens the model can return.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.3: Identify appropriate model deployment options and configuration parameters"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/prompt-engineering",
+          "tip": "Identify the parameter that puts a hard cap on response length.",
+          "explanation": "Truncated outputs usually mean the response budget is exhausted before the model finishes.\n\n**Why it works:** Raising max tokens gives the model more budget to complete its response, eliminating mid-sentence truncation.\n\n**Why the others don't work:**\n- Temperature: changes randomness.\n- Top-p: narrows candidate sampling.\n- Frequency penalty: governs repetition.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0031",
+          "type": "multiple-choice",
+          "question": "Following a board decision, a media company is launching three AI-driven features: a chat assistant that answers natural-language questions, a similarity search across articles, and an automatic illustration generator for blog posts. The architect must select appropriate Azure OpenAI model families for two of the features.\n\nWhich TWO model selections are correct?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Use a chat completion model to draw the blog post illustrations directly within the chat response",
+              "isCorrect": false,
+              "explanation": "Chat completion models produce text, not images."
+            },
+            {
+              "id": "c5",
+              "text": "Use a speech-to-text model to power the article similarity search",
+              "isCorrect": false,
+              "explanation": "Speech-to-text applies to audio inputs, not article retrieval."
+            },
+            {
+              "id": "c3",
+              "text": "Use an embeddings model to power the chat assistant so that responses are returned as numerical vectors",
+              "isCorrect": false,
+              "explanation": "Embeddings models do not produce conversational responses."
+            },
+            {
+              "id": "c1",
+              "text": "Use a chat completion model such as GPT-4 series for the chat assistant that answers natural-language questions",
+              "isCorrect": true,
+              "explanation": "Chat completion models are designed for conversational question answering.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Use an embeddings model to generate vectors for the article similarity search",
+              "isCorrect": true,
+              "explanation": "Embeddings are the right model class for similarity retrieval.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.2: Identify an appropriate AI model, based on capabilities"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",
+          "tip": "Match each feature to the model class designed for that input or output type.",
+          "explanation": "Picking the right Azure OpenAI model class depends on the input and output of the feature.\n\n**Why it works:** Chat completion models handle conversational text generation, and embeddings models produce vectors used for similarity search.\n\n**Why the others don't work:**\n- Embeddings for chat: returns vectors, not conversational responses.\n- Chat completion for illustrations: produces text, not images.\n- Speech-to-text for article search: applies to audio, not text retrieval.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0029",
+          "type": "single-choice",
+          "question": "The engineering team is building a customer-support assistant that must understand both photos of damaged products that customers upload and the accompanying text descriptions in the same conversation. Leadership wants the team to choose an appropriate model family in Azure OpenAI before development starts.\n\nWhich model capability is MOST suitable for this requirement?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "A multimodal model such as GPT-4o that can accept both images and text in the same prompt and reason across them",
+              "isCorrect": true,
+              "explanation": "Multimodal models accept image and text inputs natively.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "A text-only completion model paired with a separate workflow that asks customers to type a description of the damage instead of uploading photos",
+              "isCorrect": false,
+              "explanation": "This sidesteps the requirement to process images in the same conversation."
+            },
+            {
+              "id": "c4",
+              "text": "An image generation model such as DALL-E that produces an illustration of the damaged product based on the text description",
+              "isCorrect": false,
+              "explanation": "Image generation produces new images and does not interpret uploaded photos."
+            },
+            {
+              "id": "c3",
+              "text": "An embeddings model that converts the text description into a vector for similarity search against a damage catalogue",
+              "isCorrect": false,
+              "explanation": "Embedding models do not generate conversational responses or interpret images."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.2: Identify an appropriate AI model, based on capabilities"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",
+          "tip": "Consider which capability natively accepts more than one input type.",
+          "explanation": "When a scenario combines image and text input, a multimodal model is the right fit.\n\n**Why it works:** GPT-4o accepts text and images in the same prompt and reasons across both, which is what the support workflow requires.\n\n**Why the others don't work:**\n- Text-only model: cannot accept the photo input.\n- Embeddings model: produces vectors, not conversational responses.\n- Image generation model: creates new images rather than analysing uploads.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0040",
+          "type": "matching",
+          "question": "Match each scenario to the AI workload category it BEST fits.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Speech",
+              "isCorrect": false,
+              "explanation": "Audio-to-text transcription is a speech workload."
+            },
+            {
+              "id": "c3",
+              "text": "Generative AI",
+              "isCorrect": false,
+              "explanation": "Producing new copy from a brief is generative AI."
+            },
+            {
+              "id": "c4",
+              "text": "Information extraction",
+              "isCorrect": false,
+              "explanation": "Reading structured fields from documents is information extraction."
+            },
+            {
+              "id": "c2",
+              "text": "Computer vision",
+              "isCorrect": false,
+              "explanation": "Defect detection from images is computer vision."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s3",
+              "label": "Generating marketing copy from a product brief",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s4",
+              "label": "Pulling fields from scanned invoices",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s2",
+              "label": "Detecting product defects from production-line photos",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s1",
+              "label": "Transcribing audio of board meetings",
+              "correctChoiceId": "c1"
+            }
+          ],
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.3.1: Identify scenarios for common AI workloads, including generative and agentic AI, text analysis, speech, computer vision, and information extraction"
+          ],
+          "services": [
+            "Azure AI services"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/what-are-ai-services",
+          "tip": "Match each scenario to the workload type that defines its inputs and outputs.",
+          "explanation": "Each scenario aligns with a workload category that fits its dominant input type and task.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0020",
+          "type": "matching",
+          "question": "Match each transparency artefact or feature to the audience that BEST benefits from it.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "An on-screen disclosure that responses are AI generated",
+              "isCorrect": false,
+              "explanation": "Disclosure helps end users interpret responses appropriately."
+            },
+            {
+              "id": "c2",
+              "text": "Feature importance plots from the responsible AI dashboard",
+              "isCorrect": false,
+              "explanation": "Interpretability plots help data scientists understand model behaviour."
+            },
+            {
+              "id": "c3",
+              "text": "A transparency note describing intended uses and limitations",
+              "isCorrect": false,
+              "explanation": "Transparency notes inform compliance reviews of suitability."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s3",
+              "label": "Compliance officers assessing intended use",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "End users interacting with a chatbot",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "Data scientists evaluating a tabular model",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.5: Describe considerations for transparency in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai",
+          "tip": "Consider which artefact each audience needs to do their job.",
+          "explanation": "Transparency is delivered through different artefacts tuned to each audience: end users need disclosure, technical reviewers need interpretability, and compliance reviewers need product-level documentation.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0037",
+          "type": "single-choice",
+          "question": "The operations team at a logistics depot wants to automatically count the number of pallets on each loading bay using fixed cameras and to flag bays that exceed capacity. The team is mapping the requirement to a category of AI workload before choosing a service.\n\nWhich AI workload category BEST fits this scenario?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Computer vision, since the workload analyses image data to detect and count physical objects in a scene",
+              "isCorrect": true,
+              "explanation": "Detecting and counting objects in images is a textbook computer vision workload.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Speech recognition, since operators sometimes call out bay numbers when pallets are loaded",
+              "isCorrect": false,
+              "explanation": "Speech is irrelevant to the camera-based counting requirement."
+            },
+            {
+              "id": "c4",
+              "text": "Generative AI, since the dashboard will eventually summarise capacity in plain language for managers",
+              "isCorrect": false,
+              "explanation": "Generative AI summarisation is downstream and not the workload that produces the count."
+            },
+            {
+              "id": "c2",
+              "text": "Text analysis, since the team will need to label each bay with a textual description for the dashboard",
+              "isCorrect": false,
+              "explanation": "Text analysis processes text, not camera images."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.3.1: Identify scenarios for common AI workloads, including generative and agentic AI, text analysis, speech, computer vision, and information extraction"
+          ],
+          "services": [
+            "Azure AI Vision"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/computer-vision/overview",
+          "tip": "Identify the input data type and the primary task being performed on it.",
+          "explanation": "The defining input is the camera image and the task is detecting and counting objects, which is computer vision.\n\n**Why it works:** Object detection and counting are core computer vision capabilities offered by Azure AI Vision.\n\n**Why the others don't work:**\n- Text analysis: processes text, not images.\n- Speech recognition: applies to audio.\n- Generative AI: summarisation is a separate downstream step.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0024",
+          "type": "matching",
+          "question": "Match each accountability requirement to the Azure capability that BEST helps deliver it.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Azure Monitor with metrics and alerts on the deployed endpoint",
+              "isCorrect": false,
+              "explanation": "Azure Monitor surfaces drift and triggers alerts to owners."
+            },
+            {
+              "id": "c1",
+              "text": "Microsoft Entra ID with role-based access control on the workspace",
+              "isCorrect": false,
+              "explanation": "Entra ID and RBAC tie actions to specific identities in audit logs."
+            },
+            {
+              "id": "c2",
+              "text": "Azure Machine Learning run history and model registry versioning",
+              "isCorrect": false,
+              "explanation": "Run history and registry versions allow exact reproduction of a training run."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Trace which user trained or deployed a model",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Detect drift in production predictions and alert owners",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "Reproduce the exact training run that produced a model",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.6: Describe considerations for accountability in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Microsoft Entra ID",
+            "Azure Monitor"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai",
+          "tip": "Consider which capability provides the specific evidence each requirement needs.",
+          "explanation": "Accountability is achieved by combining identity controls, lifecycle versioning, and operational monitoring so that named humans can answer for AI behaviour.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0036",
+          "type": "matching",
+          "question": "Match each Azure OpenAI configuration parameter to the behaviour it controls.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "max tokens",
+              "isCorrect": false,
+              "explanation": "Sets the upper bound on the number of tokens returned."
+            },
+            {
+              "id": "c2",
+              "text": "temperature",
+              "isCorrect": false,
+              "explanation": "Scales the probability distribution over candidate tokens."
+            },
+            {
+              "id": "c3",
+              "text": "frequency penalty",
+              "isCorrect": false,
+              "explanation": "Penalises tokens that have already appeared in the output."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Maximum response length",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Discouraging repeated phrases",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "Randomness of token selection",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.3: Identify appropriate model deployment options and configuration parameters"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/prompt-engineering",
+          "tip": "Match each parameter to the specific aspect of generation it changes.",
+          "explanation": "Each parameter shapes a different aspect of generation: total length, randomness, or repetition.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0006",
+          "type": "single-choice",
+          "question": "Following a board decision, a logistics company is rolling out an AI model trained in Azure Machine Learning that predicts delivery routes for autonomous vehicles. Risk officers want assurance that the model behaves predictably under unusual road conditions and that failures degrade safely.\n\nWhich consideration most directly maps to the reliability and safety principle?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Publishing model cards that explain how the model was trained and what data sources were used so that drivers understand its limitations",
+              "isCorrect": false,
+              "explanation": "Model cards address transparency, not reliability and safety."
+            },
+            {
+              "id": "c1",
+              "text": "Rigorous testing of the model under representative and edge-case conditions, with defined fallback behaviour when the model is uncertain or encounters out-of-distribution inputs",
+              "isCorrect": true,
+              "explanation": "This matches Microsoft's definition of reliability and safety for AI systems.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Testing the user interface with screen readers so that visually impaired dispatch operators can review predicted routes",
+              "isCorrect": false,
+              "explanation": "Accessibility testing supports the inclusiveness principle."
+            },
+            {
+              "id": "c3",
+              "text": "Encrypting telemetry from the vehicles in transit using TLS so that route predictions cannot be intercepted by third parties",
+              "isCorrect": false,
+              "explanation": "TLS encryption addresses privacy and security."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.2: Describe considerations for reliability and safety in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai",
+          "tip": "Match the described concern to the responsible AI principle it represents.",
+          "explanation": "Reliability and safety requires AI systems to operate consistently under normal and unexpected conditions, with safe fallbacks when uncertainty is high.\n\n**Why it works:** Testing under edge cases and defining graceful degradation directly addresses the principle that AI systems must not cause physical or systemic harm when conditions change.\n\n**Why the others don't work:**\n- Model cards: maps to transparency.\n- TLS encryption: maps to privacy and security.\n- Screen reader testing: maps to inclusiveness.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0035",
+          "type": "multiple-choice",
+          "question": "Management has decided to support a high-volume customer-facing assistant on Azure OpenAI that requires predictable latency and reserved capacity during business hours. The platform team is reviewing deployment options and configuration parameters before launch.\n\nWhich TWO statements correctly describe Azure OpenAI deployments and parameters?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "The max tokens parameter sets how many tokens the model retrieves from the training corpus before answering",
+              "isCorrect": false,
+              "explanation": "Max tokens is a response length cap, not a retrieval count from training data."
+            },
+            {
+              "id": "c3",
+              "text": "The Standard deployment guarantees the same throughput as a Provisioned Throughput Unit deployment but at a lower price",
+              "isCorrect": false,
+              "explanation": "Standard deployments share capacity and do not guarantee throughput like PTUs."
+            },
+            {
+              "id": "c1",
+              "text": "A Provisioned Throughput Unit deployment reserves capacity for the resource so latency and throughput are predictable under load",
+              "isCorrect": true,
+              "explanation": "PTUs reserve capacity and provide predictable performance.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "The temperature and top-p parameters control how randomly the model selects the next token at inference time",
+              "isCorrect": true,
+              "explanation": "Both temperature and top-p are sampling parameters that influence randomness.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Setting temperature to a higher value than one disables content filters on the deployment",
+              "isCorrect": false,
+              "explanation": "Temperature has no relationship to content filtering."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.3: Identify appropriate model deployment options and configuration parameters"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/deployment-types",
+          "tip": "Look for facts about reserved capacity and sampling parameters.",
+          "explanation": "Picking deployments and tuning parameters depends on understanding capacity models and sampling controls.\n\n**Why it works:** PTUs reserve capacity for predictable throughput, while temperature and top-p both influence how the next token is sampled.\n\n**Why the others don't work:**\n- Standard equals PTU throughput: Standard is shared capacity with no guarantees.\n- Max tokens retrieves training data: max tokens caps output length.\n- High temperature disables filters: filters are independent of temperature.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0015",
+          "type": "multiple-choice",
+          "question": "The engineering team is building a reading-comprehension app aimed at primary-school students, including students with dyslexia and students learning English as an additional language. The product manager wants two design choices that align with the inclusiveness principle.\n\nWhich TWO actions directly support inclusiveness in this AI solution?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Use Azure AI Speech text-to-speech with multiple neural voices and language options so students can listen to passages in their preferred voice",
+              "isCorrect": true,
+              "explanation": "Multiple voices and languages widen the population the app serves.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Restrict the application to a single language so the reading model achieves the highest possible accuracy",
+              "isCorrect": false,
+              "explanation": "Restricting languages excludes students learning English as an additional language."
+            },
+            {
+              "id": "c3",
+              "text": "Set the application UI to a single fixed font size so that the reading experience is identical for every student",
+              "isCorrect": false,
+              "explanation": "Forcing one font size harms students who need larger text."
+            },
+            {
+              "id": "c1",
+              "text": "Integrate Azure AI Immersive Reader so that students can have text read aloud, syllables broken out, and translations shown inline",
+              "isCorrect": true,
+              "explanation": "Immersive Reader is designed to support readers with diverse abilities and language needs.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Disable keyboard navigation so the app cannot be operated without a mouse, simplifying interaction testing",
+              "isCorrect": false,
+              "explanation": "Removing keyboard navigation excludes students who rely on assistive input."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.4: Describe considerations for inclusiveness in an AI solution"
+          ],
+          "services": [
+            "Azure AI Immersive Reader",
+            "Azure AI Speech"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/immersive-reader/overview",
+          "tip": "Look for design choices that broaden, rather than narrow, the population the app can serve.",
+          "explanation": "Inclusiveness in education AI requires features that adapt to a wide range of reading abilities and languages.\n\n**Why it works:** Immersive Reader and multilingual neural voices both expand the set of students who can engage with content effectively.\n\n**Why the others don't work:**\n- Fixed font size: harms students who need larger text.\n- Single language: excludes additional-language learners.\n- Disabling keyboard navigation: blocks users of assistive input devices.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0009",
+          "type": "single-choice",
+          "question": "The organization is looking to deploy an internal Azure OpenAI assistant that summarises sensitive HR documents. Security architects require that the assistant authenticate to dependent services without storing API keys in application configuration files. The team uses managed identities elsewhere in the platform.\n\nWhich approach BEST aligns with the privacy and security principle?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Embed the Azure OpenAI key directly in the application code but obfuscate it using base64 encoding before deployment",
+              "isCorrect": false,
+              "explanation": "Base64 is encoding, not encryption, and the key remains recoverable."
+            },
+            {
+              "id": "c1",
+              "text": "Assign a system-assigned managed identity to the application and grant it the appropriate role on the Azure OpenAI resource so authentication uses Microsoft Entra ID rather than embedded keys",
+              "isCorrect": true,
+              "explanation": "Managed identities eliminate stored secrets and use Entra ID tokens.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Place the Azure OpenAI key in an Azure Storage blob and have the application download it on startup using the public endpoint",
+              "isCorrect": false,
+              "explanation": "Storing secrets in publicly reachable blobs is insecure regardless of obscurity."
+            },
+            {
+              "id": "c2",
+              "text": "Store the Azure OpenAI key in an environment variable on the host so that it is loaded at process startup and not committed to source control",
+              "isCorrect": false,
+              "explanation": "Environment variables still expose the key on the host and require manual rotation."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.3: Describe considerations for privacy and security in an AI solution"
+          ],
+          "services": [
+            "Azure OpenAI",
+            "Azure Key Vault"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/use-your-data-securely",
+          "tip": "Think about how Azure recommends services authenticate to each other without secrets.",
+          "explanation": "Privacy and security requires that AI systems protect data and credentials throughout their lifecycle.\n\n**Why it works:** A managed identity removes the need for any stored credential by issuing short-lived Entra ID tokens, with role-based access control on the target resource.\n\n**Why the others don't work:**\n- Environment variables: still expose the key on the host and need manual rotation.\n- Base64 encoding: trivially reversible, not a security control.\n- Public storage blob: exposing keys via public endpoints is insecure.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0017",
+          "type": "single-choice",
+          "question": "The engineering team is preparing a credit-scoring model trained in Azure Machine Learning for an internal review board. Reviewers have asked the team to explain why the model predicts a particular score for a given applicant and which features contributed most to that prediction.\n\nWhich approach BEST supports the transparency principle?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Increase the number of decision trees in the ensemble so that predictions become more accurate and therefore less in need of explanation",
+              "isCorrect": false,
+              "explanation": "Higher accuracy does not provide explanations and complex ensembles are harder to interpret."
+            },
+            {
+              "id": "c4",
+              "text": "Restrict the model output to a binary approve or decline flag so reviewers focus on the decision rather than the underlying score",
+              "isCorrect": false,
+              "explanation": "Hiding information reduces transparency rather than improving it."
+            },
+            {
+              "id": "c1",
+              "text": "Generate model interpretability output using the responsible AI dashboard in Azure Machine Learning to show feature importance and per-prediction explanations",
+              "isCorrect": true,
+              "explanation": "The responsible AI dashboard provides feature importance and case-level explanations directly.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Provide reviewers with the raw training dataset so that they can compute their own statistics and infer feature relevance",
+              "isCorrect": false,
+              "explanation": "Handing over training data does not produce per-prediction explanations and raises privacy issues."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.5: Describe considerations for transparency in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai-dashboard",
+          "tip": "Consider which managed Azure surface produces explanations for individual predictions.",
+          "explanation": "Transparency requires that people understand how an AI system makes its decisions, which in Azure Machine Learning is delivered through interpretability features.\n\n**Why it works:** The responsible AI dashboard surfaces global feature importance and per-prediction explanations so reviewers can see why a particular applicant received a given score.\n\n**Why the others don't work:**\n- More trees: increases complexity and provides no explanations.\n- Raw training data handover: does not produce per-prediction explanations.\n- Binary output only: hides information, the opposite of transparency.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0010",
+          "type": "single-choice",
+          "question": "You are designing a training pipeline in Azure Machine Learning that ingests medical records from Azure Storage. Privacy reviewers require that personally identifiable information is removed or masked before it is ever used to train the model.\n\nWhich consideration most directly reflects the privacy and security principle?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Apply data minimisation and de-identification to the training dataset so that only the attributes needed for the model remain and direct identifiers are removed or pseudonymised",
+              "isCorrect": true,
+              "explanation": "Data minimisation and de-identification directly address privacy of personal data used in AI.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Publish the trained model artefact to a public model registry so that other teams can reuse it without retraining",
+              "isCorrect": false,
+              "explanation": "Public publication of a model trained on sensitive data increases privacy risk."
+            },
+            {
+              "id": "c2",
+              "text": "Train the model on the full dataset but display only aggregate metrics in dashboards so individual records are not visible",
+              "isCorrect": false,
+              "explanation": "Aggregating dashboards does not protect personal data used in training."
+            },
+            {
+              "id": "c3",
+              "text": "Increase the number of training epochs so that the model memorises patterns and produces more accurate predictions for clinicians",
+              "isCorrect": false,
+              "explanation": "More memorisation increases risk of leaking training data, harming privacy."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.3: Describe considerations for privacy and security in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Storage"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-data",
+          "tip": "Consider what needs to happen to the data itself before training begins.",
+          "explanation": "Privacy and security includes protecting personal data throughout the AI lifecycle, starting with the training dataset.\n\n**Why it works:** Removing or pseudonymising direct identifiers and limiting attributes to those genuinely needed reduces exposure if the dataset or model is later compromised.\n\n**Why the others don't work:**\n- Aggregate dashboards: do not protect data used during training.\n- More epochs: increases memorisation and risk of training-data leakage.\n- Public registry publication: increases rather than reduces exposure.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0025",
+          "type": "single-choice",
+          "question": "The engineering team is preparing onboarding material for new starters joining a team that uses Azure OpenAI. The technical lead wants new starters to understand at a high level how a generative language model produces a response when given a prompt.\n\nWhich description BEST captures how a generative language model produces text?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "The model predicts the next token in a sequence based on the prompt and previously generated tokens, repeating until a stop condition is reached",
+              "isCorrect": true,
+              "explanation": "Autoregressive token-by-token generation is the core mechanism.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "The model searches a database of pre-written responses and returns the entry whose keywords most closely match the prompt",
+              "isCorrect": false,
+              "explanation": "Generative models do not retrieve fixed responses from a database."
+            },
+            {
+              "id": "c4",
+              "text": "The model loads the entire training corpus into memory and quotes the closest matching paragraph verbatim",
+              "isCorrect": false,
+              "explanation": "Models do not store or quote the training corpus directly at inference time."
+            },
+            {
+              "id": "c3",
+              "text": "The model compiles the prompt into executable code and runs it to produce a deterministic output",
+              "isCorrect": false,
+              "explanation": "Prompts are not compiled or executed; they are tokenised and processed by the model."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.1: Describe how generative AI models work"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",
+          "tip": "Think about how generative language models construct their output one piece at a time.",
+          "explanation": "Generative language models are autoregressive token predictors that build output incrementally.\n\n**Why it works:** The model converts the prompt to tokens and repeatedly predicts the next most likely token given the context, appending each token until a stop sequence or length limit is reached.\n\n**Why the others don't work:**\n- Database lookup: generative models do not retrieve canned responses.\n- Compiling and executing the prompt: prompts are not code.\n- Quoting the training corpus: training data is not stored verbatim for retrieval.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0001",
+          "type": "single-choice",
+          "question": "A healthcare provider is building a model in Azure Machine Learning that recommends triage priority for incoming patients. During internal review, the team notices that the model assigns lower priority to certain demographic groups even when symptoms are equivalent. The lead data scientist wants to formally measure this disparity before retraining.\n\nWhich approach BEST addresses the fairness concern at the assessment stage?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Deploy the current model to a managed online endpoint and rely on Application Insights latency metrics to flag biased predictions",
+              "isCorrect": false,
+              "explanation": "Latency telemetry has no relationship to prediction fairness across groups."
+            },
+            {
+              "id": "c1",
+              "text": "Use the Fairlearn integration in Azure Machine Learning to compute disparity metrics across the sensitive demographic groups and surface them in the studio dashboard",
+              "isCorrect": true,
+              "explanation": "Fairlearn integrates with Azure Machine Learning to assess group-level disparities and is the supported tool for measuring fairness.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Remove the demographic columns from the training dataset and retrain the model so that no sensitive attributes are visible to the algorithm",
+              "isCorrect": false,
+              "explanation": "Dropping sensitive columns does not remove correlated proxies and provides no measurement of disparity."
+            },
+            {
+              "id": "c3",
+              "text": "Increase the size of the training dataset by oversampling the majority group so the model has more examples to learn from",
+              "isCorrect": false,
+              "explanation": "Oversampling the majority group worsens imbalance rather than measuring or correcting fairness."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.1: Describe considerations for fairness in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Fairlearn"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-fairness-ml",
+          "tip": "Think about which Microsoft tool is purpose-built for evaluating disparity across groups.",
+          "explanation": "Fairness assessment requires a measurement step before mitigation. Azure Machine Learning integrates with Fairlearn to compute group-level disparity metrics and visualize them in the studio.\n\n**Why it works:** Fairlearn provides metrics such as demographic parity difference and equalized odds difference, which quantify how predictions vary across sensitive groups, enabling targeted mitigation.\n\n**Why the others don't work:**\n- Dropping demographic columns: correlated proxy features remain and the disparity is never measured.\n- Oversampling the majority group: amplifies the imbalance instead of correcting it.\n- Application Insights latency: measures performance, not prediction fairness.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0028",
+          "type": "ordering",
+          "question": "Arrange the following steps in the order they occur when an Azure OpenAI chat completion request is processed.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "The service tokenises the prompt into numerical tokens that the model can process",
+              "isCorrect": true,
+              "explanation": "Tokenisation precedes model computation.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "The model generates output tokens one at a time using sampling parameters such as temperature",
+              "isCorrect": true,
+              "explanation": "Token-by-token generation is the core inference loop.",
+              "sequence": 3
+            },
+            {
+              "id": "c4",
+              "text": "The generated tokens are detokenised into a text response and returned to the application",
+              "isCorrect": true,
+              "explanation": "Detokenisation produces the final readable response.",
+              "sequence": 4
+            },
+            {
+              "id": "c1",
+              "text": "The application sends the prompt and parameters to the Azure OpenAI endpoint",
+              "isCorrect": true,
+              "explanation": "The request begins when the client submits the prompt.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.1: Describe how generative AI models work"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/prompt-engineering",
+          "tip": "Trace the prompt from the application all the way back to a readable response.",
+          "explanation": "A generative AI request flows from the client to the endpoint, through tokenisation and inference, and back to text via detokenisation.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0019",
+          "type": "multiple-choice",
+          "question": "During a responsible AI workshop, a regulator asks a bank to demonstrate how it implements transparency for its customer-facing AI products built on Azure Machine Learning and Azure OpenAI. The team needs to choose two practices that align with the transparency principle.\n\nWhich TWO actions directly support transparency in these AI solutions?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Use the responsible AI dashboard to provide feature importance and per-prediction explanations for the credit risk model",
+              "isCorrect": true,
+              "explanation": "Interpretability output explains the model's reasoning to stakeholders.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Publish a transparency note for each AI product describing the intended use cases, supported scenarios, and known limitations",
+              "isCorrect": true,
+              "explanation": "Transparency notes communicate how the system should and should not be used.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Configure private endpoints on the Azure OpenAI resource so that traffic stays on the Microsoft backbone network",
+              "isCorrect": false,
+              "explanation": "Private endpoints address privacy and security."
+            },
+            {
+              "id": "c4",
+              "text": "Increase the model's training dataset size to improve accuracy across customer segments",
+              "isCorrect": false,
+              "explanation": "Larger training data may improve accuracy but does not explain decisions."
+            },
+            {
+              "id": "c5",
+              "text": "Hide the underlying model architecture from end users so they focus on the output and not the implementation",
+              "isCorrect": false,
+              "explanation": "Hiding implementation details reduces rather than improves transparency."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.5: Describe considerations for transparency in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai-dashboard",
+          "tip": "Look for actions that communicate how the system works and why it produced a particular output.",
+          "explanation": "Transparency requires both system-level disclosure and per-decision explanations.\n\n**Why it works:** A transparency note explains the system at a product level, while interpretability output explains individual predictions.\n\n**Why the others don't work:**\n- Private endpoints: address privacy and security.\n- Larger training data: improves accuracy but not explainability.\n- Hiding architecture: actively reduces transparency.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0022",
+          "type": "single-choice",
+          "question": "Following a board decision, a logistics provider is putting an AI dispatch system into production using Azure Machine Learning. Internal audit has asked the team to ensure that every model version, training run, and prediction can be traced back to the person and process that produced it.\n\nWhich approach BEST supports the accountability principle?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Deploy each new model version directly over the previous one so that only the latest version is ever in production and audit scope is small",
+              "isCorrect": false,
+              "explanation": "Overwriting versions destroys the audit trail rather than supporting it."
+            },
+            {
+              "id": "c4",
+              "text": "Allow data scientists to run training jobs on personal laptops and upload only the final model artefact to the registry",
+              "isCorrect": false,
+              "explanation": "Training off-platform breaks the chain of custody and audit evidence."
+            },
+            {
+              "id": "c3",
+              "text": "Disable diagnostic settings on the Azure Machine Learning workspace so logs do not consume Log Analytics ingestion quota",
+              "isCorrect": false,
+              "explanation": "Disabling logs eliminates the trail needed for accountability."
+            },
+            {
+              "id": "c1",
+              "text": "Use Azure Machine Learning model registry versioning together with run history and Azure Monitor logs so that every model, training run, and inference call is auditable",
+              "isCorrect": true,
+              "explanation": "Versioned registry, run history, and monitor logs provide the audit trail accountability requires.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.6: Describe considerations for accountability in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Monitor"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-rest",
+          "tip": "Consider what evidence auditors need to reconstruct who did what.",
+          "explanation": "Accountability requires traceability across the model lifecycle so that decisions can be examined after the fact.\n\n**Why it works:** Combining versioned model registry, recorded run history, and Azure Monitor logs creates a complete chain of evidence from data through training to inference.\n\n**Why the others don't work:**\n- Overwriting versions: destroys historical evidence.\n- Disabling diagnostic settings: removes the audit log.\n- Training on personal laptops: breaks the chain of custody.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0014",
+          "type": "single-choice",
+          "question": "After reviewing user feedback, a contact centre running on Azure AI Speech has discovered that its baseline speech-to-text model misrecognises callers with regional accents and callers who use assistive speech devices. The team wants to improve recognition for these users.\n\nWhich approach BEST supports the inclusiveness principle?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Reduce the number of supported languages so the baseline model has fewer phonemes to disambiguate during recognition",
+              "isCorrect": false,
+              "explanation": "Removing languages reduces the population the system can serve."
+            },
+            {
+              "id": "c2",
+              "text": "Reject calls from users whose first attempts fail recognition and route them to an email-only support channel",
+              "isCorrect": false,
+              "explanation": "Refusing service to a group is the opposite of inclusiveness."
+            },
+            {
+              "id": "c3",
+              "text": "Ask callers to slow down and repeat themselves until the baseline model returns a high enough confidence score",
+              "isCorrect": false,
+              "explanation": "Placing the burden on users with disabilities does not address inclusiveness."
+            },
+            {
+              "id": "c1",
+              "text": "Train a custom speech model in Azure AI Speech using audio samples and transcripts that represent the under-served accents and assistive speech patterns",
+              "isCorrect": true,
+              "explanation": "Custom Speech is designed to improve recognition for under-served voice patterns.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.4: Describe considerations for inclusiveness in an AI solution"
+          ],
+          "services": [
+            "Azure AI Speech"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/custom-speech-overview",
+          "tip": "Consider how Microsoft recommends adapting models when the baseline does not serve all users equally.",
+          "explanation": "Inclusiveness requires AI systems to work well for people across the full range of abilities, languages, and speech patterns.\n\n**Why it works:** A custom speech model trained on representative audio data closes the recognition gap for under-served voice patterns rather than excluding those users.\n\n**Why the others don't work:**\n- Routing to email-only: excludes users from the primary channel.\n- Asking users to adapt: shifts the burden onto people with disabilities.\n- Reducing supported languages: shrinks the user population the system serves.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0027",
+          "type": "multiple-choice",
+          "question": "During a knowledge-sharing session, a developer is describing the lifecycle of a generative AI request to Azure OpenAI. The team wants to confirm two foundational facts about how the underlying transformer-based model handles a prompt.\n\nWhich TWO statements correctly describe how generative AI models work?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "The model uses learned weights from training to compute probability distributions over possible next tokens given the input context",
+              "isCorrect": true,
+              "explanation": "Inference relies on weights learned during training to score next-token candidates.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "The model returns a single deterministic answer for every prompt, regardless of sampling parameters such as temperature or top-p",
+              "isCorrect": false,
+              "explanation": "Sampling parameters introduce variability in non-deterministic generation."
+            },
+            {
+              "id": "c1",
+              "text": "The prompt is broken into tokens, which are numerical representations of words, sub-words, or characters that the model can process",
+              "isCorrect": true,
+              "explanation": "Tokenisation is the first step in generative model inference.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Each request causes the model to retrain on the prompt so that it can answer subsequent questions more accurately",
+              "isCorrect": false,
+              "explanation": "Inference does not retrain the model; weights are fixed."
+            },
+            {
+              "id": "c5",
+              "text": "The model rewrites the prompt into SQL and queries an internal knowledge graph to compose a response",
+              "isCorrect": false,
+              "explanation": "Generative models do not translate prompts to SQL or query knowledge graphs internally."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.1: Describe how generative AI models work"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",
+          "tip": "Look for foundational facts about tokenisation and probability-based prediction.",
+          "explanation": "Generative AI inference involves tokenising the prompt and using learned weights to predict the most likely next tokens.\n\n**Why it works:** Tokenisation converts text to numbers the model can process, and the trained weights determine which next token is most probable in context.\n\n**Why the others don't work:**\n- Retraining on each request: weights are fixed during inference.\n- Always deterministic output: sampling parameters introduce variability.\n- SQL and knowledge graph: not how generative language models operate.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0002",
+          "type": "single-choice",
+          "question": "The engineering team is evaluating a loan approval model that will be exposed through Azure Machine Learning managed endpoints. Stakeholders are concerned that historical training data reflects past lending decisions which favored applicants from particular postcodes. Leadership has asked the team to align the project with Microsoft's responsible AI principle of fairness.\n\nWhich consideration most directly reflects the fairness principle in this scenario?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Ensuring the model treats people in similar circumstances comparably and does not systematically disadvantage groups based on attributes such as postcode, gender, or ethnicity",
+              "isCorrect": true,
+              "explanation": "This directly matches Microsoft's definition of fairness, which focuses on equitable treatment across groups.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Publishing detailed model architecture diagrams and hyperparameter values so that auditors can reproduce results",
+              "isCorrect": false,
+              "explanation": "Reproducibility documentation maps to transparency, not fairness."
+            },
+            {
+              "id": "c4",
+              "text": "Configuring autoscaling on the managed online endpoint so that the model responds within service-level objectives during peak loan application periods",
+              "isCorrect": false,
+              "explanation": "Autoscaling addresses reliability, not fairness."
+            },
+            {
+              "id": "c2",
+              "text": "Encrypting the training dataset at rest using customer-managed keys stored in Azure Key Vault to protect applicant records",
+              "isCorrect": false,
+              "explanation": "Encryption at rest addresses privacy and security, not fairness."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.1: Describe considerations for fairness in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai",
+          "tip": "Map the described concern to the specific responsible AI principle it represents.",
+          "explanation": "The fairness principle requires AI systems to treat people equitably and avoid systematic bias against groups defined by sensitive attributes.\n\n**Why it works:** Microsoft defines fairness as ensuring that AI systems do not discriminate or reinforce existing biases in their predictions, which is exactly what the postcode concern represents.\n\n**Why the others don't work:**\n- Encryption with customer-managed keys: maps to the privacy and security principle.\n- Publishing architecture diagrams: maps to the transparency principle.\n- Autoscaling endpoints: maps to the reliability and safety principle.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0005",
+          "type": "single-choice",
+          "question": "The engineering team is launching a customer-facing chatbot built on Azure OpenAI for a children's education platform. Leadership is concerned that the model might occasionally return responses containing violence or self-harm references. The team wants a managed safeguard that screens both prompts and completions in real time before they reach end users.\n\nWhich approach BEST supports the reliability and safety principle in this scenario?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Disable system prompts and rely entirely on user prompts so that the model only responds to what end users explicitly request",
+              "isCorrect": false,
+              "explanation": "Removing system prompts weakens guardrails and increases the risk of unsafe responses."
+            },
+            {
+              "id": "c2",
+              "text": "Lower the model temperature to zero so that responses become deterministic and therefore guaranteed to be safe for younger audiences",
+              "isCorrect": false,
+              "explanation": "Determinism does not prevent harmful content; it only reduces output variability."
+            },
+            {
+              "id": "c3",
+              "text": "Switch the deployment to a smaller base model with fewer parameters, since smaller models cannot generate harmful content",
+              "isCorrect": false,
+              "explanation": "Model size does not determine whether harmful content can be produced."
+            },
+            {
+              "id": "c1",
+              "text": "Integrate Azure AI Content Safety to evaluate prompts and completions against harm categories such as violence and self-harm and block content that exceeds the configured severity thresholds",
+              "isCorrect": true,
+              "explanation": "Azure AI Content Safety is purpose-built for filtering harmful content in generative AI scenarios.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.2: Describe considerations for reliability and safety in an AI solution"
+          ],
+          "services": [
+            "Azure AI Content Safety",
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/overview",
+          "tip": "Consider which managed Azure service is dedicated to detecting unsafe content.",
+          "explanation": "Reliability and safety means AI systems should perform as intended without harming people, which requires guardrails on generative outputs.\n\n**Why it works:** Azure AI Content Safety screens prompts and completions for categories such as hate, violence, sexual content, and self-harm and applies severity thresholds before content reaches users.\n\n**Why the others don't work:**\n- Lowering temperature: makes outputs deterministic but not safer.\n- Smaller base model: model size has no correlation with harmful content generation.\n- Disabling system prompts: removes the very instructions that guide safe behaviour.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0004",
+          "type": "matching",
+          "question": "Match each fairness activity in an Azure Machine Learning project to the stage of the model lifecycle in which it is performed.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Identify sensitive features and check the training dataset for representation imbalances across demographic groups",
+              "isCorrect": false,
+              "explanation": "Reviewing dataset composition is a data preparation activity."
+            },
+            {
+              "id": "c3",
+              "text": "Track group-level prediction outcomes over time and alert when disparity drifts beyond an agreed threshold",
+              "isCorrect": false,
+              "explanation": "Ongoing tracking of disparities is a monitoring activity after deployment."
+            },
+            {
+              "id": "c2",
+              "text": "Use Fairlearn disparity metrics in the responsible AI dashboard to compare model performance across sensitive groups",
+              "isCorrect": false,
+              "explanation": "Disparity metrics are computed during model evaluation before deployment."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s3",
+              "label": "Post-deployment monitoring",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "Model evaluation",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s1",
+              "label": "Data preparation",
+              "correctChoiceId": "c1"
+            }
+          ],
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.1: Describe considerations for fairness in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Fairlearn"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-fairness-ml",
+          "tip": "Consider when each activity adds the most value in the lifecycle.",
+          "explanation": "Fairness considerations span the full lifecycle: data preparation focuses on inputs, evaluation focuses on model behaviour, and monitoring watches for drift after release.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0008",
+          "type": "matching",
+          "question": "Match each reliability and safety practice to the lifecycle stage in which it is most effective for an Azure OpenAI assistant.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Run red team adversarial prompts against the model and document its failure modes before launch",
+              "isCorrect": false,
+              "explanation": "Adversarial testing is performed before deployment."
+            },
+            {
+              "id": "c3",
+              "text": "Review flagged completions and aggregate harm category trends to detect drift over time",
+              "isCorrect": false,
+              "explanation": "Reviewing flagged outputs is an ongoing post-deployment activity."
+            },
+            {
+              "id": "c2",
+              "text": "Apply Azure AI Content Safety filters to block harmful prompts and completions during live conversations",
+              "isCorrect": false,
+              "explanation": "Content filters operate at runtime to protect users."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s2",
+              "label": "Runtime protection",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s1",
+              "label": "Pre-deployment testing",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Post-deployment monitoring",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.2: Describe considerations for reliability and safety in an AI solution"
+          ],
+          "services": [
+            "Azure AI Content Safety",
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/overview",
+          "tip": "Consider when each practice provides the most value.",
+          "explanation": "Reliability and safety spans the full lifecycle: testing exposes weaknesses pre-launch, runtime filters block harm in production, and monitoring detects drift after release.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0023",
+          "type": "multiple-choice",
+          "question": "The organization is looking to formalise governance for its growing portfolio of Azure Machine Learning workloads. The risk function wants two practices that align with the accountability principle before further models go to production.\n\nWhich TWO actions directly support accountability in these AI solutions?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Use Microsoft Entra ID to assign role-based access control so that every action on the Azure Machine Learning workspace is attributable to an identity in audit logs",
+              "isCorrect": true,
+              "explanation": "RBAC with Entra ID makes actions traceable to specific people.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Use Azure AI Content Safety to filter prompts before they reach the Azure OpenAI endpoint",
+              "isCorrect": false,
+              "explanation": "Content Safety addresses reliability and safety, not accountability."
+            },
+            {
+              "id": "c1",
+              "text": "Define an AI governance committee with named owners for each production model and require sign-off before any model is promoted to a production endpoint",
+              "isCorrect": true,
+              "explanation": "Named owners and gated promotion put humans in charge of AI outcomes.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Replace human review of high-risk predictions with an automated approval rule based on the model's confidence score",
+              "isCorrect": false,
+              "explanation": "Removing humans from high-risk decisions weakens accountability."
+            },
+            {
+              "id": "c3",
+              "text": "Allow shared service principal credentials to be used by every data science team so that operations are simpler to manage",
+              "isCorrect": false,
+              "explanation": "Shared credentials destroy attribution and break accountability."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.6: Describe considerations for accountability in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Microsoft Entra ID"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai",
+          "tip": "Look for actions that put named humans in charge and make actions attributable.",
+          "explanation": "Accountability requires both organisational governance and technical attribution.\n\n**Why it works:** A governance committee with named owners and sign-off operationalises responsibility, while Entra ID with RBAC ensures every action in the workspace is attributable to a specific identity.\n\n**Why the others don't work:**\n- Shared service principals: destroy attribution.\n- Replacing review with confidence rules: removes human oversight from high-risk paths.\n- Content Safety: addresses reliability and safety.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0003",
+          "type": "multiple-choice",
+          "question": "During a responsible AI review, the data science team at a recruitment firm is preparing a candidate-ranking model trained in Azure Machine Learning. The reviewers want concrete actions that align with the fairness principle before the model is approved for production.\n\nWhich TWO actions directly support fairness in this AI solution?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Apply a higher learning rate during training so that the model converges faster on the majority class patterns",
+              "isCorrect": false,
+              "explanation": "Tuning learning rate for majority patterns can worsen disparity rather than reduce it."
+            },
+            {
+              "id": "c4",
+              "text": "Configure private endpoints on the workspace so that scoring traffic remains on the Microsoft backbone network",
+              "isCorrect": false,
+              "explanation": "Private networking addresses privacy and security, not fairness."
+            },
+            {
+              "id": "c1",
+              "text": "Identify sensitive features such as gender and age, then use Fairlearn to evaluate disparity metrics across those groups in the Azure Machine Learning studio",
+              "isCorrect": true,
+              "explanation": "Identifying sensitive features and measuring disparity across them is a core fairness practice.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Audit the training dataset for historical bias, such as past hiring patterns that favored particular groups, and rebalance or relabel before training",
+              "isCorrect": true,
+              "explanation": "Addressing biased training data prevents the model from learning and amplifying historical inequities.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Enable diagnostic logging on the inference endpoint and forward logs to a Log Analytics workspace for long-term retention",
+              "isCorrect": false,
+              "explanation": "Diagnostic logging supports reliability and operations, not fairness."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.1: Describe considerations for fairness in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Fairlearn"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-fairness-ml",
+          "tip": "Look for actions that directly address how predictions vary across groups of people.",
+          "explanation": "Fairness work has two complementary phases: assessing disparity in model outputs and addressing biased inputs.\n\n**Why it works:** Identifying sensitive features and measuring disparity with Fairlearn quantifies the issue, while auditing and correcting historical bias in training data prevents the model from inheriting it.\n\n**Why the others don't work:**\n- Diagnostic logging: maps to reliability, not fairness.\n- Private endpoints: maps to privacy and security.\n- Higher learning rate for majority patterns: amplifies rather than mitigates bias.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0032",
+          "type": "matching",
+          "question": "Match each business requirement to the Azure OpenAI model family that BEST satisfies it.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "DALL-E image generation model",
+              "isCorrect": false,
+              "explanation": "DALL-E creates images from text prompts."
+            },
+            {
+              "id": "c3",
+              "text": "Text embeddings model",
+              "isCorrect": false,
+              "explanation": "Embedding models produce vectors for similarity search."
+            },
+            {
+              "id": "c1",
+              "text": "GPT chat completion model",
+              "isCorrect": false,
+              "explanation": "Chat completion handles conversational responses."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s3",
+              "label": "Building a vector index for semantic search",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s1",
+              "label": "Conversational question answering over user input",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "Generating product illustrations from text prompts",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.2: Identify an appropriate AI model, based on capabilities"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",
+          "tip": "Match each requirement to the model class designed for that output type.",
+          "explanation": "Each model family is optimised for a different output: conversational text, generated images, or numerical vectors.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0021",
+          "type": "single-choice",
+          "question": "The operations team at a national health service is launching a triage AI built on Azure Machine Learning. The clinical safety officer wants to ensure that named individuals are responsible for monitoring outcomes and that decisions made by the system can be reviewed and overturned by qualified staff.\n\nWhich consideration most directly reflects the accountability principle?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Encrypting clinical training data at rest with customer-managed keys held in Azure Key Vault to protect patient information",
+              "isCorrect": false,
+              "explanation": "Encryption addresses privacy and security."
+            },
+            {
+              "id": "c3",
+              "text": "Using Azure AI Speech to make the triage interface available to clinicians who prefer voice interaction over typing",
+              "isCorrect": false,
+              "explanation": "Voice interfaces address inclusiveness, not accountability."
+            },
+            {
+              "id": "c1",
+              "text": "Establishing clear human ownership for the AI system's outcomes, with defined governance, sign-off, and override processes that allow qualified staff to review and overrule predictions",
+              "isCorrect": true,
+              "explanation": "Accountability is about humans remaining responsible for AI outcomes through governance and oversight.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Tuning the model with additional features to improve the F1 score across all triage categories",
+              "isCorrect": false,
+              "explanation": "Improving model metrics is unrelated to assigning human responsibility."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.6: Describe considerations for accountability in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai",
+          "tip": "Match the described concern to the responsible AI principle it represents.",
+          "explanation": "Accountability means humans, not AI systems, are ultimately responsible for the outcomes AI produces, with governance to support that responsibility.\n\n**Why it works:** Naming owners and defining sign-off and override processes operationalises human responsibility for the AI system's behaviour.\n\n**Why the others don't work:**\n- Encryption: maps to privacy and security.\n- Voice interfaces: map to inclusiveness.\n- Better F1 score: improves performance, not accountability.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0011",
+          "type": "multiple-choice",
+          "question": "Management has decided to roll out an Azure OpenAI based assistant for an insurance company. The security team requires that prompts and completions never traverse the public internet and that only authorised internal applications can call the endpoint.\n\nWhich TWO controls directly support the privacy and security principle?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Use Microsoft Entra ID authentication with role assignments scoped to the specific applications that need to call the Azure OpenAI endpoint",
+              "isCorrect": true,
+              "explanation": "Entra ID with RBAC limits who can call the endpoint.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Store all prompts and completions in a public Azure Storage account so analytics tools can query them without authentication",
+              "isCorrect": false,
+              "explanation": "Public storage exposes potentially sensitive prompts and completions."
+            },
+            {
+              "id": "c5",
+              "text": "Disable Microsoft Defender for Cloud for the subscription so that scanning processes do not read sensitive payload data",
+              "isCorrect": false,
+              "explanation": "Disabling Defender removes a key security control rather than improving privacy."
+            },
+            {
+              "id": "c3",
+              "text": "Allow anonymous access on the Azure OpenAI endpoint and rely on a network security group to restrict source IP ranges from the corporate proxy",
+              "isCorrect": false,
+              "explanation": "Anonymous access is insecure even with NSG filtering and bypasses identity controls."
+            },
+            {
+              "id": "c1",
+              "text": "Configure a private endpoint for the Azure OpenAI resource so that traffic from the corporate virtual network reaches the service over the Microsoft backbone instead of the public internet",
+              "isCorrect": true,
+              "explanation": "Private endpoints keep traffic off the public internet, supporting privacy.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.3: Describe considerations for privacy and security in an AI solution"
+          ],
+          "services": [
+            "Azure OpenAI",
+            "Azure Private Link"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/use-your-data-securely",
+          "tip": "Look for controls that protect both the network path and the identity calling the service.",
+          "explanation": "Privacy and security requires controls at both the network and identity layers for AI workloads.\n\n**Why it works:** Private endpoints prevent traffic from traversing the public internet, while Entra ID with RBAC ensures only the intended workloads can authenticate to the endpoint.\n\n**Why the others don't work:**\n- Anonymous access with NSG: bypasses identity-based controls and is insecure.\n- Public storage of prompts: exposes potentially sensitive data.\n- Disabling Defender for Cloud: removes a security control entirely.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0039",
+          "type": "multiple-choice",
+          "question": "The engineering team is producing a workload-categorisation guide for the platform engineering wiki. They need to classify two scenarios under the correct AI workload category before publishing.\n\nWhich TWO scenario-to-category mappings are correct?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Transcribing recorded customer support calls into searchable text maps to the speech workload category",
+              "isCorrect": true,
+              "explanation": "Audio-to-text transcription is a speech workload.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Counting cars in highway traffic camera footage maps to the speech workload category",
+              "isCorrect": false,
+              "explanation": "Counting in images is computer vision, not speech."
+            },
+            {
+              "id": "c2",
+              "text": "Detecting positive or negative sentiment in customer feedback emails maps to the text analysis workload category",
+              "isCorrect": true,
+              "explanation": "Sentiment analysis is a text analysis task.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Summarising a contract document with a chat model maps to the computer vision workload category",
+              "isCorrect": false,
+              "explanation": "Summarisation by a chat model is a generative AI workload, not computer vision."
+            },
+            {
+              "id": "c5",
+              "text": "Reading text from scanned receipts and returning structured fields maps to the speech workload category",
+              "isCorrect": false,
+              "explanation": "Reading scanned documents is information extraction, not speech."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.3.1: Identify scenarios for common AI workloads, including generative and agentic AI, text analysis, speech, computer vision, and information extraction"
+          ],
+          "services": [
+            "Azure AI services"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/what-are-ai-services",
+          "tip": "Match the input data type and the task to the right workload category.",
+          "explanation": "Workload categories are defined by the input type and the task being performed.\n\n**Why it works:** Speech-to-text on call recordings is a speech workload, and detecting sentiment in text is a text analysis workload.\n\n**Why the others don't work:**\n- Counting cars: computer vision, not speech.\n- Contract summarisation: generative AI, not computer vision.\n- Receipt fields: information extraction, not speech.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0012",
+          "type": "ordering",
+          "question": "Arrange the following privacy and security activities in the order they should occur when preparing an Azure Machine Learning training pipeline that uses sensitive customer data.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Run the training job and review pipeline logs to confirm no sensitive values were written to logs or outputs",
+              "isCorrect": true,
+              "explanation": "Verification happens after the controls are in place and a run has completed.",
+              "sequence": 4
+            },
+            {
+              "id": "c1",
+              "text": "Classify the source dataset and identify which attributes count as personal or sensitive information",
+              "isCorrect": true,
+              "explanation": "Classification informs every subsequent control.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Apply de-identification or pseudonymisation to the dataset before it is registered as a training datastore",
+              "isCorrect": true,
+              "explanation": "Data should be cleansed before it enters the training environment.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Configure managed identities and role assignments so the training compute can read the datastore without stored keys",
+              "isCorrect": true,
+              "explanation": "Access controls are configured once the protected dataset is in place.",
+              "sequence": 3
+            }
+          ],
+          "selectCount": 4,
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.3: Describe considerations for privacy and security in an AI solution"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Key Vault"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-data",
+          "tip": "Consider what must be known and prepared before training compute can run safely.",
+          "explanation": "Privacy and security work flows from understanding the data, to protecting it, to controlling access, and finally verifying that controls held during execution.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0026",
+          "type": "single-choice",
+          "question": "You are explaining to a new analyst how the temperature parameter influences the output of an Azure OpenAI chat completion. The analyst notices that two calls with the same prompt return different completions when temperature is set higher than zero.\n\nWhich statement most accurately describes the role of temperature?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Temperature controls the randomness of token selection during generation, with higher values producing more varied output and lower values producing more deterministic output",
+              "isCorrect": true,
+              "explanation": "Temperature is a sampling control that scales next-token probability distributions.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Temperature controls how recent the model's training data is when answering questions about current events",
+              "isCorrect": false,
+              "explanation": "Training data recency is fixed by the model version, not temperature."
+            },
+            {
+              "id": "c2",
+              "text": "Temperature controls how many tokens the model is allowed to generate before it stops producing output",
+              "isCorrect": false,
+              "explanation": "Maximum length is governed by max tokens, not temperature."
+            },
+            {
+              "id": "c4",
+              "text": "Temperature controls how aggressively content filters block harmful prompts and completions",
+              "isCorrect": false,
+              "explanation": "Content filtering is configured separately through Azure AI Content Safety."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.2.1: Describe how generative AI models work"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/prompt-engineering",
+          "tip": "Consider what aspect of next-token selection this parameter changes.",
+          "explanation": "Temperature is a sampling parameter that scales the probability distribution over candidate tokens.\n\n**Why it works:** A higher temperature flattens the distribution so less likely tokens become more probable, producing varied output, while a lower temperature sharpens it toward the most likely token, producing more deterministic output.\n\n**Why the others don't work:**\n- Token count limit: governed by max tokens.\n- Training data recency: fixed by the model version.\n- Content filtering: configured via Content Safety, not temperature.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0007",
+          "type": "multiple-choice",
+          "question": "During a pre-launch review, a financial services company is preparing a customer support assistant built on Azure OpenAI. Compliance reviewers want concrete safeguards that align with the reliability and safety principle before the assistant becomes generally available.\n\nWhich TWO actions directly support reliability and safety in this AI solution?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Disable retrieval-augmented generation so that the model relies entirely on its pretrained knowledge during conversations",
+              "isCorrect": false,
+              "explanation": "Removing grounding tends to increase hallucinations, harming reliability."
+            },
+            {
+              "id": "c2",
+              "text": "Conduct red team testing where adversarial prompts attempt to elicit harmful or off-topic responses, and adjust system prompts based on findings",
+              "isCorrect": true,
+              "explanation": "Adversarial testing improves robustness against unsafe behaviour.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Add applicant gender to the prompt context so the assistant can personalise tone for different customers",
+              "isCorrect": false,
+              "explanation": "Adding sensitive attributes raises fairness concerns rather than safety."
+            },
+            {
+              "id": "c1",
+              "text": "Configure Azure AI Content Safety filters on both input prompts and model completions to block harmful or unsafe responses before they reach the customer",
+              "isCorrect": true,
+              "explanation": "Content filtering is a core safety guardrail for generative AI.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Move the deployment from a Standard tier to a Provisioned Throughput Unit deployment to guarantee response latency below 200 milliseconds",
+              "isCorrect": false,
+              "explanation": "Throughput tiers address performance, not safety of content."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.2: Describe considerations for reliability and safety in an AI solution"
+          ],
+          "services": [
+            "Azure AI Content Safety",
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/overview",
+          "tip": "Look for actions that reduce the chance of harmful or unpredictable behaviour in production.",
+          "explanation": "Reliability and safety requires both proactive testing and runtime guardrails.\n\n**Why it works:** Content Safety filters provide a runtime guardrail that blocks unsafe content, while red team testing surfaces failure modes before launch so they can be fixed.\n\n**Why the others don't work:**\n- Adding gender to prompts: introduces fairness risk, not safety improvement.\n- Switching to PTU deployment: addresses throughput SLOs, not safety.\n- Disabling RAG: typically reduces grounding and increases hallucination.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-28"
+        },
+        {
+          "id": "AI-901-0018",
+          "type": "single-choice",
+          "question": "Following a board decision, a marketing team is launching a generative content assistant built on Azure OpenAI for internal copywriting. The communications lead wants users to clearly understand that responses are AI generated and to know the model's intended uses and limitations.\n\nWhich consideration most directly reflects the transparency principle?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Configure Azure AI Content Safety filters on prompts and completions so harmful outputs are blocked before reaching users",
+              "isCorrect": false,
+              "explanation": "Content filters address reliability and safety, not transparency."
+            },
+            {
+              "id": "c3",
+              "text": "Apply role-based access control so only the marketing team can call the assistant's endpoint",
+              "isCorrect": false,
+              "explanation": "RBAC addresses privacy and security."
+            },
+            {
+              "id": "c1",
+              "text": "Surface a notice that responses are AI generated and publish a transparency note describing the system's intended uses, limitations, and known risks",
+              "isCorrect": true,
+              "explanation": "Disclosure and transparency notes are the canonical implementation of this principle.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Train a fine-tuned variant of the base model so that responses match the company's tone of voice more closely",
+              "isCorrect": false,
+              "explanation": "Fine-tuning improves output style but does not communicate how the system works."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Identify AI concepts and capabilities",
+          "skills": [
+            "1.1.5: Describe considerations for transparency in an AI solution"
+          ],
+          "services": [
+            "Azure OpenAI"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/transparency-note",
+          "tip": "Match the described concern to the responsible AI principle it represents.",
+          "explanation": "Transparency means people interacting with an AI system understand what it is and how it should be used.\n\n**Why it works:** Surfacing AI disclosure plus a transparency note covering intended uses and limitations is exactly how Microsoft describes meeting the transparency principle.\n\n**Why the others don't work:**\n- Content Safety filters: address reliability and safety.\n- RBAC: addresses privacy and security.\n- Fine-tuning: improves style but does not disclose how the system works.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-28"
+        }
+      ],
+      "currentIndex": 3,
+      "flags": [],
+      "timeLeft": null,
+      "timed": false,
+      "durationMinutes": 60,
+      "numQuestions": 40,
+      "examMode": "casual",
+      "revealAnswers": "immediately",
+      "perDomain": {
+        "Identify AI concepts and capabilities": {
+          "total": 4,
+          "correct": 1,
+          "score": 25
+        }
+      },
+      "earlyComplete": true,
+      "answeredCount": 4,
+      "totalQuestions": 40
     }
   ]
 }
