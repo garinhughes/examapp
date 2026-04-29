@@ -8331,5 +8331,398 @@
       "Recognise irreversible operations that should be deferred until after recovery is confirmed"
     ],
     "realWorldValue": "Multi-region DR runbooks are the difference between a 15-minute RTO and a front-page incident; this is the exact sequence operators run under time pressure when an entire region goes dark."
+  },
+  {
+    "id": "aws-eks-crashloop-incident",
+    "title": "Investigate a CrashLoopBackOff in a Production EKS Pod",
+    "description": "Diagnose a CrashLoopBackOff on the payments-api pod following a new ECR image deployment. Identify the root cause from logs, metrics, and alerts, then select the correct remediation.",
+    "type": "incident-response",
+    "difficulty": "intermediate",
+    "platform": "AWS",
+    "category": "Kubernetes",
+    "technologies": [
+      "Amazon EKS",
+      "Amazon ECR",
+      "CloudWatch",
+      "kubectl"
+    ],
+    "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Correlate pod restart metrics with application logs to identify a missing environment variable",
+      "Distinguish a configuration error from resource exhaustion using memory metrics and exit codes",
+      "Choose between a fast rollback and a forward fix as remediation strategies"
+    ],
+    "realWorldValue": "Environment variable mismatches between image versions are one of the most common CrashLoopBackOff causes in production EKS. Diagnosing them quickly under pressure requires reading exit codes and app logs together, not just Kubernetes events.",
+    "scenario": "At 09:22 UTC the alerting system fires on the payments-api Deployment in the prod namespace. A new container image (v2.1.0) was pushed to ECR and deployed 12 minutes ago. The previous version (v2.0.3) was stable.",
+    "alerts": [
+      {
+        "id": "a1",
+        "severity": "critical",
+        "time": "09:22",
+        "service": "EKS",
+        "message": "Pod payments-api-7d9f8b-xkz2p in namespace prod entered CrashLoopBackOff. Restart count: 4."
+      },
+      {
+        "id": "a2",
+        "severity": "warning",
+        "time": "09:23",
+        "service": "CloudWatch Container Insights",
+        "message": "Container payments-api exited with code 1. OOMKilled: false."
+      }
+    ],
+    "metrics": [
+      {
+        "id": "m1",
+        "name": "Pod Restart Count",
+        "unit": "restarts",
+        "values": [
+          {
+            "time": "09:10",
+            "value": 0
+          },
+          {
+            "time": "09:15",
+            "value": 0
+          },
+          {
+            "time": "09:22",
+            "value": 1
+          },
+          {
+            "time": "09:25",
+            "value": 4
+          }
+        ]
+      },
+      {
+        "id": "m2",
+        "name": "Container Memory Usage",
+        "unit": "MB",
+        "values": [
+          {
+            "time": "09:10",
+            "value": 180
+          },
+          {
+            "time": "09:22",
+            "value": 195
+          },
+          {
+            "time": "09:25",
+            "value": 198
+          }
+        ]
+      }
+    ],
+    "logs": [
+      {
+        "timestamp": "09:20:01",
+        "level": "INFO",
+        "source": "kubelet",
+        "message": "Pulling image \"123456789012.dkr.ecr.us-east-1.amazonaws.com/payments-api:v2.1.0\""
+      },
+      {
+        "timestamp": "09:20:14",
+        "level": "INFO",
+        "source": "kubelet",
+        "message": "Successfully pulled image \"payments-api:v2.1.0\". Image size: 218 MB."
+      },
+      {
+        "timestamp": "09:20:15",
+        "level": "INFO",
+        "source": "kubelet",
+        "message": "Created container payments-api"
+      },
+      {
+        "timestamp": "09:20:15",
+        "level": "INFO",
+        "source": "kubelet",
+        "message": "Started container payments-api"
+      },
+      {
+        "timestamp": "09:20:16",
+        "level": "INFO",
+        "source": "payments-api",
+        "message": "Initialising application bootstrap..."
+      },
+      {
+        "timestamp": "09:20:16",
+        "level": "INFO",
+        "source": "payments-api",
+        "message": "Loading configuration from environment..."
+      },
+      {
+        "timestamp": "09:20:16",
+        "level": "ERROR",
+        "source": "payments-api",
+        "message": "Error: DATABASE_URL environment variable is not set"
+      },
+      {
+        "timestamp": "09:20:16",
+        "level": "ERROR",
+        "source": "payments-api",
+        "message": "Process exited with code 1"
+      },
+      {
+        "timestamp": "09:21:48",
+        "level": "WARN",
+        "source": "kubelet",
+        "message": "Back-off restarting failed container payments-api in pod payments-api-7d9f8b-xkz2p"
+      },
+      {
+        "timestamp": "09:22:05",
+        "level": "ERROR",
+        "source": "payments-api",
+        "message": "Error: DATABASE_URL environment variable is not set"
+      },
+      {
+        "timestamp": "09:22:05",
+        "level": "ERROR",
+        "source": "payments-api",
+        "message": "Process exited with code 1"
+      },
+      {
+        "timestamp": "09:25:10",
+        "level": "WARN",
+        "source": "kubelet",
+        "message": "Back-off restarting failed container payments-api (CrashLoopBackOff); restarts: 4"
+      }
+    ],
+    "timeline": [
+      {
+        "time": "09:12",
+        "event": "Image payments-api:v2.1.0 pushed to ECR and Deployment rollout triggered."
+      },
+      {
+        "time": "09:18",
+        "event": "Rolling update begins. New pod scheduled on node ip-10-0-1-42."
+      },
+      {
+        "time": "09:20",
+        "event": "ECR image pull succeeds. Container starts and exits immediately with code 1."
+      },
+      {
+        "time": "09:22",
+        "event": "CrashLoopBackOff alert fires after 4th restart. OOMKilled: false."
+      },
+      {
+        "time": "09:25",
+        "event": "Back-off delay increasing. Service partially degraded — old pods still handling some traffic."
+      }
+    ],
+    "actions": [
+      {
+        "id": "act1",
+        "description": "Patch the Deployment to add a DATABASE_URL env var sourced from the existing DB_CONNECTION_STRING secret, then trigger a rolling restart.",
+        "correct": true
+      },
+      {
+        "id": "act2",
+        "description": "Roll back the Deployment to image tag v2.0.3 using kubectl rollout undo to restore full service immediately.",
+        "correct": true
+      },
+      {
+        "id": "act3",
+        "description": "Increase the container memory limit from 256Mi to 512Mi to prevent the OOMKill.",
+        "correct": false
+      }
+    ],
+    "answers": [
+      {
+        "id": "ans1",
+        "text": "The new image (v2.1.0) expects a DATABASE_URL environment variable that is absent from the pod spec — the app exits with code 1 immediately on startup.",
+        "correct": true
+      },
+      {
+        "id": "ans2",
+        "text": "The container is being OOMKilled because the new image has a higher memory footprint than the configured limit.",
+        "correct": false
+      },
+      {
+        "id": "ans3",
+        "text": "The ECR image pull is failing due to missing IAM permissions on the node role.",
+        "correct": false
+      }
+    ],
+    "explanation": "**Root cause: missing `DATABASE_URL` environment variable in the v2.1.0 image.**\n\n**Key evidence:**\n- Alert a2 explicitly states `OOMKilled: false` — memory is not the issue.\n- Memory metrics show 195–198 MB usage, well below any reasonable limit.\n- The application log sequence is: image pull OK → container starts → `Error: DATABASE_URL environment variable is not set` → `exit code 1`. The crash happens before any request is handled.\n- The v2.1.0 image was refactored to read `DATABASE_URL` instead of the legacy `DB_CONNECTION_STRING` env var still defined in the Deployment spec.\n\n**Correct actions:**\n- **act1 (fix forward):** add `DATABASE_URL` to the Deployment env spec — the durable fix.\n- **act2 (rollback):** `kubectl rollout undo` reverts to v2.0.3 instantly — the fastest path to service restoration.\n\n**Wrong action:** Increasing memory is irrelevant — `OOMKilled: false` and exit code 1 (not 137) definitively rule out OOM."
+  },
+  {
+    "id": "aws-eks-namespace-rbac-replay",
+    "title": "Create a Namespace and Apply RBAC in EKS",
+    "description": "Queue the correct sequence of kubectl commands to create a staging namespace, provision a ServiceAccount, define a least-privilege Role, bind it, and verify access — rejecting distractors that over-permission or destroy resources.",
+    "type": "terminal-replay",
+    "difficulty": "beginner",
+    "platform": "AWS",
+    "category": "Kubernetes",
+    "technologies": [
+      "Amazon EKS",
+      "kubectl",
+      "Kubernetes RBAC"
+    ],
+    "labCategory": "Implement",
+    "learningOutcomes": [
+      "Create a Kubernetes namespace and ServiceAccount with kubectl imperative commands",
+      "Define a namespaced Role with least-privilege permissions and bind it to a ServiceAccount",
+      "Verify effective permissions with kubectl auth can-i"
+    ],
+    "realWorldValue": "Namespace isolation with fine-grained RBAC is the standard multi-team EKS pattern. Getting the creation order right — and knowing why ClusterRoles and ClusterRoleBindings are wrong here — prevents both broken deployments and accidental cluster-wide over-permission.",
+    "scenario": "You are onboarding the dev-team to a shared EKS cluster. Create an isolated `staging` namespace, provision a `dev-team` ServiceAccount, grant it read-only access to Pods and Services within that namespace only, and verify the permissions before handing over credentials.",
+    "prompt": "eks-user@lab:~$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "kubectl create namespace staging",
+        "successOutput": "namespace/staging created",
+        "errorOutput": "Create the namespace first — all subsequent resources are scoped to it."
+      },
+      {
+        "id": "c2",
+        "command": "kubectl create serviceaccount dev-team -n staging",
+        "successOutput": "serviceaccount/dev-team created",
+        "errorOutput": "The namespace must exist before you can create resources inside it.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "kubectl create role pod-reader --verb=get,list,watch --resource=pods,services -n staging",
+        "successOutput": "role.rbac.authorization.k8s.io/pod-reader created",
+        "errorOutput": "The namespace must exist before creating a Role inside it.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "kubectl create rolebinding dev-team-binding --role=pod-reader --serviceaccount=staging:dev-team -n staging",
+        "successOutput": "rolebinding.rbac.authorization.k8s.io/dev-team-binding created",
+        "errorOutput": "Both the Role and ServiceAccount must exist before creating the RoleBinding.",
+        "mustFollowIds": [
+          "c2",
+          "c3"
+        ]
+      },
+      {
+        "id": "c5",
+        "command": "kubectl auth can-i list pods --as=system:serviceaccount:staging:dev-team -n staging",
+        "successOutput": "yes",
+        "errorOutput": "The RoleBinding must be created before verifying permissions.",
+        "mustFollowIds": [
+          "c4"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "kubectl create clusterrolebinding dev-team-binding --clusterrole=cluster-admin --serviceaccount=staging:dev-team",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: This grants cluster-admin across the entire cluster — a critical least-privilege violation. Use a namespaced Role and RoleBinding instead.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "kubectl delete namespace staging",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Deletes the namespace and all resources within it.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "kubectl create clusterrole pod-reader-global --verb=get,list,watch --resource=pods,services",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: A ClusterRole applies cluster-wide. For namespace-scoped access, create a namespaced Role instead.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Correct sequence:**\n1. **Create namespace** — all subsequent resources are scoped to `staging`.\n2. **Create ServiceAccount** inside the namespace — this is the identity the dev team will use.\n3. **Create Role** — a namespaced Role grants permissions only within `staging`. Using a ClusterRole would grant access cluster-wide.\n4. **Create RoleBinding** — binds the `pod-reader` Role to the `dev-team` ServiceAccount. Both must exist first.\n5. **Verify** with `kubectl auth can-i` — impersonates the ServiceAccount to confirm the binding works.\n\n**Distractors:**\n- `clusterrolebinding` with `cluster-admin` — grants unrestricted access to the entire cluster.\n- `delete namespace` — destroys everything created.\n- `clusterrole` — cluster-scoped; use a namespaced `Role` when access should be limited to one namespace."
+  },
+  {
+    "id": "aws-eks-scale-deployment-cmd",
+    "title": "Scale an EKS Deployment",
+    "description": "Type the single kubectl command that scales the checkout Deployment in the prod namespace to 5 replicas.",
+    "type": "command-terminal",
+    "difficulty": "beginner",
+    "platform": "AWS",
+    "category": "Kubernetes",
+    "technologies": [
+      "Amazon EKS",
+      "kubectl"
+    ],
+    "labCategory": "Implement",
+    "learningOutcomes": [
+      "Construct a kubectl scale command with the correct resource type, name, replica count, and namespace",
+      "Identify and omit deprecated or irrelevant flags such as --record"
+    ],
+    "realWorldValue": "Manually scaling a Deployment is a foundational kubectl skill used during traffic spikes and before autoscaling is configured. Getting the namespace flag right avoids scaling the wrong workload in a multi-namespace cluster.",
+    "scenario": "The checkout service is experiencing elevated traffic ahead of a marketing campaign. Scale the `checkout` Deployment in the `prod` namespace from 2 to 5 replicas.",
+    "prompt": "eks-user@lab:~$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Scale the `checkout` Deployment in the `prod` namespace to 5 replicas.",
+        "hint": "Use `kubectl scale deployment`. You need the deployment name, `--replicas`, and `-n` for the namespace.",
+        "program": "kubectl",
+        "requirements": [
+          {
+            "id": "r-verb",
+            "kind": "positional",
+            "variants": [
+              "scale"
+            ],
+            "description": "scale — change the replica count of a resource"
+          },
+          {
+            "id": "r-resource",
+            "kind": "positional",
+            "variants": [
+              "deployment",
+              "deployment/checkout",
+              "deployments"
+            ],
+            "description": "resource type"
+          },
+          {
+            "id": "r-name",
+            "kind": "positional",
+            "variants": [
+              "checkout"
+            ],
+            "description": "deployment name"
+          },
+          {
+            "id": "r-replicas",
+            "kind": "flag-value",
+            "variants": [
+              "--replicas"
+            ],
+            "value": "5",
+            "description": "--replicas <count>  desired number of pod replicas"
+          },
+          {
+            "id": "r-namespace",
+            "kind": "flag-value",
+            "variants": [
+              "-n",
+              "--namespace"
+            ],
+            "value": "prod",
+            "description": "-n <namespace>  target namespace"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--timeout",
+            "description": "--timeout is not a valid flag for kubectl scale"
+          },
+          {
+            "flag": "--record",
+            "description": "--record is deprecated since Kubernetes 1.22 and has no effect"
+          }
+        ],
+        "successOutput": "deployment.apps/checkout scaled",
+        "canonicalCommand": "kubectl scale deployment checkout --replicas=5 -n prod"
+      }
+    ],
+    "explanation": "**`kubectl scale deployment <name> --replicas=<n> -n <namespace>`** is the canonical form.\n\n- `scale` — subcommand for changing replica counts\n- `deployment checkout` — resource type and name\n- `--replicas=5` — desired replica count\n- `-n prod` — targets the `prod` namespace; without this the command would target the `default` namespace\n\n`--record` was deprecated in Kubernetes 1.22 and removed in later versions. `--timeout` is not a valid flag for `scale`."
   }
 ]

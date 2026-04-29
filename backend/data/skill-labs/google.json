@@ -1,0 +1,2917 @@
+[
+  {
+    "id": "google-model-landscape-label",
+    "title": "Label the Gen AI Landscape Layers",
+    "description": "Label each layer of the Google Cloud generative AI stack from infrastructure through agents and applications.",
+    "type": "diagram-label",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI",
+      "Gemini",
+      "Agent Builder",
+      "Workspace"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Identify the five conceptual layers of the Google generative AI stack",
+      "Match Google products to the correct layer (infrastructure, models, platforms, agents, apps)",
+      "Explain the role each layer plays for builders versus end users"
+    ],
+    "realWorldValue": "Most enterprise gen AI conversations stall because executives, engineers, and end users are talking about different layers. Knowing where Vertex AI, Gemini, and Workspace each sit clears that up in a single diagram.",
+    "relatedExamCodes": [
+      "GAIL-2025"
+    ],
+    "scenario": "Your CTO has asked you to walk a non-technical stakeholder through Google's generative AI stack. Label each layer of the diagram so the stakeholder understands which products belong where.",
+    "imageUrl": "/labs/google-genai-landscape.svg",
+    "hotspots": [
+      {
+        "id": "h1",
+        "x": 50,
+        "y": 12,
+        "options": [
+          "AI-Optimised Infrastructure",
+          "Foundation Models",
+          "Agent Platform",
+          "End-User Applications"
+        ],
+        "answer": "AI-Optimised Infrastructure",
+        "label": "Bottom layer: TPUs, GPUs, networking"
+      },
+      {
+        "id": "h2",
+        "x": 50,
+        "y": 30,
+        "options": [
+          "Foundation Models",
+          "AI-Optimised Infrastructure",
+          "Agent Builder",
+          "Workspace Apps"
+        ],
+        "answer": "Foundation Models",
+        "label": "Pre-trained Gemini, Gemma, Imagen, Veo"
+      },
+      {
+        "id": "h3",
+        "x": 50,
+        "y": 48,
+        "options": [
+          "Vertex AI Platform",
+          "Cloud Run",
+          "BigQuery",
+          "Cloud Storage"
+        ],
+        "answer": "Vertex AI Platform",
+        "label": "Tuning, deployment, MLOps tooling"
+      },
+      {
+        "id": "h4",
+        "x": 50,
+        "y": 66,
+        "options": [
+          "Agent Builder & Agentspace",
+          "Compute Engine",
+          "Pub/Sub",
+          "Cloud DNS"
+        ],
+        "answer": "Agent Builder & Agentspace",
+        "label": "Tools, grounding, function calling"
+      },
+      {
+        "id": "h5",
+        "x": 50,
+        "y": 84,
+        "options": [
+          "End-User Applications",
+          "Foundation Models",
+          "Infrastructure",
+          "Storage Buckets"
+        ],
+        "answer": "End-User Applications",
+        "label": "Gemini App, NotebookLM, Workspace AI features"
+      }
+    ],
+    "answers": [
+      {
+        "id": "infra",
+        "text": "Bottom is infrastructure (TPUs/GPUs), top is end-user apps",
+        "correct": true
+      },
+      {
+        "id": "reverse",
+        "text": "Bottom is end-user apps, top is infrastructure"
+      },
+      {
+        "id": "models-bottom",
+        "text": "Foundation models sit below infrastructure"
+      },
+      {
+        "id": "agents-top",
+        "text": "Agents sit at the very bottom of the stack"
+      }
+    ],
+    "explanation": "Google's generative AI stack is conventionally drawn with five layers, bottom-up:\n\n1. AI-Optimised Infrastructure - TPUs (v5e/v5p/Trillium), GPUs, and the high-bandwidth network underneath everything.\n2. Foundation Models - pre-trained Gemini (multimodal), Gemma (open weights), Imagen (image), Veo (video).\n3. Vertex AI Platform - tuning, evaluation, deployment, MLOps, and Model Garden.\n4. Agent Builder / Agentspace - grounding, retrieval, tool/function calling, multi-agent orchestration.\n5. End-User Applications - Gemini App, NotebookLM, Agentspace, Workspace AI features (Help me write, Smart Compose, etc.).\n\nThis is the GAIL canonical mental model. Builders work at layers 2-4; buyers and end users typically interact at layer 5."
+  },
+  {
+    "id": "google-foundation-model-match",
+    "title": "Match Google Foundation Models to Use Cases",
+    "description": "Match each Google foundation model to the use case where it fits best.",
+    "type": "drag-match",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Gemini",
+      "Gemma",
+      "Imagen",
+      "Veo",
+      "Chirp"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Distinguish Google's first-party foundation models by modality and capability",
+      "Match the right model to a business use case",
+      "Explain when an open-weights model (Gemma) is preferred over a managed model (Gemini)"
+    ],
+    "realWorldValue": "Picking the wrong foundation model wastes weeks of integration work. Knowing the difference between Gemini Pro, Gemini Flash, Gemma, Imagen, and Veo before kicking off a build is what keeps projects on schedule.",
+    "relatedExamCodes": [
+      "GAIL-2025"
+    ],
+    "scenario": "Your enterprise architecture team is reviewing five separate proof-of-concept projects. For each project description, drag the most appropriate Google foundation model.",
+    "pairs": [
+      {
+        "id": "long-context",
+        "term": "Summarising 1,500-page legal contracts in a single prompt",
+        "definition": "Gemini 2.0 Pro - flagship multimodal model with a 2M-token context window for long-document reasoning"
+      },
+      {
+        "id": "low-latency",
+        "term": "Powering an in-product chat that needs sub-second responses at high volume",
+        "definition": "Gemini 2.0 Flash - cost- and latency-optimised model for high-throughput, low-latency workloads"
+      },
+      {
+        "id": "open-weights",
+        "term": "Running an LLM entirely on the customer's air-gapped GPU cluster",
+        "definition": "Gemma 2 - open-weights model family that can be downloaded and self-hosted with no Google dependency"
+      },
+      {
+        "id": "image-gen",
+        "term": "Generating brand-safe marketing imagery from text prompts",
+        "definition": "Imagen 3 - photorealistic text-to-image model with safety filters and SynthID watermarking"
+      },
+      {
+        "id": "video-gen",
+        "term": "Producing short product-launch videos from a script",
+        "definition": "Veo 2 - text-to-video model producing high-resolution clips up to one minute long"
+      },
+      {
+        "id": "speech",
+        "term": "Building a multilingual call-centre transcription pipeline",
+        "definition": "Chirp 3 - speech-to-text foundation model with strong multilingual recognition"
+      }
+    ],
+    "explanation": "Google's foundation model family covers most modalities:\n\n- Gemini Pro: largest, smartest, longest context. Use for deep reasoning over big documents.\n- Gemini Flash: faster and cheaper, with a smaller context window. Use for chat, classification, lightweight summarisation at scale.\n- Gemma: open weights, downloadable, runs on-prem or in your own VPC. Use when data residency or offline operation is required.\n- Imagen: text-to-image. Use for marketing assets, product mockups.\n- Veo: text-to-video. Use for short-form video generation.\n- Chirp: speech foundation model. Use for transcription and multilingual ASR.\n\nThe GAIL exam expects you to pick the right model by capability, not by name recognition."
+  },
+  {
+    "id": "google-prompt-techniques-match",
+    "title": "Match Prompting Techniques to Scenarios",
+    "description": "Match each prompting technique (zero-shot, few-shot, chain-of-thought, ReAct, etc.) to the scenario it is best suited for.",
+    "type": "drag-match",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Gemini",
+      "Vertex AI"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Differentiate zero-shot, few-shot, chain-of-thought, ReAct, and self-consistency prompting",
+      "Pick the right technique for a given accuracy and latency profile",
+      "Recognise when adding tools to the prompt (ReAct) is preferable to a longer prompt"
+    ],
+    "realWorldValue": "The right prompting technique can double accuracy on a hard task without a single model change. Prompt engineering is the cheapest performance lever on any gen AI project.",
+    "relatedExamCodes": [
+      "GAIL-2025"
+    ],
+    "scenario": "You are reviewing prompt designs across five Gemini projects. Match each scenario to the prompting technique that best fits it.",
+    "pairs": [
+      {
+        "id": "zero-shot",
+        "term": "Translate a sentence from English to French - simple, well-known task",
+        "definition": "Zero-shot prompting - just describe the task; the model already knows how to do it"
+      },
+      {
+        "id": "few-shot",
+        "term": "Classify customer tickets into a custom set of internal categories",
+        "definition": "Few-shot prompting - include 3-5 labelled examples so the model learns your taxonomy"
+      },
+      {
+        "id": "cot",
+        "term": "Solve multi-step word problems where the reasoning matters",
+        "definition": "Chain-of-thought prompting - ask the model to think step-by-step before answering"
+      },
+      {
+        "id": "react",
+        "term": "Answer questions that require live web search and arithmetic",
+        "definition": "ReAct prompting - alternate Reason and Act steps using tool/function calls"
+      },
+      {
+        "id": "self-consistency",
+        "term": "High-stakes maths question where you can afford multiple model calls",
+        "definition": "Self-consistency - sample several chain-of-thought answers and majority-vote"
+      },
+      {
+        "id": "system",
+        "term": "Set persistent persona, tone, and safety constraints across a long chat",
+        "definition": "System / role prompt - prepend immutable instructions that govern every turn"
+      }
+    ],
+    "explanation": "Prompting techniques on the GAIL exam:\n\n- Zero-shot: task description only. Use when the task is common.\n- Few-shot: include input/output exemplars. Use for custom taxonomies.\n- Chain-of-thought (CoT): \"think step by step\". Use when reasoning chains matter.\n- ReAct: interleave reasoning with tool calls. Use when the model needs external data or computation.\n- Self-consistency: sample N CoT traces and vote. Use when accuracy outweighs cost.\n- System prompt: persistent role/tone/safety rules. Always use one in production.\n\nA well-engineered prompt typically combines a system prompt + few-shot examples + chain-of-thought."
+  },
+  {
+    "id": "google-agent-tools-label",
+    "title": "Label an Agent Architecture Diagram",
+    "description": "Label the components of a Google Agent Builder agent diagram, including the orchestrator, tools, data stores, and grounding sources.",
+    "type": "diagram-label",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Agent Builder",
+      "Vertex AI Search",
+      "Gemini",
+      "Cloud Functions"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Identify the building blocks of a Google AI agent: model, instructions, tools, data stores",
+      "Distinguish extensions, function calls, and data store grounding",
+      "Place the human-in-the-loop and safety filter components correctly"
+    ],
+    "realWorldValue": "Most failed agent projects use the wrong building block - a function call where a data store would do, or a tool where an extension exists. Reading the agent diagram fluently prevents that mistake.",
+    "relatedExamCodes": [
+      "GAIL-2025"
+    ],
+    "scenario": "Your Agent Builder team has drawn an architecture diagram for a customer-service agent and asked you to label the components.",
+    "imageUrl": "/labs/google-agent-architecture.svg",
+    "hotspots": [
+      {
+        "id": "h1",
+        "x": 20,
+        "y": 30,
+        "options": [
+          "User Interface",
+          "Foundation Model",
+          "Tool Server",
+          "Data Store"
+        ],
+        "answer": "User Interface",
+        "label": "Where the end user interacts"
+      },
+      {
+        "id": "h2",
+        "x": 50,
+        "y": 30,
+        "options": [
+          "Gemini Model (Reasoning Core)",
+          "Cloud Storage Bucket",
+          "Cloud SQL",
+          "BigQuery"
+        ],
+        "answer": "Gemini Model (Reasoning Core)",
+        "label": "Plans steps and chooses tools"
+      },
+      {
+        "id": "h3",
+        "x": 80,
+        "y": 20,
+        "options": [
+          "Function Calling Tool",
+          "Compute Engine VM",
+          "Cloud DNS",
+          "Pub/Sub Topic"
+        ],
+        "answer": "Function Calling Tool",
+        "label": "Calls custom HTTP endpoint"
+      },
+      {
+        "id": "h4",
+        "x": 80,
+        "y": 50,
+        "options": [
+          "Vertex AI Search Data Store",
+          "Cloud Bigtable",
+          "Persistent Disk",
+          "VPC Network"
+        ],
+        "answer": "Vertex AI Search Data Store",
+        "label": "Grounds answers in private corpus"
+      },
+      {
+        "id": "h5",
+        "x": 80,
+        "y": 80,
+        "options": [
+          "Built-in Extension (Google Search)",
+          "Cloud Build Trigger",
+          "IAM Policy",
+          "Service Account Key"
+        ],
+        "answer": "Built-in Extension (Google Search)",
+        "label": "Pre-built grounded web search"
+      },
+      {
+        "id": "h6",
+        "x": 50,
+        "y": 80,
+        "options": [
+          "Safety / Responsible AI Filter",
+          "Load Balancer",
+          "Cloud CDN",
+          "Cloud NAT"
+        ],
+        "answer": "Safety / Responsible AI Filter",
+        "label": "Blocks harmful in/output"
+      }
+    ],
+    "answers": [
+      {
+        "id": "core",
+        "text": "Gemini is the reasoning core that selects tools, data stores, and extensions",
+        "correct": true
+      },
+      {
+        "id": "tool-core",
+        "text": "Tools form the reasoning core; the model is just a renderer"
+      },
+      {
+        "id": "ds-only",
+        "text": "Only data stores can ground; tools and extensions are not grounding"
+      },
+      {
+        "id": "no-safety",
+        "text": "Safety filters are optional and rarely used in production"
+      }
+    ],
+    "explanation": "A Google AI agent has six logical components:\n\n1. User Interface - chat UI, app, or API client.\n2. Foundation Model (reasoning core) - Gemini decides what to do next.\n3. Function Calling - calls developer-defined HTTP endpoints (Cloud Run, Cloud Functions, internal APIs).\n4. Data Stores - Vertex AI Search indexes for grounding (RAG).\n5. Built-in Extensions - first-party tools like Google Search, code execution, Maps.\n6. Safety / Responsible AI Filter - configurable thresholds on harassment, hate speech, sexual content, dangerous content.\n\nThe model never executes anything itself. It emits structured JSON saying \"call this function\" or \"search this datastore\", and the Agent Builder runtime executes it."
+  },
+  {
+    "id": "google-responsible-ai-toggle",
+    "title": "Identify Responsible AI Controls in Vertex AI",
+    "description": "Configure the Responsible AI controls on a Vertex AI generative model deployment to meet enterprise guardrail requirements.",
+    "type": "config-toggle",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI",
+      "Gemini",
+      "Model Armor"
+    ],
+    "labCategory": "Configure",
+    "learningOutcomes": [
+      "Configure Vertex AI safety filters across the four harm categories",
+      "Enable SynthID watermarking and citation metadata",
+      "Apply Model Armor and prompt logging for governance"
+    ],
+    "realWorldValue": "A single misconfigured safety filter on a public-facing chatbot can become tomorrow's news headline. Walking through every Responsible AI knob before launch is non-negotiable.",
+    "relatedExamCodes": [
+      "GAIL-2025"
+    ],
+    "scenario": "You are launching a public-facing customer assistant on Vertex AI Gemini. Your enterprise risk team has signed off on the following requirements:\n\n- Block all harassment and hate speech\n- Block dangerous content\n- Allow medium sexually-suggestive content (the product is age-gated 18+)\n- Watermark all generated images\n- Log every prompt and response for audit\n- Apply Model Armor in front of the model\n\nFix the configuration to match.",
+    "configItems": [
+      {
+        "id": "harassment",
+        "label": "Harassment Threshold",
+        "currentValue": "BLOCK_ONLY_HIGH",
+        "correctValue": "BLOCK_LOW_AND_ABOVE",
+        "inputType": "select",
+        "options": [
+          "BLOCK_NONE",
+          "BLOCK_ONLY_HIGH",
+          "BLOCK_MEDIUM_AND_ABOVE",
+          "BLOCK_LOW_AND_ABOVE"
+        ]
+      },
+      {
+        "id": "hate",
+        "label": "Hate Speech Threshold",
+        "currentValue": "BLOCK_NONE",
+        "correctValue": "BLOCK_LOW_AND_ABOVE",
+        "inputType": "select",
+        "options": [
+          "BLOCK_NONE",
+          "BLOCK_ONLY_HIGH",
+          "BLOCK_MEDIUM_AND_ABOVE",
+          "BLOCK_LOW_AND_ABOVE"
+        ]
+      },
+      {
+        "id": "dangerous",
+        "label": "Dangerous Content Threshold",
+        "currentValue": "BLOCK_ONLY_HIGH",
+        "correctValue": "BLOCK_LOW_AND_ABOVE",
+        "inputType": "select",
+        "options": [
+          "BLOCK_NONE",
+          "BLOCK_ONLY_HIGH",
+          "BLOCK_MEDIUM_AND_ABOVE",
+          "BLOCK_LOW_AND_ABOVE"
+        ]
+      },
+      {
+        "id": "sexual",
+        "label": "Sexually Explicit Threshold",
+        "currentValue": "BLOCK_LOW_AND_ABOVE",
+        "correctValue": "BLOCK_MEDIUM_AND_ABOVE",
+        "inputType": "select",
+        "options": [
+          "BLOCK_NONE",
+          "BLOCK_ONLY_HIGH",
+          "BLOCK_MEDIUM_AND_ABOVE",
+          "BLOCK_LOW_AND_ABOVE"
+        ]
+      },
+      {
+        "id": "synthid",
+        "label": "SynthID Image Watermarking",
+        "currentValue": "Disabled",
+        "correctValue": "Enabled",
+        "inputType": "select",
+        "options": [
+          "Disabled",
+          "Enabled"
+        ]
+      },
+      {
+        "id": "audit-logs",
+        "label": "Prompt & Response Audit Logging",
+        "currentValue": "Disabled",
+        "correctValue": "Enabled",
+        "inputType": "select",
+        "options": [
+          "Disabled",
+          "Enabled"
+        ]
+      },
+      {
+        "id": "model-armor",
+        "label": "Model Armor Filter",
+        "currentValue": "Disabled",
+        "correctValue": "Enabled",
+        "inputType": "select",
+        "options": [
+          "Disabled",
+          "Enabled"
+        ]
+      },
+      {
+        "id": "citations",
+        "label": "Citation Metadata in Responses",
+        "currentValue": "Disabled",
+        "correctValue": "Enabled",
+        "inputType": "select",
+        "options": [
+          "Disabled",
+          "Enabled"
+        ]
+      }
+    ],
+    "explanation": "The four harm categories on Vertex AI Gemini are HARM_CATEGORY_HARASSMENT, HATE_SPEECH, DANGEROUS_CONTENT, and SEXUALLY_EXPLICIT. Each takes one of four thresholds (BLOCK_NONE, BLOCK_ONLY_HIGH, BLOCK_MEDIUM_AND_ABOVE, BLOCK_LOW_AND_ABOVE).\n\nFor a public-facing assistant:\n- Harassment, hate, dangerous: BLOCK_LOW_AND_ABOVE (strictest).\n- Sexual: BLOCK_MEDIUM_AND_ABOVE because the product is age-gated and would over-block romance/relationship advice at the strictest level.\n\nSynthID embeds an invisible watermark in Imagen outputs - always enable for provenance. Audit logging captures every prompt and response for compliance review. Model Armor adds a separate prompt-injection and PII detector in front of the model. Citation metadata returns source URIs from grounding sources."
+  },
+  {
+    "id": "google-roi-scenario-order",
+    "title": "Order Steps to Build a Gen AI Business Case",
+    "description": "Order the steps a Google generative AI leader takes when building an ROI-driven business case for a new gen AI initiative.",
+    "type": "ordering",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI",
+      "Looker"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Order the steps of a gen AI business-case lifecycle",
+      "Place stakeholder alignment, baseline measurement, and post-launch review correctly",
+      "Avoid the common trap of jumping to model selection before ROI metrics exist"
+    ],
+    "realWorldValue": "Most gen AI projects fail at the funding gate because the business case is built backwards - model picked first, metrics retrofitted later. Following the right order is what gets a project funded and renewed.",
+    "relatedExamCodes": [
+      "GAIL-2025"
+    ],
+    "scenario": "Your CIO has asked you to lead a Gemini-based document summarisation pilot. Order the steps you would take to build a defensible business case from idea to renewal.",
+    "steps": [
+      {
+        "id": "step-1",
+        "text": "Identify the business problem and the affected stakeholders",
+        "correctPosition": 1
+      },
+      {
+        "id": "step-2",
+        "text": "Quantify the current cost (time, labour, errors) as a baseline",
+        "correctPosition": 2
+      },
+      {
+        "id": "step-3",
+        "text": "Define the target outcome metrics and a minimum viable improvement",
+        "correctPosition": 3
+      },
+      {
+        "id": "step-4",
+        "text": "Map the gen AI use case to one of the four ROI levers (cost, productivity, growth, differentiation)",
+        "correctPosition": 4
+      },
+      {
+        "id": "step-5",
+        "text": "Estimate build, run, and change-management costs over a 12-month horizon",
+        "correctPosition": 5
+      },
+      {
+        "id": "step-6",
+        "text": "Run a time-boxed pilot on Vertex AI to validate feasibility and effort",
+        "correctPosition": 6
+      },
+      {
+        "id": "step-7",
+        "text": "Compare actual pilot metrics against the baseline and target",
+        "correctPosition": 7
+      },
+      {
+        "id": "step-8",
+        "text": "Present results to stakeholders and decide go / no-go for production",
+        "correctPosition": 8
+      }
+    ],
+    "explanation": "The Google-recommended business-case sequence:\n\n1. Identify the problem and stakeholders - skip this and the project has no owner.\n2. Quantify the baseline - without a number you cannot prove ROI.\n3. Define target metrics - decided before model selection so technique does not bias the goal.\n4. Map to ROI lever - cost reduction, productivity, revenue growth, or differentiation.\n5. Estimate costs - including change management; many projects miss this and overrun.\n6. Time-boxed pilot - usually 6-12 weeks on Vertex AI.\n7. Compare actuals - feed back to the original metrics, not new ones.\n8. Go/no-go - present to stakeholders with the numbers in step 7."
+  },
+  {
+    "id": "google-ecosystem-match",
+    "title": "Match Google AI Products to Buyer Personas",
+    "description": "Match each Google AI product (Gemini App, Workspace AI, Agentspace, Vertex AI, Agent Builder, NotebookLM) to the buyer persona it primarily serves.",
+    "type": "drag-match",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Gemini",
+      "Workspace",
+      "Agentspace",
+      "Vertex AI",
+      "Agent Builder",
+      "NotebookLM"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Map Google AI products to the personas that buy and use them",
+      "Distinguish builder products (Vertex, Agent Builder) from end-user products (Gemini App, Workspace, Agentspace)",
+      "Recommend the right product when scoping a new AI initiative"
+    ],
+    "realWorldValue": "Showing a developer Workspace AI when they need Vertex AI - or an executive Vertex when they need Gemini App - is how solution sellers lose deals. Knowing the persona-product fit is the first slide of any Google AI pitch.",
+    "relatedExamCodes": [
+      "GAIL-2025"
+    ],
+    "scenario": "You are running a Google AI discovery workshop with six different stakeholders. Match each persona's stated need to the most appropriate Google AI product.",
+    "pairs": [
+      {
+        "id": "knowledge-worker",
+        "term": "Marketing manager wants AI inside Docs, Sheets, and Gmail without coding",
+        "definition": "Google Workspace with Gemini - AI features baked into Docs, Sheets, Slides, Meet, and Gmail"
+      },
+      {
+        "id": "consumer",
+        "term": "Anyone with a Google account who wants a free general-purpose AI chat",
+        "definition": "Gemini App - consumer-facing chat product (gemini.google.com)"
+      },
+      {
+        "id": "researcher",
+        "term": "Analyst grounding answers in their own uploaded PDFs and notes",
+        "definition": "NotebookLM - source-grounded research and notes assistant"
+      },
+      {
+        "id": "enterprise-search",
+        "term": "Employees want a single search box across Drive, Jira, ServiceNow, and email",
+        "definition": "Google Agentspace - enterprise AI agent and search across SaaS sources"
+      },
+      {
+        "id": "ml-engineer",
+        "term": "ML engineer wants to fine-tune, deploy, and monitor models programmatically",
+        "definition": "Vertex AI - end-to-end ML/Gen AI platform (Pipelines, Tuning, Endpoints, Model Garden)"
+      },
+      {
+        "id": "developer",
+        "term": "Application developer wants to build a chatbot grounded in their company knowledge base",
+        "definition": "Vertex AI Agent Builder - low-code agent builder with RAG, function calling, and extensions"
+      }
+    ],
+    "explanation": "The Google AI portfolio splits into builders and consumers:\n\nBuilder tier (developers/ML engineers):\n- Vertex AI - the platform: Pipelines, Tuning, Endpoints, Model Garden, Feature Store, Model Monitoring.\n- Vertex AI Agent Builder - low-code RAG/agent builder.\n- Vertex AI Search - enterprise search index.\n\nEnd-user tier (knowledge workers / consumers):\n- Gemini App - free consumer chat.\n- Workspace with Gemini - AI in Docs/Sheets/Gmail.\n- NotebookLM - source-grounded research notebook.\n- Agentspace - enterprise agent across SaaS connectors.\n\nWhen scoping a project, the persona dictates the product: an ML engineer never builds on Workspace, and a marketing manager never opens Vertex AI."
+  },
+  {
+    "id": "google-bq-query-fix",
+    "title": "Fix a Broken BigQuery SQL Query",
+    "description": "A BigQuery analytics query is failing or producing wrong results. Fix the SQL to compute the correct aggregation efficiently.",
+    "type": "code-fix",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "Data",
+    "technologies": [
+      "BigQuery",
+      "SQL"
+    ],
+    "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Fix common BigQuery SQL errors: misuse of GROUP BY, partition pruning, date functions",
+      "Use `_PARTITIONDATE` or partition columns to scan less data",
+      "Apply HAVING vs WHERE correctly"
+    ],
+    "realWorldValue": "A single broken aggregation query in a daily ELT pipeline can both produce wrong KPIs and silently scan terabytes a day. Fixing it tightens both correctness and bill.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "An analyst is trying to compute the top 10 product categories by revenue for the last 7 days from the partitioned `analytics.orders` table.\n\n**Issues with the current query:**\n1. The query scans the full table (no partition filter)\n2. It aggregates with the wrong GROUP BY\n3. It uses WHERE on an aggregate, which BigQuery rejects\n4. The date function is wrong\n\nFix the query so it returns the correct results and scans only the last 7 days.",
+    "language": "sql",
+    "brokenCode": "SELECT\n  category,\n  SUM(price * quantity) AS revenue\nFROM `analytics.orders`\nWHERE order_date BETWEEN DATE_ADD(CURRENT_DATE(), 7) AND CURRENT_DATE()\nGROUP BY order_id\nWHERE revenue > 1000\nORDER BY revenue DESC\nLIMIT 10;",
+    "correctCode": "SELECT\n  category,\n  SUM(price * quantity) AS revenue\nFROM `analytics.orders`\nWHERE order_date BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY) AND CURRENT_DATE()\nGROUP BY category\nHAVING revenue > 1000\nORDER BY revenue DESC\nLIMIT 10;",
+    "validations": [
+      {
+        "field": "DATE_SUB",
+        "expected": "DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)"
+      },
+      {
+        "field": "GROUP BY",
+        "expected": "GROUP BY category"
+      },
+      {
+        "field": "HAVING",
+        "expected": "HAVING revenue > 1000"
+      }
+    ],
+    "explanation": "Four fixes:\n\n1. `DATE_ADD(CURRENT_DATE(), 7)` returns a date 7 days in the *future* - reverse it with `DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)`. This also lets BigQuery prune partitions if `order_date` is the partitioning column.\n2. `GROUP BY order_id` aggregates per-order, defeating the point. Group by `category` instead.\n3. The second `WHERE` clause filters on an aggregate alias - BigQuery requires `HAVING` for that.\n4. `BETWEEN` requires the lower bound first; with the wrong date function the range was empty.\n\nThe corrected query both returns the right answer and scans only the last 7 daily partitions."
+  },
+  {
+    "id": "google-storage-class-match",
+    "title": "Match Cloud Storage Classes to Access Patterns",
+    "description": "Match each Cloud Storage class (Standard, Nearline, Coldline, Archive) to the data access pattern it best fits.",
+    "type": "drag-match",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "Storage",
+    "technologies": [
+      "Cloud Storage"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Match Cloud Storage classes to access frequency and minimum storage duration",
+      "Distinguish Nearline (30-day) from Coldline (90-day) and Archive (365-day) commitments",
+      "Apply Autoclass when access patterns are unknown"
+    ],
+    "realWorldValue": "Picking the wrong storage class is the #1 silent waste line on most GCP bills. A tag and a lifecycle rule applied correctly can drop storage spend by 60%+.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "A data engineering team is reviewing their Cloud Storage costs and needs to assign each dataset to the correct storage class based on its access pattern.",
+    "pairs": [
+      {
+        "id": "hot",
+        "term": "Active website assets and product images served on every request",
+        "definition": "Standard - frequent access; no minimum storage duration; highest at-rest cost, lowest retrieval cost"
+      },
+      {
+        "id": "warm",
+        "term": "Monthly financial reports queried a few times per month",
+        "definition": "Nearline - access ~once per month; 30-day minimum storage duration"
+      },
+      {
+        "id": "cool",
+        "term": "Quarterly disaster-recovery snapshots accessed only during DR drills",
+        "definition": "Coldline - access ~once per quarter; 90-day minimum storage duration"
+      },
+      {
+        "id": "cold",
+        "term": "Seven-year regulatory archive read at most once per year",
+        "definition": "Archive - access at most once per year; 365-day minimum storage duration; lowest at-rest cost"
+      },
+      {
+        "id": "unknown",
+        "term": "Mixed dataset where access frequency varies and is hard to predict",
+        "definition": "Autoclass - GCS automatically moves objects between classes based on observed access"
+      }
+    ],
+    "explanation": "Cloud Storage classes are priced on at-rest storage vs retrieval/operations:\n\n- Standard: highest storage, lowest retrieval. Use for hot data.\n- Nearline: 30-day minimum, lower storage, retrieval fees. Use for monthly access.\n- Coldline: 90-day minimum, even lower storage. Use for quarterly access.\n- Archive: 365-day minimum, lowest storage but highest retrieval. Use for compliance archives.\n\nIf you delete or move an object before the minimum duration expires, you pay the full duration anyway - so don't use Archive for data you might need quickly.\n\nAutoclass eliminates the guessing by transitioning objects up/down the ladder based on actual access patterns. Use it when you cannot characterise access in advance."
+  },
+  {
+    "id": "google-dataflow-log-analysis",
+    "title": "Analyse Dataflow Job Logs for a Stall",
+    "description": "Read Dataflow worker and job logs to identify why a streaming pipeline has stopped advancing the watermark.",
+    "type": "log-analysis",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "Data",
+    "technologies": [
+      "Dataflow",
+      "Pub/Sub",
+      "BigQuery",
+      "Cloud Logging"
+    ],
+    "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Read Dataflow job and worker logs in Cloud Logging",
+      "Correlate watermark stall with backend errors (BigQuery quota, hot keys, OOMs)",
+      "Identify the root cause of a streaming pipeline freeze"
+    ],
+    "realWorldValue": "A Dataflow streaming pipeline that silently freezes at 03:00 AM is a top on-call page. Knowing how to read the worker log, the watermark, and the backend error in under five minutes is how you keep the SLA.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "Your Pub/Sub → Dataflow → BigQuery streaming pipeline has stalled. Pub/Sub backlog is climbing, the Dataflow watermark hasn't advanced in 15 minutes, and downstream dashboards are stale.\n\nReview the logs and identify the root cause.",
+    "logs": [
+      {
+        "timestamp": "03:02:11",
+        "level": "INFO",
+        "source": "dataflow-job",
+        "message": "Job streaming-events-prod state = RUNNING, watermark = 03:01:50"
+      },
+      {
+        "timestamp": "03:03:42",
+        "level": "INFO",
+        "source": "worker-1",
+        "message": "Processed 12,450 elements in window [03:00:00, 03:01:00)"
+      },
+      {
+        "timestamp": "03:05:11",
+        "level": "WARNING",
+        "source": "worker-3",
+        "message": "BigQueryIO.Write: rateLimitExceeded for table analytics.events: 100 inserts/sec quota reached"
+      },
+      {
+        "timestamp": "03:06:02",
+        "level": "WARNING",
+        "source": "worker-3",
+        "message": "Retrying batch insert in 2.0s (attempt 1/8)"
+      },
+      {
+        "timestamp": "03:07:15",
+        "level": "WARNING",
+        "source": "worker-3",
+        "message": "Retrying batch insert in 4.0s (attempt 2/8)"
+      },
+      {
+        "timestamp": "03:08:33",
+        "level": "INFO",
+        "source": "dataflow-job",
+        "message": "Watermark = 03:01:50 (no advance for 6m43s)"
+      },
+      {
+        "timestamp": "03:09:50",
+        "level": "WARNING",
+        "source": "worker-3",
+        "message": "Retrying batch insert in 8.0s (attempt 3/8)"
+      },
+      {
+        "timestamp": "03:11:22",
+        "level": "INFO",
+        "source": "autoscaler",
+        "message": "Current workers = 4, target = 4, no scale-up triggered (CPU = 35%)"
+      },
+      {
+        "timestamp": "03:12:01",
+        "level": "WARNING",
+        "source": "worker-3",
+        "message": "BigQueryIO.Write: rateLimitExceeded - quotaUser projects/myproj/tables/analytics.events"
+      },
+      {
+        "timestamp": "03:13:40",
+        "level": "ERROR",
+        "source": "worker-3",
+        "message": "Failed batch after 8 retries; element will be retried by next bundle"
+      }
+    ],
+    "answers": [
+      {
+        "id": "oom",
+        "text": "Worker OOM kill is causing the watermark to stall"
+      },
+      {
+        "id": "quota",
+        "text": "BigQuery streaming insert quota is throttling the sink, blocking watermark advance",
+        "correct": true
+      },
+      {
+        "id": "hot-key",
+        "text": "A hot key on the GroupByKey transform is blocking parallelism"
+      },
+      {
+        "id": "autoscale",
+        "text": "Autoscaling failed and worker count is too low to keep up"
+      }
+    ],
+    "explanation": "The logs tell a clear story:\n\n- The job is RUNNING and CPU is only 35% - workers are not the bottleneck.\n- Worker-3 logs `rateLimitExceeded` against `analytics.events` (100 inserts/sec quota).\n- Repeated retries with exponential backoff (2s → 4s → 8s) consistent with quota throttling, not transient network errors.\n- Watermark hasn't advanced because the BigQuery sink hasn't acknowledged writes.\n\nThe fix is to either (a) request a higher streaming insert quota for the table, (b) switch to the Storage Write API which has much higher throughput limits, or (c) batch-load via files. OOMs would surface as worker restarts; hot keys would show one worker pegged at 100% CPU; autoscaling would log scale-up attempts."
+  },
+  {
+    "id": "google-iam-policy-fix",
+    "title": "Fix a BigQuery IAM Policy Violation",
+    "description": "A BigQuery IAM binding grants overly broad access. Rewrite it to follow least privilege using BigQuery-specific predefined roles.",
+    "type": "policy-fix",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "Security",
+    "technologies": [
+      "BigQuery",
+      "IAM"
+    ],
+    "labCategory": "Configure",
+    "learningOutcomes": [
+      "Distinguish bigquery.admin from bigquery.dataEditor and bigquery.dataViewer",
+      "Bind roles at dataset scope rather than project scope",
+      "Avoid using primitive roles (Owner/Editor/Viewer) on data resources"
+    ],
+    "realWorldValue": "Project-level Editor on BigQuery is the most common audit finding in any GCP environment. Rewriting it to dataset-scoped predefined roles is one of the highest-leverage security fixes.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "Your security audit has flagged the analytics IAM policy. The data analysts only need to read tables in `analytics_curated` and run query jobs - nothing else.\n\nThe current policy grants the basic Editor role at the project scope. Fix it to follow least privilege.",
+    "brokenPolicy": "{\n  \"bindings\": [\n    {\n      \"role\": \"roles/editor\",\n      \"members\": [\n        \"group:data-analysts@example.com\"\n      ]\n    }\n  ]\n}",
+    "correctPolicy": "{\n  \"bindings\": [\n    {\n      \"role\": \"roles/bigquery.jobUser\",\n      \"members\": [\n        \"group:data-analysts@example.com\"\n      ]\n    },\n    {\n      \"role\": \"roles/bigquery.dataViewer\",\n      \"members\": [\n        \"group:data-analysts@example.com\"\n      ],\n      \"condition\": {\n        \"title\": \"AnalyticsCuratedOnly\",\n        \"expression\": \"resource.name.endsWith('/datasets/analytics_curated')\"\n      }\n    }\n  ]\n}",
+    "validations": [
+      {
+        "field": "role",
+        "expected": "roles/bigquery.jobUser"
+      },
+      {
+        "field": "role",
+        "expected": "roles/bigquery.dataViewer"
+      },
+      {
+        "field": "condition",
+        "expected": "analytics_curated"
+      }
+    ],
+    "explanation": "The basic role `roles/editor` grants nearly all GCP write permissions across the project - far beyond what data analysts need.\n\nLeast-privilege fix:\n\n1. `roles/bigquery.jobUser` at project scope - allows running query/load/export jobs but no data access.\n2. `roles/bigquery.dataViewer` bound only to the `analytics_curated` dataset (via IAM condition or by binding directly on the dataset resource) - read-only access to that dataset only.\n\nAvoid primitive roles (Owner, Editor, Viewer) on any data project - they grant access far beyond the intent. BigQuery has a rich set of predefined roles (admin, user, dataOwner, dataEditor, dataViewer, jobUser, metadataViewer, readSessionUser) that should always be used instead."
+  },
+  {
+    "id": "google-transfer-tool-match",
+    "title": "Match Data Transfer Tools to Scenarios",
+    "description": "Match each data ingestion or migration scenario to the correct Google Cloud transfer tool.",
+    "type": "drag-match",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "Data",
+    "technologies": [
+      "Storage Transfer Service",
+      "Transfer Appliance",
+      "BigQuery Data Transfer Service",
+      "Database Migration Service",
+      "Datastream"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Match data volumes and sources to the right Google transfer service",
+      "Distinguish online (STS) from offline (Transfer Appliance) bulk transfer",
+      "Recognise CDC (Datastream) vs DB migration (DMS) vs SaaS sync (BQ DTS)"
+    ],
+    "realWorldValue": "Picking the wrong ingestion tool wastes weeks. A 500 TB on-prem dump shipped over the public internet can take months; a Transfer Appliance ships it in days.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "Your customer has five data movement projects coming in this quarter. Match each to the most appropriate Google Cloud transfer tool.",
+    "pairs": [
+      {
+        "id": "online-bulk",
+        "term": "Move 50 TB from S3 to Cloud Storage over a 10 Gbps link",
+        "definition": "Storage Transfer Service - online transfers between cloud object stores (S3, Azure, GCS, HTTP)"
+      },
+      {
+        "id": "offline-bulk",
+        "term": "Move 500 TB from an on-prem data centre with a 100 Mbps internet link",
+        "definition": "Transfer Appliance - physical hardware shipped to your DC, populated, then returned to Google"
+      },
+      {
+        "id": "saas",
+        "term": "Daily scheduled load of Google Ads and YouTube data into BigQuery",
+        "definition": "BigQuery Data Transfer Service - scheduled connectors for Google SaaS sources"
+      },
+      {
+        "id": "db-migration",
+        "term": "Migrate an on-prem MySQL 5.7 database to Cloud SQL with minimal downtime",
+        "definition": "Database Migration Service (DMS) - online homogenous and heterogenous database migrations"
+      },
+      {
+        "id": "cdc",
+        "term": "Stream change events from an Oracle production database to BigQuery in near real-time",
+        "definition": "Datastream - serverless CDC replication from Oracle, MySQL, PostgreSQL, SQL Server"
+      },
+      {
+        "id": "filesystem",
+        "term": "Replicate an on-prem NFS file server to Cloud Storage on a schedule",
+        "definition": "Storage Transfer Service for on-premises - agent-based filesystem to GCS sync"
+      }
+    ],
+    "explanation": "Choose the transfer tool by source, volume, and freshness:\n\n- Online cloud-to-cloud or HTTP: Storage Transfer Service.\n- Offline bulk (TBs/PBs over slow links): Transfer Appliance.\n- SaaS connectors (Google Ads, YouTube, Salesforce, Facebook Ads, Amazon S3): BigQuery Data Transfer Service.\n- Database migrations (one-shot or with cutover): Database Migration Service.\n- Continuous CDC replication: Datastream.\n- On-prem filesystems: Storage Transfer Service for on-premises (uses agents).\n\nA common mistake is using gsutil/gcloud rsync for very large transfers - it works but lacks the resumability, scheduling, and parallelism of Storage Transfer Service."
+  },
+  {
+    "id": "google-bq-ml-cmd",
+    "title": "Create and Evaluate a BigQuery ML Model",
+    "description": "Fill in the BigQuery ML SQL to create, evaluate, and run inference on a logistic regression model in BigQuery.",
+    "type": "fill-command",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "Data",
+    "technologies": [
+      "BigQuery",
+      "BigQuery ML",
+      "SQL"
+    ],
+    "labCategory": "Implement",
+    "learningOutcomes": [
+      "Use CREATE MODEL with the right model_type and OPTIONS",
+      "Evaluate a classifier with ML.EVALUATE",
+      "Run inference with ML.PREDICT"
+    ],
+    "realWorldValue": "BigQuery ML lets data analysts ship a real model from SQL alone, no MLOps stack required. Knowing the three core statements (CREATE MODEL, ML.EVALUATE, ML.PREDICT) is enough to deliver dozens of business cases.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "You are building a churn classifier in BigQuery ML. Fill in the missing parts of each statement.",
+    "questions": [
+      {
+        "id": "q1",
+        "template": "-- Step 1: Create a logistic regression churn model\nCREATE OR REPLACE MODEL `analytics.churn_model`\nOPTIONS(\n  model_type = '___',\n  input_label_cols = ['___'],\n  auto_class_weights = TRUE\n) AS\nSELECT\n  tenure_months, monthly_charges, contract_type, churned\nFROM `analytics.customers`\nWHERE split = 'TRAIN';",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "model_type for binary classification",
+            "answer": "logistic_reg"
+          },
+          {
+            "id": "b2",
+            "placeholder": "label column name",
+            "answer": "churned"
+          }
+        ],
+        "hint": "BigQuery ML uses 'logistic_reg' for both binary and multiclass logistic regression"
+      },
+      {
+        "id": "q2",
+        "template": "-- Step 2: Evaluate the model on the held-out set\nSELECT *\nFROM ML.___ (MODEL `analytics.churn_model`,\n  (SELECT * FROM `analytics.customers` WHERE split = 'EVAL'));",
+        "blanks": [
+          {
+            "id": "b3",
+            "placeholder": "evaluation function",
+            "answer": "EVALUATE"
+          }
+        ],
+        "hint": "Returns precision, recall, accuracy, F1, log_loss, and ROC AUC for classifiers"
+      },
+      {
+        "id": "q3",
+        "template": "-- Step 3: Score new customers\nSELECT customer_id,\n       predicted_churned,\n       predicted_churned_probs\nFROM ML.___ (MODEL `analytics.churn_model`,\n  (SELECT * FROM `analytics.customers` WHERE split = 'SCORE'));",
+        "blanks": [
+          {
+            "id": "b4",
+            "placeholder": "inference function",
+            "answer": "PREDICT"
+          }
+        ],
+        "hint": "Returns the predicted label and a struct of probabilities per class"
+      },
+      {
+        "id": "q4",
+        "template": "-- Step 4: Inspect feature importance via ML.GLOBAL_EXPLAIN\nSELECT *\nFROM ML.___ (MODEL `analytics.churn_model`,\n  STRUCT(TRUE AS class_level_explain));",
+        "blanks": [
+          {
+            "id": "b5",
+            "placeholder": "explainability function",
+            "answer": "GLOBAL_EXPLAIN"
+          }
+        ],
+        "hint": "Returns aggregated Shapley feature attributions for the model"
+      }
+    ],
+    "explanation": "The three core BigQuery ML SQL primitives:\n\n- `CREATE MODEL ... OPTIONS(model_type='logistic_reg', input_label_cols=[...])` - trains the model. `auto_class_weights=TRUE` rebalances imbalanced classes.\n- `ML.EVALUATE(MODEL, eval_set)` - returns classification metrics (precision, recall, accuracy, F1, log_loss, roc_auc).\n- `ML.PREDICT(MODEL, scoring_set)` - returns `predicted_<label>` and `predicted_<label>_probs`.\n- `ML.GLOBAL_EXPLAIN` - returns global Shapley feature attributions.\n\nOther model types include `linear_reg`, `kmeans`, `matrix_factorization`, `arima_plus`, `boosted_tree_classifier`, and `dnn_classifier`. For deep learning prefer `boosted_tree_*` or move to Vertex AI."
+  },
+  {
+    "id": "google-looker-dashboard-config",
+    "title": "Configure a Looker Dashboard for a Business KPI",
+    "description": "Configure the tiles, filters, and refresh settings on a Looker dashboard so it correctly reports a Monthly Active Users KPI.",
+    "type": "config-toggle",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "Data",
+    "technologies": [
+      "Looker",
+      "BigQuery"
+    ],
+    "labCategory": "Implement",
+    "learningOutcomes": [
+      "Configure dashboard-level filters and timezone",
+      "Set the right cache and refresh policy for a daily KPI",
+      "Use scheduled deliveries for stakeholder reporting"
+    ],
+    "realWorldValue": "A KPI dashboard with the wrong timezone, the wrong cache, or no scheduled delivery is the difference between an executive trusting and ignoring the data.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "You are productionising a Monthly Active Users dashboard for the executive team.\n\n**Requirements:**\n- Time zone Europe/London\n- Date range default: last 90 days\n- Refresh once an hour during business hours\n- Auto-deliver as PDF every Monday at 08:00 to `exec@example.com`\n- Drill-down enabled to underlying detail Look\n\nFix the configuration to match.",
+    "configItems": [
+      {
+        "id": "timezone",
+        "label": "Dashboard Timezone",
+        "currentValue": "UTC",
+        "correctValue": "Europe/London",
+        "inputType": "select",
+        "options": [
+          "UTC",
+          "Europe/London",
+          "America/New_York",
+          "Asia/Tokyo"
+        ]
+      },
+      {
+        "id": "default-range",
+        "label": "Default Date Range",
+        "currentValue": "Last 7 days",
+        "correctValue": "Last 90 days",
+        "inputType": "select",
+        "options": [
+          "Last 7 days",
+          "Last 30 days",
+          "Last 90 days",
+          "Year to date"
+        ]
+      },
+      {
+        "id": "cache",
+        "label": "Cache Policy",
+        "currentValue": "24 hours",
+        "correctValue": "1 hour",
+        "inputType": "select",
+        "options": [
+          "5 minutes",
+          "1 hour",
+          "6 hours",
+          "24 hours"
+        ]
+      },
+      {
+        "id": "datagroup",
+        "label": "Datagroup Trigger",
+        "currentValue": "Manual refresh only",
+        "correctValue": "SQL trigger on hourly ETL completion",
+        "inputType": "select",
+        "options": [
+          "Manual refresh only",
+          "SQL trigger on hourly ETL completion",
+          "PDT every 6 hours",
+          "Realtime"
+        ]
+      },
+      {
+        "id": "schedule",
+        "label": "Scheduled Delivery",
+        "currentValue": "Disabled",
+        "correctValue": "Weekly Mon 08:00 PDF to exec@example.com",
+        "inputType": "select",
+        "options": [
+          "Disabled",
+          "Daily 08:00 CSV to exec@example.com",
+          "Weekly Mon 08:00 PDF to exec@example.com",
+          "Hourly to slack"
+        ]
+      },
+      {
+        "id": "drill",
+        "label": "Tile Drill-down",
+        "currentValue": "Off",
+        "correctValue": "On - link to MAU detail Look",
+        "inputType": "select",
+        "options": [
+          "Off",
+          "On - link to MAU detail Look",
+          "On - link to LookML model",
+          "On - external URL only"
+        ]
+      }
+    ],
+    "explanation": "Looker dashboard productionisation checklist:\n\n- **Timezone**: align with the audience. London exec team gets Europe/London so daily/weekly buckets match their workday.\n- **Default date range**: 90 days for trend KPIs balances recency with context.\n- **Cache**: with hourly ETL, a 1-hour cache lines up with data freshness without re-running queries needlessly.\n- **Datagroup trigger**: bind cache invalidation to the ETL completion via a SQL trigger so the dashboard updates as soon as new data lands.\n- **Scheduled delivery**: PDF to the exec mailing list keeps stakeholders informed without forcing them into Looker.\n- **Drill-down**: link tiles to the detail Look so an exec can self-serve when they want to dig in."
+  },
+  {
+    "id": "google-composer-schedule-cmd",
+    "title": "Schedule a DAG in Cloud Composer",
+    "description": "Fill in the gcloud and Airflow commands to deploy and schedule a DAG in Cloud Composer.",
+    "type": "fill-command",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "Data",
+    "technologies": [
+      "Cloud Composer",
+      "Airflow",
+      "Cloud Storage"
+    ],
+    "labCategory": "Implement",
+    "learningOutcomes": [
+      "Upload DAGs to Composer's GCS bucket",
+      "Trigger DAG runs and inspect status with the gcloud composer command set",
+      "Set Airflow variables and pause/unpause DAGs"
+    ],
+    "realWorldValue": "A Composer environment with an undeployed DAG, a paused schedule, or a missing variable looks healthy in the UI and silently produces no data. Knowing the deploy commands tightens the loop.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "Your team has authored a new DAG `daily_etl.py` to refresh the analytics warehouse every night at 02:00 UTC. Fill in the missing values to deploy and operate it.",
+    "questions": [
+      {
+        "id": "q1",
+        "template": "# Step 1: Find the GCS bucket backing the Composer environment\ngcloud composer environments describe analytics-prod \\\n  --location ___ \\\n  --format='value(config.dagGcsPrefix)'",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "Composer region",
+            "answer": "europe-west2"
+          }
+        ],
+        "hint": "Composer environments are regional; the same region as your BigQuery dataset is typical"
+      },
+      {
+        "id": "q2",
+        "template": "# Step 2: Upload the DAG file into the dags/ folder\ngsutil cp daily_etl.py ___",
+        "blanks": [
+          {
+            "id": "b2",
+            "placeholder": "destination GCS path",
+            "answer": "gs://europe-west2-analytics-prod-abcd1234-bucket/dags/"
+          }
+        ],
+        "hint": "Composer auto-syncs the dags/ subfolder of its bucket to all Airflow workers"
+      },
+      {
+        "id": "q3",
+        "template": "# Step 3: Set an Airflow variable for the target dataset\ngcloud composer environments run analytics-prod \\\n  --location europe-west2 \\\n  ___ -- \\\n  set TARGET_DATASET analytics_curated",
+        "blanks": [
+          {
+            "id": "b3",
+            "placeholder": "Airflow subcommand",
+            "answer": "variables"
+          }
+        ],
+        "hint": "Airflow exposes `variables`, `dags`, `tasks`, and `connections` subcommands via composer environments run"
+      },
+      {
+        "id": "q4",
+        "template": "# Step 4: Unpause the DAG so the schedule starts firing\ngcloud composer environments run analytics-prod \\\n  --location europe-west2 \\\n  dags ___ -- daily_etl",
+        "blanks": [
+          {
+            "id": "b4",
+            "placeholder": "Airflow command to unpause",
+            "answer": "unpause"
+          }
+        ],
+        "hint": "DAGs deploy paused by default; the Airflow CLI command flips that flag"
+      },
+      {
+        "id": "q5",
+        "template": "# Step 5: Trigger a one-off run for today's logical date\ngcloud composer environments run analytics-prod \\\n  --location europe-west2 \\\n  dags trigger -- daily_etl --logical-date ___",
+        "blanks": [
+          {
+            "id": "b5",
+            "placeholder": "ISO 8601 logical date",
+            "answer": "2026-04-28T02:00:00"
+          }
+        ],
+        "hint": "Airflow uses logical_date (formerly execution_date) to partition runs; pass an ISO 8601 timestamp"
+      }
+    ],
+    "explanation": "The Composer operating model:\n\n1. `gcloud composer environments describe` returns the GCS bucket backing the environment (`config.dagGcsPrefix`).\n2. `gsutil cp` to `gs://.../dags/` is how DAGs are deployed - Composer auto-syncs that folder to workers.\n3. `gcloud composer environments run <env> <subcommand>` proxies any Airflow CLI command into the environment.\n4. DAGs deploy paused by default - `dags unpause` flips them on.\n5. `dags trigger --logical-date` fires a one-off run; useful for backfills.\n\nDon't store secrets as Airflow Variables - use Secret Manager with the secrets backend configured on the environment instead."
+  },
+  {
+    "id": "google-cmek-label",
+    "title": "Label CMEK vs CSEK vs Google-managed in a Data Architecture",
+    "description": "Label each storage and database component with the encryption key model (Google-managed, CMEK, or CSEK) that fits the regulatory requirement.",
+    "type": "diagram-label",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "Security",
+    "technologies": [
+      "Cloud KMS",
+      "Cloud Storage",
+      "BigQuery",
+      "Cloud SQL"
+    ],
+    "labCategory": "Configure",
+    "learningOutcomes": [
+      "Distinguish Google-managed encryption keys (GMEK), customer-managed (CMEK), and customer-supplied (CSEK)",
+      "Place CMEK on regulated datasets and Google-managed on non-regulated ones",
+      "Recognise where CSEK is supported (and where it isn't)"
+    ],
+    "realWorldValue": "An audit finding that PCI data is using GMEK instead of CMEK is the difference between passing and failing. Knowing which Google service supports which key model is critical.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "Your data architecture has four storage components. Your compliance team requires CMEK for regulated data, allows GMEK for non-regulated, and only one component still supports CSEK. Label each.",
+    "imageUrl": "/labs/google-cmek-architecture.svg",
+    "hotspots": [
+      {
+        "id": "h1",
+        "x": 25,
+        "y": 30,
+        "options": [
+          "GMEK (Google-managed)",
+          "CMEK (Customer-managed via Cloud KMS)",
+          "CSEK (Customer-supplied)",
+          "None - data unencrypted"
+        ],
+        "answer": "GMEK (Google-managed)",
+        "label": "Marketing assets in Cloud Storage (non-regulated)"
+      },
+      {
+        "id": "h2",
+        "x": 75,
+        "y": 30,
+        "options": [
+          "CMEK (Customer-managed via Cloud KMS)",
+          "GMEK (Google-managed)",
+          "CSEK (Customer-supplied)",
+          "Not supported"
+        ],
+        "answer": "CMEK (Customer-managed via Cloud KMS)",
+        "label": "PCI cardholder data in BigQuery"
+      },
+      {
+        "id": "h3",
+        "x": 25,
+        "y": 70,
+        "options": [
+          "CMEK (Customer-managed via Cloud KMS)",
+          "GMEK (Google-managed)",
+          "CSEK (Customer-supplied)",
+          "Not supported"
+        ],
+        "answer": "CMEK (Customer-managed via Cloud KMS)",
+        "label": "PII in Cloud SQL (HIPAA-regulated)"
+      },
+      {
+        "id": "h4",
+        "x": 75,
+        "y": 70,
+        "options": [
+          "CSEK (Customer-supplied)",
+          "GMEK (Google-managed)",
+          "CMEK (Customer-managed via Cloud KMS)",
+          "Not supported in BigQuery"
+        ],
+        "answer": "CSEK (Customer-supplied)",
+        "label": "Cloud Storage bucket where the customer holds keys outside Google"
+      }
+    ],
+    "answers": [
+      {
+        "id": "csek-bq",
+        "text": "BigQuery supports CSEK for tenant-supplied keys"
+      },
+      {
+        "id": "gmek-pci",
+        "text": "GMEK is acceptable for PCI cardholder data with CMEK strictly optional"
+      },
+      {
+        "id": "cmek-kms",
+        "text": "CMEK uses customer-controlled Cloud KMS keys, allowing key rotation and access policies",
+        "correct": true
+      },
+      {
+        "id": "all-csek",
+        "text": "All Google services support CSEK"
+      }
+    ],
+    "explanation": "Three encryption key ownership models on Google Cloud:\n\n- **GMEK** (Google-managed): default. Google owns and rotates the keys. Use for non-regulated data.\n- **CMEK** (Customer-managed): keys live in Cloud KMS under your project. You control access, rotation, audit logging via CloudTrail-equivalent KMS audit logs. Use for any regulated workload (PCI, HIPAA, GDPR).\n- **CSEK** (Customer-supplied): you provide the raw AES-256 key on every request, Google never persists it. Supported only on Cloud Storage and Compute Engine persistent disks - **not** on BigQuery, Cloud SQL, BigTable, or Spanner. Use only when regulation forbids any Google involvement in key custody.\n\nThe rule of thumb: GMEK by default, CMEK for regulated data, CSEK only where required and supported."
+  },
+  {
+    "id": "google-pubsub-pipeline-path",
+    "title": "Trace an Event-Driven Pub/Sub Pipeline",
+    "description": "Trace a streaming event from Pub/Sub through Dataflow into BigQuery to identify where messages are being lost.",
+    "type": "network-path",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "Data",
+    "technologies": [
+      "Pub/Sub",
+      "Dataflow",
+      "BigQuery"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Trace a streaming event end-to-end through Pub/Sub, Dataflow, and BigQuery",
+      "Identify where dead-letter, retry, and ack-deadline issues lose messages",
+      "Inspect each component's metrics to localise the failure"
+    ],
+    "realWorldValue": "Streaming pipelines fail silently far more often than they crash. Knowing how to follow one event from publish to landed row is what makes you the on-call person who actually fixes it.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "Your e-commerce events pipeline is missing about 1% of orders downstream. Trace one suspect event through the system and find where it is being dropped.",
+    "nodes": [
+      {
+        "id": "publisher",
+        "label": "Order Service Publisher"
+      },
+      {
+        "id": "topic",
+        "label": "Pub/Sub Topic"
+      },
+      {
+        "id": "subscription",
+        "label": "Pub/Sub Subscription"
+      },
+      {
+        "id": "dataflow",
+        "label": "Dataflow Streaming Job"
+      },
+      {
+        "id": "bq",
+        "label": "BigQuery Sink Table"
+      }
+    ],
+    "edges": [
+      {
+        "source": "publisher",
+        "target": "topic",
+        "label": "publish"
+      },
+      {
+        "source": "topic",
+        "target": "subscription",
+        "label": "fan-out"
+      },
+      {
+        "source": "subscription",
+        "target": "dataflow",
+        "label": "pull"
+      },
+      {
+        "source": "dataflow",
+        "target": "bq",
+        "label": "Storage Write API"
+      }
+    ],
+    "steps": [
+      {
+        "id": "publisher",
+        "label": "Order Service Publisher",
+        "checkLabel": "Check Publisher",
+        "status": "pass",
+        "detail": "Order Service Publisher\n\nPublish requests/sec: 1,200\nPublish errors: 0\nMessage IDs returned: yes\nOrdering keys: enabled (key=customer_id)"
+      },
+      {
+        "id": "topic",
+        "label": "Pub/Sub Topic",
+        "checkLabel": "Check Topic",
+        "status": "pass",
+        "detail": "Pub/Sub Topic\n\nName: orders-prod\nMessage retention: 7 days\nMessage size limits OK\nPublish-to-subscription latency: 12ms"
+      },
+      {
+        "id": "subscription",
+        "label": "Pub/Sub Subscription",
+        "checkLabel": "Check Subscription",
+        "status": "fail",
+        "detail": "Pub/Sub Subscription\n\nName: orders-to-bq\nAck deadline: 10 seconds\nNum unacked: ~120,000\nDead-letter topic: NOT configured\nMax delivery attempts: n/a\nNack rate: 1.1% (climbing)"
+      },
+      {
+        "id": "dataflow",
+        "label": "Dataflow Streaming Job",
+        "checkLabel": "Check Dataflow",
+        "status": "pass",
+        "detail": "Dataflow Streaming Job\n\nState: RUNNING\nWatermark lag: 8s\nElement processing time: P99 14s (exceeds ack deadline)\nWorker CPU: 75%\nElement throughput: 1,180/s"
+      },
+      {
+        "id": "bq",
+        "label": "BigQuery Sink Table",
+        "checkLabel": "Check BigQuery",
+        "status": "pass",
+        "detail": "BigQuery Sink Table\n\nTable: analytics.orders\nStorage Write API: enabled\nInsert errors: 0\nRows landed today: matches Dataflow throughput within 1%"
+      }
+    ],
+    "answers": [
+      {
+        "id": "publisher",
+        "text": "The publisher is dropping events before they reach Pub/Sub"
+      },
+      {
+        "id": "ack-deadline",
+        "text": "The subscription ack deadline (10s) is shorter than Dataflow's processing time (P99 14s), so messages are redelivered and eventually expire with no DLQ",
+        "correct": true
+      },
+      {
+        "id": "bq-quota",
+        "text": "BigQuery is throttling the Storage Write API"
+      },
+      {
+        "id": "watermark",
+        "text": "Dataflow watermark lag is too high"
+      }
+    ],
+    "explanation": "The smoking gun is in the Subscription panel: ack deadline 10s, but Dataflow P99 element processing is 14s. When an element takes longer than the ack deadline to process, Pub/Sub redelivers it, Dataflow may eventually ack a stale copy, and after enough redeliveries Pub/Sub gives up - but with no dead-letter topic configured, those messages are lost.\n\nFix:\n1. Increase the ack deadline (or use modifyAckDeadline) to comfortably exceed P99 processing time, e.g. 60s.\n2. Configure a dead-letter topic with `maxDeliveryAttempts` so problem messages are quarantined instead of silently dropped.\n3. Optionally improve Dataflow throughput (autoscale, repartition hot keys) to bring P99 below the ack deadline."
+  },
+  {
+    "id": "google-vertex-pipeline-cmd",
+    "title": "Build a Vertex AI Pipeline Component",
+    "description": "Fill in the gcloud and KFP commands to build, compile, and run a Vertex AI Pipelines training pipeline.",
+    "type": "fill-command",
+    "difficulty": "advanced",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI",
+      "Vertex AI Pipelines",
+      "KFP",
+      "Cloud Storage"
+    ],
+    "labCategory": "Implement",
+    "learningOutcomes": [
+      "Compile a KFP pipeline definition and submit it to Vertex AI Pipelines",
+      "Pass artifacts and parameters between components",
+      "Set the pipeline service account and root path correctly"
+    ],
+    "realWorldValue": "Vertex AI Pipelines is the canonical MLOps surface on GCP. Getting the compile -> submit -> monitor loop right is the foundation of every production training job.",
+    "relatedExamCodes": [
+      "PMLE-2025"
+    ],
+    "scenario": "You are deploying a training pipeline that loads data from BigQuery, trains an XGBoost model, and registers it in Vertex AI Model Registry. Fill in the missing values to compile and run it.",
+    "questions": [
+      {
+        "id": "q1",
+        "template": "# Step 1: Compile the KFP pipeline to a JSON spec\nfrom kfp import compiler\ncompiler.Compiler().compile(\n  pipeline_func=training_pipeline,\n  package_path='___'\n)",
+        "blanks": [
+          {
+            "id": "b1",
+            "placeholder": "compiled output filename",
+            "answer": "training_pipeline.json"
+          }
+        ],
+        "hint": "Vertex AI Pipelines accepts a compiled IR JSON or YAML file"
+      },
+      {
+        "id": "q2",
+        "template": "# Step 2: Submit the pipeline run via the Vertex AI SDK\nfrom google.cloud import aiplatform\naiplatform.init(project='myproj', location='europe-west2',\n  staging_bucket='gs://myproj-vertex-staging')\njob = aiplatform.PipelineJob(\n  display_name='churn-train',\n  template_path='training_pipeline.json',\n  pipeline_root='___',\n  parameter_values={'training_table': 'analytics.churn_features'}\n)\njob.submit(service_account='___')",
+        "blanks": [
+          {
+            "id": "b2",
+            "placeholder": "GCS root for pipeline artifacts",
+            "answer": "gs://myproj-vertex-pipelines/churn"
+          },
+          {
+            "id": "b3",
+            "placeholder": "service account email used by pipeline workers",
+            "answer": "vertex-pipelines@myproj.iam.gserviceaccount.com"
+          }
+        ],
+        "hint": "pipeline_root must be a GCS URI; the service account needs aiplatform.user and storage.objectAdmin on the root"
+      },
+      {
+        "id": "q3",
+        "template": "# Step 3: Monitor the run from the CLI\ngcloud ai pipeline-jobs ___ \\\n  --region=europe-west2 \\\n  --filter='displayName=churn-train' \\\n  --sort-by=~createTime --limit=1",
+        "blanks": [
+          {
+            "id": "b4",
+            "placeholder": "list subcommand",
+            "answer": "list"
+          }
+        ],
+        "hint": "Use `describe <id>` for full state once you have the job ID"
+      },
+      {
+        "id": "q4",
+        "template": "# Step 4: Cancel a misbehaving run\ngcloud ai pipeline-jobs ___ JOB_ID \\\n  --region=europe-west2",
+        "blanks": [
+          {
+            "id": "b5",
+            "placeholder": "subcommand to cancel",
+            "answer": "cancel"
+          }
+        ],
+        "hint": "Cancellation is best-effort; running components are signalled to stop"
+      }
+    ],
+    "explanation": "The Vertex AI Pipelines deployment loop:\n\n1. Compile - `kfp.compiler.Compiler().compile()` produces an IR JSON.\n2. Submit - `aiplatform.PipelineJob(template_path, pipeline_root, parameter_values).submit(service_account)`. `pipeline_root` is the GCS prefix where every artifact (datasets, models, metrics) is materialised. The service account must have `roles/aiplatform.user` and write access to that bucket.\n3. Monitor - `gcloud ai pipeline-jobs list` and `describe`.\n4. Cancel - `gcloud ai pipeline-jobs cancel`.\n\nKey gotcha: every component runs in its own container with the pipeline's service account. If your component reads from BigQuery, the pipeline service account needs BigQuery permissions, not your user identity."
+  },
+  {
+    "id": "google-feature-store-config",
+    "title": "Configure Vertex AI Feature Store for Online Serving",
+    "description": "Configure a Vertex AI Feature Store entity, feature view, and online serving settings so that prediction calls hit features in under 10ms.",
+    "type": "config-toggle",
+    "difficulty": "advanced",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI",
+      "Vertex AI Feature Store",
+      "BigQuery"
+    ],
+    "labCategory": "Configure",
+    "learningOutcomes": [
+      "Configure entity types, feature views, and online stores in Vertex AI Feature Store",
+      "Choose the right online serving option (Bigtable-backed vs optimised)",
+      "Schedule sync from offline (BigQuery) to online store"
+    ],
+    "realWorldValue": "Online feature serving is the gating constraint on most real-time ML systems. The right Feature Store config keeps p99 under 10ms; the wrong one builds a 100ms tail that ruins the user experience.",
+    "relatedExamCodes": [
+      "PMLE-2025"
+    ],
+    "scenario": "Your team is launching a real-time fraud detection model that requires p99 feature lookup latency under 10ms.\n\n**Requirements:**\n- Online store: Bigtable-backed for low-latency reads\n- Sync from BigQuery feature view every 15 minutes\n- Entity type: customer_id\n- Enable feature monitoring with daily snapshots\n- Enable point-in-time correctness for offline training joins\n\nConfigure the Feature Store accordingly.",
+    "configItems": [
+      {
+        "id": "online-store",
+        "label": "Online Store Type",
+        "currentValue": "Optimised (best-effort)",
+        "correctValue": "Bigtable (consistent low-latency)",
+        "inputType": "select",
+        "options": [
+          "None (offline only)",
+          "Optimised (best-effort)",
+          "Bigtable (consistent low-latency)"
+        ]
+      },
+      {
+        "id": "sync-cadence",
+        "label": "Feature View Sync Cadence",
+        "currentValue": "Daily",
+        "correctValue": "Every 15 minutes",
+        "inputType": "select",
+        "options": [
+          "Every 15 minutes",
+          "Hourly",
+          "Daily",
+          "Manual only"
+        ]
+      },
+      {
+        "id": "entity-type",
+        "label": "Entity Type ID",
+        "currentValue": "user",
+        "correctValue": "customer_id",
+        "inputType": "text"
+      },
+      {
+        "id": "source-table",
+        "label": "Source BigQuery Feature Table",
+        "currentValue": "analytics.raw_events",
+        "correctValue": "features.fraud_customer_features",
+        "inputType": "text"
+      },
+      {
+        "id": "monitoring",
+        "label": "Feature Monitoring",
+        "currentValue": "Disabled",
+        "correctValue": "Enabled (daily snapshots)",
+        "inputType": "select",
+        "options": [
+          "Disabled",
+          "Enabled (daily snapshots)",
+          "Enabled (hourly snapshots)"
+        ]
+      },
+      {
+        "id": "point-in-time",
+        "label": "Point-in-time Correctness for Offline Joins",
+        "currentValue": "Disabled",
+        "correctValue": "Enabled",
+        "inputType": "select",
+        "options": [
+          "Disabled",
+          "Enabled"
+        ]
+      },
+      {
+        "id": "node-count",
+        "label": "Online Serving Node Count",
+        "currentValue": "1",
+        "correctValue": "3",
+        "inputType": "select",
+        "options": [
+          "1",
+          "3",
+          "5",
+          "10"
+        ]
+      }
+    ],
+    "explanation": "Vertex AI Feature Store online serving best practice for sub-10ms reads:\n\n- **Bigtable-backed online store**: provides predictable low-latency reads at scale. The Optimised store is cheaper but best-effort.\n- **Sync cadence**: every 15 minutes is a reasonable balance between freshness and cost. Real-time use cases use streaming ingestion instead.\n- **Entity type**: must match the lookup key your serving code uses (`customer_id`).\n- **Source table**: a *curated* features table, not raw events. Pre-aggregating in BigQuery is the standard pattern.\n- **Monitoring**: snapshots feature distributions over time so you can spot drift.\n- **Point-in-time correctness**: required for offline training to avoid label leakage from features that didn't yet exist at training time.\n- **Node count**: at least 3 nodes for HA and headroom on a production endpoint."
+  },
+  {
+    "id": "google-training-job-code-fix",
+    "title": "Fix a Custom Training Job Script",
+    "description": "Fix the bugs in a Vertex AI custom training script that fails to read the dataset, save the model, or report metrics correctly.",
+    "type": "code-fix",
+    "difficulty": "advanced",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI",
+      "Python",
+      "Cloud Storage"
+    ],
+    "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Use the AIP_MODEL_DIR and AIP_*_DATA_URI environment variables correctly",
+      "Write the model to a GCS URI using a fsspec-compatible file handle",
+      "Report hyperparameter tuning metrics with hypertune"
+    ],
+    "realWorldValue": "Custom training jobs that 'succeed' but write the model to /tmp inside the container are the most common silent MLOps failure. Knowing the Vertex AI environment contract makes the difference.",
+    "relatedExamCodes": [
+      "PMLE-2025"
+    ],
+    "scenario": "A Vertex AI custom training job completes successfully but the deployed endpoint is empty: there is no model artifact in the registry. Fix the training script so it reads from the AIP-provided URIs and writes the model to AIP_MODEL_DIR.",
+    "language": "python",
+    "brokenCode": "import os, joblib\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\n\ntrain = pd.read_csv('/data/train.csv')\nX, y = train.drop('label', axis=1), train['label']\n\nmodel = LogisticRegression().fit(X, y)\n\njoblib.dump(model, 'model.joblib')\nprint(f'accuracy={model.score(X, y):.4f}')",
+    "correctCode": "import os, joblib\nimport pandas as pd\nimport gcsfs\nimport hypertune\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.model_selection import train_test_split\n\ntrain_uri = os.environ['AIP_TRAINING_DATA_URI']\nmodel_dir = os.environ['AIP_MODEL_DIR']\n\ntrain = pd.read_csv(train_uri)\nX = train.drop('label', axis=1)\ny = train['label']\nX_tr, X_val, y_tr, y_val = train_test_split(X, y, test_size=0.2, random_state=42)\n\nmodel = LogisticRegression().fit(X_tr, y_tr)\nval_acc = model.score(X_val, y_val)\n\nfs = gcsfs.GCSFileSystem()\nwith fs.open(os.path.join(model_dir, 'model.joblib'), 'wb') as f:\n    joblib.dump(model, f)\n\nhypertune.HyperTune().report_hyperparameter_tuning_metric(\n    hyperparameter_metric_tag='val_accuracy',\n    metric_value=val_acc\n)",
+    "validations": [
+      {
+        "field": "env",
+        "expected": "AIP_TRAINING_DATA_URI"
+      },
+      {
+        "field": "env",
+        "expected": "AIP_MODEL_DIR"
+      },
+      {
+        "field": "metric",
+        "expected": "hypertune"
+      },
+      {
+        "field": "split",
+        "expected": "train_test_split"
+      }
+    ],
+    "explanation": "Four fixes:\n\n1. Read the dataset from `os.environ['AIP_TRAINING_DATA_URI']`, not a hard-coded `/data/train.csv` path. Vertex AI mounts the URIs you specify in the training job spec via these environment variables.\n2. Write the model to `os.environ['AIP_MODEL_DIR']` (a GCS URI), not the local filesystem. Anything written elsewhere is discarded when the container exits, so no model artifact is registered.\n3. Use `gcsfs` (or `tf.io.gfile`) to open the GCS path - plain `open()` doesn't speak `gs://`.\n4. Always evaluate on a held-out split. Reporting accuracy on the training set is meaningless and breaks Vizier hyperparameter tuning.\n5. Report metrics via the `hypertune` library with `hyperparameter_metric_tag` matching the metric name configured on the tuning job."
+  },
+  {
+    "id": "google-data-validation-log",
+    "title": "Analyse TFX Data Validation Warnings",
+    "description": "Read TensorFlow Data Validation (TFDV) anomalies from a TFX pipeline run and identify which schema changes are real issues versus benign drift.",
+    "type": "log-analysis",
+    "difficulty": "advanced",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "TFX",
+      "TensorFlow Data Validation",
+      "Vertex AI"
+    ],
+    "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Read TFDV anomaly output",
+      "Distinguish schema-update needs from real data quality issues",
+      "Decide whether to fail the pipeline or just emit a warning"
+    ],
+    "realWorldValue": "TFDV is the only thing standing between a fresh batch of bad training data and your production model. Reading its output fluently is what keeps a release pipeline trustworthy.",
+    "relatedExamCodes": [
+      "PMLE-2025"
+    ],
+    "scenario": "Your TFX pipeline's `ExampleValidator` step has emitted anomalies against the new training batch. Decide which findings are real data quality problems and which are benign schema evolution.",
+    "logs": [
+      {
+        "timestamp": "anomaly-1",
+        "level": "ERROR",
+        "source": "TFDV",
+        "message": "Feature 'transaction_amount': missing in 18.5% of examples (schema requires <=1%)"
+      },
+      {
+        "timestamp": "anomaly-2",
+        "level": "WARNING",
+        "source": "TFDV",
+        "message": "Feature 'merchant_category': new domain value 'crypto-exchange' not in schema vocabulary"
+      },
+      {
+        "timestamp": "anomaly-3",
+        "level": "WARNING",
+        "source": "TFDV",
+        "message": "Feature 'issuer_country': new domain value 'XK' (Kosovo) not in schema vocabulary"
+      },
+      {
+        "timestamp": "anomaly-4",
+        "level": "ERROR",
+        "source": "TFDV",
+        "message": "Feature 'card_number_hash': dtype changed from BYTES to STRING"
+      },
+      {
+        "timestamp": "anomaly-5",
+        "level": "INFO",
+        "source": "TFDV",
+        "message": "Feature 'hour_of_day': value range [0, 23] matches schema"
+      },
+      {
+        "timestamp": "anomaly-6",
+        "level": "ERROR",
+        "source": "TFDV",
+        "message": "Schema training-serving skew: 'device_age_days' L-infinity distance 0.47 (threshold 0.05)"
+      }
+    ],
+    "answers": [
+      {
+        "id": "all-fail",
+        "text": "All six findings should fail the pipeline"
+      },
+      {
+        "id": "real-issues",
+        "text": "Anomalies 1, 4, and 6 are real data quality problems and should fail the run; 2 and 3 are schema evolution that just need a vocabulary update",
+        "correct": true
+      },
+      {
+        "id": "skip",
+        "text": "Skip TFDV and let the trainer handle missing values"
+      },
+      {
+        "id": "vocab",
+        "text": "Just expand the vocabulary on every feature and re-run"
+      }
+    ],
+    "explanation": "Triage:\n\n- Anomaly 1 (`transaction_amount` 18.5% missing): real data quality issue - upstream pipeline bug. Block the run.\n- Anomaly 2 (`merchant_category` new value): legitimate schema evolution. Update the schema vocabulary and continue.\n- Anomaly 3 (`issuer_country` new value `XK`): same. New ISO codes appear; expand vocabulary.\n- Anomaly 4 (`card_number_hash` dtype change): real bug. Type changes silently break feature engineering. Block the run and investigate the upstream producer.\n- Anomaly 5: informational; no action.\n- Anomaly 6 (training-serving skew on `device_age_days`): real concern - features used for training don't match those at serving. Investigate the feature transformation graph and model monitoring.\n\nThe TFX pattern is to fail on `ERROR`-level anomalies and only auto-update the schema for *new domain values* on categorical features."
+  },
+  {
+    "id": "google-serving-perf-optimize",
+    "title": "Optimise a Vertex Prediction Endpoint",
+    "description": "Optimise the serving configuration of a Vertex AI online prediction endpoint that is missing its latency SLA.",
+    "type": "performance-optimization",
+    "difficulty": "advanced",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI",
+      "Vertex AI Endpoints",
+      "Cloud Monitoring"
+    ],
+    "labCategory": "Configure",
+    "learningOutcomes": [
+      "Tune Vertex AI endpoint machine type, accelerators, and autoscaling",
+      "Distinguish dedicated from shared (multi-model) endpoints",
+      "Apply request batching and concurrency tuning"
+    ],
+    "realWorldValue": "A Vertex endpoint with the wrong machine type wastes money or misses SLAs - usually both. Walking through the dial set systematically is the difference between a happy product team and an angry CFO.",
+    "relatedExamCodes": [
+      "PMLE-2025"
+    ],
+    "scenario": "Your fraud detection model is deployed to a Vertex AI endpoint with P99 latency at 380ms against a 100ms SLA, while utilisation is only 15%. Pick the right optimisation for each bottleneck.",
+    "architectureDescription": "Client → API Gateway → Vertex AI Endpoint (n1-standard-2, no GPU, min/max replicas 1/3) → Model (XGBoost classifier, 250MB)",
+    "problems": [
+      {
+        "id": "machine-type",
+        "area": "Machine Type",
+        "problem": "Endpoint runs on n1-standard-2 (2 vCPU). Tail latency is dominated by single-request CPU time on a CPU-bound XGBoost predictor.",
+        "options": [
+          "Switch to n1-highcpu-8 (more vCPUs, same memory class)",
+          "Switch to n1-highmem-8 (more memory, same CPU)",
+          "Add a T4 GPU - XGBoost benefits from GPU inference",
+          "Switch to e2-micro for cost savings"
+        ],
+        "correctOption": "Switch to n1-highcpu-8 (more vCPUs, same memory class)"
+      },
+      {
+        "id": "autoscale",
+        "area": "Autoscaling Bounds",
+        "problem": "Min=1, max=3 replicas. Cold scale-up after idle periods causes a 15-second tail spike at the start of each business day.",
+        "options": [
+          "Set min_replica_count=2 to keep capacity warm and raise max for headroom",
+          "Reduce max to 1 - fewer replicas means less cold start",
+          "Increase the autoscaling target CPU to 95% to delay scale-out",
+          "Disable autoscaling entirely"
+        ],
+        "correctOption": "Set min_replica_count=2 to keep capacity warm and raise max for headroom"
+      },
+      {
+        "id": "batching",
+        "area": "Request Batching",
+        "problem": "Each request carries a single feature row. The model wastes per-request overhead doing one prediction at a time.",
+        "options": [
+          "Enable request batching with max_batch_size=32 and max_latency_ms=20",
+          "Disable batching to minimise per-request latency",
+          "Send each request to a separate endpoint",
+          "Move to offline batch prediction only"
+        ],
+        "correctOption": "Enable request batching with max_batch_size=32 and max_latency_ms=20"
+      },
+      {
+        "id": "endpoint-type",
+        "area": "Endpoint Sharing",
+        "problem": "The endpoint shares hardware with two other low-traffic models, leading to noisy-neighbour effects on the tail.",
+        "options": [
+          "Deploy to a dedicated endpoint (single model)",
+          "Co-locate with even more models to amortise cost",
+          "Use private endpoints for noise isolation",
+          "Switch to AutoML batch prediction"
+        ],
+        "correctOption": "Deploy to a dedicated endpoint (single model)"
+      },
+      {
+        "id": "concurrency",
+        "area": "Per-Replica Concurrency",
+        "problem": "Per-replica concurrent requests is set to 1, so every queued request waits for the prior one to finish before the next starts on the same replica.",
+        "options": [
+          "Raise max_concurrent_requests_per_replica to match vCPU count and validate with load test",
+          "Keep concurrency at 1 to avoid CPU contention",
+          "Set concurrency to 1000 for maximum parallelism",
+          "Move to async predictions only"
+        ],
+        "correctOption": "Raise max_concurrent_requests_per_replica to match vCPU count and validate with load test"
+      },
+      {
+        "id": "caching",
+        "area": "Client-Side Caching",
+        "problem": "About 20% of requests are duplicates within a 60-second window (same customer + amount + merchant), repeatedly invoking the model.",
+        "options": [
+          "Add a short-TTL prediction cache in API Gateway keyed on the request body hash",
+          "Cache aggressively at 1 hour TTL with no staleness checks",
+          "Disable caching - predictions must always be fresh",
+          "Switch from online to batch prediction for these requests"
+        ],
+        "correctOption": "Add a short-TTL prediction cache in API Gateway keyed on the request body hash"
+      }
+    ],
+    "explanation": "Six optimisations bring P99 under 100ms:\n\n1. n1-highcpu-8 - XGBoost is CPU-bound; more vCPUs cut single-request latency. GPUs don't help here.\n2. min_replica_count=2 - eliminates cold-start tail; the daily spike disappears.\n3. Request batching - amortises per-request overhead across 32 rows with a 20ms max-latency budget.\n4. Dedicated endpoint - removes noisy-neighbour variance.\n5. Concurrent-requests-per-replica matched to vCPU - lets each replica serve requests in parallel.\n6. Short-TTL prediction cache - 20% of requests never reach the model, freeing capacity for the rest."
+  },
+  {
+    "id": "google-mlops-architecture",
+    "title": "Design an MLOps Architecture on Vertex AI",
+    "description": "Assemble the components of an end-to-end MLOps architecture on Vertex AI: from feature engineering through training, registry, deployment, and monitoring.",
+    "type": "architecture-builder",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI",
+      "Vertex AI Pipelines",
+      "Vertex AI Model Registry",
+      "Vertex AI Endpoints",
+      "Vertex AI Model Monitoring",
+      "BigQuery"
+    ],
+    "labCategory": "Design",
+    "learningOutcomes": [
+      "Identify the five core components of a Vertex AI MLOps pipeline",
+      "Connect data, training, registry, serving, and monitoring in order"
+    ],
+    "realWorldValue": "Most MLOps redesigns reinvent the same Vertex reference architecture. Knowing it cold lets you skip months of debate and ship the build.",
+    "relatedExamCodes": [
+      "PMLE-2025"
+    ],
+    "scenario": "Your team is setting up a basic MLOps pipeline on Vertex AI. Place the five core components and connect them in order: data in, features, train, register, then deploy and watch.",
+    "availableComponents": [
+      {
+        "id": "bq",
+        "label": "BigQuery",
+        "icon": "🗄️",
+        "category": "Data"
+      },
+      {
+        "id": "pipelines",
+        "label": "Vertex AI Pipelines",
+        "icon": "🛠️",
+        "category": "Training"
+      },
+      {
+        "id": "registry",
+        "label": "Vertex AI Model Registry",
+        "icon": "📦",
+        "category": "Registry"
+      },
+      {
+        "id": "endpoint",
+        "label": "Vertex AI Online Endpoint",
+        "icon": "🚀",
+        "category": "Serving"
+      },
+      {
+        "id": "monitoring",
+        "label": "Vertex AI Model Monitoring",
+        "icon": "📊",
+        "category": "Monitoring"
+      },
+      {
+        "id": "looker",
+        "label": "Looker Studio",
+        "icon": "📈",
+        "category": "Analytics"
+      },
+      {
+        "id": "build",
+        "label": "Cloud Build",
+        "icon": "🔁",
+        "category": "CI/CD"
+      }
+    ],
+    "requiredComponents": [
+      "bq",
+      "pipelines",
+      "registry",
+      "endpoint",
+      "monitoring"
+    ],
+    "requiredConnections": [
+      {
+        "from": "bq",
+        "to": "pipelines"
+      },
+      {
+        "from": "pipelines",
+        "to": "registry"
+      },
+      {
+        "from": "registry",
+        "to": "endpoint"
+      },
+      {
+        "from": "endpoint",
+        "to": "monitoring"
+      }
+    ],
+    "validationChecks": [
+      "BigQuery feeds training data into Vertex AI Pipelines",
+      "Vertex AI Pipelines outputs a trained model to Model Registry",
+      "Model Registry deploys to Online Endpoint",
+      "Online Endpoint is watched by Model Monitoring"
+    ],
+    "explanation": "The Vertex AI MLOps reference architecture:\n\n- **BigQuery** holds raw data and curated features.\n- **Vertex AI Feature Store** materialises features for online serving and offline training joins, sourced from BigQuery.\n- **Vertex AI Pipelines** orchestrates the training DAG: data prep → training → evaluation → registration.\n- **Custom Training Job** runs the actual model fitting inside the pipeline.\n- **Model Registry** versions every model and tracks lineage, metrics, and approval state.\n- **Online Endpoint** serves the deployed version with traffic splitting for canaries.\n- **Model Monitoring** observes the endpoint for drift, skew, and prediction quality.\n- **Cloud Build** is CI/CD: code change triggers a pipeline run; pipeline run produces a registered model; promotion deploys to the endpoint.\n\nLooker Studio and Compute Engine are decoys here - the reference architecture is fully managed."
+  },
+  {
+    "id": "google-vertex-deploy-cmd",
+    "title": "Deploy a Model to a Vertex AI Endpoint",
+    "description": "Use gcloud to deploy a registered model to an existing Vertex AI online endpoint.",
+    "type": "command-terminal",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI",
+      "Vertex AI Model Registry",
+      "Vertex AI Endpoints"
+    ],
+    "labCategory": "Implement",
+    "learningOutcomes": [
+      "Construct a gcloud ai endpoints deploy-model command with all required flags",
+      "Distinguish required flags from optional ones such as --accelerator-type",
+      "Understand how machine type and traffic split affect a deployment"
+    ],
+    "realWorldValue": "Deploying a model to a Vertex endpoint is the last step before real traffic hits. Knowing the exact flags avoids silent misconfigurations that waste GPU quota or leave the endpoint unreachable.",
+    "relatedExamCodes": [
+      "PMLE-2025"
+    ],
+    "scenario": "You have trained a churn-prediction model and registered it in Vertex AI Model Registry as `projects/ml-prod/locations/us-central1/models/churn-v3`. An endpoint named `churn-endpoint` already exists. Deploy the model to that endpoint with a standard CPU machine type.",
+    "prompt": "ml-user@lab:~$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Deploy model `churn-v3` (ID `5551234567890`) to endpoint `churn-endpoint` (ID `1234567890123`) in `us-central1` on machine type `n1-standard-4`, giving the deployment the display name `churn-v3-deployment`.",
+        "hint": "Use `gcloud ai endpoints deploy-model`. You need --endpoint, --model, --display-name, --machine-type, and --region.",
+        "program": "gcloud",
+        "requirements": [
+          {
+            "id": "r-subcommand",
+            "kind": "positional",
+            "variants": [
+              "ai"
+            ],
+            "description": "gcloud product group"
+          },
+          {
+            "id": "r-command",
+            "kind": "positional",
+            "variants": [
+              "endpoints"
+            ],
+            "description": "resource type"
+          },
+          {
+            "id": "r-action",
+            "kind": "positional",
+            "variants": [
+              "deploy-model"
+            ],
+            "description": "action"
+          },
+          {
+            "id": "r-endpoint",
+            "kind": "flag-value",
+            "variants": [
+              "--endpoint"
+            ],
+            "value": "1234567890123",
+            "description": "Endpoint ID"
+          },
+          {
+            "id": "r-model",
+            "kind": "flag-value",
+            "variants": [
+              "--model"
+            ],
+            "value": "5551234567890",
+            "description": "Model ID"
+          },
+          {
+            "id": "r-display-name",
+            "kind": "flag-value",
+            "variants": [
+              "--display-name"
+            ],
+            "value": "churn-v3-deployment",
+            "description": "Name shown in the console for this deployed model"
+          },
+          {
+            "id": "r-machine-type",
+            "kind": "flag-value",
+            "variants": [
+              "--machine-type"
+            ],
+            "value": "n1-standard-4",
+            "description": "VM machine type for serving"
+          },
+          {
+            "id": "r-region",
+            "kind": "flag-value",
+            "variants": [
+              "--region"
+            ],
+            "value": "us-central1",
+            "description": "GCP region"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--accelerator-type",
+            "description": "GPU accelerators are optional and not required for a standard CPU deployment"
+          },
+          {
+            "flag": "--enable-access-logging",
+            "description": "Access logging is useful but not required to complete the deployment"
+          },
+          {
+            "flag": "--min-replica-count",
+            "description": "Replica count defaults to 1; not required here"
+          }
+        ],
+        "successOutput": "Using endpoint [https://us-central1-aiplatform.googleapis.com/]\nDeployedModel [churn-v3-deployment] is being deployed to Endpoint [churn-endpoint].\nThis operation may take several minutes.",
+        "canonicalCommand": "gcloud ai endpoints deploy-model 1234567890123 --model=5551234567890 --display-name=churn-v3-deployment --machine-type=n1-standard-4 --region=us-central1"
+      }
+    ],
+    "explanation": "**`gcloud ai endpoints deploy-model`** attaches a model version to an existing endpoint and starts serving traffic.\n\n**Required flags:**\n- `--endpoint` — the endpoint resource ID\n- `--model` — the model resource ID from Model Registry\n- `--display-name` — a human-readable label for this deployed model slot\n- `--machine-type` — VM type used for serving replicas (e.g. `n1-standard-4`)\n- `--region` — GCP region where both endpoint and model reside\n\n**Common optional flags (not needed here):**\n- `--accelerator-type` / `--accelerator-count` — attach GPUs; only needed for large generative models\n- `--enable-access-logging` — logs every prediction request to Cloud Logging\n- `--traffic-split` — percentage of traffic routed to this deployed model; defaults to 100 for the first deployment\n\nThe command is asynchronous: the CLI prints a long-running operation name that you can poll with `gcloud ai operations describe`."
+  },
+  {
+    "id": "google-pipeline-incident",
+    "title": "Investigate a Failed Vertex AI Retraining Pipeline",
+    "description": "Triage a nightly Vertex AI Pipelines run that failed at the data validation step. Correlate alerts, metrics, and logs to identify the root cause.",
+    "type": "incident-response",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "AI/ML",
+    "technologies": [
+      "Vertex AI Pipelines",
+      "Cloud Logging",
+      "Cloud Monitoring",
+      "TFX"
+    ],
+    "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Correlate Vertex AI pipeline failure alerts with component-level logs",
+      "Identify data schema violations as a pipeline failure root cause",
+      "Choose correct remediation actions for a feature skew failure"
+    ],
+    "realWorldValue": "Nightly retraining pipelines are the backbone of production ML. When they fail silently, models go stale. Knowing how to triage pipeline logs fast keeps your model freshness SLA intact.",
+    "relatedExamCodes": [
+      "PMLE-2025"
+    ],
+    "scenario": "At 02:14 UTC your on-call alert fires: the nightly churn-model retraining pipeline has failed. The last successful run completed yesterday at 02:08 UTC. Investigate and choose the correct remediation actions.",
+    "alerts": [
+      {
+        "id": "a1",
+        "severity": "critical",
+        "time": "02:14",
+        "service": "Vertex AI Pipelines",
+        "message": "Pipeline run `churn-retrain-20260429` entered FAILED state. Failed component: data-validation-step."
+      },
+      {
+        "id": "a2",
+        "severity": "warning",
+        "time": "02:13",
+        "service": "Cloud Logging",
+        "message": "Error count for pipeline `churn-retrain-20260429` exceeded threshold: 3 errors in 60 s."
+      }
+    ],
+    "metrics": [
+      {
+        "id": "m1",
+        "name": "Pipeline Run Duration (s)",
+        "unit": "seconds",
+        "values": [
+          {
+            "time": "02:00",
+            "value": 0
+          },
+          {
+            "time": "02:08",
+            "value": 487
+          },
+          {
+            "time": "02:14",
+            "value": 721
+          }
+        ]
+      },
+      {
+        "id": "m2",
+        "name": "Pipeline Error Count",
+        "unit": "count",
+        "values": [
+          {
+            "time": "02:00",
+            "value": 0
+          },
+          {
+            "time": "02:12",
+            "value": 1
+          },
+          {
+            "time": "02:13",
+            "value": 3
+          }
+        ]
+      }
+    ],
+    "logs": [
+      {
+        "timestamp": "02:08:01",
+        "level": "INFO",
+        "source": "vertex-pipelines/orchestrator",
+        "message": "Pipeline churn-retrain-20260429 started. Components: ingest-data, data-validation-step, trainer, pusher."
+      },
+      {
+        "timestamp": "02:08:14",
+        "level": "INFO",
+        "source": "vertex-pipelines/ingest-data",
+        "message": "Data ingestion complete. Rows written to GCS: 2,847,334."
+      },
+      {
+        "timestamp": "02:08:15",
+        "level": "INFO",
+        "source": "vertex-pipelines/ingest-data",
+        "message": "Feature columns: age, tenure_months, monthly_charges, contract_type, num_products, churned."
+      },
+      {
+        "timestamp": "02:09:02",
+        "level": "INFO",
+        "source": "vertex-pipelines/data-validation",
+        "message": "TFX ExampleValidator: comparing statistics against schema version 4."
+      },
+      {
+        "timestamp": "02:09:18",
+        "level": "WARN",
+        "source": "vertex-pipelines/data-validation",
+        "message": "Feature `contract_type`: training distribution top-1 was `Month-to-month` (54%). Serving snapshot top-1 is `Two year` (61%). Jensen-Shannon divergence: 0.18 (threshold: 0.10)."
+      },
+      {
+        "timestamp": "02:09:19",
+        "level": "WARN",
+        "source": "vertex-pipelines/data-validation",
+        "message": "Feature `num_products`: training mean 1.8, serving mean 3.1. Z-score: 4.2 (threshold: 3.0)."
+      },
+      {
+        "timestamp": "02:09:20",
+        "level": "ERROR",
+        "source": "vertex-pipelines/data-validation",
+        "message": "Schema validation FAILED: 2 features exceeded drift thresholds. Anomalies: contract_type (distribution shift), num_products (mean shift)."
+      },
+      {
+        "timestamp": "02:09:21",
+        "level": "ERROR",
+        "source": "vertex-pipelines/data-validation",
+        "message": "ExampleValidator blocked pipeline progression. Artifact output not written."
+      },
+      {
+        "timestamp": "02:09:22",
+        "level": "ERROR",
+        "source": "vertex-pipelines/orchestrator",
+        "message": "Component data-validation-step failed with exit code 1. Downstream components (trainer, pusher) will not execute."
+      },
+      {
+        "timestamp": "02:11:04",
+        "level": "INFO",
+        "source": "vertex-pipelines/orchestrator",
+        "message": "Pipeline churn-retrain-20260429 FAILED. Duration: 182 s."
+      },
+      {
+        "timestamp": "02:13:45",
+        "level": "INFO",
+        "source": "cloud-monitoring/alerting",
+        "message": "Alert `pipeline-error-threshold` fired. Policy: error count > 2 in 60 s."
+      },
+      {
+        "timestamp": "02:14:01",
+        "level": "INFO",
+        "source": "cloud-monitoring/alerting",
+        "message": "Alert `pipeline-run-failed` fired. Pipeline: churn-retrain-20260429."
+      }
+    ],
+    "timeline": [
+      {
+        "time": "02:08",
+        "event": "Pipeline starts. Ingest-data component completes in 13 s."
+      },
+      {
+        "time": "02:09",
+        "event": "Data validation detects distribution shift in contract_type and num_products. Validation fails, blocking trainer and pusher."
+      },
+      {
+        "time": "02:11",
+        "event": "Pipeline marked FAILED after orchestrator times out waiting for data-validation-step output."
+      },
+      {
+        "time": "02:13",
+        "event": "Cloud Monitoring error-count alert fires."
+      },
+      {
+        "time": "02:14",
+        "event": "Pipeline-run-failed alert fires. On-call paged."
+      }
+    ],
+    "actions": [
+      {
+        "id": "act1",
+        "description": "Update the TFX schema to reflect the new contract_type distribution and num_products range, then re-trigger the pipeline.",
+        "correct": true
+      },
+      {
+        "id": "act2",
+        "description": "Investigate the upstream data source for a business-event change (e.g. pricing plan change) that caused the feature shift.",
+        "correct": true
+      },
+      {
+        "id": "act3",
+        "description": "Increase the Vertex AI Pipelines worker machine type from n1-standard-4 to n1-standard-8 to give the validator more memory.",
+        "correct": false
+      },
+      {
+        "id": "act4",
+        "description": "Disable the data validation step so the trainer can proceed with current data.",
+        "correct": false
+      }
+    ],
+    "answers": [
+      {
+        "id": "ans1",
+        "text": "A Vertex AI Pipelines worker ran out of memory during data ingestion",
+        "correct": false
+      },
+      {
+        "id": "ans2",
+        "text": "Feature distribution skew in contract_type and num_products exceeded the TFX schema drift thresholds",
+        "correct": true
+      },
+      {
+        "id": "ans3",
+        "text": "The Cloud Storage bucket containing training data was deleted",
+        "correct": false
+      },
+      {
+        "id": "ans4",
+        "text": "The pipeline timed out because the ingestion component took too long",
+        "correct": false
+      }
+    ],
+    "explanation": "The root cause is **feature distribution skew** detected by the TFX ExampleValidator component.\n\n**What happened:**\n1. The ingest-data component succeeded and wrote 2.8 M rows to GCS.\n2. The data-validation-step compared the new batch statistics against the stored TFX schema (version 4).\n3. Two features exceeded drift thresholds: `contract_type` (Jensen-Shannon divergence 0.18 > 0.10) and `num_products` (Z-score 4.2 > 3.0).\n4. ExampleValidator blocked artifact output, causing the pipeline to fail and preventing trainer and pusher from running.\n\n**Correct actions:**\n- Update the TFX schema after confirming the new distribution is intentional, then re-run.\n- Investigate the upstream source — a business event such as a new pricing plan or product launch likely caused the shift. Understanding the cause determines whether to update the schema or fix the data.\n\n**Incorrect actions:**\n- Scaling the machine type has no effect on a schema validation failure.\n- Disabling data validation removes the guardrail that prevents retraining on corrupted or shifted data, which is the opposite of responsible ML practice."
+  },
+  {
+    "id": "google-gcs-setup-replay",
+    "title": "Set Up a Cloud Storage Bucket with Versioning and Lifecycle",
+    "description": "Queue the correct sequence of gcloud storage / gsutil commands to create a bucket, enable versioning, add a lifecycle rule, and verify the configuration.",
+    "type": "terminal-replay",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "Storage",
+    "technologies": [
+      "Cloud Storage"
+    ],
+    "labCategory": "Implement",
+    "learningOutcomes": [
+      "Create a Cloud Storage bucket with the correct storage class and location",
+      "Enable object versioning and add a lifecycle delete rule",
+      "Identify commands that would break the configuration (distractors)"
+    ],
+    "realWorldValue": "Versioning and lifecycle rules are the foundation of every GCS data retention policy. Setting them in the right order, and knowing which flags to avoid, is a day-one operational skill.",
+    "relatedExamCodes": [
+      "ADP-2025"
+    ],
+    "scenario": "You are setting up a Cloud Storage bucket `gs://ml-training-data-prod` in `us-central1` with Standard storage class. You need versioning enabled and a lifecycle rule that deletes non-current versions older than 30 days.",
+    "prompt": "gcp-user@lab:~$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "gcloud storage buckets create gs://ml-training-data-prod --location=us-central1 --default-storage-class=STANDARD",
+        "successOutput": "Creating gs://ml-training-data-prod/...\nCreated gs://ml-training-data-prod/.",
+        "errorOutput": "Create the bucket first before configuring versioning or lifecycle."
+      },
+      {
+        "id": "c2",
+        "command": "gcloud storage buckets update gs://ml-training-data-prod --versioning",
+        "successOutput": "Updating gs://ml-training-data-prod/...\nUpdated gs://ml-training-data-prod/.",
+        "errorOutput": "Enable versioning before uploading objects or setting lifecycle rules on versions.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "gcloud storage buckets update gs://ml-training-data-prod --lifecycle-file=lifecycle.json",
+        "successOutput": "Updating gs://ml-training-data-prod/...\nUpdated gs://ml-training-data-prod/.",
+        "errorOutput": "The bucket must exist before you can apply a lifecycle policy.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "gsutil cp ./sample_data.csv gs://ml-training-data-prod/raw/sample_data.csv",
+        "successOutput": "Copying file://./sample_data.csv [Content-Type=text/csv]...\n/ [1 files][  2.1 KiB/  2.1 KiB]\nOperation completed over 1 objects/2.1 KiB.",
+        "errorOutput": "Upload an object only after the bucket exists and versioning is enabled.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "c5",
+        "command": "gcloud storage buckets describe gs://ml-training-data-prod --format='value(versioning,lifecycle)'",
+        "successOutput": "versioning:\n  enabled: true\nlifecycle:\n  rule:\n  - action:\n      type: Delete\n    condition:\n      daysSinceNoncurrentTime: 30\n      isLive: false",
+        "errorOutput": "Run describe after the bucket is fully configured.",
+        "mustFollowIds": [
+          "c3"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "gcloud storage buckets delete gs://ml-training-data-prod",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Deleting the bucket removes all data and configuration. Do not run this.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "gcloud storage buckets update gs://ml-training-data-prod --no-versioning",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Disabling versioning prevents lifecycle rules from acting on non-current versions.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "gcloud storage buckets create gs://ml-training-data-prod --location=us-central1 --default-storage-class=ARCHIVE",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: ARCHIVE storage class is for cold data accessed less than once a year — inappropriate for active training data.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Correct sequence:**\n1. **Create** the bucket with `--location` and `--default-storage-class`. Location and class cannot be changed after creation.\n2. **Enable versioning** with `buckets update --versioning`. Versioning must be on before lifecycle rules that act on non-current versions will work.\n3. **Apply lifecycle policy** with `--lifecycle-file`. The JSON file specifies `daysSinceNoncurrentTime: 30` and `isLive: false` to target only non-current versions.\n4. **Upload an object** to verify the bucket is writable.\n5. **Describe** to confirm versioning and lifecycle are both active.\n\n**Distractors explained:**\n- `buckets delete` — irreversible destructive operation.\n- `--no-versioning` — disabling versioning breaks the `daysSinceNoncurrentTime` lifecycle condition.\n- `ARCHIVE` storage class — chosen for compliance cold storage, not active ML training data that is read frequently."
+  },
+  {
+    "id": "google-dataproc-log-analysis",
+    "title": "Find the Root Cause of a Dataproc Spark Job OOM Failure",
+    "description": "Analyse interleaved YARN ResourceManager and Spark executor logs to identify why a Spark job is failing with OutOfMemoryError.",
+    "type": "log-analysis",
+    "difficulty": "advanced",
+    "platform": "GCP",
+    "category": "Data Engineering",
+    "technologies": [
+      "Dataproc",
+      "Cloud Logging",
+      "Cloud Storage"
+    ],
+    "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Distinguish YARN container kill events from Spark executor OOM errors",
+      "Correlate partition size and executor memory settings to identify misconfiguration",
+      "Identify the correct fix without rewriting the Spark application logic"
+    ],
+    "realWorldValue": "Spark OOM failures on Dataproc are one of the most common production incidents in data engineering. Reading YARN and Spark logs together — rather than in isolation — is the fastest path to the fix.",
+    "relatedExamCodes": [
+      "PMLE-2025"
+    ],
+    "scenario": "A nightly Spark job that joins two large GCS datasets and writes a feature table to BigQuery is failing on Dataproc. The cluster uses `n2-standard-8` workers with 30 GB RAM each. The job was working two weeks ago and started failing after the upstream dataset grew from 200 GB to 800 GB. Investigate the logs and identify the root cause.",
+    "logs": [
+      {
+        "timestamp": "03:01:00.012",
+        "level": "INFO",
+        "source": "yarn/ResourceManager",
+        "message": "Application application_1745900000_0042 submitted. Queue: default. User: spark-svc."
+      },
+      {
+        "timestamp": "03:01:01.445",
+        "level": "INFO",
+        "source": "yarn/ResourceManager",
+        "message": "Allocated container container_001 on worker-0 (4 GB, 2 vCPU). Executor 1 started."
+      },
+      {
+        "timestamp": "03:01:01.448",
+        "level": "INFO",
+        "source": "yarn/ResourceManager",
+        "message": "Allocated container container_002 on worker-1 (4 GB, 2 vCPU). Executor 2 started."
+      },
+      {
+        "timestamp": "03:01:01.450",
+        "level": "INFO",
+        "source": "yarn/ResourceManager",
+        "message": "Allocated container container_003 on worker-2 (4 GB, 2 vCPU). Executor 3 started."
+      },
+      {
+        "timestamp": "03:01:05.120",
+        "level": "INFO",
+        "source": "spark/driver",
+        "message": "Job 0 started: Joining feature_events (800 GB) with user_profiles (12 GB). Partition count: 200. Target partition size: 128 MB."
+      },
+      {
+        "timestamp": "03:01:22.880",
+        "level": "WARN",
+        "source": "spark/executor-1",
+        "message": "GC overhead limit exceeded. Executor heap usage: 3.8 GB / 4 GB. Spilling shuffle data to disk."
+      },
+      {
+        "timestamp": "03:01:28.334",
+        "level": "WARN",
+        "source": "spark/executor-2",
+        "message": "GC overhead limit exceeded. Executor heap usage: 3.9 GB / 4 GB. Spilling shuffle data to disk."
+      },
+      {
+        "timestamp": "03:01:35.001",
+        "level": "ERROR",
+        "source": "spark/executor-1",
+        "message": "java.lang.OutOfMemoryError: Java heap space\n\tat org.apache.spark.shuffle.sort.UnsafeShuffleWriter.insertRecordIntoSorter(UnsafeShuffleWriter.java:247)"
+      },
+      {
+        "timestamp": "03:01:35.120",
+        "level": "ERROR",
+        "source": "yarn/NodeManager",
+        "message": "Container container_001 exceeded memory limit. Used: 4.2 GB, Limit: 4 GB. Killing container."
+      },
+      {
+        "timestamp": "03:01:35.200",
+        "level": "WARN",
+        "source": "spark/driver",
+        "message": "Executor 1 lost. Reason: Container killed by YARN for exceeding memory limits. Attempting re-schedule."
+      },
+      {
+        "timestamp": "03:01:48.771",
+        "level": "ERROR",
+        "source": "spark/executor-3",
+        "message": "java.lang.OutOfMemoryError: Java heap space\n\tat org.apache.spark.shuffle.sort.UnsafeShuffleWriter.java:247"
+      },
+      {
+        "timestamp": "03:01:48.900",
+        "level": "ERROR",
+        "source": "yarn/NodeManager",
+        "message": "Container container_003 exceeded memory limit. Used: 4.3 GB, Limit: 4 GB. Killing container."
+      },
+      {
+        "timestamp": "03:02:01.000",
+        "level": "ERROR",
+        "source": "spark/driver",
+        "message": "Job 0 failed: ExecutorLostFailure. All 3 executors lost. Aborting job."
+      },
+      {
+        "timestamp": "03:02:01.100",
+        "level": "ERROR",
+        "source": "spark/driver",
+        "message": "Application finished with FAILED status. Exception: SparkException: Job aborted due to stage failure."
+      },
+      {
+        "timestamp": "03:02:01.200",
+        "level": "INFO",
+        "source": "yarn/ResourceManager",
+        "message": "Application application_1745900000_0042 finished. FinalStatus=FAILED."
+      }
+    ],
+    "answers": [
+      {
+        "id": "ans1",
+        "text": "The Dataproc cluster ran out of disk space during GCS shuffle spill",
+        "correct": false
+      },
+      {
+        "id": "ans2",
+        "text": "Executor memory (4 GB per container) is too small for the shuffle partition size when joining the 800 GB dataset — YARN kills containers that exceed the limit",
+        "correct": true
+      },
+      {
+        "id": "ans3",
+        "text": "The Spark driver node ran out of memory while collecting results",
+        "correct": false
+      },
+      {
+        "id": "ans4",
+        "text": "The GCS connector failed to read the feature_events dataset due to a permissions error",
+        "correct": false
+      }
+    ],
+    "explanation": "**Root cause:** Executor containers are allocated only **4 GB** each (`spark.executor.memory` + overhead). After the source dataset grew from 200 GB to 800 GB, each shuffle partition is 4× larger (up to ~512 MB per partition after the join). The Spark shuffle writer cannot fit the partition sort buffer plus JVM overhead within the 4 GB YARN container limit, causing `OutOfMemoryError: Java heap space` and YARN container kills.\n\n**Evidence in the logs:**\n- YARN allocates containers with `4 GB` limit (lines 03:01:01).\n- GC overhead warnings appear immediately as executors try to sort shuffle data (03:01:22–28).\n- YARN NodeManager kills containers reporting `Used: 4.2–4.3 GB > Limit: 4 GB` (03:01:35, 03:01:48).\n- No GCS or permissions errors appear anywhere in the log.\n\n**Fix options (do not require rewriting the job):**\n1. Increase executor memory: set `spark.executor.memory=8g` (and `spark.yarn.executor.memoryOverhead=1g`) in the Dataproc job properties.\n2. Increase partition count: set `spark.sql.shuffle.partitions=800` so each partition is ~1 GB / 200 = smaller.\n3. Use a larger worker machine type (`n2-standard-16`) to allow bigger containers.\n\nThe job was working at 200 GB because the shuffle sort fit within 4 GB. The dataset growth crossed the threshold."
+  },
+  {
+    "id": "gcp-gke-pending-pod-incident",
+    "title": "Investigate Pending Pods Blocked by GPU Quota in GKE",
+    "description": "Triage 6 pods stuck in Pending state in a GKE cluster after a GPU batch workload was deployed. Identify why Node Auto-Provisioning cannot schedule them and choose the correct remediation.",
+    "type": "incident-response",
+    "difficulty": "intermediate",
+    "platform": "GCP",
+    "category": "Kubernetes",
+    "technologies": [
+      "Google Kubernetes Engine",
+      "kubectl",
+      "Cloud Monitoring",
+      "GKE Node Auto Provisioner"
+    ],
+    "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Distinguish Pending pods (scheduling failure) from CrashLoopBackOff (runtime failure)",
+      "Correlate Insufficient nvidia.com/gpu scheduler events with GPU quota exhaustion in NAP logs",
+      "Identify the correct remediation — quota increase or reduced resource requests — over ineffective control plane restarts"
+    ],
+    "realWorldValue": "GPU quota exhaustion is one of the most common blockers when scaling ML batch jobs on GKE. Recognising it from scheduler events rather than application logs is a key skill for ML platform engineers.",
+    "scenario": "At 14:10 UTC, 6 pods in the batch-jobs namespace have been Pending for over 10 minutes after a new GPU batch workload was deployed. The cluster uses CPU node pools for regular workloads; GPU nodes are managed by Node Auto-Provisioning. Investigate and choose the correct remediation.",
+    "alerts": [
+      {
+        "id": "a1",
+        "severity": "critical",
+        "time": "14:10",
+        "service": "GKE",
+        "message": "6 pods in namespace batch-jobs have been in Pending state for > 10 minutes."
+      },
+      {
+        "id": "a2",
+        "severity": "warning",
+        "time": "14:12",
+        "service": "Cloud Monitoring",
+        "message": "Node Auto-Provisioning failed to provision requested node type. Reason: quota exceeded (GPUS_ALL_REGIONS)."
+      }
+    ],
+    "metrics": [
+      {
+        "id": "m1",
+        "name": "Pending Pod Count",
+        "unit": "pods",
+        "values": [
+          {
+            "time": "14:00",
+            "value": 0
+          },
+          {
+            "time": "14:05",
+            "value": 0
+          },
+          {
+            "time": "14:08",
+            "value": 6
+          },
+          {
+            "time": "14:20",
+            "value": 6
+          }
+        ]
+      },
+      {
+        "id": "m2",
+        "name": "GPU Quota Used (%)",
+        "unit": "percent",
+        "values": [
+          {
+            "time": "14:00",
+            "value": 85
+          },
+          {
+            "time": "14:08",
+            "value": 100
+          },
+          {
+            "time": "14:20",
+            "value": 100
+          }
+        ]
+      }
+    ],
+    "logs": [
+      {
+        "timestamp": "14:05:01",
+        "level": "INFO",
+        "source": "gke/scheduler",
+        "message": "New Job batch-gpu-job-20260429 submitted. Requesting 6 pods, each with resource limit nvidia.com/gpu=1."
+      },
+      {
+        "timestamp": "14:05:10",
+        "level": "WARN",
+        "source": "gke/scheduler",
+        "message": "0/4 nodes are available: 4 Insufficient nvidia.com/gpu. Preemption is not helpful for this pod."
+      },
+      {
+        "timestamp": "14:05:11",
+        "level": "WARN",
+        "source": "gke/scheduler",
+        "message": "0/4 nodes are available: 4 Insufficient nvidia.com/gpu. (pod batch-gpu-job-20260429-0)"
+      },
+      {
+        "timestamp": "14:05:12",
+        "level": "WARN",
+        "source": "gke/scheduler",
+        "message": "0/4 nodes are available: 4 Insufficient nvidia.com/gpu. (pod batch-gpu-job-20260429-1)"
+      },
+      {
+        "timestamp": "14:08:00",
+        "level": "INFO",
+        "source": "gke/node-auto-provisioner",
+        "message": "Triggering scale-up: adding GPU node pool to accommodate 6 pending pods requesting nvidia.com/gpu."
+      },
+      {
+        "timestamp": "14:10:14",
+        "level": "ERROR",
+        "source": "gke/node-auto-provisioner",
+        "message": "Failed to scale up: compute.googleapis.com quota GPUS_ALL_REGIONS exceeded. Current usage: 8/8. Requested: 2 additional."
+      },
+      {
+        "timestamp": "14:10:15",
+        "level": "ERROR",
+        "source": "gke/node-auto-provisioner",
+        "message": "Scale-up abandoned. Quota error is not retryable without manual intervention."
+      },
+      {
+        "timestamp": "14:12:00",
+        "level": "INFO",
+        "source": "cloud-monitoring",
+        "message": "Alert node-auto-provisioner-quota-exceeded fired. Quota: GPUS_ALL_REGIONS at 100%."
+      },
+      {
+        "timestamp": "14:15:00",
+        "level": "WARN",
+        "source": "gke/scheduler",
+        "message": "Pod batch-gpu-job-20260429-0 unschedulable for 10 min. No GPU capacity available."
+      },
+      {
+        "timestamp": "14:15:01",
+        "level": "WARN",
+        "source": "gke/scheduler",
+        "message": "Pod batch-gpu-job-20260429-1 unschedulable for 10 min. No GPU capacity available."
+      },
+      {
+        "timestamp": "14:20:00",
+        "level": "WARN",
+        "source": "gke/scheduler",
+        "message": "All 6 pods in batch-jobs still Pending. GPU quota exhausted, NAP cannot provision new nodes."
+      },
+      {
+        "timestamp": "14:20:01",
+        "level": "INFO",
+        "source": "gke/control-plane",
+        "message": "Control plane healthy. API server, scheduler, and controller-manager all running normally."
+      }
+    ],
+    "timeline": [
+      {
+        "time": "14:05",
+        "event": "New batch Job deployed requesting 6 pods each with 1 GPU. Scheduler immediately reports Insufficient nvidia.com/gpu on all 4 nodes."
+      },
+      {
+        "time": "14:08",
+        "event": "Node Auto-Provisioning triggered — attempts to add a new GPU node pool."
+      },
+      {
+        "time": "14:10",
+        "event": "NAP fails: GPUS_ALL_REGIONS quota exhausted (8/8 in use). Pods remain Pending."
+      },
+      {
+        "time": "14:12",
+        "event": "Cloud Monitoring quota alert fires. On-call paged."
+      },
+      {
+        "time": "14:20",
+        "event": "All 6 pods still Pending. Control plane confirmed healthy."
+      }
+    ],
+    "actions": [
+      {
+        "id": "act1",
+        "description": "Submit a GPU quota increase request via the Google Cloud console for the GPUS_ALL_REGIONS quota in the project's region.",
+        "correct": true
+      },
+      {
+        "id": "act2",
+        "description": "In the short term, reduce the Job's parallelism or the GPU request per pod to fit within the remaining quota headroom.",
+        "correct": true
+      },
+      {
+        "id": "act3",
+        "description": "Restart the GKE control plane to trigger a fresh scheduling pass.",
+        "correct": false
+      }
+    ],
+    "answers": [
+      {
+        "id": "ans1",
+        "text": "GPU quota is exhausted — Node Auto-Provisioning cannot add new GPU nodes, so the scheduler has nowhere to place the pods.",
+        "correct": true
+      },
+      {
+        "id": "ans2",
+        "text": "The pods are crashing on startup because the container image is missing the NVIDIA GPU driver libraries.",
+        "correct": false
+      },
+      {
+        "id": "ans3",
+        "text": "The batch-jobs namespace has a ResourceQuota that blocks pod creation.",
+        "correct": false
+      }
+    ],
+    "explanation": "**Root cause: GPU quota exhaustion prevents Node Auto-Provisioning from adding capacity.**\n\n**Key evidence:**\n- Pods are in **Pending** state, not CrashLoopBackOff — the scheduler never placed them, so no container ever started.\n- Scheduler events show `Insufficient nvidia.com/gpu` for all 4 existing nodes.\n- NAP tried to provision a new GPU node at 14:08 but hit the `GPUS_ALL_REGIONS` quota limit (8/8 used) at 14:10.\n- The control plane log at 14:20:01 confirms it is healthy — a control plane restart has no effect.\n- No ResourceQuota error appears anywhere in the logs.\n\n**Correct actions:**\n- **Quota increase** — the durable fix; request more GPU quota via the console.\n- **Reduce resource requests** — allows the job to run within current quota; useful when the full parallelism is not strictly required immediately.\n\n**Wrong action:** Restarting the control plane has no effect on quota limits and would cause unnecessary API server downtime."
+  },
+  {
+    "id": "gcp-gke-rolling-update-replay",
+    "title": "Perform a Rolling Update and Rollback in GKE",
+    "description": "Queue the correct sequence of kubectl commands to update a Deployment to a new image, verify the rollout, inspect history, roll back, and confirm the pods are healthy — rejecting commands that destroy or stall the Deployment.",
+    "type": "terminal-replay",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "Kubernetes",
+    "technologies": [
+      "Google Kubernetes Engine",
+      "kubectl",
+      "Google Container Registry"
+    ],
+    "labCategory": "Implement",
+    "learningOutcomes": [
+      "Update a Deployment image with kubectl set image and monitor rollout progress",
+      "Use kubectl rollout history and rollout undo to inspect and revert to a previous revision",
+      "Identify commands that pause or destroy a Deployment as distractors"
+    ],
+    "realWorldValue": "Rolling updates and rollbacks are the most common kubectl operations in production. Knowing the exact command sequence — and why rollout pause mid-deploy is dangerous — is essential for any GKE operator.",
+    "scenario": "Update the `frontend` Deployment in the `prod` namespace from image tag `v1.9` to `v2.0`. After the rollout completes, you discover v2.0 has a rendering bug. Roll back to the previous revision.",
+    "prompt": "gke-user@lab:~$",
+    "commands": [
+      {
+        "id": "c1",
+        "command": "kubectl set image deployment/frontend frontend=gcr.io/my-project/frontend:v2.0 -n prod",
+        "successOutput": "deployment.apps/frontend image updated",
+        "errorOutput": "Update the image first to start the rolling update."
+      },
+      {
+        "id": "c2",
+        "command": "kubectl rollout status deployment/frontend -n prod",
+        "successOutput": "Waiting for deployment \"frontend\" rollout to finish: 1 out of 3 new replicas have been updated...\nWaiting for deployment \"frontend\" rollout to finish: 2 out of 3 new replicas have been updated...\ndeployment \"frontend\" successfully rolled out",
+        "errorOutput": "Start the rolling update before checking its status.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c3",
+        "command": "kubectl rollout history deployment/frontend -n prod",
+        "successOutput": "deployment.apps/frontend\nREVISION  CHANGE-CAUSE\n1         <none>\n2         <none>",
+        "errorOutput": "The update must be in progress or complete before inspecting rollout history.",
+        "mustFollowIds": [
+          "c1"
+        ]
+      },
+      {
+        "id": "c4",
+        "command": "kubectl rollout undo deployment/frontend -n prod",
+        "successOutput": "deployment.apps/frontend rolled back",
+        "errorOutput": "Complete the rollout before attempting a rollback.",
+        "mustFollowIds": [
+          "c2"
+        ]
+      },
+      {
+        "id": "c5",
+        "command": "kubectl get pods -n prod -l app=frontend",
+        "successOutput": "NAME                        READY   STATUS    RESTARTS   AGE\nfrontend-5f7d9b8c4-xkz2p    1/1     Running   0          45s\nfrontend-5f7d9b8c4-r8m3q    1/1     Running   0          43s\nfrontend-5f7d9b8c4-p9n1w    1/1     Running   0          41s",
+        "errorOutput": "Wait for the rollback to complete before checking pod status.",
+        "mustFollowIds": [
+          "c4"
+        ]
+      },
+      {
+        "id": "d1",
+        "command": "kubectl delete deployment frontend -n prod",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Deletes the Deployment entirely, removing all pods and configuration.",
+        "isDistractor": true
+      },
+      {
+        "id": "d2",
+        "command": "kubectl rollout pause deployment/frontend -n prod",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Pauses the rollout mid-way, leaving pods running a mix of old and new image versions.",
+        "isDistractor": true
+      },
+      {
+        "id": "d3",
+        "command": "kubectl scale deployment frontend --replicas=0 -n prod",
+        "successOutput": "",
+        "errorOutput": "DISTRACTOR: Scales to zero replicas, taking the frontend offline entirely.",
+        "isDistractor": true
+      }
+    ],
+    "explanation": "**Correct sequence:**\n1. **`set image`** — triggers the rolling update; Kubernetes replaces pods one by one.\n2. **`rollout status`** — streams progress until all replicas are updated. Wait for this before proceeding.\n3. **`rollout history`** — shows available revisions. After a `set image`, revision 2 is created.\n4. **`rollout undo`** — reverts to the previous revision (revision 1 = v1.9). Kubernetes performs another rolling replacement.\n5. **`get pods`** — confirms all 3 replicas are Running and Ready after the rollback.\n\n**Distractors:**\n- `delete deployment` — permanent, loses all pod specs and rollout history.\n- `rollout pause` — leaves the cluster in a degraded mixed-version state; requires `rollout resume` to fix.\n- `scale --replicas=0` — takes the service offline with no rollback capability."
+  },
+  {
+    "id": "gcp-gke-exec-pod-cmd",
+    "title": "Run a Diagnostic Command Inside a GKE Pod",
+    "description": "Type the single kubectl command that runs redis-cli ping inside the redis container of a specific pod to verify the Redis instance is responding.",
+    "type": "command-terminal",
+    "difficulty": "beginner",
+    "platform": "GCP",
+    "category": "Kubernetes",
+    "technologies": [
+      "Google Kubernetes Engine",
+      "kubectl"
+    ],
+    "labCategory": "Troubleshoot",
+    "learningOutcomes": [
+      "Construct a kubectl exec command with the correct pod, namespace, container, and command separator",
+      "Use -c to target a named container in a multi-container pod",
+      "Understand why --tty and --stdin are not needed for a non-interactive one-shot command"
+    ],
+    "realWorldValue": "kubectl exec is the primary tool for live pod inspection. Using -- to separate kubectl flags from the container command, and -c to target the right container, are the two details that trip up most beginners.",
+    "scenario": "The `redis-0` pod in the `cache` namespace may have connectivity issues. The pod has two containers: `redis` and `metrics-exporter`. Run `redis-cli ping` inside the `redis` container to verify it is responding.",
+    "prompt": "gke-user@lab:~$",
+    "steps": [
+      {
+        "id": "s1",
+        "task": "Run `redis-cli ping` inside the `redis` container of pod `redis-0` in the `cache` namespace.",
+        "hint": "Use `kubectl exec` with `-n cache`, `-c redis`, then `--` to separate kubectl args from the container command.",
+        "program": "kubectl",
+        "requirements": [
+          {
+            "id": "r-verb",
+            "kind": "positional",
+            "variants": [
+              "exec"
+            ],
+            "description": "exec — run a command in a container"
+          },
+          {
+            "id": "r-pod",
+            "kind": "positional",
+            "variants": [
+              "redis-0"
+            ],
+            "description": "pod name"
+          },
+          {
+            "id": "r-namespace",
+            "kind": "flag-value",
+            "variants": [
+              "-n",
+              "--namespace"
+            ],
+            "value": "cache",
+            "description": "-n <namespace>  target namespace"
+          },
+          {
+            "id": "r-container",
+            "kind": "flag-value",
+            "variants": [
+              "-c",
+              "--container"
+            ],
+            "value": "redis",
+            "description": "-c <container>  target container name within the pod"
+          },
+          {
+            "id": "r-separator",
+            "kind": "positional",
+            "variants": [
+              "--"
+            ],
+            "description": "-- separates kubectl flags from the command to run inside the container"
+          },
+          {
+            "id": "r-cmd",
+            "kind": "positional",
+            "variants": [
+              "redis-cli"
+            ],
+            "description": "command to run"
+          },
+          {
+            "id": "r-arg",
+            "kind": "positional",
+            "variants": [
+              "ping"
+            ],
+            "description": "argument to redis-cli"
+          }
+        ],
+        "distractors": [
+          {
+            "flag": "--tty",
+            "description": "-t allocates a TTY — only needed for interactive sessions like bash; unnecessary for a single command"
+          },
+          {
+            "flag": "--stdin",
+            "description": "-i passes stdin — only needed when the container command reads from stdin; redis-cli ping does not"
+          }
+        ],
+        "successOutput": "PONG",
+        "canonicalCommand": "kubectl exec redis-0 -n cache -c redis -- redis-cli ping"
+      }
+    ],
+    "explanation": "**`kubectl exec <pod> -n <namespace> -c <container> -- <command>`**\n\n- `exec redis-0` — targets the pod by name\n- `-n cache` — targets the `cache` namespace\n- `-c redis` — selects the `redis` container specifically; without `-c`, kubectl would use the first container in the pod spec (which might be `metrics-exporter`)\n- `--` — the double-dash separator tells kubectl that everything after it is the command to run inside the container, not a kubectl flag\n- `redis-cli ping` — the command and argument passed to the container\n\n**Why not `-i` and `-t`?** Those flags are for interactive sessions where you want a shell (e.g. `kubectl exec -it redis-0 -- bash`). For a single non-interactive command like `redis-cli ping`, they are unnecessary.\n\nThe expected output `PONG` confirms Redis is alive and accepting connections."
+  }
+]

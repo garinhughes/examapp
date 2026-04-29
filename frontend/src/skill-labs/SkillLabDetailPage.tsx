@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronLeft, Clock, Hourglass, Coffee, Lock, ArrowRight, X, Play, CheckCircle2, Info, Target, Briefcase, BookOpen } from 'lucide-react'
+import { ChevronLeft, Clock, Hourglass, Coffee, Lock, ArrowRight, X, Play, CheckCircle2, Info, Target, Briefcase, BookOpen, Bookmark } from 'lucide-react'
 import Loader from '@/components/Loader'
 import { useExam } from '@/exam/ExamContext'
 import { clarityEvent, clarityTag } from '@/clarity'
@@ -8,6 +8,7 @@ import { apiUrl } from '@/apiBase'
 import type { LabSummary } from './types'
 import { LAB_TIME_LIMITS } from './types'
 import { useSkillLab } from './SkillLabContext'
+import { getBookmarkedLabs, toggleBookmark } from './labs/shared'
 import { MarkdownText } from '@/exam/utils'
 import { DIFFICULTY_COLORS, getPlatformMeta, CloudIcon } from './platformMeta'
 import { ProviderLogo } from '@/components/ProviderLogo'
@@ -41,6 +42,18 @@ export function SkillLabDetailPage({ labId, onLabLoad }: SkillLabDetailPageProps
   const [error, setError] = useState<string | null>(null)
   const [timed, setTimed] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
+  const [bookmarked, setBookmarked] = useState(() => getBookmarkedLabs().has(labId))
+  const [completed, setCompleted] = useState(() => {
+    try {
+      const stored: string[] = JSON.parse(localStorage.getItem('skill-labs-completed') || '[]')
+      return stored.includes(labId)
+    } catch { return false }
+  })
+
+  function handleToggleBookmark() {
+    const updated = toggleBookmark(labId)
+    setBookmarked(updated.has(labId))
+  }
 
   const isThisLabInProgress = inProgressLab?.labId === labId
   const isOtherLabInProgress = inProgressLab !== null && inProgressLab.labId !== labId
@@ -69,6 +82,14 @@ export function SkillLabDetailPage({ labId, onLabLoad }: SkillLabDetailPageProps
           const codes = new Set(found.relatedExamCodes!.map((c) => c.toLowerCase()))
           setRelatedExams(exams.filter((e) => codes.has(String(e.code).toLowerCase())))
         }
+
+        // Merge backend completed IDs with localStorage
+        authFetch(apiUrl('/skill-labs/my-attempts'))
+          .then((r: Response) => r.json())
+          .then((d: { completedLabIds: string[] }) => {
+            if (!cancelled && d.completedLabIds.includes(labId)) setCompleted(true)
+          })
+          .catch(() => {})
       } catch {
         if (!cancelled) setError('Unable to load lab. Please try again.')
       } finally {
@@ -142,12 +163,26 @@ export function SkillLabDetailPage({ labId, onLabLoad }: SkillLabDetailPageProps
         <div className="p-5 space-y-4">
           <div className="flex items-start justify-between gap-3">
             <h1 className="text-2xl font-bold leading-snug">{lab.title}</h1>
-            {lab.locked && (
-              <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted border border-border text-xs font-medium text-muted-foreground">
-                <Lock className="w-3 h-3" />
-                Premium
-              </span>
-            )}
+            <div className="shrink-0 flex items-center gap-2">
+              {lab.locked && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted border border-border text-xs font-medium text-muted-foreground">
+                  <Lock className="w-3 h-3" />
+                  Premium
+                </span>
+              )}
+              {completed && (
+                <span title="Completed" className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-600 text-white">
+                  <CheckCircle2 className="w-4 h-4" />
+                </span>
+              )}
+              <button
+                onClick={handleToggleBookmark}
+                title={bookmarked ? 'Remove bookmark' : 'Save for later'}
+                className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-border bg-muted/50 hover:bg-muted transition"
+              >
+                <Bookmark className={`w-4 h-4 transition ${bookmarked ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">

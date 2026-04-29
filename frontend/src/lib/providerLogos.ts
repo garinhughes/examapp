@@ -39,6 +39,11 @@ const PROVIDER_LOGOS: Record<string, ProviderMeta> = {
     logoHref: 'https://cloud.google.com/',
     displayName: 'Google',
   },
+  gcp: {
+    logo: '/logos/google.svg',
+    logoHref: 'https://cloud.google.com/',
+    displayName: 'Google',
+  },
 }
 
 export function normalisePlatformKey(platform: string | undefined | null): string {

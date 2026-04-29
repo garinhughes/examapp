@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Loader from '@/components/Loader'
 import { useExam } from '@/exam/ExamContext'
@@ -22,7 +22,7 @@ function readLabsSession(): Record<string, unknown> {
     return raw ? JSON.parse(raw) : {}
   } catch { return {} }
 }
-const LABS_PER_PAGE = 12 // 3 cols × 4 rows
+const PER_PAGE_OPTIONS = [12, 24, 48, 96] as const
 
 function inlineMarkdown(text: string) {
   return text.split(/(`[^`]+`)/).map((part, i) =>
@@ -35,6 +35,12 @@ function inlineMarkdown(text: string) {
 export function SkillLabsPage() {
   const { setRoute, authFetch, user } = useExam()
   const { inProgressLab, cancelActive } = useSkillLab()
+  const topRef = useRef<HTMLDivElement>(null)
+
+  function scrollToTop() {
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const [labs, setLabs] = useState<LabSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -104,6 +110,13 @@ export function SkillLabsPage() {
   }, [])
 
   // Pagination
+  const [perPage, setPerPage] = useState<typeof PER_PAGE_OPTIONS[number]>(() => {
+    const ss = readLabsSession()
+    const v = ss.perPage
+    return typeof v === 'number' && (PER_PAGE_OPTIONS as readonly number[]).includes(v)
+      ? (v as typeof PER_PAGE_OPTIONS[number])
+      : 12
+  })
   const [page, setPage] = useState(() => {
     const ss = readLabsSession()
     return typeof ss.page === 'number' && ss.page > 0 ? ss.page : 1
@@ -172,9 +185,10 @@ export function SkillLabsPage() {
         selectedTechnologies: [...selectedTechnologies],
         showSavedOnly,
         page,
+        perPage,
       }))
     } catch {}
-  }, [searchQuery, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showSavedOnly, page])
+  }, [searchQuery, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, showSavedOnly, page, perPage])
 
   // Derive unique filter options from lab data
   const filterOptions = useMemo(() => {
@@ -228,8 +242,8 @@ export function SkillLabsPage() {
     return result
   }, [labs, selectedDifficulty, selectedPlatforms, selectedCategories, selectedTechnologies, completionFilter, completedLabIds, showSavedOnly, bookmarkedLabIds, searchQuery])
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / LABS_PER_PAGE))
-  let paginated = filtered.slice((page - 1) * LABS_PER_PAGE, page * LABS_PER_PAGE)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
+  let paginated = filtered.slice((page - 1) * perPage, page * perPage)
   const isLocked = inProgressLab !== null
   if (isLocked) {
     const activeLab = labs.find((l) => l.id === inProgressLab.labId)
@@ -256,7 +270,7 @@ export function SkillLabsPage() {
   if (error) return <div className="text-destructive">{error}</div>
 
   return (
-    <div className="space-y-5">
+    <div ref={topRef} className="space-y-5">
       {/* Controls bar: search + filters */}
       <div className="flex flex-col gap-3">
         {/* Top row: search + saved + count */}
@@ -506,36 +520,55 @@ export function SkillLabsPage() {
         document.body
       )}
 
-      {/* Pagination */}
-      {!isLocked && totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-2">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="p-1.5 rounded-md border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed transition"
+      {/* Pagination + per-page selector */}
+      {!isLocked && (totalPages > 1 || filtered.length > 12) && (
+        <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
+          {totalPages > 1 && (
+            <>
+              <button
+                onClick={() => { setPage((p) => Math.max(1, p - 1)); scrollToTop() }}
+                disabled={page === 1}
+                className="p-1.5 rounded-md border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed transition"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => { setPage(p); scrollToTop() }}
+                  className={`w-8 h-8 rounded-md text-sm font-medium transition ${
+                    p === page
+                      ? 'bg-primary text-primary-foreground'
+                      : 'border border-border hover:bg-muted/50'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => { setPage((p) => Math.min(totalPages, p + 1)); scrollToTop() }}
+                disabled={page === totalPages}
+                className="p-1.5 rounded-md border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed transition"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <span className="w-px h-5 bg-border mx-1" />
+            </>
+          )}
+          <select
+            value={perPage}
+            onChange={(e) => {
+              setPerPage(Number(e.target.value) as typeof PER_PAGE_OPTIONS[number])
+              setPage(1)
+              scrollToTop()
+            }}
+            className="text-sm border border-border rounded-md px-2 py-1 bg-background text-foreground hover:bg-muted/50 transition cursor-pointer"
+            aria-label="Labs per page"
           >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`w-8 h-8 rounded-md text-sm font-medium transition ${
-                p === page
-                  ? 'bg-primary text-primary-foreground'
-                  : 'border border-border hover:bg-muted/50'
-              }`}
-            >
-              {p}
-            </button>
-          ))}
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-            className="p-1.5 rounded-md border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed transition"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+            {PER_PAGE_OPTIONS.map((n) => (
+              <option key={n} value={n}>{n} per page</option>
+            ))}
+          </select>
         </div>
       )}
     </div>

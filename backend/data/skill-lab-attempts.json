@@ -2558,5 +2558,102 @@
     },
     "timed": true,
     "abandonedAt": "2026-04-26T17:02:35.512Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "50d287e6-f3c9-436a-bce6-db7af13a558a",
+    "labId": "google-pubsub-pipeline-path",
+    "labType": "network-path",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-29T07:06:08.185Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-29T07:06:08.185Z",
+    "lastSavedAt": "2026-04-29T07:06:14.948Z",
+    "progressState": {
+      "checkedSteps": {},
+      "selectedAnswer": null,
+      "timeLeft": 599
+    },
+    "timed": true,
+    "abandonedAt": "2026-04-29T07:06:14.948Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "5e6cbb44-2b3b-4593-8566-b977348c8fcf",
+    "labId": "comptia-ransomware-response",
+    "labType": "incident-response",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-04-29T07:23:35.383Z",
+    "status": "abandoned",
+    "startedAt": "2026-04-29T07:23:35.383Z",
+    "lastSavedAt": "2026-04-29T07:24:22.311Z",
+    "progressState": {
+      "selectedActions": [],
+      "selectedAnswer": "",
+      "timeLeft": 261
+    },
+    "timed": true,
+    "abandonedAt": "2026-04-29T07:24:22.311Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "8fadfffa-1cee-4f39-8dac-a2b05154a993",
+    "labId": "google-vertex-deploy-cmd",
+    "labType": "command-terminal",
+    "selectedAnswer": "all-steps-complete",
+    "correct": true,
+    "timeTaken": 193,
+    "createdAt": "2026-04-29T07:41:11.322Z",
+    "status": "completed",
+    "startedAt": "2026-04-29T07:41:11.322Z",
+    "lastSavedAt": "2026-04-29T07:44:23.501Z",
+    "progressState": {
+      "stepIndex": 0,
+      "lines": [
+        {
+          "kind": "info",
+          "text": "# Practice terminal. Type each command to complete the task."
+        },
+        {
+          "kind": "info",
+          "text": "# Tip: type `<command> --help` to list available flags. Not every flag you see is needed."
+        },
+        {
+          "kind": "output",
+          "text": ""
+        }
+      ],
+      "history": [],
+      "input": "h",
+      "timeLeft": 599
+    },
+    "timed": true,
+    "completedAt": "2026-04-29T07:44:23.501Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "f72a83bd-fbc8-4c17-adbf-513c9e2f7193",
+    "labId": "google-pipeline-incident",
+    "labType": "incident-response",
+    "selectedAnswer": "ans2",
+    "correct": false,
+    "timeTaken": 6,
+    "createdAt": "2026-04-29T07:44:57.022Z",
+    "status": "completed",
+    "startedAt": "2026-04-29T07:44:57.022Z",
+    "lastSavedAt": "2026-04-29T07:45:33.325Z",
+    "progressState": {
+      "selectedActions": [
+        "act1"
+      ],
+      "selectedAnswer": "ans2",
+      "timeLeft": 565
+    },
+    "timed": true,
+    "completedAt": "2026-04-29T07:45:33.325Z"
   }
 ]
