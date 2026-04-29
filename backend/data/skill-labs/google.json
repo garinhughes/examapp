@@ -820,7 +820,7 @@
     "category": "Security",
     "technologies": [
       "BigQuery",
-      "IAM"
+      "Cloud IAM"
     ],
     "labCategory": "Configure",
     "learningOutcomes": [

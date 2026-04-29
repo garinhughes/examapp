@@ -6,6 +6,8 @@ import lightTheme from 'prism-react-renderer/themes/vsLight'
 function useDark() {
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
   useEffect(() => {
+    // Read current state immediately in case it changed before the effect ran
+    setDark(document.documentElement.classList.contains('dark'))
     const obs = new MutationObserver(() => setDark(document.documentElement.classList.contains('dark')))
     obs.observe(document.documentElement, { attributeFilter: ['class'] })
     return () => obs.disconnect()
@@ -100,7 +102,10 @@ export default function CodeBlock({ code, language = 'bash', inline = false }: P
       {({ className, style, tokens, getLineProps, getTokenProps }) => {
         return (
           <div>
-            <pre className={`${className} p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-all max-w-full`} style={{ ...style }}>
+            <pre
+              className={`${className} p-3 rounded text-sm overflow-x-auto font-mono whitespace-pre-wrap break-all max-w-full`}
+              style={{ ...style, backgroundColor: 'var(--code-block-bg)', color: 'var(--code-block-fg)' }}
+            >
               {tokens.map((line, i) => {
                 const { key: lineKey, ...lineProps } = getLineProps({ line, key: i })
                 return (

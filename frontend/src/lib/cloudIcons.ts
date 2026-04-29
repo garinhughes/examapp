@@ -162,7 +162,7 @@ export const CLOUD_ICON_KEYS: Record<string, string> = {
   'Dataproc':                        'icons/gcp/dataproc.svg',
   'Dataplex':                        'icons/gcp/dataplex.svg',
   'Pub/Sub':                         'icons/gcp/pubsub.svg',
-  'IAM':                             'icons/gcp/identity-and-access-management.svg',
+  'Cloud IAM':                       'icons/gcp/identity-and-access-management.svg',
   'Looker':                          'icons/gcp/looker.svg',
   'Workspace':                       'icons/gcp/google-kubernetes-engine.svg',
   'NotebookLM':                      'icons/gcp/ai-platform.svg',

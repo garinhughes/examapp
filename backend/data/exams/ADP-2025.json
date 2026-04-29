@@ -602,43 +602,43 @@
     {
       "id": "ADP-2025-0014",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language",
       "format": "text",
-      "services": [
-        "BigQuery"
-      ],
+      "difficulty": 1,
+      "domain": "Data Preparation and Ingestion",
       "skills": [
         "1.1.4: Conduct data cleaning using tools such as Cloud Data Fusion, BigQuery, SQL, and Dataflow."
       ],
-      "question": "An analyst has loaded a raw orders table into BigQuery and discovers that several thousand rows contain trailing whitespace in the `customer_email` column and inconsistent letter casing. Downstream joins on email are failing as a result, and they want a fix that runs in place using familiar SQL.\n\nWhich approach is the MOST cost-effective for cleaning these values?",
+      "services": [
+        "BigQuery"
+      ],
+      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions",
+      "lastReviewed": "2026-04-28",
+      "question": "An analyst is cleaning a raw orders table in BigQuery. The `product_name` column contains trailing whitespace and inconsistent casing. The analyst writes the following query to create a cleaned version of the table:\n\n```sql\nCREATE OR REPLACE TABLE orders_clean AS\nSELECT\n  order_id,\n  order_date,\n  customer_id,\n  LOWER(LTRIM(product_name))  AS product_name,\n  quantity,\n  unit_price,\n  region\nFROM\n  orders_raw;\n```\n\nWhich expression will NOT fully clean the `product_name` column as intended?",
       "choices": [
         {
           "id": "c1",
-          "text": "Run a BigQuery `UPDATE` statement that applies `LOWER(TRIM(customer_email))` to the affected column",
+          "text": "`LOWER(LTRIM(product_name))` - because `LTRIM` removes only leading whitespace, so trailing spaces remain after the transformation.",
           "sequence": 1,
-          "explanation": "An in-warehouse SQL update is the most direct, cost-effective fix for a string-cleaning issue."
+          "explanation": "Correct. `LTRIM` only strips leading whitespace, leaving trailing spaces intact."
         },
         {
           "id": "c2",
-          "text": "Export the table to Cloud Storage, clean the CSV with a Python script on Compute Engine, and reload the data",
-          "explanation": "Exporting and reloading adds storage egress and compute costs for a problem solvable in SQL."
+          "text": "`LOWER(TRIM(product_name))` - because `TRIM` removes both leading and trailing whitespace before `LOWER` converts the result to lowercase.",
+          "explanation": "`LOWER(TRIM(product_name))` is the correct expression. Both surrounding whitespace and casing are handled."
         },
         {
           "id": "c3",
-          "text": "Build a Dataflow pipeline that reads the table, cleans the column, and writes a new table",
-          "explanation": "Spinning up Dataflow for a simple string fix introduces unnecessary infrastructure cost."
+          "text": "`TRIM(LOWER(product_name))` - because applying `LOWER` first and then `TRIM` still removes all surrounding whitespace and normalises casing.",
+          "explanation": "`TRIM(LOWER(product_name))` also works correctly. The order of `LOWER` and `TRIM` does not affect the result."
         },
         {
           "id": "c4",
-          "text": "Author a Cloud Data Fusion pipeline solely to lowercase and trim the column",
-          "explanation": "Cloud Data Fusion incurs cluster cost and complexity that is unwarranted for a single-column fix."
+          "text": "`LOWER(TRIM(BOTH ' ' FROM product_name))` - because the explicit `BOTH` clause removes whitespace from both sides before lowercasing.",
+          "explanation": "`TRIM(BOTH ' ' FROM product_name)` is equivalent to `TRIM(product_name)` in BigQuery standard SQL. This expression is also correct."
         }
       ],
-      "tip": "Prefer in-place cleanup when SQL functions can do the job.",
-      "explanation": "BigQuery's built-in string functions (`TRIM`, `LOWER`) handle the issue with a single DML statement, with no extra services or data movement.\n\n**Why it works:** The fix runs entirely inside BigQuery using cheap, familiar SQL.\n\n**Why the others don't work:**\n- Export, clean, reload: incurs egress, compute, and operational overhead.\n- Dataflow pipeline: heavy infrastructure for a trivial cleanup.\n- Cloud Data Fusion: pipeline cluster cost is excessive for one column.",
-      "domain": "Data Preparation and Ingestion",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "tip": "In BigQuery standard SQL, `TRIM` removes both leading and trailing whitespace. `LTRIM` removes only leading whitespace and `RTRIM` removes only trailing whitespace.",
+      "explanation": "`LTRIM` (left trim) removes whitespace only from the beginning of a string. Any trailing spaces in `product_name` survive the transformation, so the column is not fully cleaned. The correct function is `TRIM`, which removes whitespace from both ends.\n\n**Why it works:** `LTRIM` does not touch the right side of the string, so trailing spaces are preserved.\n\n**Why the others don't work:**\n- `LOWER(TRIM(...))`: `TRIM` removes all surrounding whitespace - fully correct.\n- `TRIM(LOWER(...))`: The order of functions does not matter here - also correct.\n- `TRIM(BOTH ' ' FROM ...)`: Equivalent to `TRIM` - also correct."
     },
     {
       "id": "ADP-2025-0015",
@@ -1187,44 +1187,44 @@
     {
       "id": "ADP-2025-0026",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/bq-command-line-tool",
       "format": "text",
+      "difficulty": 1,
+      "domain": "Data Preparation and Ingestion",
+      "skills": [
+        "1.2.3: Load data into Google Cloud storage systems using the appropriate tool, including gcloud and BQ CLI, Storage Transfer Service, BigQuery Data Transfer Service, and client libraries."
+      ],
       "services": [
         "BigQuery",
         "Cloud Storage"
       ],
-      "skills": [
-        "1.2.3: Load data into Google Cloud storage systems using the appropriate tool, including gcloud and BQ CLI, Storage Transfer Service, BigQuery Data Transfer Service, and client libraries."
-      ],
-      "question": "A data engineer is automating a one-off ingestion of a single 5 GB Apache Avro file from a Cloud Storage bucket into a new BigQuery table from a Cloud Build step.\n\nWhich command-line approach correctly performs this load with the LEAST operational overhead?",
+      "docs": "https://cloud.google.com/bigquery/docs/reference/bq-cli-reference",
+      "lastReviewed": "2026-04-28",
+      "question": "A data engineer needs to load a single Avro file from Cloud Storage into BigQuery using the `bq load` CLI. They run the following command:\n\n```bash\nbq load \\\n  --source_format=AVRO \\\n  --autodetect \\\n  --schema=./orders_schema.json \\\n  my-project:sales_dataset.orders \\\n  gs://my-bucket/data/orders.avro\n```\n\nWhich flag or argument combination will cause this command to fail?",
       "choices": [
         {
           "id": "c1",
-          "text": "Run `bq load --source_format=AVRO project:dataset.table gs://bucket/file.avro` so BigQuery loads directly from Cloud Storage using the embedded Avro schema.",
+          "text": "`--autodetect` and `--schema` used together - these flags are mutually exclusive and cannot both be specified in the same `bq load` command.",
           "sequence": 1,
-          "explanation": "The bq CLI natively supports loading Avro from Cloud Storage and uses the embedded Avro schema."
+          "explanation": "Correct. `--autodetect` infers the schema from the data; `--schema` supplies it explicitly. Using both causes `bq load` to return an error."
         },
         {
           "id": "c2",
-          "text": "Use `gcloud storage cp` to download the Avro file locally, then upload it again with `bq load` using a manually written JSON schema file.",
-          "explanation": "Downloading first wastes bandwidth and a manual schema is unnecessary because Avro carries its schema."
+          "text": "`--source_format=AVRO` - this flag is incorrect because Avro files are detected automatically and do not require a source format flag.",
+          "explanation": "Explicitly specifying `--source_format=AVRO` is valid and recommended practice. It is not an error."
         },
         {
           "id": "c3",
-          "text": "Configure a Storage Transfer Service job to push the Avro file into the BigQuery table.",
-          "explanation": "Storage Transfer Service moves objects between buckets, not into BigQuery tables."
+          "text": "`my-project:sales_dataset.orders` - the colon separator between the project and dataset is incorrect and should be replaced with a dot.",
+          "explanation": "The colon is the correct separator between the project ID and the dataset name in a `bq` CLI table reference. `project:dataset.table` is valid."
         },
         {
           "id": "c4",
-          "text": "Set up a BigQuery Data Transfer Service run with a custom REST connector pointing at the Cloud Storage object.",
-          "explanation": "BigQuery Data Transfer Service does not expose a generic custom REST connector for arbitrary Cloud Storage Avro files; the bq load command is the direct path."
+          "text": "`gs://my-bucket/data/orders.avro` - the GCS URI format is invalid because `bq load` requires a path without the `gs://` prefix.",
+          "explanation": "The `gs://` prefix is required and correct for all GCS URIs used with `bq load`."
         }
       ],
-      "tip": "Pick the simplest tool that natively understands the file format and target.",
-      "explanation": "The bq CLI's load command supports Avro directly from Cloud Storage and uses the schema embedded in the file.\n\n**Why it works:** A single bq load command in the Cloud Build step handles the whole load with the Avro schema discovered automatically.\n\n**Why the others don't work:**\n- Local download with manual schema: adds I/O and a schema file the format already provides.\n- Storage Transfer Service: does not write into BigQuery tables.\n- Custom REST connector: is not the appropriate mechanism for a single Avro file in Cloud Storage.",
-      "domain": "Data Preparation and Ingestion",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "tip": "When using `bq load`, use either `--autodetect` (to infer schema from the file) or `--schema` (to supply a schema file), but never both.",
+      "explanation": "The `--autodetect` flag instructs BigQuery to infer the schema from the source data. The `--schema` flag provides an explicit schema definition. These two flags are mutually exclusive - specifying both causes `bq load` to return an error.\n\n**Why it works:** BigQuery cannot simultaneously auto-detect and use a provided schema. Providing both flags is contradictory and the CLI rejects the command.\n\n**Why the others don't work:**\n- `--source_format=AVRO`: Valid and recommended.\n- `project:dataset.table` with a colon: Correct `bq` CLI table reference format.\n- `gs://` URI prefix: Required and correct."
     },
     {
       "id": "ADP-2025-0027",
@@ -1363,43 +1363,43 @@
     {
       "id": "ADP-2025-0030",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/best-practices-performance-compute",
       "format": "text",
-      "services": [
-        "BigQuery"
-      ],
+      "difficulty": 2,
+      "domain": "Data Analysis and Presentation",
       "skills": [
         "2.1.1: Define and execute SQL queries in BigQuery to generate reports and extract key insights."
       ],
-      "question": "An analyst at a logistics company writes ad hoc BigQuery SQL against a 5 TB shipments table that is partitioned by `event_date` and clustered by `carrier_id`. Recent queries scan the entire table because the WHERE clause filters by month using `EXTRACT(MONTH FROM event_date)`.\n\nWhich change will MOST reduce bytes scanned without altering business logic?",
+      "services": [
+        "BigQuery"
+      ],
+      "docs": "https://cloud.google.com/bigquery/docs/running-queries",
+      "lastReviewed": "2026-04-28",
+      "question": "An analyst writes the following BigQuery SQL query to report total sales and average order value by region and sales representative:\n\n```sql\nSELECT\n  region,\n  sales_rep,\n  order_month,\n  SUM(order_value)          AS total_sales,\n  AVG(order_value)          AS avg_order_value,\n  COUNT(DISTINCT order_id)  AS order_count\nFROM\n  sales.orders\nWHERE\n  order_status = 'COMPLETED'\nGROUP BY\n  region,\n  sales_rep\nHAVING\n  total_sales > 10000\nORDER BY\n  total_sales DESC;\n```\n\nWhich line contains a SQL error that will cause this query to fail in BigQuery?",
       "choices": [
         {
           "id": "c1",
-          "text": "Rewrite the predicate to filter `event_date` directly with a date range such as `event_date BETWEEN '2026-03-01' AND '2026-03-31'`.",
+          "text": "`order_month` in the SELECT list - it is neither included in the `GROUP BY` clause nor wrapped in an aggregate function.",
           "sequence": 1,
-          "explanation": "A direct range predicate on the partition column lets BigQuery prune partitions, dramatically reducing bytes scanned."
+          "explanation": "Correct. Every non-aggregated SELECT column must appear in GROUP BY. `order_month` violates this rule."
         },
         {
           "id": "c2",
-          "text": "Add a SELECT DISTINCT clause to the query so duplicate rows are eliminated before scanning.",
-          "explanation": "DISTINCT is applied after data is read and does not reduce the bytes scanned by the storage engine."
+          "text": "`HAVING total_sales > 10000` - the HAVING clause cannot reference a column alias defined in the SELECT list.",
+          "explanation": "BigQuery supports referencing SELECT aliases in the HAVING clause. This line is valid."
         },
         {
           "id": "c3",
-          "text": "Cluster the table by `event_date` in addition to `carrier_id` so month-based filters benefit.",
-          "explanation": "Clustering a partitioned table by its partition column adds no benefit; the issue is the function-wrapped predicate."
+          "text": "`COUNT(DISTINCT order_id) AS order_count` - `COUNT(DISTINCT ...)` is not supported in BigQuery and must be replaced with `APPROX_COUNT_DISTINCT`.",
+          "explanation": "BigQuery fully supports `COUNT(DISTINCT column)`. `APPROX_COUNT_DISTINCT` is an optional approximation, not a replacement."
         },
         {
           "id": "c4",
-          "text": "Switch the query to legacy SQL so partition filters are inferred automatically from `EXTRACT` calls.",
-          "explanation": "Legacy SQL does not infer partition pruning from `EXTRACT`; the function still defeats pruning."
+          "text": "`ORDER BY total_sales DESC` - the ORDER BY clause cannot reference an alias from the SELECT list in BigQuery.",
+          "explanation": "BigQuery allows SELECT aliases to be referenced in ORDER BY. This line is valid."
         }
       ],
-      "tip": "Partition pruning depends on how the partition column appears in the predicate.",
-      "explanation": "Wrapping a partition column in a function prevents BigQuery from pruning partitions, so the engine reads them all.\n\n**Why it works:** A direct range filter on the partition column allows the query planner to read only the relevant partitions.\n\n**Why the others don't work:**\n- DISTINCT: post-scan operation.\n- Reclustering by partition column: not how clustering works.\n- Legacy SQL: does not change pruning behaviour.",
-      "domain": "Data Analysis and Presentation",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "tip": "In GROUP BY queries, every column in the SELECT list that is not inside an aggregate function must also appear in the GROUP BY clause.",
+      "explanation": "`order_month` appears in the SELECT list but is not listed in the GROUP BY clause and is not wrapped in an aggregate function. BigQuery enforces this standard SQL rule and will return an error like 'SELECT list expression references column `order_month` which is neither grouped nor aggregated'.\n\n**Why it works:** `order_month` is unaggregated and ungrouped - a clear GROUP BY violation.\n\n**Why the others don't work:**\n- `HAVING total_sales > 10000`: BigQuery's SQL dialect allows SELECT aliases in HAVING.\n- `COUNT(DISTINCT order_id)`: Standard aggregate function, fully supported.\n- `ORDER BY total_sales DESC`: Aliases from SELECT are allowed in ORDER BY."
     },
     {
       "id": "ADP-2025-0031",
@@ -1537,44 +1537,44 @@
     {
       "id": "ADP-2025-0034",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/visualize-jupyter",
       "format": "text",
-      "services": [
-        "Colab Enterprise",
-        "BigQuery"
-      ],
+      "difficulty": 2,
+      "domain": "Data Analysis and Presentation",
       "skills": [
         "2.1.2: Use Jupyter notebooks to analyze and visualize data, including Colab Enterprise."
       ],
-      "question": "An analyst working in a Colab Enterprise notebook needs to query a BigQuery table and load the result into a pandas DataFrame for visualization. The analyst wants the LEAST amount of boilerplate code while still using authenticated access from the notebook runtime.\n\nWhich approach should the analyst use?",
+      "services": [
+        "BigQuery",
+        "Colab Enterprise"
+      ],
+      "docs": "https://cloud.google.com/bigquery/docs/bigquery-dataframes-introduction",
+      "lastReviewed": "2026-04-28",
+      "question": "An analyst working in a Colab Enterprise notebook writes the following Python code to query BigQuery and load the result into a pandas DataFrame:\n\n```python\nfrom google.cloud import bigquery\nimport pandas as pd\n\nproject_id = 'my-project'\nclient = bigquery.Client(project_id)\n\nsql = \"\"\"\n  SELECT product_id, region, SUM(revenue) AS total_revenue\n  FROM sales.transactions\n  WHERE DATE(order_date) >= '2025-01-01'\n  GROUP BY product_id, region\n\"\"\"\n\njob = client.query(sql)\ndf = job.to_dataframe()\n\nprint(df.head())\n```\n\nWhich line will cause an error?",
       "choices": [
         {
           "id": "c1",
-          "text": "Use the `%%bigquery df` cell magic to run SQL and assign the result directly to a pandas DataFrame named `df`.",
+          "text": "`client = bigquery.Client(project_id)` - the project ID must be passed as a keyword argument using `project=project_id`, not as a positional argument.",
           "sequence": 1,
-          "explanation": "The BigQuery cell magic is the shortest path from SQL to a DataFrame inside a notebook."
+          "explanation": "Correct. `bigquery.Client()` does not accept the project as a positional argument - it must be `bigquery.Client(project='my-project')`."
         },
         {
           "id": "c2",
-          "text": "Open a Cloud Shell session, run `bq query --format=csv`, download the file, and read it with `pandas.read_csv`.",
-          "explanation": "This adds shell steps and a file round trip that the cell magic eliminates."
+          "text": "`job = client.query(sql)` - the `query` method does not exist on the BigQuery `Client` object and should be replaced with `client.run_query(sql)`.",
+          "explanation": "`client.query(sql)` is the correct method for submitting a query job. There is no `run_query` method."
         },
         {
           "id": "c3",
-          "text": "Export the table to Cloud Storage as Parquet and read it back into the notebook with `pandas.read_parquet`.",
-          "explanation": "Export plus reload adds storage and latency for a step covered by the magic."
+          "text": "`df = job.to_dataframe()` - calling `to_dataframe()` directly on the `QueryJob` object is not supported and will raise an `AttributeError`.",
+          "explanation": "In current versions of `google-cloud-bigquery`, calling `to_dataframe()` on a `QueryJob` is valid and waits for the job to complete before returning a DataFrame."
         },
         {
           "id": "c4",
-          "text": "Create a federated external table over Cloud Storage and query it via the BigQuery REST API in the notebook.",
-          "explanation": "Federation is unrelated to the goal and adds setup overhead."
+          "text": "`from google.cloud import bigquery` - this import is unavailable in Colab Enterprise and must be replaced with `import bigquery`.",
+          "explanation": "The `google-cloud-bigquery` library is pre-installed in Colab Enterprise and the standard import is correct."
         }
       ],
-      "tip": "Look for the native notebook integration with BigQuery.",
-      "explanation": "Cell magics provide a single-line bridge between BigQuery SQL and pandas DataFrames inside Colab Enterprise notebooks.\n\n**Why it works:** `%%bigquery df` runs the cell SQL using notebook credentials and writes the results into a DataFrame.\n\n**Why the others don't work:**\n- Cloud Shell `bq` plus CSV: extra steps and shell context.\n- Export to Cloud Storage: unnecessary round trip.\n- Federated external table: solves a different problem.",
-      "domain": "Data Analysis and Presentation",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "tip": "Check the constructor signature of any Google Cloud client class before passing arguments positionally - most parameters are keyword-only.",
+      "explanation": "`bigquery.Client()` accepts the project ID only as a keyword argument: `bigquery.Client(project='my-project')`. Passing the project ID as a positional argument raises a `TypeError` because the first positional parameter of the `Client` constructor is not the project.\n\n**Why it works:** The `Client` constructor signature requires `project` to be a keyword argument. Passing a positional string maps to the wrong parameter.\n\n**Why the others don't work:**\n- `client.query(sql)`: Correct method for submitting a query.\n- `job.to_dataframe()`: Valid in current library versions.\n- `from google.cloud import bigquery`: Correct and available in Colab Enterprise."
     },
     {
       "id": "ADP-2025-0035",
@@ -2231,43 +2231,43 @@
     {
       "id": "ADP-2025-0049",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/looker/docs/reference/param-measure-types",
       "format": "text",
-      "services": [
-        "Looker"
-      ],
+      "difficulty": 1,
+      "domain": "Data Analysis and Presentation",
       "skills": [
         "2.2.3: Manipulate simple LookML parameters to modify a data model."
       ],
-      "question": "The analytics team is modifying a Looker view that exposes an `orders` table. They need to add a measure that counts the total number of orders so analysts can use it in Explores and dashboards.\n\nWhich LookML definition correctly adds this measure?",
+      "services": [
+        "Looker"
+      ],
+      "docs": "https://cloud.google.com/looker/docs/reference/param-measure-types",
+      "lastReviewed": "2026-04-28",
+      "question": "A Looker developer is adding a measure to a view that should count the number of unique order IDs placed by each customer. They write the following LookML block:\n\n```yaml\nview: orders {\n  sql_table_name: sales.orders ;;\n\n  measure: unique_orders {\n    type: count\n    sql: ${TABLE}.order_id ;;\n    label: \"Unique Orders\"\n    description: \"Number of distinct orders placed\"\n    value_format_name: decimal_0\n  }\n}\n```\n\nWhich parameter in the `unique_orders` measure block is incorrect for counting unique order IDs?",
       "choices": [
         {
           "id": "c1",
-          "text": "Define a measure named `total_orders` with `type: count` inside the `orders` view.",
+          "text": "`type: count` - this counts all rows including duplicates and should be `type: count_distinct` to count unique order IDs.",
           "sequence": 1,
-          "explanation": "`type: count` is the LookML measure type that counts rows in the view."
+          "explanation": "Correct. `type: count` is equivalent to `COUNT(*)` - it counts all rows. `type: count_distinct` with a `sql` field is needed for `COUNT(DISTINCT order_id)`."
         },
         {
           "id": "c2",
-          "text": "Define a dimension named `total_orders` with `type: number` and the SQL `COUNT(*)`.",
-          "explanation": "Aggregations belong in measures, not dimensions; placing them in dimensions causes SQL errors."
+          "text": "`sql: ${TABLE}.order_id` - specifying a `sql` parameter on a count measure is invalid in LookML and must be removed.",
+          "explanation": "The `sql` parameter is valid on a `count_distinct` measure to specify which column to count. It can also appear on a `count` measure. It is not the source of the error here."
         },
         {
           "id": "c3",
-          "text": "Add a `derived_table` block that selects `COUNT(*)` and reference it as a dimension.",
-          "explanation": "A derived table is excessive for a simple count and bypasses standard measure semantics."
+          "text": "`value_format_name: decimal_0` - this format type is not supported for numeric measures in LookML and must be replaced with `number`.",
+          "explanation": "`decimal_0` is a valid `value_format_name` in Looker that formats a number as an integer with no decimal places. It is appropriate for a count measure."
         },
         {
           "id": "c4",
-          "text": "Define a parameter named `total_orders` with `type: count` so users can toggle the count on and off.",
-          "explanation": "`parameter` fields capture user input, not aggregations."
+          "text": "`label: \"Unique Orders\"` - measure labels must match the measure name in LookML and cannot be set to a custom string.",
+          "explanation": "The `label` parameter exists precisely to allow developers to set a human-readable name that differs from the measure's field name. This is valid and commonly used."
         }
       ],
-      "tip": "Recall which LookML field type performs aggregations.",
-      "explanation": "LookML measures of `type: count` produce a row-count aggregate over the view's primary key.\n\n**Why it works:** Defining the field as a measure with the correct type makes it usable in Explores, dashboards, and pivots without writing custom SQL.\n\n**Why the others don't work:**\n- Dimension with COUNT: Dimensions cannot contain aggregations.\n- Derived table: Overkill and not the idiomatic LookML pattern for a simple count.\n- `parameter`: Captures user input, not aggregate results.",
-      "domain": "Data Analysis and Presentation",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "tip": "Use `type: count` to count all rows (equivalent to `COUNT(*)`) and `type: count_distinct` with a `sql` parameter to count unique values of a specific column.",
+      "explanation": "`type: count` counts all rows in the result set, including rows with duplicate `order_id` values. To count only unique (distinct) values, the measure type must be `type: count_distinct` combined with a `sql` parameter pointing to the column.\n\n**Why it works:** `type: count` overcounts when multiple rows share the same `order_id`. `type: count_distinct` performs the equivalent of `COUNT(DISTINCT order_id)`.\n\n**Why the others don't work:**\n- `sql: ${TABLE}.order_id`: Valid and required for `count_distinct`.\n- `value_format_name: decimal_0`: Supported format for whole-number counts.\n- `label: \"Unique Orders\"`: The `label` parameter is designed for custom display names."
     },
     {
       "id": "ADP-2025-0050",
@@ -2973,43 +2973,43 @@
     {
       "id": "ADP-2025-0065",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/create-machine-learning-model",
       "format": "text",
-      "services": [
-        "BigQuery ML"
-      ],
+      "difficulty": 1,
+      "domain": "Data Analysis and Presentation",
       "skills": [
         "2.3.4: Execute SQL to create, train, and evaluate models using BigQuery ML."
       ],
-      "question": "You are training a customer churn classifier in BigQuery ML on a table that has a boolean churned column and several feature columns. You want a single SQL statement that creates and trains the model in one step.\n\nWhich SQL pattern correctly creates and trains the model?",
+      "services": [
+        "BigQuery ML"
+      ],
+      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-create",
+      "lastReviewed": "2026-04-28",
+      "question": "A data analyst creates a BigQuery ML logistic regression model to predict customer churn. The training table has a column called `churned` (the binary label) and feature columns `monthly_charges`, `tenure_months`, and `num_products`. They run the following statement:\n\n```sql\nCREATE OR REPLACE MODEL\n  churn_dataset.churn_classifier\nOPTIONS(\n  model_type         = 'logistic_reg',\n  input_label_cols   = ['monthly_charges'],\n  auto_class_weights = TRUE,\n  max_iterations     = 50,\n  l2_reg             = 0.01\n)\nAS\nSELECT\n  monthly_charges,\n  tenure_months,\n  num_products,\n  churned\nFROM\n  churn_dataset.customer_features\nWHERE\n  split = 'TRAIN';\n```\n\nWhich option will cause the model to produce incorrect results?",
       "choices": [
         {
           "id": "c1",
-          "text": "`CREATE MODEL` with `OPTIONS(model_type='LOGISTIC_REG', input_label_cols=['churned'])` followed by an `AS SELECT` of features and label",
+          "text": "`input_label_cols = ['monthly_charges']` - `monthly_charges` is a feature column, not the label. The label column is `churned`, so the model will be trained to predict the wrong column.",
           "sequence": 1,
-          "explanation": "CREATE MODEL with model_type and input_label_cols and an AS SELECT trains the model in one statement."
+          "explanation": "Correct. `input_label_cols` must contain the name of the target variable. Setting it to a feature column causes the model to predict the wrong thing entirely."
         },
         {
           "id": "c2",
-          "text": "`CREATE TABLE` with `OPTIONS(model_type='LOGISTIC_REG')` followed by an INSERT of training rows",
-          "explanation": "Models are not created with CREATE TABLE in BigQuery ML."
+          "text": "`model_type = 'logistic_reg'` - logistic regression is not supported for binary classification in BigQuery ML and must be replaced with `model_type = 'binary_classifier'`.",
+          "explanation": "`logistic_reg` is a valid and commonly used `model_type` in BigQuery ML for binary and multi-class classification. There is no `binary_classifier` type."
         },
         {
           "id": "c3",
-          "text": "`CREATE MODEL` with `OPTIONS(model_type='LOGISTIC_REG')` followed by a separate `TRAIN MODEL` statement that supplies features",
-          "explanation": "There is no separate TRAIN MODEL statement; training happens during CREATE MODEL via AS SELECT."
+          "text": "`auto_class_weights = TRUE` - this option is not compatible with logistic regression models and will cause the `CREATE MODEL` statement to fail.",
+          "explanation": "`auto_class_weights = TRUE` is a supported option for `logistic_reg` in BigQuery ML. It adjusts class weights to handle imbalanced datasets."
         },
         {
           "id": "c4",
-          "text": "`CREATE PROCEDURE` that loops through rows and calls `ML.UPDATE_WEIGHTS` for each batch",
-          "explanation": "BigQuery ML does not expose a manual weight update procedure to users."
+          "text": "`max_iterations = 50` - the maximum number of iterations for logistic regression in BigQuery ML cannot exceed 20 and this value will cause a validation error.",
+          "explanation": "BigQuery ML allows `max_iterations` values well above 20. The default is 20 but higher values are valid."
         }
       ],
-      "tip": "Recall the single-statement pattern that combines model creation and training in BigQuery ML.",
-      "explanation": "`CREATE MODEL ... OPTIONS(...) AS SELECT ...` is the canonical BigQuery ML training statement.\n\n**Why it works:** It declares model type, label, and feature query in one statement that BigQuery executes as a training job.\n\n**Why the others don't work:**\n- CREATE TABLE does not create models.\n- There is no TRAIN MODEL statement; training is part of CREATE MODEL.\n- Manual weight updates via procedures are not part of the BigQuery ML interface.",
-      "domain": "Data Analysis and Presentation",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "tip": "Always double-check `input_label_cols` - it must contain the name of the column that holds the ground truth labels, not a feature column.",
+      "explanation": "`input_label_cols` tells BigQuery ML which column is the target variable (the label to predict). Setting it to `['monthly_charges']` causes the model to treat `monthly_charges` as the output and `churned` as just another feature. The model will train but predict monthly charges rather than churn.\n\n**Why it works:** `input_label_cols` specifies the prediction target. Pointing it at a feature column trains the model on the wrong outcome entirely.\n\n**Why the others don't work:**\n- `logistic_reg`: Correct model type for binary classification.\n- `auto_class_weights = TRUE`: Supported and compatible with `logistic_reg`.\n- `max_iterations = 50`: Valid value above the default of 20."
     },
     {
       "id": "ADP-2025-0066",
@@ -3146,84 +3146,84 @@
     {
       "id": "ADP-2025-0069",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-predict",
       "format": "text",
-      "services": [
-        "BigQuery ML"
-      ],
+      "difficulty": 1,
+      "domain": "Data Analysis and Presentation",
       "skills": [
         "2.3.5: Perform inference using BigQuery ML models."
       ],
-      "question": "After training a logistic regression model named `analytics.churn_model` in BigQuery ML, you want to score every customer in the `analytics.customers` table and write the predictions to a new table.\n\nWhich SQL approach performs the inference?",
+      "services": [
+        "BigQuery ML"
+      ],
+      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-predict",
+      "lastReviewed": "2026-04-28",
+      "question": "A data analyst wants to score a customer churn model against a table of new customers using `ML.PREDICT` in BigQuery. They write the following query:\n\n```sql\nSELECT\n  customer_id,\n  predicted_churned,\n  predicted_churned_probs\nFROM\n  ML.PREDICT(\n    TABLE churn_dataset.new_customers,\n    MODEL churn_dataset.churn_classifier\n  );\n```\n\nWhich part of this query will cause it to fail?",
       "choices": [
         {
           "id": "c1",
-          "text": "Run `CREATE TABLE analytics.churn_predictions AS SELECT * FROM ML.PREDICT(MODEL analytics.churn_model, TABLE analytics.customers)`",
+          "text": "The argument order is reversed - `ML.PREDICT` requires `MODEL` as the first argument and `TABLE` as the second argument.",
           "sequence": 1,
-          "explanation": "ML.PREDICT scores rows from the supplied table and the result can be materialised with CREATE TABLE AS."
+          "explanation": "Correct. The required signature is `ML.PREDICT(MODEL ..., TABLE ...)`. Swapping the arguments is a syntax error."
         },
         {
           "id": "c2",
-          "text": "Run `EXPORT MODEL analytics.churn_model TO 'gs://bucket/preds'` and then load the file back into BigQuery",
-          "explanation": "EXPORT MODEL exports the model artefact, not predictions."
+          "text": "The `TABLE` keyword is invalid in `ML.PREDICT` and must be replaced with a subquery using `SELECT * FROM churn_dataset.new_customers`.",
+          "explanation": "The `TABLE` keyword is a valid shorthand in `ML.PREDICT` for selecting all rows from a table. Both `TABLE` and a subquery are accepted."
         },
         {
           "id": "c3",
-          "text": "Run `CALL ML.SCORE(analytics.churn_model, analytics.customers)` from a stored procedure",
-          "explanation": "There is no ML.SCORE callable; ML.PREDICT is the inference function."
+          "text": "`predicted_churned_probs` is not a valid output column name from `ML.PREDICT` and will cause a column-not-found error.",
+          "explanation": "For logistic regression models, `ML.PREDICT` returns a `predicted_<label>_probs` column. `predicted_churned_probs` is the correct column name when the label is `churned`."
         },
         {
           "id": "c4",
-          "text": "Issue an `INSERT INTO analytics.churn_predictions SELECT ML.PREDICT(...)` without specifying the model object",
-          "explanation": "ML.PREDICT requires the MODEL reference and the input rows as arguments."
+          "text": "`ML.PREDICT` cannot be used in the `FROM` clause and must be called in the `SELECT` clause instead.",
+          "explanation": "`ML.PREDICT` is a table-valued function and is correctly placed in the `FROM` clause. The syntax shown is the standard pattern."
         }
       ],
-      "tip": "Identify the BigQuery ML inference function name.",
-      "explanation": "ML.PREDICT scores an input table against a trained model and can feed CREATE TABLE AS to persist the results.\n\n**Why it works:** It is the standard inference function in BigQuery ML for batch scoring.\n\n**Why the others don't work:**\n- EXPORT MODEL exports model artefacts, not predictions.\n- There is no ML.SCORE function.\n- ML.PREDICT requires the model reference; omitting it is a syntax error.",
-      "domain": "Data Analysis and Presentation",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "tip": "Remember the `ML.PREDICT` argument order as MODEL then TABLE - model first, data second.",
+      "explanation": "The `ML.PREDICT` function signature is `ML.PREDICT(MODEL model_name, {TABLE table_name | (subquery)})`. The `MODEL` reference must be first. In the query shown, the arguments are swapped - `TABLE` is first and `MODEL` is second. BigQuery returns a syntax error because it expects a model reference as the first argument.\n\n**Why it works:** `ML.PREDICT` positionally expects the model first. Reversing the arguments violates the function contract.\n\n**Why the others don't work:**\n- `TABLE` keyword: Valid shorthand accepted by `ML.PREDICT`.\n- `predicted_churned_probs`: Correct column name for a `churned` label.\n- `ML.PREDICT` in `FROM`: Correct placement for a table-valued function."
     },
     {
       "id": "ADP-2025-0070",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-create-time-series",
       "format": "text",
-      "services": [
-        "BigQuery ML"
-      ],
+      "difficulty": 2,
+      "domain": "Data Analysis and Presentation",
       "skills": [
         "2.3.5: Perform inference using BigQuery ML models."
       ],
-      "question": "The merchandising team trained an ARIMA_PLUS model in BigQuery ML to forecast weekly sales by product. They now need a 12-week forecast with prediction intervals.\n\nWhich function should they call to retrieve the forecast?",
+      "services": [
+        "BigQuery ML"
+      ],
+      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-predict",
+      "lastReviewed": "2026-04-28",
+      "question": "The merchandising team wants a 13-week sales forecast from a trained ARIMA_PLUS model. An analyst writes the following `ML.FORECAST` query:\n\n```sql\nSELECT\n  forecast_timestamp,\n  forecast_value,\n  prediction_interval_lower_bound,\n  prediction_interval_upper_bound\nFROM\n  ML.FORECAST(\n    MODEL sales_dataset.weekly_sales_model,\n    STRUCT(\n      '13'  AS horizon,\n      1.5   AS confidence_level\n    )\n  )\nORDER BY\n  forecast_timestamp;\n```\n\nWhich argument will cause a runtime error?",
       "choices": [
         {
           "id": "c1",
-          "text": "`ML.FORECAST(MODEL sales.weekly_arima, STRUCT(12 AS horizon, 0.95 AS confidence_level))` to return forecast points and intervals",
+          "text": "`confidence_level = 1.5` - `confidence_level` must be a value strictly between 0 and 1, so 1.5 is out of range and will cause a runtime error.",
           "sequence": 1,
-          "explanation": "ML.FORECAST is the inference function for ARIMA_PLUS models with horizon and confidence_level arguments."
+          "explanation": "Correct. `confidence_level` represents a probability and must be in the range (0, 1). A value of 1.5 is invalid and BigQuery raises a runtime error."
         },
         {
           "id": "c2",
-          "text": "`ML.PREDICT(MODEL sales.weekly_arima, (SELECT GENERATE_DATE_ARRAY(...)))` against synthetic future dates",
-          "explanation": "ML.PREDICT is not the time series forecasting interface; ML.FORECAST is purpose-built."
+          "text": "`'13' AS horizon` - passing `horizon` as a string instead of an integer will cause a type mismatch error because `ML.FORECAST` requires an `INT64` value.",
+          "explanation": "BigQuery will implicitly coerce the string `'13'` to `INT64` in a `STRUCT` context when the parameter expects an integer. This is not the primary cause of failure."
         },
         {
           "id": "c3",
-          "text": "`ML.EXPLAIN_PREDICT(MODEL sales.weekly_arima, ...)` and read the predicted_value column",
-          "explanation": "ML.EXPLAIN_PREDICT returns feature attributions, not multi-step forecasts."
+          "text": "The `STRUCT()` wrapper is invalid syntax for passing parameters to `ML.FORECAST` and must be replaced with individual named arguments.",
+          "explanation": "Using `STRUCT()` to pass named parameters is the correct and documented syntax for `ML.FORECAST`."
         },
         {
           "id": "c4",
-          "text": "`ML.GLOBAL_EXPLAIN(MODEL sales.weekly_arima)` to retrieve the seasonal forecast components",
-          "explanation": "ML.GLOBAL_EXPLAIN returns global feature importance, not forecast values."
+          "text": "`ML.FORECAST` cannot be used in the `FROM` clause and must be called as a subquery inside a `WITH` clause.",
+          "explanation": "`ML.FORECAST` is a table-valued function and is correctly used in the `FROM` clause."
         }
       ],
-      "tip": "Recall the forecasting-specific function in BigQuery ML for ARIMA_PLUS.",
-      "explanation": "ML.FORECAST produces multi-horizon forecasts with prediction intervals for time series models.\n\n**Why it works:** It accepts horizon and confidence_level and returns the forecast columns directly.\n\n**Why the others don't work:**\n- ML.PREDICT does not produce multi-step time series forecasts.\n- ML.EXPLAIN_PREDICT returns explanations, not forecasts.\n- ML.GLOBAL_EXPLAIN returns feature importance, not forecast values.",
-      "domain": "Data Analysis and Presentation",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "tip": "`confidence_level` represents a probability and must be a decimal fraction strictly between 0 and 1. Typical values are 0.80, 0.90, and 0.95.",
+      "explanation": "The `confidence_level` parameter for `ML.FORECAST` must be a `FLOAT64` value in the range (0, 1) exclusive. A value of `1.5` is outside this valid range and BigQuery raises a runtime error. A typical value is `0.95` for a 95% prediction interval.\n\n**Why it works:** `confidence_level` is a probability parameter. Values outside (0, 1) are mathematically invalid and BigQuery rejects them.\n\n**Why the others don't work:**\n- `'13' AS horizon`: BigQuery coerces the string to `INT64` - not the primary failure.\n- `STRUCT()` wrapper: Correct and documented syntax for `ML.FORECAST`.\n- `ML.FORECAST` in `FROM`: Correct placement for a table-valued function."
     },
     {
       "id": "ADP-2025-0071",
@@ -4131,43 +4131,43 @@
     {
       "id": "ADP-2025-0090",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/scheduling-queries",
       "format": "text",
-      "services": [
-        "BigQuery"
-      ],
+      "difficulty": 2,
+      "domain": "Data Pipeline Orchestration",
       "skills": [
         "3.2.1: Create and manage scheduled queries using BigQuery, Cloud Scheduler, and Cloud Composer."
       ],
-      "question": "You are reviewing a BigQuery scheduled query that loads marketing data into a partitioned table. The team wants the destination partition to be set automatically based on each run's scheduled execution time, so backfills land in the correct partition.\n\nWhich approach satisfies this requirement?",
+      "services": [
+        "BigQuery"
+      ],
+      "docs": "https://cloud.google.com/bigquery/docs/scheduling-queries",
+      "lastReviewed": "2026-04-28",
+      "question": "A data engineer is reviewing the following BigQuery scheduled query, which is supposed to load daily marketing data into a date-partitioned table. The query runs nightly but the target partition is always empty after execution.\n\n```sql\nDECLARE run_dt DATE DEFAULT @run_date;\n\nMERGE INTO `project.dataset.marketing_daily` AS target\nUSING (\n  SELECT\n    campaign_id,\n    impressions,\n    clicks,\n    spend,\n    DATE(event_time) AS event_date\n  FROM `project.dataset.marketing_raw`\n  WHERE DATE(event_time) = @run_time\n) AS source\nON  target.campaign_id = source.campaign_id\nAND target.event_date  = source.event_date\nWHEN MATCHED THEN UPDATE SET\n  impressions = source.impressions,\n  clicks      = source.clicks,\n  spend       = source.spend\nWHEN NOT MATCHED THEN INSERT ROW;\n```\n\nWhich line contains the error that causes the target partition to receive no rows?",
       "choices": [
         {
           "id": "c1",
-          "text": "Use the `@run_time` and `@run_date` parameters in the SQL to derive the partition decorator, then enable backfill from the scheduled queries page.",
+          "text": "The `WHERE` clause references `@run_time`, but the scheduled query only provides `@run_date`, causing the source subquery to return no rows.",
           "sequence": 1,
-          "explanation": "Scheduled queries expose run_time and run_date parameters that resolve to the scheduled execution timestamp, enabling correct partition targeting during normal runs and backfills."
+          "explanation": "Correct. `@run_time` is not a valid scheduled-query parameter. BigQuery treats it as `NULL`, so the `WHERE` predicate matches nothing."
         },
         {
           "id": "c2",
-          "text": "Hard-code `CURRENT_DATE()` into the SQL and rely on the actual wall-clock time at execution to choose the partition.",
-          "explanation": "CURRENT_DATE() returns the time of execution, not the scheduled run time, so backfills would write to today's partition rather than the historical one."
+          "text": "The `MERGE` statement cannot be used in a BigQuery scheduled query - only `INSERT` or `SELECT` statements are supported.",
+          "explanation": "`MERGE` is fully supported in BigQuery scheduled queries. The error is a parameter name mismatch, not the statement type."
         },
         {
           "id": "c3",
-          "text": "Create a Cloud Scheduler job that publishes a Pub/Sub message with the partition date, then have the scheduled query read it from a metadata table.",
-          "explanation": "Scheduled queries cannot subscribe to Pub/Sub messages, and this design duplicates a parameter the service already provides."
+          "text": "The `DECLARE` statement is invalid in a scheduled query context and prevents the query from running at all.",
+          "explanation": "`DECLARE` is valid in BigQuery scripting, which scheduled queries support. The query does run - it just matches zero rows due to the wrong parameter name."
         },
         {
           "id": "c4",
-          "text": "Set the destination table partitioning to ingestion-time and let BigQuery decide the partition when each row is written.",
-          "explanation": "Ingestion-time partitioning uses the load timestamp, which would still misplace backfilled data."
+          "text": "The destination table is missing a `$YYYYMMDD` partition decorator suffix in the query, which is required for `WRITE_TRUNCATE` to target the correct partition.",
+          "explanation": "Partition decorators belong in the destination table configuration of the scheduled query, not inside the SQL text itself."
         }
       ],
-      "tip": "Check which built-in parameters scheduled queries expose for time-based logic.",
-      "explanation": "Scheduled queries provide built-in parameters that resolve to the run's scheduled execution time, which is the correct value for partition decorators on both normal runs and backfills.\n\n**Why it works:** Using `@run_time` or `@run_date` ties the partition to the logical schedule slot, so a backfilled run for 2026-01-10 still writes to the 2026-01-10 partition.\n\n**Why the others don't work:**\n- CURRENT_DATE: uses execution time, breaking backfills.\n- Pub/Sub metadata: scheduled queries do not consume Pub/Sub messages.\n- Ingestion-time partitioning: tied to load time, not the logical date.",
-      "domain": "Data Pipeline Orchestration",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "tip": "BigQuery scheduled queries provide a small set of built-in parameters. Verify that every parameter reference in the SQL uses the exact name BigQuery provides - a mismatched name resolves to NULL.",
+      "explanation": "The `DECLARE` statement correctly aliases `@run_date`, but the `WHERE` clause filters on `@run_time` - a different parameter that does not exist in this scheduled query context. BigQuery treats an unrecognised parameter reference as `NULL`, so `WHERE DATE(event_time) = NULL` matches no rows, and the `MERGE` source subquery is empty.\n\n**Why it works:** `@run_time` is undefined in this context. BigQuery evaluates it as `NULL`, and equality with `NULL` always yields `NULL` (not `TRUE`), so no rows are selected.\n\n**Why the others don't work:**\n- `MERGE` in scheduled queries: Fully supported.\n- `DECLARE` in scheduled queries: Valid BigQuery scripting syntax.\n- Partition decorator in SQL text: Decorators belong in configuration, not in the SQL body."
     },
     {
       "id": "ADP-2025-0091",
@@ -4452,43 +4452,43 @@
     {
       "id": "ADP-2025-0097",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/logging/docs/view/logs-explorer-interface",
       "format": "text",
-      "services": [
-        "Cloud Logging"
-      ],
+      "difficulty": 2,
+      "domain": "Data Pipeline Orchestration",
       "skills": [
         "3.2.3: Review and analyze logs in Cloud Logging and Cloud Monitoring."
       ],
-      "question": "An on-call engineer needs to find all error-level entries written by a specific Cloud Run service named `orders-api` in the last hour. They want to use a single query rather than browsing folders in the Logs Explorer.\n\nWhich query best filters those log entries?",
+      "services": [
+        "Cloud Logging"
+      ],
+      "docs": "https://cloud.google.com/logging/docs/view/logging-query-language",
+      "lastReviewed": "2026-04-28",
+      "question": "An on-call engineer needs to find error-level log entries from a Cloud Run service named `orders-api` generated in the last hour. They write the following filter in Logs Explorer:\n\n```text\nresource.type=\"cloud_run\"\nresource.labels.service_name=\"orders-api\"\nseverity=\"ERROR\"\ntimestamp>=\"2026-04-29T10:00:00Z\"\n```\n\nThe filter returns no results even though the engineer can see error entries when browsing the service in the Cloud Run console. Which line in the filter is incorrect?",
       "choices": [
         {
           "id": "c1",
-          "text": "`resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"orders-api\" AND severity=\"ERROR\"` with the time range set to the last hour.",
+          "text": "`resource.type=\"cloud_run\"` is wrong - the correct monitored resource type for Cloud Run is `cloud_run_revision`.",
           "sequence": 1,
-          "explanation": "This logging query language filter targets Cloud Run logs by service name and severity within the chosen window."
+          "explanation": "Correct. The Cloud Logging resource type for Cloud Run is `cloud_run_revision`. `cloud_run` does not match any monitored resource descriptor, so the filter returns nothing."
         },
         {
           "id": "c2",
-          "text": "`logName:\"orders-api\" severity>=WARNING` against the global resource.",
-          "explanation": "logName does not contain the service name in that form, and the severity threshold is too broad."
+          "text": "`severity=\"ERROR\"` is wrong - Cloud Logging requires severity to be specified as a numeric value such as `severity=500`.",
+          "explanation": "Cloud Logging accepts both string labels (`ERROR`, `WARNING`) and numeric values. `severity=\"ERROR\"` is a valid and commonly used form."
         },
         {
           "id": "c3",
-          "text": "`textPayload=\"ERROR\" AND service=\"orders-api\"` against the projects/_Default sink.",
-          "explanation": "Cloud Run uses structured fields rather than a top-level service field, and severity is matched on the severity field."
+          "text": "The timestamp filter is invalid because Cloud Logging requires the `>` operator rather than `>=` for time range comparisons.",
+          "explanation": "Both `>` and `>=` are valid comparators for timestamp fields in Cloud Logging query language."
         },
         {
           "id": "c4",
-          "text": "`labels.\"run.googleapis.com/service\"=\"orders-api\" severity!=INFO` with no time scope.",
-          "explanation": "Omitting a time scope can return very large result sets and INFO exclusion still includes WARNING and DEBUG."
+          "text": "`resource.labels.service_name` is not a valid label for Cloud Run - the correct label key is `resource.labels.name`.",
+          "explanation": "For the `cloud_run_revision` resource type, `service_name` is the correct label key for filtering by Cloud Run service name."
         }
       ],
-      "tip": "Recall the standard Cloud Run resource type and label structure.",
-      "explanation": "Cloud Run revision logs are surfaced under the cloud_run_revision resource type with a service_name label. Combining that with a severity filter and a time range gives the exact set the engineer needs.\n\n**Why it works:** Resource type and labels precisely identify the service; severity equals ERROR limits noise.\n\n**Why the others don't work:**\n- logName form: not how service identity is encoded.\n- textPayload approach: ignores structured fields.\n- No time scope: risks large unbounded results.",
-      "domain": "Data Pipeline Orchestration",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "tip": "Cloud Logging resource types must exactly match the monitored resource descriptor string. The resource type for Cloud Run is `cloud_run_revision`, not `cloud_run`.",
+      "explanation": "The correct resource type for Cloud Run services in Cloud Logging is `cloud_run_revision`, not `cloud_run`. Because `resource.type=\"cloud_run\"` does not match any monitored resource descriptor, the filter returns zero results even though matching logs exist.\n\n**Why it works:** `cloud_run` is not a valid resource type. The filter silently matches nothing.\n\n**Why the others don't work:**\n- `severity=\"ERROR\"`: Valid string label for error-level entries.\n- `>=` comparator: Valid for timestamp fields.\n- `resource.labels.service_name`: Correct label key for `cloud_run_revision` resources."
     },
     {
       "id": "ADP-2025-0098",
@@ -5072,45 +5072,44 @@
     {
       "id": "ADP-2025-0110",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/composer/docs/composer-2/triggering-with-gcf",
       "format": "text",
-      "services": [
-        "Eventarc",
-        "Cloud Functions",
-        "Cloud Composer"
-      ],
+      "difficulty": 2,
+      "domain": "Data Pipeline Orchestration",
       "skills": [
         "3.2.6: Use Eventarc triggers in event-driven pipelines including Dataform, Dataflow, Cloud Functions, Cloud Run, and Cloud Composer."
       ],
-      "question": "To reduce infrastructure costs, the platform team wants to start a Cloud Composer DAG run only when a specific file pattern lands in Cloud Storage, rather than running on a schedule.\n\nWhich design correctly triggers the DAG using Eventarc?",
+      "services": [
+        "Eventarc",
+        "Cloud Run"
+      ],
+      "docs": "https://cloud.google.com/eventarc/docs/overview",
+      "lastReviewed": "2026-04-28",
+      "question": "A data engineer creates an Eventarc trigger intended to invoke a Cloud Run service whenever a CSV file is finalized in a Cloud Storage bucket. The trigger is created with the following configuration:\n\n```json\n{\n  \"name\": \"projects/my-project/locations/us-central1/triggers/csv-ingest-trigger\",\n  \"serviceAccount\": \"pipeline-sa@my-project.iam.gserviceaccount.com\",\n  \"eventFilters\": [\n    {\n      \"attribute\": \"type\",\n      \"value\": \"google.cloud.storage.object.v1.finalized\"\n    },\n    {\n      \"attribute\": \"bucket\",\n      \"value\": \"my-landing-bucket\"\n    },\n    {\n      \"attribute\": \"suffix\",\n      \"value\": \".csv\"\n    }\n  ],\n  \"destination\": {\n    \"cloudRun\": {\n      \"service\": \"csv-processor\",\n      \"path\": \"/ingest\"\n    }\n  }\n}\n```\n\nAfter deploying, the Cloud Run service is never triggered when CSV files are uploaded. Which field in the configuration is the cause?",
       "choices": [
         {
           "id": "c1",
-          "text": "Create an Eventarc trigger on the Cloud Storage finalize event that invokes a Cloud Function, which calls the Composer Airflow REST API to trigger the DAG.",
+          "text": "The `destination.cloudRun` block is missing the required `region` field - Eventarc cannot route events to the Cloud Run service without knowing its region.",
           "sequence": 1,
-          "explanation": "Eventarc routes object events to a Cloud Function that authenticates and triggers the DAG via Composer's API."
+          "explanation": "Correct. The `destination.cloudRun` block must include a `region` field so Eventarc can construct the HTTPS endpoint for the Cloud Run service."
         },
         {
           "id": "c2",
-          "text": "Create an Eventarc trigger that points directly at the Cloud Composer environment URL.",
-          "explanation": "Eventarc cannot target a Composer environment as a destination directly."
+          "text": "The event type `google.cloud.storage.object.v1.finalized` is incorrect - the correct type for file uploads is `google.cloud.storage.object.v1.created`.",
+          "explanation": "`google.cloud.storage.object.v1.finalized` is the correct Eventarc event type for GCS object finalization (completed upload)."
         },
         {
           "id": "c3",
-          "text": "Schedule the DAG every minute with a sensor that checks for the file pattern.",
-          "explanation": "Schedule plus sensor is not event-driven and continues to incur worker time."
+          "text": "The `suffix` attribute filter is not supported by Eventarc for Cloud Storage triggers - path patterns must be specified on the destination service instead.",
+          "explanation": "Eventarc does support a `suffix` event filter for Cloud Storage triggers, allowing filtering to objects whose names end with a given string."
         },
         {
           "id": "c4",
-          "text": "Use a BigQuery scheduled query to detect the file via the OBJECT_METADATA function and start the DAG.",
-          "explanation": "There is no such function chain that triggers Composer DAGs from BigQuery."
+          "text": "The `serviceAccount` field must be omitted when using Cloud Run as the destination because Eventarc manages authentication automatically.",
+          "explanation": "Providing a service account is required when the trigger needs to authenticate to the destination. Omitting it would cause authentication failures, not silence the trigger entirely."
         }
       ],
-      "tip": "Identify which intermediary glues an event to the Airflow API.",
-      "explanation": "The recommended pattern is Cloud Storage event to Eventarc trigger to Cloud Function, which calls the Composer Airflow REST API to trigger the DAG.\n\n**Why it works:** Eventarc handles delivery; the function provides authenticated invocation.\n\n**Why the others don't work:**\n- Direct Composer destination: not supported by Eventarc.\n- Sensor on schedule: not event-driven.\n- BigQuery scheduled query: wrong tool.",
-      "domain": "Data Pipeline Orchestration",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "tip": "When an Eventarc trigger targets a Cloud Run service, the `destination.cloudRun` block must include a `region` field to route events to the correct regional endpoint.",
+      "explanation": "The `destination.cloudRun` block is missing the required `region` field. Eventarc needs to know which region the Cloud Run service is deployed in to construct the correct HTTPS endpoint. Without it, the trigger cannot route events to the service.\n\n**Why it works:** Without `region`, Eventarc has no endpoint to deliver events to, so the Cloud Run service is never invoked.\n\n**Why the others don't work:**\n- Event type: `google.cloud.storage.object.v1.finalized` is correct for GCS finalization events.\n- `suffix` filter: Valid for Cloud Storage triggers in Eventarc.\n- `serviceAccount`: Required for authentication - its presence is correct."
     },
     {
       "id": "ADP-2025-0111",
@@ -5979,84 +5978,84 @@
     {
       "id": "ADP-2025-0129",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/storage/docs/lifecycle",
       "format": "text",
-      "services": [
-        "Cloud Storage"
-      ],
+      "difficulty": 1,
+      "domain": "Data Management",
       "skills": [
         "4.2.2: Configure rules to delete objects after a specified period to automatically remove unnecessary data and reduce storage expenses, including BigQuery and Cloud Storage."
       ],
-      "question": "The platform team stores raw application logs in a Cloud Storage bucket and wants every object automatically deleted 90 days after it was uploaded. They prefer a built-in feature that requires no scheduled jobs or external code.\n\nWhich approach should the team configure?",
+      "services": [
+        "Cloud Storage"
+      ],
+      "docs": "https://cloud.google.com/storage/docs/lifecycle",
+      "lastReviewed": "2026-04-28",
+      "question": "A storage administrator wants to configure a Cloud Storage bucket so that objects are automatically deleted 90 days after creation. They apply the following lifecycle configuration to the bucket:\n\n```json\n{\n  \"lifecycle\": {\n    \"rule\": [\n      {\n        \"action\": {\n          \"type\": \"SetStorageClass\",\n          \"storageClass\": \"NEARLINE\"\n        },\n        \"condition\": {\n          \"age\": 90\n        }\n      }\n    ]\n  }\n}\n```\n\nAfter 90 days, objects are moved to Nearline storage instead of being deleted. Which field value must be changed to achieve the intended behavior?",
       "choices": [
         {
           "id": "c1",
-          "text": "Add an Object Lifecycle Management rule with the `Delete` action and an `age` condition of 90 days on the bucket.",
+          "text": "`action.type` must be `\"Delete\"` instead of `\"SetStorageClass\"` - the current action only changes the storage class and does not remove objects.",
           "sequence": 1,
-          "explanation": "Object Lifecycle Management evaluates the age condition and deletes matching objects with no extra services."
+          "explanation": "Correct. To delete objects, `action.type` must be `\"Delete\"` and the `storageClass` field should be removed from the action block."
         },
         {
           "id": "c2",
-          "text": "Enable a bucket retention policy of 90 days so that objects are automatically removed when the policy expires.",
-          "explanation": "A retention policy prevents deletion before the period elapses, but it does not delete objects when they expire."
+          "text": "`condition.age` must be set to the string `\"90\"` instead of the integer `90` because lifecycle rule conditions require string values.",
+          "explanation": "Cloud Storage lifecycle rules require `age` to be an integer. Using a string would be the error, not the fix."
         },
         {
           "id": "c3",
-          "text": "Apply an Object Hold to every object so that it is automatically removed once the hold expires after 90 days.",
-          "explanation": "Object Holds block deletion entirely and have no built-in expiry that triggers removal."
+          "text": "The rule must include `numNewerVersions: 1` in the condition so the lifecycle policy knows which version to delete.",
+          "explanation": "`numNewerVersions` is only meaningful when object versioning is enabled. For a non-versioned bucket with age-based deletion, it is not needed."
         },
         {
           "id": "c4",
-          "text": "Enable Object Versioning with a 90-day non-current version expiry so that all live objects are deleted after 90 days.",
-          "explanation": "Non-current version rules only act on overwritten or deleted versions, not live current objects."
+          "text": "The lifecycle rule must specify a `storageClass` of `\"NONE\"` in the action block to signal that objects should be deleted rather than transitioned.",
+          "explanation": "There is no `storageClass` value of `NONE`. To delete objects, `action.type` must be `Delete` - the `storageClass` field is not used for deletion."
         }
       ],
-      "tip": "Look for the native bucket-level feature that can both evaluate object age and perform deletion.",
-      "explanation": "Object Lifecycle Management is the built-in mechanism for age-based deletion in Cloud Storage.\n\n**Why it works:** A lifecycle rule with the Delete action and an age condition of 90 days runs on every object in the bucket without scheduled jobs or custom code.\n\n**Why the others don't work:**\n- Retention policy: blocks early deletion but does not delete on expiry.\n- Object Hold: prevents deletion and has no scheduled-removal behaviour.\n- Object Versioning: non-current expiry applies to old versions, not live objects.",
-      "domain": "Data Management",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "tip": "Cloud Storage lifecycle rules support several action types. Only `Delete` permanently removes objects from the bucket. `SetStorageClass` transitions objects to another class.",
+      "explanation": "`action.type` is set to `SetStorageClass`, which transitions objects to the specified storage class rather than deleting them. To delete objects, `action.type` must be `Delete` and the `storageClass` field removed.\n\n**Why it works:** `SetStorageClass` explicitly transitions objects - it never deletes them. `Delete` is the only action type that removes objects.\n\n**Why the others don't work:**\n- `condition.age` as integer: Correct type - strings would be the error.\n- `numNewerVersions`: Only relevant when versioning is enabled.\n- `storageClass: \"NONE\"`: Not a valid value; the action type itself must change."
     },
     {
       "id": "ADP-2025-0130",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/managing-tables#updating_the_expiration_time_of_a_table",
       "format": "text",
-      "services": [
-        "BigQuery"
-      ],
+      "difficulty": 2,
+      "domain": "Data Management",
       "skills": [
         "4.2.2: Configure rules to delete objects after a specified period to automatically remove unnecessary data and reduce storage expenses, including BigQuery and Cloud Storage."
       ],
-      "question": "The data engineering team loads daily click-stream data into a date-partitioned BigQuery table and wants every partition automatically removed 30 days after its partition date. The team wants to avoid running scheduled scripts.\n\nWhich configuration provides the LEAST operational overhead?",
+      "services": [
+        "BigQuery"
+      ],
+      "docs": "https://cloud.google.com/bigquery/docs/managing-tables#updating_the_expiration_time_of_a_table",
+      "lastReviewed": "2026-04-28",
+      "question": "A data engineer wants each partition of a date-partitioned BigQuery table to be automatically deleted 90 days after it is created. They run the following SQL statement:\n\n```sql\nALTER TABLE `project.dataset.events_partitioned`\nSET OPTIONS (\n  expiration_timestamp = TIMESTAMP_ADD(\n    CURRENT_TIMESTAMP(),\n    INTERVAL 90 DAY\n  )\n);\n```\n\nAfter running the statement, the entire table is scheduled for deletion 90 days from now rather than individual partitions expiring on a rolling basis. Which option in the statement must be changed to achieve per-partition expiration?",
       "choices": [
         {
           "id": "c1",
-          "text": "Set the table's `partition expiration` to 30 days so BigQuery deletes each partition once it ages out.",
+          "text": "`expiration_timestamp` must be replaced with `partition_expiration_days` set to an integer value of `90` - `expiration_timestamp` schedules the whole table for deletion, not individual partitions.",
           "sequence": 1,
-          "explanation": "Partition expiration is evaluated continuously and removes partitions automatically based on partition date."
+          "explanation": "Correct. `expiration_timestamp` is a table-level option that schedules the entire table for deletion at a fixed timestamp. `partition_expiration_days` sets a rolling per-partition retention period."
         },
         {
           "id": "c2",
-          "text": "Set the table's overall `table expiration` to 30 days so the whole table is recreated each month.",
-          "explanation": "Table expiration deletes the entire table at one moment, not individual partitions on a rolling basis."
+          "text": "The `INTERVAL` value must use seconds instead of days - BigQuery partition expiration is always expressed in seconds when using `TIMESTAMP_ADD`.",
+          "explanation": "`TIMESTAMP_ADD` with `INTERVAL 90 DAY` is valid SQL, but the core issue is that `expiration_timestamp` applies to the whole table, not to individual partitions."
         },
         {
           "id": "c3",
-          "text": "Schedule a Cloud Scheduler job that triggers a Cloud Run service to run `DELETE` statements against partitions older than 30 days.",
-          "explanation": "Custom DELETE jobs add operational overhead and incur DML cost where a built-in option already exists."
+          "text": "The value must be changed from `TIMESTAMP_ADD(...)` to the string `'90'` because `partition_expiration_days` accepts only string representations of day counts.",
+          "explanation": "`partition_expiration_days` accepts an integer, not a string. The root issue is the option name, not the value type."
         },
         {
           "id": "c4",
-          "text": "Export the table to Cloud Storage every night and apply a 30-day Object Lifecycle Management rule on the bucket.",
-          "explanation": "Exporting to Cloud Storage does not remove data from the BigQuery table itself."
+          "text": "The `ALTER TABLE` statement must include a `PARTITION BY` clause to specify which partition the expiration applies to before `SET OPTIONS` can set a per-partition value.",
+          "explanation": "Per-partition expiration is set at the table level via `partition_expiration_days` and applies to all partitions automatically. There is no per-partition variant of `ALTER TABLE SET OPTIONS`."
         }
       ],
-      "tip": "Use the BigQuery feature that targets partitions specifically rather than the whole table.",
-      "explanation": "Partition expiration is the native BigQuery mechanism for rolling deletion of date-partitioned data.\n\n**Why it works:** Setting partition expiration to 30 days makes BigQuery automatically drop each partition 30 days after its partition date with no jobs to run or maintain.\n\n**Why the others don't work:**\n- Table expiration: deletes the entire table at a fixed time rather than rolling partitions.\n- Scheduled DELETE jobs: extra moving parts and DML charges where a native feature applies.\n- Export plus lifecycle: removes copies in Cloud Storage but leaves the original table untouched.",
-      "domain": "Data Management",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "tip": "BigQuery distinguishes between `expiration_timestamp` (deletes the whole table at a fixed time) and `partition_expiration_days` (rolling per-partition retention in days).",
+      "explanation": "`expiration_timestamp` is a table-level option that schedules the entire table for deletion at a specific timestamp. To set a rolling per-partition expiration, the correct option is `partition_expiration_days`, which accepts an integer representing the number of days each partition is retained after creation.\n\n**Why it works:** `expiration_timestamp` deletes the whole table at a single fixed point in time. `partition_expiration_days` applies independently to each partition as a rolling window.\n\n**Why the others don't work:**\n- `INTERVAL 90 DAY` syntax: Valid, but applied to the wrong option.\n- String `'90'` for `partition_expiration_days`: The option requires an integer, but the naming is the primary issue.\n- `PARTITION BY` clause: Not applicable to `SET OPTIONS`."
     },
     {
       "id": "ADP-2025-0131",
@@ -7156,44 +7155,44 @@
     {
       "id": "ADP-2025-0154",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/kms/docs/iam",
       "format": "text",
+      "difficulty": 2,
+      "domain": "Data Management",
+      "skills": [
+        "4.4.2: Understand the role of Cloud Key Management Service (Cloud KMS) to manage encryption keys."
+      ],
       "services": [
         "Cloud KMS",
         "BigQuery"
       ],
-      "skills": [
-        "4.4.2: Understand the role of Cloud Key Management Service (Cloud KMS) to manage encryption keys."
-      ],
-      "question": "You are configuring a BigQuery dataset to use a CMEK key from Cloud KMS for at-rest encryption. After running the configuration, queries against the dataset return permission errors that mention key access.\n\nWhich action will resolve the error with the LEAST privilege?",
+      "docs": "https://cloud.google.com/kms/docs/cmek",
+      "lastReviewed": "2026-04-28",
+      "question": "A data engineer is configuring a BigQuery dataset to use a customer-managed encryption key (CMEK) from Cloud KMS. They run the following commands:\n\n```bash\n# Step 1: Grant the BigQuery service account access to the KMS key\ngcloud kms keys add-iam-policy-binding my-bq-key \\\n  --keyring=my-keyring \\\n  --location=us-central1 \\\n  --member=\"serviceAccount:bq-PROJECT_NUMBER@bigquery-encryption.iam.gserviceaccount.com\" \\\n  --role=\"roles/cloudkms.cryptoKeyEncrypter\"\n\n# Step 2: Create the dataset with the CMEK key\nbq mk --dataset \\\n  --default_kms_key=\"projects/my-project/locations/us-central1/keyRings/my-keyring/cryptoKeys/my-bq-key\" \\\n  my-project:my_encrypted_dataset\n```\n\nAfter writing data to the dataset, the BigQuery service account cannot read the data back. Which configuration is the cause?",
       "choices": [
         {
           "id": "c1",
-          "text": "Grant the BigQuery service account the `roles/cloudkms.cryptoKeyEncrypterDecrypter` role on the specific key",
+          "text": "The IAM binding grants only `roles/cloudkms.cryptoKeyEncrypter`, which does not include decrypt permissions - the role must be `roles/cloudkms.cryptoKeyEncrypterDecrypter` to allow BigQuery to read data back.",
           "sequence": 1,
-          "explanation": "This role on the key resource grants exactly the encrypt and decrypt permissions BigQuery needs."
+          "explanation": "Correct. `cryptoKeyEncrypter` allows encrypting (writing) but not decrypting (reading). BigQuery needs both encrypt and decrypt permissions, provided by `cryptoKeyEncrypterDecrypter`."
         },
         {
           "id": "c2",
-          "text": "Grant the BigQuery service account the `roles/cloudkms.admin` role on the project",
-          "explanation": "Admin on the project is far broader than needed and violates least privilege."
+          "text": "The `--default_kms_key` flag is incorrect - BigQuery CMEK keys must be configured using the `bq update` command after the dataset is created, not during dataset creation.",
+          "explanation": "The `--default_kms_key` flag is valid during dataset creation with `bq mk`. Setting it at creation time is correct."
         },
         {
           "id": "c3",
-          "text": "Grant the user running the query the `roles/owner` role on the Cloud KMS project",
-          "explanation": "Owner is excessive and queries fail because the service agent lacks access, not the user."
+          "text": "The key resource name must include a specific key version, for example by appending `/cryptoKeyVersions/1`, because BigQuery CMEK requires a pinned key version.",
+          "explanation": "CMEK for BigQuery requires specifying the key itself, not a specific version. Appending a `cryptoKeyVersions` suffix makes the key name invalid for CMEK configuration."
         },
         {
           "id": "c4",
-          "text": "Disable Cloud KMS auditing on the key ring so BigQuery can call it without logging restrictions",
-          "explanation": "Audit logging does not block access; disabling it removes visibility but does not fix permissions."
+          "text": "The IAM binding must be applied to the keyring rather than the individual key so that the permission applies to all keys in the ring used by the dataset.",
+          "explanation": "For CMEK, IAM bindings should be scoped to the specific key. Applying at the keyring level grants broader access than necessary."
         }
       ],
-      "tip": "Consider which identity actually performs the cryptographic operation and the smallest scope that grants it.",
-      "explanation": "The BigQuery service agent must be granted encrypt and decrypt rights on the specific CMEK key.\n\n**Why it works:** `roles/cloudkms.cryptoKeyEncrypterDecrypter` on the key resource is the minimum predefined role that lets BigQuery wrap and unwrap data encryption keys.\n\n**Why the others don't work:**\n- KMS admin on project: grants management of all keys, more than required.\n- Owner on user: the failing identity is the BigQuery service agent, not the user.\n- Disable auditing: auditing is not an access control mechanism.",
-      "domain": "Data Management",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "tip": "CMEK requires the BigQuery service account to both encrypt (write) and decrypt (read) data. Verify that the IAM role covers both operations - `cryptoKeyEncrypterDecrypter` covers both, while `cryptoKeyEncrypter` covers only writes.",
+      "explanation": "The IAM binding grants only `roles/cloudkms.cryptoKeyEncrypter`, which allows the BigQuery service account to encrypt data when writing but not to decrypt data when reading. The role must be `roles/cloudkms.cryptoKeyEncrypterDecrypter` to support both read and write operations.\n\n**Why it works:** `cryptoKeyEncrypter` is a write-only permission. Without the corresponding decrypt permission, BigQuery cannot unwrap the data encryption key needed to serve query results.\n\n**Why the others don't work:**\n- `--default_kms_key` at creation: Valid - the flag is supported in `bq mk`.\n- Key version suffix: CMEK requires the key resource, not a pinned version. Appending `/cryptoKeyVersions/N` would make the name invalid.\n- IAM at keyring level: Over-permissive and not the recommended practice."
     },
     {
       "id": "ADP-2025-0155",
@@ -7290,44 +7289,43 @@
     {
       "id": "ADP-2025-0157",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/docs/security/encryption-in-transit",
       "format": "text",
-      "services": [
-        "Cloud Storage",
-        "Compute Engine"
-      ],
+      "difficulty": 1,
+      "domain": "Data Management",
       "skills": [
         "4.4.3: Identify the difference between encryption in transit and encryption at rest."
       ],
-      "question": "During a security audit, the auditor asks the platform team to explain what encryption in transit protects against in Google Cloud. The team needs a concise, accurate definition for the audit report.\n\nWhich statement BEST describes encryption in transit?",
+      "services": [
+        "Cloud Storage"
+      ],
+      "docs": "https://cloud.google.com/docs/security/encryption-in-transit",
+      "lastReviewed": "2026-04-28",
+      "question": "A developer writes the following Python script to upload a local file to a Cloud Storage bucket:\n\n```python\nfrom google.cloud import storage\n\ndef upload_report(bucket_name, source_path, destination_blob):\n    client = storage.Client()                        # Line A\n    bucket = client.bucket(bucket_name)             # Line B\n    blob   = bucket.blob(destination_blob)          # Line C\n    blob.upload_from_filename(source_path)          # Line D\n    print(f\"Uploaded {source_path} to {destination_blob}\")\n\nupload_report(\"my-reports\", \"report.csv\", \"2026/report.csv\")\n```\n\nA security reviewer asks which line is protected by encryption in transit and what happens to the data after Line D completes. Which answer is correct?",
       "choices": [
         {
           "id": "c1",
-          "text": "It protects data as it moves between endpoints over a network so that an observer cannot read or modify it on the wire",
+          "text": "Line D is protected by TLS (encryption in transit) during the upload; after Line D completes, the file is automatically encrypted at rest by Cloud Storage using AES-256.",
           "sequence": 1,
-          "explanation": "Encryption in transit secures data while it is being transmitted, typically using TLS."
+          "explanation": "Correct. Line D transfers file bytes to GCS over HTTPS (TLS). Once stored, Google Cloud Storage encrypts all objects at rest by default using AES-256."
         },
         {
           "id": "c2",
-          "text": "It protects data while it is persisted on physical disks so that a stolen disk cannot be read",
-          "explanation": "That describes encryption at rest, not in transit."
+          "text": "Line D transfers the file without encryption unless the developer explicitly enables TLS in the `storage.Client()` constructor on Line A.",
+          "explanation": "The `google-cloud-storage` client library always uses HTTPS for API calls. TLS is not optional and does not need to be enabled manually."
         },
         {
           "id": "c3",
-          "text": "It anonymizes personally identifiable fields inside a payload before the request leaves the client",
-          "explanation": "That describes data masking or tokenization, not transport encryption."
+          "text": "Lines A and B are protected by encryption in transit because they contact the Google Cloud API to resolve the bucket; Line D writes data to local disk only.",
+          "explanation": "Lines A and B create local Python objects with possible lightweight API calls, but Line D is where file contents are actually transferred over the network to GCS."
         },
         {
           "id": "c4",
-          "text": "It signs the source code of an application so that runtime tampering can be detected",
-          "explanation": "Code signing addresses integrity of binaries, not data on the network."
+          "text": "After Line D completes, the data in Cloud Storage is unencrypted at rest unless the developer configures a CMEK key before calling `upload_from_filename`.",
+          "explanation": "Google Cloud Storage encrypts all data at rest by default using Google-managed keys. CMEK is an option for customer-controlled key management but is not required for encryption at rest to occur."
         }
       ],
-      "tip": "Think about where the data is when the protection is applied.",
-      "explanation": "Encryption in transit secures data while it travels between two endpoints across a network.\n\n**Why it works:** Protocols such as TLS encrypt the channel between client and server so the payload cannot be read or altered by intermediaries.\n\n**Why the others don't work:**\n- Disk protection: that is encryption at rest.\n- Field anonymization: that is masking or tokenization.\n- Code signing: that addresses binary integrity.",
-      "domain": "Data Management",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "tip": "Google Cloud client libraries always use HTTPS. Think about which line actually sends file bytes over the network - that is where encryption in transit applies.",
+      "explanation": "Line D (`blob.upload_from_filename`) sends data from the local machine to Cloud Storage over HTTPS, meaning TLS encrypts the data in transit during that network transfer. Once the upload completes, Cloud Storage automatically encrypts all objects at rest using AES-256 with Google-managed keys - no additional configuration is required.\n\n**Why it works:** Line D is the only line that transfers file content across the network. TLS is always active in the `google-cloud-storage` library.\n\n**Why the others don't work:**\n- TLS must be enabled manually: The library always uses HTTPS. There is no opt-in.\n- Lines A and B protect the transit: These lines create local Python objects, not file transfers.\n- CMEK required for at-rest encryption: GCS encrypts all objects at rest by default."
     },
     {
       "id": "ADP-2025-0158",
@@ -7373,53 +7371,45 @@
     },
     {
       "id": "ADP-2025-0159",
-      "type": "multiple-choice",
-      "docs": "https://cloud.google.com/docs/security/encryption-in-transit",
+      "type": "single-choice",
       "format": "text",
-      "services": [
-        "Cloud Storage",
-        "Cloud Interconnect",
-        "Compute Engine"
-      ],
+      "difficulty": 2,
+      "domain": "Data Management",
       "skills": [
         "4.4.3: Identify the difference between encryption in transit and encryption at rest."
       ],
-      "question": "The engineering team is evaluating which controls relate to encryption in transit versus encryption at rest for a new ingestion pipeline that uploads files into Cloud Storage and processes them on Compute Engine.\n\nWhich TWO controls are examples of encryption in transit?",
+      "services": [
+        "BigQuery",
+        "Cloud KMS"
+      ],
+      "docs": "https://cloud.google.com/docs/security/encryption/default-encryption",
+      "lastReviewed": "2026-04-28",
+      "question": "A security architect reviews a BigQuery table resource configuration that includes the following `encryptionConfiguration` block:\n\n```json\n{\n  \"kind\": \"bigquery#table\",\n  \"tableReference\": {\n    \"projectId\": \"my-project\",\n    \"datasetId\": \"analytics\",\n    \"tableId\": \"user_events\"\n  },\n  \"schema\": {\n    \"fields\": [\n      { \"name\": \"user_id\",    \"type\": \"STRING\" },\n      { \"name\": \"event_type\", \"type\": \"STRING\" },\n      { \"name\": \"event_ts\",   \"type\": \"TIMESTAMP\" }\n    ]\n  },\n  \"encryptionConfiguration\": {\n    \"kmsKeyName\": \"projects/my-project/locations/us-central1/keyRings/my-ring/cryptoKeys/my-key\"\n  }\n}\n```\n\nWhat does the `encryptionConfiguration` block protect, and what does it NOT protect?",
       "choices": [
         {
           "id": "c1",
-          "text": "Using HTTPS with TLS when uploading objects to Cloud Storage from a client application",
+          "text": "It controls encryption at rest - BigQuery uses the specified KMS key to encrypt stored data blocks. Data in transit is separately protected by TLS and is not affected by this setting.",
           "sequence": 1,
-          "explanation": "TLS over HTTPS encrypts the payload while it travels to the Cloud Storage endpoint."
+          "explanation": "Correct. `encryptionConfiguration.kmsKeyName` configures CMEK for at-rest encryption. In-transit encryption is handled independently by TLS."
         },
         {
           "id": "c2",
-          "text": "Enabling MACsec or IPsec on a Cloud Interconnect or HA VPN connection between on-premises and the VPC",
-          "sequence": 2,
-          "explanation": "These technologies encrypt traffic on the link between networks, which is in-transit protection."
+          "text": "It controls encryption in transit - BigQuery uses the KMS key to establish a TLS session with the client, replacing the default certificate-based TLS handshake.",
+          "explanation": "CMEK has no role in TLS session establishment. TLS uses certificates managed by Google's infrastructure, not KMS keys. CMEK applies to data at rest in BigQuery storage."
         },
         {
           "id": "c3",
-          "text": "Configuring a Cloud Storage bucket to use a CMEK key from Cloud KMS for default object encryption",
-          "explanation": "CMEK protects objects at rest, not while they travel over the network."
+          "text": "It replaces Google's default encryption entirely - without this block, BigQuery stores data in plaintext, so `kmsKeyName` is required for any encryption to occur.",
+          "explanation": "BigQuery encrypts all data at rest by default using Google-managed AES-256 keys. CMEK supplements this by giving the customer control over the key, but data is never stored in plaintext."
         },
         {
           "id": "c4",
-          "text": "Enabling Confidential VM so that memory contents on a Compute Engine instance are encrypted while in use",
-          "explanation": "Confidential VM addresses encryption in use, not data crossing a network."
-        },
-        {
-          "id": "c5",
-          "text": "Configuring a persistent disk to be encrypted with a customer-supplied key passed at attach time",
-          "explanation": "That is at-rest disk encryption, not in-transit."
+          "text": "It encrypts query results in transit between BigQuery and the client, but has no effect on how data is stored on disk.",
+          "explanation": "CMEK controls at-rest encryption of stored data, not the transport of query results. Query results in transit are protected by TLS, which is independent of `encryptionConfiguration`."
         }
       ],
-      "selectCount": 2,
-      "tip": "Identify which protections operate on data while it is moving across a network.",
-      "explanation": "TLS uploads and link-layer encryption on Interconnect or VPN both protect data while it is moving over a network.\n\n**Why it works:** HTTPS terminates TLS at the Cloud Storage frontend, and MACsec or IPsec encrypts the underlying network path.\n\n**Why the others don't work:**\n- CMEK on bucket: protects stored objects at rest.\n- Confidential VM: protects data while it is in use in memory.\n- Disk CSEK: protects the persisted disk content at rest.",
-      "domain": "Data Management",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "tip": "CMEK and TLS address different threat models. `encryptionConfiguration` controls who holds the key for data at rest; TLS independently protects data moving over the network.",
+      "explanation": "The `encryptionConfiguration.kmsKeyName` field configures a CMEK for the BigQuery table. CMEK controls encryption at rest - BigQuery uses the specified Cloud KMS key to encrypt the data blocks stored on disk rather than using a Google-managed key. Data in transit is separately protected by TLS regardless of whether CMEK is configured.\n\n**Why it works:** CMEK operates at the storage layer. It determines which key encrypts data on disk. TLS operates at the transport layer and is always active, independent of this setting.\n\n**Why the others don't work:**\n- Controls TLS: CMEK has no role in TLS. TLS uses Google-managed certificates.\n- Replaces default encryption: Google-managed AES-256 encryption is always active. CMEK shifts key management to the customer, not the encryption itself.\n- Encrypts query results in transit: Query results are protected by TLS, not CMEK."
     },
     {
       "id": "ADP-2025-0160",

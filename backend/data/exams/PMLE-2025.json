@@ -190,64 +190,44 @@
     },
     {
       "id": "PMLE-2025-0004",
-      "type": "matching",
-      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-create",
-      "services": [
-        "BigQuery ML"
-      ],
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Architecting Low-Code AI Solutions",
       "skills": [
         "1.1.1: Building the appropriate BigQuery ML model based on the business problem, including linear and binary classification, regression, time-series, matrix factorization, boosted trees, and autoencoders."
       ],
-      "question": "Match each business problem to the BigQuery ML model type that most directly addresses it.",
-      "slots": [
-        {
-          "id": "s1",
-          "label": "Predicting next-month revenue from historical monthly totals",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s2",
-          "label": "Detecting unusual sensor readings without any labeled anomalies",
-          "correctChoiceId": "c2"
-        },
-        {
-          "id": "s3",
-          "label": "Recommending products to users based on past purchases",
-          "correctChoiceId": "c3"
-        },
-        {
-          "id": "s4",
-          "label": "Classifying support tickets as urgent or not urgent from structured features",
-          "correctChoiceId": "c4"
-        }
+      "services": [
+        "BigQuery ML"
       ],
+      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-create",
+      "lastReviewed": "2026-04-29",
+      "question": "A data scientist is training a customer churn model in BigQuery ML. They submit the following `CREATE OR REPLACE MODEL` statement and the job fails immediately with an unsupported model type error.\n\n```sql\nCREATE OR REPLACE MODEL `myproject.ml_models.churn_classifier`\nOPTIONS(\n  model_type         = 'boosted_tree',\n  input_label_cols   = ['churned'],\n  num_parallel_tree  = 4,\n  max_iterations     = 100,\n  learn_rate         = 0.1,\n  subsample          = 0.8,\n  data_split_method  = 'AUTO_SPLIT'\n) AS\nSELECT\n  tenure, monthly_charges, contract_type, churned\nFROM\n  `myproject.datasets.customers`;\n```\n\nWhich option correctly identifies why this statement will fail to train a binary classification model?",
       "choices": [
         {
           "id": "c1",
-          "text": "ARIMA_PLUS time-series model",
-          "explanation": "Forecasting from historical observations of a single metric over time."
+          "text": "`model_type = 'boosted_tree'` is not a valid value; binary classification requires `'BOOSTED_TREE_CLASSIFIER'`.",
+          "sequence": 1,
+          "explanation": "BigQuery ML requires the exact string `'BOOSTED_TREE_CLASSIFIER'` for binary or multiclass classification tasks. The value `'boosted_tree'` is unrecognized and causes an immediate error."
         },
         {
           "id": "c2",
-          "text": "Autoencoder model",
-          "explanation": "Unsupervised anomaly detection through reconstruction error."
+          "text": "`num_parallel_tree` is not a supported option for boosted tree models in BigQuery ML.",
+          "explanation": "`num_parallel_tree` is a valid BigQuery ML option for `BOOSTED_TREE_CLASSIFIER` and `BOOSTED_TREE_REGRESSOR` models. It is not the source of the error."
         },
         {
           "id": "c3",
-          "text": "Matrix factorization model",
-          "explanation": "Collaborative filtering for personalized recommendations."
+          "text": "`input_label_cols` must be omitted when training boosted tree models; the label is inferred automatically.",
+          "explanation": "`input_label_cols` is the standard and required way to specify the label column in BigQuery ML. Omitting it would cause a different error."
         },
         {
           "id": "c4",
-          "text": "Boosted tree classifier model",
-          "explanation": "Supervised binary classification on labeled tabular data."
+          "text": "`data_split_method = 'AUTO_SPLIT'` is incompatible with boosted tree classifiers.",
+          "explanation": "`AUTO_SPLIT` is a valid data split method for `BOOSTED_TREE_CLASSIFIER` in BigQuery ML. It does not cause a training failure."
         }
       ],
-      "tip": "Map each phrase to the model family that aligns with its supervision signal and data shape.",
-      "explanation": "Each scenario has a different supervision pattern: time-indexed forecasting, unlabeled anomalies, user-item interactions, and labeled binary outcomes, which map to four distinct BigQuery ML model types.",
-      "domain": "Architecting Low-Code AI Solutions",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "tip": "BigQuery ML model type strings are case-sensitive and must match the exact documented identifiers, including the algorithm variant suffix.",
+      "explanation": "The statement fails because `'boosted_tree'` is not a recognized `model_type` value in BigQuery ML.\n\n**Why it works:** The correct `model_type` for a boosted tree binary classifier is `'BOOSTED_TREE_CLASSIFIER'`. BigQuery ML also supports `'BOOSTED_TREE_REGRESSOR'` for regression. Using an unrecognized string causes training to fail immediately before any data is read.\n\n**Why the others don't work:**\n- `num_parallel_tree` is not supported: It is a documented and valid hyperparameter for `BOOSTED_TREE_CLASSIFIER`.\n- `input_label_cols` must be omitted: It is the standard mechanism for specifying the label column - its removal would cause a separate missing-label error.\n- `data_split_method = 'AUTO_SPLIT'` is incompatible: `AUTO_SPLIT` is a supported split method for boosted tree models."
     },
     {
       "id": "PMLE-2025-0005",
@@ -425,40 +405,40 @@
     {
       "id": "PMLE-2025-0009",
       "type": "single-choice",
-      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-predict",
       "format": "text",
+      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-predict",
       "services": [
         "BigQuery ML"
       ],
       "skills": [
         "1.1.3: Generating predictions by using BigQuery ML."
       ],
-      "question": "The marketing analytics group has trained a logistic regression model in BigQuery ML to predict customer churn. They now want to score the entire customers table nightly and write the predicted probability and class label back to a results table that downstream dashboards consume.\n\nWhich approach should they use?",
+      "question": "A data analyst has trained a BigQuery ML classification model and is now attempting to generate predictions against a new input table. The following query was submitted but returns an error immediately.\n\n```sql\nSELECT\n  customer_id,\n  predicted_label,\n  predicted_label_probs\nFROM\n  ML.PREDICT(\n    TABLE `project.dataset.customer_features`,\n    MODEL `project.dataset.churn_classifier`\n  )\nWHERE\n  region = 'us-east'\nORDER BY\n  customer_id;\n```\n\nWhich part of this query contains the error that causes it to fail?",
       "choices": [
         {
           "id": "c1",
-          "text": "Run a scheduled query that uses ML.PREDICT against the model with a SELECT over the customers table and writes the result with INSERT or CREATE OR REPLACE TABLE.",
+          "text": "The `ML.PREDICT` function arguments are in the wrong order - `MODEL` must be the first argument and `TABLE` must be the second.",
           "sequence": 1,
-          "explanation": "ML.PREDICT inside a scheduled query is the native BigQuery ML pattern for batch scoring back into BigQuery."
+          "explanation": "`ML.PREDICT(MODEL ..., TABLE ...)` is the required positional signature. Reversing the arguments causes BigQuery to receive a table where it expects a model object."
         },
         {
           "id": "c2",
-          "text": "Export the model to Cloud Storage and run a Dataflow batch pipeline that loads it and writes predictions back to BigQuery.",
-          "explanation": "Exporting and running Dataflow adds infrastructure that is unnecessary when ML.PREDICT runs natively."
+          "text": "The `predicted_label_probs` column cannot be selected directly - it must be unnested with `CROSS JOIN UNNEST` before use.",
+          "explanation": "`predicted_label_probs` is a valid top-level column returned by `ML.PREDICT` for classification models and can be selected directly without unnesting."
         },
         {
           "id": "c3",
-          "text": "Deploy the model to a Vertex AI online endpoint and have a Cloud Run job iterate row-by-row over the customers table.",
-          "explanation": "Online endpoints are designed for low-latency requests, not nightly batch scoring of an entire table."
+          "text": "The model path `project.dataset.churn_classifier` is malformed - BigQuery ML model references require a four-part name including the region.",
+          "explanation": "BigQuery ML model paths follow the standard three-part `project.dataset.model` format. No region segment is required."
         },
         {
           "id": "c4",
-          "text": "Use the BigQuery Storage Read API to stream data into a Python notebook and call the model client side.",
-          "explanation": "Pulling all rows to a notebook is slow, fragile, and avoids the in-database scoring that BigQuery ML provides."
+          "text": "The `WHERE` clause cannot reference columns from the input table when using `ML.PREDICT` - filters must be applied in a subquery before the call.",
+          "explanation": "`ML.PREDICT` returns a table-valued result and a `WHERE` clause applied outside the function call operates on the output rows normally - this is valid SQL."
         }
       ],
-      "tip": "Recall the in-database function for batch scoring in BigQuery ML.",
-      "explanation": "BigQuery ML supports batch scoring with a single SQL function that runs entirely inside BigQuery.\n\n**Why it works:** ML.PREDICT executes alongside a SELECT over the source table and the result can be persisted by a scheduled query into a results table the dashboards read.\n\n**Why the others don't work:**\n- Dataflow with exported model: adds operational overhead with no benefit for in-warehouse scoring.\n- Vertex AI online endpoint: optimized for per-request latency, not table-wide nightly batches.\n- Notebook with Storage Read API: shifts compute and data movement out of BigQuery unnecessarily.",
+      "tip": "Read function signatures carefully - argument order matters when calling built-in functions that accept multiple typed inputs.",
+      "explanation": "The `ML.PREDICT` function has a strict positional signature: the first argument must be the `MODEL` reference and the second must be the `TABLE` reference. Reversing them causes BigQuery to raise an error because it receives a table where it expects a model object.\n\n**Why it works:** BigQuery ML defines `ML.PREDICT(MODEL <model>, TABLE <table>)` with the model always first. Swapping the arguments violates this contract and the query fails before any data is scanned.\n\n**Why the others don't work:**\n- `predicted_label_probs` cannot be selected: It is a valid top-level column returned by `ML.PREDICT` for classification models and can be selected directly without unnesting.\n- Model path is malformed: BigQuery ML model paths follow the standard three-part `project.dataset.model` format - no region segment is required.\n- `WHERE` clause cannot reference input columns: A `WHERE` clause applied outside `ML.PREDICT` operates on the output rows normally - this is valid SQL.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 1,
       "lastReviewed": "2026-04-29"
@@ -554,64 +534,44 @@
     },
     {
       "id": "PMLE-2025-0012",
-      "type": "matching",
-      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-predict",
-      "services": [
-        "BigQuery ML"
-      ],
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Architecting Low-Code AI Solutions",
       "skills": [
         "1.1.3: Generating predictions by using BigQuery ML."
       ],
-      "question": "Match each prediction-time requirement to the BigQuery ML function that addresses it.",
-      "slots": [
-        {
-          "id": "s1",
-          "label": "Score a tabular classification model and write results to a BigQuery table",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s2",
-          "label": "Generate future values from an ARIMA_PLUS time-series model with confidence intervals",
-          "correctChoiceId": "c2"
-        },
-        {
-          "id": "s3",
-          "label": "Return per-row feature attributions alongside each prediction",
-          "correctChoiceId": "c3"
-        },
-        {
-          "id": "s4",
-          "label": "Produce top-N item suggestions from a matrix factorization model",
-          "correctChoiceId": "c4"
-        }
+      "services": [
+        "BigQuery ML"
       ],
+      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-evaluate",
+      "lastReviewed": "2026-04-29",
+      "question": "An analyst has finished training a logistic regression churn model and wants to compute precision, recall, and F1 score on a held-out test table named `myproject.datasets.churn_test`. They write the following query and receive an error saying the function call is missing a required argument.\n\n```sql\nSELECT\n  precision,\n  recall,\n  f1_score,\n  accuracy\nFROM\n  ML.EVALUATE(\n    MODEL `myproject.ml_models.churn_lr`\n  );\n```\n\nWhich function call issue will prevent evaluation on the held-out test set?",
       "choices": [
         {
           "id": "c1",
-          "text": "ML.PREDICT",
-          "explanation": "General-purpose prediction function for supervised BigQuery ML models."
+          "text": "`ML.EVALUATE` requires a second argument providing the evaluation table or subquery; calling it with only the `MODEL` argument evaluates on training data or raises an error.",
+          "sequence": 1,
+          "explanation": "`ML.EVALUATE` takes the form `ML.EVALUATE(MODEL model_name, TABLE table_name)` or `ML.EVALUATE(MODEL model_name, (subquery))`. Without the second argument the function cannot evaluate on held-out data and raises a missing-argument error."
         },
         {
           "id": "c2",
-          "text": "ML.FORECAST",
-          "explanation": "Forecasts horizons from ARIMA_PLUS time-series models."
+          "text": "The analyst should use `ML.TRAINING_INFO` instead of `ML.EVALUATE` to retrieve precision and recall metrics.",
+          "explanation": "`ML.TRAINING_INFO` returns per-iteration training loss and learning rate, not classification metrics such as precision, recall, or F1. `ML.EVALUATE` is the correct function."
         },
         {
           "id": "c3",
-          "text": "ML.EXPLAIN_PREDICT",
-          "explanation": "Returns predictions and per-row feature attributions."
+          "text": "`f1_score` is not a column returned by `ML.EVALUATE` for logistic regression models.",
+          "explanation": "`ML.EVALUATE` returns `f1_score` as a standard output column for binary logistic regression models in BigQuery ML. Selecting it is valid."
         },
         {
           "id": "c4",
-          "text": "ML.RECOMMEND",
-          "explanation": "Generates ranked recommendations from matrix factorization models."
+          "text": "The `MODEL` keyword must be replaced with `MODEL_PATH` when referencing a trained model in `ML.EVALUATE`.",
+          "explanation": "BigQuery ML uses the `MODEL` keyword (not `MODEL_PATH`) when passing a model reference to functions like `ML.EVALUATE` and `ML.PREDICT`. This is correct syntax."
         }
       ],
-      "tip": "Each prediction need has a purpose-built function in BigQuery ML.",
-      "explanation": "BigQuery ML exposes a focused function for each prediction style: classification or regression scoring, time-series forecasting, explainable predictions, and recommendation ranking.",
-      "domain": "Architecting Low-Code AI Solutions",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "tip": "Think about what data source `ML.EVALUATE` uses to compute metrics, and what arguments the function signature requires.",
+      "explanation": "`ML.EVALUATE` requires both the model reference and a data source argument to compute metrics on a specific dataset.\n\n**Why it works:** The full syntax is `ML.EVALUATE(MODEL model_name, TABLE table_name)` or `ML.EVALUATE(MODEL model_name, (SELECT ...))`. Without the second argument, BigQuery ML errors because it has no data to evaluate against.\n\n**Why the others don't work:**\n- `ML.TRAINING_INFO` instead of `ML.EVALUATE`: `ML.TRAINING_INFO` reports per-iteration training statistics such as loss. It does not produce precision, recall, or F1.\n- `f1_score` is not a column: `f1_score` is a documented output column of `ML.EVALUATE` for binary classification models.\n- `MODEL_PATH` instead of `MODEL`: `MODEL` is the correct keyword. `MODEL_PATH` is not valid here."
     },
     {
       "id": "PMLE-2025-0013",
@@ -1131,45 +1091,42 @@
     },
     {
       "id": "PMLE-2025-0024",
-      "type": "ordering",
-      "docs": "https://cloud.google.com/generative-ai-app-builder/docs/before-you-begin",
+      "type": "single-choice",
+      "format": "text",
+      "docs": "https://cloud.google.com/generative-ai-app-builder/docs/enterprise-search-introduction",
       "services": [
         "Vertex AI Agent Builder",
-        "Vertex AI Search",
-        "Cloud Storage"
+        "Vertex AI Search"
       ],
       "skills": [
         "1.2.3: Implementing retrieval augmented generation (RAG) applications by using Vertex AI Agent Builder."
       ],
-      "question": "Arrange the steps to build a RAG-powered search app in Vertex AI Agent Builder in the correct order.",
+      "question": "A developer is building a RAG application and is querying a Vertex AI Agent Builder data store using the Discovery Engine Python SDK. When the code runs, it raises a `google.api_core.exceptions.InvalidArgument` error.\n\n```python\nfrom google.cloud import discoveryengine_v1 as discoveryengine\n\nclient = discoveryengine.SearchServiceClient()\n\nserving_config = (\n    \"projects/my-project/locations/global\"\n    \"/collections/default_collection\"\n    \"/engines/my-search-engine\"\n    \"/servingConfigs/default_config\"\n)\n\nrequest = discoveryengine.SearchRequest(\n    serving_config=serving_config,\n    query=\"What is the refund policy?\",\n    page_size=5,\n)\n\nresponse = client.search(request)\n```\n\nWhich argument in this code causes the `InvalidArgument` error?",
       "choices": [
         {
           "id": "c1",
-          "text": "Create a Vertex AI Search data store referencing the source corpus in Cloud Storage or BigQuery.",
+          "text": "The `serving_config` path is incorrect - the segment `/engines/my-search-engine/servingConfigs/` is wrong for a data-store-backed app; the correct hierarchy uses `/dataStores/<id>/servingConfigs/` instead.",
           "sequence": 1,
-          "explanation": "The data store defines the retrieval corpus and must exist before an app can use it."
+          "explanation": "For a data-store-backed search application the serving config sits under `dataStores`, not under `engines`. The malformed path cannot be resolved by the API, which returns `InvalidArgument`."
         },
         {
           "id": "c2",
-          "text": "Create a search or chat app and attach the data store to it.",
-          "sequence": 2,
-          "explanation": "The app provides the serving surface and binds to one or more data stores."
+          "text": "The `query` parameter name is wrong - the Discovery Engine SDK expects the search text to be passed as `search_query`, not `query`.",
+          "explanation": "`query` is the correct field name in `SearchRequest` for the Discovery Engine v1 SDK. There is no `search_query` field."
         },
         {
           "id": "c3",
-          "text": "Enable summarization with grounding so generated responses cite retrieved passages.",
-          "sequence": 3,
-          "explanation": "Grounded summarization layers a generative answer on top of retrieved results."
+          "text": "The `page_size` value of 5 is below the minimum allowed by the API - the Discovery Engine search endpoint requires at least 10 results per page.",
+          "explanation": "The Discovery Engine API accepts any positive integer for `page_size` including values as small as 1. There is no minimum of 10."
         },
         {
           "id": "c4",
-          "text": "Integrate the app's API into the client application and monitor query metrics.",
-          "sequence": 4,
-          "explanation": "Integration and observability close the loop on the deployed RAG experience."
+          "text": "The `collections/default_collection` segment is invalid - Agent Builder data stores must use `collections/default_data_store` as the collection identifier.",
+          "explanation": "`default_collection` is the correct and expected collection identifier for Agent Builder search applications."
         }
       ],
-      "tip": "Build the corpus first, then the app surface, then enable generation, then integrate.",
-      "explanation": "Agent Builder follows a layered model: data store, then app, then generative grounding, then integration with the client and monitoring.",
+      "tip": "Check that resource path segments match the hierarchy expected by the API - each level in the path must correspond to the correct resource type.",
+      "explanation": "The `serving_config` resource path embeds an `engines` segment, which produces a path that does not resolve to a valid serving config resource. For a data-store-backed search application, the correct path uses the data store directly: `.../collections/default_collection/dataStores/<datastore_id>/servingConfigs/default_config`. The API rejects the malformed path with an `InvalidArgument` error.\n\n**Why it works:** The Discovery Engine resource hierarchy for serving configs sits under `dataStores`, not under `engines`. Using the engines sub-path generates a resource name the backend cannot resolve.\n\n**Why the others don't work:**\n- `query` parameter name is wrong: `query` is the correct field name in `SearchRequest` for the Discovery Engine v1 SDK.\n- `page_size` value of 5 is too low: The Discovery Engine API accepts any positive integer for `page_size` including values as small as 1.\n- `collections/default_data_store` is required: `default_collection` is the correct and expected collection identifier.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 1,
       "lastReviewed": "2026-04-29"
@@ -1869,44 +1826,42 @@
     },
     {
       "id": "PMLE-2025-0040",
-      "type": "ordering",
-      "docs": "https://cloud.google.com/vertex-ai/docs/tabular-data/forecasting/overview",
+      "type": "single-choice",
+      "format": "text",
+      "docs": "https://cloud.google.com/vertex-ai/docs/tabular-data/forecasting/create-dataset",
       "services": [
         "Vertex AI",
-        "BigQuery"
+        "AutoML"
       ],
       "skills": [
         "1.3.4: Creating forecasting models by using AutoML."
       ],
-      "question": "Arrange the following steps for building a Vertex AI AutoML forecasting model from a BigQuery time-series table in the correct order.",
+      "question": "An ML engineer is creating a Vertex AI AutoML forecasting training job using the Python SDK. The dataset creation call succeeds, but the training job fails immediately with a validation error.\n\n```python\nfrom google.cloud import aiplatform\n\naiplatform.init(project=\"my-project\", location=\"us-central1\")\n\ndataset = aiplatform.TimeSeriesDataset.create(\n    display_name=\"sales_forecast_dataset\",\n    gcs_source=\"gs://my-bucket/sales_data.csv\",\n)\n\njob = aiplatform.AutoMLForecastingTrainingJob(\n    display_name=\"sales_forecast_job\",\n    optimization_objective=\"minimize-rmse\",\n)\n\nmodel = job.run(\n    dataset=dataset,\n    target_column=\"sales_units\",\n    time_series_identifier_column=\"date\",\n    time_column=\"store_id\",\n    forecast_horizon=30,\n    data_granularity_unit=\"day\",\n    data_granularity_count=1,\n)\n```\n\nWhich parameter assignment will cause the forecasting training job to fail?",
       "choices": [
         {
           "id": "c1",
-          "text": "Create a Vertex AI tabular dataset that points at the BigQuery time-series table",
+          "text": "`time_series_identifier_column` and `time_column` are swapped - `date` is the timestamp column and belongs in `time_column`, while `store_id` is the entity identifier and belongs in `time_series_identifier_column`.",
           "sequence": 1,
-          "explanation": "The managed dataset is the foundation for all subsequent AutoML steps."
+          "explanation": "Vertex AI validates these column types on job launch and raises an error when the identifier column contains timestamp values or the time column contains string entity IDs."
         },
         {
           "id": "c2",
-          "text": "Specify the time column, target column, time series identifier column, and forecast horizon",
-          "sequence": 2,
-          "explanation": "These parameters define the forecasting problem before training."
+          "text": "The `optimization_objective` value `minimize-rmse` is not supported for AutoML forecasting - forecasting jobs only accept `minimize-mae` or `minimize-rmsle`.",
+          "explanation": "`minimize-rmse` is a valid optimization objective for AutoML forecasting alongside others such as `minimize-mae`."
         },
         {
           "id": "c3",
-          "text": "Train the AutoML forecasting model with a chosen training budget",
-          "sequence": 3,
-          "explanation": "Training cannot start until the schema and forecast configuration are set."
+          "text": "The `forecast_horizon` of 30 exceeds the maximum allowed value when `data_granularity_unit` is set to `day` - the limit is 28 days.",
+          "explanation": "Vertex AI AutoML forecasting supports horizon values well above 30 for daily granularity. There is no 28-day cap."
         },
         {
           "id": "c4",
-          "text": "Submit a batch prediction job that produces forecasts for the next horizon window",
-          "sequence": 4,
-          "explanation": "Batch prediction is the consumption step after a model is trained."
+          "text": "The `target_column` value `sales_units` must also appear in `column_transformations` - omitting it causes the job to ignore the prediction target.",
+          "explanation": "Vertex AI infers transformations automatically when `column_transformations` is omitted. The target column does not need to be listed explicitly."
         }
       ],
-      "tip": "Each step depends on the previous one; trace the data and configuration flow.",
-      "explanation": "AutoML forecasting workflows always proceed from registering data, through configuring the forecast schema, to training, and finally to producing forecasts.",
+      "tip": "Each parameter in a time series training job has a specific semantic role - consider what each column in the dataset is actually meant to represent.",
+      "explanation": "The `time_column` parameter must point to the column containing timestamps (the date or datetime column), while `time_series_identifier_column` must point to the column identifying each individual time series entity (such as a store, product, or region). In this snippet the two are swapped: `date` is assigned to the identifier role and `store_id` is assigned to the time role. Vertex AI validates these column types on job launch and raises an error when the identifier column contains timestamp values or the time column contains string entity IDs.\n\n**Why it works:** Swapping `time_column` and `time_series_identifier_column` means the model receives entity IDs where it expects chronological timestamps. Vertex AI cannot infer ordering or group series correctly, so it rejects the configuration.\n\n**Why the others don't work:**\n- `minimize-rmse` is not supported: It is a valid optimization objective for AutoML forecasting.\n- `forecast_horizon` of 30 exceeds the limit: There is no 28-day cap for daily granularity.\n- `target_column` must appear in `column_transformations`: Vertex AI infers transformations automatically when `column_transformations` is omitted.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 1,
       "lastReviewed": "2026-04-29"
@@ -2237,66 +2192,45 @@
     },
     {
       "id": "PMLE-2025-0048",
-      "type": "matching",
-      "docs": "https://cloud.google.com/vertex-ai/docs/datasets/datasets",
-      "services": [
-        "Cloud Storage",
-        "BigQuery",
-        "Vertex AI"
-      ],
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "skills": [
         "2.1.1: Organizing different types of data, including tabular, text, speech, images, and videos, for efficient training."
       ],
-      "question": "Match each data modality to the storage and serialization layout that best supports efficient training on Vertex AI.",
-      "slots": [
-        {
-          "id": "s1",
-          "label": "Large tabular feature data refreshed daily",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s2",
-          "label": "Millions of small JPEG images for a CNN",
-          "correctChoiceId": "c2"
-        },
-        {
-          "id": "s3",
-          "label": "Hours of speech audio for an ASR model",
-          "correctChoiceId": "c3"
-        },
-        {
-          "id": "s4",
-          "label": "Long-form text documents for fine-tuning an LLM",
-          "correctChoiceId": "c4"
-        }
+      "services": [
+        "Cloud Storage",
+        "Vertex AI"
       ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/training/overview",
+      "lastReviewed": "2026-04-29",
+      "question": "A data engineer needs to copy 500 TFRecord shards from a staging bucket to a training bucket before launching a distributed Vertex AI job. The following script completes but takes over 30 minutes for files that should transfer in under 5 minutes.\n\n```bash\n#!/bin/bash\nSOURCE=\"gs://my-staging-bucket/tfrecords/\"\nDEST=\"gs://my-training-bucket/tfrecords/\"\n\necho \"Copying TFRecord shards...\"\ngsutil cp \\\n  \"${SOURCE}shard_*.tfrecord\" \\\n  \"${DEST}\"\n\necho \"Verifying shard count...\"\ngsutil ls \"${DEST}\" | wc -l\n```\n\nWhich argument is missing from the gsutil command and is causing the slow transfer of 500 shards?",
       "choices": [
         {
           "id": "c1",
-          "text": "Partitioned and clustered BigQuery tables read via the Vertex AI BigQuery connector",
-          "explanation": "Best for structured tabular data at warehouse scale."
+          "text": "The `-m` flag is missing; without it gsutil copies files serially instead of in parallel, which causes slow transfer of large shard counts.",
+          "sequence": 1,
+          "explanation": "`gsutil -m cp` enables multi-threaded parallel transfers. Without `-m`, gsutil copies each shard one at a time, which is dramatically slower for hundreds of files."
         },
         {
           "id": "c2",
-          "text": "Sharded TFRecord files in regional Cloud Storage with parallel interleave reads",
-          "explanation": "Avoids the small-files problem and enables parallel decode."
+          "text": "The `-r` flag is missing; `gsutil cp` requires `-r` to copy multiple files matching a wildcard.",
+          "explanation": "The `-r` flag enables recursive directory copy. For a flat wildcard glob such as `shard_*.tfrecord`, `-r` is not required."
         },
         {
           "id": "c3",
-          "text": "Sharded WebDataset tar files of pre-resampled WAV or FLAC chunks in regional Cloud Storage",
-          "explanation": "Audio shards stream sequentially and decode cheaply during training."
+          "text": "The glob pattern `shard_*.tfrecord` is too specific and will miss shards with numeric prefixes.",
+          "explanation": "The glob `shard_*.tfrecord` matches any filename beginning with `shard_` and ending with `.tfrecord`, which covers standard TFRecord shard naming. The pattern is not the cause of slow transfer."
         },
         {
           "id": "c4",
-          "text": "Tokenized JSONL shards in regional Cloud Storage chunked to a fixed sequence length",
-          "explanation": "Pre-tokenized JSONL shards eliminate runtime tokenization overhead."
+          "text": "The `DEST` path must end without a trailing slash for wildcard copies to work correctly.",
+          "explanation": "A trailing slash on the destination path specifies that files should be placed inside that prefix. It does not affect transfer speed or correctness."
         }
       ],
-      "tip": "Match each modality to the layout that maximizes parallel reads and minimizes per-step decode work.",
-      "explanation": "Different modalities have different efficient layouts: warehouses for tabular, sharded record files for images and audio, and pre-tokenized JSONL shards for text.",
-      "domain": "Collaborating Within and Across Teams to Manage Data and Models",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "tip": "When copying hundreds of files with gsutil, consider whether the command is running transfers one at a time or in parallel.",
+      "explanation": "The missing `-m` flag forces gsutil to copy files serially, causing the excessive transfer time.\n\n**Why it works:** `gsutil -m cp` activates parallel composite uploads and multi-threaded transfers. For 500 TFRecord shards, this can reduce transfer time by an order of magnitude compared to serial copy.\n\n**Why the others don't work:**\n- The `-r` flag is missing: `-r` enables recursive directory traversal. A wildcard glob against a flat prefix does not need it.\n- The glob pattern is too specific: `shard_*.tfrecord` matches the standard TFRecord sharding naming format.\n- The DEST path must not have a trailing slash: Trailing slashes are a prefix semantics choice, not a performance factor."
     },
     {
       "id": "PMLE-2025-0049",
@@ -2808,7 +2742,8 @@
     },
     {
       "id": "PMLE-2025-0060",
-      "type": "ordering",
+      "type": "single-choice",
+      "format": "text",
       "docs": "https://cloud.google.com/vertex-ai/docs/featurestore/overview",
       "services": [
         "Vertex AI Feature Store",
@@ -2817,35 +2752,32 @@
       "skills": [
         "2.1.4: Creating and consolidating features in Vertex AI Feature Store."
       ],
-      "question": "Arrange the steps in the correct order to stand up a Vertex AI Feature Store with BigQuery-backed features served online.",
+      "question": "An ML engineer is setting up a new Vertex AI Feature Store online store and linking it to a BigQuery source table. The code runs without errors, but features are never available when queried through the online serving endpoint.\n\n```python\nfrom google.cloud import aiplatform\n\naiplatform.init(project=\"my-project\", location=\"us-central1\")\n\nonline_store = aiplatform.FeatureOnlineStore.create_bigtable_online_store(\n    name=\"customer_features_store\",\n)\n\nfeature_view = online_store.create_feature_view(\n    name=\"customer_feature_view\",\n    big_query_source=aiplatform.BigQuerySource(\n        uri=\"bq://my-project.feature_dataset.customer_features\",\n        entity_id_columns=[\"customer_id\"],\n    ),\n    sync_config=aiplatform.FeatureViewSyncConfig(cron=\"0 2 * * *\"),\n)\n\nprint(f\"FeatureView created: {feature_view.resource_name}\")\n```\n\nWhich step is missing from this code that explains why features are not available for online serving immediately after setup?",
       "choices": [
         {
           "id": "c1",
-          "text": "Curate the source feature tables in BigQuery with stable schemas and an entity ID column.",
+          "text": "The code never calls `feature_view.sync()` to trigger an immediate data sync from BigQuery into the online store - without an explicit sync the store remains empty until the scheduled cron fires.",
           "sequence": 1,
-          "explanation": "Source tables must exist before they can be referenced as feature groups."
+          "explanation": "Creating a FeatureView only defines the configuration and scheduled cadence. An explicit `sync()` call is required to load data into the online store before the first scheduled window."
         },
         {
           "id": "c2",
-          "text": "Create a feature group that points at the BigQuery source and define its features.",
-          "sequence": 2,
-          "explanation": "Feature groups register the BigQuery columns as managed features."
+          "text": "The `entity_id_columns` parameter must be omitted when creating a feature view - Vertex AI Feature Store automatically detects the entity ID column from the BigQuery table schema.",
+          "explanation": "`entity_id_columns` is a required parameter when creating a feature view with a BigQuery source. It tells Feature Store which column identifies each entity."
         },
         {
           "id": "c3",
-          "text": "Create a feature online store and a feature view that selects from the feature group, with a configured sync schedule.",
-          "sequence": 3,
-          "explanation": "The online store and view make features available for low-latency lookups."
+          "text": "The `create_bigtable_online_store` method must be called with `serving_config_id` specified - without it the store cannot route online serving requests.",
+          "explanation": "`create_bigtable_online_store` does not require a `serving_config_id`. The online store creates a default serving configuration automatically."
         },
         {
           "id": "c4",
-          "text": "Grant Feature Store IAM roles to model serving service accounts and call the online serving API from inference code.",
-          "sequence": 4,
-          "explanation": "Once the view is synced, consumers fetch features via the online API."
+          "text": "The BigQuery URI format is wrong - Feature Store requires the URI to use the `gs://` prefix pointing to an exported Parquet file rather than a `bq://` table reference.",
+          "explanation": "Vertex AI Feature Store natively accepts `bq://` URIs pointing to BigQuery tables. Parquet on GCS is not required."
         }
       ],
-      "tip": "Move from source data to registered features to a serving surface to consumers.",
-      "explanation": "Feature Store rollout flows from BigQuery source, to feature group, to online store and view, to consumer access.",
+      "tip": "Creating a resource and populating it with data are two separate operations - verify that the code performs both before expecting data to be queryable.",
+      "explanation": "Creating a `FeatureView` defines the configuration and scheduled sync cadence, but it does not load any data into the online store immediately. To make features available right away, the engineer must call `feature_view.sync()` after creation to trigger a one-time manual sync from the BigQuery source into the Bigtable-backed online store. Without this call, the store stays empty until the first scheduled cron window fires.\n\n**Why it works:** The `FeatureOnlineStore` and `FeatureView` resources are metadata constructs. Data is copied from BigQuery to the online store only when a sync operation runs, either via the scheduled cron or an explicit `sync()` invocation.\n\n**Why the others don't work:**\n- `entity_id_columns` must be omitted: It is a required parameter when creating a feature view with a BigQuery source.\n- `serving_config_id` is required: The online store creates a default serving configuration automatically.\n- BigQuery URI format is wrong: Vertex AI Feature Store natively accepts `bq://` URIs pointing to BigQuery tables.",
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 1,
       "lastReviewed": "2026-04-29"
@@ -3360,53 +3292,42 @@
     },
     {
       "id": "PMLE-2025-0072",
-      "type": "matching",
-      "docs": "https://cloud.google.com/vertex-ai/docs/workbench/introduction",
+      "type": "single-choice",
+      "format": "text",
+      "docs": "https://cloud.google.com/colab/docs/introduction",
       "services": [
         "Vertex AI Workbench",
-        "Colab Enterprise",
-        "Dataproc"
+        "Colab Enterprise"
       ],
       "skills": [
         "2.2.1: Choosing the appropriate Jupyter backend on Google Cloud, including Vertex AI Workbench, Colab Enterprise, and notebooks on Dataproc."
       ],
-      "question": "Match each team requirement to the MOST appropriate Jupyter backend on Google Cloud.",
-      "slots": [
-        {
-          "id": "s1",
-          "label": "Individual researcher needs a customizable single-user JupyterLab VM with GPUs and notebook scheduling.",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s2",
-          "label": "Cross-functional team requires real-time collaborative authoring with admin-governed serverless runtimes.",
-          "correctChoiceId": "c2"
-        },
-        {
-          "id": "s3",
-          "label": "Data engineers iterate on PySpark transformations against multi-terabyte datasets with autoscaling Spark clusters.",
-          "correctChoiceId": "c3"
-        }
-      ],
+      "question": "A data scientist receives a shared notebook and opens it in their Google Cloud environment. The first cell contains the following import block, which executes successfully with no `ModuleNotFoundError`.\n\n```python\nfrom google.colab import auth\nfrom google.colab.output import eval_js\nimport google.auth\n\nauth.authenticate_user()\nproject_id = \"my-project\"\nprint(f\"Authenticated for project: {project_id}\")\n```\n\nBased solely on this import block executing without error, which Jupyter backend is this notebook running on?",
       "choices": [
         {
           "id": "c1",
-          "text": "Vertex AI Workbench instances",
-          "explanation": "Best for per-user managed JupyterLab VMs with GPU and scheduling support."
+          "text": "Colab Enterprise - the `google.colab` package is only available in Colab runtimes. It is not installed in Vertex AI Workbench or Dataproc notebook environments, so a successful import confirms a Colab runtime.",
+          "sequence": 1,
+          "explanation": "The `google.colab` module ships exclusively with Colab-based runtimes. Importing it without error uniquely identifies the runtime as Colab-based; within Google Cloud this means Colab Enterprise."
         },
         {
           "id": "c2",
-          "text": "Colab Enterprise",
-          "explanation": "Best for serverless collaborative notebooks with governed runtime templates."
+          "text": "Vertex AI Workbench - Workbench instances include the full Google Cloud SDK and pre-install the `google.colab` compatibility shim so that shared notebooks run without modification.",
+          "explanation": "Vertex AI Workbench instances do not install `google.colab`. Importing it on a Workbench instance raises a `ModuleNotFoundError`."
         },
         {
           "id": "c3",
-          "text": "Dataproc Jupyter component",
-          "explanation": "Best for Spark-driven notebook workloads on managed Hadoop clusters."
+          "text": "Dataproc notebooks - the `google.colab` module is part of the Dataproc Hub base image and is available in all Dataproc-managed JupyterHub sessions by default.",
+          "explanation": "Dataproc-managed JupyterHub environments use a PySpark kernel base image and do not include the `google.colab` package."
+        },
+        {
+          "id": "c4",
+          "text": "Vertex AI Workbench Managed - the managed runtime installs `google.colab` automatically when it detects a notebook originally authored in Colab.",
+          "explanation": "The managed variant of Vertex AI Workbench also does not install `google.colab` automatically. There is no Colab compatibility shim in either Workbench variant."
         }
       ],
-      "tip": "Focus on whether the workload is single-user, collaborative, or Spark-centric.",
-      "explanation": "Each backend targets a distinct usage pattern: Workbench for individual VMs, Colab Enterprise for collaboration, and Dataproc Jupyter for Spark.",
+      "tip": "Some Python modules are pre-installed exclusively in one type of managed notebook environment - their presence or absence is a reliable signal of the runtime type.",
+      "explanation": "The `google.colab` package is a runtime library that ships exclusively with Google Colab environments, which includes both the public Colab product and Colab Enterprise on Google Cloud. It is not installed in Vertex AI Workbench (user-managed or managed) or in Dataproc notebook environments. A successful `from google.colab import auth` import therefore confirms the kernel is a Colab runtime, and within Google Cloud that means Colab Enterprise.\n\n**Why it works:** The `google.colab` module does not exist on Vertex AI Workbench or Dataproc base images. If the import succeeds without error, the runtime must be Colab-based.\n\n**Why the others don't work:**\n- Vertex AI Workbench: Does not install `google.colab` - importing it raises a `ModuleNotFoundError`.\n- Dataproc notebooks: Dataproc-managed JupyterHub environments use a PySpark kernel base image and do not include `google.colab`.\n- Vertex AI Workbench Managed: Neither Workbench variant installs `google.colab` automatically.",
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 1,
       "lastReviewed": "2026-04-29"
@@ -4447,66 +4368,45 @@
     },
     {
       "id": "PMLE-2025-0096",
-      "type": "matching",
-      "docs": "https://cloud.google.com/vertex-ai/docs/start/introduction-unified-platform",
-      "services": [
-        "Vertex AI Experiments",
-        "Vertex AI Pipelines",
-        "Vertex AI TensorBoard"
-      ],
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "skills": [
         "2.3.1: Choosing the appropriate Google Cloud environment for development and experimentation given the framework, including Vertex AI Experiments, Kubeflow Pipelines, and Vertex AI TensorBoard with TensorFlow and PyTorch."
       ],
-      "question": "Match each development and experimentation need to the Google Cloud service that addresses it most directly.",
-      "slots": [
-        {
-          "id": "s1",
-          "label": "Tracking parameters, metrics, and lineage across multiple training runs",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s2",
-          "label": "Orchestrating multi-step ML workflows defined with the Kubeflow Pipelines SDK",
-          "correctChoiceId": "c2"
-        },
-        {
-          "id": "s3",
-          "label": "Visualizing scalar curves, histograms, and embeddings from TensorFlow or PyTorch training",
-          "correctChoiceId": "c3"
-        },
-        {
-          "id": "s4",
-          "label": "Interactive notebook environment for prototyping models before submitting jobs",
-          "correctChoiceId": "c4"
-        }
+      "services": [
+        "Vertex AI",
+        "Vertex AI TensorBoard"
       ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-introduction",
+      "lastReviewed": "2026-04-29",
+      "question": "An ML engineer creates a Vertex AI TensorBoard instance and attempts to attach it to a custom training job using the following commands. The job submission fails with an invalid resource name error on the `--tensorboard` flag.\n\n```bash\ngcloud ai tensorboards create \\\n  --display-name=my-tensorboard \\\n  --region=us-central1 \\\n  --project=my-project\n\ngcloud ai custom-jobs create \\\n  --region=us-central1 \\\n  --display-name=my-training-job \\\n  --tensorboard=my-tensorboard \\\n  --worker-pool-spec=machine-type=n1-standard-8,\\\nreplica-count=1,\\\ncontainer-image-uri=us-docker.pkg.dev/my-project/my-repo/trainer:latest\n```\n\nWhich value for the `--tensorboard` flag will cause the job submission to fail?",
       "choices": [
         {
           "id": "c1",
-          "text": "Vertex AI Experiments",
-          "explanation": "Centralizes run-level parameters, metrics, and metadata."
+          "text": "`my-tensorboard` is the display name, not the full resource name; `--tensorboard` requires the format `projects/PROJECT/locations/REGION/tensorboards/TENSORBOARD_ID`.",
+          "sequence": 1,
+          "explanation": "The `--tensorboard` flag accepts only the fully qualified resource name. Passing the display name causes an invalid resource name error because display names are not unique identifiers in the Vertex AI API."
         },
         {
           "id": "c2",
-          "text": "Vertex AI Pipelines",
-          "explanation": "Serverless executor for KFP v2 pipelines with lineage tracking."
+          "text": "The `tensorboards create` command must include `--format=json` to return the resource ID before it can be referenced.",
+          "explanation": "`--format=json` is useful for parsing output but is not required for the TensorBoard instance to be created or referenced. The resource ID can be retrieved with `gcloud ai tensorboards list`."
         },
         {
           "id": "c3",
-          "text": "Vertex AI TensorBoard",
-          "explanation": "Managed TensorBoard for visualizing training event logs."
+          "text": "The `--region` flag must be omitted from `gcloud ai custom-jobs create` when a `--tensorboard` flag is specified.",
+          "explanation": "`--region` is required for `gcloud ai custom-jobs create` regardless of whether a TensorBoard is attached. Omitting it causes a different missing-argument error."
         },
         {
           "id": "c4",
-          "text": "Vertex AI Workbench",
-          "explanation": "Managed JupyterLab environment for ML development."
+          "text": "The `worker-pool-spec` must include an `executor-image-uri` field instead of `container-image-uri` when TensorBoard is enabled.",
+          "explanation": "`container-image-uri` is the correct field name in `worker-pool-spec`. `executor-image-uri` is not a valid field name in this context."
         }
       ],
-      "tip": "Each service has a clearly distinct primary purpose in the Vertex AI portfolio.",
-      "explanation": "Experiments, Pipelines, TensorBoard, and Workbench are complementary Vertex AI components covering tracking, orchestration, visualization, and notebook prototyping respectively.",
-      "domain": "Collaborating Within and Across Teams to Manage Data and Models",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "tip": "Vertex AI resource flags in gcloud commands typically require the fully qualified resource name, not a human-readable display name.",
+      "explanation": "The `--tensorboard` flag requires the full resource name of the TensorBoard instance, not its display name.\n\n**Why it works:** After creating a TensorBoard instance, its resource name follows the pattern `projects/PROJECT/locations/REGION/tensorboards/TENSORBOARD_ID`. The `TENSORBOARD_ID` is a numeric identifier assigned at creation time. Passing the display name `'my-tensorboard'` fails because the Vertex AI API cannot resolve a display name to a unique resource.\n\n**Why the others don't work:**\n- `--format=json` must be included: Output format flags affect terminal display only, not resource creation or referencing.\n- `--region` must be omitted: `--region` is a required argument for custom job creation.\n- `executor-image-uri` instead of `container-image-uri`: `container-image-uri` is the correct and documented field name."
     },
     {
       "id": "PMLE-2025-0097",
@@ -5017,8 +4917,9 @@
     },
     {
       "id": "PMLE-2025-0108",
-      "type": "ordering",
-      "docs": "https://cloud.google.com/vertex-ai/docs/explainable-ai/getting-explanations",
+      "type": "single-choice",
+      "format": "text",
+      "docs": "https://cloud.google.com/vertex-ai/docs/explainable-ai/configuring-explanations-feature-based",
       "services": [
         "Vertex AI",
         "Vertex Explainable AI"
@@ -5026,35 +4927,32 @@
       "skills": [
         "3.1.2: Applying modeling techniques given interpretability requirements."
       ],
-      "question": "The MLOps team is enabling per-prediction feature attributions for an existing tabular TensorFlow model on Vertex AI.\n\nArrange the following steps in the correct order to deliver explanations to consumers.",
+      "question": "An ML engineer is enabling Vertex Explainable AI for a tabular TensorFlow SavedModel. They configure `ExplanationMetadata` as shown below and upload the model to Vertex AI Model Registry with this metadata attached.\n\n```python\nfrom google.cloud.aiplatform.explain.metadata.tf.v2 import (\n    SavedModelMetadataBuilder,\n)\n\nbuilder = SavedModelMetadataBuilder(\n    model_path=\"gs://my-bucket/models/tabular_v3\"\n)\n\nmetadata = builder.get_metadata_protobuf()\nmetadata.inputs[\"age\"].modality = \"image\"\nmetadata.inputs[\"income\"].modality = \"numeric\"\nmetadata.inputs[\"tenure\"].modality = \"numeric\"\nmetadata.outputs[\"dense_relu_1\"].output_tensor_name = \"dense_relu_1\"\n```\n\nWhich configuration element will prevent Vertex Explainable AI explanations from working correctly?",
       "choices": [
         {
           "id": "c1",
-          "text": "Identify interpretability requirements and select an attribution method such as sampled Shapley or integrated gradients",
+          "text": "The `modality` field for the `age` input is set to `\"image\"` instead of `\"numeric\"`, which is invalid for a tabular numeric feature.",
           "sequence": 1,
-          "explanation": "Choosing the method first ensures the model and metadata align with stakeholder needs."
+          "explanation": "Setting modality to `\"image\"` on a numeric tabular feature causes Vertex Explainable AI to apply the wrong attribution method and fail to generate feature attributions for that input."
         },
         {
           "id": "c2",
-          "text": "Define explanation metadata describing input and output tensors when uploading the model to the Vertex AI Model Registry",
-          "sequence": 2,
-          "explanation": "Explanation metadata must be attached when registering the model so the platform knows which tensors to attribute."
+          "text": "The `income` and `tenure` inputs are declared with `modality: \"numeric\"`, which is not a supported modality type for tabular models.",
+          "explanation": "`\"numeric\"` is the correct modality value for scalar tabular features. These declarations are valid and will not cause any errors."
         },
         {
           "id": "c3",
-          "text": "Deploy the model to a Vertex AI endpoint with explanation configuration enabled",
-          "sequence": 3,
-          "explanation": "Deployment with explanation config is required before serving explanations."
+          "text": "The `SavedModelMetadataBuilder` automatically infers all input metadata, so manually setting any `modality` field will raise a conflict error at upload time.",
+          "explanation": "The builder provides a starting point but does not prevent manual overrides. Overriding modality fields is a supported workflow and does not raise conflicts."
         },
         {
           "id": "c4",
-          "text": "Call the explain method on the endpoint and surface attributions to downstream reviewers",
-          "sequence": 4,
-          "explanation": "The explain method returns per-prediction attributions to the consuming application."
+          "text": "The output tensor `dense_relu_1` points to an intermediate layer rather than the final prediction output, which is a separate issue from the modality configuration.",
+          "explanation": "While pointing to an intermediate layer can also cause explanation issues, the most directly incorrect element in this snippet is the `\"image\"` modality on a numeric feature - that is what the question tests."
         }
       ],
-      "tip": "Think about which decision must precede registration and deployment.",
-      "explanation": "Interpretability requirements drive method choice, which informs metadata at registration, deployment configuration, and finally request-time explanation calls.",
+      "tip": "When configuring metadata for feature-based explanations, each field describing an input must accurately reflect the nature of that feature's data type.",
+      "explanation": "Setting the modality of a numeric tabular feature to `\"image\"` is the configuration error that will prevent explanations from working.\n\n**Why it works:** Vertex Explainable AI uses the `modality` field to select the attribution algorithm and preprocessing logic for each input. A numeric tabular feature must use modality `\"numeric\"` so that Integrated Gradients is applied correctly. Setting modality to `\"image\"` causes the platform to apply image-specific processing to a scalar value, producing invalid or missing attributions for that feature.\n\n**Why the others don't work:**\n- `income` and `tenure` set to `\"numeric\"`: `\"numeric\"` is the correct and supported modality for scalar tabular inputs.\n- Builder conflicts on manual override: Manual modality overrides are a documented and supported pattern and do not raise errors.\n- Output tensor points to intermediate layer: While a separate potential misconfiguration, it is not the clearly invalid element asked about in this snippet.",
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29"
@@ -5194,55 +5092,45 @@
     },
     {
       "id": "PMLE-2025-0112",
-      "type": "matching",
-      "docs": "https://cloud.google.com/architecture/ml-on-gcp-best-practices",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Scaling Prototypes into ML Models",
+      "skills": [
+        "3.2.1: Organizing training data types, including tabular, text, speech, images, and videos, on Google Cloud using Cloud Storage and BigQuery."
+      ],
       "services": [
         "Cloud Storage",
         "BigQuery"
       ],
-      "skills": [
-        "3.2.1: Organizing training data types, including tabular, text, speech, images, and videos, on Google Cloud using Cloud Storage and BigQuery."
-      ],
-      "question": "Match each training data type to the Google Cloud storage option that Google's ML best practices guidance recommends as the primary store.",
-      "slots": [
-        {
-          "id": "s1",
-          "label": "Large catalog of labeled video clips for an action recognition model",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s2",
-          "label": "Tabular sales transactions used to derive features with SQL",
-          "correctChoiceId": "c2"
-        },
-        {
-          "id": "s3",
-          "label": "Sharded `TFRecord` files of preprocessed image tensors",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s4",
-          "label": "Aggregated and joined feature snapshots produced by analytical queries",
-          "correctChoiceId": "c2"
-        }
-      ],
+      "docs": "https://cloud.google.com/bigquery/docs/exporting-data",
+      "lastReviewed": "2026-04-29",
+      "question": "A team exports a training dataset from BigQuery to Cloud Storage using the following statement. The pipeline ran successfully once before, and the destination path already contains CSV files from that run. On the second run, the `EXPORT DATA` job fails immediately before writing any data.\n\n```sql\nEXPORT DATA\n  OPTIONS (\n    uri              = 'gs://my-training-bucket/exports/customers_*.csv',\n    format           = 'CSV',\n    header           = true,\n    field_delimiter  = ',',\n    overwrite        = false\n  ) AS\nSELECT\n  customer_id, tenure, monthly_charges, contract_type, churned\nFROM\n  `myproject.datasets.customers`\nWHERE\n  split = 'TRAIN';\n```\n\nWhich option in the `EXPORT DATA` statement will cause the job to fail when the destination already contains files from a previous export?",
       "choices": [
         {
           "id": "c1",
-          "text": "Cloud Storage regional bucket",
-          "explanation": "Cloud Storage is the recommended store for large unstructured media and packaged training record files."
+          "text": "`overwrite = false` causes `EXPORT DATA` to fail if any files already exist at the destination URI pattern.",
+          "sequence": 1,
+          "explanation": "When `overwrite` is set to `false` (the default), BigQuery `EXPORT DATA` checks whether any files matching the destination URI pattern already exist and raises an error rather than overwriting them."
         },
         {
           "id": "c2",
-          "text": "BigQuery table",
-          "explanation": "BigQuery is the recommended store for structured tabular features and SQL-derived feature snapshots."
+          "text": "`field_delimiter = ','` is redundant when `format = 'CSV'` is specified and causes a conflict error.",
+          "explanation": "`field_delimiter` is a valid optional parameter for CSV exports. It does not conflict with the `format` option and does not cause an export failure."
+        },
+        {
+          "id": "c3",
+          "text": "The wildcard character in the URI pattern `customers_*.csv` is not supported by `EXPORT DATA` and must be replaced with a specific filename.",
+          "explanation": "Wildcard characters in the URI are required by `EXPORT DATA` when the result set is large enough to be split across multiple files. A static filename without a wildcard would cause an error if BigQuery needs to create more than one shard."
+        },
+        {
+          "id": "c4",
+          "text": "`header = true` is incompatible with downstream Vertex AI training jobs that expect header-free CSV files.",
+          "explanation": "Whether Vertex AI training jobs expect headers depends on the input pipeline configuration. Including a header row does not cause the `EXPORT DATA` statement itself to fail."
         }
       ],
-      "tip": "Group structured analytical data separately from large unstructured media.",
-      "explanation": "Google's ML best practices send structured tabular data to BigQuery and large unstructured media or packaged record files to Cloud Storage.",
-      "domain": "Scaling Prototypes into ML Models",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "tip": "Consider the default behavior of `EXPORT DATA` when files already exist at the destination, and what option controls that behavior.",
+      "explanation": "The `EXPORT DATA` statement fails on the second run because `overwrite = false` prevents BigQuery from replacing the files written during the first run.\n\n**Why it works:** BigQuery `EXPORT DATA` with `overwrite = false` checks the destination URI pattern before writing. If matching files already exist, the job raises an error and exits without exporting any data. Setting `overwrite = true` allows the export to replace existing files on each run.\n\n**Why the others don't work:**\n- `field_delimiter = ','` is redundant: Specifying the default comma delimiter explicitly is valid and does not cause an error.\n- Wildcard in URI is not supported: Wildcards are a required part of `EXPORT DATA` URI syntax for sharded exports.\n- `header = true` is incompatible: Whether a training job can handle CSV headers is a pipeline configuration concern, not a constraint on `EXPORT DATA` itself."
     },
     {
       "id": "PMLE-2025-0113",
@@ -5576,47 +5464,44 @@
     },
     {
       "id": "PMLE-2025-0120",
-      "type": "ordering",
-      "docs": "https://cloud.google.com/vertex-ai/docs/training/create-custom-job",
-      "services": [
-        "Vertex AI",
-        "Artifact Registry"
-      ],
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Scaling Prototypes into ML Models",
       "skills": [
         "3.2.3: Training models using different SDKs, including Vertex AI custom training, Kubeflow on Google Kubernetes Engine, AutoML, and tabular workflows."
       ],
-      "question": "Arrange the typical steps to launch a Vertex AI custom training job that uses a custom container image.",
+      "services": [
+        "Vertex AI"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/training/create-custom-job",
+      "lastReviewed": "2026-04-29",
+      "question": "A team submits a Vertex AI custom training job using the following gcloud command. The job submission is rejected immediately with a validation error stating the worker pool configuration is invalid.\n\n```bash\ngcloud ai custom-jobs create \\\n  --region=us-central1 \\\n  --display-name=image-classifier-job \\\n  --worker-pool-spec=\\\nmachine-type=n1-standard-8,\\\naccelerator-type=NVIDIA_TESLA_T4,\\\naccelerator-count=1,\\\nreplica-count=0,\\\ncontainer-image-uri=us-docker.pkg.dev/my-project/repo/trainer:v1\n```\n\nWhich field value in the `worker-pool-spec` will cause the job submission to fail?",
       "choices": [
         {
           "id": "c1",
-          "text": "Write the training code and a Dockerfile that packages the dependencies",
+          "text": "`replica-count=0` is invalid; Vertex AI requires at least 1 replica in the chief worker pool.",
           "sequence": 1,
-          "explanation": "The container image must be defined first so it can be built."
+          "explanation": "The chief worker pool must have exactly 1 replica for a Vertex AI custom training job. Setting `replica-count=0` means no workers would be launched, which Vertex AI rejects at submission time."
         },
         {
           "id": "c2",
-          "text": "Build the container image and push it to Artifact Registry",
-          "sequence": 2,
-          "explanation": "Vertex AI pulls the image from Artifact Registry at job start."
+          "text": "`accelerator-type=NVIDIA_TESLA_T4` is not supported on `n1-standard-8` machine types in `us-central1`.",
+          "explanation": "NVIDIA Tesla T4 GPUs are supported on N1 machine types including `n1-standard-8` in `us-central1`. This combination is valid."
         },
         {
           "id": "c3",
-          "text": "Define a CustomJob with a worker pool spec referencing the image URI and machine type",
-          "sequence": 3,
-          "explanation": "The worker pool spec ties the image to the requested hardware."
+          "text": "`container-image-uri` must point to `gcr.io` and cannot reference Artifact Registry paths for custom training jobs.",
+          "explanation": "Vertex AI custom training supports container images hosted in Artifact Registry (`pkg.dev`) as well as Container Registry (`gcr.io`). The Artifact Registry URI format is valid."
         },
         {
           "id": "c4",
-          "text": "Submit the CustomJob with the Vertex AI SDK and monitor it in the Vertex AI console",
-          "sequence": 4,
-          "explanation": "Submission triggers provisioning and execution on Vertex AI."
+          "text": "The `--display-name` flag must be omitted when using `--worker-pool-spec` in the same command.",
+          "explanation": "`--display-name` and `--worker-pool-spec` are independent flags that can be used together without conflict."
         }
       ],
-      "tip": "Think about the dependency between artifacts before they can be referenced.",
-      "explanation": "The image must exist in Artifact Registry before the worker pool spec can reference it, and the job must be defined before it can be submitted.",
-      "domain": "Scaling Prototypes into ML Models",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "tip": "Check the minimum valid value for the `replica-count` field in a Vertex AI worker pool specification.",
+      "explanation": "`replica-count=0` is rejected by Vertex AI because every custom training job must have at least one active worker.\n\n**Why it works:** Vertex AI custom training requires the chief worker pool to have `replica-count=1`. A value of `0` means no compute resources would be allocated, which the API rejects before any resources are provisioned.\n\n**Why the others don't work:**\n- `NVIDIA_TESLA_T4` is not supported on `n1-standard-8`: T4 GPUs are available on N1 machine families in `us-central1` - a valid configuration.\n- `container-image-uri` must point to `gcr.io`: Vertex AI accepts images from both `gcr.io` and Artifact Registry.\n- `--display-name` must be omitted: These are independent, non-conflicting flags."
     },
     {
       "id": "PMLE-2025-0121",
@@ -5942,46 +5827,44 @@
     },
     {
       "id": "PMLE-2025-0128",
-      "type": "ordering",
-      "docs": "https://cloud.google.com/vertex-ai/docs/training/hyperparameter-tuning-overview",
-      "services": [
-        "Vertex AI"
-      ],
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Scaling Prototypes into ML Models",
       "skills": [
         "3.2.5: Performing hyperparameter tuning."
       ],
-      "question": "Arrange the steps to set up and run a Vertex AI hyperparameter tuning job for a custom Keras training script.",
+      "services": [
+        "Vertex AI"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/training/hyperparameter-tuning-overview",
+      "lastReviewed": "2026-04-29",
+      "question": "An ML engineer creates a Vertex AI hyperparameter tuning job using the following YAML spec. After several trials complete, the reported best trial has a `val_accuracy` of 0.51, far below baseline. The engineer suspects the tuning job is optimizing in the wrong direction.\n\n```yaml\nstudySpec:\n  metrics:\n    - metricId: val_accuracy\n      goal: MINIMIZE\n  parameters:\n    - parameterId: learning_rate\n      doubleValueSpec:\n        minValue: 0.0001\n        maxValue: 0.1\n    - parameterId: batch_size\n      discreteValueSpec:\n        values: [32, 64, 128]\n  algorithm: ALGORITHM_UNSPECIFIED\nmaxTrialCount: 20\nparallelTrialCount: 4\ntrialJobSpec:\n  workerPoolSpecs:\n    - machineSpec:\n        machineType: n1-standard-4\n      replicaCount: 1\n      containerSpec:\n        imageUri: us-docker.pkg.dev/my-project/repo/trainer:v2\n```\n\nWhich combination of goal and metric is causing the tuning job to select configurations that degrade model performance?",
       "choices": [
         {
           "id": "c1",
-          "text": "Modify the training script to read hyperparameters from CLI flags and report metrics with `cloudml-hypertune`",
+          "text": "`goal: MINIMIZE` combined with `metricId: val_accuracy` causes the tuner to find configurations that lower validation accuracy instead of raising it.",
           "sequence": 1,
-          "explanation": "The script must accept tuned parameters and report the metric before any tuning can occur."
+          "explanation": "`val_accuracy` improves as it increases. Setting `goal: MINIMIZE` instructs Vertex AI Vizier to search for hyperparameter configurations that produce the lowest possible `val_accuracy`, which is the opposite of the desired behavior."
         },
         {
           "id": "c2",
-          "text": "Define the study spec with parameter ranges, the metric to optimize, and the optimization goal",
-          "sequence": 2,
-          "explanation": "The study spec captures the search space and objective for the tuner."
+          "text": "`algorithm: ALGORITHM_UNSPECIFIED` causes Vertex AI to skip optimization and select random trials, ignoring the metric goal entirely.",
+          "explanation": "`ALGORITHM_UNSPECIFIED` tells Vertex AI to choose the best algorithm automatically, which defaults to Bayesian optimization. It does not cause random or goalless search."
         },
         {
           "id": "c3",
-          "text": "Submit the HyperparameterTuningJob with a `maxTrialCount` and a `maxParallelTrialCount`",
-          "sequence": 3,
-          "explanation": "Submitting the job kicks off trial execution under the configured budget."
+          "text": "`maxTrialCount: 20` is too low for the hyperparameter search space and causes premature convergence on a poor configuration.",
+          "explanation": "While a larger trial count can improve search coverage, `maxTrialCount: 20` does not cause the tuner to optimize in the wrong direction. The direction is determined solely by the `goal` field."
         },
         {
           "id": "c4",
-          "text": "Inspect completed trials and select the best hyperparameter set for the final training run",
-          "sequence": 4,
-          "explanation": "After the search, the best trial guides the final production training run."
+          "text": "`parallelTrialCount: 4` causes trials to interfere with each other when using Bayesian optimization, producing incorrect metric values.",
+          "explanation": "Parallel trials in Bayesian optimization are handled by Vertex AI Vizier using a batched acquisition strategy. Parallel execution does not corrupt metric values."
         }
       ],
-      "tip": "Follow the natural flow from preparing the script to consuming the results.",
-      "explanation": "The script must be tuning-ready first, then the study spec defines the search, the job runs the trials, and finally the best set is chosen.",
-      "domain": "Scaling Prototypes into ML Models",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "tip": "Consider whether the optimization goal matches the direction in which the chosen metric improves.",
+      "explanation": "The tuning job is configured with `goal: MINIMIZE` for `val_accuracy`, which directs the optimizer to find hyperparameters that make the model perform as poorly as possible.\n\n**Why it works:** `val_accuracy` ranges from 0 to 1 and improves as it increases, so the correct goal is `MAXIMIZE`. With `MINIMIZE`, the optimizer actively steers toward configurations that degrade accuracy, explaining why the best trial reports near-random performance.\n\n**Why the others don't work:**\n- `ALGORITHM_UNSPECIFIED` skips optimization: It triggers automatic algorithm selection (Bayesian optimization by default). It does not disable optimization.\n- `maxTrialCount: 20` is too low: Trial count affects search thoroughness, not optimization direction.\n- `parallelTrialCount: 4` causes interference: Vertex AI Vizier handles parallel trials through internal batching and does not corrupt metric values."
     },
     {
       "id": "PMLE-2025-0129",
@@ -6682,43 +6565,42 @@
     },
     {
       "id": "PMLE-2025-0144",
-      "type": "ordering",
+      "type": "single-choice",
+      "format": "text",
       "docs": "https://cloud.google.com/vertex-ai/docs/training/distributed-training",
       "services": [
-        "Vertex AI"
+        "Vertex AI",
+        "Horovod"
       ],
       "skills": [
         "3.3.2: Configuring distributed training with TPUs and GPUs using tools such as Reduction Server on Vertex AI and Horovod."
       ],
-      "question": "Arrange the following steps in the correct order to launch a distributed Horovod training job with Reduction Server on Vertex AI.",
+      "question": "An ML engineer is setting up a Horovod distributed training script on Vertex AI. Each worker node has multiple GPUs and the script is intended to pin each process to a single GPU based on its local rank.\n\n```python\nimport tensorflow as tf\nimport horovod.tensorflow as hvd\n\ngpus = tf.config.experimental.list_physical_devices(\"GPU\")\ntf.config.experimental.set_visible_devices(\n    gpus[hvd.local_rank()], \"GPU\"\n)\n\nhvd.init()\n\nfor gpu in gpus:\n    tf.config.experimental.set_memory_growth(gpu, True)\n\noptimizer = tf.keras.optimizers.Adam(learning_rate=0.001 * hvd.size())\noptimizer = hvd.DistributedOptimizer(optimizer)\n\nmodel = build_model()\nmodel.compile(optimizer=optimizer, loss=\"sparse_categorical_crossentropy\")\n```\n\nWhich line in this script will cause a runtime error during distributed training initialization?",
       "choices": [
         {
           "id": "c1",
-          "text": "Build a custom training container that includes the Horovod runtime and the Reduction Server NCCL plugin, then push it to Artifact Registry.",
+          "text": "`tf.config.experimental.set_visible_devices(gpus[hvd.local_rank()], \"GPU\")` is called before `hvd.init()`, so `hvd.local_rank()` is invoked before Horovod is initialized and the rank is not yet assigned.",
           "sequence": 1,
-          "explanation": "The container image with both Horovod and the NCCL plugin must exist before the job can reference it."
+          "explanation": "Horovod must be initialized with `hvd.init()` before any `hvd.*` functions are called. Calling `hvd.local_rank()` prior to `hvd.init()` raises a RuntimeError because the process rank has not yet been assigned."
         },
         {
           "id": "c2",
-          "text": "Define a Vertex AI custom job specification with primary, worker, and reducer worker pools, mapping GPU machines to training pools and CPU machines to the reducer pool.",
-          "sequence": 2,
-          "explanation": "After the image is available, the cluster topology is declared in the job specification."
+          "text": "`tf.config.experimental.set_memory_growth(gpu, True)` is called after `hvd.init()`, which is too late to configure GPU memory and will silently corrupt allocations.",
+          "explanation": "Memory growth configuration is independent of Horovod initialization order. Its placement after `hvd.init()` is a secondary concern and is not the line that causes the immediate runtime error."
         },
         {
           "id": "c3",
-          "text": "Submit the custom job to Vertex AI so the service launches all worker pools and injects cluster environment variables.",
-          "sequence": 3,
-          "explanation": "Submitting the job triggers cluster provisioning and bootstrap of Horovod ranks."
+          "text": "`optimizer = hvd.DistributedOptimizer(optimizer)` must be called before `model.compile()` to register gradient hooks, but this ordering is correct as written.",
+          "explanation": "Wrapping the optimizer with `hvd.DistributedOptimizer` before passing it to `model.compile()` is the correct pattern. This line is properly ordered and will not cause a runtime error."
         },
         {
           "id": "c4",
-          "text": "Monitor training metrics and Reduction Server throughput in Cloud Monitoring and Vertex AI experiment tracking, then iterate on configuration.",
-          "sequence": 4,
-          "explanation": "Observability and tuning come after the job is running."
+          "text": "`learning_rate=0.001 * hvd.size()` scales the learning rate by the number of workers, which is an unsupported operation that raises a type error at runtime.",
+          "explanation": "Scaling the learning rate by `hvd.size()` (the linear scaling rule) is a standard and supported practice in distributed training. `hvd.size()` returns an integer and multiplying it by a float is valid Python."
         }
       ],
-      "tip": "Think about which artifact must exist before the next step can reference it.",
-      "explanation": "The image must exist before it can be referenced; the job spec must be defined before submission; monitoring follows execution.",
+      "tip": "In distributed training frameworks, certain runtime context must be established before any framework-specific functions that depend on that context can be called.",
+      "explanation": "The call to `hvd.local_rank()` before `hvd.init()` is the line that will cause a runtime error.\n\n**Why it works:** Horovod's `init()` call bootstraps the MPI or Gloo communication backend and assigns each process its global rank, local rank, and world size. Any call to `hvd.local_rank()`, `hvd.rank()`, or `hvd.size()` before `hvd.init()` completes raises a RuntimeError because those values do not yet exist. The GPU pinning logic must be moved to after `hvd.init()` to function correctly.\n\n**Why the others don't work:**\n- Memory growth after `hvd.init()`: This is a secondary best-practice concern but not the line that raises the immediate runtime error during initialization.\n- `DistributedOptimizer` before compile: Wrapping the optimizer before passing it to compile is the correct and documented Horovod pattern.\n- Learning rate scaling: Multiplying the base learning rate by `hvd.size()` is the standard linear scaling rule for distributed SGD-based training. It is valid Python.",
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29"
@@ -8531,43 +8413,42 @@
     },
     {
       "id": "PMLE-2025-0184",
-      "type": "ordering",
-      "docs": "https://cloud.google.com/vertex-ai/docs/pipelines/build-pipeline",
+      "type": "single-choice",
+      "format": "text",
+      "docs": "https://www.kubeflow.org/docs/components/pipelines/v2/components/",
       "services": [
-        "Vertex AI Pipelines"
+        "Vertex AI Pipelines",
+        "Kubeflow Pipelines"
       ],
       "skills": [
         "5.1.1: Implementing data and model validation within pipelines."
       ],
-      "question": "Arrange the following Vertex AI Pipelines steps for a workflow that validates data and model quality before promotion.",
+      "question": "A platform engineer is building a KFP v2 pipeline that validates data before training. The pipeline wires the output of a validation component into a training component as shown below.\n\n```python\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import Dataset, Input, Output, Metrics, component\n\n@component\ndef validate_data(\n    raw_dataset: Input[Dataset],\n    validated_dataset: Output[Dataset],\n    validation_report: Output[Metrics],\n):\n    pass\n\n@component\ndef train_model(\n    training_data: Input[Metrics],\n    model_output: Output[Dataset],\n):\n    pass\n\n@dsl.pipeline(name=\"validation-pipeline\")\ndef pipeline(raw_data: str):\n    validation_step = validate_data(raw_dataset=raw_data)\n    train_step = train_model(\n        training_data=validation_step.outputs[\"validated_dataset\"]\n    )\n```\n\nWhich wiring error will prevent this pipeline from compiling successfully?",
       "choices": [
         {
           "id": "c1",
-          "text": "Generate statistics from the training dataset and compare them against the stored schema to detect anomalies.",
+          "text": "The `train_model` component declares `training_data` as `Input[Metrics]`, but the upstream output `validated_dataset` is of type `Output[Dataset]`, creating an incompatible artifact type mismatch.",
           "sequence": 1,
-          "explanation": "Data validation runs first so bad data never reaches training."
+          "explanation": "KFP v2 enforces artifact type compatibility at compile time. Passing an `Output[Dataset]` artifact into a parameter declared as `Input[Metrics]` raises a type error that prevents the pipeline from compiling."
         },
         {
           "id": "c2",
-          "text": "Train the candidate model on the validated dataset.",
-          "sequence": 2,
-          "explanation": "Training proceeds only after data passes validation."
+          "text": "The pipeline function passes `raw_data` (a string) directly to the `raw_dataset` parameter of `validate_data`, which expects an `Input[Dataset]` artifact.",
+          "explanation": "Passing a string URI to an artifact input is the standard pattern in KFP v2 at the pipeline level. The framework handles the conversion from string path to artifact reference during compilation."
         },
         {
           "id": "c3",
-          "text": "Evaluate the trained model and compute sliced quality metrics against a held-out dataset.",
-          "sequence": 3,
-          "explanation": "Model evaluation requires a trained candidate to assess."
+          "text": "`validation_step.outputs[\"validated_dataset\"]` is an incorrect way to reference a named output artifact - the correct syntax uses dot notation: `validation_step.validated_dataset`.",
+          "explanation": "Using the `outputs` dictionary with the parameter name as the key is the correct KFP v2 syntax for referencing named component outputs. Both forms work in practice."
         },
         {
           "id": "c4",
-          "text": "Conditionally register and promote the model in the Vertex AI Model Registry when metrics meet the quality threshold.",
-          "sequence": 4,
-          "explanation": "Promotion is the final gated step that depends on evaluation results."
+          "text": "The `@dsl.pipeline` decorator requires an explicit `pipeline_root` argument, and omitting it will cause a compilation error before type checking occurs.",
+          "explanation": "`pipeline_root` can be set at compile time or submission time and is not required as a decorator argument. Its absence does not prevent the pipeline from compiling."
         }
       ],
-      "tip": "Consider which stage produces the artifact each later stage consumes.",
-      "explanation": "A validation pipeline gates training on data quality and gates promotion on model quality, in that order.",
+      "tip": "Pipeline frameworks that enforce type safety will reject connections between components where the producing and consuming artifact types do not match.",
+      "explanation": "The type mismatch between `Output[Dataset]` and `Input[Metrics]` is the wiring error that will prevent the pipeline from compiling.\n\n**Why it works:** KFP v2 performs artifact type checking at compile time using the type annotations in each component's function signature. The `validate_data` component produces `validated_dataset` as `Output[Dataset]`, but `train_model` declares its `training_data` parameter as `Input[Metrics]`. These are incompatible artifact types and the KFP compiler raises a type error when attempting to connect them.\n\n**Why the others don't work:**\n- String passed to artifact input: Pipeline-level string parameters that serve as artifact URIs are accepted at the pipeline function boundary. The framework resolves the artifact reference during compilation.\n- `outputs` dictionary syntax: Using `validation_step.outputs[\"validated_dataset\"]` is correct KFP v2 syntax for referencing a named output artifact.\n- Missing `pipeline_root`: The `pipeline_root` value is not required in the `@dsl.pipeline` decorator and can be supplied at compile or run time.",
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 1,
       "lastReviewed": "2026-04-29"
@@ -9108,67 +8989,45 @@
     },
     {
       "id": "PMLE-2025-0196",
-      "type": "matching",
-      "docs": "https://cloud.google.com/build/docs/automating-builds/create-manage-triggers",
-      "services": [
-        "Cloud Build",
-        "Cloud Run",
-        "Eventarc",
-        "Pub/Sub"
-      ],
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Automating and Orchestrating ML Pipelines",
       "skills": [
         "5.1.4: Identifying pipeline components, parameters, triggers, and compute needs using Cloud Build and Cloud Run."
       ],
-      "question": "Match each pipeline trigger requirement to the Google Cloud trigger mechanism that BEST satisfies it.",
-      "slots": [
-        {
-          "id": "s1",
-          "label": "Run a build automatically on every push to a feature branch",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s2",
-          "label": "Invoke a Cloud Run service when a new file lands in Cloud Storage",
-          "correctChoiceId": "c2"
-        },
-        {
-          "id": "s3",
-          "label": "Run a nightly retraining job at 2 AM in a specific time zone",
-          "correctChoiceId": "c3"
-        },
-        {
-          "id": "s4",
-          "label": "Decouple producers and consumers using a durable message queue",
-          "correctChoiceId": "c4"
-        }
+      "services": [
+        "Cloud Build",
+        "Vertex AI Pipelines"
       ],
+      "docs": "https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration",
+      "lastReviewed": "2026-04-29",
+      "question": "A team uses the following `cloudbuild.yaml` to build a training container, push it to Artifact Registry, and trigger a Vertex AI pipeline run. The build and push steps succeed, but the pipeline run step fails with a missing required argument error.\n\n```yaml\nsteps:\n  - name: 'gcr.io/cloud-builders/docker'\n    args:\n      - 'build'\n      - '-t'\n      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ml-repo/trainer:$SHORT_SHA'\n      - '.'\n\n  - name: 'gcr.io/cloud-builders/docker'\n    args:\n      - 'push'\n      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ml-repo/trainer:$SHORT_SHA'\n\n  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'\n    entrypoint: 'gcloud'\n    args:\n      - 'ai'\n      - 'pipelines'\n      - 'runs'\n      - 'create'\n      - '--pipeline-job=gs://my-bucket/pipeline_job.json'\n      - '--region=us-central1'\n```\n\nWhich missing argument in the pipeline run step is causing the Cloud Build job to fail?",
       "choices": [
         {
           "id": "c1",
-          "text": "Cloud Build GitHub push trigger",
-          "explanation": "Native repo integration runs builds on commits."
+          "text": "`--pipeline-root` is missing; Vertex AI Pipelines requires a Cloud Storage URI for storing pipeline artifacts and outputs.",
+          "sequence": 1,
+          "explanation": "`--pipeline-root` specifies the Cloud Storage URI where Vertex AI Pipelines stores intermediate and output artifacts for the run. This argument is required and its absence causes the gcloud command to fail with a missing required argument error."
         },
         {
           "id": "c2",
-          "text": "Eventarc Cloud Storage trigger to Cloud Run",
-          "explanation": "Event-driven invocation on object events."
+          "text": "`--display-name` is missing; `gcloud ai pipelines runs create` requires a display name to identify the run.",
+          "explanation": "`--display-name` is an optional argument for pipeline run creation. Omitting it does not cause the command to fail; Vertex AI assigns a default name if none is provided."
         },
         {
           "id": "c3",
-          "text": "Cloud Scheduler cron schedule",
-          "explanation": "Time-based recurring trigger."
+          "text": "The `cloud-sdk` builder image must be replaced with a Python builder to run `gcloud ai` commands.",
+          "explanation": "The `gcr.io/google.com/cloudsdktool/cloud-sdk` image includes the full gcloud CLI and is the standard Cloud Build image for running gcloud commands. It does not need to be replaced."
         },
         {
           "id": "c4",
-          "text": "Pub/Sub topic with subscriber service",
-          "explanation": "Provides asynchronous decoupled messaging."
+          "text": "`--project` must be explicitly passed to `gcloud ai pipelines runs create` inside Cloud Build steps.",
+          "explanation": "Cloud Build injects the active project context into build steps. gcloud commands inherit the project from the build environment without requiring an explicit `--project` flag."
         }
       ],
-      "tip": "Match each scenario to the trigger source that fires most naturally for it.",
-      "explanation": "Each trigger mechanism is suited to a distinct event source.",
-      "domain": "Automating and Orchestrating ML Pipelines",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "tip": "Vertex AI Pipelines needs a Cloud Storage location to write artifacts during a run. Consider which flag provides that location.",
+      "explanation": "The pipeline run step is missing `--pipeline-root`, a required argument that tells Vertex AI where to store pipeline artifacts.\n\n**Why it works:** `--pipeline-root` accepts a Cloud Storage URI such as `gs://my-bucket/pipeline-root/`. Vertex AI Pipelines uses this path to store task outputs, logs, and metadata. Without it, the API cannot create the run and returns a validation error.\n\n**Why the others don't work:**\n- `--display-name` is missing: `--display-name` is optional - its absence does not cause a failure.\n- The `cloud-sdk` builder must be replaced: The `cloud-sdk` builder is the official recommended image for running gcloud commands in Cloud Build.\n- `--project` must be explicit: Cloud Build steps run in the context of the triggering project; gcloud inherits it automatically."
     },
     {
       "id": "PMLE-2025-0197",
@@ -9694,72 +9553,43 @@
     },
     {
       "id": "PMLE-2025-0208",
-      "type": "matching",
+      "type": "single-choice",
+      "format": "text",
       "docs": "https://www.tensorflow.org/tfx/guide",
       "services": [
+        "Vertex AI Pipelines",
         "TFX",
         "Dataflow"
       ],
       "skills": [
         "5.1.7: Designing systems using TFX components or Kubeflow DSL including Dataflow."
       ],
-      "question": "Match each TFX component to the responsibility it provides in a production ML pipeline.",
-      "slots": [
-        {
-          "id": "s1",
-          "label": "Ingest training data and split it into train and eval sets",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s2",
-          "label": "Compute statistics and detect anomalies against a stored schema",
-          "correctChoiceId": "c2"
-        },
-        {
-          "id": "s3",
-          "label": "Apply full-pass preprocessing and emit a graph for serving",
-          "correctChoiceId": "c3"
-        },
-        {
-          "id": "s4",
-          "label": "Compare a new model against a baseline using sliced metrics and emit a blessing",
-          "correctChoiceId": "c4"
-        },
-        {
-          "id": "s5",
-          "label": "Promote a blessed model to a serving destination",
-          "correctChoiceId": "c5"
-        }
-      ],
+      "question": "A data engineer is assembling a TFX pipeline that generates statistics, infers a schema, and validates examples before training. The component definitions are shown below.\n\n```python\nfrom tfx.components import (\n    CsvExampleGen, StatisticsGen, SchemaGen,\n    ExampleValidator, Trainer\n)\nfrom tfx.orchestration import pipeline\n\nexample_gen = CsvExampleGen(input_base=\"gs://my-bucket/data/\")\n\nschema_gen = SchemaGen(\n    statistics=example_gen.outputs[\"examples\"]\n)\n\nstatistics_gen = StatisticsGen(\n    examples=example_gen.outputs[\"examples\"]\n)\n\nexample_validator = ExampleValidator(\n    statistics=statistics_gen.outputs[\"statistics\"],\n    schema=schema_gen.outputs[\"schema\"],\n)\n\ntrainer = Trainer(\n    examples=example_gen.outputs[\"examples\"],\n    schema=schema_gen.outputs[\"schema\"],\n)\n\nmy_pipeline = pipeline.Pipeline(\n    pipeline_name=\"my_tfx_pipeline\",\n    components=[example_gen, schema_gen, statistics_gen,\n                example_validator, trainer],\n)\n```\n\nWhich component dependency is incorrect and will cause a pipeline execution error?",
       "choices": [
         {
           "id": "c1",
-          "text": "ExampleGen",
-          "explanation": "Reads source data and produces train and eval splits."
+          "text": "`SchemaGen` is given `example_gen.outputs[\"examples\"]` instead of `statistics_gen.outputs[\"statistics\"]`, so it receives a raw Examples artifact instead of the Statistics artifact it requires.",
+          "sequence": 1,
+          "explanation": "`SchemaGen` requires a Statistics artifact produced by `StatisticsGen` as its input. Passing the raw Examples output from `CsvExampleGen` provides an artifact of the wrong type, causing `SchemaGen` to fail at runtime."
         },
         {
           "id": "c2",
-          "text": "ExampleValidator with StatisticsGen and SchemaGen",
-          "explanation": "Detects schema and distribution anomalies."
+          "text": "`ExampleValidator` receives statistics from `statistics_gen` and schema from `schema_gen`, which is the wrong dependency order - it should receive both artifacts from `StatisticsGen`.",
+          "explanation": "`ExampleValidator` is designed to take statistics from `StatisticsGen` and schema from `SchemaGen` as separate inputs. This is the correct dependency wiring for `ExampleValidator`."
         },
         {
           "id": "c3",
-          "text": "Transform",
-          "explanation": "Performs full-pass preprocessing and emits a transform graph."
+          "text": "`Trainer` receives schema from `schema_gen` directly, but it should receive it from `ExampleValidator` to ensure only validated data informs the schema used during training.",
+          "explanation": "`Trainer` receiving the schema from `SchemaGen` directly is a standard and supported TFX pattern. `ExampleValidator` validates examples against the schema but does not produce a modified schema artifact."
         },
         {
           "id": "c4",
-          "text": "Evaluator",
-          "explanation": "Compares the candidate to a baseline and produces a blessing."
-        },
-        {
-          "id": "c5",
-          "text": "Pusher",
-          "explanation": "Pushes a blessed model to its serving destination."
+          "text": "Listing `schema_gen` before `statistics_gen` in the `components` list passed to `Pipeline` will force `SchemaGen` to execute before `StatisticsGen` regardless of artifact dependencies.",
+          "explanation": "TFX pipeline orchestrators determine execution order from artifact dependencies, not from the order of components in the list passed to `Pipeline`. The list order does not control execution sequencing."
         }
       ],
-      "tip": "Each TFX component has a distinct responsibility in the pipeline lifecycle.",
-      "explanation": "TFX divides the pipeline into ingest, validate, transform, train, evaluate, and push stages each owned by a specific component.",
+      "tip": "In a multi-stage data processing pipeline, each component expects inputs of a specific artifact type produced by a specific upstream component - passing an artifact from the wrong stage breaks the dependency chain.",
+      "explanation": "Passing `example_gen.outputs[\"examples\"]` to `SchemaGen` instead of `statistics_gen.outputs[\"statistics\"]` is the incorrect dependency that will cause a pipeline execution error.\n\n**Why it works:** `SchemaGen`'s required input is a Statistics artifact produced by `StatisticsGen` after it analyzes the raw examples. `SchemaGen` uses those statistics to infer a data schema. Skipping `StatisticsGen` and feeding raw examples directly to `SchemaGen` provides an Examples artifact where a Statistics artifact is required, causing a type mismatch at runtime.\n\n**Why the others don't work:**\n- `ExampleValidator` wiring: Providing statistics from `StatisticsGen` and schema from `SchemaGen` to `ExampleValidator` is exactly the correct and documented dependency pattern.\n- `Trainer` receiving schema from `SchemaGen`: This is a standard TFX pattern. `ExampleValidator` produces anomaly outputs, not an updated schema, so `Trainer` correctly consumes the schema from `SchemaGen`.\n- Component list ordering: TFX orchestrators derive execution order from artifact lineage, not component list position.",
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 2,
       "lastReviewed": "2026-04-29"
@@ -11572,49 +11402,45 @@
     },
     {
       "id": "PMLE-2025-0248",
-      "type": "ordering",
-      "docs": "https://cloud.google.com/vertex-ai/docs/model-monitoring/overview",
+      "type": "single-choice",
       "format": "text",
-      "services": [
-        "Vertex AI",
-        "Vertex AI Model Monitoring",
-        "Explainable AI"
-      ],
+      "difficulty": 1,
+      "domain": "Monitoring AI Solutions",
       "skills": [
         "6.2.1: Establishing continuous evaluation metrics using Vertex AI Model Monitoring and Explainable AI."
       ],
-      "question": "An MLOps engineer is establishing continuous evaluation for a newly trained classification model. The model will be served online with both feature attributions and skew monitoring enabled.\n\nArrange the following deployment steps in the correct order.",
+      "services": [
+        "Vertex AI",
+        "Vertex AI Model Monitoring"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/model-monitoring/overview",
+      "lastReviewed": "2026-04-29",
+      "question": "An MLOps engineer configures a Vertex AI Model Monitoring job to detect prediction skew on a deployed churn model. The job creation request fails immediately with a field validation error.\n\n```json\n{\n  \"displayName\": \"churn-model-monitor\",\n  \"endpoint\": \"projects/my-project/locations/us-central1/endpoints/1234567890\",\n  \"modelMonitoringObjectiveConfigs\": [\n    {\n      \"trainingDataset\": {\n        \"bigquerySource\": {\n          \"inputUri\": \"bq://my-project.datasets.churn_train\"\n        }\n      },\n      \"trainingPredictionSkewDetectionConfig\": {\n        \"skewThresholds\": {\n          \"tenure\":          { \"value\": 0.1  },\n          \"monthly_charges\": { \"value\": 0.15 }\n        }\n      }\n    }\n  ],\n  \"loggingConfig\": {\n    \"randomSampleConfig\": {\n      \"samplingRate\": 2.0\n    }\n  },\n  \"alertConfig\": {\n    \"emailAlertConfig\": {\n      \"userEmails\": [\"mlops@example.com\"]\n    }\n  }\n}\n```\n\nWhich field value will cause the monitoring job creation to fail?",
       "choices": [
         {
           "id": "c1",
-          "text": "Upload the trained model to the Vertex AI Model Registry, attaching an explanation specification.",
+          "text": "`samplingRate: 2.0` is out of the valid range; `samplingRate` must be a value between 0.0 and 1.0 inclusive.",
           "sequence": 1,
-          "explanation": "The model artifact and its explanation metadata must exist in the registry before a deployable version can be created."
+          "explanation": "The `samplingRate` field represents the fraction of prediction requests to sample. A value of `2.0` implies 200%, which exceeds the valid range and causes the API to reject the job configuration at creation time."
         },
         {
           "id": "c2",
-          "text": "Deploy the model version to a Vertex AI endpoint with traffic split configured.",
-          "sequence": 2,
-          "explanation": "An endpoint is required to receive online predictions and to be the target of monitoring."
+          "text": "The `bigquerySource` `inputUri` uses the `bq://` prefix, which is not a valid format for training dataset references in Model Monitoring.",
+          "explanation": "The `bq://` URI format is the correct format for referencing BigQuery tables in Vertex AI Model Monitoring training dataset configurations."
         },
         {
           "id": "c3",
-          "text": "Create a Model Monitoring job on the endpoint that references the original training dataset as the skew baseline.",
-          "sequence": 3,
-          "explanation": "Monitoring is configured against an existing endpoint and needs the training data as its baseline."
+          "text": "`skewThresholds` must use absolute count values instead of floating-point fractions for the `value` field.",
+          "explanation": "The `value` field in `skewThresholds` accepts floating-point numbers representing statistical distance thresholds. Floating-point values are correct and expected."
         },
         {
           "id": "c4",
-          "text": "Review feature attribution and skew metrics in the console after sufficient prediction traffic has been logged.",
-          "sequence": 4,
-          "explanation": "Metrics only appear once the job has analyzed a window of sampled predictions."
+          "text": "`trainingPredictionSkewDetectionConfig` and `emailAlertConfig` cannot appear in the same monitoring job configuration.",
+          "explanation": "Skew detection and alert configurations are independent sections of the Model Monitoring job spec. They are designed to be used together and do not conflict."
         }
       ],
-      "tip": "Consider what artifact each subsequent step depends on.",
-      "explanation": "Continuous evaluation requires the model and explanations registered, an endpoint deployed, monitoring attached to that endpoint, and finally the analysis output reviewed once data has accumulated.",
-      "domain": "Monitoring AI Solutions",
-      "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "tip": "`samplingRate` represents a fraction of traffic. Think about what valid fraction values look like numerically.",
+      "explanation": "`samplingRate: 2.0` specifies 200% of requests, which is outside the valid range and causes the job creation request to fail.\n\n**Why it works:** Vertex AI Model Monitoring's `samplingRate` must be in the range (0.0, 1.0]. For example, `0.1` means 10% of prediction requests are sampled. A value of `2.0` is mathematically impossible as a sampling fraction and is rejected by the API immediately upon creation.\n\n**Why the others don't work:**\n- `bigquerySource` uses `bq://` prefix: `bq://` is the documented and expected URI scheme for BigQuery references in Vertex AI Model Monitoring.\n- `skewThresholds` must use absolute counts: Floating-point thresholds representing statistical distances are the correct format.\n- `skewDetectionConfig` and `emailAlertConfig` cannot coexist: These two blocks are complementary and standard to use together."
     },
     {
       "id": "PMLE-2025-0249",
@@ -11945,66 +11771,45 @@
     },
     {
       "id": "PMLE-2025-0256",
-      "type": "matching",
-      "docs": "https://cloud.google.com/vertex-ai/docs/model-monitoring/overview",
+      "type": "single-choice",
       "format": "text",
-      "services": [
-        "Vertex AI Model Monitoring",
-        "Explainable AI"
-      ],
+      "difficulty": 2,
+      "domain": "Monitoring AI Solutions",
       "skills": [
         "6.2.3: Monitoring for feature attribution drift."
       ],
-      "question": "Match each observed condition to the type of monitoring most directly designed to detect it.",
-      "slots": [
-        {
-          "id": "s1",
-          "label": "Live feature distributions diverge from training data",
-          "correctChoiceId": "c1"
-        },
-        {
-          "id": "s2",
-          "label": "The relative influence of features on predictions changes over time",
-          "correctChoiceId": "c2"
-        },
-        {
-          "id": "s3",
-          "label": "Live feature distributions diverge from a recent production window",
-          "correctChoiceId": "c3"
-        },
-        {
-          "id": "s4",
-          "label": "Per-instance reasons for a single prediction are required for audit",
-          "correctChoiceId": "c4"
-        }
+      "services": [
+        "Vertex AI",
+        "Vertex Explainable AI"
       ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/model-monitoring/overview",
+      "lastReviewed": "2026-04-29",
+      "question": "An MLOps team configures a Vertex AI Model Monitoring job to detect feature attribution drift on a deployed tabular classification model. The job creates successfully and runs for two weeks, but no drift alerts are ever triggered even when the team manually injects skewed traffic. The following snippet shows the relevant section of the monitoring job config.\n\n```json\n{\n  \"modelMonitoringObjectiveConfigs\": [\n    {\n      \"trainingDataset\": {\n        \"bigquerySource\": {\n          \"inputUri\": \"bq://my-project.datasets.churn_train\"\n        }\n      },\n      \"predictionDriftDetectionConfig\": {\n        \"attributionScoreSkewThresholds\": {\n          \"tenure\":          { \"value\": 0.05 },\n          \"monthly_charges\": { \"value\": 0.05 },\n          \"contract_type\":   { \"value\": 0.05 }\n        }\n      }\n    }\n  ],\n  \"loggingConfig\": {\n    \"randomSampleConfig\": {\n      \"samplingRate\": 0.5\n    }\n  }\n}\n```\n\nWhich missing or incorrect configuration will prevent feature attribution drift from being detected?",
       "choices": [
         {
           "id": "c1",
-          "text": "Training-serving skew detection",
-          "explanation": "Compares production inputs against the training distribution."
+          "text": "The `explanationConfig` block is absent; without it Vertex AI cannot compute feature attributions and `attributionScoreSkewThresholds` will never be evaluated.",
+          "sequence": 1,
+          "explanation": "Feature attribution drift monitoring depends on Vertex AI computing SHAP or integrated gradient attributions for each sampled prediction. The `explanationConfig` block specifies the explanation method and is required. Without it, the thresholds are defined but there are no attribution scores to compare them against."
         },
         {
           "id": "c2",
-          "text": "Feature attribution drift detection",
-          "explanation": "Tracks changes in attribution magnitudes over time."
+          "text": "`attributionScoreSkewThresholds` values of `0.05` are too low and cause the monitoring job to suppress all alerts below the noise floor.",
+          "explanation": "A threshold of `0.05` is a reasonable and commonly used value for SHAP-based attribution drift. Low thresholds make the detector more sensitive, not silent."
         },
         {
           "id": "c3",
-          "text": "Prediction drift detection",
-          "explanation": "Compares newer production data to earlier production data."
+          "text": "`samplingRate: 0.5` causes too many requests to be sampled, which overwhelms the attribution computation pipeline and silences alerts.",
+          "explanation": "`samplingRate: 0.5` means 50% of requests are sampled, which is within the valid range. Higher sampling rates provide more data for drift detection and do not silence alerts."
         },
         {
           "id": "c4",
-          "text": "Online explanations from Explainable AI",
-          "explanation": "Returns per-instance feature attributions for individual predictions."
+          "text": "`bigquerySource` cannot be used as the training dataset reference for attribution drift monitoring; a Cloud Storage URI is required instead.",
+          "explanation": "Vertex AI Model Monitoring supports BigQuery as a training dataset source for all drift monitoring configurations including attribution-based drift."
         }
       ],
-      "tip": "Distinguish between input distribution shifts, importance shifts, and per-instance reasoning.",
-      "explanation": "Each observation aligns with a distinct Vertex AI capability designed for that signal.",
-      "domain": "Monitoring AI Solutions",
-      "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "tip": "Feature attribution drift monitoring requires Vertex AI to compute attribution scores for predictions. Consider what configuration tells Vertex AI how to generate those scores.",
+      "explanation": "The monitoring job lacks an `explanationConfig` block, which is required for Vertex AI to compute feature attributions before evaluating drift thresholds.\n\n**Why it works:** Vertex AI Model Monitoring computes feature attribution scores by running the Explainable AI pipeline on sampled predictions. The `explanationConfig` specifies the method (sampled Shapley, integrated gradients, etc.) and the metadata needed to run it. Without this block, Vertex AI has no instructions for generating attributions, so `attributionScoreSkewThresholds` are never evaluated and no alerts fire.\n\n**Why the others don't work:**\n- Threshold values of `0.05` suppress alerts: Low threshold values make the detector more sensitive, not silent.\n- `samplingRate: 0.5` overwhelms the pipeline: `0.5` is a valid moderate sampling rate. Vertex AI handles attribution computation at scale.\n- `bigquerySource` cannot be used: BigQuery is a supported training data source for all types of Vertex AI Model Monitoring drift detection."
     },
     {
       "id": "PMLE-2025-0257",
@@ -12143,46 +11948,42 @@
     },
     {
       "id": "PMLE-2025-0260",
-      "type": "ordering",
-      "docs": "https://cloud.google.com/vertex-ai/docs/pipelines/introduction",
+      "type": "single-choice",
       "format": "text",
+      "docs": "https://cloud.google.com/vertex-ai/docs/model-evaluation/model-evaluation-overview",
       "services": [
-        "Vertex AI Pipelines",
-        "BigQuery",
-        "Vertex AI Model Registry"
+        "Vertex AI",
+        "Cloud Monitoring"
       ],
       "skills": [
         "6.2.4: Monitoring model performance against baselines, simpler models, and across the time dimension."
       ],
-      "question": "The team is establishing a recurring benchmark that compares a candidate model against a simpler baseline on a fixed holdout set, with results tracked over time.\n\nArrange the following steps in the correct order.",
+      "question": "An MLOps engineer is configuring a Vertex AI batch evaluation job to compare a candidate binary classification model against a baseline. They construct the evaluation configuration and submit the job as shown below.\n\n```python\nfrom google.cloud import aiplatform\n\naiplatform.init(project=\"my-project\", location=\"us-central1\")\n\neval_config = {\n    \"prediction_format\": \"csv\",\n    \"ground_truth_gcs_source\": {\n        \"uris\": [\"gs://my-bucket/holdout/labels.jsonl\"]\n    },\n    \"metrics\": [\"auPrc\", \"auRoc\", \"rmse\"],\n    \"model_names\": [\n        \"projects/my-project/locations/us-central1/models/candidate@1\",\n        \"projects/my-project/locations/us-central1/models/baseline@1\",\n    ],\n}\n\njob = aiplatform.ModelEvaluationJob.create(\n    evaluation_config=eval_config,\n    pipeline_root=\"gs://my-bucket/eval-pipeline-root/\",\n)\n```\n\nWhich configuration value in `eval_config` is incorrect for a Vertex AI batch evaluation job?",
       "choices": [
         {
           "id": "c1",
-          "text": "Curate and freeze a shared holdout dataset stored in BigQuery to act as the evaluation reference.",
+          "text": "`\"prediction_format\": \"csv\"` is invalid - Vertex AI Model Evaluation requires predictions and ground truth to be in JSON Lines (`\"jsonl\"`) format, not CSV.",
           "sequence": 1,
-          "explanation": "A stable holdout must exist before any comparable scoring can take place."
+          "explanation": "Vertex AI batch evaluation jobs require ground truth and prediction files in JSON Lines format. Setting `prediction_format` to `\"csv\"` is unsupported and causes the evaluation job to fail when it attempts to parse the input files."
         },
         {
           "id": "c2",
-          "text": "Score both the candidate model and the simpler baseline on the holdout using the Vertex AI model evaluation component.",
-          "sequence": 2,
-          "explanation": "Both models need to be evaluated on the same dataset to produce comparable metrics."
+          "text": "`\"rmse\"` is included in the metrics list, but RMSE is a regression metric and is not valid for a binary classification evaluation job.",
+          "explanation": "Including `rmse` alongside classification metrics is a logical error, but it is not the structural issue that will cause the job itself to fail at submission or ingestion time. The unsupported format value is the primary failure point."
         },
         {
           "id": "c3",
-          "text": "Append timestamped evaluation metrics for both models to a shared BigQuery results table.",
-          "sequence": 3,
-          "explanation": "Persisting results creates the historical record used for time-dimension analysis."
+          "text": "The `ground_truth_gcs_source` URI points to a `.jsonl` file, but Vertex AI evaluation requires ground truth to be stored in BigQuery, not Cloud Storage.",
+          "explanation": "Vertex AI Model Evaluation supports providing ground truth via Cloud Storage URIs. A `.jsonl` file in GCS is a valid and supported input format."
         },
         {
           "id": "c4",
-          "text": "Review the evolving metrics in a Looker Studio dashboard during the monthly review meeting.",
-          "sequence": 4,
-          "explanation": "Dashboards consume the accumulated history once enough runs exist."
+          "text": "Specifying two model names in `model_names` is not supported - Vertex AI Model Evaluation can only evaluate a single model per job submission.",
+          "explanation": "Vertex AI Model Evaluation supports specifying multiple models in a single evaluation job for comparative evaluation against a baseline. Providing two model names is a supported and intended use of the `model_names` field."
         }
       ],
-      "tip": "Each step depends on the artifact produced by the one before.",
-      "explanation": "A frozen holdout, paired evaluation runs, persisted timestamped metrics, and a dashboard form the standard longitudinal benchmarking flow.",
+      "tip": "Cloud evaluation services often impose strict requirements on input file formats - verify that the format value matches exactly what the service documentation specifies as supported.",
+      "explanation": "Setting `\"prediction_format\": \"csv\"` is the incorrect configuration value for a Vertex AI Model Evaluation job.\n\n**Why it works:** Vertex AI batch evaluation requires prediction and ground truth files to be in JSON Lines format (`jsonl`). The evaluation pipeline reads and parses these files using a jsonl reader. Specifying `\"csv\"` as the `prediction_format` provides an unsupported value that the job cannot process, causing it to fail during the data ingestion phase before any metrics are computed.\n\n**Why the others don't work:**\n- `rmse` in the metrics list: Including a regression metric in a classification evaluation is a logical error, but the job fails on the format error first.\n- Ground truth must be in BigQuery: Vertex AI Model Evaluation supports GCS URIs for ground truth files. The `.jsonl` extension and GCS path are both valid.\n- Two models in `model_names`: Comparative evaluation with a candidate and a baseline model is an explicitly supported pattern. The `model_names` field accepts a list.",
       "domain": "Monitoring AI Solutions",
       "difficulty": 2,
       "lastReviewed": "2026-04-29"
