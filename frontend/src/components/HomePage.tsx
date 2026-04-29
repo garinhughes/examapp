@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useExam } from '@/exam/ExamContext'
 import { useNavigate } from 'react-router-dom'
 import {
   BookOpen, Terminal, CheckCircle2, ChevronLeft, ChevronRight,
@@ -151,6 +152,8 @@ export function HomePage() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [autoplay.current])
   const [selectedSlide, setSelectedSlide] = useState(0)
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null)
+  const { dark } = useExam()
+  const logoSrc = dark ? "/logo_light.png" : "/logo_dark.png"
 
   const openLightbox = useCallback((src: string, alt: string) => {
     setLightbox({ src, alt })
@@ -199,9 +202,9 @@ export function HomePage() {
       {/* ── Hero ──────────────────────────────────────────────── */}
       <section className="text-center -mt-4 pb-4">
         <div className="flex items-center justify-center gap-3 mb-3">
-          <img src="/favicon.png" alt="certshack" className="w-12 h-12 rounded-xl" />
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-primary">
-            certshack
+          <img src={logoSrc} alt="certshack" className="h-12 w-auto" />
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+            <span className="text-foreground">cert</span><span className="text-orange-500">shack</span>
           </h1>
         </div>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">

@@ -114,11 +114,23 @@ export default function CertificatesTab() {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
-        onclone: (clonedDoc) => {
+        onclone: async (clonedDoc) => {
           // html2canvas can't parse oklch() used by Tailwind CSS variables.
-          // The certificate uses only inline hex styles so removing all
-          // stylesheets from the clone has no visual effect.
           clonedDoc.querySelectorAll('link[rel="stylesheet"], style').forEach((el) => el.remove())
+          // Pre-fetch images as base64 so html2canvas can render them cross-origin
+          const imgs = clonedDoc.querySelectorAll('img')
+          await Promise.all(Array.from(imgs).map(async (img) => {
+            try {
+              const res = await fetch(img.src)
+              const blob = await res.blob()
+              const b64 = await new Promise<string>((resolve) => {
+                const reader = new FileReader()
+                reader.onload = () => resolve(reader.result as string)
+                reader.readAsDataURL(blob)
+              })
+              img.src = b64
+            } catch {}
+          }))
         },
       })
       const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })

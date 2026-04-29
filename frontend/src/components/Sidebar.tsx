@@ -24,6 +24,7 @@ import { useBasket } from "@/basket/BasketContext";
 import { useFeedback } from "@/feedback/FeedbackContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useExam } from "@/exam/ExamContext";
 import type { AuthUser } from "@/auth/AuthContext";
 
 const navItems = [
@@ -62,6 +63,8 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
   const navigate = useNavigate();
   const { itemCount: basketCount } = useBasket();
   const { badgeCount: feedbackCount } = useFeedback();
+  const { dark } = useExam();
+  const logoSrc = dark ? "/logo_light.png" : "/logo_dark.png";
 
   const handleNav = (key: string, href: string) => {
     setMobileOpen(false);
@@ -78,12 +81,12 @@ export function Sidebar({ className, currentRoute, onNavigate, logout, login, us
       <div className="h-16 flex items-center border-b border-sidebar-border overflow-hidden shrink-0">
         {!isMobile && collapsed ? (
           <div className="flex items-center justify-center w-14">
-            <img src="/favicon.png" alt="certshack" className="h-7 w-7 object-contain rounded-lg bg-white" />
+            <img src={logoSrc} alt="certshack" className="h-7 w-7 object-contain rounded-lg" />
           </div>
         ) : (
           <span className="px-6 text-xl font-bold tracking-tight text-sidebar-foreground flex items-center gap-2 whitespace-nowrap">
-            <img src="/favicon.png" alt="certshack" className="h-7 w-7 object-contain rounded-lg bg-white" />
-            certshack
+            <img src={logoSrc} alt="certshack" className="h-7 w-7 object-contain rounded-lg" />
+            <span><span>cert</span><span className="text-orange-500">shack</span></span>
           </span>
         )}
       </div>

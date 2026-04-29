@@ -1,6 +1,6 @@
 import React from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
-import certshackLogo from '@/assets/certshack_logo.png'
+import certshackLogo from '@/assets/logo_light.png'
 import type { PassedExam } from '../gamification/types'
 
 export interface CertOptions {
@@ -90,11 +90,11 @@ const CertificatePreview = React.forwardRef<HTMLDivElement, CertificatePreviewPr
           ))}
         </div>
 
-        {/* Orange header */}
+        {/* Dark header */}
         <div
           style={{
             height: 60,
-            backgroundColor: '#F97316',
+            backgroundColor: '#1a1a1a',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -104,14 +104,14 @@ const CertificatePreview = React.forwardRef<HTMLDivElement, CertificatePreviewPr
             flexShrink: 0,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, height: 40 }}>
             <img
               src={certshackLogo}
               alt="certshack"
-              style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 6, backgroundColor: '#FFFFFF', padding: 2 }}
+              style={{ height: 40, width: 'auto', objectFit: 'contain', display: 'block' }}
             />
-            <div style={{ color: '#FFFFFF', fontSize: 28, fontWeight: 'bold', letterSpacing: 1 }}>
-              certshack
+            <div style={{ fontSize: 28, fontWeight: 'bold', letterSpacing: 1, lineHeight: '40px', height: 40, display: 'flex', alignItems: 'center' }}>
+              <span style={{ color: '#FFFFFF' }}>cert</span><span style={{ color: '#F97316' }}>shack</span>
             </div>
           </div>
           {/* Dot grid accent */}

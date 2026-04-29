@@ -13,7 +13,7 @@ const BACKEND = process.env.BACKEND_ORIGIN || 'https://api.certshack.com'
 
 // ── Shared HTML helpers ────────────────────────────────────────────────────
 
-const LOGO_URL = LOGO_BASE64
+const LOGO_URL = `${FRONTEND}/logo_light.png`
 const BRAND = '#FF6B35'
 
 /** Build a signed, one-click unsubscribe token (JWT). */
@@ -28,7 +28,7 @@ async function buildUnsubToken(userId: string): Promise<string> {
 
 /**
  * Render a branded HTML email.
- * - `title` goes in the orange header band.
+ * - `title` goes in the header band.
  * - `body` is raw HTML injected into the white content area.
  * - `userId` is used to generate the unsubscribe link (transactional => pass undefined).
  */
@@ -59,14 +59,14 @@ async function renderEmail(opts: {
       <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;max-width:600px;">
         <!-- Header -->
         <tr>
-          <td style="background:${BRAND};padding:24px 32px;">
+          <td style="background:#1a1a1a;padding:20px 32px;">
             <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
               <tr>
                 <td style="padding:0 10px 0 0;vertical-align:middle;">
-                  <img src="${LOGO_URL}" alt="" height="36" width="36" style="display:block;border-radius:6px;">
+                  <img src="${LOGO_URL}" alt="" height="36" width="28" style="display:block;">
                 </td>
                 <td style="vertical-align:middle;">
-                  <span style="font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:0.5px;font-family:Arial,sans-serif;">certshack</span>
+                  <span style="font-size:22px;font-weight:bold;letter-spacing:0.5px;font-family:Arial,sans-serif;"><span style="color:#ffffff;">cert</span><span style="color:#F97316;">shack</span></span>
                 </td>
               </tr>
             </table>
@@ -74,8 +74,8 @@ async function renderEmail(opts: {
         </tr>
         <!-- Heading band -->
         <tr>
-          <td style="background:#222;padding:16px 32px;">
-            <h1 style="margin:0;font-size:20px;color:#fff;">${opts.title}</h1>
+          <td style="background:#f0f0f0;padding:16px 32px;border-bottom:1px solid #ddd;">
+            <h1 style="margin:0;font-size:20px;color:#1a1a1a;">${opts.title}</h1>
           </td>
         </tr>
         <!-- Body -->
