@@ -35899,7 +35899,7 @@
       "s3VersionId": null,
       "attemptSchemaVersion": 1,
       "startedAt": "2026-04-30T10:25:41.553Z",
-      "updatedAt": "2026-04-30T11:27:30.209Z",
+      "updatedAt": "2026-04-30T13:41:12.010Z",
       "finishedAt": null,
       "status": "abandoned",
       "score": null,
@@ -36002,9 +36002,9 @@
       "s3VersionId": null,
       "attemptSchemaVersion": 1,
       "startedAt": "2026-04-30T11:28:02.848Z",
-      "updatedAt": "2026-04-30T11:31:17.150Z",
+      "updatedAt": "2026-04-30T11:44:45.031Z",
       "finishedAt": null,
-      "status": "in-progress",
+      "status": "abandoned",
       "score": null,
       "answers": [
         {
@@ -36316,7 +36316,8 @@
       "durationMinutes": 90,
       "numQuestions": 4,
       "examMode": "casual",
-      "revealAnswers": "immediately"
+      "revealAnswers": "immediately",
+      "abandonedAt": "2026-04-30T11:44:45.031Z"
     }
   ]
 }

@@ -181,6 +181,7 @@
     },
     {
       "id": "PT0-003-0005",
+      "diagram": "diagrams/comptia/PT0-003/PentestEngagementPhases.mmd",
       "type": "ordering",
       "services": [
         "Windows"
@@ -2544,6 +2545,7 @@
     },
     {
       "id": "PT0-003-0055",
+      "diagram": "diagrams/comptia/PT0-003/VulnDiscoveryWorkflow.mmd",
       "type": "ordering",
       "format": "text",
       "services": [
@@ -3450,6 +3452,7 @@
     },
     {
       "id": "PT0-003-0074",
+      "diagram": "diagrams/comptia/PT0-003/SqlmapExploitChain.mmd",
       "type": "ordering",
       "format": "text",
       "services": [

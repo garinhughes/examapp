@@ -5156,6 +5156,7 @@
     },
     {
       "id": "EX200-0112",
+      "diagram": "diagrams/redhat/EX200/SystemdServiceLifecycle.mmd",
       "type": "matching",
       "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/using_systemd_unit_files_to_customize_and_optimize_your_system",
       "services": [
@@ -6736,6 +6737,7 @@
     },
     {
       "id": "EX200-0146",
+      "diagram": "diagrams/redhat/EX200/NfsMountArchitecture.mmd",
       "type": "single-choice",
       "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/configuring_and_using_network_file_services",
       "format": "text",
@@ -11367,6 +11369,7 @@
     },
     {
       "id": "EX200-0245",
+      "diagram": "diagrams/redhat/EX200/SelinuxHttpdPolicy.mmd",
       "type": "single-choice",
       "docs": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/using_selinux",
       "format": "text",

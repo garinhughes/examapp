@@ -2291,6 +2291,7 @@
     },
     {
       "id": "CS0-003-0048",
+      "diagram": "diagrams/comptia/CS0-003/IoCWorkflow.mmd",
       "type": "ordering",
       "format": "text",
       "services": [
@@ -2335,6 +2336,7 @@
     },
     {
       "id": "CS0-003-0049",
+      "diagram": "diagrams/comptia/CS0-003/PhishingTriagePlaybook.mmd",
       "type": "single-choice",
       "docs": "https://docs.splunk.com/Documentation/SOARonprem",
       "format": "text",
@@ -2635,6 +2637,7 @@
     },
     {
       "id": "CS0-003-0056",
+      "diagram": "diagrams/comptia/CS0-003/SiemEdrToolIntegration.mmd",
       "type": "multiple-choice",
       "format": "text",
       "services": [
