@@ -226,9 +226,9 @@ function PlanCard({ plan, currentTier, products, discountActive, onBuy, inBasket
       {/* CTA */}
       {isFree ? (
         <div className="mt-auto">
-          {isCurrent ? (
+          {isCurrent || currentTier === 'pro' || currentTier === 'pro_plus' ? (
             <span className="inline-flex w-full justify-center items-center py-2.5 rounded-lg text-sm font-semibold text-muted-foreground bg-muted">
-              Your current plan
+              {isCurrent ? 'Your current plan' : 'Already subscribed'}
             </span>
           ) : (
             <button
@@ -291,7 +291,12 @@ export default function PricingPage() {
     const ok = basket.add(product)
     if (ok) {
       setActionError(null)
-      showToast(`${product.label} added to basket`, 'info')
+      // Paid users upgrading go straight to basket — no need for the toast detour
+      if (tier === 'pro' || tier === 'pro_plus') {
+        navigate('/basket')
+      } else {
+        showToast(`${product.label} added to basket`, 'info')
+      }
     } else {
       setActionError(basket.lastError)
     }
