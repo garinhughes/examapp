@@ -1408,7 +1408,8 @@
       "explanation": "Unlabeled data has no associated target categories, making it suitable for unsupervised methods such as clustering.\n\n**Why it works:** Without labels, the model cannot learn input-to-target mappings, but it can discover structure or themes in the data.\n\n**Why the others don't work:**\n- Subject lines as labels: subject lines are not consistent thematic categories.\n- Reinforcement: no reward signal exists.\n- Refusing entirely: unlabeled data has many valid use cases.",
       "domain": "Fundamentals of gen AI",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/GAIL-2025/GcsVertexUnsupervisedClustering.mmd"
     },
     {
       "id": "GAIL-2025-0031",
@@ -4526,7 +4527,8 @@
       "explanation": "Google Cloud provides a pre-built AI API for each common modality and operation, simplifying agent integration.",
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/GAIL-2025/AiApiInputRouting.mmd"
     },
     {
       "id": "GAIL-2025-0097",

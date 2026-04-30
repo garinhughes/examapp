@@ -221,7 +221,7 @@
         }
       ],
       "tip": "Consider which step minimizes ongoing risk while preserving the information needed for a complete investigation, then work through the logical dependencies between steps.",
-      "explanation": "The correct sequence is: disable the key → investigate via CloudTrail → remediate affected resources → delete and replace the key.\n\nDisabling first stops active unauthorized use without losing the key ID for forensic correlation. CloudTrail investigation precedes remediation because you cannot know what to remediate until you understand the full scope. Remediating affected resources before issuing a new key ensures no backdoors remain active when the user returns to service. Deleting the old key and creating a replacement is the final restoration step.\n\n**Implementation:** `aws iam update-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --status Inactive --user-name username` → `aws cloudtrail lookup-events --lookup-attributes AttributeKey=AccessKeyId,AttributeValue=AKIAIOSFODNN7EXAMPLE` → remediate findings → `aws iam delete-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --user-name username` + `aws iam create-access-key --user-name username`.",
+      "explanation": "The correct sequence is: disable the key \u2192 investigate via CloudTrail \u2192 remediate affected resources \u2192 delete and replace the key.\n\nDisabling first stops active unauthorized use without losing the key ID for forensic correlation. CloudTrail investigation precedes remediation because you cannot know what to remediate until you understand the full scope. Remediating affected resources before issuing a new key ensures no backdoors remain active when the user returns to service. Deleting the old key and creating a replacement is the final restoration step.\n\n**Implementation:** `aws iam update-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --status Inactive --user-name username` \u2192 `aws cloudtrail lookup-events --lookup-attributes AttributeKey=AccessKeyId,AttributeValue=AKIAIOSFODNN7EXAMPLE` \u2192 remediate findings \u2192 `aws iam delete-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --user-name username` + `aws iam create-access-key --user-name username`.",
       "domain": "Design Secure Architectures",
       "difficulty": 3,
       "lastReviewed": "2026-03-30"
@@ -266,7 +266,8 @@
       "explanation": "The SNS + SQS fan-out pattern is the canonical AWS architecture for delivering the same event to multiple independent downstream services. SNS publishes the message once and simultaneously delivers it to all subscribed SQS queues. Each queue acts as an independent, durable buffer.\n\n**Why it works:** SNS guarantees delivery to each subscribed SQS queue. Messages persist in each queue independently - during the inventory service's 10-minute maintenance window, messages accumulate in its queue and are processed automatically when the service recovers, with no message loss and no impact on the shipping or fraud service queues.\n\n**Why the others fail:**\n- Shared SQS standard queue with competing consumers: Each SQS message is delivered to exactly one consumer. All three services compete for the same messages, so each order event reaches only one service.\n- EventBridge rules directly to Lambda: Lambda async retry covers only short failure windows (2 retries over a few minutes). A 10-minute maintenance window exceeds built-in retry behavior without an SQS buffer to retain messages during the outage.\n- SQS FIFO with message group IDs per service: Message group IDs manage ordering within a single queue for one consumer - they do not enable multiple independent consumers to each receive the same message.\n\n**Implementation:** Console > SNS > Create topic > Add subscriptions. `aws sns subscribe --topic-arn <arn> --protocol sqs --notification-endpoint <queue-arn>` repeated for each downstream SQS queue.",
       "domain": "Design Resilient Architectures",
       "difficulty": 4,
-      "lastReviewed": "2026-03-30"
+      "lastReviewed": "2026-03-30",
+      "diagram": "diagrams/aws/SAA-C03/SnsSquFanOut.mmd"
     },
     {
       "id": "SAA-C03-0007",
@@ -1560,7 +1561,8 @@
       "explanation": "A Lambda resource-based policy is the correct mechanism for controlling who can invoke a function. By granting `lambda:InvokeFunction` only to the API Gateway service principal and scoping it to a specific source ARN, the policy ensures that no other service or IAM principal can trigger the function.\n\n**Why it works:** Lambda resource-based policies are evaluated whenever the function is invoked. Only callers explicitly permitted by the policy can invoke the function, regardless of how or where the invocation originates.\n\n**Why the others don't work:**\n- A permissions boundary controls outbound permissions for the execution role, not inbound invocation rights for the function itself.\n- AWS WAF operates at the HTTP layer of API Gateway and cannot block direct AWS API invocations that do not go through API Gateway.\n- A VPC configuration restricts network-layer access but does not prevent AWS API-plane invocations from authorized IAM principals.",
       "domain": "Design Secure Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-14"
+      "lastReviewed": "2026-04-14",
+      "diagram": "diagrams/aws/SAA-C03/ApiGatewayLambdaPermission.mmd"
     },
     {
       "id": "SAA-C03-0035",
@@ -2357,7 +2359,8 @@
       "explanation": "Volumetric DDoS attacks and application-layer exploits require different controls. AWS Shield Advanced addresses DDoS threats at layers 3 and 4, while AWS WAF addresses application-layer threats at layer 7. Both are required for comprehensive protection of the API.\n\n**Why it works:** Shield Advanced monitors for abnormal traffic volumes targeting the API Gateway endpoint and coordinates automatic mitigation. AWS WAF inspects each HTTP request against rules that block rate-based abuse, bots, and common exploits. Together they cover both threat categories.\n\n**Why the others don't work:**\n- GuardDuty is a threat detection service for account-level activity. Reactively modifying API Gateway resource policies based on its findings introduces latency and is not a supported real-time mitigation pattern.\n- Firewall Manager centralizes policy management but does not itself protect against DDoS or perform application-layer traffic inspection.\n- AWS Config is a configuration compliance service, not a threat prevention or traffic filtering service.",
       "domain": "Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-14"
+      "lastReviewed": "2026-04-14",
+      "diagram": "diagrams/aws/SAA-C03/ApiGatewayDdosProtection.mmd"
     },
     {
       "id": "SAA-C03-0052",
@@ -2555,7 +2558,8 @@
       "explanation": "AWS Direct Connect provides the dedicated private network path (addressing the 'no public internet' requirement), and a Site-to-Site VPN overlay adds IPsec encryption in transit (addressing the encryption requirement). Running a VPN over Direct Connect is the AWS-recommended architecture when both are needed.\n\n**Why it works:** Direct Connect ensures the physical path avoids the public internet. The Site-to-Site VPN creates an encrypted IPsec tunnel traveling within the Direct Connect connection, encrypting data end-to-end between the on-premises VPN device and the AWS virtual private gateway.\n\n**Why the others don't work:**\n- Transit Gateway inter-region peering is an AWS-to-AWS construct and cannot substitute for on-premises connectivity or add encryption to Direct Connect.\n- AWS Shield Advanced and VPC Flow Logs address threat protection and traffic visibility, not data-in-transit encryption for external connections.\n- AWS PrivateLink requires a pre-existing private connectivity mechanism for on-premises access and cannot replace the dedicated circuit provided by Direct Connect.",
       "domain": "Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-14"
+      "lastReviewed": "2026-04-14",
+      "diagram": "diagrams/aws/SAA-C03/DirectConnectVpnEncryption.mmd"
     },
     {
       "id": "SAA-C03-0056",
@@ -2896,7 +2900,8 @@
       "explanation": "Enabling EBS encryption by default at the AWS account level is the intended mechanism for this requirement. Once enabled for a region, all newly created EBS volumes and snapshots copied within that region are encrypted automatically using the specified KMS key, with no developer action required during volume creation.\n\n**Why it works:** The setting is a single toggle in the EC2 console or via the `EnableEbsEncryptionByDefault` API call, applied per region. It acts as a true preventive control that cannot be bypassed by developers on a per-volume basis, satisfying the operational efficiency and universal enforcement requirements.\n\n**Why the others don't work:**\n- IAM deny policy: Cannot inspect EBS-specific encryption attributes in a simple, universally applicable way. Requires maintenance across every principal that can create volumes and does not cover volumes created by AWS services acting on behalf of the account.\n- AWS Config with SSM remediation: A reactive approach that leaves a window of unencrypted exposure between volume creation and remediation. Operationally more complex than enabling the account-level default.\n- SCP on EBS encryption condition key: SCP condition-key enforcement for EBS encryption attributes is not straightforward and is a significantly more complex mechanism than the purpose-built account-level default setting.",
       "domain": "Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-14"
+      "lastReviewed": "2026-04-14",
+      "diagram": "diagrams/aws/SAA-C03/EbsEncryptionDefault.mmd"
     },
     {
       "id": "SAA-C03-0063",
@@ -3880,7 +3885,8 @@
       "domain": "Security",
       "difficulty": 3,
       "lastReviewed": "2026-04-14",
-      "selectCount": 2
+      "selectCount": 2,
+      "diagram": "diagrams/aws/SAA-C03/AcmCertificateRenewal.mmd"
     },
     {
       "id": "SAA-C03-0084",
@@ -4181,7 +4187,8 @@
       "explanation": "Containers provide process-level isolation with independent filesystems, letting each microservice carry its own runtime version. Deploying on Fargate means AWS manages the underlying host OS, patching, and infrastructure, directly addressing the team's limited operational capacity.\n\n**Why it works:** Each container image bundles the exact runtime (JDK version, Python version, Go binary) needed. ECS task definitions allow independent deployment -- updating the Python service does not redeploy the Java service. Fargate ensures no EC2 instance maintenance.\n\n**Why the others don't work:**\n- Option B: Lambda is not designed for continuously running services. Its 15-minute maximum invocation duration and event-driven model are mismatched to sustained traffic workloads.\n- Option C: One EC2 per service resolves dependency conflicts but reintroduces OS management per instance. Patch Manager reduces effort but does not eliminate it the way Fargate does.\n- Option D: Shared-instance co-location with virtual environments does not provide container-grade isolation and makes independent service deployments error-prone.",
       "domain": "Design Resilient Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/EcsFargateEcr.mmd"
     },
     {
       "id": "SAA-C03-0090",
@@ -4418,7 +4425,8 @@
       "explanation": "For global video delivery, S3 combined with CloudFront is the standard AWS pattern: S3 provides durable origin storage and CloudFront caches at 400+ edge locations, reducing origin load and egress cost. For shared POSIX filesystem access across ECS tasks, Amazon EFS is the appropriate choice because it scales automatically and supports concurrent mounts.\n\n**Why it works:** CloudFront cached edge delivery means most viewer requests are served from a nearby edge location, not the S3 origin, lowering latency and egress cost. EFS Elastic throughput mode grows with demand and `EFSVolumeConfiguration` in ECS task definitions mounts the filesystem to each task without manual provisioning.\n\n**Why the others don't work:**\n- Option C: S3 Transfer Acceleration accelerates uploads from clients to S3. For video download delivery, CloudFront is the correct caching and distribution layer.\n- Option D: EBS is a block device attached to a single instance. Sharing configuration across multiple hosts via scheduled DataSync does not provide real-time POSIX filesystem semantics.\n- Option E: AWS Transfer Family is designed for external file transfer workflows (SFTP batch transfers). It is not a shared filesystem for concurrent container workloads.",
       "domain": "Design Resilient Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/CloudFrontEfsStorage.mmd"
     },
     {
       "id": "SAA-C03-0095",

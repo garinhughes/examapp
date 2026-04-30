@@ -2793,7 +2793,8 @@
       "explanation": "When time and labeled data are scarce, pre-trained open-source models are the most practical source. They encode general language understanding from large-scale pretraining so only a small amount of domain-specific fine-tuning is needed. Amazon SageMaker JumpStart provides curated, ready-to-deploy pre-trained models that can be fine-tuned on SageMaker Training with minimal setup.\n\n**Why it works:** Pre-trained models transfer knowledge from massive unlabeled corpora, drastically reducing both the labeled data volume and the compute hours required to reach acceptable accuracy.\n\n**Why the others don't work:**\n- Training from scratch: demands large labeled datasets and long training runs, incompatible with a two-week timeline and limited data.\n- Rule-based keyword matching: not an ML model and does not generalize to nuanced or novel customer phrasing.\n- Third-party on-premises model: violates the requirement to avoid on-premises GPU capacity and adds unnecessary licensing overhead.",
       "domain": "Fundamentals of AI and ML",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/SageMakerJumpStart.mmd"
     },
     {
       "id": "AIF-C01-0062",
@@ -2988,7 +2989,8 @@
       "explanation": "Amazon SageMaker Feature Store addresses the problem of repeated, inconsistent feature engineering by providing a managed central store. It maintains an online store for real-time low-latency feature retrieval and an offline store for batch training queries, so features are defined once and reused by any team or model that needs them.\n\n**Why it works:** Feature Store decouples feature engineering from model training, enabling feature reuse, version control, and consistent definitions across an organization.\n\n**Why the others don't work:**\n- Data Wrangler: a data preparation and transformation UI that outputs datasets, not a shared feature repository with online serving.\n- SageMaker Pipelines: an orchestration service for ML workflows; S3 artifacts it produces are not a managed feature store with online and offline stores.\n- Model Monitor: a post-deployment monitoring service that detects drift; it does not store or serve features.",
       "domain": "Fundamentals of AI and ML",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/SageMakerFeatureStore.mmd"
     },
     {
       "id": "AIF-C01-0066",
@@ -3145,7 +3147,8 @@
       "explanation": "Model quality degradation caused by data drift is addressed in MLOps through two complementary practices: continuous monitoring to detect when drift occurs, and automated retraining pipelines to respond to it. Together they form a feedback loop that keeps models production-ready without requiring manual intervention.\n\n**Why the others don't work:**\n- Scaling endpoint compute: improves latency, not prediction accuracy; irrelevant to drift-induced quality loss.\n- Manual retraining on observation: slow, inconsistent, and not scalable; does not constitute an automated MLOps practice.\n- Switching algorithms: model architecture does not address the root cause of staleness from outdated training data.",
       "domain": "Fundamentals of AI and ML",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/SageMakerMlOps.mmd"
     },
     {
       "id": "AIF-C01-0069",
@@ -3350,7 +3353,8 @@
       "explanation": "Each architecture or technique has a defining characteristic: transformer-based LLMs rely on self-attention over token sequences for language generation; diffusion models learn by reversing a noise process and are widely used for image synthesis; multi-modal models operate across more than one input or output type; and prompt engineering steers model behavior through carefully constructed inputs rather than weight updates.",
       "domain": "Fundamentals of Generative AI",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/BedrockSageMakerPaths.mmd"
     },
     {
       "id": "AIF-C01-0073",
@@ -3449,7 +3453,8 @@
       "explanation": "The standard foundation model lifecycle follows this sequence: data selection establishes the training corpus; model selection defines the architecture based on that data; pre-training builds general representations; fine-tuning specializes the model for the target application; evaluation validates quality and safety; and deployment releases the model while capturing feedback to restart the cycle. Each stage produces an artifact or decision that the next stage depends on.",
       "domain": "Fundamentals of Generative AI",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/FoundationModelLifecycle.mmd"
     },
     {
       "id": "AIF-C01-0075",

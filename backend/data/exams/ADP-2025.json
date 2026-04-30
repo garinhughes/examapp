@@ -90,7 +90,8 @@
       "explanation": "ETLT combines a pre-load transformation (often for compliance, like tokenization) with additional post-load transformations in the warehouse.\n\n**Why it works:** Sensitive fields are handled before landing, while bulk reshaping happens cheaply in BigQuery.\n\n**Why the others don't work:**\n- ELT: defers all transformations until after load, breaking the PII requirement.\n- ETL: completes all transformations before load, with no post-load step.\n- CDC: a replication pattern, not a transformation methodology.",
       "domain": "Data Preparation and Ingestion",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/ADP-2025/PubSubDataflowBigQuery.mmd"
     },
     {
       "id": "ADP-2025-0003",
@@ -326,7 +327,8 @@
       "explanation": "Storage Transfer Service supports on-premises file system sources via a software agent. A managed transfer job coordinates the agents, provides retries, and surfaces transfer metrics.\n\n**Why it works:** Combined, the agent and job give a managed, observable bulk transfer over the Interconnect.\n\n**Why the others don't work:**\n- Transfer Appliance: overkill for 30 TB on 10 Gbps.\n- Manual gsutil: lacks coordination and observability.\n- Datastream: a CDC service for databases, not NFS shares.",
       "domain": "Data Preparation and Ingestion",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/ADP-2025/OnPremToGcsTransfer.mmd"
     },
     {
       "id": "ADP-2025-0008",
@@ -379,7 +381,8 @@
       "explanation": "Each tool has a primary use case: Storage Transfer Service for online object transfers, Transfer Appliance for offline bulk migration, and BigQuery Data Transfer Service for scheduled loads into BigQuery.",
       "domain": "Data Preparation and Ingestion",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/ADP-2025/TransferToolMatching.mmd"
     },
     {
       "id": "ADP-2025-0009",
@@ -421,7 +424,8 @@
       "explanation": "Dataplex provides built-in data quality scans that run user-defined rules against tables registered in a lake and publish the outcomes for monitoring and alerting.\n\n**Why it works:** Rule-based scans match the team's stated need for declarative checks with observable results.\n\n**Why the others don't work:**\n- Cloud DLP: focuses on sensitive data discovery, not quality dimensions.\n- Row-level security: an access control mechanism.\n- Cloud Logging filters: cannot evaluate column values.",
       "domain": "Data Preparation and Ingestion",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/ADP-2025/DataplexBigQueryQuality.mmd"
     },
     {
       "id": "ADP-2025-0010",
@@ -1074,7 +1078,8 @@
       "explanation": "Classifying data by structure is the first step in choosing storage. PDFs are binary blobs (unstructured), normalized sales tables are relational (structured), and variable JSON is semi-structured.\n\n**Why it works:** Cloud Storage is purpose-built for arbitrary objects, and Cloud SQL is the managed relational option for transactional schemas.\n\n**Why the others don't work:**\n- PDFs as STRING columns: loses native handling and bloats analytical tables.\n- Variable JSON in fixed Cloud SQL schema: ignores its semi-structured nature.\n- Sales tables as objects: object storage cannot enforce relational constraints or transactions.",
       "domain": "Data Preparation and Ingestion",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/ADP-2025/StorageSelectionMatching.mmd"
     },
     {
       "id": "ADP-2025-0024",
@@ -1140,7 +1145,8 @@
       "explanation": "Each Google Cloud storage service is optimized for a particular workload. Global transactional SQL goes to Spanner, real-time mobile data to Firestore, analytical SQL to BigQuery, and cold archives to Cloud Storage Archive class.",
       "domain": "Data Preparation and Ingestion",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/ADP-2025/DatabaseServiceMatching.mmd"
     },
     {
       "id": "ADP-2025-0025",
@@ -1859,7 +1865,8 @@
       "explanation": "Effective analysis starts with the question, moves through data discovery and computation, and ends with communication.",
       "domain": "Data Analysis and Presentation",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/ADP-2025/BigQueryLookerStudioWorkflow.mmd"
     },
     {
       "id": "ADP-2025-0041",
@@ -2613,7 +2620,8 @@
       "explanation": "Each workload has a clearly best-suited Google Cloud service: BigQuery ML for SQL forecasting, AutoML for image classification, Document AI for prebuilt extraction, and custom training for researcher control.",
       "domain": "Data Analysis and Presentation",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/ADP-2025/MlServiceMatching.mmd"
     },
     {
       "id": "ADP-2025-0057",

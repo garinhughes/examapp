@@ -420,7 +420,8 @@
       "explanation": "Each Azure Machine Learning datastore type maps to distinct storage capabilities: Azure Blob is best for unstructured object storage (model files, outputs, logs); Azure Data Lake Storage Gen2 is designed for large-scale analytics datasets with hierarchical access control; and Azure Files provides SMB-based shared file system access for multi-machine and hybrid scenarios.",
       "domain": "Design and implement an MLOps infrastructure",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/AmlDatastoreTypes.mmd"
     },
     {
       "id": "AI-300-0009",
@@ -1088,7 +1089,8 @@
       "explanation": "Attaching a private Azure Container Registry ensures images land in the organization's registry, and enabling image pre-building at registration time ensures they are ready before job submission.\n\n**Why it works:** These two settings work together: the ACR attachment routes image pushes to the private registry, and the pre-build setting triggers builds immediately on registration rather than lazily at job start.\n\n**Why the others don't work:**\n- Cluster startup scripts: not version-managed by the workspace environment system.\n- Blob Storage YAML URLs: bypasses the workspace environment registry and versioning.\n- Curated environments only: insufficient for custom organizational packages and private registry requirements.",
       "domain": "Design and implement an MLOps infrastructure",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/AmlAcrEnvironments.mmd"
     },
     {
       "id": "AI-300-0024",
@@ -1364,7 +1366,8 @@
       "explanation": "Azure Machine Learning registries are the correct resource for sharing assets across workspaces in different subscriptions. They provide a centralized catalog with versioning and lineage that any connected workspace can access.\n\n**Why it works:** Registries allow assets to be published once and referenced by name and version from multiple workspaces, supporting promotion workflows from development to staging to production.\n\n**Why the others don't work:**\n- Linked services: for external data stores, not cross-workspace asset sharing.\n- Azure Artifacts: for software packages, not Azure Machine Learning assets.\n- Shared Blob Storage: no versioning or lineage integration; requires manual re-registration in each workspace.",
       "domain": "Design and implement an MLOps infrastructure",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/AmlCrossWorkspaceRegistry.mmd"
     },
     {
       "id": "AI-300-0030",
@@ -1699,7 +1702,8 @@
       "explanation": "The correct sequence is: create the app registration, add the federated credential, assign the workspace role, then configure the workflow. Each step depends on the one before - you cannot add a federated credential without an app registration, cannot assign a role without a service principal, and cannot write a correct workflow without the IDs from the previous steps.",
       "domain": "Design and implement an MLOps infrastructure",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/GitHubEntraAmlFederation.mmd"
     },
     {
       "id": "AI-300-0037",
@@ -1942,7 +1946,8 @@
       "explanation": "The correct combination is a push trigger on main (which fires after a merge is complete), OIDC-based authentication via azure/login, and `az deployment group create` to apply the Bicep template. This is fully automated, secretless, and uses the existing template.\n\n**Why it works:** The push trigger on main corresponds exactly to the moment a branch is merged. OIDC authentication with azure/login uses workload identity federation so no client secret is stored. The Azure CLI deployment command submits the Bicep file directly.\n\n**Why the others don't work:**\n- A pull_request trigger fires before the merge and would provision resources prematurely.\n- A workflow_dispatch trigger requires manual action, defeating automation.\n- Calling `az ml workspace create` bypasses the existing Bicep template.",
       "domain": "Design and implement an MLOps infrastructure",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/GitHubBicepAmlProvisioning.mmd"
     },
     {
       "id": "AI-300-0042",
@@ -5090,7 +5095,8 @@
       "explanation": "Each symptom maps to a distinct diagnostic layer. Startup failures (failed state at creation) are revealed by container logs that capture init() output before any requests are accepted. Incorrect predictions require examining actual input-output pairs via data collection. Latency spikes without errors point to resource saturation visible in CPU and queue metrics. HTTP 401 errors are access control failures diagnosed by reviewing the endpoint's authentication configuration and the caller's credentials.",
       "domain": "Implement machine learning model lifecycle and operations",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/OnlineEndpointDiagnostics.mmd"
     },
     {
       "id": "AI-300-0109",
@@ -5132,7 +5138,8 @@
       "explanation": "The correct command is `az ml online-endpoint update` with `--traffic \"stable=90 canary=10\"`. This sets the live traffic split at the endpoint level, routing 90% to the existing stable deployment and 10% to the canary. To revert, the team runs the same command with `stable=100 canary=0`.\n\n**Why it works:** `az ml online-endpoint update --traffic` is the documented way to adjust traffic weights across deployments on a managed online endpoint. Both names must exist and weights must sum to 100.\n\n**Why the others don't work:**\n- `az ml online-deployment update --traffic-percentage`: No such flag exists; traffic is an endpoint-level concern.\n- `--set properties.mirrorTraffic=true`: Enables shadow mirroring, not a real traffic split. The canary receives copies but stable still handles all live responses.\n- `stable=80 canary=10`: Weights sum to 90, which is invalid and causes the command to fail.",
       "domain": "Implement machine learning model lifecycle and operations",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/CanaryTrafficSplit.mmd"
     },
     {
       "id": "AI-300-0110",

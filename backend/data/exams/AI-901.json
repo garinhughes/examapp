@@ -231,7 +231,8 @@
       "explanation": "Reliability and safety means AI systems should perform as intended without harming people, which requires guardrails on generative outputs.\n\n**Why it works:** Azure AI Content Safety screens prompts and completions for categories such as hate, violence, sexual content, and self-harm and applies severity thresholds before content reaches users.\n\n**Why the others don't work:**\n- Lowering temperature: makes outputs deterministic but not safer.\n- Smaller base model: model size has no correlation with harmful content generation.\n- Disabling system prompts: removes the very instructions that guide safe behaviour.",
       "domain": "Identify AI concepts and capabilities",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/ContentSafetyOpenAI.mmd"
     },
     {
       "id": "AI-901-0006",
@@ -550,7 +551,8 @@
       "explanation": "Privacy and security work flows from understanding the data, to protecting it, to controlling access, and finally verifying that controls held during execution.",
       "domain": "Identify AI concepts and capabilities",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/AmlKeyVaultPipeline.mmd"
     },
     {
       "id": "AI-901-0013",
@@ -1000,7 +1002,8 @@
       "explanation": "Accountability requires traceability across the model lifecycle so that decisions can be examined after the fact.\n\n**Why it works:** Combining versioned model registry, recorded run history, and Azure Monitor logs creates a complete chain of evidence from data through training to inference.\n\n**Why the others don't work:**\n- Overwriting versions: destroys historical evidence.\n- Disabling diagnostic settings: removes the audit log.\n- Training on personal laptops: breaks the chain of custody.",
       "domain": "Identify AI concepts and capabilities",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/AmlMonitorLineage.mmd"
     },
     {
       "id": "AI-901-0023",
@@ -2588,7 +2591,8 @@
       "explanation": "Each medium has a corresponding Azure capability optimised for extracting information from that input type.",
       "domain": "Identify AI concepts and capabilities",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/AzureAiInputRouting.mmd"
     },
     {
       "id": "AI-901-0057",

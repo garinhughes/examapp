@@ -614,7 +614,8 @@
       "explanation": "Cloud Vision exposes a managed OCR endpoint that returns detected text directly. Pairing it with a Cloud Storage trigger gives reactive, serverless processing.\n\n**Why it works:** `TEXT_DETECTION` returns full text annotations from images; Cloud Functions integrates natively with Cloud Storage finalize events.\n\n**Why the others don't work:**\n- AutoML Vision: solves classification, not OCR.\n- Dataproc + Tesseract: heavy cluster ops and not event-driven.\n- Cloud Translation: does not accept images or perform OCR.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/VisionStorageFunctions.mmd"
     },
     {
       "id": "PMLE-2025-0014",
@@ -2097,7 +2098,8 @@
       "explanation": "Sharded binary record files are the canonical Vertex AI / TensorFlow pattern for high-throughput distributed training on large image corpora.\n\n**Why it works:** Splitting data into ~100-200 MB shards lets `tf.data` read multiple shards in parallel, decode in parallel, and prefetch batches so the GPU is never idle waiting for data.\n\n**Why the others don't work:**\n- Single archive: serializes reads and defeats parallelism.\n- Serial list_files: per-object latency dominates throughput.\n- Cloud SQL BYTEA: relational storage is the wrong primitive for ML data pipelines.",
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/GcsToVertexTraining.mmd"
     },
     {
       "id": "PMLE-2025-0046",
@@ -2450,7 +2452,8 @@
       "explanation": "Dataflow streaming is built for stateful, high-throughput, low-latency preprocessing.\n\n**Why it works:** Apache Beam pipelines on Dataflow handle windowed aggregations, exactly-once writes via the Storage Write API, and autoscaling at the required event rate.\n\n**Why the others don't work:**\n- Scheduled query: latency floor too high.\n- Per-event Cloud Run: stateless and not throughput-shaped.\n- Composer + Dataproc micro-batch: scheduling overhead and no native windowing.",
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/PubSubDataflowBigQuery.mmd"
     },
     {
       "id": "PMLE-2025-0054",
@@ -2605,7 +2608,8 @@
       "explanation": "Dataflow handles streaming and batch custom transforms, BigQuery handles tabular SQL preprocessing, and TFX Transform handles training/serving graph parity.",
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/PreprocessingToolsMatching.mmd"
     },
     {
       "id": "PMLE-2025-0057",
@@ -2647,7 +2651,8 @@
       "explanation": "Vertex AI Feature Store is the consolidated registry and serving layer for BigQuery-sourced features.\n\n**Why it works:** Feature groups/views map BigQuery columns to feature definitions, while the online store handles low-latency serving and scheduled syncs.\n\n**Why the others don't work:**\n- Looker views: analytics surface only.\n- Parquet copies: no registry or online path.\n- Cloud SQL: not a managed feature store.",
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/FeatureStoreConsolidation.mmd"
     },
     {
       "id": "PMLE-2025-0058",
@@ -2689,7 +2694,8 @@
       "explanation": "High-QPS, low-latency online feature serving is what Bigtable-backed Vertex AI online feature stores are designed for.\n\n**Why it works:** Bigtable online stores expose a key-value lookup API with predictable latency and elastic throughput.\n\n**Why the others don't work:**\n- BigQuery per request: wrong workload shape.\n- Cloud Storage per request: object latency too high.\n- Dataflow per request: batch engine, not an online serving primitive.",
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/FeatureStoreOnlineServing.mmd"
     },
     {
       "id": "PMLE-2025-0059",
@@ -4997,7 +5003,8 @@
       "explanation": "BigQuery is the right home for analytical, schema-enforced tabular training data that requires SQL feature engineering and versioned snapshots.\n\n**Why it works:** BigQuery offers columnar storage, schema enforcement, partitioning, time-travel snapshots, and a first-class Vertex AI integration so training jobs can read tabular features directly without expensive exports.\n\n**Why the others don't work:**\n- Per-row JSON in Cloud Storage loses schema and is inefficient for tabular data.\n- Bigtable is for low-latency key lookups, not analytical scans.\n- Firestore is a document store for application data, not ML training scans.",
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/BigQueryTrainingData.mmd"
     },
     {
       "id": "PMLE-2025-0110",
@@ -5265,7 +5272,8 @@
       "explanation": "Datastream plus its native BigQuery integration is the managed CDC pattern for streaming relational changes into BigQuery feature tables.\n\n**Why it works:** Datastream captures row-level changes from Cloud SQL using logical replication and delivers them to BigQuery without custom code.\n\n**Why the others don't work:**\n- Nightly dumps and full-table polling miss the near-real-time requirement.\n- Replacing the source database is an unrelated and disruptive change.",
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/DatastreamCdcBigQuery.mmd"
     },
     {
       "id": "PMLE-2025-0116",

@@ -223,7 +223,8 @@
       "explanation": "CloudWatch Synthetics canaries exist specifically for this pattern.\n\n**Why it works:** Canaries run a Puppeteer or Selenium script at a configurable cadence, emit SuccessPercent and latency metrics to CloudWatch, and integrate with alarms and SNS without writing and maintaining bespoke Lambda code.\n\n**Why the others don't work:**\n- Hand-built Lambda checks: duplicates Synthetics with more code to own.\n- Athena on ALB logs: latent and cannot validate session issuance.\n- Route 53 health check: DNS reachability only.",
       "domain": "Detection",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/SyntheticsLoginMonitor.mmd"
     },
     {
       "id": "SCS-C03-0006",
@@ -265,7 +266,8 @@
       "explanation": "The CloudWatch agent plus a custom Auto Scaling health check delivers all three signals.\n\n**Why it works:** The agent collects memory and per-process metrics and can watch specific files through its logs and procstat plugins. A CloudWatch alarm on the Java process metric can call the `SetInstanceHealth` API so Auto Scaling replaces only instances where the application itself has failed.\n\n**Why the others don't work:**\n- EC2 + ELB checks: do not cover app process or memory.\n- Inspector: vulnerability scanner, not a runtime monitor.\n- Config only: too slow and not OS-aware.",
       "domain": "Detection",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/Ec2ProcessMonitoring.mmd"
     },
     {
       "id": "SCS-C03-0007",
@@ -463,7 +465,8 @@
       "explanation": "Only the organization trail with Object Lock compliance mode satisfies every requirement.\n\n**Why it works:** Organization trails are created once in the management or delegated admin account and automatically include every member account. S3 Object Lock in compliance mode with a seven-year retention period makes objects immutable, even to the root user.\n\n**Why the others don't work:**\n- Per-account trails + SCP: weaker control surface and higher overhead.\n- Cross-account role pattern: trails must run in the logging account of origin.\n- Versioning + Glacier: does not provide WORM protection against deletion.",
       "domain": "Detection",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/OrgTrailCentralLogs.mmd"
     },
     {
       "id": "SCS-C03-0011",
@@ -620,7 +623,8 @@
       "explanation": "EventBridge is the natural orchestration layer for GuardDuty findings.\n\n**Why it works:** The rule pattern matches only the specific finding type and severity. One target pages the SOC via SNS, another invokes a Lambda that attaches the managed `AWSRevokeOlderSessions` policy or equivalent inline policy to kill active sessions.\n\n**Why the others don't work:**\n- Trusted-IP suppression: silences the finding rather than acting on it.\n- CloudTrail metric filter alone: lacks GuardDuty's anomaly context.\n- Macie + Config: wrong data sources for IAM session revocation.",
       "domain": "Detection",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/GuardDutyAutoRemediation.mmd"
     },
     {
       "id": "SCS-C03-0014",
@@ -859,7 +863,8 @@
       "explanation": "State Manager is purpose-built for this workflow.\n\n**Why it works:** A State Manager association binds a document (such as `AWS-RunShellScript` or an Ansible/Chef document) to targets and a schedule. It reapplies on drift and produces per-instance compliance records usable for audit.\n\n**Why the others don't work:**\n- Lambda-triggered Run Command: custom plumbing without native compliance.\n- Patch Manager: wrong scope.\n- AMI rotation: costly for configuration management.",
       "domain": "Detection",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/StateManagerDriftRemediation.mmd"
     },
     {
       "id": "SCS-C03-0019",
@@ -3286,7 +3291,8 @@
       "explanation": "S3 Object Lock in compliance mode is the right answer.\n\n**Why it works:** Compliance-mode Object Lock prevents any user, including root, from deleting or overwriting objects until retention expires. Combined with versioning and SSE-KMS, it provides an immutable, encrypted, queryable evidence store.\n\n**Why the others don't work:**\n- EFS + snapshots: mutable.\n- EBS flag: no immutability.\n- Deny-delete bucket policy: editable by admins.",
       "domain": "Incident Response",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/S3ForensicStorage.mmd"
     },
     {
       "id": "SCS-C03-0070",
@@ -3329,7 +3335,8 @@
       "explanation": "CloudWatch Agent on both OS families is the native pattern.\n\n**Why it works:** The agent supports Linux log files and Windows event channels, streaming them in near real time to CloudWatch Logs, which can be subscribed or exported to S3 for long-term forensic retention.\n\n**Why the others don't work:**\n- Nightly cron: evidence gaps.\n- CloudTrail: wrong data plane.\n- AWS Backup images: stale evidence.",
       "domain": "Incident Response",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/Ec2LogPipeline.mmd"
     },
     {
       "id": "SCS-C03-0071",
@@ -3662,7 +3669,8 @@
       "explanation": "CloudTrail Lake or trail queries are the validation source.\n\n**Why it works:** CloudTrail records the `StopLogging` action plus every subsequent API call while logging was disabled (via digest and other trails), allowing you to reconstruct the principal's actions and scope the impact.\n\n**Why the others don't work:**\n- Remediation text: not evidence.\n- Self-attestation: not a control.\n- Last sign-in time: no action detail.",
       "domain": "Incident Response",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/GuardDutyCloudTrailValidation.mmd"
     },
     {
       "id": "SCS-C03-0078",
@@ -3705,7 +3713,8 @@
       "explanation": "S3 access logs or CloudTrail data events are the validation source.\n\n**Why it works:** S3 server access logs and CloudTrail S3 data events capture the specific `GetObject` calls, including anonymous requests, so correlating them with the exposure window demonstrates whether data was actually accessed.\n\n**Why the others don't work:**\n- Macie severity: potential, not actual.\n- Config history: change, not access.\n- VPC Flow Logs: wrong plane for internet S3.",
       "domain": "Incident Response",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/MacieExposureValidation.mmd"
     },
     {
       "id": "SCS-C03-0079",
@@ -3903,7 +3912,8 @@
       "explanation": "Restoring to a new RDS instance is the correct recovery path.\n\n**Why it works:** Point-in-time restore creates a new DB instance at the target moment, letting operations resume on a clean endpoint while the compromised instance remains available for investigation.\n\n**Why the others don't work:**\n- In-place rollback: unsupported.\n- Failover: same data.\n- Delete + recreate: destroys evidence.",
       "domain": "Incident Response",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/RdsPointInTimeRestore.mmd"
     },
     {
       "id": "SCS-C03-0083",
@@ -5040,7 +5050,8 @@
       "explanation": "Inspector enhanced scanning for ECR is the fit.\n\n**Why it works:** Enhanced scanning integrates Inspector with ECR to evaluate images on push and rescan them against new CVEs, covering both OS and language packages without custom pipelines.\n\n**Why the others don't work:**\n- ECR basic scan: OS-only.\n- CI `trivy` once: no rescans.\n- GuardDuty Runtime: runtime layer.",
       "domain": "Infrastructure Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/EcrInspectorScanning.mmd"
     },
     {
       "id": "SCS-C03-0107",
@@ -5196,7 +5207,8 @@
       "explanation": "An instance profile with a scoped IAM role is the answer.\n\n**Why it works:** The instance profile delivers temporary STS credentials via IMDSv2, scoped to the role's policy, eliminating long-lived keys on disk.\n\n**Why the others don't work:**\n- Rotate user keys: still long-lived.\n- Secrets Manager user keys: still user identity.\n- IMDSv1: deprecated, wrong feature.",
       "domain": "Infrastructure Security",
       "difficulty": 1,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/Ec2InstanceRoleS3.mmd"
     },
     {
       "id": "SCS-C03-0110",
@@ -5239,7 +5251,8 @@
       "explanation": "A minimal policy with table and topic ARNs is the answer.\n\n**Why it works:** Granting only `dynamodb:PutItem` on the table and `sns:Publish` on the topic matches the function's real needs and denies everything else by default.\n\n**Why the others don't work:**\n- Full access: too broad.\n- Admin + boundary: still overpermissive baseline.\n- Remove role: Lambda cannot run.",
       "domain": "Infrastructure Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/LambdaLeastPrivilege.mmd"
     },
     {
       "id": "SCS-C03-0111",
