@@ -288,15 +288,16 @@ export default function PricingPage() {
     clarityEvent('add_to_basket')
     clarityTag('product_added', `${product.kind}:${product.productId}`)
     clarityTag('funnel_stage', 'add_to_basket')
+    if (tier === 'pro' || tier === 'pro_plus') {
+      // For paid users upgrading, replace whatever is in the basket and go straight there
+      basket.switchTo(product)
+      navigate('/basket')
+      return
+    }
     const ok = basket.add(product)
     if (ok) {
       setActionError(null)
-      // Paid users upgrading go straight to basket — no need for the toast detour
-      if (tier === 'pro' || tier === 'pro_plus') {
-        navigate('/basket')
-      } else {
-        showToast(`${product.label} added to basket`, 'info')
-      }
+      showToast(`${product.label} added to basket`, 'info')
     } else {
       setActionError(basket.lastError)
     }
