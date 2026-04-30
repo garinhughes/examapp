@@ -12,6 +12,7 @@ import { CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { useEntitlements, isPaidTier } from '../hooks/useEntitlements'
 import { useBasket } from './BasketContext'
 import { trackPurchase } from '../analytics'
+import { captureWarning } from '../lib/sentry'
 
 const POLL_INTERVAL_MS = 2000
 const POLL_MAX_ATTEMPTS = 12 // ~24s total
@@ -49,7 +50,16 @@ export function PaymentResultModal() {
       if (cancelled) return
       attempts += 1
       refresh()
-      if (attempts >= POLL_MAX_ATTEMPTS) setPolling(false)
+      if (attempts >= POLL_MAX_ATTEMPTS) {
+        setPolling(false)
+        // User paid but entitlement still hasn't arrived after ~24s — webhook is
+        // probably delayed or misrouted. High-signal: investigate immediately.
+        captureWarning('payment.entitlement_polling_timeout', {
+          tags: { 'payment.stage': 'verify' },
+          extra: { purchasedProductId, attempts },
+          fingerprint: ['payment', 'polling-timeout', purchasedProductId ?? 'unknown'],
+        })
+      }
     }
     const id = setInterval(tick, POLL_INTERVAL_MS)
     tick()

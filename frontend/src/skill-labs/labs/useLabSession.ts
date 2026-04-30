@@ -24,6 +24,7 @@ import { LAB_TIME_LIMITS } from '../types'
 import { useLabProgress } from './useLabProgress'
 import { useLabComplete, signalLabCancelled } from './shared'
 import { useSkillLab } from '@/skill-labs/SkillLabContext'
+import { captureError } from '@/lib/sentry'
 
 type LabMeta = Pick<LabSummary, 'id' | 'type' | 'difficulty' | 's3VersionId'>
 
@@ -122,7 +123,10 @@ export function useLabSession<TProgress extends { timeLeft: number }>(options: {
           setActive({ labId: lab.id, attemptId: aid, timed, startedAt: d?.startedAt })
         }
         return aid
-      } catch { return null }
+      } catch (err) {
+        captureError(err, { tags: { surface: 'skill-lab', stage: 'attempt-start' }, extra: { labId: lab.id, labType: lab.type } })
+        return null
+      }
     })()
     startInFlightRef.current = promise
     promise.finally(() => { startInFlightRef.current = null })
@@ -285,7 +289,9 @@ export function useLabSession<TProgress extends { timeLeft: number }>(options: {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ correct, selectedAnswer, timeTaken, labType: lab.type }),
         })
-      } catch { /* non-critical */ }
+      } catch (err) {
+        captureError(err, { tags: { surface: 'skill-lab', stage: 'complete' }, extra: { labId: lab.id, attemptId: aid, correct, timeTaken } })
+      }
       clearActive()
       if (!opts?.skipRatingPrompt) signalRatingPrompt(lab.id)
       return
@@ -299,7 +305,9 @@ export function useLabSession<TProgress extends { timeLeft: number }>(options: {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ selectedAnswer, correct, timeTaken, labType: lab.type }),
       })
-    } catch { /* non-critical */ }
+    } catch (err) {
+      captureError(err, { tags: { surface: 'skill-lab', stage: 'legacy-complete' }, extra: { labId: lab.id, correct, timeTaken } })
+    }
     if (!opts?.skipRatingPrompt) signalRatingPrompt(lab.id)
   }, [clearProgress, clearActive, completeWithGamification, authFetch, user, lab.id, lab.type])
 

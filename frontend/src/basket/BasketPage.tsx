@@ -14,6 +14,7 @@ import { useBasket } from './BasketContext'
 import { useEntitlements, type CatalogProduct } from '../hooks/useEntitlements'
 import { useAuth } from '../auth/AuthContext'
 import { apiUrl } from '../apiBase'
+import { captureError } from '../lib/sentry'
 
 function formatPrice(pence: number): string {
   const pounds = pence / 100
@@ -74,6 +75,14 @@ export default function BasketPage() {
           setCheckoutError(data.message ?? 'You already have an active subscription for this plan. Visit Account → Purchases to manage it.')
         } else {
           setCheckoutError(data.message ?? `Checkout failed (${res.status})`)
+          // 409 is expected (duplicate subscription); 4xx are user-input filtered by beforeSend.
+          // Capture only the 5xx + unexpected statuses so we know about real backend issues.
+          if (res.status >= 500) {
+            captureError(new Error(`Stripe checkout failed: ${data.message ?? res.status}`), {
+              tags: { 'payment.provider': 'stripe', 'payment.stage': 'init', 'http.status': res.status },
+              extra: { productIds, message: data.message },
+            })
+          }
         }
         return
       }
@@ -86,9 +95,17 @@ export default function BasketPage() {
       }
 
       setCheckoutError('Unexpected response from payments API')
+      captureError(new Error('Stripe checkout returned no URL'), {
+        tags: { 'payment.provider': 'stripe', 'payment.stage': 'init' },
+        extra: { productIds, response: data },
+      })
     } catch (err: any) {
       console.error('Checkout error', err)
       setCheckoutError('Checkout error: ' + String(err))
+      captureError(err, {
+        tags: { 'payment.provider': 'stripe', 'payment.stage': 'init' },
+        extra: { productIds },
+      })
     }
   }
 

@@ -25,6 +25,7 @@ import { sendInternalAlert, sendPaymentConfirmedEmail, sendRefundedEmail, sendSu
 import { putPaypalSession, getPaypalSession, deletePaypalSession } from '../services/paypalSessions.js'
 import { ddb, ENTITLEMENTS_TABLE, getUserBySub } from '../services/dynamo.js'
 import { logEmailSend } from '../services/emailLogs.js'
+import { captureWithContext, captureWarning, addBreadcrumb } from '../lib/sentry.js'
 
 const PP_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.paypal.com'
 
@@ -120,6 +121,12 @@ async function _grantFromSession(
           `Timestamp:    ${new Date().toISOString()}`,
           'Note: likely a cancel-then-upgrade — verify both expiresAt dates are correct.',
         ],
+      })
+      captureWarning('paypal.multiple_active_subs', {
+        user: { id: sess.userId },
+        tags: { 'payment.provider': 'paypal' },
+        extra: { activeSubs: activeSubs.map((e) => ({ productId: e.productId, status: e.status, expiresAt: e.expiresAt })) },
+        fingerprint: ['paypal', 'multi-active', sess.userId],
       })
     }
   }
@@ -230,6 +237,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       return reply.send({ subscriptionId })
     } catch (err: any) {
       server.log.error({ err }, '[paypal] create-subscription error')
+      captureWithContext(err, {
+        tags: { 'payment.provider': 'paypal', 'payment.stage': 'create-subscription' },
+        user: userId ? { id: userId } : undefined,
+        extra: { productId, planId },
+      })
       return reply.status(500).send({ message: 'Internal error creating PayPal subscription' })
     }
   })
@@ -263,6 +275,9 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         }
       } catch (err) {
         server.log.error({ err }, '[paypal] webhook verification error')
+        captureWithContext(err, {
+          tags: { 'payment.provider': 'paypal', 'payment.stage': 'webhook-verify' },
+        })
         // Fall through — still return 200 to avoid PayPal retries flooding logs
       }
     }
@@ -563,6 +578,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }
     } catch (err) {
       server.log.error({ err, eventType }, '[paypal] webhook event processing failed')
+      captureWithContext(err, {
+        tags: {
+          'payment.provider': 'paypal',
+          'payment.event_type': eventType,
+          'payment.stage': 'webhook',
+        },
+        extra: { eventId: (request.body as any)?.id },
+        fingerprint: ['paypal', String(eventType ?? 'unknown')],
+      })
     }
 
     return reply.status(200).send({ received: true })
@@ -657,6 +681,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         return { ok: true, accessUntil: periodEnd }
       } catch (err: any) {
         server.log.error({ err }, '[paypal] cancel-subscription error')
+        captureWithContext(err, {
+          tags: { 'payment.provider': 'paypal', 'payment.stage': 'cancel-subscription' },
+          user: { id: userId },
+          extra: { subscriptionId: subEnt.stripeSubscriptionId, productId: subEnt.productId },
+        })
         return reply.status(500).send({ message: 'Failed to cancel subscription' })
       }
     }
@@ -739,6 +768,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         return { approvalUrl: approvalLink }
       } catch (err: any) {
         server.log.error({ err }, '[paypal] revise-subscription error')
+        captureWithContext(err, {
+          tags: { 'payment.provider': 'paypal', 'payment.stage': 'revise-subscription' },
+          user: { id: userId },
+          extra: { subscriptionId: subEnt.stripeSubscriptionId, fromProduct: subEnt.productId, toProduct: targetProductId },
+        })
         return reply.status(500).send({ message: 'Failed to initiate subscription revision' })
       }
     }
@@ -848,5 +882,9 @@ async function _revokeSubscription(subscriptionId: string, server: FastifyInstan
     }
   } catch (err) {
     server.log.error({ err, subscriptionId }, '[paypal] revokeSubscription failed')
+    captureWithContext(err, {
+      tags: { 'payment.provider': 'paypal', 'payment.stage': 'revoke-subscription' },
+      extra: { subscriptionId, eventType },
+    })
   }
 }

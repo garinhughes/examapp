@@ -1,11 +1,48 @@
 import 'dotenv/config'
 import * as Sentry from '@sentry/node'
 
+// Cognito user-error names — these are normal user actions (wrong password,
+// unconfirmed account, etc.), not bugs. Drop them so we don't burn quota.
+const COGNITO_USER_ERRORS = new Set([
+  'NotAuthorizedException',
+  'UserNotConfirmedException',
+  'UserNotFoundException',
+  'CodeMismatchException',
+  'ExpiredCodeException',
+  'UsernameExistsException',
+  'InvalidPasswordException',
+  'InvalidParameterException',
+  'LimitExceededException',
+  'TooManyRequestsException',
+  'TooManyFailedAttemptsException',
+])
+
 if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV ?? 'production',
     tracesSampleRate: 0,
+    sendDefaultPii: false,
+    beforeSend(event, hint) {
+      const err: any = hint?.originalException
+      if (err) {
+        // Drop client errors — Fastify validation, 401/403/404, rate-limit 429.
+        const status = err.statusCode ?? err.status
+        if (typeof status === 'number' && status >= 400 && status < 500) return null
+        // Drop expected Cognito user errors
+        const name = err.name || err.code || err.__type
+        if (typeof name === 'string') {
+          const bare = name.split('#').pop() as string
+          if (COGNITO_USER_ERRORS.has(bare)) return null
+          if (bare === 'AbortError') return null
+        }
+        // Drop Stripe webhook signature failures (replay attempts / scanners)
+        if (typeof err.message === 'string' && /signature verification failed/i.test(err.message)) {
+          return null
+        }
+      }
+      return event
+    },
   })
 }
 
@@ -44,6 +81,29 @@ import unsubscribeRoutes from './routes/unsubscribe.js'
 import feedbackRoutes from './routes/feedback.js'
 
 const server = Fastify({ logger: true, trustProxy: true })
+
+if (process.env.SENTRY_DSN) {
+  Sentry.setupFastifyErrorHandler(server)
+}
+
+// Per-request scope: tag route + set user (when auth resolves) so any error
+// captured during the request carries useful context.
+server.addHook('onRequest', async (req) => {
+  if (!process.env.SENTRY_DSN) return
+  Sentry.getCurrentScope().setTag('route', (req.routeOptions as any)?.url ?? req.url)
+  Sentry.getCurrentScope().setContext('request', {
+    id: req.id,
+    method: req.method,
+    ip: req.ip,
+  })
+})
+
+server.addHook('preHandler', async (req) => {
+  if (!process.env.SENTRY_DSN) return
+  if (req.user?.sub) {
+    Sentry.getCurrentScope().setUser({ id: req.user.sub })
+  }
+})
 
 // Capture raw body string so webhook handlers (Stripe, PayPal) can verify
 // HMAC-SHA256 signatures over the exact bytes the provider signed.
@@ -134,11 +194,10 @@ await server.register(cronRoutes, { prefix: '/internal/cron' })
 // Public one-click unsubscribe
 await server.register(unsubscribeRoutes, { prefix: '/unsubscribe' })
 
-// Capture unhandled route errors in Sentry
+// Sentry.setupFastifyErrorHandler (above) already captures unhandled errors
+// with full request context. This handler only owns the wire response shape;
+// beforeSend filters out 4xx so we don't need to re-check statusCode here.
 server.setErrorHandler((err, _req, reply) => {
-  if (process.env.SENTRY_DSN && (err.statusCode == null || (err.statusCode ?? 500) >= 500)) {
-    Sentry.captureException(err)
-  }
   reply.status(err.statusCode ?? 500).send({ error: err.message })
 })
 

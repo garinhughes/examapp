@@ -15,6 +15,7 @@ import { useBasket } from './BasketContext'
 import { useAuth } from '../auth/AuthContext'
 import { apiUrl } from '../apiBase'
 import { clarityEvent, clarityTag } from '../clarity'
+import { captureError, addBreadcrumb } from '../lib/sentry'
 
 const PAYPAL_CLIENT_ID = (import.meta as any).env?.VITE_PAYPAL_CLIENT_ID ?? ''
 
@@ -65,7 +66,12 @@ export default function PayPalCheckout() {
           })
           if (!res.ok) {
             const text = await res.text()
-            throw new Error(`Failed to create subscription: ${text}`)
+            const err = new Error(`Failed to create subscription: ${text}`)
+            captureError(err, {
+              tags: { 'payment.provider': 'paypal', 'payment.stage': 'init', 'http.status': res.status },
+              extra: { productId: productIds[0], status: res.status, body: text.slice(0, 500) },
+            })
+            throw err
           }
           const data = await res.json()
           return data.subscriptionId
@@ -81,7 +87,14 @@ export default function PayPalCheckout() {
           clarityEvent('payment_error')
           clarityTag('payment_method', 'paypal_subscription')
           console.error('[PayPal] subscription error', err)
+          captureError(err, {
+            tags: { 'payment.provider': 'paypal', 'payment.stage': 'approve' },
+            extra: { productId: productIds[0] },
+          })
           alert('PayPal error: ' + String(err))
+        }}
+        onCancel={() => {
+          addBreadcrumb('payment', 'paypal cancel', { productId: productIds[0] })
         }}
       />
     </PayPalScriptProvider>

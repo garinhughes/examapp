@@ -2,6 +2,7 @@ import { useAuth } from './AuthContext'
 import { useCallback, useRef } from 'react'
 import { apiUrl } from '../apiBase'
 import { getOrCreateVisitorId } from './visitorId'
+import { addBreadcrumb } from '../lib/sentry'
 
 /**
  * Returns a fetch wrapper that automatically injects the Authorization header.
@@ -49,7 +50,13 @@ export function useAuthFetch() {
 
       // Prefix relative paths with the API base when set (production)
       const url = typeof input === 'string' ? apiUrl(input) : input
+      const startedAt = Date.now()
       const response = await fetch(url, { ...init, headers })
+      addBreadcrumb('fetch', `${init?.method ?? 'GET'} ${typeof input === 'string' ? input : url.toString()}`, {
+        method: init?.method ?? 'GET',
+        status: response.status,
+        ms: Date.now() - startedAt,
+      })
 
       // If we get a 401, attempt one refresh + retry
       if (response.status === 401 && token && !isRefreshing.current) {

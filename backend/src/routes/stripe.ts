@@ -22,6 +22,7 @@ import { grantEntitlement, revokeEntitlement, getUserEntitlements, setEntitlemen
 import { getUserBySub } from '../services/dynamo.js'
 import { sendPaymentConfirmedEmail, sendInternalAlert, sendRefundedEmail, sendSubscriptionCancelledEmail, sendSubscriptionChangedEmail, sendSubscriptionEndedEmail, sendPaymentFailedEmail } from '../services/ses.js'
 import { logEmailSend } from '../services/emailLogs.js'
+import { captureWithContext, addBreadcrumb } from '../lib/sentry.js'
 
 const STRIPE_API = 'https://api.stripe.com/v1'
 // Pin API version so schema changes (like basil removing invoice.subscription) can't
@@ -213,6 +214,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         return { url: session.url }
       } catch (err: any) {
         server.log.error({ err }, '[stripe] create-checkout error')
+        captureWithContext(err, {
+          tags: { 'payment.provider': 'stripe', 'payment.stage': 'create-checkout' },
+          user: userId ? { id: userId } : undefined,
+          extra: { stripeError: err.stripeError },
+        })
         if (err.stripeError) {
           return reply.status(502).send({ message: 'Stripe API error', details: err.stripeError })
         }
@@ -641,6 +647,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }
     } catch (err) {
       server.log.error({ err }, '[stripe] webhook processing error')
+      captureWithContext(err, {
+        tags: {
+          'payment.provider': 'stripe',
+          'payment.event_type': event?.type,
+          'payment.stage': 'webhook',
+        },
+        extra: { eventId: event?.id },
+        fingerprint: ['stripe', String(event?.type ?? 'unknown')],
+      })
       // Return 500 so Stripe retries the delivery
       return reply.status(500).send({ message: 'webhook processing failed' })
     }
@@ -706,6 +721,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         return { ok: true, cancelAtPeriodEnd: true, accessUntil }
       } catch (err: any) {
         server.log.error({ err }, '[stripe] cancel-subscription error')
+        captureWithContext(err, {
+          tags: { 'payment.provider': 'stripe', 'payment.stage': 'cancel-subscription' },
+          user: { id: userId },
+          extra: { subscriptionId: subEnt.stripeSubscriptionId, productId: subEnt.productId },
+        })
         return reply.status(502).send({ message: 'Failed to cancel subscription', details: err.stripeError })
       }
     }
@@ -833,6 +853,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         }
       } catch (err: any) {
         server.log.error({ err }, '[stripe] upgrade-subscription error')
+        captureWithContext(err, {
+          tags: { 'payment.provider': 'stripe', 'payment.stage': 'upgrade-subscription' },
+          user: { id: userId },
+          extra: { subscriptionId: subEnt.stripeSubscriptionId, fromProduct: subEnt.productId, toProduct: targetProductId },
+        })
         return reply.status(502).send({ message: 'Failed to change subscription plan', details: err.stripeError })
       }
     }
@@ -868,6 +893,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         return { url: portalSession.url }
       } catch (err: any) {
         server.log.error({ err }, '[stripe] portal-session error')
+        captureWithContext(err, {
+          tags: { 'payment.provider': 'stripe', 'payment.stage': 'portal-session' },
+          user: { id: userId },
+          extra: { subscriptionId: subEnt.stripeSubscriptionId },
+        })
         return reply.status(502).send({ message: 'Failed to create portal session', details: err.stripeError })
       }
     }

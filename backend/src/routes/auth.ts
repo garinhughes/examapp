@@ -22,6 +22,7 @@ import {
   AdminUpdateUserAttributesCommand,
 } from '@aws-sdk/client-cognito-identity-provider'
 import { fromSSO } from '@aws-sdk/credential-providers'
+import { captureWithContext, addBreadcrumb } from '../lib/sentry.js'
 
 const AUTH_MODE = process.env.AUTH_MODE || 'dev'
 
@@ -170,6 +171,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
       return tokens
     } catch (err: any) {
+      captureWithContext(err, { tags: { 'auth.flow': 'token-exchange' } })
       return reply.status(500).send({ message: err.message })
     }
   })
@@ -262,6 +264,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
       return reply.send(tokens)
     } catch (err: any) {
+      captureWithContext(err, { tags: { 'auth.flow': 'token-redirect' } })
       return reply.status(500).send({ message: err.message })
     }
   })
@@ -339,6 +342,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }
     } catch (err: any) {
       request.log?.error?.({ err: err.message }, 'refresh exchange error')
+      captureWithContext(err, { tags: { 'auth.flow': 'refresh' } })
       return reply.status(500).send({ message: err.message })
     }
   })
@@ -389,6 +393,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }))
       return { message: 'Verification code sent to email' }
     } catch (err: any) {
+      captureWithContext(err, { tags: { 'auth.flow': 'signup' }, extra: { email } })
       return reply.status(400).send({ message: err.message })
     }
   })
@@ -406,6 +411,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }))
       return { message: 'Email confirmed — you can now sign in' }
     } catch (err: any) {
+      captureWithContext(err, { tags: { 'auth.flow': 'confirm' }, extra: { email } })
       return reply.status(400).send({ message: err.message })
     }
   })
@@ -422,6 +428,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }))
       return { message: 'Verification code resent' }
     } catch (err: any) {
+      captureWithContext(err, { tags: { 'auth.flow': 'resend' }, extra: { email } })
       return reply.status(400).send({ message: err.message })
     }
   })
@@ -481,6 +488,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       if (err.name === 'UserNotConfirmedException') {
         return reply.status(403).send({ message: 'Email not confirmed', code: 'UserNotConfirmed' })
       }
+      captureWithContext(err, { tags: { 'auth.flow': 'login' }, extra: { email } })
       return reply.status(401).send({ message: err.message })
     }
   })
@@ -498,6 +506,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       // Always return success to avoid user enumeration
       return { message: 'If an account exists, a reset code has been sent' }
     } catch (err: any) {
+      // Cognito user errors (UserNotFoundException, etc.) are filtered by beforeSend.
+      captureWithContext(err, { tags: { 'auth.flow': 'forgot' }, extra: { email } })
       return { message: 'If an account exists, a reset code has been sent' }
     }
   })
@@ -518,6 +528,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       }))
       return { message: 'Password reset successful — you can now sign in' }
     } catch (err: any) {
+      captureWithContext(err, { tags: { 'auth.flow': 'reset' }, extra: { email } })
       return reply.status(400).send({ message: err.message })
     }
   })
@@ -548,6 +559,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         }))
       } catch (err: any) {
         request.log?.warn?.({ err: err.message }, 'AdminUpdateUserAttributes failed')
+        captureWithContext(err, { tags: { 'auth.flow': 'profile' }, user: { id: userId } })
       }
     }
 

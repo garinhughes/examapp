@@ -11,6 +11,7 @@ import { isAnswerCorrect, computeDerivedAttempt } from './utils'
 import { downloadAttemptCSV as dlCSV, downloadAttemptPDF as dlPDF, downloadAnalyticsCSV as dlAnalyticsCSV } from './downloads'
 import type { Exam, Question, QuestionType, ExamMode, RevealMode, AppRoute } from './types'
 import { trackExamStarted } from '../analytics'
+import { captureError, addBreadcrumb } from '../lib/sentry'
 
 // ═══════════════════════════════════════════════
 // Context type
@@ -857,8 +858,23 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ questionId: qId, ...payload, timeMs: 0, showTip: !!showTipMap[qId] })
       })
-      if (!res.ok) { const msg = await extractErrorMessage(res, 'save answer failed'); console.error('save answer failed', msg); setLastError(msg) }
-    } catch (err) { console.error('submit answer error', err); setLastError(String(err)) }
+      if (!res.ok) {
+        const msg = await extractErrorMessage(res, 'save answer failed')
+        console.error('save answer failed', msg)
+        setLastError(msg)
+        captureError(new Error(`save answer failed: ${msg}`), {
+          tags: { surface: 'exam-submit', stage: 'answer', 'http.status': res.status },
+          extra: { attemptId, questionId: qId },
+        })
+      }
+    } catch (err) {
+      console.error('submit answer error', err)
+      setLastError(String(err))
+      captureError(err, {
+        tags: { surface: 'exam-submit', stage: 'answer' },
+        extra: { attemptId, questionId: qId },
+      })
+    }
   }
 
   async function submitAnswer(q: Question, i: string | string[]) {
@@ -905,8 +921,21 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         setExamStarted(false)
         setTimeLeft(null)
         handleGamificationReward(computed)
-      } else { setLastError(finData?.message ?? finData?.error ?? 'Failed to finish attempt') }
-    } catch (err) { console.error('finishAttempt error', err); setLastError(String(err)) }
+      } else {
+        setLastError(finData?.message ?? finData?.error ?? 'Failed to finish attempt')
+        captureError(new Error(`finish attempt failed: ${finData?.message ?? finData?.error ?? 'unknown'}`), {
+          tags: { surface: 'exam-submit', stage: 'finish' },
+          extra: { attemptId: aid },
+        })
+      }
+    } catch (err) {
+      console.error('finishAttempt error', err)
+      setLastError(String(err))
+      captureError(err, {
+        tags: { surface: 'exam-submit', stage: 'finish' },
+        extra: { attemptId: aid },
+      })
+    }
   }
 
   function handleGamificationReward(finData: any) {

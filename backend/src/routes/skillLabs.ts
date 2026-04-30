@@ -12,6 +12,7 @@ import {
 import { updateMetricsOnLabAttempt } from '../services/metricsStore.js'
 import { touchUserActivity } from '../services/dynamo.js'
 import { TIERS, type Tier } from '../catalog.js'
+import { captureWithContext } from '../lib/sentry.js'
 
 const LABS_DIR = path.join(process.cwd(), 'data', 'skill-labs')
 
@@ -54,6 +55,7 @@ async function loadLabsLocal(): Promise<any[]> {
     return arrays.flat()
   } catch (err) {
     console.error('[skill-labs] Failed to load labs data from disk', err)
+    captureWithContext(err, { tags: { surface: 'skill-lab', source: 'local', stage: 'list' } })
     return []
   }
 }
@@ -88,6 +90,7 @@ async function loadLabsS3Summary(): Promise<any[]> {
     }))
   } catch (err) {
     console.error('[skill-labs] Failed to scan DynamoDB index', err)
+    captureWithContext(err, { tags: { surface: 'skill-lab', source: 's3', stage: 'list-index' } })
     return []
   }
 }
@@ -100,6 +103,7 @@ async function findLabS3(id: string): Promise<any | null> {
     return { ...JSON.parse(body), s3VersionId: idx.s3VersionId }
   } catch (err) {
     console.error('[skill-labs] S3 load failed for id:', id, err)
+    captureWithContext(err, { tags: { surface: 'skill-lab', source: 's3', stage: 'load' }, extra: { labId: id } })
     return null
   }
 }
@@ -409,7 +413,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       await skillLabAttemptsStore.put(attempt)
       void touchUserActivity(userId)
       updateMetricsOnLabAttempt({ labId, labType: attempt.labType, correct, timeTaken })
-        .catch((err) => console.error('[metrics] updateMetricsOnLabAttempt failed', err))
+        .catch((err) => {
+          console.error('[metrics] updateMetricsOnLabAttempt failed', err)
+          captureWithContext(err, { tags: { surface: 'skill-lab', stage: 'metrics-update' }, user: { id: userId }, extra: { labId } })
+        })
       return reply.status(201).send(attempt)
     }
 
@@ -493,7 +500,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     })
     void touchUserActivity(userId)
     updateMetricsOnLabAttempt({ labId, labType, correct, timeTaken })
-      .catch((err) => console.error('[metrics] updateMetricsOnLabAttempt failed', err))
+      .catch((err) => {
+        console.error('[metrics] updateMetricsOnLabAttempt failed', err)
+        captureWithContext(err, { tags: { surface: 'skill-lab', stage: 'metrics-update' }, user: { id: userId }, extra: { labId, attemptId } })
+      })
 
     request.log.info({ userId, labId, attemptId, correct, timeTaken }, '[skill-labs] attempt completed')
     return { completed: true, attemptId, completedAt: now, correct }

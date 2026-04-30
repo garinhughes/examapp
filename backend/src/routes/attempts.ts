@@ -6,6 +6,7 @@ import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS, isPaidTier } from '../catalog.js'
 import { updateMetricsOnAttemptFinish } from '../services/metricsStore.js'
 import { touchUserActivity } from '../services/dynamo.js'
+import { captureWithContext } from '../lib/sentry.js'
 
 /** Extract userId from a JWT-authenticated user or a visitor ID header. */
 function extractUserId(request: any): string | null {
@@ -49,6 +50,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       } catch (err) {
         // GSI may not be populated yet during rollout — don't block attempt creation
         console.warn('[attempts] listInProgressByUser failed, continuing:', err)
+        captureWithContext(err, {
+          tags: { surface: 'attempt', stage: 'list-in-progress' },
+          user: { id: userId },
+          extra: { examCode },
+        })
       }
     }
 
@@ -215,6 +221,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       return { attempts }
     } catch (err) {
       console.error('[attempts] /in-progress failed', err)
+      captureWithContext(err, {
+        tags: { surface: 'attempt', stage: 'in-progress-route' },
+        user: { id: userId },
+      })
       return reply.status(500).send({ message: 'failed to list in-progress attempts' })
     }
   })
@@ -544,7 +554,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       answers: Array.isArray(attempt.answers) ? attempt.answers : [],
       questions: Array.isArray(attempt.questions) ? attempt.questions : [],
       metadata: attempt.metadata as any,
-    }).catch((err) => console.error('[metrics] updateMetricsOnAttemptFinish failed', err))
+    }).catch((err) => {
+      console.error('[metrics] updateMetricsOnAttemptFinish failed', err)
+      captureWithContext(err, {
+        tags: { surface: 'attempt', stage: 'metrics-update' },
+        user: { id: attempt.userId ?? userId },
+        extra: { attemptId: attempt.attemptId, examCode: attempt.examCode },
+      })
+    })
 
     return { attemptId: attempt.attemptId, score, correctCount, total, totalQuestions, answeredCount, earlyComplete, perDomain }
   })
@@ -584,6 +601,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     } catch (err) {
       // If normalization fails, return original attempt but log the error
       console.error('Failed to normalise attempt.questions', err)
+      captureWithContext(err, {
+        tags: { surface: 'attempt', stage: 'normalise' },
+        user: { id: userId },
+        extra: { attemptId: id, examCode: attempt.examCode },
+      })
     }
 
     return attempt

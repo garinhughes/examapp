@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useCallback, useRef, ty
 import { apiUrl } from '../apiBase'
 import { clarityIdentify, clarityTag } from '../clarity'
 import { trackSignUp } from '../analytics'
+import { setSentryUser, captureError, addBreadcrumb } from '../lib/sentry'
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -216,6 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return null
       } catch (err) {
         console.error('[auth] Token refresh error', err)
+        captureError(err, { tags: { 'auth.flow': 'refresh', 'auth.refresh': 'silent' } })
         return null
       } finally {
         refreshPromiseRef.current = null
@@ -424,13 +426,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /* ---- email/password auth methods ---- */
   const loginWithEmail = useCallback(async (email: string, password: string) => {
+    addBreadcrumb('auth', 'login attempt', { email })
     const res = await fetch(apiUrl('/auth/email/login'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
     const data = await res.json()
-    if (!res.ok) throw Object.assign(new Error(data.message || 'Login failed'), { code: data.code })
+    if (!res.ok) {
+      addBreadcrumb('auth', 'login failed', { status: res.status, code: data.code })
+      throw Object.assign(new Error(data.message || 'Login failed'), { code: data.code })
+    }
     if (data.id_token) {
       setToken(data.id_token)
       if (data.refresh_token) setRefreshToken(data.refresh_token)
@@ -535,13 +541,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser((prev) => prev ? { ...prev, name } : prev)
   }, [])
 
-  /* ---- Clarity: tag auth state whenever user changes ---- */
+  /* ---- Clarity + Sentry: tag auth state whenever user changes ---- */
   useEffect(() => {
     if (user) {
       clarityIdentify(user.sub)
       clarityTag('auth_state', 'logged_in')
+      setSentryUser(user.sub)
     } else if (!loading) {
       clarityTag('auth_state', 'anonymous')
+      setSentryUser(null)
     }
   }, [user, loading])
 

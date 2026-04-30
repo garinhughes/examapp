@@ -17,6 +17,7 @@
 import fp from 'fastify-plugin'
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { createSecretKey } from 'crypto'
+import { captureWithContext, addBreadcrumb } from '../lib/sentry.js'
 // ——— Types ———
 
 export interface AuthUser {
@@ -167,6 +168,7 @@ async function extractUser(request: FastifyRequest) {
         return
       } catch (err: any) {
         request.log.warn({ err: err.message }, 'Impersonation token verification failed')
+        captureWithContext(err, { tags: { 'auth.flow': 'impersonation-verify' } })
         request.user = null
         return
       }
@@ -194,6 +196,13 @@ async function extractUser(request: FastifyRequest) {
     request.user = await verifyCognitoToken(token)
   } catch (err: any) {
     request.log.warn({ err: err.message }, 'JWT verification failed')
+    // Most JWT failures are expired/invalid tokens — quiet, but keep a breadcrumb
+    // so a later captured error includes context. JWKS-network failures are
+    // captured separately so we surface infra issues.
+    addBreadcrumb('auth', 'JWT verification failed', { reason: err.message })
+    if (typeof err.message === 'string' && /jwks|fetch|network|enotfound/i.test(err.message)) {
+      captureWithContext(err, { tags: { 'auth.flow': 'jwt-verify', infra: 'jwks' } })
+    }
     request.user = null
   }
 }

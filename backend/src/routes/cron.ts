@@ -12,6 +12,7 @@ import { ddb, ENTITLEMENTS_TABLE, getUserBySub } from '../services/dynamo.js'
 import { sendExpiryReminderEmail } from '../services/ses.js'
 import { logEmailSend } from '../services/emailLogs.js'
 import { PRODUCTS } from '../catalog.js'
+import { captureWithContext } from '../lib/sentry.js'
 
 const REMINDER_DAYS = parseInt(process.env.EXPIRY_REMINDER_DAYS ?? '7', 10)
 
@@ -28,6 +29,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         }
       }
 
+      try {
       const cutoff = new Date(Date.now() + REMINDER_DAYS * 86_400_000).toISOString()
       const now = new Date().toISOString()
 
@@ -75,6 +77,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         } catch (err: any) {
           errors.push(`${ent.userId}/${ent.productId}: ${err.message ?? String(err)}`)
           server.log.error({ err }, '[cron] expiry reminder send failed')
+          captureWithContext(err, {
+            tags: { surface: 'cron', 'cron.job': 'expiry-reminders', stage: 'send' },
+            user: { id: ent.userId },
+            extra: { productId: ent.productId, expiresAt: ent.expiresAt },
+          })
         }
       }
 
@@ -89,6 +96,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
       server.log.info({ sent, errors: errors.length }, '[cron] expiry reminders sent')
       return { sent, errors: errors.length > 0 ? errors : undefined }
+      } catch (err) {
+        captureWithContext(err, { tags: { surface: 'cron', 'cron.job': 'expiry-reminders', stage: 'scan' } })
+        throw err
+      }
     }
   )
 }
