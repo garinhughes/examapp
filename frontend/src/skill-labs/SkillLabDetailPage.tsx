@@ -34,7 +34,7 @@ interface SkillLabDetailPageProps {
 }
 
 export function SkillLabDetailPage({ labId, onLabLoad }: SkillLabDetailPageProps) {
-  const { setRoute, authFetch, setupExamFromMeta } = useExam()
+  const { setRoute, authFetch, setupExamFromMeta, user } = useExam()
   const { inProgressLab, cancelActive } = useSkillLab()
   const [lab, setLab] = useState<LabSummary | null>(null)
   const [relatedExams, setRelatedExams] = useState<ExamMeta[]>([])
@@ -83,13 +83,15 @@ export function SkillLabDetailPage({ labId, onLabLoad }: SkillLabDetailPageProps
           setRelatedExams(exams.filter((e) => codes.has(String(e.code).toLowerCase())))
         }
 
-        // Merge backend completed IDs with localStorage
-        authFetch(apiUrl('/skill-labs/my-attempts'))
-          .then((r: Response) => r.json())
-          .then((d: { completedLabIds: string[] }) => {
-            if (!cancelled && d.completedLabIds.includes(labId)) setCompleted(true)
-          })
-          .catch(() => {})
+        // Merge backend completed IDs with localStorage (authenticated users only)
+        if (user) {
+          authFetch(apiUrl('/skill-labs/my-attempts'))
+            .then((r: Response) => r.json())
+            .then((d: { completedLabIds: string[] }) => {
+              if (!cancelled && d.completedLabIds.includes(labId)) setCompleted(true)
+            })
+            .catch(() => {})
+        }
       } catch {
         if (!cancelled) setError('Unable to load lab. Please try again.')
       } finally {

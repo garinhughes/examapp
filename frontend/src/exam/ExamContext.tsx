@@ -1162,18 +1162,19 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       .catch(() => setAvailableServices([]))
   }, [selected])
 
-  // Fetch score history when exam selected
+  // Fetch score history when exam selected (only for authenticated users)
   useEffect(() => {
+    if (!user) return
     if (selected) fetchScoreHistory(selected); else setScoreHistory(null)
-  }, [selected])
+  }, [user, selected])
 
   // Analytics / per-exam history page data
   useEffect(() => {
     if (route !== 'analytics' && route !== 'exam-history') return
-    if (!selected) return
+    if (!selected || !user) return
     setAnalyticsAttempts(null); setAnalyticsDomains(null)
     void fetchScoreHistory(selected)
-  }, [route, selected])
+  }, [route, selected, user])
 
   // Fetch questions
   useEffect(() => {

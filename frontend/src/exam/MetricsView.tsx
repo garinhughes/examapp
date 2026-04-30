@@ -161,7 +161,7 @@ function OverviewTab({ overview, exams }: { overview: OverviewData; exams: ExamS
       {/* Daily trend chart */}
       <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
         <h3 className="text-sm font-semibold mb-3 text-foreground">Daily Activity - Last 30 Days</h3>
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={200} minWidth={0}>
           <AreaChart data={overview.dailyTrend} margin={{ top: 4, right: 12, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="gradAttempts" x1="0" y1="0" x2="0" y2="1">
@@ -344,7 +344,7 @@ function QuestionsTab({ exams }: { exams: ExamSummary[] }) {
       {domains.length > 0 && (
         <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <h3 className="text-sm font-semibold mb-3 text-foreground">Domain Avg Scores</h3>
-          <ResponsiveContainer width="100%" height={Math.max(120, domains.length * 36)}>
+          <ResponsiveContainer width="100%" height={Math.max(120, domains.length * 36)} minWidth={0}>
             <BarChart data={domains} layout="vertical" margin={{ top: 0, right: 40, left: 8, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
               <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} tickFormatter={(v) => `${v}%`} />
@@ -433,7 +433,7 @@ function LabsTab({ labs }: { labs: LabStat[] }) {
       {chartData.length > 0 && (
         <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <h3 className="text-sm font-semibold mb-3 text-foreground">Pass Rate by Lab</h3>
-          <ResponsiveContainer width="100%" height={Math.max(160, chartData.length * 32)}>
+          <ResponsiveContainer width="100%" height={Math.max(160, chartData.length * 32)} minWidth={0}>
             <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 50, left: 8, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
               <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} tickFormatter={(v) => `${v}%`} />
@@ -517,7 +517,7 @@ function ModesTab({ exams }: { exams: ExamSummary[] }) {
       {attemptsData.length > 0 && (
         <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <h3 className="text-sm font-semibold mb-3 text-foreground">Total Attempts by Exam</h3>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={200} minWidth={0}>
             <BarChart data={attemptsData} margin={{ top: 4, right: 12, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} />
@@ -552,7 +552,7 @@ function ModesTab({ exams }: { exams: ExamSummary[] }) {
             <div key={exam.examCode} className="rounded-lg border border-border bg-card p-4 shadow-sm">
               <h3 className="text-sm font-semibold mb-2 text-foreground font-mono">{exam.examCode}</h3>
               <p className="text-xs text-muted-foreground mb-2">{total} total attempts</p>
-              <ResponsiveContainer width="100%" height={160}>
+              <ResponsiveContainer width="100%" height={160} minWidth={0}>
                 <PieChart>
                   <Pie data={data} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" paddingAngle={2}>
                     {data.map((entry, i) => (

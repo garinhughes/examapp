@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, Suspense, lazy, ComponentType } from 'react'
+import { Lock, ArrowRight } from 'lucide-react'
 import Loader from '@/components/Loader'
 import { apiUrl } from '@/apiBase'
 import { useExam } from '@/exam/ExamContext'
@@ -40,9 +41,10 @@ const genericRunnerImports: Record<SkillLabType, () => Promise<{ default: Compon
 }
 
 export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPageProps) {
-  const { authFetch, setRoute } = useExam()
+  const { authFetch, setRoute, user } = useExam()
   const [lab, setLab] = useState<LabDefinition | null>(null)
   const [loading, setLoading] = useState(true)
+  const [errorStatus, setErrorStatus] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
     async function fetchLab() {
       try {
         const res = await authFetch(apiUrl(`/skill-labs/${encodeURIComponent(labId)}`))
-        if (!res.ok) throw new Error('Failed to load')
+        if (!res.ok) { setErrorStatus(res.status); throw new Error('Failed to load') }
         const data = await res.json()
         if (!cancelled) setLab(data)
       } catch {
@@ -74,17 +76,58 @@ export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPagePr
   }, [runnerKey, labType])
 
   if (loading) return <Loader text="Loading lab…" />
-  if (error || !lab) return (
-    <div className="flex flex-col items-start gap-3 p-4">
-      <p className="text-destructive">{error || 'Lab not found'}</p>
-      <button
-        onClick={() => setRoute('skill-labs')}
-        className="px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition"
-      >
-        Back to Skill Labs
-      </button>
-    </div>
-  )
+
+  if (error || !lab) {
+    const isLocked = errorStatus === 403 || errorStatus === 401
+    return (
+      <div className="flex items-center justify-center min-h-[40vh] p-6">
+        <div className="max-w-sm w-full rounded-xl border border-border bg-card shadow-sm p-6 space-y-4 text-center">
+          {isLocked ? (
+            <>
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mx-auto">
+                <Lock className="w-6 h-6 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <h2 className="font-semibold text-foreground">Premium lab</h2>
+                <p className="text-sm text-muted-foreground">
+                  {user
+                    ? 'Your current plan does not include access to this lab.'
+                    : 'Sign in or upgrade your plan to access this lab.'}
+                </p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => setRoute('pricing')}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
+                >
+                  View Plans <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setRoute('skill-labs')}
+                  className="text-sm text-muted-foreground hover:text-foreground transition"
+                >
+                  Back to Skill Labs
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-1">
+                <h2 className="font-semibold text-foreground">Unable to load lab</h2>
+                <p className="text-sm text-muted-foreground">Something went wrong. Please try again.</p>
+              </div>
+              <button
+                onClick={() => setRoute('skill-labs')}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
+              >
+                Back to Skill Labs
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   if (!LazyRunner) {
     return <div className="text-destructive p-4">Unknown lab type: {(lab as any).type}</div>

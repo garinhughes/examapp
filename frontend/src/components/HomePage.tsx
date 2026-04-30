@@ -433,7 +433,7 @@ export function HomePage() {
               Certification Pass Rates by Study Method
             </h3>
             <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={288} minWidth={0}>
                 <BarChart data={researchData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis
