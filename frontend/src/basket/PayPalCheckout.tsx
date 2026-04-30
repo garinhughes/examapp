@@ -59,7 +59,7 @@ export default function PayPalCheckout() {
             headers: authHeaders(),
             body: JSON.stringify({
               productId: productIds[0],
-              successUrl: window.location.origin + '/?payment=success',
+              successUrl: window.location.origin + '/?payment=success&product=' + encodeURIComponent(productIds[0]),
               cancelUrl: window.location.origin + '/?payment=cancel',
             }),
           })
@@ -75,7 +75,7 @@ export default function PayPalCheckout() {
           clarityTag('payment_method', 'paypal_subscription')
           // Subscription activation is confirmed via webhook; navigate immediately
           clear()
-          window.location.href = window.location.origin + '/?payment=success'
+          window.location.href = window.location.origin + '/?payment=success&product=' + encodeURIComponent(productIds[0])
         }}
         onError={(err) => {
           clarityEvent('payment_error')

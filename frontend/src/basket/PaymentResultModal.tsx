@@ -18,10 +18,11 @@ const POLL_MAX_ATTEMPTS = 12 // ~24s total
 export function PaymentResultModal() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { tier, tierConfig, refresh } = useEntitlements()
+  const { tier, tierConfig, entitlements, products, refresh } = useEntitlements()
   const { clear } = useBasket()
   const [state, setState] = useState<'success' | 'cancel' | null>(null)
   const [polling, setPolling] = useState(false)
+  const [purchasedProductId, setPurchasedProductId] = useState<string | null>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -29,6 +30,7 @@ export function PaymentResultModal() {
     if (p === 'success' || p === 'cancel') {
       setState(p)
       if (p === 'success') {
+        setPurchasedProductId(params.get('product'))
         clear()
         setPolling(true)
       }
@@ -56,10 +58,14 @@ export function PaymentResultModal() {
     }
   }, [polling]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Stop polling once the paid tier appears.
+  // Stop polling once the purchased product's entitlement appears (or any paid tier if unknown).
   useEffect(() => {
-    if (polling && isPaidTier(tier)) setPolling(false)
-  }, [polling, tier])
+    if (!polling) return
+    const granted = purchasedProductId
+      ? entitlements.includes(purchasedProductId)
+      : isPaidTier(tier)
+    if (granted) setPolling(false)
+  }, [polling, tier, entitlements, purchasedProductId])
 
   if (!state) return null
 
@@ -98,7 +104,7 @@ export function PaymentResultModal() {
             <p className="text-center text-muted-foreground mb-5">
               {isPaidTier(tier) ? (
                 <>
-                  Your <strong className="text-foreground">{tierConfig.label}</strong> plan is now
+                  Your <strong className="text-foreground">{purchasedProductId ? (products.find(p => p.productId === purchasedProductId)?.label ?? tierConfig.label) : tierConfig.label}</strong> plan is now
                   active. You have full access to all practice exams and skill labs.
                 </>
               ) : polling ? (

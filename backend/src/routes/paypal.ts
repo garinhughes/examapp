@@ -199,10 +199,13 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       const sub = (await subRes.json()) as any
       const subscriptionId = sub.id
 
+      const discountedPrice = discountActive ? (
+        productId === 'sub:pro' ? 500 : productId === 'sub:pro-plus' ? 700 : prod.priceGBP
+      ) : prod.priceGBP
       await putPaypalSession('PAYPAL_SUB', subscriptionId, {
         userId,
         productIds: [productId],
-        amountPence: prod.priceGBP,
+        amountPence: discountedPrice,
         successUrl,
         cancelUrl,
       })

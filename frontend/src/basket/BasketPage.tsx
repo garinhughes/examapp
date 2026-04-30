@@ -55,7 +55,7 @@ export default function BasketPage() {
     if (productIds.length === 0) return
 
     try {
-      const successUrl = window.location.origin + '/?payment=success'
+      const successUrl = window.location.origin + '/?payment=success&product=' + encodeURIComponent(productIds[0])
       const cancelUrl = window.location.origin + '/?payment=cancel'
 
       const headers: Record<string, string> = { 'Content-Type': 'application/json' }
