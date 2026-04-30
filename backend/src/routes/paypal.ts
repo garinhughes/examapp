@@ -106,6 +106,23 @@ async function _grantFromSession(
     { pk, sk, userId: sess.userId, productIds: sess.productIds },
     '[paypal] entitlements granted'
   )
+  // Alert if the user now holds multiple active subscription tiers — indicates a cancelled-then-upgraded
+  // scenario where both entitlements are valid concurrently (expected but worth monitoring).
+  if (sess.productIds.some((pid: string) => getProduct(pid)?.kind === 'subscription')) {
+    const allEnts = await getUserEntitlements(sess.userId)
+    const activeSubs = allEnts.filter((e) => getProduct(e.productId)?.kind === 'subscription')
+    if (activeSubs.length > 1) {
+      sendInternalAlert({
+        subject: '[certshack] User has multiple active PayPal subscriptions (review)',
+        lines: [
+          `User ID:      ${sess.userId}`,
+          `Products:     ${activeSubs.map((e) => `${e.productId} (${e.status}, expires ${e.expiresAt ?? 'never'})`).join(' | ')}`,
+          `Timestamp:    ${new Date().toISOString()}`,
+          'Note: likely a cancel-then-upgrade — verify both expiresAt dates are correct.',
+        ],
+      })
+    }
+  }
   // Send payment confirmation email (fire-and-forget)
   try {
     const user = await getUserBySub(sess.userId)
@@ -270,6 +287,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             ? new Date(new Date(nextBillingTime).getTime() + 86400_000).toISOString()
             : null
           await _grantFromSession('PAYPAL_SUB', subscriptionId, server, expiresAt)
+          sendInternalAlert({
+            subject: '[certshack] PayPal subscription activated',
+            lines: [
+              `Subscription: ${subscriptionId}`,
+              `Plan ID:      ${resource?.plan_id ?? 'unknown'}`,
+              `Expires at:   ${expiresAt ?? 'unknown'}`,
+              `Timestamp:    ${new Date().toISOString()}`,
+            ],
+          })
         }
       } else if (eventType === 'PAYMENT.SALE.COMPLETED') {
         // Recurring subscription payment — refresh expiresAt for the next billing cycle
@@ -304,6 +330,16 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
                   })
                 }
                 server.log.info({ subscriptionId, nextBillingTime, count: scan.Items?.length ?? 0 }, '[paypal] renewal — entitlement refreshed')
+                sendInternalAlert({
+                  subject: '[certshack] PayPal subscription renewed',
+                  lines: [
+                    `Subscription:     ${subscriptionId}`,
+                    `Entitlements:     ${scan.Items?.map((i) => i.productId).join(', ') ?? 'none'}`,
+                    `Next billing:     ${nextBillingTime}`,
+                    `New expires at:   ${expiresAt}`,
+                    `Timestamp:        ${new Date().toISOString()}`,
+                  ],
+                })
               }
             }
           } catch (err) {
