@@ -204,7 +204,7 @@ export function HomePage() {
         <div className="flex items-center justify-center gap-3 mb-3">
           <img src={logoSrc} alt="certshack" className="h-12 w-auto" />
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
-            <span className="text-foreground">cert</span><span className="text-orange-500">shack</span>
+            <span className="text-foreground">cert</span><span className="text-[var(--primary)]">shack</span>
           </h1>
         </div>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
