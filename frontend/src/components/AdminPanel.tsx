@@ -1602,21 +1602,7 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
                   <div className="space-y-2">
                     <p className="text-xs font-medium text-muted-foreground">Audience filters <span className="font-normal">(all active filters are ANDed)</span></p>
 
-                    {/* Provider filter */}
-                    <div className="p-3 rounded-lg border border-border bg-card space-y-1.5">
-                      <label className="text-xs font-medium block">By provider</label>
-                      <select
-                        value={campaignProvider}
-                        onChange={(e) => { setCampaignProvider(e.target.value); resetPreview() }}
-                        className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      >
-                        <option value="">Any provider</option>
-                        <option value="AWS">AWS customers</option>
-                        <option value="Anthropic">Anthropic customers</option>
-                      </select>
-                    </div>
-
-                    {/* Exam filter */}
+                    {/* Tier filter */}
                     <div className="p-3 rounded-lg border border-border bg-card space-y-1.5">
                       <label className="text-xs font-medium block">By product</label>
                       <select
@@ -1625,10 +1611,9 @@ function EmailsPanel({ authFetch }: { authFetch: ReturnType<typeof useAuthFetch>
                         className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                       >
                         <option value="">Any product</option>
+                        <option value="free">Free</option>
                         <option value="sub:pro">Pro (subscription)</option>
                         <option value="sub:pro-plus">Pro Plus (subscription)</option>
-                        <option value="sub:pro-oneoff">Pro (one-off)</option>
-                        <option value="sub:pro-plus-oneoff">Pro Plus (one-off)</option>
                       </select>
                     </div>
 

@@ -53,8 +53,8 @@ async function renderEmail(opts: {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>${opts.title}</title>
 </head>
-<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:32px 0;">
+<body style="margin:0;padding:0;background:#d4d4d4;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#d4d4d4;padding:32px 0;">
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;max-width:600px;">
         <!-- Header -->
@@ -86,7 +86,7 @@ async function renderEmail(opts: {
         </tr>
         <!-- Footer -->
         <tr>
-          <td style="background:#f4f4f4;padding:20px 32px;border-top:1px solid #e0e0e0;">
+          <td style="background:#d4d4d4;padding:20px 32px;border-top:1px solid #d0d0d0;">
             ${unsubLine}
             <p style="margin:0;font-size:12px;color:#999;">certshack - IT Practice Exams &amp; Skill Labs Platform</p>
             <p style="margin:4px 0 0;font-size:12px;color:#999;">
