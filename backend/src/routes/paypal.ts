@@ -660,6 +660,18 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
       try {
         const token = await getPaypalToken()
+
+        // Check current subscription status — PayPal rejects revisions on cancelled subscriptions.
+        const statusRes = await fetch(`${PP_BASE}/v1/billing/subscriptions/${subEnt.stripeSubscriptionId}`, {
+          headers: ppHeaders(token),
+        })
+        if (statusRes.ok) {
+          const statusData = await statusRes.json() as any
+          if (statusData?.status === 'CANCELLED') {
+            return reply.status(409).send({ message: 'subscription_cancelled', hint: 'Your current subscription is cancelled — please purchase a new subscription.' })
+          }
+        }
+
         const frontend = process.env.FRONTEND_ORIGIN || 'https://certshack.com'
         const reviseRes = await fetch(`${PP_BASE}/v1/billing/subscriptions/${subEnt.stripeSubscriptionId}/revise`, {
           method: 'POST',

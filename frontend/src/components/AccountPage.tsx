@@ -118,6 +118,11 @@ export default function AccountPage() {
           }
         }
         const ppData = await ppRes.json().catch(() => ({}))
+        if (ppRes.status === 409 && (ppData as any).message === 'subscription_cancelled') {
+          // Cancelled sub can't be revised — send to pricing to buy a new one
+          window.location.href = `/pricing`
+          return
+        }
         setChangePlanError((ppData as any).message ?? 'Could not initiate plan change')
       } else {
         setChangePlanError((data as any).message ?? 'Could not change plan')
@@ -700,7 +705,7 @@ export default function AccountPage() {
                       <div className="text-xs font-mono text-muted-foreground">{pid}</div>
                       {renewsAt && (
                         <div className="text-xs text-muted-foreground">
-                          {detail?.status === 'cancelled' ? 'Access until' : 'Renews on'}: <span className="font-medium text-foreground">{renewsAt}</span>
+                          {detail?.status === 'cancelled' ? 'Expires on' : 'Renews on'}: <span className="font-medium text-foreground">{renewsAt}</span>
                         </div>
                       )}
                       <div className="text-xs text-muted-foreground">Via {sourceLabel}</div>
