@@ -204,7 +204,7 @@ module "ecs" {
   paypal_plan_id_pro_plus_monthly  = "" # Set after creating PayPal billing plan for Pro Plus
   paypal_plan_id_pro_discount      = "" # Set when running a promotion (discounted Pro plan)
   paypal_plan_id_pro_plus_discount = "" # Set when running a promotion (discounted Pro Plus plan)
-  paypal_webhook_id                = "3B392581WH426842V"
+  paypal_webhook_id                = "5H458344BE202643E"
   paypal_client_secret_arn         = module.secretsmanager.paypal_client_secret_arn
   stripe_secret_key_arn            = module.secretsmanager.stripe_secret_key_arn
   stripe_webhook_secret_arn        = module.secretsmanager.stripe_webhook_secret_arn

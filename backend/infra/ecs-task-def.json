@@ -52,7 +52,7 @@
         { "name": "PAYPAL_PLAN_ID_PRO_PLUS_MONTHLY",  "value": "P-99007729S16370157NHRBXIA" },
         { "name": "PAYPAL_PLAN_ID_PRO_DISCOUNT",      "value": "P-7HN732197E215610YNHRBYOA" },
         { "name": "PAYPAL_PLAN_ID_PRO_PLUS_DISCOUNT", "value": "P-05F13338N6355904CNHRBZBA" },
-        { "name": "PAYPAL_WEBHOOK_ID", "value": "3B392581WH426842V" },
+        { "name": "PAYPAL_WEBHOOK_ID", "value": "5H458344BE202643E" },
         { "name": "SES_OUTREACH_ADDRESS", "value": "outreach@certshack.com" },
         { "name": "EMAIL_TEMPLATES_TABLE", "value": "examapp-email-templates" },
         { "name": "EMAIL_LOGS_TABLE", "value": "examapp-email-logs" },
