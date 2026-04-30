@@ -1,4 +1,14 @@
 import 'dotenv/config'
+import * as Sentry from '@sentry/node'
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV ?? 'production',
+    tracesSampleRate: 0,
+  })
+}
+
 // Ensure Node's WebCrypto is available as `globalThis.crypto` for libraries
 // like `jose` that expect the Web Crypto API.
 import { webcrypto as nodeWebcrypto } from 'crypto'
@@ -123,6 +133,14 @@ await server.register(imagesRoutes, { prefix: '/images' })
 await server.register(cronRoutes, { prefix: '/internal/cron' })
 // Public one-click unsubscribe
 await server.register(unsubscribeRoutes, { prefix: '/unsubscribe' })
+
+// Capture unhandled route errors in Sentry
+server.setErrorHandler((err, _req, reply) => {
+  if (process.env.SENTRY_DSN && (err.statusCode == null || (err.statusCode ?? 500) >= 500)) {
+    Sentry.captureException(err)
+  }
+  reply.status(err.statusCode ?? 500).send({ error: err.message })
+})
 
 // Health check for ALB
 server.get('/health', async () => ({ status: 'ok' }))

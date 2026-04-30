@@ -43,3 +43,9 @@ variable "unsubscribe_secret_name" {
   type        = string
   default     = "examapp-unsubscribe-secret"
 }
+
+variable "sentry_dsn_secret_name" {
+  description = "Name of the Secrets Manager secret holding the Sentry DSN"
+  type        = string
+  default     = "examapp-sentry-dsn"
+}

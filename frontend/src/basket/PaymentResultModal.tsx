@@ -11,6 +11,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { useEntitlements, isPaidTier } from '../hooks/useEntitlements'
 import { useBasket } from './BasketContext'
+import { trackPurchase } from '../analytics'
 
 const POLL_INTERVAL_MS = 2000
 const POLL_MAX_ATTEMPTS = 12 // ~24s total
@@ -59,12 +60,16 @@ export function PaymentResultModal() {
   }, [polling]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Stop polling once the purchased product's entitlement appears (or any paid tier if unknown).
+  // Fire the GA4 purchase event exactly once when the entitlement is confirmed.
   useEffect(() => {
     if (!polling) return
     const granted = purchasedProductId
       ? entitlements.includes(purchasedProductId)
       : isPaidTier(tier)
-    if (granted) setPolling(false)
+    if (granted) {
+      setPolling(false)
+      trackPurchase(purchasedProductId ?? tier, tierConfig?.label)
+    }
   }, [polling, tier, entitlements, purchasedProductId])
 
   if (!state) return null

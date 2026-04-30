@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react'
 import { apiUrl } from '../apiBase'
 import { clarityIdentify, clarityTag } from '../clarity'
+import { trackSignUp } from '../analytics'
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -457,6 +458,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.message || 'Confirmation failed')
+    trackSignUp()
   }, [])
 
   const resendConfirmation = useCallback(async (email: string) => {

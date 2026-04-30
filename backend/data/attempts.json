@@ -36318,6 +36318,2060 @@
       "examMode": "casual",
       "revealAnswers": "immediately",
       "abandonedAt": "2026-04-30T11:44:45.031Z"
+    },
+    {
+      "attemptId": "472608d5-11f5-4ce8-92c8-a01c44b53988",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "SAA-C03",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-04-30T14:12:16.207Z",
+      "updatedAt": "2026-04-30T14:13:26.191Z",
+      "finishedAt": null,
+      "status": "abandoned",
+      "score": null,
+      "answers": [
+        {
+          "questionId": "SAA-C03-0051",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": [
+            "c2",
+            "c4"
+          ],
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:12:19.140Z"
+        },
+        {
+          "questionId": "SAA-C03-0062",
+          "selectedChoiceId": "c4",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:12:24.870Z"
+        },
+        {
+          "questionId": "SAA-C03-0055",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": [
+            "c4",
+            "c2"
+          ],
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:12:32.045Z"
+        },
+        {
+          "questionId": "SAA-C03-0006",
+          "selectedChoiceId": "c3",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:12:36.540Z"
+        },
+        {
+          "questionId": "SAA-C03-0089",
+          "selectedChoiceId": "c2",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:12:49.380Z"
+        },
+        {
+          "questionId": "SAA-C03-0046",
+          "selectedChoiceId": "c1",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:12:53.173Z"
+        },
+        {
+          "questionId": "SAA-C03-0034",
+          "selectedChoiceId": "c3",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:12:56.348Z"
+        },
+        {
+          "questionId": "SAA-C03-0094",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": [
+            "c2",
+            "c4"
+          ],
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:13:00.771Z"
+        },
+        {
+          "questionId": "SAA-C03-0083",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": [
+            "c5",
+            "c3"
+          ],
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:13:05.817Z"
+        }
+      ],
+      "metadata": {
+        "pinned": true,
+        "pinnedQuestionIds": [
+          "SAA-C03-0006",
+          "SAA-C03-0034",
+          "SAA-C03-0046",
+          "SAA-C03-0051",
+          "SAA-C03-0055",
+          "SAA-C03-0062",
+          "SAA-C03-0083",
+          "SAA-C03-0089",
+          "SAA-C03-0094"
+        ]
+      },
+      "questions": [
+        {
+          "id": "SAA-C03-0051",
+          "type": "multiple-choice",
+          "question": "Management has approved a budget to protect a customer-facing API deployed on Amazon API Gateway from both volumetric DDoS attacks and application-layer exploits, including rate-based abuse and automated bot traffic.\n\nWhich TWO actions provide COMPREHENSIVE protection against both threat categories?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Associate an AWS WAF web ACL with the Amazon API Gateway stage, configuring rate-based rules and managed rule groups to inspect and block malicious HTTP requests at the application layer.",
+              "isCorrect": true,
+              "explanation": "AWS WAF attached to API Gateway inspects each HTTP request at layer 7, enabling rate limiting and blocking of bots, scrapers, and other application-layer threats through configurable rules and managed rule groups.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Deploy AWS Firewall Manager to centrally manage network ACL policies across all AWS accounts in the organization, automatically pushing subnet-level deny rules to the API Gateway region to block all attack vectors.",
+              "isCorrect": false,
+              "explanation": "AWS Firewall Manager helps manage WAF and security group policies centrally across accounts. Network ACLs at the subnet level do not inspect API Gateway traffic at the application layer and do not provide DDoS mitigation comparable to Shield Advanced."
+            },
+            {
+              "id": "c5",
+              "text": "Enable AWS Config rules to continuously evaluate the API Gateway configuration for compliance with security standards and automatically invoke Lambda remediation functions when non-compliant settings are detected.",
+              "isCorrect": false,
+              "explanation": "AWS Config monitors resource configuration for compliance but is not an active threat protection service. It does not inspect live traffic, block attacks, or mitigate DDoS events."
+            },
+            {
+              "id": "c1",
+              "text": "Enable AWS Shield Advanced on the Amazon API Gateway endpoint to receive managed DDoS detection, automatic mitigation, and proactive support from the AWS Shield Response Team for volumetric attacks.",
+              "isCorrect": true,
+              "explanation": "AWS Shield Advanced provides layer 3 and layer 4 DDoS protection with automatic threat mitigation and access to the Shield Response Team for assistance during active attacks.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Enable Amazon GuardDuty on the AWS account and configure an Amazon EventBridge rule to automatically update API Gateway resource policies to block IP addresses flagged by GuardDuty threat intelligence feeds.",
+              "isCorrect": false,
+              "explanation": "GuardDuty detects threats based on account-level log analysis rather than real-time request inspection. Automatically modifying API Gateway resource policies based on GuardDuty findings is a reactive remediation pattern, not a comprehensive protection layer for both DDoS and application-layer attacks."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "1.2.3: Integrating AWS services to secure applications (for example, AWS Shield, AWS WAF, IAM Identity Center, AWS Secrets Manager)."
+          ],
+          "services": [
+            "AWS Shield",
+            "AWS WAF",
+            "Amazon API Gateway"
+          ],
+          "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/aws-shield.html",
+          "tip": "Identify the two distinct threat categories (volumetric at the network layer vs. exploits at the application layer) and match each to the AWS service built specifically for that threat type.",
+          "explanation": "Volumetric DDoS attacks and application-layer exploits require different controls. AWS Shield Advanced addresses DDoS threats at layers 3 and 4, while AWS WAF addresses application-layer threats at layer 7. Both are required for comprehensive protection of the API.\n\n**Why it works:** Shield Advanced monitors for abnormal traffic volumes targeting the API Gateway endpoint and coordinates automatic mitigation. AWS WAF inspects each HTTP request against rules that block rate-based abuse, bots, and common exploits. Together they cover both threat categories.\n\n**Why the others don't work:**\n- GuardDuty is a threat detection service for account-level activity. Reactively modifying API Gateway resource policies based on its findings introduces latency and is not a supported real-time mitigation pattern.\n- Firewall Manager centralizes policy management but does not itself protect against DDoS or perform application-layer traffic inspection.\n- AWS Config is a configuration compliance service, not a threat prevention or traffic filtering service.",
+          "diagram": "diagrams/aws/SAA-C03/ApiGatewayDdosProtection.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0062",
+          "type": "single-choice",
+          "question": "Management has decided that all new Amazon EBS volumes created in the production AWS account must be encrypted at rest. The security team wants encryption to be applied automatically to every new EBS volume regardless of which developer or service creates it, without requiring developers to specify encryption settings manually during volume creation.\n\nWhat is the MOST operationally efficient way to enforce this requirement across the entire AWS account?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Create a Service Control Policy at the organization root OU level that denies the ec2:CreateVolume action unless a specific encryption condition key is present in the request, preventing unencrypted volumes across all accounts.",
+              "isCorrect": false,
+              "explanation": "AWS IAM condition keys for evaluating resource-level encryption attributes in EBS CreateVolume requests are not available in a way that makes SCP-based enforcement straightforwardly reliable. Enabling account-level EBS encryption by default is the intentional AWS mechanism for this requirement and is simpler and more authoritative than attempting to enforce it via SCP condition keys."
+            },
+            {
+              "id": "c3",
+              "text": "Deploy an AWS Config managed rule that identifies unencrypted EBS volumes and triggers an automatic SSM Automation remediation action to encrypt the volumes by creating an encrypted snapshot and replacement volume.",
+              "isCorrect": false,
+              "explanation": "An AWS Config rule with SSM automation remediation is a reactive detective and corrective control rather than a preventive one. There is a window of exposure between when an unencrypted volume is created and when the remediation completes. This approach is also operationally more complex to set up and maintain than the account-level default encryption setting."
+            },
+            {
+              "id": "c1",
+              "text": "Enable EBS encryption by default at the AWS account level in the EC2 console for each applicable region, which causes all newly created EBS volumes and snapshots to be encrypted automatically using the specified KMS key without requiring any developer action.",
+              "isCorrect": true,
+              "explanation": "The EBS account-level encryption by default setting is a single configuration change per region that automatically encrypts all new EBS volumes and copied snapshots without requiring developers to select encryption during volume creation. It is a preventive control that applies universally to the account.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Attach an IAM permissions policy to every developer role that denies the ec2:CreateVolume action when the volume encryption parameter is not set to true, ensuring developers cannot create unencrypted volumes.",
+              "isCorrect": false,
+              "explanation": "IAM deny policies cannot inspect resource-level encryption attributes in CreateVolume requests in a straightforward way and are complex to maintain. Even if such a policy were implemented, it would need to be applied to every role that can create volumes and would not automatically enforce encryption on volumes created by AWS services or automation on the developer's behalf."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "1.3.2: Encrypting data at rest (for example, AWS Key Management Service [AWS KMS])."
+          ],
+          "services": [
+            "Amazon EC2",
+            "Amazon EBS",
+            "AWS KMS"
+          ],
+          "docs": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html",
+          "tip": "Consider which single account-level configuration change acts as a preventive control that requires no per-developer action and applies automatically to all volume creation events in the account.",
+          "explanation": "Enabling EBS encryption by default at the AWS account level is the intended mechanism for this requirement. Once enabled for a region, all newly created EBS volumes and snapshots copied within that region are encrypted automatically using the specified KMS key, with no developer action required during volume creation.\n\n**Why it works:** The setting is a single toggle in the EC2 console or via the `EnableEbsEncryptionByDefault` API call, applied per region. It acts as a true preventive control that cannot be bypassed by developers on a per-volume basis, satisfying the operational efficiency and universal enforcement requirements.\n\n**Why the others don't work:**\n- IAM deny policy: Cannot inspect EBS-specific encryption attributes in a simple, universally applicable way. Requires maintenance across every principal that can create volumes and does not cover volumes created by AWS services acting on behalf of the account.\n- AWS Config with SSM remediation: A reactive approach that leaves a window of unencrypted exposure between volume creation and remediation. Operationally more complex than enabling the account-level default.\n- SCP on EBS encryption condition key: SCP condition-key enforcement for EBS encryption attributes is not straightforward and is a significantly more complex mechanism than the purpose-built account-level default setting.",
+          "diagram": "diagrams/aws/SAA-C03/EbsEncryptionDefault.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0055",
+          "type": "multiple-choice",
+          "question": "To reduce infrastructure costs, an organization must transfer financial data between an on-premises data center and AWS over a connection that is both private (not traversing the public internet) and encrypted in transit.\n\nWhich TWO components should be combined to satisfy both requirements simultaneously?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Enable AWS Shield Advanced on the virtual private gateway to protect the connection from DDoS attacks, and enable VPC Flow Logs to verify that traffic between the on-premises network and AWS is encrypted end to end.",
+              "isCorrect": false,
+              "explanation": "AWS Shield Advanced provides DDoS protection. VPC Flow Logs provide metadata visibility into network traffic. Neither service encrypts the data channel between on-premises and AWS."
+            },
+            {
+              "id": "c2",
+              "text": "Configure an AWS Site-to-Site VPN connection over the Direct Connect link to apply IPsec encryption to all data in transit between the on-premises network and the AWS virtual private gateway.",
+              "isCorrect": true,
+              "explanation": "Running a Site-to-Site VPN over a Direct Connect connection adds IPsec encryption while keeping traffic on the dedicated private circuit. This is the AWS-recommended pattern when both privacy and encryption in transit are required.",
+              "sequence": 2
+            },
+            {
+              "id": "c5",
+              "text": "Use AWS PrivateLink to create interface endpoints for all required AWS services and configure on-premises DNS to resolve AWS service hostnames to private endpoint IP addresses over an existing internet connection.",
+              "isCorrect": false,
+              "explanation": "AWS PrivateLink routes traffic within the AWS network to private service endpoints but still requires an existing private connectivity mechanism for on-premises access. Using it over an internet connection does not create a private or encrypted dedicated path."
+            },
+            {
+              "id": "c1",
+              "text": "Establish an AWS Direct Connect connection to create a dedicated private link between the on-premises network and AWS, ensuring data does not traverse any shared public internet infrastructure.",
+              "isCorrect": true,
+              "explanation": "AWS Direct Connect provides the dedicated private network path. However, Direct Connect does not encrypt traffic by default, so encryption must be added separately.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Deploy an AWS Transit Gateway with an inter-region peering attachment and enable BGP route propagation on the virtual private gateway to create a dedicated, encrypted path for all on-premises-to-AWS traffic.",
+              "isCorrect": false,
+              "explanation": "Transit Gateway inter-region peering connects AWS regions within the AWS network. It does not connect on-premises data centers to AWS and does not add encryption to a Direct Connect connection."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "1.2.4: Securing external network connections to and from the AWS Cloud (for example, VPN, AWS Direct Connect)."
+          ],
+          "services": [
+            "AWS Direct Connect",
+            "AWS Site-to-Site VPN"
+          ],
+          "docs": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/encryption-in-transit.html",
+          "tip": "Note that no single AWS connectivity service simultaneously provides both a dedicated private circuit and built-in encryption. Consider which two distinct services complement each other to cover both requirements.",
+          "explanation": "AWS Direct Connect provides the dedicated private network path (addressing the 'no public internet' requirement), and a Site-to-Site VPN overlay adds IPsec encryption in transit (addressing the encryption requirement). Running a VPN over Direct Connect is the AWS-recommended architecture when both are needed.\n\n**Why it works:** Direct Connect ensures the physical path avoids the public internet. The Site-to-Site VPN creates an encrypted IPsec tunnel traveling within the Direct Connect connection, encrypting data end-to-end between the on-premises VPN device and the AWS virtual private gateway.\n\n**Why the others don't work:**\n- Transit Gateway inter-region peering is an AWS-to-AWS construct and cannot substitute for on-premises connectivity or add encryption to Direct Connect.\n- AWS Shield Advanced and VPC Flow Logs address threat protection and traffic visibility, not data-in-transit encryption for external connections.\n- AWS PrivateLink requires a pre-existing private connectivity mechanism for on-premises access and cannot replace the dedicated circuit provided by Direct Connect.",
+          "diagram": "diagrams/aws/SAA-C03/DirectConnectVpnEncryption.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0006",
+          "type": "single-choice",
+          "question": "Orders are processed through a central checkout service on AWS. When an order is confirmed, an inventory service, a shipping service, and a fraud detection service must each independently receive and process every order event. The inventory service experiences scheduled maintenance windows lasting up to 10 minutes, during which it cannot consume messages.\n\nWhich architecture ensures all three services receive every order event, maintains message delivery during downstream outages, and allows each service to process events at its own rate?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Create an Amazon SNS topic for order confirmations and subscribe a dedicated Amazon SQS standard queue for each downstream service, allowing each service to poll its own queue independently.",
+              "isCorrect": true,
+              "explanation": "The SNS fan-out to SQS pattern publishes each order event once to SNS, which delivers it simultaneously to all three subscribed SQS queues. Each queue buffers messages independently, retaining events during the inventory service's maintenance window and allowing each service to consume at its own pace without affecting the others.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Create an Amazon SQS FIFO queue for order events with a message group ID assigned per downstream service, and configure all three services as consumers so each receives only messages belonging to its own group, preserving strict per-service ordering throughout processing.",
+              "isCorrect": false,
+              "explanation": "SQS FIFO queues with message group IDs control ordering within a queue for a single consumer type - they do not support multiple independent consumers each receiving the same message. Messages are still consumed competitively, and each order event can reach only one of the three services."
+            },
+            {
+              "id": "c1",
+              "text": "Create an Amazon SQS standard queue for order events and configure all three downstream services as consumers using long polling, relying on SQS message visibility timeouts to prevent duplicate processing across services.",
+              "isCorrect": false,
+              "explanation": "SQS standard queues use a competing consumer model: each message is delivered to exactly one consumer. Once any service reads and deletes a message, the other two services never receive it. This is not fan-out delivery."
+            },
+            {
+              "id": "c2",
+              "text": "Create an Amazon EventBridge custom event bus and configure three rules, each routing order events directly to a target Lambda function representing the inventory, shipping, and fraud services, with Lambda async retry and a dead-letter queue configured on each function.",
+              "isCorrect": false,
+              "explanation": "EventBridge routing directly to Lambda lacks a durable per-service message buffer. During a 10-minute maintenance window, Lambda invocations will fail and the built-in async retry policy (2 retries over a few minutes) does not retain messages for the full outage duration. A persistent queue is required to absorb extended outages."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Resilient Architectures",
+          "skills": [
+            "2.1.1: Designing event-driven, microservice, and/or multi-tier architectures based on requirements."
+          ],
+          "services": [
+            "SNS",
+            "SQS"
+          ],
+          "docs": "https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html",
+          "tip": "Identify which pattern delivers the same event independently to multiple consumers while providing per-consumer durability that can absorb downstream outages.",
+          "explanation": "The SNS + SQS fan-out pattern is the canonical AWS architecture for delivering the same event to multiple independent downstream services. SNS publishes the message once and simultaneously delivers it to all subscribed SQS queues. Each queue acts as an independent, durable buffer.\n\n**Why it works:** SNS guarantees delivery to each subscribed SQS queue. Messages persist in each queue independently - during the inventory service's 10-minute maintenance window, messages accumulate in its queue and are processed automatically when the service recovers, with no message loss and no impact on the shipping or fraud service queues.\n\n**Why the others fail:**\n- Shared SQS standard queue with competing consumers: Each SQS message is delivered to exactly one consumer. All three services compete for the same messages, so each order event reaches only one service.\n- EventBridge rules directly to Lambda: Lambda async retry covers only short failure windows (2 retries over a few minutes). A 10-minute maintenance window exceeds built-in retry behavior without an SQS buffer to retain messages during the outage.\n- SQS FIFO with message group IDs per service: Message group IDs manage ordering within a single queue for one consumer - they do not enable multiple independent consumers to each receive the same message.\n\n**Implementation:** Console > SNS > Create topic > Add subscriptions. `aws sns subscribe --topic-arn <arn> --protocol sqs --notification-endpoint <queue-arn>` repeated for each downstream SQS queue.",
+          "diagram": "diagrams/aws/SAA-C03/SnsSquFanOut.mmd",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-30"
+        },
+        {
+          "id": "SAA-C03-0089",
+          "type": "single-choice",
+          "question": "The organization is migrating a suite of microservices from on-premises bare-metal servers to AWS. Each microservice is written in a different language (Java, Python, and Go), has distinct runtime dependency versions that conflict when co-located, and must be deployable independently without affecting other services. The operations team has limited capacity to manage EC2 instance patching and OS maintenance. The services run continuously and handle sustained traffic, with no tolerance for cold starts measured in seconds.\n\nWhich hosting approach is MOST appropriate?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Deploy each microservice as an AWS Lambda function, packaging each language runtime as a Lambda layer, and configure provisioned concurrency to eliminate cold starts.",
+              "isCorrect": false,
+              "explanation": "Lambda functions have a maximum execution duration of 15 minutes and are optimised for event-driven invocations rather than continuously running services. Provisioned concurrency reduces cold starts but adds cost and does not address sustained long-running workloads."
+            },
+            {
+              "id": "c1",
+              "text": "Package each microservice as a container image, push to Amazon ECR, and deploy on Amazon ECS with the AWS Fargate launch type, using separate task definitions per service.",
+              "isCorrect": true,
+              "explanation": "Containers encapsulate each runtime and its dependencies, eliminating conflicts. Fargate removes OS patching overhead. ECS task definitions provide independent deployment units per service.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Deploy all microservices on a single EC2 instance using separate Python virtual environments and Java class-path isolation to prevent runtime conflicts.",
+              "isCorrect": false,
+              "explanation": "Co-locating services on a single instance introduces resource contention and does not provide the process-level isolation that containers offer. Independent deployment without affecting co-located services is difficult to achieve reliably in this model."
+            },
+            {
+              "id": "c3",
+              "text": "Launch a dedicated `m5.xlarge` EC2 instance per microservice and use AWS Systems Manager Patch Manager to automate OS patching across the fleet.",
+              "isCorrect": false,
+              "explanation": "Dedicated EC2 instances per service resolve dependency conflicts but do not reduce operational overhead compared to containers on Fargate. The team still manages OS lifecycles per instance, and Patch Manager assists but does not eliminate that burden."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Resilient Architectures",
+          "skills": [
+            "2.1.4: Determining when to use containers."
+          ],
+          "services": [
+            "Amazon ECS",
+            "AWS Fargate",
+            "Amazon ECR"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html",
+          "tip": "Consider which compute model provides runtime isolation and removes OS management responsibilities.",
+          "explanation": "Containers provide process-level isolation with independent filesystems, letting each microservice carry its own runtime version. Deploying on Fargate means AWS manages the underlying host OS, patching, and infrastructure, directly addressing the team's limited operational capacity.\n\n**Why it works:** Each container image bundles the exact runtime (JDK version, Python version, Go binary) needed. ECS task definitions allow independent deployment -- updating the Python service does not redeploy the Java service. Fargate ensures no EC2 instance maintenance.\n\n**Why the others don't work:**\n- Option B: Lambda is not designed for continuously running services. Its 15-minute maximum invocation duration and event-driven model are mismatched to sustained traffic workloads.\n- Option C: One EC2 per service resolves dependency conflicts but reintroduces OS management per instance. Patch Manager reduces effort but does not eliminate it the way Fargate does.\n- Option D: Shared-instance co-location with virtual environments does not provide container-grade isolation and makes independent service deployments error-prone.",
+          "diagram": "diagrams/aws/SAA-C03/EcsFargateEcr.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0046",
+          "type": "single-choice",
+          "question": "Following a security review, the architecture team is designing a three-tier web application. The web tier serves end users directly from the internet, the application tier processes business logic, and the database tier stores sensitive customer records.\n\nWhich subnet placement strategy provides the MOST secure configuration for this architecture?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Place the web and application tiers in public subnets for direct internet access, and restrict the database tier to a private subnet protected by network ACL rules that deny all traffic except from the application tier CIDR block.",
+              "isCorrect": false,
+              "explanation": "Placing the application tier in a public subnet unnecessarily exposes business logic servers to the internet, widening the attack surface. Application servers do not require direct internet accessibility to serve the web tier."
+            },
+            {
+              "id": "c1",
+              "text": "Place the web tier in public subnets with a route to an internet gateway, and place the application and database tiers in separate private subnets with no route to an internet gateway.",
+              "isCorrect": true,
+              "explanation": "Only the web tier requires direct internet exposure. Placing the application and database tiers in private subnets with no internet gateway route isolates them from external threats while still allowing the web tier to reach them through internal VPC routing.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Place the web and application tiers in public subnets for direct internet access, and co-locate the database tier in the same public subnet as the application tier with security groups restricting inbound database port traffic.",
+              "isCorrect": false,
+              "explanation": "Placing the application tier in a public subnet is unnecessary and increases exposure. Locating the database in a public subnet alongside the application tier compounds this risk, even if security group rules are applied. Both tiers should be in private subnets."
+            },
+            {
+              "id": "c3",
+              "text": "Place all three tiers in private subnets and configure an internet gateway as the default route for all subnets, using security groups alone to block external traffic from reaching the application and database tiers.",
+              "isCorrect": false,
+              "explanation": "Adding a default route to an internet gateway on all subnets makes them public subnets, eliminating the isolation benefit of private subnets. Security groups provide instance-level filtering but are not a substitute for correct subnet segmentation."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "1.2.2: Determining network segmentation strategies (for example, using public subnets and private subnets)."
+          ],
+          "services": [
+            "Amazon VPC",
+            "Amazon EC2",
+            "Amazon RDS"
+          ],
+          "docs": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-best-practices.html",
+          "tip": "Identify which tier genuinely requires direct inbound access from the internet and which tiers can be shielded from all external network traffic.",
+          "explanation": "The web tier requires direct internet exposure to serve user requests and must be placed in a public subnet. The application and database tiers have no need for direct internet access and should be placed in private subnets, isolating them from external networks.\n\n**Why it works:** Private subnets do not have a route to an internet gateway, so resources within them cannot be directly reached from or initiated to the internet. The web tier communicates with the application tier through internal VPC routing, and the application tier reaches the database tier the same way.\n\n**Why the others don't work:**\n- Placing the application tier in a public subnet exposes business logic servers to the internet and increases the attack surface beyond what is necessary.\n- Routing all subnets to an internet gateway makes them public subnets in practice, defeating the purpose of private subnet isolation.\n- Co-locating the database in a public subnet alongside the application tier combines two separate tiers in a publicly routable network, which is contrary to least-privilege network design.",
+          "diagram": "diagrams/aws/three-tier-subnet-placement.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0034",
+          "type": "single-choice",
+          "question": "During a security review, the team confirmed that only Amazon API Gateway should be able to invoke a specific AWS Lambda function in the same account. No other AWS service or IAM principal should be able to trigger the function directly.\n\nWhich is the MOST suitable control to enforce this restriction?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Attach an IAM permissions boundary to the Lambda function's execution role that restricts the function from being invoked by any principal except Amazon API Gateway, preventing unauthorized service triggers.",
+              "isCorrect": false,
+              "explanation": "A permissions boundary controls what the Lambda execution role itself can do when making outbound AWS API calls. It has no effect on who is allowed to invoke the Lambda function. Invocation control requires a resource-based policy on the function."
+            },
+            {
+              "id": "c3",
+              "text": "Enable AWS WAF on the Amazon API Gateway stage with IP-based and rate-limiting rules to filter incoming requests, preventing callers that do not originate through the API Gateway endpoint from reaching the Lambda function.",
+              "isCorrect": false,
+              "explanation": "AWS WAF inspects HTTP requests at the API Gateway layer and can block unwanted web traffic. It cannot prevent direct Lambda invocations made through the AWS SDK or CLI that bypass API Gateway entirely."
+            },
+            {
+              "id": "c4",
+              "text": "Move the Lambda function into a VPC with no internet gateway and configure a VPC endpoint for API Gateway, ensuring that only requests routed through the private internal network can trigger the function.",
+              "isCorrect": false,
+              "explanation": "Placing Lambda in a VPC restricts network-level access but does not prevent IAM-authorized invocations through the AWS API. A principal with the appropriate IAM permissions can still invoke the function via the AWS SDK even when it is deployed inside a VPC."
+            },
+            {
+              "id": "c1",
+              "text": "Add a resource-based policy to the Lambda function that grants `lambda:InvokeFunction` exclusively to the Amazon API Gateway service principal for that specific API.",
+              "isCorrect": true,
+              "explanation": "A Lambda resource-based policy is the purpose-built control for specifying which services and principals can invoke the function. Granting lambda:InvokeFunction only to the API Gateway service principal with a source ARN condition restricts invocation to that specific API.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Secure Architectures",
+          "skills": [
+            "1.1.5: Determining the appropriate use of resource policies for AWS services."
+          ],
+          "services": [
+            "IAM",
+            "Lambda",
+            "API Gateway"
+          ],
+          "docs": "https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html",
+          "tip": "Look for the control that is attached to the Lambda function itself and specifies which callers are permitted to invoke it, independent of network path.",
+          "explanation": "A Lambda resource-based policy is the correct mechanism for controlling who can invoke a function. By granting `lambda:InvokeFunction` only to the API Gateway service principal and scoping it to a specific source ARN, the policy ensures that no other service or IAM principal can trigger the function.\n\n**Why it works:** Lambda resource-based policies are evaluated whenever the function is invoked. Only callers explicitly permitted by the policy can invoke the function, regardless of how or where the invocation originates.\n\n**Why the others don't work:**\n- A permissions boundary controls outbound permissions for the execution role, not inbound invocation rights for the function itself.\n- AWS WAF operates at the HTTP layer of API Gateway and cannot block direct AWS API invocations that do not go through API Gateway.\n- A VPC configuration restricts network-layer access but does not prevent AWS API-plane invocations from authorized IAM principals.",
+          "diagram": "diagrams/aws/SAA-C03/ApiGatewayLambdaPermission.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0094",
+          "type": "multiple-choice",
+          "question": "During a security review, the team must select storage and networking technologies for two distinct requirements. First, a video streaming platform needs to serve large video files (up to 8 GB each) to a global audience with the lowest possible latency and minimum egress cost from the origin. Second, a fleet of 40 ECS tasks running on `c6g.2xlarge` instances must share a common POSIX-compliant filesystem for reading shared configuration files and writing job output, with automatic scaling of storage capacity.\n\nWhich TWO technology choices should the architect recommend?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Store video files in Amazon S3 and serve them through Amazon CloudFront with an S3 origin, using CloudFront's regional edge caches and signed URLs to minimise origin fetch frequency and secure content access.",
+              "isCorrect": true,
+              "explanation": "CloudFront caches content at edge locations globally, dramatically reducing latency for international viewers. Serving from CloudFront edge caches minimises S3 data transfer out charges by avoiding repeated S3 fetches.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Use Amazon EFS with the General Purpose performance mode and Elastic throughput mode, mounting the filesystem to all 40 ECS tasks via the `EFSVolumeConfiguration` in the ECS task definition.",
+              "isCorrect": true,
+              "explanation": "EFS provides a POSIX-compliant shared filesystem that scales storage automatically and can be mounted simultaneously by multiple ECS tasks. Elastic throughput mode scales throughput with actual usage without manual provisioning.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Use Amazon EBS `gp3` volumes attached to each ECS EC2 host, and synchronise shared configuration files across instances using AWS DataSync on a 5-minute schedule.",
+              "isCorrect": false,
+              "explanation": "EBS volumes are attached to a single EC2 instance and cannot be shared simultaneously across 40 ECS tasks on different hosts. DataSync scheduled sync introduces staleness and does not provide the real-time shared filesystem semantics that POSIX compliance implies."
+            },
+            {
+              "id": "c5",
+              "text": "Use AWS Transfer Family with an SFTP server endpoint backed by Amazon S3 to provide the ECS tasks with a shared filesystem interface using the `sftp` protocol over the task network.",
+              "isCorrect": false,
+              "explanation": "AWS Transfer Family provides managed SFTP/FTPS/FTP access to S3 or EFS for external file transfer workflows, not as a low-latency shared filesystem for containers. SFTP is not a POSIX filesystem interface and is not suitable for concurrent read/write access by 40 tasks."
+            },
+            {
+              "id": "c3",
+              "text": "Store video files in Amazon S3 and serve them directly from an S3 presigned URL without CloudFront, relying on S3 Transfer Acceleration to reduce latency for global viewers.",
+              "isCorrect": false,
+              "explanation": "S3 Transfer Acceleration uses CloudFront edge locations to accelerate uploads, not downloads for end users. For global video delivery at scale, CloudFront distribution with an S3 origin provides lower latency and significantly reduced egress cost compared to direct S3 access."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Design Resilient Architectures",
+          "skills": [
+            "2.1.6: Recommending appropriate compute, storage, networking, and database technologies based on requirements."
+          ],
+          "services": [
+            "Amazon S3",
+            "Amazon CloudFront",
+            "Amazon EFS",
+            "AWS Transfer Family"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+          "tip": "Consider which storage type provides POSIX semantics for concurrent access and which CDN pattern minimises global delivery latency.",
+          "explanation": "For global video delivery, S3 combined with CloudFront is the standard AWS pattern: S3 provides durable origin storage and CloudFront caches at 400+ edge locations, reducing origin load and egress cost. For shared POSIX filesystem access across ECS tasks, Amazon EFS is the appropriate choice because it scales automatically and supports concurrent mounts.\n\n**Why it works:** CloudFront cached edge delivery means most viewer requests are served from a nearby edge location, not the S3 origin, lowering latency and egress cost. EFS Elastic throughput mode grows with demand and `EFSVolumeConfiguration` in ECS task definitions mounts the filesystem to each task without manual provisioning.\n\n**Why the others don't work:**\n- Option C: S3 Transfer Acceleration accelerates uploads from clients to S3. For video download delivery, CloudFront is the correct caching and distribution layer.\n- Option D: EBS is a block device attached to a single instance. Sharing configuration across multiple hosts via scheduled DataSync does not provide real-time POSIX filesystem semantics.\n- Option E: AWS Transfer Family is designed for external file transfer workflows (SFTP batch transfers). It is not a shared filesystem for concurrent container workloads.",
+          "diagram": "diagrams/aws/SAA-C03/CloudFrontEfsStorage.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0083",
+          "type": "multiple-choice",
+          "question": "The operations team manages TLS certificates issued through AWS Certificate Manager for a customer-facing application served by an Application Load Balancer. During a recent incident, an ACM-issued certificate expired unexpectedly because the DNS CNAME validation record had been accidentally removed from the hosted zone, preventing automatic renewal. The team wants to implement measures to prevent certificate expiry incidents from recurring.\n\nWhich TWO actions MOST effectively prevent future certificate expiry incidents caused by domain validation failures?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Purchase a multi-year TLS certificate from a third-party certificate authority, import it into ACM, and configure a calendar-based reminder to manually re-import a renewed certificate before the multi-year period expires.",
+              "isCorrect": false,
+              "explanation": "Certificates imported into ACM from third-party CAs are not automatically renewed by ACM. Manual renewal and re-import are required before each expiry. Multi-year certificates reduce renewal frequency but do not eliminate the risk of human error or missed renewal deadlines, and this approach is less automated than maintaining an ACM-issued certificate with a valid DNS validation record."
+            },
+            {
+              "id": "c5",
+              "text": "Configure an IAM policy that denies deletion of Route 53 CNAME records whose names match the ACM validation pattern, preventing any administrator from accidentally removing the validation record.",
+              "isCorrect": false,
+              "explanation": "IAM policies can restrict which Route 53 record actions principals can perform, but crafting a policy that accurately identifies only ACM validation CNAME records by name pattern and prevents their deletion while allowing management of all other DNS records is complex and brittle. It does not address the monitoring gap that would allow an expiry to go undetected if the record is removed by other means."
+            },
+            {
+              "id": "c3",
+              "text": "Switch the ACM certificate from DNS validation to email validation so that certificate renewal no longer depends on a DNS record being present in Route 53, removing the single point of failure.",
+              "isCorrect": false,
+              "explanation": "Email-based domain validation replaces a DNS dependency with an email dependency. For each renewal cycle, ACM sends validation emails to registered contacts for the domain, requiring a human to respond to the email. This approach is less automated than DNS validation with a persistent CNAME record and introduces a different point of failure if the validation email is missed."
+            },
+            {
+              "id": "c2",
+              "text": "Restore and maintain the ACM DNS validation CNAME record in the Amazon Route 53 hosted zone so that ACM can validate domain ownership and automatically renew the certificate before it expires.",
+              "isCorrect": true,
+              "explanation": "ACM's automatic renewal for DNS-validated certificates depends on the CNAME validation record being present in the domain's DNS configuration at the time of renewal. Maintaining this record persistently in Route 53 ensures ACM can perform uninterrupted automatic renewals without any manual steps.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Create an Amazon EventBridge rule that matches ACM certificate approaching-expiry events and sends a notification to an SNS topic, alerting the operations team before the certificate expires so they can take corrective action.",
+              "isCorrect": true,
+              "explanation": "ACM publishes events to EventBridge when a certificate is approaching expiry and when renewal actions succeed or fail. An EventBridge rule that captures these events and sends notifications provides proactive alerting so the team can investigate and restore any missing DNS validation records before expiry occurs.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "1.3.7: Rotating encryption keys and renewing certificates."
+          ],
+          "services": [
+            "AWS Certificate Manager",
+            "Amazon Route 53",
+            "Amazon EventBridge"
+          ],
+          "docs": "https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html",
+          "tip": "One action provides proactive monitoring and alerting for certificate expiry events; the other addresses the root cause of the incident by ensuring the DNS validation record required for automatic renewal is persistently in place.",
+          "explanation": "The two most effective actions are creating an EventBridge rule for certificate expiry event notifications and maintaining the DNS CNAME validation record in Route 53. These address both root causes: the monitoring gap that allowed the expiry to be missed, and the missing DNS record that prevented automatic renewal.\n\n**Why they work:** EventBridge certificate approaching-expiry events give the team advance warning to verify the DNS record is in place before renewal is attempted. Maintaining the Route 53 CNAME record permanently ensures that ACM can renew the certificate automatically without requiring any manual action at renewal time.\n\n**Why the others don't work:**\n- Switching to email validation: Requires a human to respond to validation emails at each renewal, introducing a dependency on email delivery and human action rather than an autonomous DNS-based renewal process.\n- Third-party certificate with manual re-import: Eliminates automatic renewal entirely and reintroduces the risk of missed manual renewals at each certificate expiry.\n- IAM policy blocking CNAME deletion: Complex to implement accurately and does not provide the proactive alerting needed to detect configuration drift before it leads to a renewal failure.",
+          "diagram": "diagrams/aws/SAA-C03/AcmCertificateRenewal.mmd",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-14"
+        }
+      ],
+      "currentIndex": 4,
+      "flags": [],
+      "timeLeft": null,
+      "timed": false,
+      "durationMinutes": 170,
+      "numQuestions": 9,
+      "examMode": "casual",
+      "revealAnswers": "immediately",
+      "abandonedAt": "2026-04-30T14:13:26.191Z"
+    },
+    {
+      "attemptId": "c4a21791-65c5-4d42-aefe-1f7c21955baa",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "AI-300",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-04-30T14:14:19.977Z",
+      "updatedAt": "2026-04-30T14:15:00.435Z",
+      "finishedAt": null,
+      "status": "abandoned",
+      "score": null,
+      "answers": [
+        {
+          "questionId": "AI-300-0109",
+          "selectedChoiceId": "c1",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:14:22.049Z"
+        },
+        {
+          "questionId": "AI-300-0029",
+          "selectedChoiceId": "c3",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:14:26.197Z"
+        },
+        {
+          "questionId": "AI-300-0036",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": [
+            "c4",
+            "c2",
+            "c1",
+            "c3"
+          ],
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:14:31.387Z"
+        },
+        {
+          "questionId": "AI-300-0041",
+          "selectedChoiceId": "c1",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": true,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:14:38.959Z"
+        },
+        {
+          "questionId": "AI-300-0023",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": [
+            "c2",
+            "c3"
+          ],
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:14:52.667Z"
+        }
+      ],
+      "metadata": {
+        "pinned": true,
+        "pinnedQuestionIds": [
+          "AI-300-0008",
+          "AI-300-0023",
+          "AI-300-0029",
+          "AI-300-0036",
+          "AI-300-0041",
+          "AI-300-0108",
+          "AI-300-0109"
+        ]
+      },
+      "questions": [
+        {
+          "id": "AI-300-0109",
+          "type": "single-choice",
+          "question": "A managed online endpoint named `rec-endpoint` currently routes 100% of traffic to a deployment named `stable`. A new deployment named `canary` has been created on the same endpoint with the retrained model. The team wants to shift 10% of live traffic to `canary` and keep 90% on `stable`, with the ability to revert instantly.\n\nWhich Azure CLI command correctly applies this traffic split?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "`az ml online-endpoint update --name rec-endpoint --traffic \"stable=90 canary=10\" --resource-group rg-ml --workspace-name ws-prod`",
+              "isCorrect": true,
+              "explanation": "The `az ml online-endpoint update` command with `--traffic` accepts a space-separated `name=weight` string. Weights must sum to 100, and both deployments must already exist on the endpoint.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "`az ml online-deployment update --name canary --endpoint-name rec-endpoint --traffic-percentage 10 --resource-group rg-ml --workspace-name ws-prod`",
+              "isCorrect": false,
+              "explanation": "`az ml online-deployment update` does not have a `--traffic-percentage` flag. Traffic allocation is set at the endpoint level via `az ml online-endpoint update`, not per-deployment."
+            },
+            {
+              "id": "c4",
+              "text": "`az ml online-endpoint update --name rec-endpoint --traffic \"stable=80 canary=10\" --resource-group rg-ml --workspace-name ws-prod`",
+              "isCorrect": false,
+              "explanation": "The weights 80 and 10 sum to 90, not 100. Azure ML requires endpoint traffic weights to sum exactly to 100 and will reject this command."
+            },
+            {
+              "id": "c3",
+              "text": "`az ml online-endpoint update --name rec-endpoint --traffic \"stable=90 canary=10\" --resource-group rg-ml --workspace-name ws-prod --set properties.mirrorTraffic=true`",
+              "isCorrect": false,
+              "explanation": "`--set properties.mirrorTraffic=true` enables traffic mirroring (shadow mode), which duplicates requests without affecting live response routing. It does not implement a real traffic split."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Implement machine learning model lifecycle and operations",
+          "skills": [
+            "2.3.3: Implement progressive rollout and safe rollback strategies"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Machine Learning Online Endpoints"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-safely-rollout-online-endpoints",
+          "tip": "Traffic allocation is set at the endpoint level, not the deployment level. The weights must always sum to exactly 100.",
+          "explanation": "The correct command is `az ml online-endpoint update` with `--traffic \"stable=90 canary=10\"`. This sets the live traffic split at the endpoint level, routing 90% to the existing stable deployment and 10% to the canary. To revert, the team runs the same command with `stable=100 canary=0`.\n\n**Why it works:** `az ml online-endpoint update --traffic` is the documented way to adjust traffic weights across deployments on a managed online endpoint. Both names must exist and weights must sum to 100.\n\n**Why the others don't work:**\n- `az ml online-deployment update --traffic-percentage`: No such flag exists; traffic is an endpoint-level concern.\n- `--set properties.mirrorTraffic=true`: Enables shadow mirroring, not a real traffic split. The canary receives copies but stable still handles all live responses.\n- `stable=80 canary=10`: Weights sum to 90, which is invalid and causes the command to fail.",
+          "diagram": "diagrams/azure/AI-300/CanaryTrafficSplit.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0029",
+          "type": "single-choice",
+          "question": "Management has decided to consolidate the organization's Azure Machine Learning assets so that trained models, components, and environments developed in a central development workspace can be consumed by separate production and staging workspaces in different Azure subscriptions.\n\nWhich Azure Machine Learning resource should be used to share these assets across the workspaces?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "An Azure Artifacts feed scoped to the organization, where model packages and environment definitions are published as versioned NuGet or PyPI packages for consumption across workspaces.",
+              "isCorrect": false,
+              "explanation": "Azure Artifacts feeds are for software package distribution, not for Azure Machine Learning asset management. They do not integrate with the Azure Machine Learning asset versioning and lineage system."
+            },
+            {
+              "id": "c4",
+              "text": "A shared Azure Blob Storage account accessible from all workspaces, where model files and component YAML definitions are stored and referenced by direct storage paths in job definitions.",
+              "isCorrect": false,
+              "explanation": "Referencing assets by raw storage paths does not integrate with the Azure Machine Learning versioning and lineage system. It also requires each workspace to maintain its own registration, defeating centralized governance."
+            },
+            {
+              "id": "c2",
+              "text": "An Azure Machine Learning linked service connecting each workspace pair, using ARM template exports to replicate model registration metadata between workspaces on a scheduled basis.",
+              "isCorrect": false,
+              "explanation": "Linked services in Azure Machine Learning are used to connect external data stores, not to share ML assets between workspaces. ARM template exports do not replicate model versioning or lineage across workspaces."
+            },
+            {
+              "id": "c1",
+              "text": "An Azure Machine Learning registry, configured to span the required subscriptions, so that assets registered in the central workspace can be referenced by name and version from any connected workspace.",
+              "isCorrect": true,
+              "explanation": "Azure Machine Learning registries are purpose-built for cross-workspace and cross-subscription asset sharing. Assets published to a registry can be referenced from any workspace that has access to the registry, regardless of subscription boundary.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.2.4: Share assets across workspaces by using registries"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Machine Learning Registry"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-share-models-pipelines-across-workspaces-with-registries",
+          "tip": "Consider which Azure Machine Learning resource is specifically designed for cross-workspace and cross-subscription asset sharing.",
+          "explanation": "Azure Machine Learning registries are the correct resource for sharing assets across workspaces in different subscriptions. They provide a centralized catalog with versioning and lineage that any connected workspace can access.\n\n**Why it works:** Registries allow assets to be published once and referenced by name and version from multiple workspaces, supporting promotion workflows from development to staging to production.\n\n**Why the others don't work:**\n- Linked services: for external data stores, not cross-workspace asset sharing.\n- Azure Artifacts: for software packages, not Azure Machine Learning assets.\n- Shared Blob Storage: no versioning or lineage integration; requires manual re-registration in each workspace.",
+          "diagram": "diagrams/azure/AI-300/AmlCrossWorkspaceRegistry.mmd",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0108",
+          "type": "matching",
+          "question": "Match each endpoint symptom to the diagnostic tool or resource that MOST directly identifies the cause.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Model data collection payloads stored in Azure Blob Storage reviewed against expected outputs",
+              "isCorrect": false,
+              "explanation": "Collecting and comparing input-output pairs reveals whether specific input patterns trigger incorrect predictions, enabling the team to identify data preprocessing issues or model boundary conditions."
+            },
+            {
+              "id": "c4",
+              "text": "Endpoint authentication configuration and the calling application's managed identity or API key assignment in the workspace",
+              "isCorrect": false,
+              "explanation": "HTTP 401 errors indicate an authentication mismatch; reviewing the endpoint's auth mode (key-based or Azure Active Directory token) and whether the calling application has been granted the correct key or role resolves the cause."
+            },
+            {
+              "id": "c1",
+              "text": "Deployment container logs retrieved with the get-logs CLI command",
+              "isCorrect": false,
+              "explanation": "Container logs capture stdout and stderr from the scoring container during startup, surfacing init() failures such as missing dependencies or model loading errors that prevent the deployment from reaching a healthy state."
+            },
+            {
+              "id": "c3",
+              "text": "CPU utilization and request queue depth metrics on the endpoint Monitoring tab in Azure Machine Learning studio",
+              "isCorrect": false,
+              "explanation": "Latency spikes without scoring errors indicate resource saturation; CPU utilization and queue depth metrics reveal whether instances are overloaded during peak load, pointing to a scaling configuration gap."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s3",
+              "label": "The endpoint latency spikes during peak hours but errors are not logged in the scoring script",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "The endpoint returns HTTP 200 responses but predictions are incorrect for a subset of inputs",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s4",
+              "label": "The endpoint returns HTTP 401 errors when called from a new application service",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s1",
+              "label": "The deployment enters a failed state immediately after creation and never accepts requests",
+              "correctChoiceId": "c1"
+            }
+          ],
+          "domain": "Implement machine learning model lifecycle and operations",
+          "skills": [
+            "2.3.2: Test and troubleshoot model endpoints"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Machine Learning Online Endpoints",
+            "Azure Monitor"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-troubleshoot-online-endpoints",
+          "tip": "Consider what layer each symptom originates in - startup, model logic, resource capacity, or access control - and which diagnostic surface covers that layer.",
+          "explanation": "Each symptom maps to a distinct diagnostic layer. Startup failures (failed state at creation) are revealed by container logs that capture init() output before any requests are accepted. Incorrect predictions require examining actual input-output pairs via data collection. Latency spikes without errors point to resource saturation visible in CPU and queue metrics. HTTP 401 errors are access control failures diagnosed by reviewing the endpoint's authentication configuration and the caller's credentials.",
+          "diagram": "diagrams/azure/AI-300/OnlineEndpointDiagnostics.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0036",
+          "type": "ordering",
+          "question": "Arrange the following steps in the correct order to configure a GitHub Actions workflow with secure, secretless access to an Azure Machine Learning workspace using workload identity federation.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Store the client ID, tenant ID, and subscription ID as GitHub Actions secrets, then configure the workflow to use the azure/login action with OIDC inputs.",
+              "isCorrect": true,
+              "explanation": "The workflow configuration is the final step. It references the previously created identity and triggers the token exchange at runtime. No client secret is stored.",
+              "sequence": 4
+            },
+            {
+              "id": "c2",
+              "text": "Add a federated identity credential to the app registration, specifying the GitHub repository, branch, and entity type as the subject claim.",
+              "isCorrect": true,
+              "explanation": "The federated credential establishes trust between Azure and the specific GitHub source, and requires the app registration to already exist.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Register an application in Microsoft Entra ID and note the client ID and tenant ID.",
+              "isCorrect": true,
+              "explanation": "The app registration creates the service principal identity that Azure will use to authorize the workflow. It must exist before any credentials or roles can be configured.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Assign the service principal an appropriate role, such as Contributor, on the Azure Machine Learning workspace.",
+              "isCorrect": true,
+              "explanation": "Role assignment grants the authenticated identity permission to operate on the workspace. It requires the service principal to exist but does not depend on the workflow being configured.",
+              "sequence": 3
+            }
+          ],
+          "selectCount": 4,
+          "format": "text",
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.3.1: Configure GitHub integration with Machine Learning to enable secure access"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "GitHub",
+            "Microsoft Entra ID"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-github-actions-machine-learning",
+          "tip": "Consider which Azure resources and permissions must exist before the GitHub workflow can be written.",
+          "explanation": "The correct sequence is: create the app registration, add the federated credential, assign the workspace role, then configure the workflow. Each step depends on the one before - you cannot add a federated credential without an app registration, cannot assign a role without a service principal, and cannot write a correct workflow without the IDs from the previous steps.",
+          "diagram": "diagrams/azure/AI-300/GitHubEntraAmlFederation.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0008",
+          "type": "matching",
+          "question": "Match each Azure Machine Learning datastore type to the primary scenario it is designed to support.",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Storing unstructured experiment outputs such as model checkpoints, logs, and binary artifacts in a cost-effective object storage container",
+              "isCorrect": false,
+              "explanation": "Azure Blob Storage datastores are optimized for unstructured binary data such as model files, training outputs, and log archives - the most common general-purpose datastore type in Azure ML."
+            },
+            {
+              "id": "c2",
+              "text": "Managing hierarchical large-scale tabular and semi-structured datasets with fine-grained folder-level access control using POSIX-compatible permissions",
+              "isCorrect": false,
+              "explanation": "Azure Data Lake Storage Gen2 supports hierarchical namespaces and POSIX-compatible ACLs, making it the right datastore type for large-scale datasets that require fine-grained access control at the folder or file level."
+            },
+            {
+              "id": "c3",
+              "text": "Providing a shared file system accessible simultaneously from multiple compute instances and on-premises machines via SMB protocol",
+              "isCorrect": false,
+              "explanation": "Azure Files datastores expose an SMB-compatible file share that can be mounted concurrently from multiple Azure compute instances and on-premises clients, making it suitable for shared configuration files and collaborative data access."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Azure Blob datastore",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Azure Files datastore",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s2",
+              "label": "Azure Data Lake Storage Gen2 datastore",
+              "correctChoiceId": "c2"
+            }
+          ],
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.1.2: Create and manage datastores"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Blob Storage",
+            "Azure Data Lake Storage Gen2",
+            "Azure Files"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-datastore",
+          "tip": "Consider the access protocol and data structure each storage type is built around, and match that to the described workload.",
+          "explanation": "Each Azure Machine Learning datastore type maps to distinct storage capabilities: Azure Blob is best for unstructured object storage (model files, outputs, logs); Azure Data Lake Storage Gen2 is designed for large-scale analytics datasets with hierarchical access control; and Azure Files provides SMB-based shared file system access for multi-machine and hybrid scenarios.",
+          "diagram": "diagrams/azure/AI-300/AmlDatastoreTypes.mmd",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0041",
+          "type": "single-choice",
+          "question": "To reduce infrastructure costs and manual effort, the platform team wants to automate the provisioning of Azure Machine Learning workspaces whenever a new feature branch is merged into the `main` branch of their repository. The workspace Bicep template already exists in the repository under `infra/workspace.bicep`. The team wants the workflow to authenticate to Azure without storing a client secret.\n\nWhich GitHub Actions workflow trigger and step combination should the team configure?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Set the trigger to `on: push: branches: [main]`, use the `azure/login` action with OIDC inputs, then run `az deployment group create --template-file infra/workspace.bicep` as a subsequent step.",
+              "isCorrect": true,
+              "explanation": "The push trigger on main fires when the merge lands, the OIDC-based login avoids storing a secret, and the Azure CLI command deploys the Bicep template.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Set the trigger to `on: workflow_dispatch`, authenticate using a stored client secret, and run the Bicep deployment manually each time a branch is merged.",
+              "isCorrect": false,
+              "explanation": "A workflow_dispatch trigger requires manual invocation and does not automate provisioning on merge. It also uses a stored secret."
+            },
+            {
+              "id": "c4",
+              "text": "Set the trigger to `on: push: branches: [main]`, use the `azure/login` action with OIDC inputs, then call `az ml workspace create` to provision the workspace directly without the Bicep template.",
+              "isCorrect": false,
+              "explanation": "Bypassing the existing Bicep template with an imperative CLI command is inconsistent with the infrastructure-as-code approach and ignores the template the team already maintains."
+            },
+            {
+              "id": "c2",
+              "text": "Set the trigger to `on: pull_request: branches: [main]`, use the `azure/login` action with a client secret stored in GitHub secrets, then run `az deployment group create --template-file infra/workspace.bicep`.",
+              "isCorrect": false,
+              "explanation": "A pull_request trigger fires before the merge is complete, so the workspace would be provisioned during code review rather than after the branch lands on main. Additionally, using a client secret contradicts the requirement to avoid stored credentials."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.3.3: Automate resource provisioning by using GitHub Actions workflows"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "GitHub Actions",
+            "Azure Bicep"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-github-actions-machine-learning",
+          "tip": "Think about which trigger corresponds to a completed merge and which authentication method avoids storing a credential.",
+          "explanation": "The correct combination is a push trigger on main (which fires after a merge is complete), OIDC-based authentication via azure/login, and `az deployment group create` to apply the Bicep template. This is fully automated, secretless, and uses the existing template.\n\n**Why it works:** The push trigger on main corresponds exactly to the moment a branch is merged. OIDC authentication with azure/login uses workload identity federation so no client secret is stored. The Azure CLI deployment command submits the Bicep file directly.\n\n**Why the others don't work:**\n- A pull_request trigger fires before the merge and would provision resources prematurely.\n- A workflow_dispatch trigger requires manual action, defeating automation.\n- Calling `az ml workspace create` bypasses the existing Bicep template.",
+          "diagram": "diagrams/azure/AI-300/GitHubBicepAmlProvisioning.mmd",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0023",
+          "type": "multiple-choice",
+          "question": "The operations team is standardizing environment management for an Azure Machine Learning workspace used by multiple data science teams. They want to ensure that environments are reproducible across training and inference, that image builds are triggered automatically when a new environment version is registered, and that the resulting images are stored in the organization's private container registry.\n\nWhich TWO configurations should be applied to the workspace?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Attach an Azure Container Registry to the Azure Machine Learning workspace so that environment images are pushed to the organization's private registry when built.",
+              "isCorrect": true,
+              "explanation": "Attaching a private Azure Container Registry to the workspace directs all environment image builds to that registry, ensuring images are stored in an organization-controlled location rather than the default workspace-managed registry.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Enable the workspace-level option to build environment Docker images on environment registration, so that images are available before any job that references the environment is submitted.",
+              "isCorrect": true,
+              "explanation": "Triggering builds at registration time rather than at job submission ensures images are pre-built and available immediately, improving job start time and enabling early detection of build failures.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Configure a shared Conda environment on each compute cluster node using a startup script that runs pip install at cluster provisioning time.",
+              "isCorrect": false,
+              "explanation": "Installing packages via startup scripts creates cluster-specific state that is not managed by the Azure Machine Learning environment versioning system, breaking reproducibility and lineage tracking."
+            },
+            {
+              "id": "c4",
+              "text": "Store all Conda specification YAML files in Azure Blob Storage and reference them by URL in job definitions to allow teams to share dependency files without workspace registration.",
+              "isCorrect": false,
+              "explanation": "Referencing YAML files by URL bypasses the workspace environment registry, meaning there is no versioning, build pipeline, or lineage association with training runs."
+            },
+            {
+              "id": "c5",
+              "text": "Use only Azure Machine Learning curated environments for all training and inference jobs to avoid managing custom Docker images entirely.",
+              "isCorrect": false,
+              "explanation": "Curated environments do not support custom organizational package requirements and cannot be pushed to a private registry in the same way as custom environments, limiting organizational control."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.2.2: Create and manage environments"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Container Registry"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-environments-v2",
+          "tip": "Consider which workspace-level settings govern where images are stored and when they are built.",
+          "explanation": "Attaching a private Azure Container Registry ensures images land in the organization's registry, and enabling image pre-building at registration time ensures they are ready before job submission.\n\n**Why it works:** These two settings work together: the ACR attachment routes image pushes to the private registry, and the pre-build setting triggers builds immediately on registration rather than lazily at job start.\n\n**Why the others don't work:**\n- Cluster startup scripts: not version-managed by the workspace environment system.\n- Blob Storage YAML URLs: bypasses the workspace environment registry and versioning.\n- Curated environments only: insufficient for custom organizational packages and private registry requirements.",
+          "diagram": "diagrams/azure/AI-300/AmlAcrEnvironments.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        }
+      ],
+      "currentIndex": 6,
+      "flags": [],
+      "timeLeft": null,
+      "timed": false,
+      "durationMinutes": 60,
+      "numQuestions": 7,
+      "examMode": "casual",
+      "revealAnswers": "immediately",
+      "abandonedAt": "2026-04-30T14:15:00.435Z"
+    },
+    {
+      "attemptId": "b68b3b5c-78e1-4adb-8d53-cb181d5df8fd",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "PMLE-2025",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-04-30T14:15:51.549Z",
+      "updatedAt": "2026-04-30T14:17:27.198Z",
+      "finishedAt": null,
+      "status": "abandoned",
+      "score": null,
+      "answers": [
+        {
+          "questionId": "PMLE-2025-0058",
+          "selectedChoiceId": "c3",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:15:56.338Z"
+        },
+        {
+          "questionId": "PMLE-2025-0057",
+          "selectedChoiceId": "c3",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:16:04.599Z"
+        },
+        {
+          "questionId": "PMLE-2025-0013",
+          "selectedChoiceId": "c2",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:16:08.703Z"
+        },
+        {
+          "questionId": "PMLE-2025-0053",
+          "selectedChoiceId": "c3",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:16:11.378Z"
+        },
+        {
+          "questionId": "PMLE-2025-0045",
+          "selectedChoiceId": "c2",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:16:14.810Z"
+        }
+      ],
+      "metadata": {
+        "pinned": true,
+        "pinnedQuestionIds": [
+          "PMLE-2025-0013",
+          "PMLE-2025-0045",
+          "PMLE-2025-0053",
+          "PMLE-2025-0056",
+          "PMLE-2025-0057",
+          "PMLE-2025-0058",
+          "PMLE-2025-0109"
+        ]
+      },
+      "questions": [
+        {
+          "id": "PMLE-2025-0056",
+          "type": "matching",
+          "question": "Match each preprocessing requirement to the MOST appropriate Google Cloud preprocessing tool.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Dataflow batch pipeline with Python custom DoFns",
+              "isCorrect": false,
+              "explanation": "Dataflow batch handles custom large-scale media transformations."
+            },
+            {
+              "id": "c2",
+              "text": "BigQuery SQL with window functions and BigQuery ML transforms",
+              "isCorrect": false,
+              "explanation": "BigQuery handles tabular feature engineering at warehouse scale."
+            },
+            {
+              "id": "c3",
+              "text": "TFX Transform with tf.Transform analyzers",
+              "isCorrect": false,
+              "explanation": "Transform fuses preprocessing into the served model graph."
+            },
+            {
+              "id": "c1",
+              "text": "Dataflow streaming pipeline with Apache Beam windowing",
+              "isCorrect": false,
+              "explanation": "Beam on Dataflow is built for stateful streaming preprocessing."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Stateful windowed aggregation of high-throughput streaming events",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "Warehouse-scale tabular feature joins and aggregations on stored history",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s3",
+              "label": "Embedding preprocessing graph into the SavedModel for serving parity",
+              "correctChoiceId": "c3"
+            },
+            {
+              "id": "s4",
+              "label": "Custom large-scale image decoding and augmentation as a batch step",
+              "correctChoiceId": "c4"
+            }
+          ],
+          "domain": "Collaborating Within and Across Teams to Manage Data and Models",
+          "skills": [
+            "2.1.3: Applying data preprocessing techniques using tools such as Dataflow, TensorFlow Extended (TFX), and BigQuery."
+          ],
+          "services": [
+            "Dataflow",
+            "BigQuery",
+            "TensorFlow Extended"
+          ],
+          "docs": "https://cloud.google.com/architecture/ml-on-gcp-best-practices",
+          "tip": "Match each preprocessing need to the tool whose programming model fits it natively.",
+          "explanation": "Dataflow handles streaming and batch custom transforms, BigQuery handles tabular SQL preprocessing, and TFX Transform handles training/serving graph parity.",
+          "diagram": "diagrams/gcp/PMLE-2025/PreprocessingToolsMatching.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "PMLE-2025-0058",
+          "type": "single-choice",
+          "question": "The recommendations team is preparing a low-latency online model deployed on Vertex AI Online Prediction. The model needs the latest values of 23 user features at inference, and they expect a sustained 5,000 QPS with a p99 latency budget of 30 ms for the feature lookup step.\n\nWhich serving configuration is the MOST appropriate?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Cache features in a Cloud Storage object that the prediction container downloads on every request.",
+              "isCorrect": false,
+              "explanation": "Per-request object reads cannot meet 30 ms p99 at 5k QPS."
+            },
+            {
+              "id": "c2",
+              "text": "Read features at inference time directly from BigQuery using `bigquery.Client().query()` for each request.",
+              "isCorrect": false,
+              "explanation": "BigQuery is not designed for per-request OLTP-style lookups at high QPS or tight tail latency."
+            },
+            {
+              "id": "c1",
+              "text": "Configure a Bigtable-backed online feature store with a feature view fed by a BigQuery source on a periodic sync.",
+              "isCorrect": true,
+              "explanation": "Bigtable online stores deliver consistent single-digit millisecond reads at high QPS, suitable for the latency budget.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Run feature aggregations from raw event tables on every prediction request via a Dataflow pipeline.",
+              "isCorrect": false,
+              "explanation": "Triggering Dataflow per request is not viable for online inference latency."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Collaborating Within and Across Teams to Manage Data and Models",
+          "skills": [
+            "2.1.4: Creating and consolidating features in Vertex AI Feature Store."
+          ],
+          "services": [
+            "Vertex AI Feature Store",
+            "Vertex AI Online Prediction"
+          ],
+          "docs": "https://cloud.google.com/vertex-ai/docs/featurestore/latest/serve-feature-values",
+          "tip": "Match the QPS and tail latency requirement to a key-value style backing store.",
+          "explanation": "High-QPS, low-latency online feature serving is what Bigtable-backed Vertex AI online feature stores are designed for.\n\n**Why it works:** Bigtable online stores expose a key-value lookup API with predictable latency and elastic throughput.\n\n**Why the others don't work:**\n- BigQuery per request: wrong workload shape.\n- Cloud Storage per request: object latency too high.\n- Dataflow per request: batch engine, not an online serving primitive.",
+          "diagram": "diagrams/gcp/PMLE-2025/FeatureStoreOnlineServing.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "PMLE-2025-0057",
+          "type": "single-choice",
+          "question": "The platform team manages a curated BigQuery dataset of customer features that several model teams currently re-derive in their own pipelines. Leadership wants one consolidated source of features that supports both batch training and low-latency online lookups for real-time scoring.\n\nWhich approach BEST consolidates these features?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Copy the BigQuery features into a Cloud Storage bucket as Parquet files and have each team load them into their training jobs.",
+              "isCorrect": false,
+              "explanation": "Parquet copies do not provide a managed registry, sync, or online serving surface."
+            },
+            {
+              "id": "c1",
+              "text": "Register the BigQuery feature tables as Vertex AI Feature Store feature groups and feature views, and serve them online through a feature online store with a sync schedule.",
+              "isCorrect": true,
+              "explanation": "Feature groups/views over BigQuery plus an online store deliver one canonical definition for batch and online use.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Provision a Cloud SQL for PostgreSQL instance and replicate features from BigQuery hourly using Datastream.",
+              "isCorrect": false,
+              "explanation": "Cloud SQL is not designed as a managed feature store and lacks the registry, lineage, and online-serving abstractions."
+            },
+            {
+              "id": "c2",
+              "text": "Create per-team materialized views in BigQuery and expose them through Looker dashboards.",
+              "isCorrect": false,
+              "explanation": "Looker is for analytics consumption; it does not provide low-latency online feature serving for inference."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Collaborating Within and Across Teams to Manage Data and Models",
+          "skills": [
+            "2.1.4: Creating and consolidating features in Vertex AI Feature Store."
+          ],
+          "services": [
+            "Vertex AI Feature Store",
+            "BigQuery"
+          ],
+          "docs": "https://cloud.google.com/vertex-ai/docs/featurestore/latest/overview",
+          "tip": "Look for the managed surface that links a tabular source to both batch and online consumers.",
+          "explanation": "Vertex AI Feature Store is the consolidated registry and serving layer for BigQuery-sourced features.\n\n**Why it works:** Feature groups/views map BigQuery columns to feature definitions, while the online store handles low-latency serving and scheduled syncs.\n\n**Why the others don't work:**\n- Looker views: analytics surface only.\n- Parquet copies: no registry or online path.\n- Cloud SQL: not a managed feature store.",
+          "diagram": "diagrams/gcp/PMLE-2025/FeatureStoreConsolidation.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "PMLE-2025-0013",
+          "type": "single-choice",
+          "question": "The operations team at a logistics company needs to extract printed text from millions of scanned shipment labels stored in Cloud Storage. They want to add an event-driven workflow that processes each new image as it lands and writes the extracted text to BigQuery. The team has limited ML experience and wants to avoid training a custom model.\n\nWhich approach provides the MOST suitable solution with the least operational overhead?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Train a custom Vertex AI AutoML Vision model on a labeled subset of the labels, deploy it to a Vertex AI endpoint, and call it from Cloud Functions for each new file.",
+              "isCorrect": false,
+              "explanation": "AutoML Vision is for classification or object detection, not generic OCR, and adds training and endpoint cost without benefit."
+            },
+            {
+              "id": "c1",
+              "text": "Trigger a Cloud Functions function on Cloud Storage finalize events that calls the Cloud Vision API `images:annotate` method with the `TEXT_DETECTION` feature and writes results to BigQuery.",
+              "isCorrect": true,
+              "explanation": "Cloud Vision is a Model Garden ML API providing pre-trained OCR; an event-driven function gives a serverless, low-overhead pipeline.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Run a scheduled Dataproc job each hour that reads new images from Cloud Storage and uses an open source Tesseract container to perform OCR before loading BigQuery.",
+              "isCorrect": false,
+              "explanation": "Tesseract on Dataproc requires cluster management, batches results hourly rather than reactively, and skips Model Garden APIs entirely."
+            },
+            {
+              "id": "c4",
+              "text": "Use the Cloud Translation API on each image after uploading the binary content as a translation request, then parse the response to get text.",
+              "isCorrect": false,
+              "explanation": "Cloud Translation does not accept image inputs or perform OCR; it translates supplied text strings only."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Architecting Low-Code AI Solutions",
+          "skills": [
+            "1.2.1: Building applications by using ML APIs from Model Garden."
+          ],
+          "services": [
+            "Cloud Vision API",
+            "Cloud Storage",
+            "Cloud Functions"
+          ],
+          "docs": "https://cloud.google.com/vision/docs/ocr",
+          "tip": "Match the task to the pre-trained Model Garden API designed for it.",
+          "explanation": "Cloud Vision exposes a managed OCR endpoint that returns detected text directly. Pairing it with a Cloud Storage trigger gives reactive, serverless processing.\n\n**Why it works:** `TEXT_DETECTION` returns full text annotations from images; Cloud Functions integrates natively with Cloud Storage finalize events.\n\n**Why the others don't work:**\n- AutoML Vision: solves classification, not OCR.\n- Dataproc + Tesseract: heavy cluster ops and not event-driven.\n- Cloud Translation: does not accept images or perform OCR.",
+          "diagram": "diagrams/gcp/PMLE-2025/VisionStorageFunctions.mmd",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "PMLE-2025-0053",
+          "type": "single-choice",
+          "question": "The fraud team ingests roughly 40,000 events per second from Pub/Sub and needs to enrich, window, and aggregate features in near real time before writing them to BigQuery for both analytics and online model scoring. Latency from event arrival to feature availability must stay under one minute.\n\nWhich preprocessing approach is the MOST suitable?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Run a Cloud Run service per event that performs Python pandas aggregations and inserts rows into BigQuery via streaming inserts.",
+              "isCorrect": false,
+              "explanation": "Per-event Python pandas does not maintain windowed state and does not scale at 40k events per second."
+            },
+            {
+              "id": "c4",
+              "text": "Use a Cloud Composer DAG that triggers every minute to run a Dataproc PySpark batch job over the last minute of data.",
+              "isCorrect": false,
+              "explanation": "Repeated micro-batch Dataproc jobs add scheduling overhead and stateful windowing is not native."
+            },
+            {
+              "id": "c1",
+              "text": "Run a streaming Dataflow pipeline that reads from Pub/Sub, applies windowed aggregations, and writes enriched features into BigQuery via the Storage Write API.",
+              "isCorrect": true,
+              "explanation": "Dataflow streaming with the Storage Write API is the canonical low-latency, high-throughput preprocessing path on Google Cloud.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Schedule a BigQuery scheduled query every five minutes that reads raw events from a staging table and recomputes aggregations.",
+              "isCorrect": false,
+              "explanation": "Scheduled queries cannot meet the sub-minute latency target and reprocess data each run."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Collaborating Within and Across Teams to Manage Data and Models",
+          "skills": [
+            "2.1.3: Applying data preprocessing techniques using tools such as Dataflow, TensorFlow Extended (TFX), and BigQuery."
+          ],
+          "services": [
+            "Dataflow",
+            "Pub/Sub",
+            "BigQuery"
+          ],
+          "docs": "https://cloud.google.com/dataflow/docs/guides/templates/provided-streaming",
+          "tip": "Match the throughput and latency constraint to the streaming-native preprocessing service.",
+          "explanation": "Dataflow streaming is built for stateful, high-throughput, low-latency preprocessing.\n\n**Why it works:** Apache Beam pipelines on Dataflow handle windowed aggregations, exactly-once writes via the Storage Write API, and autoscaling at the required event rate.\n\n**Why the others don't work:**\n- Scheduled query: latency floor too high.\n- Per-event Cloud Run: stateless and not throughput-shaped.\n- Composer + Dataproc micro-batch: scheduling overhead and no native windowing.",
+          "diagram": "diagrams/gcp/PMLE-2025/PubSubDataflowBigQuery.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "PMLE-2025-0045",
+          "type": "single-choice",
+          "question": "The data engineering team is preparing 12 TB of labeled image data stored as individual JPEG files in Cloud Storage for distributed training of a custom TensorFlow model on Vertex AI. They observe that GPU utilization stays below 30% during training because of slow input pipeline throughput.\n\nWhich approach is the MOST effective way to organize the dataset to maximize training throughput?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Compress all JPEG files into a single tar.gz archive in Cloud Storage and stream it directly into the training job using `tf.data.Dataset.from_generator`.",
+              "isCorrect": false,
+              "explanation": "A single archive serializes reads and prevents parallel I/O, making input throughput a hard bottleneck."
+            },
+            {
+              "id": "c3",
+              "text": "Load the JPEG files individually with `tf.data.Dataset.list_files` and apply `num_parallel_reads=1` to ensure ordered reads from Cloud Storage.",
+              "isCorrect": false,
+              "explanation": "Reading millions of small files in serial from object storage is dominated by per-object latency and starves the GPU."
+            },
+            {
+              "id": "c1",
+              "text": "Convert the JPEG images and labels into sharded `TFRecord` files of roughly 100-200 MB each in Cloud Storage and read them with `tf.data.TFRecordDataset` using parallel interleave and prefetch.",
+              "isCorrect": true,
+              "explanation": "Sharded TFRecord files provide sequential reads, parallel I/O across shards, and high throughput suitable for distributed training.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Copy the JPEG files into a Cloud SQL for PostgreSQL table as BYTEA columns and query batches over JDBC during training.",
+              "isCorrect": false,
+              "explanation": "Relational databases are not designed for high-throughput binary streaming and would severely cap input pipeline performance."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Collaborating Within and Across Teams to Manage Data and Models",
+          "skills": [
+            "2.1.1: Organizing different types of data, including tabular, text, speech, images, and videos, for efficient training."
+          ],
+          "services": [
+            "Cloud Storage",
+            "Vertex AI Training"
+          ],
+          "docs": "https://www.tensorflow.org/tutorials/load_data/tfrecord",
+          "tip": "Think about how training pipelines achieve parallel I/O across many files in object storage.",
+          "explanation": "Sharded binary record files are the canonical Vertex AI / TensorFlow pattern for high-throughput distributed training on large image corpora.\n\n**Why it works:** Splitting data into ~100-200 MB shards lets `tf.data` read multiple shards in parallel, decode in parallel, and prefetch batches so the GPU is never idle waiting for data.\n\n**Why the others don't work:**\n- Single archive: serializes reads and defeats parallelism.\n- Serial list_files: per-object latency dominates throughput.\n- Cloud SQL BYTEA: relational storage is the wrong primitive for ML data pipelines.",
+          "diagram": "diagrams/gcp/PMLE-2025/GcsToVertexTraining.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "PMLE-2025-0109",
+          "type": "single-choice",
+          "question": "The data engineering team at a retail analytics firm is preparing tens of millions of structured customer transaction rows for use as training data for a churn prediction model in Vertex AI. They need fast SQL-based feature engineering, schema enforcement, and the ability to materialize feature snapshots for repeatable training runs.\n\nWhich storage approach is the MOST suitable for this tabular workload?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Persist the transactions in Bigtable using a tall-narrow row key design and have the Vertex AI training job perform full table scans for every epoch.",
+              "isCorrect": false,
+              "explanation": "Bigtable is optimized for low-latency lookups, not scan-heavy SQL feature engineering or repeatable tabular training snapshots."
+            },
+            {
+              "id": "c1",
+              "text": "Land the transaction data in BigQuery tables and run feature engineering with SQL, producing versioned snapshot tables that Vertex AI training jobs read directly through the BigQuery connector.",
+              "isCorrect": true,
+              "explanation": "BigQuery is the canonical store for large structured tabular training data and integrates natively with Vertex AI training and feature engineering workflows.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Export each daily batch of transactions to per-row JSON objects in a Cloud Storage bucket with autoclass enabled and load them into the training job as a streaming dataset.",
+              "isCorrect": false,
+              "explanation": "Per-row JSON in Cloud Storage is inefficient for large structured tabular data and loses schema enforcement, schema evolution, and SQL feature engineering benefits."
+            },
+            {
+              "id": "c4",
+              "text": "Store the transactions in Firestore in Native mode and have the training job use the client library to iterate documents during each training step.",
+              "isCorrect": false,
+              "explanation": "Firestore is a document database for application state and is not designed for scan-oriented tabular ML training workloads."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Scaling Prototypes into ML Models",
+          "skills": [
+            "3.2.1: Organizing training data types, including tabular, text, speech, images, and videos, on Google Cloud using Cloud Storage and BigQuery."
+          ],
+          "services": [
+            "BigQuery",
+            "Cloud Storage"
+          ],
+          "docs": "https://cloud.google.com/bigquery/docs/storage_overview",
+          "tip": "Consider which Google Cloud service is purpose-built for analytical SQL over large tabular datasets.",
+          "explanation": "BigQuery is the right home for analytical, schema-enforced tabular training data that requires SQL feature engineering and versioned snapshots.\n\n**Why it works:** BigQuery offers columnar storage, schema enforcement, partitioning, time-travel snapshots, and a first-class Vertex AI integration so training jobs can read tabular features directly without expensive exports.\n\n**Why the others don't work:**\n- Per-row JSON in Cloud Storage loses schema and is inefficient for tabular data.\n- Bigtable is for low-latency key lookups, not analytical scans.\n- Firestore is a document store for application data, not ML training scans.",
+          "diagram": "diagrams/gcp/PMLE-2025/BigQueryTrainingData.mmd",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-29"
+        }
+      ],
+      "currentIndex": 1,
+      "flags": [],
+      "timeLeft": null,
+      "timed": false,
+      "durationMinutes": 120,
+      "numQuestions": 7,
+      "examMode": "casual",
+      "revealAnswers": "immediately",
+      "abandonedAt": "2026-04-30T14:17:27.198Z"
+    },
+    {
+      "attemptId": "633896d7-45f3-4c48-85f4-4999dddf9f5b",
+      "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+      "examCode": "AI-300",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-04-30T14:18:02.291Z",
+      "updatedAt": "2026-04-30T14:20:28.812Z",
+      "finishedAt": null,
+      "status": "in-progress",
+      "score": null,
+      "answers": [
+        {
+          "questionId": "AI-300-0041",
+          "selectedChoiceId": "c2",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:18:03.984Z"
+        },
+        {
+          "questionId": "AI-300-0023",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": [
+            "c3",
+            "c2"
+          ],
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:18:18.662Z"
+        },
+        {
+          "questionId": "AI-300-0036",
+          "selectedChoiceId": null,
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": [
+            "c4",
+            "c2",
+            "c1",
+            "c3"
+          ],
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-04-30T14:18:22.770Z"
+        }
+      ],
+      "metadata": {
+        "pinned": true,
+        "pinnedQuestionIds": [
+          "AI-300-0008",
+          "AI-300-0023",
+          "AI-300-0029",
+          "AI-300-0036",
+          "AI-300-0041",
+          "AI-300-0108",
+          "AI-300-0109"
+        ]
+      },
+      "questions": [
+        {
+          "id": "AI-300-0041",
+          "type": "single-choice",
+          "question": "To reduce infrastructure costs and manual effort, the platform team wants to automate the provisioning of Azure Machine Learning workspaces whenever a new feature branch is merged into the `main` branch of their repository. The workspace Bicep template already exists in the repository under `infra/workspace.bicep`. The team wants the workflow to authenticate to Azure without storing a client secret.\n\nWhich GitHub Actions workflow trigger and step combination should the team configure?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Set the trigger to `on: push: branches: [main]`, use the `azure/login` action with OIDC inputs, then run `az deployment group create --template-file infra/workspace.bicep` as a subsequent step.",
+              "isCorrect": true,
+              "explanation": "The push trigger on main fires when the merge lands, the OIDC-based login avoids storing a secret, and the Azure CLI command deploys the Bicep template.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Set the trigger to `on: pull_request: branches: [main]`, use the `azure/login` action with a client secret stored in GitHub secrets, then run `az deployment group create --template-file infra/workspace.bicep`.",
+              "isCorrect": false,
+              "explanation": "A pull_request trigger fires before the merge is complete, so the workspace would be provisioned during code review rather than after the branch lands on main. Additionally, using a client secret contradicts the requirement to avoid stored credentials."
+            },
+            {
+              "id": "c3",
+              "text": "Set the trigger to `on: workflow_dispatch`, authenticate using a stored client secret, and run the Bicep deployment manually each time a branch is merged.",
+              "isCorrect": false,
+              "explanation": "A workflow_dispatch trigger requires manual invocation and does not automate provisioning on merge. It also uses a stored secret."
+            },
+            {
+              "id": "c4",
+              "text": "Set the trigger to `on: push: branches: [main]`, use the `azure/login` action with OIDC inputs, then call `az ml workspace create` to provision the workspace directly without the Bicep template.",
+              "isCorrect": false,
+              "explanation": "Bypassing the existing Bicep template with an imperative CLI command is inconsistent with the infrastructure-as-code approach and ignores the template the team already maintains."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.3.3: Automate resource provisioning by using GitHub Actions workflows"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "GitHub Actions",
+            "Azure Bicep"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-github-actions-machine-learning",
+          "tip": "Think about which trigger corresponds to a completed merge and which authentication method avoids storing a credential.",
+          "explanation": "The correct combination is a push trigger on main (which fires after a merge is complete), OIDC-based authentication via azure/login, and `az deployment group create` to apply the Bicep template. This is fully automated, secretless, and uses the existing template.\n\n**Why it works:** The push trigger on main corresponds exactly to the moment a branch is merged. OIDC authentication with azure/login uses workload identity federation so no client secret is stored. The Azure CLI deployment command submits the Bicep file directly.\n\n**Why the others don't work:**\n- A pull_request trigger fires before the merge and would provision resources prematurely.\n- A workflow_dispatch trigger requires manual action, defeating automation.\n- Calling `az ml workspace create` bypasses the existing Bicep template.",
+          "diagram": "diagrams/azure/AI-300/GitHubBicepAmlProvisioning.mmd",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0108",
+          "type": "matching",
+          "question": "Match each endpoint symptom to the diagnostic tool or resource that MOST directly identifies the cause.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "CPU utilization and request queue depth metrics on the endpoint Monitoring tab in Azure Machine Learning studio",
+              "isCorrect": false,
+              "explanation": "Latency spikes without scoring errors indicate resource saturation; CPU utilization and queue depth metrics reveal whether instances are overloaded during peak load, pointing to a scaling configuration gap."
+            },
+            {
+              "id": "c1",
+              "text": "Deployment container logs retrieved with the get-logs CLI command",
+              "isCorrect": false,
+              "explanation": "Container logs capture stdout and stderr from the scoring container during startup, surfacing init() failures such as missing dependencies or model loading errors that prevent the deployment from reaching a healthy state."
+            },
+            {
+              "id": "c4",
+              "text": "Endpoint authentication configuration and the calling application's managed identity or API key assignment in the workspace",
+              "isCorrect": false,
+              "explanation": "HTTP 401 errors indicate an authentication mismatch; reviewing the endpoint's auth mode (key-based or Azure Active Directory token) and whether the calling application has been granted the correct key or role resolves the cause."
+            },
+            {
+              "id": "c2",
+              "text": "Model data collection payloads stored in Azure Blob Storage reviewed against expected outputs",
+              "isCorrect": false,
+              "explanation": "Collecting and comparing input-output pairs reveals whether specific input patterns trigger incorrect predictions, enabling the team to identify data preprocessing issues or model boundary conditions."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s4",
+              "label": "The endpoint returns HTTP 401 errors when called from a new application service",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s1",
+              "label": "The deployment enters a failed state immediately after creation and never accepts requests",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "The endpoint returns HTTP 200 responses but predictions are incorrect for a subset of inputs",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s3",
+              "label": "The endpoint latency spikes during peak hours but errors are not logged in the scoring script",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Implement machine learning model lifecycle and operations",
+          "skills": [
+            "2.3.2: Test and troubleshoot model endpoints"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Machine Learning Online Endpoints",
+            "Azure Monitor"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-troubleshoot-online-endpoints",
+          "tip": "Consider what layer each symptom originates in - startup, model logic, resource capacity, or access control - and which diagnostic surface covers that layer.",
+          "explanation": "Each symptom maps to a distinct diagnostic layer. Startup failures (failed state at creation) are revealed by container logs that capture init() output before any requests are accepted. Incorrect predictions require examining actual input-output pairs via data collection. Latency spikes without errors point to resource saturation visible in CPU and queue metrics. HTTP 401 errors are access control failures diagnosed by reviewing the endpoint's authentication configuration and the caller's credentials.",
+          "diagram": "diagrams/azure/AI-300/OnlineEndpointDiagnostics.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0023",
+          "type": "multiple-choice",
+          "question": "The operations team is standardizing environment management for an Azure Machine Learning workspace used by multiple data science teams. They want to ensure that environments are reproducible across training and inference, that image builds are triggered automatically when a new environment version is registered, and that the resulting images are stored in the organization's private container registry.\n\nWhich TWO configurations should be applied to the workspace?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Configure a shared Conda environment on each compute cluster node using a startup script that runs pip install at cluster provisioning time.",
+              "isCorrect": false,
+              "explanation": "Installing packages via startup scripts creates cluster-specific state that is not managed by the Azure Machine Learning environment versioning system, breaking reproducibility and lineage tracking."
+            },
+            {
+              "id": "c4",
+              "text": "Store all Conda specification YAML files in Azure Blob Storage and reference them by URL in job definitions to allow teams to share dependency files without workspace registration.",
+              "isCorrect": false,
+              "explanation": "Referencing YAML files by URL bypasses the workspace environment registry, meaning there is no versioning, build pipeline, or lineage association with training runs."
+            },
+            {
+              "id": "c5",
+              "text": "Use only Azure Machine Learning curated environments for all training and inference jobs to avoid managing custom Docker images entirely.",
+              "isCorrect": false,
+              "explanation": "Curated environments do not support custom organizational package requirements and cannot be pushed to a private registry in the same way as custom environments, limiting organizational control."
+            },
+            {
+              "id": "c2",
+              "text": "Enable the workspace-level option to build environment Docker images on environment registration, so that images are available before any job that references the environment is submitted.",
+              "isCorrect": true,
+              "explanation": "Triggering builds at registration time rather than at job submission ensures images are pre-built and available immediately, improving job start time and enabling early detection of build failures.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Attach an Azure Container Registry to the Azure Machine Learning workspace so that environment images are pushed to the organization's private registry when built.",
+              "isCorrect": true,
+              "explanation": "Attaching a private Azure Container Registry to the workspace directs all environment image builds to that registry, ensuring images are stored in an organization-controlled location rather than the default workspace-managed registry.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.2.2: Create and manage environments"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Container Registry"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-environments-v2",
+          "tip": "Consider which workspace-level settings govern where images are stored and when they are built.",
+          "explanation": "Attaching a private Azure Container Registry ensures images land in the organization's registry, and enabling image pre-building at registration time ensures they are ready before job submission.\n\n**Why it works:** These two settings work together: the ACR attachment routes image pushes to the private registry, and the pre-build setting triggers builds immediately on registration rather than lazily at job start.\n\n**Why the others don't work:**\n- Cluster startup scripts: not version-managed by the workspace environment system.\n- Blob Storage YAML URLs: bypasses the workspace environment registry and versioning.\n- Curated environments only: insufficient for custom organizational packages and private registry requirements.",
+          "diagram": "diagrams/azure/AI-300/AmlAcrEnvironments.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0036",
+          "type": "ordering",
+          "question": "Arrange the following steps in the correct order to configure a GitHub Actions workflow with secure, secretless access to an Azure Machine Learning workspace using workload identity federation.",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Store the client ID, tenant ID, and subscription ID as GitHub Actions secrets, then configure the workflow to use the azure/login action with OIDC inputs.",
+              "isCorrect": true,
+              "explanation": "The workflow configuration is the final step. It references the previously created identity and triggers the token exchange at runtime. No client secret is stored.",
+              "sequence": 4
+            },
+            {
+              "id": "c2",
+              "text": "Add a federated identity credential to the app registration, specifying the GitHub repository, branch, and entity type as the subject claim.",
+              "isCorrect": true,
+              "explanation": "The federated credential establishes trust between Azure and the specific GitHub source, and requires the app registration to already exist.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Register an application in Microsoft Entra ID and note the client ID and tenant ID.",
+              "isCorrect": true,
+              "explanation": "The app registration creates the service principal identity that Azure will use to authorize the workflow. It must exist before any credentials or roles can be configured.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Assign the service principal an appropriate role, such as Contributor, on the Azure Machine Learning workspace.",
+              "isCorrect": true,
+              "explanation": "Role assignment grants the authenticated identity permission to operate on the workspace. It requires the service principal to exist but does not depend on the workflow being configured.",
+              "sequence": 3
+            }
+          ],
+          "selectCount": 4,
+          "format": "text",
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.3.1: Configure GitHub integration with Machine Learning to enable secure access"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "GitHub",
+            "Microsoft Entra ID"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-github-actions-machine-learning",
+          "tip": "Consider which Azure resources and permissions must exist before the GitHub workflow can be written.",
+          "explanation": "The correct sequence is: create the app registration, add the federated credential, assign the workspace role, then configure the workflow. Each step depends on the one before - you cannot add a federated credential without an app registration, cannot assign a role without a service principal, and cannot write a correct workflow without the IDs from the previous steps.",
+          "diagram": "diagrams/azure/AI-300/GitHubEntraAmlFederation.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0109",
+          "type": "single-choice",
+          "question": "A managed online endpoint named `rec-endpoint` currently routes 100% of traffic to a deployment named `stable`. A new deployment named `canary` has been created on the same endpoint with the retrained model. The team wants to shift 10% of live traffic to `canary` and keep 90% on `stable`, with the ability to revert instantly.\n\nWhich Azure CLI command correctly applies this traffic split?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "`az ml online-endpoint update --name rec-endpoint --traffic \"stable=90 canary=10\" --resource-group rg-ml --workspace-name ws-prod --set properties.mirrorTraffic=true`",
+              "isCorrect": false,
+              "explanation": "`--set properties.mirrorTraffic=true` enables traffic mirroring (shadow mode), which duplicates requests without affecting live response routing. It does not implement a real traffic split."
+            },
+            {
+              "id": "c1",
+              "text": "`az ml online-endpoint update --name rec-endpoint --traffic \"stable=90 canary=10\" --resource-group rg-ml --workspace-name ws-prod`",
+              "isCorrect": true,
+              "explanation": "The `az ml online-endpoint update` command with `--traffic` accepts a space-separated `name=weight` string. Weights must sum to 100, and both deployments must already exist on the endpoint.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "`az ml online-endpoint update --name rec-endpoint --traffic \"stable=80 canary=10\" --resource-group rg-ml --workspace-name ws-prod`",
+              "isCorrect": false,
+              "explanation": "The weights 80 and 10 sum to 90, not 100. Azure ML requires endpoint traffic weights to sum exactly to 100 and will reject this command."
+            },
+            {
+              "id": "c2",
+              "text": "`az ml online-deployment update --name canary --endpoint-name rec-endpoint --traffic-percentage 10 --resource-group rg-ml --workspace-name ws-prod`",
+              "isCorrect": false,
+              "explanation": "`az ml online-deployment update` does not have a `--traffic-percentage` flag. Traffic allocation is set at the endpoint level via `az ml online-endpoint update`, not per-deployment."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Implement machine learning model lifecycle and operations",
+          "skills": [
+            "2.3.3: Implement progressive rollout and safe rollback strategies"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Machine Learning Online Endpoints"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-safely-rollout-online-endpoints",
+          "tip": "Traffic allocation is set at the endpoint level, not the deployment level. The weights must always sum to exactly 100.",
+          "explanation": "The correct command is `az ml online-endpoint update` with `--traffic \"stable=90 canary=10\"`. This sets the live traffic split at the endpoint level, routing 90% to the existing stable deployment and 10% to the canary. To revert, the team runs the same command with `stable=100 canary=0`.\n\n**Why it works:** `az ml online-endpoint update --traffic` is the documented way to adjust traffic weights across deployments on a managed online endpoint. Both names must exist and weights must sum to 100.\n\n**Why the others don't work:**\n- `az ml online-deployment update --traffic-percentage`: No such flag exists; traffic is an endpoint-level concern.\n- `--set properties.mirrorTraffic=true`: Enables shadow mirroring, not a real traffic split. The canary receives copies but stable still handles all live responses.\n- `stable=80 canary=10`: Weights sum to 90, which is invalid and causes the command to fail.",
+          "diagram": "diagrams/azure/AI-300/CanaryTrafficSplit.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0008",
+          "type": "matching",
+          "question": "Match each Azure Machine Learning datastore type to the primary scenario it is designed to support.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Managing hierarchical large-scale tabular and semi-structured datasets with fine-grained folder-level access control using POSIX-compatible permissions",
+              "isCorrect": false,
+              "explanation": "Azure Data Lake Storage Gen2 supports hierarchical namespaces and POSIX-compatible ACLs, making it the right datastore type for large-scale datasets that require fine-grained access control at the folder or file level."
+            },
+            {
+              "id": "c3",
+              "text": "Providing a shared file system accessible simultaneously from multiple compute instances and on-premises machines via SMB protocol",
+              "isCorrect": false,
+              "explanation": "Azure Files datastores expose an SMB-compatible file share that can be mounted concurrently from multiple Azure compute instances and on-premises clients, making it suitable for shared configuration files and collaborative data access."
+            },
+            {
+              "id": "c1",
+              "text": "Storing unstructured experiment outputs such as model checkpoints, logs, and binary artifacts in a cost-effective object storage container",
+              "isCorrect": false,
+              "explanation": "Azure Blob Storage datastores are optimized for unstructured binary data such as model files, training outputs, and log archives - the most common general-purpose datastore type in Azure ML."
+            }
+          ],
+          "selectCount": 3,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Azure Blob datastore",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s2",
+              "label": "Azure Data Lake Storage Gen2 datastore",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s3",
+              "label": "Azure Files datastore",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.1.2: Create and manage datastores"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Blob Storage",
+            "Azure Data Lake Storage Gen2",
+            "Azure Files"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-datastore",
+          "tip": "Consider the access protocol and data structure each storage type is built around, and match that to the described workload.",
+          "explanation": "Each Azure Machine Learning datastore type maps to distinct storage capabilities: Azure Blob is best for unstructured object storage (model files, outputs, logs); Azure Data Lake Storage Gen2 is designed for large-scale analytics datasets with hierarchical access control; and Azure Files provides SMB-based shared file system access for multi-machine and hybrid scenarios.",
+          "diagram": "diagrams/azure/AI-300/AmlDatastoreTypes.mmd",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "AI-300-0029",
+          "type": "single-choice",
+          "question": "Management has decided to consolidate the organization's Azure Machine Learning assets so that trained models, components, and environments developed in a central development workspace can be consumed by separate production and staging workspaces in different Azure subscriptions.\n\nWhich Azure Machine Learning resource should be used to share these assets across the workspaces?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "A shared Azure Blob Storage account accessible from all workspaces, where model files and component YAML definitions are stored and referenced by direct storage paths in job definitions.",
+              "isCorrect": false,
+              "explanation": "Referencing assets by raw storage paths does not integrate with the Azure Machine Learning versioning and lineage system. It also requires each workspace to maintain its own registration, defeating centralized governance."
+            },
+            {
+              "id": "c1",
+              "text": "An Azure Machine Learning registry, configured to span the required subscriptions, so that assets registered in the central workspace can be referenced by name and version from any connected workspace.",
+              "isCorrect": true,
+              "explanation": "Azure Machine Learning registries are purpose-built for cross-workspace and cross-subscription asset sharing. Assets published to a registry can be referenced from any workspace that has access to the registry, regardless of subscription boundary.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "An Azure Machine Learning linked service connecting each workspace pair, using ARM template exports to replicate model registration metadata between workspaces on a scheduled basis.",
+              "isCorrect": false,
+              "explanation": "Linked services in Azure Machine Learning are used to connect external data stores, not to share ML assets between workspaces. ARM template exports do not replicate model versioning or lineage across workspaces."
+            },
+            {
+              "id": "c3",
+              "text": "An Azure Artifacts feed scoped to the organization, where model packages and environment definitions are published as versioned NuGet or PyPI packages for consumption across workspaces.",
+              "isCorrect": false,
+              "explanation": "Azure Artifacts feeds are for software package distribution, not for Azure Machine Learning asset management. They do not integrate with the Azure Machine Learning asset versioning and lineage system."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design and implement an MLOps infrastructure",
+          "skills": [
+            "1.2.4: Share assets across workspaces by using registries"
+          ],
+          "services": [
+            "Azure Machine Learning",
+            "Azure Machine Learning Registry"
+          ],
+          "docs": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-share-models-pipelines-across-workspaces-with-registries",
+          "tip": "Consider which Azure Machine Learning resource is specifically designed for cross-workspace and cross-subscription asset sharing.",
+          "explanation": "Azure Machine Learning registries are the correct resource for sharing assets across workspaces in different subscriptions. They provide a centralized catalog with versioning and lineage that any connected workspace can access.\n\n**Why it works:** Registries allow assets to be published once and referenced by name and version from multiple workspaces, supporting promotion workflows from development to staging to production.\n\n**Why the others don't work:**\n- Linked services: for external data stores, not cross-workspace asset sharing.\n- Azure Artifacts: for software packages, not Azure Machine Learning assets.\n- Shared Blob Storage: no versioning or lineage integration; requires manual re-registration in each workspace.",
+          "diagram": "diagrams/azure/AI-300/AmlCrossWorkspaceRegistry.mmd",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-29"
+        }
+      ],
+      "currentIndex": 3,
+      "flags": [],
+      "timeLeft": null,
+      "timed": false,
+      "durationMinutes": 60,
+      "numQuestions": 7,
+      "examMode": "casual",
+      "revealAnswers": "immediately"
     }
   ]
 }

@@ -36,6 +36,7 @@ jobs:
             VITE_COGNITO_CLIENT_ID: ${{ secrets.VITE_COGNITO_CLIENT_ID }}
             VITE_BACKEND_TOKEN_CALLBACK: ${{ secrets.VITE_BACKEND_TOKEN_CALLBACK }}
             VITE_PAYPAL_CLIENT_ID: ${{ secrets.VITE_PAYPAL_CLIENT_ID }}
+            VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
         run: |
           cd frontend
           corepack enable

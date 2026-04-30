@@ -10,6 +10,7 @@ import { apiUrl } from '../apiBase'
 import { isAnswerCorrect, computeDerivedAttempt } from './utils'
 import { downloadAttemptCSV as dlCSV, downloadAttemptPDF as dlPDF, downloadAnalyticsCSV as dlAnalyticsCSV } from './downloads'
 import type { Exam, Question, QuestionType, ExamMode, RevealMode, AppRoute } from './types'
+import { trackExamStarted } from '../analytics'
 
 // ═══════════════════════════════════════════════
 // Context type
@@ -1209,6 +1210,13 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     }, 1000)
     return () => clearInterval(id)
   }, [examStarted, examMode, timeLeft, attemptId, paused])
+
+  // GA4: exam started
+  useEffect(() => {
+    if (!examStarted || !selected) return
+    trackExamStarted(selected, selectedMeta?.title)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examStarted])
 
   // Track visited questions as user navigates
   useEffect(() => {

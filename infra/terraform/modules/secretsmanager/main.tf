@@ -104,6 +104,27 @@ resource "aws_secretsmanager_secret_policy" "cron_secret_policy" {
   })
 }
 
+# Sentry DSN (managed out-of-band)
+data "aws_secretsmanager_secret" "sentry_dsn" {
+  name = var.sentry_dsn_secret_name
+}
+
+resource "aws_secretsmanager_secret_policy" "sentry_dsn_policy" {
+  secret_arn = data.aws_secretsmanager_secret.sentry_dsn.arn
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "AllowEcsTaskGetSecret",
+        Effect    = "Allow",
+        Principal = { AWS = var.ecs_task_execution_role_arn },
+        Action    = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        Resource  = data.aws_secretsmanager_secret.sentry_dsn.arn
+      }
+    ]
+  })
+}
+
 # Unsubscribe token signing secret (managed out-of-band)
 data "aws_secretsmanager_secret" "unsubscribe_secret" {
   name = var.unsubscribe_secret_name

@@ -4,6 +4,7 @@ import { CheckCircle2, XCircle, Star, BookOpen, TrendingUp } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useExam } from './ExamContext'
 import { apiUrl } from '@/apiBase'
+import { trackExamCompleted } from '@/analytics'
 
 /**
  * ExamCompleteModal — opens automatically when an exam transitions to finished
@@ -33,6 +34,7 @@ export function ExamCompleteModal() {
       if (sessionStorage.getItem(key)) return
       sessionStorage.setItem(key, '1')
     } catch {}
+    if (selected) trackExamCompleted(selected, selectedMeta?.title)
     setOpen(true)
   }, [attemptData?.attemptId, attemptData?.finishedAt])
 
