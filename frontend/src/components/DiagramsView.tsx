@@ -199,96 +199,163 @@ export function DiagramsView() {
             spellCheck={false}
           />
           <p className="text-xs text-muted-foreground">
-            Use the <code className="bg-muted px-1 rounded">logos:aws-*</code> prefix for AWS icons
-            (bundled from <code className="bg-muted px-1 rounded">@iconify-json/logos</code>). See the{' '}
-            <a
-              href="https://icon-sets.iconify.design/logos/?keyword=aws"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              full AWS icons list
-            </a>{' '}
-            for all available codes.
+            Use <code className="bg-muted px-1 rounded">icon:aws:</code>, <code className="bg-muted px-1 rounded">icon:azure:</code>, <code className="bg-muted px-1 rounded">icon:gcp:</code> for cloud icons (fetched from S3),{' '}
+            <code className="bg-muted px-1 rounded">icon:logos:</code> for tech logos (docker, mysql, terraform…),{' '}
+            and <code className="bg-muted px-1 rounded">icon:general:</code> for generic nodes (server, database, user…).
           </p>
         </div>
       </div>
 
-      {/* Mermaid AWS icons reference link */}
-      <div className="text-right mt-2">
-        <a
-          href="https://icon-sets.iconify.design/logos/?keyword=aws"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-primary hover:underline"
-        >
-          Browse all logos:aws-* icons
-        </a>
-      </div>
-
       {/* Icon reference */}
       <div className="rounded-lg border border-border bg-card p-4 space-y-4">
-        <h3 className="text-sm font-semibold">AWS Icons for <code className="bg-muted px-1 rounded">architecture-beta</code></h3>
-        <p className="text-xs text-muted-foreground">All icons use the <code className="bg-muted px-1 rounded">logos:aws-*</code> prefix. Click to copy.</p>
+        <h3 className="text-sm font-semibold">Icon reference for <code className="bg-muted px-1 rounded">architecture-beta</code></h3>
+        <p className="text-xs text-muted-foreground">Click any icon name to copy it.</p>
         {[
-          { label: 'Networking / Edge', icons: [
-            'logos:aws-elb',
-            'logos:aws-vpc',
-            'logos:aws-route53',
-            'logos:aws-cloudfront',
-            'logos:aws-waf',
+          { label: 'AWS — Networking / Edge', icons: [
+            'icon:aws:elastic-load-balancing',
+            'icon:aws:virtual-private-cloud',
+            'icon:aws:route-53',
+            'icon:aws:cloudfront',
+            'icon:aws:waf',
+            'icon:aws:direct-connect',
+            'icon:aws:site-to-site-vpn',
+            'icon:aws:transit-gateway',
+            'icon:aws:global-accelerator',
           ]},
-          { label: 'Compute', icons: [
-            'logos:aws-ec2',
-            'logos:aws-lambda',
-            'logos:aws-ecs',
-            'logos:aws-eks',
-            'logos:aws-fargate',
-            'logos:aws-ecr',
-            'logos:aws-elastic-beanstalk',
-            'logos:aws-batch',
+          { label: 'AWS — Compute', icons: [
+            'icon:aws:ec2',
+            'icon:aws:lambda',
+            'icon:aws:elastic-container-service',
+            'icon:aws:elastic-kubernetes-service',
+            'icon:aws:fargate-compute',
+            'icon:aws:elastic-container-registry',
+            'icon:aws:elastic-beanstalk',
+            'icon:aws:batch',
+            'icon:aws:ec2-auto-scaling',
           ]},
-          { label: 'Storage', icons: [
-            'logos:aws-s3',
-            'logos:aws-glacier',
+          { label: 'AWS — Storage', icons: [
+            'icon:aws:simple-storage-service',
+            'icon:aws:simple-storage-service-glacier',
+            'icon:aws:elastic-block-store',
+            'icon:aws:efs',
+            'icon:aws:storage-gateway',
+            'icon:aws:backup',
+            'icon:aws:snowball',
           ]},
-          { label: 'Databases', icons: [
-            'logos:aws-rds',
-            'logos:aws-aurora',
-            'logos:aws-dynamodb',
-            'logos:aws-elasticache',
-            'logos:aws-redshift',
-            'logos:aws-neptune',
-            'logos:aws-documentdb',
-            'logos:aws-keyspaces',
-            'logos:aws-timestream',
+          { label: 'AWS — Databases', icons: [
+            'icon:aws:rds',
+            'icon:aws:aurora',
+            'icon:aws:dynamodb',
+            'icon:aws:elasticache',
+            'icon:aws:redshift',
+            'icon:aws:neptune',
+            'icon:aws:documentdb',
+            'icon:aws:database-migration-service',
           ]},
-          { label: 'Integration / Messaging', icons: [
-            'logos:aws-api-gateway',
-            'logos:aws-eventbridge',
-            'logos:aws-sns',
-            'logos:aws-sqs',
-            'logos:aws-step-functions',
-            'logos:aws-mq',
-            'logos:aws-msk',
-            'logos:aws-appsync',
+          { label: 'AWS — Integration / Messaging', icons: [
+            'icon:aws:api-gateway',
+            'icon:aws:eventbridge',
+            'icon:aws:simple-notification-service',
+            'icon:aws:simple-queue-service',
+            'icon:aws:step-functions',
+            'icon:aws:mq',
+            'icon:aws:managed-streaming-for-apache-kafka',
           ]},
-          { label: 'Security / Identity', icons: [
-            'logos:aws-cognito',
-            'logos:aws-iam',
-            'logos:aws-waf',
-            'logos:aws-shield',
-            'logos:aws-secrets-manager',
-            'logos:aws-kms',
-            'logos:aws-certificate-manager',
+          { label: 'AWS — Security / Identity', icons: [
+            'icon:aws:cognito',
+            'icon:aws:identity-and-access-management',
+            'icon:aws:iam-identity-center',
+            'icon:aws:shield',
+            'icon:aws:secrets-manager',
+            'icon:aws:key-management-service',
+            'icon:aws:certificate-manager',
+            'icon:aws:artifact',
           ]},
-          { label: 'Management / Monitoring', icons: [
-            'logos:aws-cloudwatch',
-            'logos:aws-cloudtrail',
-            'logos:aws-config',
-            'logos:aws-systems-manager',
-            'logos:aws-cloudformation',
-            'logos:aws-xray',
+          { label: 'AWS — Management / Monitoring', icons: [
+            'icon:aws:cloudwatch',
+            'icon:aws:cloudtrail',
+            'icon:aws:config',
+            'icon:aws:systems-manager',
+            'icon:aws:cloudformation',
+            'icon:aws:cost-explorer',
+            'icon:aws:trusted-advisor',
+          ]},
+          { label: 'General — Compute & Servers', icons: [
+            'icon:general:server','icon:general:server-network','icon:general:server-security',
+            'icon:general:desktop-tower','icon:general:chip','icon:general:memory',
+            'icon:general:layers','icon:general:layers-triple','icon:general:cube',
+            'icon:general:application','icon:general:package-variant','icon:general:docker',
+            'icon:general:kubernetes',
+          ]},
+          { label: 'General — Storage & Files', icons: [
+            'icon:general:database','icon:general:database-lock','icon:general:database-sync',
+            'icon:general:harddisk','icon:general:nas','icon:general:folder-network',
+            'icon:general:file','icon:general:file-document','icon:general:file-code',
+            'icon:general:archive','icon:general:backup-restore',
+          ]},
+          { label: 'General — Networking', icons: [
+            'icon:general:network','icon:general:sitemap','icon:general:router',
+            'icon:general:router-wireless','icon:general:access-point',
+            'icon:general:transit-connection-variant','icon:general:ethernet',
+            'icon:general:vpn','icon:general:wall-fire','icon:general:ip-network',
+            'icon:general:lan','icon:general:wan','icon:general:switch','icon:general:hub',
+          ]},
+          { label: 'General — Internet & Cloud', icons: [
+            'icon:general:earth','icon:general:cloud','icon:general:cloud-sync',
+            'icon:general:cloud-lock','icon:general:web','icon:general:wifi',
+            'icon:general:signal',
+          ]},
+          { label: 'General — Security', icons: [
+            'icon:general:shield','icon:general:shield-check','icon:general:shield-lock',
+            'icon:general:shield-key','icon:general:lock','icon:general:lock-alert',
+            'icon:general:key','icon:general:key-variant','icon:general:fingerprint',
+            'icon:general:two-factor-authentication','icon:general:certificate',
+            'icon:general:incognito','icon:general:eye','icon:general:eye-off',
+          ]},
+          { label: 'General — Users & Identity', icons: [
+            'icon:general:account','icon:general:account-group','icon:general:account-multiple',
+            'icon:general:account-key','icon:general:account-lock','icon:general:domain',
+            'icon:general:badge-account','icon:general:card-account-details',
+          ]},
+          { label: 'General — Devices', icons: [
+            'icon:general:laptop','icon:general:monitor','icon:general:cellphone',
+            'icon:general:tablet','icon:general:keyboard','icon:general:printer',
+            'icon:general:camera','icon:general:webcam',
+          ]},
+          { label: 'General — Messaging & Integration', icons: [
+            'icon:general:email','icon:general:email-fast','icon:general:bell',
+            'icon:general:bell-alert','icon:general:api','icon:general:webhook',
+            'icon:general:message-text','icon:general:send','icon:general:sync',
+            'icon:general:transfer','icon:general:rss',
+          ]},
+          { label: 'General — Dev & Automation', icons: [
+            'icon:general:git','icon:general:source-branch','icon:general:code-braces',
+            'icon:general:console','icon:general:console-line','icon:general:language-python',
+            'icon:general:ansible','icon:general:terraform',
+            'icon:general:cog','icon:general:cogs','icon:general:robot',
+            'icon:general:pipe','icon:general:state-machine',
+          ]},
+          { label: 'General — Monitoring & Misc', icons: [
+            'icon:general:chart-line','icon:general:chart-bar','icon:general:gauge',
+            'icon:general:monitor-dashboard','icon:general:alert','icon:general:alert-circle',
+            'icon:general:magnify','icon:general:pulse','icon:general:clock',
+            'icon:general:tag','icon:general:wrench','icon:general:tools',
+            'icon:general:lightning-bolt','icon:general:power','icon:general:refresh',
+            'icon:general:check-circle','icon:general:close-circle','icon:general:information',
+          ]},
+          { label: 'Tech logos (bundled)', icons: [
+            'icon:logos:docker-icon',
+            'icon:logos:kubernetes',
+            'icon:logos:terraform-icon',
+            'icon:logos:mysql-icon',
+            'icon:logos:postgresql',
+            'icon:logos:mongodb-icon',
+            'icon:logos:redis',
+            'icon:logos:linux-tux',
+            'icon:logos:nginx',
+            'icon:logos:github-icon',
+            'icon:logos:redhat-icon',
+            'icon:logos:terminal',
           ]},
         ].map((group) => (
           <div key={group.label}>

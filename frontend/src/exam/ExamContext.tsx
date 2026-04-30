@@ -188,7 +188,7 @@ export interface ExamContextType {
   // Actions
   setupExamFromMeta: (ex: any) => void
   fetchScoreHistory: (code: string) => Promise<void>
-  createAttempt: (opts?: { pinnedQuestionId?: string }) => Promise<void>
+  createAttempt: (opts?: { pinnedQuestionIds?: string[] }) => Promise<void>
   submitAnswer: (q: Question, i: string | string[]) => Promise<void>
   submitMatchingAnswer: (q: Question, mappings: Record<string, string>) => Promise<void>
   submitOrderingAnswer: (q: Question, order: string[]) => Promise<void>
@@ -679,9 +679,10 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }
 
-  async function createAttempt(opts?: { pinnedQuestionId?: string }) {
+  async function createAttempt(opts?: { pinnedQuestionIds?: string[] }) {
     if (!selected) return
-    const pinnedId = opts?.pinnedQuestionId?.trim() || null
+    const pinnedIds = opts?.pinnedQuestionIds?.map(s => s.trim()).filter(Boolean) ?? []
+    const pinnedId = pinnedIds.length === 1 ? pinnedIds[0] : null
     setSelectedAnswers({})
     setAttemptData(null)
     setLastError(null)
@@ -749,13 +750,16 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Normal (casual / timed) mode
-      // Admin-pinned single question: bypass filters, send inline question
-      if (pinnedId) {
-        const pinned = (questions || []).find((q: any) => String(q.id).toLowerCase() === pinnedId.toLowerCase())
-        if (!pinned) { setLastError(`Question "${pinnedId}" not found in this exam's accessible set`); return }
+      // Admin-pinned question(s): bypass filters, send inline questions
+      if (pinnedIds.length > 0) {
+        const allQ = questions || []
+        const pinned = pinnedIds.map(id => allQ.find((q: any) => String(q.id).toLowerCase() === id.toLowerCase()))
+        const missing = pinnedIds.filter((_, i) => !pinned[i])
+        if (missing.length > 0) { setLastError(`Question(s) not found: ${missing.join(', ')}`); return }
+        const pinnedList = pinned as any[]
         const res = await authFetch('/attempts', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ examCode: selected, questions: [pinned], metadata: { pinned: true, pinnedQuestionId: pinned.id } })
+          body: JSON.stringify({ examCode: selected, questions: pinnedList, metadata: { pinned: true, pinnedQuestionIds: pinnedList.map((q: any) => q.id) } })
         })
         if (!res.ok) { setLastError(await extractErrorMessage(res, 'create attempt failed')); return }
         const data = await res.json()
