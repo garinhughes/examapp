@@ -66,25 +66,27 @@ module "dynamodb" {
   source  = "./modules/dynamodb"
   project = var.project
   tables = {
-    users = { table_name = "${var.project}-users", hash_key = "userId" }
+    users = { table_name = "${var.project}-users", hash_key = "userId", pitr = true }
     attempts = {
       table_name = "${var.project}-attempts"
       hash_key   = "userId"
       range_key  = "attemptId"
+      pitr       = true
       gsis = [
         { name = "status-index", hash_key = "userId", range_key = "status", projection_type = "ALL" }
       ]
     }
-    gamification       = { table_name = "${var.project}-gamification", hash_key = "userId", range_key = "SK" }
+    gamification       = { table_name = "${var.project}-gamification", hash_key = "userId", range_key = "SK", pitr = true }
     exams_index        = { table_name = "${var.project}-exams-index", hash_key = "examCode" }
-    entitlements       = { table_name = "${var.project}-entitlements", hash_key = "userId", range_key = "productId" }
-    audit              = { table_name = "${var.project}-audit", hash_key = "adminId", range_key = "createdAt" }
+    entitlements       = { table_name = "${var.project}-entitlements", hash_key = "userId", range_key = "productId", pitr = true }
+    audit              = { table_name = "${var.project}-audit", hash_key = "adminId", range_key = "createdAt", pitr = true }
     sessions           = { table_name = "${var.project}-sessions", hash_key = "PK", range_key = "SK", ttl_attribute = "ttl" }
     skill_labs_index   = { table_name = "${var.project}-skill-labs-index", hash_key = "labId" }
     skill_lab_attempts = {
       table_name = "${var.project}-skill-lab-attempts"
       hash_key   = "userId"
       range_key  = "attemptId"
+      pitr       = true
       gsis = [
         # Lifecycle redesign (dev-guide §15 / 14.8) — find a user's in_progress
         # attempts in one query instead of scanning all rows.
@@ -93,7 +95,7 @@ module "dynamodb" {
     }
     issue_reports      = { table_name = "${var.project}-issue-reports", hash_key = "reportId" }
     metrics            = { table_name = "${var.project}-metrics", hash_key = "pk", range_key = "sk" }
-    interactions       = { table_name = "${var.project}-interactions", hash_key = "userId", range_key = "SK" }
+    interactions       = { table_name = "${var.project}-interactions", hash_key = "userId", range_key = "SK", pitr = true }
     email_templates    = { table_name = "${var.project}-email-templates", hash_key = "templateId" }
     email_logs         = { table_name = "${var.project}-email-logs", hash_key = "logId" }
   }

@@ -84,7 +84,7 @@ resource "aws_dynamodb_table" "this" {
     }
   }
 
-  point_in_time_recovery { enabled = false }
+  point_in_time_recovery { enabled = lookup(each.value, "pitr", false) }
   tags = { Project = var.project }
 }
 
