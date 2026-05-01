@@ -1361,7 +1361,8 @@
       "explanation": "Embedding models produce dense vector representations that enable similarity search over large text corpora.\n\n**Why it works:** Each chunk and each query is embedded into the same vector space, and a vector store such as Azure AI Search returns the closest chunks to the query as retrieval results.\n\n**Why the others don't work:**\n- Chat completion summarising every document: not scalable as a retrieval mechanism.\n- Image generation: produces images, not retrievals.\n- Speech-to-text: applies to audio inputs.",
       "domain": "Identify AI concepts and capabilities",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/RagRetrievalPipeline.mmd"
     },
     {
       "id": "AI-901-0031",
@@ -1409,7 +1410,8 @@
       "explanation": "Picking the right Azure OpenAI model class depends on the input and output of the feature.\n\n**Why it works:** Chat completion models handle conversational text generation, and embeddings models produce vectors used for similarity search.\n\n**Why the others don't work:**\n- Embeddings for chat: returns vectors, not conversational responses.\n- Chat completion for illustrations: produces text, not images.\n- Speech-to-text for article search: applies to audio, not text retrieval.",
       "domain": "Identify AI concepts and capabilities",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/OpenAiModelFamilies.mmd"
     },
     {
       "id": "AI-901-0032",
@@ -1723,7 +1725,8 @@
       "explanation": "When a model plans and invokes multiple tools or systems to achieve a user goal, the workload is agentic AI.\n\n**Why it works:** Agents in Azure AI Foundry plan, call tools, observe results, and continue until the goal is met, which is exactly what the claims assistant does.\n\n**Why the others don't work:**\n- Text analysis: a single capability, not orchestration.\n- Information extraction: extracts fields rather than orchestrating actions.\n- Computer vision: a possible tool but not the overall workload category.",
       "domain": "Identify AI concepts and capabilities",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/AgenticToolCalling.mmd"
     },
     {
       "id": "AI-901-0039",
@@ -3691,7 +3694,8 @@
       "explanation": "Voice-in voice-out scenarios need a transcription step, a multimodal model call, and a synthesis step.\n\n**Why it works:** Azure AI Speech speech-to-text turns the question into text, the multimodal model produces a response, and Azure AI Speech text-to-speech reads it aloud.\n\n**Why the others don't work:**\n- Sentiment analysis: not a question-answering capability.\n- Translation: produces translations.\n- Storage triggers: not a transcription path.",
       "domain": "Implement AI solutions by using Microsoft Foundry",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/VoiceLoopPipeline.mmd"
     },
     {
       "id": "AI-901-0082",
@@ -3781,7 +3785,8 @@
       "explanation": "A voice loop needs transcription on the way in and synthesis on the way out.\n\n**Why it works:** Speech-to-text turns the prompt into text and text-to-speech reads the response aloud, completing the loop with the multimodal model in between.\n\n**Why the others don't work:**\n- Translator: not required for a single language.\n- OCR: applies to images.\n- Anomaly Detector: unrelated to voice.",
       "domain": "Implement AI solutions by using Microsoft Foundry",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/ClinicalVoiceLoopServices.mmd"
     },
     {
       "id": "AI-901-0084",
@@ -4057,7 +4062,8 @@
       "explanation": "Interpreting visual input alongside a text question is exactly what multimodal models are designed for.\n\n**Why it works:** A multimodal GPT deployment accepts image and text content together and reasons across both, producing a contextual answer to the agent's question.\n\n**Why the others don't work:**\n- OCR plus text-only model: discards visual context.\n- Image classification: returns labels, not free-form answers.\n- DALL-E: generates new images instead of interpreting one.",
       "domain": "Implement AI solutions by using Microsoft Foundry",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/MultimodalHelpDesk.mmd"
     },
     {
       "id": "AI-901-0090",
@@ -4988,7 +4994,8 @@
       "explanation": "Content Understanding audio analyzers consolidate transcription, topics, and key moments.\n\n**Why it works:** A single audio analyzer is configured with the desired outputs and returns them in one structured response.\n\n**Why the others don't work:**\n- Chaining multiple services: more complex than required.\n- Chat completion inventing transcripts: not a transcription path.\n- OCR on waveforms: applies to image text.",
       "domain": "Implement AI solutions by using Microsoft Foundry",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/ContentUnderstandingAudioOneCall.mmd"
     },
     {
       "id": "AI-901-0111",
@@ -5171,7 +5178,8 @@
       "explanation": "Managed identity with DefaultAzureCredential is the keyless authentication pattern for Azure-hosted apps.\n\n**Why it works:** The App Service identity is granted access to the Content Understanding resource and the SDK obtains Entra ID tokens automatically.\n\n**Why the others don't work:**\n- Hard-coded key: violates the requirement.\n- Public storage: insecure.\n- Anonymous access: not supported.",
       "domain": "Implement AI solutions by using Microsoft Foundry",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/azure/AI-901/AppServiceManagedIdentityCU.mmd"
     },
     {
       "id": "AI-901-0115",

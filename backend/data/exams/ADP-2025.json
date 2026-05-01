@@ -749,6 +749,7 @@
     {
       "id": "ADP-2025-0017",
       "type": "single-choice",
+      "diagram": "diagrams/gcp/ADP-2025/DmsPostgresToCloudSql.mmd",
       "docs": "https://cloud.google.com/database-migration/docs/postgres/quickstart",
       "format": "text",
       "services": [
@@ -834,6 +835,7 @@
     {
       "id": "ADP-2025-0019",
       "type": "multiple-choice",
+      "diagram": "diagrams/gcp/ADP-2025/DataFusionSftpHttpToBigQuery.mmd",
       "docs": "https://cloud.google.com/data-fusion/docs/concepts/overview",
       "format": "text",
       "services": [
@@ -1235,6 +1237,7 @@
     {
       "id": "ADP-2025-0027",
       "type": "multiple-choice",
+      "diagram": "diagrams/gcp/ADP-2025/BqDtsAdsYouTube.mmd",
       "docs": "https://cloud.google.com/bigquery-transfer/docs/introduction",
       "format": "text",
       "services": [
@@ -3520,6 +3523,7 @@
     {
       "id": "ADP-2025-0077",
       "type": "single-choice",
+      "diagram": "diagrams/gcp/ADP-2025/DataflowClickstreamEnrichment.mmd",
       "docs": "https://cloud.google.com/dataflow/docs/concepts/streaming-pipelines",
       "format": "text",
       "services": [
@@ -3607,6 +3611,7 @@
     {
       "id": "ADP-2025-0079",
       "type": "multiple-choice",
+      "diagram": "diagrams/gcp/ADP-2025/ComposerDataformOrchestration.mmd",
       "docs": "https://cloud.google.com/composer/docs/concepts/overview",
       "format": "text",
       "services": [
@@ -3776,6 +3781,7 @@
     {
       "id": "ADP-2025-0082",
       "type": "single-choice",
+      "diagram": "diagrams/gcp/ADP-2025/DataflowEtlPiiTokenization.mmd",
       "docs": "https://cloud.google.com/dataflow/docs/overview",
       "format": "text",
       "services": [
@@ -3957,6 +3963,7 @@
     {
       "id": "ADP-2025-0086",
       "type": "single-choice",
+      "diagram": "diagrams/gcp/ADP-2025/GcsBigQueryDataformPipeline.mmd",
       "docs": "https://cloud.google.com/dataform/docs/overview",
       "format": "text",
       "services": [
@@ -4180,6 +4187,7 @@
     {
       "id": "ADP-2025-0091",
       "type": "multiple-choice",
+      "diagram": "diagrams/gcp/ADP-2025/ComposerDagBigQueryGcs.mmd",
       "docs": "https://cloud.google.com/composer/docs/composer-2/triggering-with-gcf",
       "format": "text",
       "services": [
@@ -4928,6 +4936,7 @@
     {
       "id": "ADP-2025-0107",
       "type": "multiple-choice",
+      "diagram": "diagrams/gcp/ADP-2025/PubSubSubscriptionVsDataflow.mmd",
       "docs": "https://cloud.google.com/pubsub/docs/bigquery",
       "format": "text",
       "services": [
@@ -5080,6 +5089,7 @@
     {
       "id": "ADP-2025-0110",
       "type": "single-choice",
+      "diagram": "diagrams/gcp/ADP-2025/EventarcGcsToCloudRun.mmd",
       "format": "text",
       "difficulty": 2,
       "domain": "Data Pipeline Orchestration",
@@ -5618,6 +5628,7 @@
     {
       "id": "ADP-2025-0121",
       "type": "single-choice",
+      "diagram": "diagrams/gcp/ADP-2025/AnalyticsHubPublisherSubscribers.mmd",
       "docs": "https://cloud.google.com/bigquery/docs/analytics-hub-introduction",
       "format": "text",
       "services": [

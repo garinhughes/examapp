@@ -2655,7 +2655,8 @@
       "explanation": "The three pipeline stages map directly to three distinct AWS managed AI services: speech-to-text conversion is Amazon Transcribe's core capability, natural language analysis including sentiment detection and key phrase extraction is Amazon Comprehend's specialty, and text-to-speech synthesis is Amazon Polly's function.\n\n**Why it works:** Each service is purpose-built for its stage. Transcribe handles multilingual audio transcription, Comprehend performs NLP analysis on the resulting text, and Polly synthesizes natural-sounding speech from text in multiple languages.\n\n**Why the others don't work:**\n- Using Amazon Translate for sentiment analysis: Translate is a language translation service, not an NLP analysis service. Sentiment and key phrase extraction belong to Comprehend.\n- Using Amazon Lex for transcription: Lex is a conversational interface builder that processes speech within a defined dialogue flow. It is not suited for batch transcription of recorded calls.\n- Using Amazon Translate for audio synthesis: Translate outputs translated text, not audio. Polly is required to produce the spoken audio summary.",
       "domain": "Fundamentals of AI and ML",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/MultilingualFeedbackPipeline.mmd"
     },
     {
       "id": "AIF-C01-0059",
@@ -2945,7 +2946,8 @@
       "explanation": "Self-hosted API deployments are characterized by two core trade-offs: greater control over the environment (OS, runtime, dependencies) and full responsibility for scaling configuration. Managed services like Amazon SageMaker abstract these concerns away, handling auto-scaling and infrastructure management automatically in exchange for reduced customization flexibility.\n\n**Why the others don't work:**\n- AWS patching the hypervisor does not relieve teams of OS-level patching on self-hosted EC2 instances.\n- Self-hosted deployments have custom endpoint URLs and are not automatically SageMaker-endpoint-compatible.\n- Built-in monitoring and data capture are SageMaker managed features, not available on arbitrary self-hosted deployments.",
       "domain": "Fundamentals of AI and ML",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/ManagedVsSelfHosted.mmd"
     },
     {
       "id": "AIF-C01-0065",
@@ -3097,7 +3099,8 @@
       "explanation": "Repeatable and auditable ML operations require automated pipelines that track all inputs, outputs, and parameters for every training execution. Amazon SageMaker Pipelines encodes ML workflows as directed acyclic graphs, versions all artifacts, and enables quality gates such as evaluation steps that must pass before a model is registered or deployed.\n\n**Why it works:** Automation ensures every training run follows the same defined steps, and artifact versioning means any run can be reproduced exactly, satisfying both repeatability and auditability requirements.\n\n**Why the others don't work:**\n- Wiki documentation: manual, error-prone, and produces no machine-readable audit trail.\n- Model Monitor: a post-deployment monitoring tool that does not address the training and versioning gap.\n- EC2 with S3 scripts: reduces chaos slightly but provides no automated pipeline, version control for data, or quality gate enforcement.",
       "domain": "Fundamentals of AI and ML",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/SageMakerPipelinesRepeatable.mmd"
     },
     {
       "id": "AIF-C01-0068",
@@ -3778,7 +3781,8 @@
       "explanation": "Amazon Bedrock is the correct choice because it provides serverless, fully managed access to a broad selection of foundation models via a unified API, and natively integrates with Knowledge Bases to enable retrieval-augmented generation.\n\n**Why it works:** Bedrock abstracts all model infrastructure, letting teams focus on application logic, prompt design, and data integration without provisioning or scaling model servers.\n\n**Why the others don't work:**\n- SageMaker JumpStart: Deploys models to SageMaker-managed endpoints that still require configuration and scaling decisions, adding operational overhead.\n- Amazon Q: Is a finished assistant product for business and developer productivity, not a platform for constructing custom generative AI applications.\n- PartyRock: Is a no-code sandbox for quick experimentation, not suitable for production application development with programmatic API requirements.",
       "domain": "Fundamentals of Generative AI",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/GenAIServicePicker.mmd"
     },
     {
       "id": "AIF-C01-0082",
@@ -4448,7 +4452,8 @@
       "explanation": "Fine-tuning is cost-optimal when a small, stable, labeled dataset exists and query volume is sufficient to amortize the one-time training cost. It embeds task-specific knowledge into model weights, eliminating the per-request token overhead of RAG or in-context learning.\n\n**Why it works:** Amazon Bedrock fine-tuning charges a flat compute cost for the training job and then serves the resulting model at standard inference rates with no additional prompt tokens. For a fixed monthly budget, this is predictable and scalable.\n\n**Why the others don't work:**\n- RAG: Avoids training cost but adds retrieved tokens to every request; ongoing costs scale with query volume and retrieved chunk size.\n- Continued pre-training: Requires more compute than supervised fine-tuning and is designed for large unlabeled corpora, not small labeled datasets.\n- In-context learning with 500 examples: Exceeds typical context windows and produces prohibitively high per-request token costs at any meaningful query volume.",
       "domain": "Applications of Foundation Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/FineTuneVsRagCost.mmd"
     },
     {
       "id": "AIF-C01-0096",
@@ -4532,7 +4537,8 @@
       "explanation": "Agents for Amazon Bedrock provides a managed orchestration runtime that enables multi-step task execution. The agent iteratively reasons about the task goal, selects the next action, invokes the associated tool (via action groups backed by AWS Lambda or OpenAPI schemas), processes the result, and continues until the goal is achieved - without requiring the developer to write a custom state machine.\n\n**Why it works:** The scenario requires dependent sequential steps (query, identify, email, update) with branching logic based on intermediate results. This is precisely the use case for agents: the foundation model acts as the reasoning engine that decides what to do next at each step.\n\n**Why the others don't work:**\n- Vector store and retrieval: This describes a Bedrock Knowledge Base, not an agent. Agents can call a Knowledge Base as one of their actions, but that is not the agent's primary role.\n- Prompt router: Routing requests to different models is a separate pattern; agents are defined by stateful multi-step execution, not routing.\n- Training pipeline coordinator: Agents operate entirely at inference time and have no involvement in model training or weight updates.",
       "domain": "Applications of Foundation Models",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/BedrockAgentOrchestrator.mmd"
     },
     {
       "id": "AIF-C01-0098",
@@ -4580,7 +4586,8 @@
       "explanation": "The two essential capabilities for this workflow are action groups (which connect the agent to each external system) and the iterative reasoning loop (which allows the model to evaluate ticket severity and choose between the escalation and remediation paths). Together, these form the foundation of any multi-step agent built with Agents for Amazon Bedrock.\n\n**Why it works:** Action groups define what the agent can do; the reasoning loop governs when and why it does each thing. The combination enables goal-directed, conditional, multi-step execution without custom orchestration code.\n\n**Why the others don't work:**\n- Fine-tuning scheduler: Not a feature of the agent runtime; fine-tuning is configured separately in Amazon Bedrock.\n- Automatic vector index: Knowledge Base integration is optional and external to the agent's core architecture.\n- Prompt router: Model routing is not a built-in agent capability; each agent uses a single configured foundation model.",
       "domain": "Applications of Foundation Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/BedrockAgentActionGroups.mmd"
     },
     {
       "id": "AIF-C01-0099",
@@ -5585,7 +5592,8 @@
       "explanation": "Amazon SageMaker Model Monitor configured with a SageMaker Clarify bias baseline is the best tool for this requirement.\n\n**Why it works:** SageMaker Model Monitor supports bias drift detection as a native monitoring type. When combined with a Clarify bias baseline established from training data, it automatically schedules analysis of inference data, computes fairness metrics for specified demographic facets, and triggers CloudWatch alerts when defined thresholds are exceeded - providing the continuous, automated oversight required.\n\n**Why the others don't work:**\n- Quarterly Clarify batch job: One-time or infrequent analysis misses bias that emerges gradually in live traffic between runs.\n- Amazon A2I human review: A2I provides human judgment on individual predictions but does not perform statistical aggregate bias drift analysis.\n- Custom Lambda solution: This is a valid but undifferentiated approach requiring custom maintenance when a managed service already provides the capability.",
       "domain": "Guidelines for Responsible AI",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/BiasDriftMonitoring.mmd"
     },
     {
       "id": "AIF-C01-0121",
@@ -5752,7 +5760,8 @@
       "explanation": "IAM execution roles with least-privilege policies are the standard mechanism for granting SageMaker training jobs scoped, identity-based access to S3 buckets. AWS PrivateLink interface VPC endpoints for Amazon S3 and SageMaker ensure that all API calls and data transfers stay within the AWS private network and never traverse the public internet, satisfying both the access control and network isolation requirements.\n\n**Why it works:** The IAM role controls who can access the bucket, and PrivateLink controls where the network traffic flows - together they address both requirements explicitly.\n\n**Why the others don't work:**\n- Amazon Macie with broad S3 access: Macie detects sensitive data but cannot restrict access or network paths, and broad permissions violate least-privilege.\n- NAT gateway with IP-based bucket policy: NAT gateways route through the public internet, directly violating the network isolation requirement.\n- KMS encryption only: Encryption protects data at rest but does not control network routing; data can still transit the public internet.",
       "domain": "Security, Compliance, and Governance for AI Solutions",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/SageMakerPrivateLinkS3.mmd"
     },
     {
       "id": "AIF-C01-0125",
@@ -5839,7 +5848,8 @@
       "explanation": "Secure data engineering for ML pipelines requires layered controls: AWS Glue's DetectPII transform masks sensitive fields in-pipeline before data reaches training, AWS Glue data quality rules assess completeness and value validity at the ETL layer, AWS Lake Formation column-level permissions enforce fine-grained role-based access to feature columns in the data lake, and SageMaker Data Wrangler provides pre-training data quality profiling to flag anomalous records.\n\n**Why it works:** Each capability addresses a distinct engineering concern - PII masking happens at transformation time, access is restricted at the column level where the data resides, and data quality is evaluated before training begins.\n\n**Why the others don't work:**\n- Macie with S3 bucket policies and CloudWatch alarms: Macie detects but does not redact PII, bucket policies cannot restrict individual columns, and object count alarms are not field-level quality checks.\n- KMS encryption with IAM prefix policies and Lambda null check: Encryption does not mask PII values, prefix policies are not column-level, and a single Lambda check is not a robust data quality framework.\n- SageMaker Processing with full-bucket access and Model Monitor: Processing can run masking scripts but does not enforce column-level access at the lake layer, and Model Monitor operates post-deployment rather than pre-training.",
       "domain": "Security, Compliance, and Governance for AI Solutions",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/AIF-C01/SecureFeaturePipeline.mmd"
     },
     {
       "id": "AIF-C01-0127",

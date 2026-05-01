@@ -5180,7 +5180,8 @@
       "explanation": "Dataflow templates are the recommended path for ingesting CSV files from Cloud Storage into BigQuery with transformations.\n\n**Why it works:** The Cloud Storage Text to BigQuery template provides autoscaling workers, exactly-once semantics, and UDF transformation hooks for nightly batch loads.\n\n**Why the others don't work:**\n- Single-VM scripts and per-row inserts do not scale and are costly.\n- Cloud Functions with per-row inserts hit the same problems.\n- The S3 transfer service does not read from Cloud Storage.",
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/CsvDataflowToBigQuery.mmd"
     },
     {
       "id": "PMLE-2025-0114",
@@ -5222,7 +5223,8 @@
       "explanation": "Lift-and-shift Hadoop workloads to Dataproc with data on Cloud Storage is Google's recommended pattern.\n\n**Why it works:** The Cloud Storage connector lets Spark read Parquet from `gs://` paths almost identically to HDFS, so existing jobs run with minimal modification.\n\n**Why the others don't work:**\n- Converting Parquet to CSV and rewriting jobs in SQL is heavy refactoring.\n- Self-managed Hadoop on Compute Engine forfeits the managed-service benefits.\n- Routing through Pub/Sub and Bigtable rewrites both the storage layer and the jobs.",
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/HadoopLiftShiftDataproc.mmd"
     },
     {
       "id": "PMLE-2025-0115",
@@ -6479,7 +6481,8 @@
       "explanation": "Reduction Server is the purpose-built Vertex AI feature for accelerating all-reduce in synchronous GPU training.\n\n**Why it works:** Dedicated reducer nodes aggregate gradients with bandwidth-optimal topology, freeing GPU NICs and shortening step time without modifying training code.\n\n**Why the others don't work:**\n- Async parameter server: hurts convergence and requires rewrites.\n- Smaller batch size: no effect on communication bottleneck.\n- TPU rewrite: violates the minimal-change constraint.",
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/ReductionServerGpuTraining.mmd"
     },
     {
       "id": "PMLE-2025-0142",
@@ -6654,7 +6657,8 @@
       "explanation": "When predictions are scheduled, large volume, and not latency sensitive, a managed batch prediction job that reads and writes BigQuery directly minimizes both operational and compute cost.\n\n**Why it works:** Vertex AI batch prediction provisions ephemeral workers, reads the BigQuery table directly, and writes a destination table without requiring a deployed endpoint.\n\n**Why the others don't work:**\n- Online endpoint per row: Always-on replicas and per-request overhead make it expensive for nightly bulk scoring.\n- Dataproc Serverless export: Adds export steps and custom code, and does not satisfy the requirement to write to BigQuery natively.\n- Streaming Dataflow: Designed for continuous low-latency inference, not nightly batch jobs.",
       "domain": "Serving and Scaling Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/BigQueryBatchPrediction.mmd"
     },
     {
       "id": "PMLE-2025-0146",
@@ -6696,7 +6700,8 @@
       "explanation": "BigQuery ML remote models bridge SQL and Vertex AI endpoints without retraining or moving data.\n\n**Why it works:** A remote model uses a BigQuery connection to invoke the Vertex AI endpoint when `ML.PREDICT` is called, keeping the workflow in SQL.\n\n**Why the others don't work:**\n- Export and batch job: Requires data movement and coordination outside SQL.\n- Duplicate XGBoost in BigQuery ML: Creates two models to maintain and risks drift.\n- Dataflow pipeline: Adds infrastructure and breaks the SQL-only requirement.",
       "domain": "Serving and Scaling Models",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/BigQueryMlRemoteModel.mmd"
     },
     {
       "id": "PMLE-2025-0147",
@@ -6789,7 +6794,8 @@
       "explanation": "Each step depends on the artifact built in the previous one: endpoint, then pipeline code, then deployed job, then ongoing tuning.",
       "domain": "Serving and Scaling Models",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/PubSubRunInferenceBigQuery.mmd"
     },
     {
       "id": "PMLE-2025-0149",
@@ -7198,7 +7204,8 @@
       "explanation": "Vertex AI endpoints accept multiple deployed models and a traffic split that controls request distribution.\n\n**Why it works:** Clients call the same endpoint URL while the platform routes a configurable percentage of traffic to each version, providing clean A/B exposure.\n\n**Why the others don't work:**\n- Separate endpoints with client choice: Decentralizes routing and biases the split.\n- Header-based routing: Requires custom client logic and is not a controlled experiment.\n- Batch prediction: Cannot run a live experiment.",
       "domain": "Serving and Scaling Models",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/EndpointTrafficSplit.mmd"
     },
     {
       "id": "PMLE-2025-0158",
@@ -8367,7 +8374,8 @@
       "explanation": "Vertex AI Pipelines supports automated champion-challenger validation through its evaluation component and conditional gating.\n\n**Why it works:** ModelEvaluation outputs structured metrics that a dsl.Condition can evaluate, blocking registration when quality drops.\n\n**Why the others don't work:**\n- Always uploading: pollutes the registry and relies on manual approval.\n- Two-seed training: compares candidates to each other, not to production.\n- Email and manual registration: not automated validation.",
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/PipelineConditionalRegistration.mmd"
     },
     {
       "id": "PMLE-2025-0183",
@@ -8501,7 +8509,8 @@
       "explanation": "Vertex AI Feature Store is purpose-built to serve identical feature values to training and online prediction.\n\n**Why it works:** Both the training pipeline and the serving service read from the same materialized feature definitions, eliminating duplicated logic.\n\n**Why the others don't work:**\n- Same language code copy: still duplicated logic.\n- Dataflow per request: not viable for online latency.\n- Removing features: degrades model quality.",
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/FeatureStoreSkewFix.mmd"
     },
     {
       "id": "PMLE-2025-0186",
@@ -8700,7 +8709,8 @@
       "explanation": "The recommended pattern hosts MLflow on a managed compute platform with managed storage backends.\n\n**Why it works:** GKE plus Cloud SQL plus Cloud Storage matches MLflow's architecture and gives each layer independent scalability.\n\n**Why the others don't work:**\n- Single VM with SQLite: not scalable or HA.\n- Per-user Workbench: not a shared server.\n- Replacing with Vertex AI Experiments: discards the MLflow requirement.",
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/MlflowOnGke.mmd"
     },
     {
       "id": "PMLE-2025-0190",
@@ -8901,7 +8911,8 @@
       "explanation": "Cloud Build supports first-class GitHub triggers that execute pipeline steps on push events.\n\n**Why it works:** A trigger plus a build config delivers an event-driven pipeline with no extra orchestration components.\n\n**Why the others don't work:**\n- Pub/Sub polling: re-implements existing functionality.\n- Hourly scheduler: not event-driven.\n- Jenkins layer: redundant infrastructure.",
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/gcp/PMLE-2025/CloudBuildVertexPipelines.mmd"
     },
     {
       "id": "PMLE-2025-0194",

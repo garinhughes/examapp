@@ -516,7 +516,8 @@
       "explanation": "EventBridge plus AWS Chatbot is the native pattern.\n\n**Why it works:** Security Hub emits `Security Hub Findings - Imported` events to EventBridge. A filtered rule picks the high and critical findings and delivers them to an AWS Chatbot configuration, which posts formatted messages to the chosen Slack channel.\n\n**Why the others don't work:**\n- Custom actions: manual, not automated.\n- Insight URL in Slack: no push notifications.\n- SNS email to Slack: unreliable and unformatted.",
       "domain": "Detection",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/SecurityHubSlackPipeline.mmd"
     },
     {
       "id": "SCS-C03-0012",
@@ -715,7 +716,8 @@
       "explanation": "A metric filter plus an anomaly detection alarm is the standard pattern.\n\n**Why it works:** The filter converts relevant CloudTrail events into a CloudWatch metric. Anomaly detection builds a model from past data and raises an alarm when current values deviate, which catches behavioral spikes that a static threshold would miss.\n\n**Why the others don't work:**\n- Weekly Athena queries: not real-time.\n- Disabling CloudWatch Logs integration: conflicts with the metric-filter approach.\n- Lambda Errors alarm: wrong signal for IAM abuse.",
       "domain": "Detection",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/CloudTrailMetricAnomalyAlarm.mmd"
     },
     {
       "id": "SCS-C03-0016",
@@ -914,7 +916,8 @@
       "explanation": "EventBridge routes the finding; Systems Manager Automation performs the steps.\n\n**Why it works:** EventBridge matches the Security Hub finding pattern and invokes a Systems Manager Automation runbook. The runbook sequences the tag, snapshot, and security group actions with documented inputs and outputs suitable for audit.\n\n**Why the others don't work:**\n- Macie disk scan: wrong scope.\n- Config replacement: not finding-driven.\n- Frequent Inspector: no orchestration.",
       "domain": "Detection",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/SecurityHubAutomationRunbook.mmd"
     },
     {
       "id": "SCS-C03-0020",
@@ -1241,7 +1244,8 @@
       "explanation": "Cross-account CloudWatch Logs destinations target Kinesis streams in the logging account.\n\n**Why it works:** Subscription filters in each workload account push events to a destination in the logging account. The destination is backed by a Kinesis Data Stream, letting the SOC run consumers for enrichment or filtering before writing to S3 or OpenSearch.\n\n**Why the others don't work:**\n- Nightly export: latency and no processing hook.\n- RAM sharing of log groups: not supported for cross-account writes.\n- Long-lived user credentials: insecure anti-pattern.",
       "domain": "Detection",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/CrossAccountLogsKinesis.mmd"
     },
     {
       "id": "SCS-C03-0027",
@@ -1377,7 +1381,8 @@
       "explanation": "Security Lake handles ingestion, normalization, and subscriber access natively.\n\n**Why it works:** Security Lake supports AWS-native sources, converts them into Open Cybersecurity Schema Framework Parquet in an S3 bucket, and includes subscriber management so partner tools can query or consume events.\n\n**Why the others don't work:**\n- Firehose + Lambda: builds what Security Lake provides.\n- Cross-account replication: no normalization.\n- Glue crawlers: custom pipeline overhead.",
       "domain": "Detection",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/SecurityLakeIngestion.mmd"
     },
     {
       "id": "SCS-C03-0030",
@@ -1757,7 +1762,8 @@
       "explanation": "Firehose + Lambda + OpenSearch is the standard pattern.\n\n**Why it works:** Firehose buffers events, invokes a Lambda transform to parse and enrich, and delivers structured documents to OpenSearch for indexing. OpenSearch Dashboards then powers SOC visualizations without batch delays.\n\n**Why the others don't work:**\n- Glue DataBrew + Athena: batch and higher latency.\n- Redshift COPY: wrong workload shape and costly.\n- EventBridge Pipes to SNS: no central normalization.",
       "domain": "Detection",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/FirehoseOpenSearchPipeline.mmd"
     },
     {
       "id": "SCS-C03-0038",
@@ -1944,7 +1950,8 @@
       "explanation": "Transit Gateway Flow Logs are purpose-built for this view.\n\n**Why it works:** TGW Flow Logs include attachment IDs, route decisions, and accept/reject status for flows traversing the Transit Gateway, giving exactly the requested inter-attachment visibility.\n\n**Why the others don't work:**\n- VPC Flow Logs everywhere: lack TGW routing context.\n- Traffic Mirroring: cost and scope mismatch.\n- Network Firewall logs only: partial coverage.",
       "domain": "Detection",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/TransitGatewayFlowLogs.mmd"
     },
     {
       "id": "SCS-C03-0042",
@@ -2522,7 +2529,8 @@
       "explanation": "OpsCenter is purpose-built for this workflow.\n\n**Why it works:** EventBridge forwards Security Hub findings to OpsCenter, which creates OpsItems that analysts update, assign, and resolve. Associated SSM runbooks provide repeatable response actions tied to the item.\n\n**Why the others don't work:**\n- SNS + spreadsheet: no tracking or runbook linkage.\n- Firehose + Athena: passive, not interactive.\n- Custom application: unnecessary build.",
       "domain": "Incident Response",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/OpsCenterFindingTickets.mmd"
     },
     {
       "id": "SCS-C03-0054",
@@ -3093,7 +3101,8 @@
       "explanation": "EventBridge triggering an SSM Automation runbook is the managed pattern.\n\n**Why it works:** EventBridge routes GuardDuty findings to an SSM Automation runbook that performs the `ModifyInstanceAttribute` call to swap in a quarantine security group, with approvals, logging, and retries built in.\n\n**Why the others don't work:**\n- Polling script on EC2: unnecessary infrastructure.\n- SNS + manual: not automated.\n- Config custom rule: evaluation, not enforcement action by default.",
       "domain": "Incident Response",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/GuardDutySshQuarantine.mmd"
     },
     {
       "id": "SCS-C03-0066",
@@ -3136,7 +3145,8 @@
       "explanation": "The Automated Forensics Orchestrator fits the described workflow.\n\n**Why it works:** The AWS Solutions Library solution uses Step Functions to drive instance isolation, memory capture with SSM, EBS snapshot copy into a forensic account, and chain-of-custody tagging, across the organization.\n\n**Why the others don't work:**\n- Inspector + Lambda: partial and ad hoc.\n- AWS Backup: missing memory and custody.\n- Macie: wrong data domain.",
       "domain": "Incident Response",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/AutomatedForensicsOrchestrator.mmd"
     },
     {
       "id": "SCS-C03-0067",
@@ -3962,7 +3972,8 @@
       "explanation": "Deleting the key plus denying the principal and revoking sessions covers both containment and eradication.\n\n**Why it works:** Deactivating and deleting the exposed access key stops future credential use, while an explicit deny policy plus STS session revocation cuts any currently active sessions. Rotating remaining keys prevents lateral use of the same user's credentials.\n\n**Why the others don't work:**\n- Password email: wrong credential type.\n- Disable CloudTrail: destroys evidence.\n- Delete/recreate user: disruptive.",
       "domain": "Incident Response",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/IamKeyCompromiseEradication.mmd"
     },
     {
       "id": "SCS-C03-0084",
@@ -6393,7 +6404,8 @@
       "explanation": "AWS Network Firewall with Firewall Manager is the fit.\n\n**Why it works:** Network Firewall provides stateful inspection, managed IPS rule groups, and domain-list filtering; Firewall Manager centrally deploys and maintains rule groups across accounts.\n\n**Why the others don't work:**\n- Security groups: no L7 filtering.\n- NACLs: IP-only.\n- GuardDuty: detective.",
       "domain": "Infrastructure Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/NetworkFirewallCentralEgress.mmd"
     },
     {
       "id": "SCS-C03-0135",
@@ -6739,7 +6751,8 @@
       "explanation": "AWS Verified Access is purpose-built for this.\n\n**Why it works:** Verified Access evaluates every request against identity claims from an IdP trust provider and device posture from a device trust provider, granting access without a VPN.\n\n**Why the others don't work:**\n- Client VPN: VPN-based.\n- Header-only: spoofable.\n- SSO alone: no per-request posture.",
       "domain": "Infrastructure Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/VerifiedAccessTrustProviders.mmd"
     },
     {
       "id": "SCS-C03-0142",
@@ -7969,7 +7982,8 @@
       "explanation": "Trust anchor plus profile are required.\n\n**Why it works:** IAM Roles Anywhere validates X.509 client certificates via a trust anchor tied to the customer CA, and a profile links the trust anchor to IAM roles and optional session policies that the external workload can assume.\n\n**Why the others don't work:**\n- Fallback keys: defeats the design.\n- Disable STS: breaks assumption.\n- Administrator role: overpermissive.",
       "domain": "Identity and Access Management",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/IamRolesAnywhereOnPrem.mmd"
     },
     {
       "id": "SCS-C03-0168",
@@ -9237,7 +9251,8 @@
       "explanation": "An EMR security configuration with in-transit encryption is the answer.\n\n**Why it works:** Security configurations bundle at-rest and in-transit encryption settings, including certificate material for the TLS sessions between cluster nodes for components such as HDFS, MapReduce, Spark, and Tez.\n\n**Why the others don't work:**\n- Subnet isolation: not encryption.\n- S3 default: wrong scope.\n- MACsec: wrong place.",
       "domain": "Data Protection",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/EmrInTransitEncryption.mmd"
     },
     {
       "id": "SCS-C03-0194",
@@ -10016,7 +10031,8 @@
       "explanation": "AWS Backup logically air-gapped vault with cross-account copy is the answer.\n\n**Why it works:** A logically air-gapped vault in a separate account, protected by Vault Lock, stores restore points out of reach of the production account's blast radius; cross-account and cross-Region copies ensure a recoverable copy survives compromise.\n\n**Why the others don't work:**\n- Same account snapshots: same blast radius.\n- CRR same account: still exposed.\n- Versioning only: reversible.",
       "domain": "Data Protection",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/BackupAirGappedVault.mmd"
     },
     {
       "id": "SCS-C03-0210",
@@ -10210,7 +10226,8 @@
       "explanation": "Secrets Manager managed rotation for RDS is the answer.\n\n**Why it works:** Secrets Manager provisions and invokes the AWS-provided RDS rotation Lambda that creates a new credential, updates the database user, and shifts the secret version staging labels, transparently refreshing clients using the GetSecretValue API.\n\n**Why the others don't work:**\n- SecureString + Lambda: not managed rotation.\n- Manual CLI: not automated.\n- KMS key rotation: wrong object.",
       "domain": "Data Protection",
       "difficulty": 2,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/SecretsManagerRdsRotation.mmd"
     },
     {
       "id": "SCS-C03-0214",
@@ -10425,7 +10442,8 @@
       "explanation": "AWS KMS external key store (XKS) is the answer.\n\n**Why it works:** XKS lets KMS forward cryptographic operations to a customer-operated HSM via an XKS proxy, so key material never leaves the customer's environment while AWS KMS APIs still work for integrated services.\n\n**Why the others don't work:**\n- Multi-Region keys: within AWS.\n- Replicate to CloudHSM: not a feature.\n- Export to S3: never allowed.",
       "domain": "Data Protection",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/KmsExternalKeyStore.mmd"
     },
     {
       "id": "SCS-C03-0219",
@@ -10961,7 +10979,8 @@
       "explanation": "AWS KMS multi-Region keys are the answer.\n\n**Why it works:** Multi-Region keys consist of a primary and replicas that share the same key ID and key material, so ciphertext created in one Region can be decrypted in the other locally without cross-Region calls.\n\n**Why the others don't work:**\n- Independent keys: incompatible ciphertext.\n- Single key cross-Region: adds dependency.\n- CloudHSM: not multi-Region.",
       "domain": "Data Protection",
       "difficulty": 3,
-      "lastReviewed": "2026-04-18"
+      "lastReviewed": "2026-04-18",
+      "diagram": "diagrams/aws/SCS-C03/KmsMultiRegionKeys.mmd"
     },
     {
       "id": "SCS-C03-0230",

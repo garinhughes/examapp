@@ -2171,7 +2171,8 @@
       "explanation": "The allow-only-approved-outbound isolation mode is the MOST restrictive option that still permits access to approved external endpoints. It blocks all outbound by default and requires administrators to explicitly list each permitted FQDN or service tag.\n\n**Why it works:** This mode implements a default-deny outbound policy. Approved FQDNs are added as outbound rules, so only traffic to those destinations is permitted.\n\n**Why the others don't work:**\n- Allow internet outbound permits all outbound traffic without per-destination approval.\n- Disabling managed VNet and using Azure Firewall is a valid but separate architectural approach, not a managed VNet isolation mode.\n- A wildcard FQDN rule that covers all destinations negates the restrictive stance of the mode.",
       "domain": "Design and implement an MLOps infrastructure",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/AmlPrivateEndpointExpressRoute.mmd"
     },
     {
       "id": "AI-300-0047",
@@ -2284,7 +2285,8 @@
       "explanation": "The managed virtual network is a Microsoft-managed compute network. The allow-only-approved-outbound mode is the most restrictive outbound policy within it. A private endpoint gives the workspace a private IP. Disabling public access removes the public endpoint entirely. Each addresses a different aspect of workspace network security.",
       "domain": "Design and implement an MLOps infrastructure",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/AmlPrivateMigrationVpn.mmd"
     },
     {
       "id": "AI-300-0049",
@@ -5032,7 +5034,8 @@
       "explanation": "Isolating 5xx errors requires examining both the application layer (scoring script exceptions) and the infrastructure layer (resource exhaustion). Container logs expose scoring script tracebacks, while CPU and memory metrics reveal whether resource pressure is killing container processes.\n\n**Why they work:** Container logs capture the exact Python exceptions thrown in run(), while Monitoring tab metrics show whether instances are saturated - together they cover all three suspected causes: scoring logic errors, dependency failures surfaced as import exceptions in logs, and resource exhaustion visible in metrics.\n\n**Why the others don't work:**\n- Model data collection for drift analysis: A long-running quality assurance process with no bearing on immediate HTTP 5xx failures.\n- Delete and recreate on larger SKU: Destroys diagnostic evidence and confirms nothing definitively about the root cause.\n- Mirror traffic allocation review: Mirror traffic supplements a working primary deployment; it does not cause 5xx errors on the primary deployment itself.",
       "domain": "Implement machine learning model lifecycle and operations",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/OnlineEndpointFiveHundredDiagnostics.mmd"
     },
     {
       "id": "AI-300-0108",
@@ -5687,7 +5690,8 @@
       "explanation": "Azure Monitor alert rules can target the drift magnitude metric that dataset monitors emit as an Azure Monitor metric. When the drift exceeds the configured threshold, the alert fires an action group that can call a webhook pointing to the Azure Machine Learning pipeline endpoint, triggering a retraining run automatically. This requires no custom polling code and uses only native platform capabilities.\n\n**Why it works:** Azure Monitor natively watches the drift metric, and the pipeline endpoint provides a REST-callable URL that an action group webhook can invoke directly.\n\n**Why the others don't work:**\n- A custom Azure Function timer approach achieves the goal but requires building and maintaining polling infrastructure.\n- The Event Hub, Stream Analytics, and Logic Apps chain is technically functional but adds unnecessary complexity for a straightforward threshold-to-pipeline trigger.\n- Dataset monitors have no built-in auto-retrain capability; triggering retraining always requires an external action.",
       "domain": "Implement machine learning model lifecycle and operations",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/DataDriftRetrainTrigger.mmd"
     },
     {
       "id": "AI-300-0122",
@@ -6255,7 +6259,8 @@
       "explanation": "Private endpoints are the correct solution because they assign a private IP address to each resource (the hub, storage account, and Key Vault) within the virtual network. All communication routes over the Microsoft backbone without traversing the internet. Disabling public access on each resource enforces this path exclusively.\n\n**Why it works:** Private endpoints provide true network-level isolation by replacing public endpoints with private IPs inside the VNet, and disabling public access removes the fallback path.\n\n**Why the others don't work:**\n- Private endpoint for hub with service endpoints for storage and Key Vault: Service endpoints use the public IP of the source and do not provide private IPs for the target resources.\n- Azure Firewall with FQDN rules: Filters outbound internet traffic but still sends traffic to public endpoints unless private endpoints are also in place.\n- Trusted Microsoft Services bypass: Allows traffic through public endpoints, not through private network paths.",
       "domain": "Design and implement a GenAIOps infrastructure",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/FoundryPrivateEndpointTrio.mmd"
     },
     {
       "id": "AI-300-0134",
@@ -6346,7 +6351,8 @@
       "explanation": "Private endpoint DNS resolution requires two things to work correctly: a private DNS zone for the correct namespace linked to the relevant virtual networks, and an A record in that zone mapping the resource's FQDN to the private endpoint IP address. Together these override public DNS and ensure clients resolve the private IP.\n\n**Why it works:** The private DNS zone scoped to the correct namespace intercepts DNS queries and the A record directs them to the private IP rather than the public endpoint.\n\n**Why the others don't work:**\n- NSG rule blocking port 443: Controls traffic flow but does not fix DNS resolution; clients still get the public IP.\n- Azure Firewall DNS proxy forwarding to public resolver: Without private DNS zone integration, forwarding returns public IPs.\n- Disabling public network access: An access control change that does not update DNS records or create zone entries.",
       "domain": "Design and implement a GenAIOps infrastructure",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/PrivateEndpointDnsResolution.mmd"
     },
     {
       "id": "AI-300-0136",
@@ -7849,7 +7855,8 @@
       "explanation": "The pipeline has two gaps: no quality gate before deployment, and deployment names based on a timestamp that cannot be traced back to a specific commit.\n\nAdding an evaluation job (c1) addresses the first requirement by blocking deployment if the prompt fails quality checks. Using the Git SHA in the deployment name and adding semantic version tags (c2) addresses the second by creating a traceable, reversible deployment history.\n\n**Why the others don't work:**\n- Scheduled deployments (c3): Reduce blast radius but do not test the prompt or enable rollback.\n- `auto-rollback` flag (c4): Does not exist on Azure AI Foundry managed online endpoints.\n- Azure Blob Storage (c5): Removes the prompt from Git, making tag-based rollback impossible.",
       "domain": "Design and implement a GenAIOps infrastructure",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/PromptFlowCicdEvalGate.mmd"
     },
     {
       "id": "AI-300-0168",
@@ -9273,7 +9280,8 @@
       "explanation": "Distributed tracing requires that a consistent trace identifier flows from the application through to the Azure OpenAI call. The Azure OpenAI SDK's OpenTelemetry instrumentation propagates the existing trace context automatically, creating child spans that are linked to the parent application span in Application Insights.\n\n**Why it works:** SDK-level instrumentation injects W3C trace context headers into API calls, ensuring parent-child span relationships are captured without manual correlation.\n\n**Why the others don't work:**\n- Diagnostic logs with KQL join: no automatic context propagation; the join key must be manually threaded through, which is brittle.\n- Diagnostic settings union in workspace: co-locates data but creates no causal trace link between specific requests.\n- API Management timestamp correlation: imprecise for concurrent traffic and does not provide deterministic request linkage.",
       "domain": "Implement generative AI quality assurance and observability",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/OpenAiDistributedTracing.mmd"
     },
     {
       "id": "AI-300-0199",
@@ -9798,7 +9806,8 @@
       "explanation": "Azure AI Search natively supports hybrid search by running BM25 and vector retrieval in parallel and using Reciprocal Rank Fusion to merge the result lists. RRF ranks documents by their reciprocal rank in each individual list, producing a combined ranking that captures both exact-match signals from BM25 and semantic signals from vector search.\n\n**Why it works:** RRF does not require score normalization and is robust to scale differences between retrieval methods, making it the correct and least-friction approach for this scenario.\n\n**Why the others don't work:**\n- BM25-only with synonym maps: removes semantic search capability entirely.\n- Pre-processing alphanumeric tokens for embedding: does not reliably preserve exact-match ranking for identifiers in vector space.\n- Separate indexes merged in application: requires custom normalization logic that Azure AI Search already provides natively via hybrid search.",
       "domain": "Optimize generative AI systems and model performance",
       "difficulty": 1,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/HybridSearchRrf.mmd"
     },
     {
       "id": "AI-300-0210",
@@ -9888,7 +9897,8 @@
       "explanation": "Semantic ranking provides a language-model-based re-ranking signal that improves recommendation query precision by grounding final scores in semantic relevance. Query-type routing allows the hybrid configuration to adapt its BM25-to-vector balance dynamically based on query structure, preserving keyword precision for model-number queries and semantic precision for recommendation queries.\n\n**Why it works:** These two mechanisms operate at different levels - one at re-ranking, one at retrieval routing - and together cover both precision requirements without requiring a single static configuration to satisfy both query types.\n\n**Why the others don't work:**\n- Disabling BM25: eliminates the keyword precision gains the hybrid configuration was designed to provide.\n- Increasing `top` to 50: shifts retrieval burden to the language model rather than improving ranking quality.\n- Custom linear score combination: fragile and requires ongoing normalization maintenance that RRF avoids.",
       "domain": "Optimize generative AI systems and model performance",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/azure/AI-300/HybridSearchSemanticReranker.mmd"
     },
     {
       "id": "AI-300-0212",

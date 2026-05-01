@@ -511,7 +511,8 @@
       "explanation": "Cloud Storage and BigQuery land raw data at ingestion; Vertex AI Training runs training jobs.\n\n**Why it works:** These are the canonical Google Cloud tools for their respective stages.\n\n**Why the others don't work:**\n- Model Registry for raw data: it stores model artefacts, not datasets.\n- Cloud Storage exclusively for deployment: it is used at multiple stages.\n- BigQuery only for monitoring: it spans ingestion, preparation, and analysis.",
       "domain": "Fundamentals of gen AI",
       "difficulty": 2,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/GAIL-2025/MlLifecycleToolMapping.mmd"
     },
     {
       "id": "GAIL-2025-0012",
@@ -3917,7 +3918,8 @@
       "explanation": "Prebuilt RAG with Vertex AI Search and RAG APIs are the two main RAG offerings, each with a distinct role.\n\n**Why it works:** Prebuilt RAG is the managed end-to-end option, and RAG APIs are the composable developer-facing option.\n\n**Why the others don't work:**\n- Self-operated vector DB: not required.\n- Audio-only prebuilt RAG: incorrect.\n- RAG APIs as image-only: incorrect.",
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/GAIL-2025/RagOfferingsManagedVsCustom.mmd"
     },
     {
       "id": "GAIL-2025-0084",
@@ -4270,7 +4272,8 @@
       "explanation": "Functions or extensions enable API calls, and data stores enable retrieval-based grounding.\n\n**Why it works:** These two concepts cover the most common kinds of agent tooling.\n\n**Why the others don't work:**\n- Retrain before invoking: incorrect.\n- Plugins as image-only: incorrect.\n- Tools tied to billing: incorrect.",
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/GAIL-2025/AgentToolingFunctionsAndDataStores.mmd"
     },
     {
       "id": "GAIL-2025-0092",
@@ -4452,7 +4455,8 @@
       "explanation": "Cloud Vision API and Natural Language API cover image labelling and text sentiment respectively.\n\n**Why it works:** Each is a managed pre-built API designed for the specific task.\n\n**Why the others don't work:**\n- Speech-to-Text for images: wrong modality.\n- Cloud DNS for text: unrelated.\n- Cloud Storage for image labelling: it stores, does not label.",
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/GAIL-2025/AgentWithVisionAndLanguageApis.mmd"
     },
     {
       "id": "GAIL-2025-0096",
@@ -5882,7 +5886,8 @@
       "explanation": "Grounding with first-party enterprise data is the technique for anchoring responses in customer-owned content.\n\n**Why it works:** Indexing the company's product manuals and retrieving relevant passages at query time ensures responses are anchored to proprietary content rather than the model's general knowledge.\n\n**Why the others don't work:**\n- Google Search grounding: anchors to public web data.\n- Third-party data grounding: uses licensed external datasets.\n- World data alone: uses only the model's pretrained knowledge.",
       "domain": "Techniques to improve gen AI model output",
       "difficulty": 1,
-      "lastReviewed": "2026-04-28"
+      "lastReviewed": "2026-04-28",
+      "diagram": "diagrams/gcp/GAIL-2025/RagFirstPartyGroundingPipeline.mmd"
     },
     {
       "id": "GAIL-2025-0126",

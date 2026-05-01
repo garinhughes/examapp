@@ -1930,7 +1930,8 @@
       "explanation": "A NAT gateway in a public subnet allows EC2 instances in private subnets to initiate outbound internet connections. The NAT gateway holds an Elastic IP and forwards traffic through the VPC's internet gateway. Private instances are never assigned public IPs and cannot be reached from the internet.\n\n**Why it works:** The NAT gateway sits in a public subnet with a route to the internet gateway. The private subnet route table sends internet-bound traffic to the NAT gateway, which performs network address translation. Return traffic flows back through the NAT gateway to the originating private instance.\n\n**Why the others don't work:**\n- Assigning Elastic IPs to instances makes them publicly addressable. Security groups provide instance-level filtering but cannot eliminate the risk of a publicly routable IP on a sensitive instance.\n- A NAT gateway in a private subnet has no internet connectivity path, because NAT gateways themselves need a route to an internet gateway to forward traffic outward.\n- An internet gateway is a VPC-level resource and cannot be attached to a single subnet. Instances would also need public IPs and a route to the gateway to have internet access.",
       "domain": "Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-14"
+      "lastReviewed": "2026-04-14",
+      "diagram": "diagrams/aws/SAA-C03/NatGatewayPrivateSubnet.mmd"
     },
     {
       "id": "SAA-C03-0043",
@@ -1979,7 +1980,8 @@
       "explanation": "Configuring the web tier security group to accept inbound HTTPS and allow outbound traffic to the database security group, combined with a database security group that only accepts traffic from the web tier security group, implements a layered security model using security group chaining.\n\n**Why it works:** Security groups can reference other security groups as the source or destination in rules. The database tier only accepts connections from instances that are members of the web tier security group, regardless of their IP addresses. This is the recommended pattern for multi-tier architectures.\n\n**Why the others don't work:**\n- Network ACLs are stateless and subnet-scoped. Allowing port 443 inbound at the NACL level applies to all resources in the subnet, not just the web tier, and does not fulfill the database isolation requirement.\n- Permitting all inbound traffic on all ports to the web tier exposes the web tier to unnecessary risk and is not required for an HTTPS-only application.\n- Allowing all traffic from the VPC CIDR to both tiers is too broad and does not limit database access to the web tier specifically.",
       "domain": "Security",
       "difficulty": 1,
-      "lastReviewed": "2026-04-14"
+      "lastReviewed": "2026-04-14",
+      "diagram": "diagrams/aws/SAA-C03/WebDbSecurityGroupChain.mmd"
     },
     {
       "id": "SAA-C03-0044",
@@ -2309,7 +2311,8 @@
       "explanation": "AWS Secrets Manager is designed to store, retrieve, and automatically rotate secrets. It integrates with supported databases to rotate credentials on a defined schedule using Lambda rotation functions, with no manual intervention required after initial setup.\n\n**Why it works:** Secrets Manager triggers the rotation Lambda function at the configured interval, updates the stored secret value, and (for supported databases) updates the credentials in the database itself. The application always retrieves the current valid credential by calling the Secrets Manager API.\n\n**Why the others don't work:**\n- AWS Systems Manager Parameter Store does not provide automatic rotation for SecureString parameters. Any rotation logic must be built and maintained separately.\n- Manual rotation in Secrets Manager still requires human action on a schedule and is more error-prone than automatic rotation.\n- Using S3 with a custom EventBridge-Lambda rotation pipeline requires building and operating a solution that Secrets Manager already provides natively.",
       "domain": "Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-14"
+      "lastReviewed": "2026-04-14",
+      "diagram": "diagrams/aws/SAA-C03/SecretsManagerLambdaRotation.mmd"
     },
     {
       "id": "SAA-C03-0051",
@@ -2857,7 +2860,8 @@
       "explanation": "SSE-KMS with a customer managed key is the correct configuration. The CMK's key policy gives the organization explicit control over who can use the key, every KMS Encrypt and Decrypt call made by S3 on the customer's behalf appears in CloudTrail, and automatic annual key rotation can be enabled with a single CMK setting without any S3 or application changes.\n\n**Why it works:** Customer managed keys in KMS are customer-owned, auditable, and rotatable. When S3 uses SSE-KMS, it calls KMS APIs that are captured in CloudTrail, producing a full audit trail. Enabling key rotation on a CMK causes KMS to rotate the key material every year while preserving the key ARN, so no application or bucket reconfiguration is required.\n\n**Why the others don't work:**\n- SSE-S3: Encryption is handled entirely by AWS using AWS-managed keys. The organization has no key policy control, and key usage is not surfaced as distinct KMS events in CloudTrail.\n- SSE-C: The organization provides keys per request but must manage key storage and rotation externally. There is no automatic KMS rotation mechanism and no CloudTrail KMS key-usage audit trail.\n- Client-side encryption: Provides key control but depends on off-premises infrastructure, produces no CloudTrail KMS events, and requires manual rotation management outside AWS.",
       "domain": "Security",
       "difficulty": 2,
-      "lastReviewed": "2026-04-14"
+      "lastReviewed": "2026-04-14",
+      "diagram": "diagrams/aws/SAA-C03/SseKmsCustomerManagedKey.mmd"
     },
     {
       "id": "SAA-C03-0062",
@@ -4656,7 +4660,8 @@
       "explanation": "AWS Global Accelerator is specifically designed for multi-Region active-passive or active-active architectures requiring static anycast IPs, fast health-check-based failover, and ALB integration.\n\n**Why it works:** Global Accelerator assigns two permanent anycast IP addresses routed from AWS edge locations globally. Endpoint group health checks detect Regional unavailability in seconds, typically failing over within 30 seconds, well within the 60-second requirement. The traffic dial setting allows 100% primary Region routing with automatic failover.\n\n**Why the others don't work:**\n- Option B: Route 53 failover depends on DNS TTL expiry and client resolver caching behavior; a 60-second TTL does not guarantee 60-second failover. Route 53 also does not provide static IPs.\n- Option C: CloudFront origin failover is origin-response-based, not Region-availability-based, and CloudFront edge IP addresses are dynamic, making IP allowlisting impractical.\n- Option D: Transit Gateway inter-Region peering is a private network construct for VPC-to-VPC connectivity and has no role in routing public internet traffic or providing static IPs to end users.",
       "domain": "Design Resilient Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/GlobalAcceleratorMultiRegionFailover.mmd"
     },
     {
       "id": "SAA-C03-0100",
@@ -4707,7 +4712,8 @@
       "explanation": "Eliminating AZ single points of failure requires synchronous standby replication with automatic failover at both the RDS layer (Multi-AZ) and the ElastiCache layer (Redis Multi-AZ with a replica in a different AZ).\n\n**Why it works:** RDS Multi-AZ maintains a synchronous replica in a second AZ with automatic DNS failover, so no data is lost when a primary AZ fails. ElastiCache for Redis with Multi-AZ enabled automatically promotes the replica to primary when the primary node's AZ is unavailable, preserving session continuity.\n\n**Why the others don't work:**\n- Option C: Cross-zone load balancing affects how the ALB distributes traffic to already-registered targets; it does not add AZ-redundant EC2 instances. The ALB itself spans AZs by virtue of subnet selection, but the compute layer must also span AZs via an Auto Scaling group with subnets in multiple AZs.\n- Option D: RDS read replicas use asynchronous replication and require manual promotion; they are for read scaling, not AZ fault tolerance.\n- Option E: Memcached partitions data across nodes without replication; a node failure permanently evicts its cached data, breaking session integrity.",
       "domain": "Design Resilient Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/MultiAzRedisRdsHa.mmd"
     },
     {
       "id": "SAA-C03-0101",
@@ -4844,7 +4850,8 @@
       "explanation": "DynamoDB global tables provide multi-active replication, meaning every regional replica accepts reads and writes independently. The remaining gap is in the application layer: Lambda functions must target the local regional DynamoDB endpoint to truly eliminate the cross-Region dependency.\n\n**Why it works:** `create-global-table` with replicas in both Regions establishes synchronous propagation of writes across replicas. When Lambda in `eu-west-1` connects to `dynamodb.eu-west-1.amazonaws.com`, it reads and writes locally with no dependency on `us-east-1`. Combined with Route 53 latency routing, the architecture is fully multi-active.\n\n**Why the others don't work:**\n- Option B: Global tables are multi-active, not primary-replica. Routing `eu-west-1` writes to `us-east-1` reintroduces the cross-Region dependency that caused the original incident.\n- Option C: Route 53 and API Gateway routing do not influence which DynamoDB endpoint is used inside Lambda function code; the SDK endpoint must be explicitly configured.\n- Option D: DAX is a write-through cache, not a standalone datastore. It does not protect against a DynamoDB regional failure because all write operations pass through to DynamoDB.",
       "domain": "Design Resilient Architectures",
       "difficulty": 3,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/DynamoDbGlobalTableMultiRegion.mmd"
     },
     {
       "id": "SAA-C03-0104",
@@ -4895,7 +4902,8 @@
       "explanation": "Distributing the Auto Scaling group across all three AZs eliminates the web tier single point of failure. Enabling RDS Multi-AZ and ElastiCache for Redis with automatic failover eliminates the database and session cache single points of failure, all with minimal operational overhead because AWS manages the failover automatically.\n\n**Why it works:** The `--vpc-zone-identifier` with three subnet IDs instructs Auto Scaling to balance instances across all AZs. RDS `--multi-az` creates a synchronous standby in a different AZ with automatic promotion. ElastiCache for Redis `--automatic-failover-enabled` with multi-AZ replicas promotes a replica automatically when the primary fails.\n\n**Why the others don't work:**\n- Option C: Manual snapshots provide disaster recovery, not high availability. Restoring from a snapshot requires manual effort and significant downtime, which does not eliminate a single point of failure.\n- Option D: Adding one instance in a second AZ still leaves the architecture vulnerable to either AZ failing; using an Auto Scaling group spanning all three AZs with a minimum of 3 is the correct pattern.\n- Option E: Memcached partitions data without replication, so any node failure permanently evicts that node's data. Session data loss does not constitute fault tolerance.",
       "domain": "Design Resilient Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/MultiAzAsgRdsRedis.mmd"
     },
     {
       "id": "SAA-C03-0105",
@@ -5031,7 +5039,8 @@
       "explanation": "Warm standby is the correct DR strategy when the RTO is measured in minutes and the RPO requires near-continuous replication, but a full active/active deployment is cost-prohibitive.\n\n**Why it works:** A warm standby environment runs continuously at reduced capacity in the secondary Region. The RDS read replica is kept in near-real-time sync (satisfying the 5-minute RPO), and the small but running Auto Scaling group can scale out rapidly. Promoting the read replica and updating the Route 53 weighted policy are operations that complete well within 15 minutes.\n\n**Why the others don't work:**\n- Option B: Pilot light leaves compute stopped, requiring instance launch and configuration time after a failure. This pushes the realistic RTO beyond 15 minutes.\n- Option C: Backup-and-restore involves restoring snapshots and relaunching entire environments, yielding RTOs of 1 hour or more and RPOs tied to the snapshot schedule.\n- Option D: Active/active does meet the RTO/RPO but requires a fully active duplicate environment in both Regions at full scale, which the budget constraints explicitly prohibit.",
       "domain": "Design Resilient Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/WarmStandbyDr.mmd"
     },
     {
       "id": "SAA-C03-0108",
@@ -5081,7 +5090,8 @@
       "explanation": "Meeting a 1-minute RPO with automated failover for both Aurora and EC2 requires a continuously replicating database solution paired with an automated DNS failover mechanism.\n\n**Why it works:** Aurora Global Database provides sub-second replication lag and a managed failover API, satisfying the 1-minute RPO for the database tier. Route 53 Application Recovery Controller provides health-check-driven, automated routing control changes that eliminate manual DNS steps and enable traffic cutover within the 10-minute RTO.\n\n**Why the others don't work:**\n- Option C: AWS Elastic Disaster Recovery (DRS) is appropriate for EC2 server replication but the question is asking for two actions that together cover the full architecture. DRS does not address the Aurora failover requirement; Aurora Global Database and Route 53 ARC together form the complete solution.\n- Option D: Snapshot-based restore cannot meet a 10-minute RTO or 1-minute RPO.\n- Option E: Manual DNS changes violate the automation requirement and introduce unpredictable failover times.",
       "domain": "Design Resilient Architectures",
       "difficulty": 3,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/AuroraGlobalRoute53Arc.mmd"
     },
     {
       "id": "SAA-C03-0109",
@@ -5865,7 +5875,8 @@
       "explanation": "Amazon DynamoDB global tables are the purpose-built solution for active-active multi-Region key-value workloads requiring single-digit millisecond latency.\n\n**Why it works:** DynamoDB global tables replicate writes across Regions with conflict resolution, supporting active-active writes. The schema-less model accommodates varying game mode attributes. On-demand mode scales automatically to millions of concurrent players, and DAX provides sub-millisecond in-memory caching for hot leaderboard reads.\n\n**Why the others don't work:**\n- Option B: Aurora Global Database is active-passive; only the primary cluster accepts writes. It does not satisfy active-active multi-Region write requirements.\n- Option C: RDS cross-Region replicas are read-only. The relational schema and JSONB approach adds overhead compared to DynamoDB's native flexible schema.\n- Option D: Amazon Keyspaces supports multi-Region replication but does not offer DAX-style caching or the same operational simplicity as DynamoDB global tables for this use case.",
       "domain": "Design High-Performing Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/DynamoDbGlobalDax.mmd"
     },
     {
       "id": "SAA-C03-0126",
@@ -5915,7 +5926,8 @@
       "explanation": "Aurora Serverless v2 and RDS Proxy together address both the cost and connection challenges for Lambda-backed relational workloads.\n\n**Why it works:** Aurora Serverless v2 scales from a minimum of 0.5 ACUs, dramatically reducing costs during off-peak hours compared to always-on provisioned instances. RDS Proxy sits between Lambda and the database, pooling and multiplexing connections so that thousands of short-lived Lambda invocations share a small number of persistent database connections, eliminating `too many connections` errors.\n\n**Why the others don't work:**\n- Option C: Aurora Auto Scaling on a provisioned cluster adds read replicas but does not reduce write instance costs during idle periods.\n- Option D: Connection reuse within Lambda warm instances reduces connection churn but does not bound total concurrent connections across all Lambda instances at scale.\n- Option E: DynamoDB does not support relational JOIN queries and would require a full application rewrite, which is out of scope for this optimization task.",
       "domain": "Design High-Performing Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/AuroraServerlessRdsProxy.mmd"
     },
     {
       "id": "SAA-C03-0127",
@@ -6051,7 +6063,8 @@
       "explanation": "Amazon Neptune is the correct choice for graph workloads requiring multi-hop traversals, shortest path queries, and community detection on large relationship datasets.\n\n**Why it works:** Neptune stores data as a property graph or RDF model and processes Gremlin or openCypher traversal queries natively in the graph engine. Multi-hop relationship queries that would require recursive CTEs and multiple joins in a relational database are handled efficiently in Neptune's storage and query layer, meeting sub-10 ms latency requirements.\n\n**Why the others don't work:**\n- Option B: DynamoDB adjacency lists work for first-degree lookups but require multiple sequential round trips for multi-hop traversals, making latency targets difficult to meet at depth.\n- Option C: Aurora PostgreSQL with Apache AGE stores graph data relationally. Multi-hop traversals on hundreds of millions of edges are not performant in a relational engine.\n- Option D: Amazon Timestream is a time-series database with no graph traversal capabilities.",
       "domain": "Design High-Performing Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/NeptuneGraphDb.mmd"
     },
     {
       "id": "SAA-C03-0130",
@@ -6145,7 +6158,8 @@
       "explanation": "A read-through cache with background refresh (write-behind pattern) satisfies the requirement that RDS is never hit during normal operation while keeping data fresh within a 60-second window.\n\n**Why it works:** By proactively refreshing cache entries before their TTL elapses -- using a background worker that calls `SET` with updated data -- the cache always has a valid entry for hot products. The API never triggers a synchronous RDS read for cached SKUs. Redis `EXPIRE` enforces the 60-second maximum staleness boundary.\n\n**Why the others don't work:**\n- Option B: Cache-aside populates entries only on miss. Every TTL expiry causes a synchronous RDS read, which violates the stated requirement.\n- Option C: LRU eviction without TTLs does not enforce a 60-second staleness limit. Entries can remain stale indefinitely until memory pressure forces eviction.\n- Option D: DAX is a DynamoDB-specific in-memory cache and cannot front Amazon RDS PostgreSQL.",
       "domain": "Design High-Performing Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/ElasticacheReadThroughRefresh.mmd"
     },
     {
       "id": "SAA-C03-0132",
@@ -6239,7 +6253,8 @@
       "explanation": "Amazon CloudFront with origin failover handles global user routing using AWS edge locations, while AWS Transit Gateway inter-Region peering connects Regional VPCs over the AWS private backbone without traversing the public internet.\n\n**Why it works:** CloudFront's global points of presence route end-user requests to the nearest healthy origin, satisfying the latency and failover requirement. Transit Gateway inter-Region peering (`CreateTransitGatewayPeeringAttachment`) routes all VPC-to-VPC traffic over the AWS internal network, satisfying the private backbone requirement. Separating the three tiers into distinct subnets within each VPC enforces multi-tier isolation.\n\n**Why the others don't work:**\n- Option B: VPC peering is point-to-point and does not scale to many Regional VPCs without a full mesh, and inter-Region peering still uses the public internet routing path for DNS but not the AWS backbone uniformly.\n- Option C: Site-to-Site VPN tunnels are established over the public internet, violating the private backbone requirement.\n- Option D: AWS Global Accelerator is a valid alternative for user-facing routing, but VPC peering creates a management-heavy full mesh for inter-Region application traffic compared to Transit Gateway.",
       "domain": "Design High-Performing Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/MultiRegionCloudFrontTgw.mmd"
     },
     {
       "id": "SAA-C03-0134",
@@ -6289,7 +6304,8 @@
       "explanation": "The correct approach combines a Direct Connect transit VIF attached to a Direct Connect gateway with a Transit Gateway that aggregates all three VPCs into a single hub-and-spoke model.\n\n**Why it works:** A `transit VIF` is the only VIF type that can be associated with a Direct Connect gateway and then linked to a Transit Gateway (`CreateTransitGatewayAttachment`). The Transit Gateway acts as a regional hub, allowing on-premises traffic entering via Direct Connect to reach all three VPC attachments without separate physical connections.\n\n**Why the others don't work:**\n- Option C: Three private VIFs with separate Virtual Private Gateways achieve connectivity but do not scale, require per-VPC configuration, and do not use the modern Transit Gateway pattern that replaces the Transit VPC appliance.\n- Option D: Site-to-Site VPN does not provide dedicated sub-millisecond latency or guaranteed 1 Gbps throughput.\n- Option E: VPC peering is non-transitive; on-premises routes cannot hop through a peered VPC to reach another VPC.",
       "domain": "Design High-Performing Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/DirectConnectTransitGateway.mmd"
     },
     {
       "id": "SAA-C03-0135",
@@ -6802,7 +6818,8 @@
       "explanation": "AWS DataSync is purpose-built for large-scale online data migrations from NFS and other protocols to Amazon S3. It supports per-task bandwidth throttling via the `BandwidthLimit` setting, parallel multi-part transfers, and data integrity verification. Storage Gateway File Gateway then provides a managed NFS endpoint backed by the same S3 bucket, enabling seamless on-premises application continuity.\n\n**Why it works:** DataSync's built-in throttling ensures production traffic is not impacted during business hours. File Gateway caches frequently accessed objects locally and presents an NFS interface, satisfying the ongoing on-premises access requirement without duplicating data.\n\n**Why the others don't work:**\n- Option B: Snowball Edge is designed for low-bandwidth or offline scenarios. With off-hours bandwidth available, online transfer is viable and avoids shipping delays.\n- Option C: `aws s3 sync` lacks a bandwidth throttle flag and `s3fs-fuse` is unsupported and unreliable at 600 TB scale.\n- Option D: Provisioning Direct Connect takes weeks and Amazon EFS would create a separate data store, breaking the shared-data requirement.",
       "domain": "Design High-Performing Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/DataSyncFileGatewayMigration.mmd"
     },
     {
       "id": "SAA-C03-0146",
@@ -7135,7 +7152,8 @@
       "explanation": "The combination of AWS DMS CDC and Amazon Kinesis Data Firehose satisfies both the 5-minute delivery SLA and the minimal operational management constraint.\n\n**Why it works:** AWS DMS captures PostgreSQL WAL changes via CDC and streams them to Kinesis Data Streams in near real time without requiring custom connector management. Kinesis Data Firehose then consumes from the stream and delivers buffered batches to S3 within the configured 300-second window, handling compression, format conversion, and retries automatically.\n\n**Why the others don't work:**\n- Option C: Amazon MSK with Debezium requires managing Kafka Connect worker fleets, connector configurations, and consumer applications on EC2, creating high operational overhead.\n- Option D: AWS Glue JDBC polling is not a CDC mechanism; it cannot capture deletes reliably and may not sustain 200,000 events per minute within a 5-minute window.\n- Option E: AWS Data Pipeline is a legacy batch service; its minimum schedule granularity and lack of CDC support make it unsuitable for near-real-time ingestion at this volume.",
       "domain": "Design High-Performing Architectures",
       "difficulty": 2,
-      "lastReviewed": "2026-04-29"
+      "lastReviewed": "2026-04-29",
+      "diagram": "diagrams/aws/SAA-C03/DmsKinesisFirehoseS3.mmd"
     },
     {
       "id": "SAA-C03-0153",
