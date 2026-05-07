@@ -258,7 +258,8 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     if (p === '/privacy') return 'privacy'
     if (p === '/terms') return 'terms'
     if (p === '/refund') return 'refund'
-    return 'home'
+    if (p === '/' || p === '') return 'home'
+    return 'not-found'
   })
   const [exams, setExams] = useState<Exam[]>([])
   const [selected, setSelected] = useState<string | null>(() => {

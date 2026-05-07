@@ -45,6 +45,7 @@ import { HomePage } from '@/components/HomePage'
 import PrivacyPolicy from '@/components/PrivacyPolicy'
 import TermsOfService from '@/components/TermsOfService'
 import RefundPolicy from '@/components/RefundPolicy'
+import NotFoundPage from '@/components/NotFoundPage'
 
 export default function ExamApp() {
   return (
@@ -434,6 +435,7 @@ function ExamAppInner() {
             {route === 'privacy' && <PrivacyPolicy />}
             {route === 'terms' && <TermsOfService />}
             {route === 'refund' && <RefundPolicy />}
+            {route === 'not-found' && <NotFoundPage />}
 
             {/* Homepage when no exam selected */}
             {route === 'home' && !selected && <HomePage />}

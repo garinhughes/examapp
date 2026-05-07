@@ -75,18 +75,19 @@ resource "aws_cloudfront_distribution" "cdn" {
     max_ttl     = 31536000
   }
 
-  # SPA: serve index.html for 403/404 (S3 returns 403 when object missing)
+  # SPA fallback: serve 404.html (not index.html) so unknown URLs get noindex meta.
+  # React hydrates normally — valid routes (e.g. /pricing) still render correctly.
   custom_error_response {
     error_code            = 403
     response_code         = 200
-    response_page_path    = "/index.html"
+    response_page_path    = "/404.html"
     error_caching_min_ttl = 10
   }
 
   custom_error_response {
     error_code            = 404
     response_code         = 200
-    response_page_path    = "/index.html"
+    response_page_path    = "/404.html"
     error_caching_min_ttl = 10
   }
 

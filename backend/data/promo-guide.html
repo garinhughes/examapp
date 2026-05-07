@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>certshack — SEO Review (2026-05-07)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 860px; margin: 40px auto; padding: 0 24px; color: #1a1a1a; line-height: 1.6; }
+    h1 { font-size: 1.6rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 12px; }
+    h2 { font-size: 1.15rem; margin-top: 2rem; color: #374151; }
+    ol { padding-left: 1.4rem; }
+    li { margin-bottom: 1.2rem; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+    .tag { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; margin-right: 6px; vertical-align: middle; }
+    .critical { background: #fee2e2; color: #b91c1c; }
+    .high { background: #fef3c7; color: #92400e; }
+    .medium { background: #dbeafe; color: #1d4ed8; }
+    .low { background: #f3f4f6; color: #6b7280; }
+    .done { background: #d1fae5; color: #065f46; }
+    .file { font-size: 0.85rem; color: #6b7280; margin-top: 4px; }
+    .sc { font-size: 0.85rem; background: #fffbeb; border-left: 3px solid #f59e0b; padding: 6px 10px; margin-top: 6px; border-radius: 0 4px 4px 0; }
+  </style>
+</head>
+<body>
+
+<h1>certshack — SEO Review</h1>
+<p>Generated 2026-05-07. Issues ordered by impact. Items marked <span class="tag done">DONE</span> were fixed in this session.</p>
+
+<h2>Critical — blocking indexing</h2>
+<ol>
+
+  <li>
+    <span class="tag done">DONE</span>
+    <span class="tag critical">CRITICAL</span>
+    <strong>Generic meta description overrides page-specific description on every exam/lab page.</strong><br>
+    The base <code>index.html</code> contained a fallback <code>&lt;meta name="description"&gt;</code> that appeared <em>before</em> the page-specific one injected by <code>generate-static-meta.mjs</code>. Google uses whichever tag appears first, so every exam and lab page showed the generic fallback in search results.<br>
+    <span class="file">Fixed: scripts/generate-static-meta.mjs — strip fallback before injecting page meta. index.html fallback also updated to "IT certifications".</span>
+  </li>
+
+  <li>
+    <span class="tag critical">CRITICAL</span>
+    <strong>32 pages flagged "Alternate page with proper canonical tag" in Search Console.</strong><br>
+    CloudFront is configured to return HTTP 200 (serving root <code>index.html</code>) for all 403 and 404 responses. When Google finds a URL in the sitemap that doesn't have a pre-built static file (e.g. a skill lab that hasn't been deployed yet, or a trailing-slash variant like <code>/exams/AI-901/</code>), it receives the root <code>index.html</code> with canonical = <code>https://certshack.com/</code>. Google correctly treats it as a duplicate of the homepage and refuses to index it, but this inflates the "not indexed" count and wastes crawl budget.<br>
+    <strong>Fix:</strong> Add a CloudFront Function (viewer-request) that checks whether the path matches a known static route and, for unknown paths, returns a real 404 with a lightweight error HTML page that includes <code>&lt;meta name="robots" content="noindex"&gt;</code>. Until then, ensure all sitemap URLs have pre-built static files before deployment.<br>
+    <span class="sc">Search Console → Indexing → Pages → "Alternate page with proper canonical tag" (32 pages)</span>
+    <span class="file">infra/terraform/modules/cloudfront/main.tf — custom_error_response blocks</span>
+  </li>
+
+  <li>
+    <span class="tag critical">CRITICAL</span>
+    <strong>AI-901 (and likely other recently added exams) unknown to Google — not in any crawled page.</strong><br>
+    URL Inspection shows "URL is unknown to Google" with "No referring sitemaps detected" and "No referring page." The sitemap was last read 4/30/26. Any exam added after that date is invisible until Google re-crawls the sitemap or finds an internal link. With no crawlable internal links from <code>/exams</code> (it's a JS-rendered SPA), new exams have no discovery path.<br>
+    <strong>Fix (short-term):</strong> Use "Request Indexing" in URL Inspection for each new exam. <strong>Fix (long-term):</strong> Static <code>/exams</code> and <code>/skill-labs</code> listing pages — see item 5.<br>
+    <span class="sc">Search Console → URL Inspection → https://certshack.com/exams/AI-901</span>
+  </li>
+
+  <li>
+    <span class="tag critical">CRITICAL</span>
+    <strong>16 pages "Crawled — currently not indexed."</strong><br>
+    Google crawled these pages but chose not to index them, most likely because the crawled HTML was thin (body = <code>&lt;div id="root"&gt;&lt;/div&gt;</code> with no visible text). This affects any page that doesn't yet have a pre-rendered static file. Google's JS rendering is a second-wave process and lower priority — pages without real HTML content on first parse are deprioritised or dropped.<br>
+    <strong>Fix:</strong> Ensure all sitemap URLs have pre-built static HTML with body content before deployment. The listing pages generated in this session (items 5 and 6) address the most important cases.<br>
+    <span class="sc">Search Console → Indexing → Pages → "Crawled - currently not indexed" (16 pages)</span>
+  </li>
+
+</ol>
+
+<h2>High — hurting rankings</h2>
+<ol start="5">
+
+  <li>
+    <span class="tag done">DONE</span>
+    <span class="tag high">HIGH</span>
+    <strong>No static HTML for <code>/exams</code> listing page — Google can't follow links to exam detail pages.</strong><br>
+    The <code>/exams</code> route is a React SPA page with no pre-rendered body content. Googlebot's first-pass crawl sees no <code>&lt;a href&gt;</code> links to individual exam pages. All exam page discovery depends entirely on the sitemap. A static listing page with real links passes authority and makes discovery resilient.<br>
+    <span class="file">Fixed: scripts/generate-static-meta.mjs — generates dist/exams/index.html with H1, 15 linked exam entries, and full meta tags.</span>
+  </li>
+
+  <li>
+    <span class="tag done">DONE</span>
+    <span class="tag high">HIGH</span>
+    <strong>No static HTML for <code>/skill-labs</code> listing page.</strong><br>
+    Same issue as above. 216 skill labs are discoverable only via the sitemap. A static listing page with all 216 labs linked provides a reliable crawl path and signals the breadth of content.<br>
+    <span class="file">Fixed: scripts/generate-static-meta.mjs — generates dist/skill-labs/index.html with H1, 216 linked lab entries, and full meta tags.</span>
+  </li>
+
+  <li>
+    <span class="tag high">HIGH</span>
+    <strong>Missing <code>&lt;PageMeta&gt;</code> on <code>/exams</code> and <code>/skill-labs</code> listing pages — no runtime Helmet tags.</strong><br>
+    <code>PageMeta.tsx</code> defines metadata for both routes (<code>practice</code> and <code>skill-labs</code> keys) but neither <code>PracticeExams.tsx</code> nor <code>SkillLabsPage.tsx</code> call <code>&lt;PageMeta&gt;</code>. For JS-rendered views (i.e. real users after hydration), the tab title stays as "certshack" and no canonical is set at runtime, which can confuse crawlers that do render JS.<br>
+    <strong>Fix:</strong> Add <code>&lt;PageMeta route="practice" /&gt;</code> to <code>PracticeExams.tsx</code> and <code>&lt;PageMeta route="skill-labs" /&gt;</code> to <code>SkillLabsPage.tsx</code>.<br>
+    <span class="file">src/exam/PracticeExams.tsx, src/skill-labs/SkillLabsPage.tsx</span>
+  </li>
+
+  <li>
+    <span class="tag done">DONE — partially</span>
+    <span class="tag high">HIGH</span>
+    <strong><code>/pricing</code> has H2 as top-level heading instead of H1.</strong><br>
+    <code>/exams</code> and <code>/skill-labs</code> both have correct H1s rendered by the shared ExamApp header (<code>ExamApp.tsx:330</code>). However the pricing page uses <code>&lt;h2&gt;</code> where an <code>&lt;h1&gt;</code> should be — it sits outside the shared header and doesn't benefit from that pattern.<br>
+    <strong>Fix:</strong> Change <code>&lt;h2&gt;</code> → <code>&lt;h1&gt;</code> on PricingPage line 316.<br>
+    <span class="file">src/pricing/PricingPage.tsx:316</span>
+  </li>
+
+  <li>
+    <span class="tag high">HIGH</span>
+    <strong>No dedicated 404 page — invalid URLs return 200 with homepage content (soft 404).</strong><br>
+    The React Router wildcard route (<code>path="*"</code>) renders the same app shell as the homepage. Combined with CloudFront returning 200 for all 404s, Google cannot distinguish a real page from a missing one. This wastes crawl budget and can dilute site authority.<br>
+    <strong>Fix:</strong> Create a <code>NotFoundPage</code> component with <code>&lt;meta name="robots" content="noindex, nofollow" /&gt;</code>, map the wildcard route to it, and update CloudFront to return a real 404 status for unknown paths.<br>
+    <span class="file">src/App.tsx:87 (wildcard route), infra/terraform/modules/cloudfront/main.tf</span>
+  </li>
+
+</ol>
+
+<h2>Medium — improving rankings and click-through</h2>
+<ol start="10">
+
+  <li>
+    <span class="tag medium">MEDIUM</span>
+    <strong>Exam detail page titles follow a weak pattern for search intent.</strong><br>
+    Current pattern: <code>certshack | Microsoft Azure AI Fundamentals (AI-901) Practice Exam</code>. Leading with the brand name pushes the exam code and keywords to the right where they're truncated in SERPs (~60 char limit). Users searching "AI-901 practice exam" scan the left side of the title first.<br>
+    <strong>Suggested pattern:</strong> <code>AI-901 Practice Exam | certshack</code> — exam code first, brand last. This also aligns with how competitors title their pages.<br>
+    <span class="file">scripts/generate-static-meta.mjs:80, src/components/PageMeta.tsx:170</span>
+  </li>
+
+  <li>
+    <span class="tag medium">MEDIUM</span>
+    <strong>Skill lab pages lack keywords in their descriptions.</strong><br>
+    The generated description for lab pages is: <em>"[lab.description]. Interactive [platform] skill lab. [difficulty] difficulty. Covers [tech]."</em> This buries the certification relevance. Users search for "AWS SAA-C03 practice lab" or "CompTIA hands-on lab" — those phrases don't appear.<br>
+    <strong>Fix:</strong> Append related exam codes to the description and keywords. The lab JSON has a <code>relatedExamCodes</code> field — use it: <em>"...Covers CloudFront, S3, IAM. Relevant to SAA-C03."</em><br>
+    <span class="file">scripts/generate-static-meta.mjs:117-118</span>
+  </li>
+
+  <li>
+    <span class="tag medium">MEDIUM</span>
+    <strong>Homepage static HTML has no page-specific meta — relies entirely on runtime Helmet.</strong><br>
+    <code>dist/index.html</code> (served for the root <code>/</code> route) has only the generic fallback title ("certshack") and generic description. The homepage Helmet tags (FAQPage schema, WebSite schema, rich description) are injected at runtime by React. For Google's first-pass crawl of the homepage, it may see no meaningful meta.<br>
+    <strong>Fix:</strong> Add the homepage to <code>generate-static-meta.mjs</code> so <code>dist/index.html</code> gets a proper title, description, canonical, and JSON-LD baked in.<br>
+    <span class="file">scripts/generate-static-meta.mjs, frontend/dist/index.html</span>
+  </li>
+
+  <li>
+    <span class="tag medium">MEDIUM</span>
+    <strong>No breadcrumb structured data (BreadcrumbList schema).</strong><br>
+    Breadcrumbs appear in Google search results as path indicators (e.g. <em>certshack › Exams › AI-901</em>) and can increase click-through rate. Neither the static meta generator nor the React components emit BreadcrumbList JSON-LD.<br>
+    <strong>Fix:</strong> Add BreadcrumbList to exam detail and skill lab detail pages in <code>generate-static-meta.mjs</code>:<br>
+    <code>Home → Practice Exams → [Exam Name]</code> and <code>Home → Skill Labs → [Lab Name]</code><br>
+    <span class="file">scripts/generate-static-meta.mjs</span>
+  </li>
+
+  <li>
+    <span class="tag medium">MEDIUM</span>
+    <strong>8 internal routes have no PageMeta entries and will show generic title/description.</strong><br>
+    Routes with no metadata: <code>exam-setup</code>, <code>exam-attempt-review</code>, <code>diagrams</code>, <code>feedback</code>, <code>basket</code>, <code>metrics</code>. Some of these (diagrams, basket) should probably be <code>noindex</code> since they're not useful search landing pages. <code>exam-attempt-review</code> could have a meaningful title.<br>
+    <strong>Fix:</strong> Add entries to the META object in <code>PageMeta.tsx</code> — <code>noindex: true</code> for utility pages, descriptive titles for content pages.<br>
+    <span class="file">src/components/PageMeta.tsx</span>
+  </li>
+
+</ol>
+
+<h2>Low — incremental gains</h2>
+<ol start="15">
+
+  <li>
+    <span class="tag low">LOW</span>
+    <strong>No <code>lastmod</code> dates reflect actual content changes — all set to today's build date.</strong><br>
+    The sitemap generator sets <code>lastmod</code> to today for every URL on every build. This means Google can't use lastmod to prioritise recrawling pages that have actually changed. An exam page that hasn't changed in months gets the same lastmod as one updated today.<br>
+    <strong>Fix:</strong> Derive lastmod from the exam JSON's most recent <code>lastReviewed</code> date across its questions, or store a dedicated <code>updatedAt</code> field on each exam/lab.<br>
+    <span class="file">scripts/generate-sitemap.js</span>
+  </li>
+
+  <li>
+    <span class="tag low">LOW</span>
+    <strong>Missing <code>og:image</code> alt text and no per-page OG image — all pages share one generic image.</strong><br>
+    Every page uses <code>/og-image.png</code>. Social shares for individual exams or labs show the same generic image regardless of context. A per-exam OG image (even a simple text-on-background with the exam code) would improve click-through from social shares and messaging apps.<br>
+    <span class="file">scripts/generate-static-meta.mjs:24</span>
+  </li>
+
+  <li>
+    <span class="tag low">LOW</span>
+    <strong>Sitemap <code>changefreq</code> is "monthly" for exam pages but these change as questions are added.</strong><br>
+    Not a ranking factor directly, but misaligned changefreq can cause Google to delay recrawling pages that have actually been updated. "Weekly" would be more appropriate for active exams.<br>
+    <span class="file">scripts/generate-sitemap.js</span>
+  </li>
+
+  <li>
+    <span class="tag low">LOW</span>
+    <strong>No <code>robots</code> meta tag on transient/utility pages (diagrams, basket, feedback).</strong><br>
+    These routes are disallowed in <code>robots.txt</code> but robots.txt disallow is a crawl directive, not an index directive. If Google somehow discovers these URLs (e.g. through JS navigation), it can index them. A <code>noindex</code> meta tag is the belt-and-braces guarantee.<br>
+    <span class="file">src/components/PageMeta.tsx, frontend/public/robots.txt</span>
+  </li>
+
+</ol>
+
+<h2>Summary</h2>
+<table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+  <tr style="background:#f9fafb;">
+    <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Priority</th>
+    <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Count</th>
+    <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Status</th>
+  </tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Critical</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">1 fixed, 3 remaining</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">High</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">2 fixed, 2 fixed (partially), 1 remaining</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Medium</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">0 fixed, 5 remaining</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Low</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">0 fixed, 4 remaining</td></tr>
+</table>
+
+</body>
+</html>

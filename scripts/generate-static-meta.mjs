@@ -26,9 +26,9 @@ const OG_IMAGE = `${SITE_URL}/og-image.png`
 const shell = await readFile(join(DIST, 'index.html'), 'utf-8')
 
 function injectMeta(metaTags) {
-  // Replace existing <title> and inject meta before </head>
   return shell
     .replace(/<title>[^<]*<\/title>/, `<title>${metaTags.title}</title>`)
+    .replace(/<meta name="description"[^>]*>\n?/, '')
     .replace('</head>', `${metaTags.inject}\n</head>`)
 }
 
@@ -59,6 +59,17 @@ async function writeRoute(relPath, metaTags) {
   const dir = join(DIST, relPath)
   await mkdir(dir, { recursive: true })
   const html = injectMeta(metaTags)
+  await writeFile(join(dir, 'index.html'), html)
+}
+
+function injectBody(html, bodyContent) {
+  return html.replace('<div id="root"></div>', `<div id="root">${bodyContent}</div>`)
+}
+
+async function writeListingPage(relPath, metaTags, bodyContent) {
+  const dir = join(DIST, relPath)
+  await mkdir(dir, { recursive: true })
+  const html = injectBody(injectMeta(metaTags), bodyContent)
   await writeFile(join(dir, 'index.html'), html)
 }
 
@@ -138,4 +149,80 @@ for (const file of labFiles) {
   }
 }
 
-console.log(`[generate-static-meta] wrote ${examCount} exam routes, ${labCount} lab routes`)
+// ── Static 404 page ──────────────────────────────────────────────────────────
+// CloudFront serves this for 403/404 errors instead of index.html.
+// The noindex tag stops Google indexing unknown URLs as homepage duplicates.
+// React still hydrates normally, so valid SPA routes (e.g. /pricing) render correctly.
+
+const notFoundHtml = shell
+  .replace(/<title>[^<]*<\/title>/, '<title>Page Not Found | certshack</title>')
+  .replace(/<meta name="description"[^>]*>\n?/, '')
+  .replace('</head>', '  <meta name="robots" content="noindex, nofollow">\n</head>')
+
+await writeFile(join(DIST, '404.html'), notFoundHtml)
+
+// ── Pricing listing page ──────────────────────────────────────────────────────
+
+await writeRoute('pricing', {
+  title: 'certshack | Pricing — IT Certification Practice Exams & Skill Labs',
+  inject: buildInject({
+    description: 'Simple, transparent pricing for certshack practice exams and skill labs. Start free with sample exams, upgrade for full access to all certifications and labs.',
+    keywords: 'certshack pricing, certification exam pricing, practice exam subscription, skill lab access',
+    canonical: `${SITE_URL}/pricing`,
+    ogTitle: 'certshack | Pricing',
+    ogDescription: 'Practice exams and skill labs for IT certifications. Start free, upgrade for full access.',
+  }),
+})
+
+// ── Exams listing page ───────────────────────────────────────────────────────
+
+const allExams = []
+for (const file of examFiles) {
+  const raw = JSON.parse(await readFile(join(EXAMS_DIR, file), 'utf-8'))
+  if (raw.code) allExams.push(raw)
+}
+allExams.sort((a, b) => (a.title ?? a.code).localeCompare(b.title ?? b.code))
+
+const examListItems = allExams.map(e => {
+  const qCount = e.defaultQuestions ?? e.defaultQuestionCount
+  return `<li><a href="/exams/${e.code}"><strong>${esc(e.title)} (${e.code})</strong></a> — ${esc(e.provider ?? '')} practice exam${qCount ? `, ${qCount} questions` : ''}, pass mark ${e.passMark ?? 70}%</li>`
+}).join('\n      ')
+
+await writeListingPage('exams', {
+  title: 'certshack | IT Certification Practice Exams',
+  inject: buildInject({
+    description: `Practice exams for ${allExams.length} IT certifications including AWS, Azure, CompTIA, and more. Timed mock exams with detailed explanations mapped to exam objectives.`,
+    keywords: 'IT certification practice exams, AWS practice exam, Azure practice exam, CompTIA practice exam, cloud certification prep',
+    canonical: `${SITE_URL}/exams`,
+    ogTitle: 'certshack | IT Certification Practice Exams',
+    ogDescription: `Practice exams for ${allExams.length} IT certifications. Timed mock exams with detailed explanations.`,
+  }),
+}, `<h1>IT Certification Practice Exams</h1><ul>${examListItems}</ul>`)
+
+// ── Skill labs listing page ───────────────────────────────────────────────────
+
+const allLabs = []
+for (const file of labFiles) {
+  const raw = JSON.parse(await readFile(join(LABS_DIR, file), 'utf-8'))
+  if (!Array.isArray(raw)) continue
+  for (const lab of raw) { if (lab.id) allLabs.push(lab) }
+}
+allLabs.sort((a, b) => (a.title ?? a.id).localeCompare(b.title ?? b.id))
+
+const labListItems = allLabs.map(lab => {
+  const techList = (lab.technologies ?? []).slice(0, 3).join(', ')
+  return `<li><a href="/skill-labs/${lab.id}"><strong>${esc(lab.title)}</strong></a> — ${esc(lab.platform ?? '')} ${esc(lab.difficulty ?? '')} lab${techList ? `. Covers ${esc(techList)}` : ''}</li>`
+}).join('\n      ')
+
+await writeListingPage('skill-labs', {
+  title: 'certshack | IT Certification Skill Labs',
+  inject: buildInject({
+    description: `${allLabs.length} hands-on skill labs for AWS, Azure, CompTIA, and more. Interactive scenario-based labs mapped to certification exam objectives.`,
+    keywords: 'IT certification skill labs, AWS hands-on labs, Azure labs, CompTIA labs, cloud certification practice',
+    canonical: `${SITE_URL}/skill-labs`,
+    ogTitle: 'certshack | IT Certification Skill Labs',
+    ogDescription: `${allLabs.length} hands-on skill labs for IT certifications. Interactive scenario-based practice.`,
+  }),
+}, `<h1>IT Certification Skill Labs</h1><ul>${labListItems}</ul>`)
+
+console.log(`[generate-static-meta] wrote ${examCount} exam routes, ${labCount} lab routes, 2 listing pages`)

@@ -50,4 +50,4 @@ export type Question = {
 
 export type ExamMode = 'casual' | 'timed' | 'weakest-link' | 'weakest-link-timed'
 export type RevealMode = 'immediately' | 'on-completion'
-export type AppRoute = 'home' | 'practice' | 'analytics' | 'exam-history' | 'exam-landing' | 'exam-attempt-review' | 'account' | 'admin' | 'metrics' | 'pricing' | 'basket' | 'diagrams' | 'skill-labs' | 'feedback' | 'privacy' | 'terms' | 'refund' | `skill-lab:${string}` | `skill-lab-detail:${string}`
+export type AppRoute = 'home' | 'practice' | 'analytics' | 'exam-history' | 'exam-landing' | 'exam-attempt-review' | 'account' | 'admin' | 'metrics' | 'pricing' | 'basket' | 'diagrams' | 'skill-labs' | 'feedback' | 'privacy' | 'terms' | 'refund' | 'not-found' | `skill-lab:${string}` | `skill-lab-detail:${string}`
