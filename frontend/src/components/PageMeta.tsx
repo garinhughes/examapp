@@ -180,7 +180,7 @@ export function PageMeta({ route, examMeta, labMeta }: Props) {
     const provider = examMeta.provider ?? 'certshack'
     const passMark = examMeta.passMark ?? 70
     const qCount = examMeta.questionCount ?? examMeta.defaultQuestions
-    const pageTitle = `certshack | ${title} (${code}) Practice Exam`
+    const pageTitle = `${code} Practice Exam | certshack`
     const description = `${title} (${code}) practice questions and mock exam. ${qCount ? `${qCount} questions` : 'Questions'} across multiple domains, pass mark ${passMark}%. Timed or casual mode — every question mapped to a specific exam objective with detailed explanations.`
     const keywords = `${code} practice exam, ${code} mock exam, ${title} practice test, ${code} sample questions, ${code} practice questions, ${provider} certification prep, ${code} exam questions`
     const canonical = `${SITE_URL}/exams/${code}`
@@ -224,7 +224,7 @@ export function PageMeta({ route, examMeta, labMeta }: Props) {
   // Skill lab detail pages get per-lab dynamic meta once the lab data has loaded
   if (route.startsWith('skill-lab-detail:') && labMeta) {
     const labId = route.slice('skill-lab-detail:'.length)
-    const pageTitle = `certshack | ${labMeta.title} Skill Lab`
+    const pageTitle = `${labMeta.title} Skill Lab | certshack`
     const techList = labMeta.technologies.slice(0, 4).join(', ')
     const description = `${labMeta.description} Interactive ${labMeta.platform} skill lab. ${labMeta.difficulty} difficulty${techList ? ` — covering ${techList}` : ''}.`
     const keywords = `${labMeta.title}, ${labMeta.platform} skill lab, hands-on lab, ${labMeta.difficulty} lab${techList ? `, ${techList}` : ''}, certification practice`
