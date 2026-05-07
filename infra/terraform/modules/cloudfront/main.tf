@@ -34,6 +34,14 @@ variable "s3_bucket_regional_domain_name" {
   type        = string
 }
 
+# ---------- CloudFront Function — SPA path rewrite ----------
+resource "aws_cloudfront_function" "spa_rewrite" {
+  name    = "${var.project}-spa-rewrite"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code    = file("${path.module}/viewer-request.js")
+}
+
 # ---------- OAC ----------
 resource "aws_cloudfront_origin_access_control" "oac" {
   name                              = "${var.project}-oac"
@@ -73,6 +81,11 @@ resource "aws_cloudfront_distribution" "cdn" {
     min_ttl     = 0
     default_ttl = 86400
     max_ttl     = 31536000
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.spa_rewrite.arn
+    }
   }
 
   # SPA fallback: serve 404.html (not index.html) so unknown URLs get noindex meta.

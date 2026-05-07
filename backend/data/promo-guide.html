@@ -37,12 +37,11 @@
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag critical">CRITICAL</span>
     <strong>32 pages flagged "Alternate page with proper canonical tag" in Search Console.</strong><br>
-    CloudFront is configured to return HTTP 200 (serving root <code>index.html</code>) for all 403 and 404 responses. When Google finds a URL in the sitemap that doesn't have a pre-built static file (e.g. a skill lab that hasn't been deployed yet, or a trailing-slash variant like <code>/exams/AI-901/</code>), it receives the root <code>index.html</code> with canonical = <code>https://certshack.com/</code>. Google correctly treats it as a duplicate of the homepage and refuses to index it, but this inflates the "not indexed" count and wastes crawl budget.<br>
-    <strong>Fix:</strong> Add a CloudFront Function (viewer-request) that checks whether the path matches a known static route and, for unknown paths, returns a real 404 with a lightweight error HTML page that includes <code>&lt;meta name="robots" content="noindex"&gt;</code>. Until then, ensure all sitemap URLs have pre-built static files before deployment.<br>
-    <span class="sc">Search Console → Indexing → Pages → "Alternate page with proper canonical tag" (32 pages)</span>
-    <span class="file">infra/terraform/modules/cloudfront/main.tf — custom_error_response blocks</span>
+    CloudFront was serving root <code>index.html</code> (canonical = homepage) for all unknown paths. Fixed in two parts: (1) CloudFront now serves <code>404.html</code> (with <code>noindex</code>) for error paths instead of <code>index.html</code>; (2) a CloudFront Function rewrites clean paths (e.g. <code>/exams/AI-901</code> → <code>/exams/AI-901/index.html</code>) so pre-built static files are served directly from S3 with their correct canonicals.<br>
+    <span class="file">Fixed: infra/terraform/modules/cloudfront/viewer-request.js + main.tf, scripts/generate-static-meta.mjs (404.html)</span>
   </li>
 
   <li>
@@ -100,11 +99,11 @@
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag high">HIGH</span>
     <strong>No dedicated 404 page — invalid URLs return 200 with homepage content (soft 404).</strong><br>
-    The React Router wildcard route (<code>path="*"</code>) renders the same app shell as the homepage. Combined with CloudFront returning 200 for all 404s, Google cannot distinguish a real page from a missing one. This wastes crawl budget and can dilute site authority.<br>
-    <strong>Fix:</strong> Create a <code>NotFoundPage</code> component with <code>&lt;meta name="robots" content="noindex, nofollow" /&gt;</code>, map the wildcard route to it, and update CloudFront to return a real 404 status for unknown paths.<br>
-    <span class="file">src/App.tsx:87 (wildcard route), infra/terraform/modules/cloudfront/main.tf</span>
+    <code>NotFoundPage</code> component created with <code>noindex, nofollow</code> Helmet tag. Unknown paths now map to <code>'not-found'</code> route in ExamContext (previously fell through to <code>'home'</code>). CloudFront serves <code>404.html</code> for error paths; the CloudFront Function ensures valid pre-built paths are served directly.<br>
+    <span class="file">Fixed: src/components/NotFoundPage.tsx, src/exam/ExamContext.tsx, src/exam/ExamApp.tsx, src/exam/types.ts</span>
   </li>
 
 </ol>
@@ -196,8 +195,8 @@
     <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Count</th>
     <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Status</th>
   </tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Critical</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">1 fixed, 3 remaining</td></tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">High</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">2 fixed, 2 fixed (partially), 1 remaining</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Critical</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">3 fixed, 1 remaining (AI-901 — manual Request Indexing)</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">High</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">4 fixed, 1 remaining (pricing H2, PageMeta on listing pages)</td></tr>
   <tr><td style="padding:8px; border:1px solid #e5e7eb;">Medium</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">0 fixed, 5 remaining</td></tr>
   <tr><td style="padding:8px; border:1px solid #e5e7eb;">Low</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">0 fixed, 4 remaining</td></tr>
 </table>

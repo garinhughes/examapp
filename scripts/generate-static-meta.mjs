@@ -62,14 +62,14 @@ async function writeRoute(relPath, metaTags) {
   await writeFile(join(dir, 'index.html'), html)
 }
 
-function injectBody(html, bodyContent) {
-  return html.replace('<div id="root"></div>', `<div id="root">${bodyContent}</div>`)
-}
-
-async function writeListingPage(relPath, metaTags, bodyContent) {
+async function writeListingPage(relPath, metaTags, noscriptContent) {
   const dir = join(DIST, relPath)
   await mkdir(dir, { recursive: true })
-  const html = injectBody(injectMeta(metaTags), bodyContent)
+  // Links go in <noscript> — invisible to users (JS always runs), crawlable by bots
+  const html = injectMeta(metaTags).replace(
+    '<div id="root"></div>',
+    `<div id="root"></div><noscript>${noscriptContent}</noscript>`
+  )
   await writeFile(join(dir, 'index.html'), html)
 }
 
