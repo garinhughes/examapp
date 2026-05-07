@@ -6,6 +6,16 @@
   "defaultDuration": 90,
   "title": "CompTIA Security+",
   "level": 1,
+  "showcaseQuestionIds": [
+    "SY0-701-0004", "SY0-701-0008", "SY0-701-0012", "SY0-701-0014", "SY0-701-0015", "SY0-701-0016",
+    "SY0-701-0020", "SY0-701-0022", "SY0-701-0024", "SY0-701-0028", "SY0-701-0031", "SY0-701-0033", "SY0-701-0035", "SY0-701-0036",
+    "SY0-701-0040", "SY0-701-0044", "SY0-701-0047", "SY0-701-0048", "SY0-701-0051", "SY0-701-0052",
+    "SY0-701-0056", "SY0-701-0059", "SY0-701-0063", "SY0-701-0067", "SY0-701-0071", "SY0-701-0072", "SY0-701-0074", "SY0-701-0076", "SY0-701-0079", "SY0-701-0082", "SY0-701-0083", "SY0-701-0086",
+    "SY0-701-0092", "SY0-701-0093", "SY0-701-0096", "SY0-701-0100", "SY0-701-0103", "SY0-701-0107", "SY0-701-0108", "SY0-701-0112"
+  ],
+  "featuredLabIds": ["comptia-firewall-rule-ordering", "comptia-iam-provisioning-workflow", "comptia-vulnerability-scan-triage", "comptia-incident-response-sequence"],
+  "realWorldValue": "The SY0-701 is the industry-standard entry credential for cybersecurity roles, satisfying DoD 8570 baseline requirements and recognised globally by employers. It validates hands-on skills across threat analysis, architecture, operations, and governance — making it the typical first certification for analysts, administrators, and junior security engineers.",
+  "jobRoles": ["Security Analyst", "SOC Analyst", "IT Security Administrator", "Systems Administrator (Security Focus)", "Network Security Technician", "Junior Penetration Tester"],
   "questions": [
     {
       "id": "SY0-701-0001",
