@@ -88,19 +88,31 @@ for (const file of examFiles) {
   const passMark = raw.passMark ?? 70
   const qCount = raw.defaultQuestions ?? raw.defaultQuestionCount
   const canonical = `${SITE_URL}/exams/${code}`
-  const pageTitle = `certshack | ${title} (${code}) Practice Exam`
+  const pageTitle = `${code} Practice Exam | certshack`
   const description = `${title} (${code}) practice questions and mock exam. ${qCount ? `${qCount} questions` : 'Questions'} across multiple domains, pass mark ${passMark}%. Every question mapped to a specific exam objective with detailed explanations.`
   const keywords = `${code} practice exam, ${code} mock exam, ${title} practice test, ${code} sample questions, ${code} practice questions, ${provider} certification prep`
 
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
-    '@type': 'Course',
-    name: `${title} (${code}) Practice Exam`,
-    description,
-    url: canonical,
-    provider: { '@type': 'Organization', name: 'certshack', url: SITE_URL },
-    educationalCredentialAwarded: title,
-    ...(raw.defaultDuration ? { timeRequired: `PT${raw.defaultDuration}M` } : {}),
+    '@graph': [
+      {
+        '@type': 'Course',
+        name: `${title} (${code}) Practice Exam`,
+        description,
+        url: canonical,
+        provider: { '@type': 'Organization', name: 'certshack', url: SITE_URL },
+        educationalCredentialAwarded: title,
+        ...(raw.defaultDuration ? { timeRequired: `PT${raw.defaultDuration}M` } : {}),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Practice Exams', item: `${SITE_URL}/exams` },
+          { '@type': 'ListItem', position: 3, name: `${code} Practice Exam`, item: canonical },
+        ],
+      },
+    ],
   })
 
   await writeRoute(`exams/${code}`, {
@@ -123,22 +135,35 @@ for (const file of labFiles) {
     const labId = lab.id
     if (!labId) continue
 
-    const pageTitle = `certshack | ${lab.title} Skill Lab`
+    const pageTitle = `${lab.title} Skill Lab | certshack`
     const techList = (lab.technologies ?? []).slice(0, 4).join(', ')
-    const description = `${lab.description ?? lab.title}. Interactive ${lab.platform ?? ''} skill lab. ${lab.difficulty ?? ''} difficulty${techList ? `. Covers ${techList}` : ''}.`.replace(/\s+/g, ' ').trim()
-    const keywords = `${lab.title}, ${lab.platform ?? ''} skill lab, hands-on lab, ${lab.difficulty ?? ''} lab${techList ? `, ${techList}` : ''}, certification practice`
+    const relatedCodes = (lab.relatedExamCodes ?? []).join(', ')
+    const description = `${lab.description ?? lab.title}. Interactive ${lab.platform ?? ''} skill lab. ${lab.difficulty ?? ''} difficulty${techList ? `. Covers ${techList}` : ''}${relatedCodes ? `. Relevant to ${relatedCodes}` : ''}.`.replace(/\s+/g, ' ').trim()
+    const keywords = `${lab.title}, ${lab.platform ?? ''} skill lab, hands-on lab, ${lab.difficulty ?? ''} lab${techList ? `, ${techList}` : ''}${relatedCodes ? `, ${relatedCodes} practice lab` : ''}, certification practice`
     const canonical = `${SITE_URL}/skill-labs/${labId}`
 
     const jsonLd = JSON.stringify({
       '@context': 'https://schema.org',
-      '@type': 'LearningResource',
-      name: lab.title,
-      description: lab.description ?? lab.title,
-      url: canonical,
-      educationalLevel: lab.difficulty,
-      learningResourceType: 'Simulation',
-      provider: { '@type': 'Organization', name: 'certshack', url: SITE_URL },
-      ...(lab.technologies?.length ? { teaches: lab.technologies } : {}),
+      '@graph': [
+        {
+          '@type': 'LearningResource',
+          name: lab.title,
+          description: lab.description ?? lab.title,
+          url: canonical,
+          educationalLevel: lab.difficulty,
+          learningResourceType: 'Simulation',
+          provider: { '@type': 'Organization', name: 'certshack', url: SITE_URL },
+          ...(lab.technologies?.length ? { teaches: lab.technologies } : {}),
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+            { '@type': 'ListItem', position: 2, name: 'Skill Labs', item: `${SITE_URL}/skill-labs` },
+            { '@type': 'ListItem', position: 3, name: lab.title, item: canonical },
+          ],
+        },
+      ],
     })
 
     await writeRoute(`skill-labs/${labId}`, {
@@ -225,4 +250,50 @@ await writeListingPage('skill-labs', {
   }),
 }, `<h1>IT Certification Skill Labs</h1><ul>${labListItems}</ul>`)
 
-console.log(`[generate-static-meta] wrote ${examCount} exam routes, ${labCount} lab routes, 2 listing pages`)
+// ── Homepage (dist/index.html) ────────────────────────────────────────────────
+// Overwrite the generic shell with baked-in homepage meta so Google's first-pass
+// crawl sees a meaningful title, description, and JSON-LD without waiting for React.
+
+const homeJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      name: 'certshack',
+      url: SITE_URL,
+      description: 'IT certification practice exams and hands-on skill labs for AWS, Azure, CompTIA, and more.',
+      potentialAction: { '@type': 'SearchAction', target: `${SITE_URL}/exams?q={search_term_string}`, 'query-input': 'required name=search_term_string' },
+    },
+    {
+      '@type': 'Organization',
+      name: 'certshack',
+      url: SITE_URL,
+      logo: `${SITE_URL}/logo.png`,
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        { '@type': 'Question', name: 'Are practice exams enough to pass a certification?', acceptedAnswer: { '@type': 'Answer', text: 'Practice exams are one of the most effective study methods, but combining them with hands-on skill labs and official documentation produces the best results.' } },
+        { '@type': 'Question', name: 'How do skill labs help me become a better engineer?', acceptedAnswer: { '@type': 'Answer', text: 'Skill labs simulate real-world tasks like debugging IAM policies, running AWS CLI commands, and diagnosing architecture issues — building practical muscle memory beyond exam knowledge.' } },
+        { '@type': 'Question', name: 'Which certifications do you cover?', acceptedAnswer: { '@type': 'Answer', text: 'certshack covers AWS (SAA-C03, CLF-C02, SCS-C03), CompTIA (PenTest+ PT0-003), Microsoft Azure, and more, with new certifications added regularly.' } },
+        { '@type': 'Question', name: 'Is there a free tier?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. You can start with free practice exams. Premium tiers unlock additional exams, skill labs, and detailed analytics.' } },
+      ],
+    },
+  ],
+})
+
+const homeHtml = shell
+  .replace(/<title>[^<]*<\/title>/, '<title>certshack | IT Certification Practice Exams &amp; Skill Labs</title>')
+  .replace(/<meta name="description"[^>]*>\n?/, '')
+  .replace('</head>', `${buildInject({
+    description: 'Free practice exams and interactive skill labs for AWS, Azure, CompTIA, and more. Timed or casual mode, per-question explanations, domain analytics, and hands-on labs.',
+    keywords: 'IT certification practice exams, AWS certification, Azure certification, CompTIA practice exam, skill labs, cloud certification prep, SAA-C03, AZ-900',
+    canonical: SITE_URL,
+    ogTitle: 'certshack | IT Certification Practice Exams & Skill Labs',
+    ogDescription: 'Practice exams and hands-on skill labs for AWS, Azure, CompTIA, and more.',
+    jsonLd: homeJsonLd,
+  })}\n</head>`)
+
+await writeFile(join(DIST, 'index.html'), homeHtml)
+
+console.log(`[generate-static-meta] wrote ${examCount} exam routes, ${labCount} lab routes, 2 listing pages, homepage`)

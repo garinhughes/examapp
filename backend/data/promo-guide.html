@@ -82,11 +82,11 @@
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag high">HIGH</span>
     <strong>Missing <code>&lt;PageMeta&gt;</code> on <code>/exams</code> and <code>/skill-labs</code> listing pages — no runtime Helmet tags.</strong><br>
-    <code>PageMeta.tsx</code> defines metadata for both routes (<code>practice</code> and <code>skill-labs</code> keys) but neither <code>PracticeExams.tsx</code> nor <code>SkillLabsPage.tsx</code> call <code>&lt;PageMeta&gt;</code>. For JS-rendered views (i.e. real users after hydration), the tab title stays as "certshack" and no canonical is set at runtime, which can confuse crawlers that do render JS.<br>
-    <strong>Fix:</strong> Add <code>&lt;PageMeta route="practice" /&gt;</code> to <code>PracticeExams.tsx</code> and <code>&lt;PageMeta route="skill-labs" /&gt;</code> to <code>SkillLabsPage.tsx</code>.<br>
-    <span class="file">src/exam/PracticeExams.tsx, src/skill-labs/SkillLabsPage.tsx</span>
+    Already handled by <code>ExamApp.tsx</code> which calls <code>&lt;PageMeta route={route}&gt;</code> for all routes. Both <code>practice</code> and <code>skill-labs</code> have entries in the META object. No additional changes needed.<br>
+    <span class="file">src/exam/ExamApp.tsx:159, src/components/PageMeta.tsx</span>
   </li>
 
   <li>
@@ -112,6 +112,7 @@
 <ol start="10">
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag medium">MEDIUM</span>
     <strong>Exam detail page titles follow a weak pattern for search intent.</strong><br>
     Current pattern: <code>certshack | Microsoft Azure AI Fundamentals (AI-901) Practice Exam</code>. Leading with the brand name pushes the exam code and keywords to the right where they're truncated in SERPs (~60 char limit). Users searching "AI-901 practice exam" scan the left side of the title first.<br>
@@ -120,6 +121,7 @@
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag medium">MEDIUM</span>
     <strong>Skill lab pages lack keywords in their descriptions.</strong><br>
     The generated description for lab pages is: <em>"[lab.description]. Interactive [platform] skill lab. [difficulty] difficulty. Covers [tech]."</em> This buries the certification relevance. Users search for "AWS SAA-C03 practice lab" or "CompTIA hands-on lab" — those phrases don't appear.<br>
@@ -128,6 +130,7 @@
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag medium">MEDIUM</span>
     <strong>Homepage static HTML has no page-specific meta — relies entirely on runtime Helmet.</strong><br>
     <code>dist/index.html</code> (served for the root <code>/</code> route) has only the generic fallback title ("certshack") and generic description. The homepage Helmet tags (FAQPage schema, WebSite schema, rich description) are injected at runtime by React. For Google's first-pass crawl of the homepage, it may see no meaningful meta.<br>
@@ -136,6 +139,7 @@
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag medium">MEDIUM</span>
     <strong>No breadcrumb structured data (BreadcrumbList schema).</strong><br>
     Breadcrumbs appear in Google search results as path indicators (e.g. <em>certshack › Exams › AI-901</em>) and can increase click-through rate. Neither the static meta generator nor the React components emit BreadcrumbList JSON-LD.<br>
@@ -145,6 +149,7 @@
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag medium">MEDIUM</span>
     <strong>8 internal routes have no PageMeta entries and will show generic title/description.</strong><br>
     Routes with no metadata: <code>exam-setup</code>, <code>exam-attempt-review</code>, <code>diagrams</code>, <code>feedback</code>, <code>basket</code>, <code>metrics</code>. Some of these (diagrams, basket) should probably be <code>noindex</code> since they're not useful search landing pages. <code>exam-attempt-review</code> could have a meaningful title.<br>
@@ -158,32 +163,31 @@
 <ol start="15">
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag low">LOW</span>
     <strong>No <code>lastmod</code> dates reflect actual content changes — all set to today's build date.</strong><br>
-    The sitemap generator sets <code>lastmod</code> to today for every URL on every build. This means Google can't use lastmod to prioritise recrawling pages that have actually changed. An exam page that hasn't changed in months gets the same lastmod as one updated today.<br>
-    <strong>Fix:</strong> Derive lastmod from the exam JSON's most recent <code>lastReviewed</code> date across its questions, or store a dedicated <code>updatedAt</code> field on each exam/lab.<br>
-    <span class="file">scripts/generate-sitemap.js</span>
+    <span class="file">Fixed: scripts/generate-sitemap.js — lastmod now derived from most recent question <code>lastReviewed</code> date.</span>
   </li>
 
   <li>
     <span class="tag low">LOW</span>
-    <strong>Missing <code>og:image</code> alt text and no per-page OG image — all pages share one generic image.</strong><br>
-    Every page uses <code>/og-image.png</code>. Social shares for individual exams or labs show the same generic image regardless of context. A per-exam OG image (even a simple text-on-background with the exam code) would improve click-through from social shares and messaging apps.<br>
+    <strong>Missing per-page OG image — all pages share one generic image.</strong><br>
+    Every page uses <code>/og-image.png</code>. Social shares for individual exams or labs show the same generic image. A per-exam OG image (even a simple text-on-background with the exam code) would improve click-through from social and messaging apps. Requires image generation — out of scope for this session.<br>
     <span class="file">scripts/generate-static-meta.mjs:24</span>
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag low">LOW</span>
     <strong>Sitemap <code>changefreq</code> is "monthly" for exam pages but these change as questions are added.</strong><br>
-    Not a ranking factor directly, but misaligned changefreq can cause Google to delay recrawling pages that have actually been updated. "Weekly" would be more appropriate for active exams.<br>
-    <span class="file">scripts/generate-sitemap.js</span>
+    <span class="file">Fixed: scripts/generate-sitemap.js — exam changefreq changed to "weekly".</span>
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag low">LOW</span>
     <strong>No <code>robots</code> meta tag on transient/utility pages (diagrams, basket, feedback).</strong><br>
-    These routes are disallowed in <code>robots.txt</code> but robots.txt disallow is a crawl directive, not an index directive. If Google somehow discovers these URLs (e.g. through JS navigation), it can index them. A <code>noindex</code> meta tag is the belt-and-braces guarantee.<br>
-    <span class="file">src/components/PageMeta.tsx, frontend/public/robots.txt</span>
+    <span class="file">Fixed: src/components/PageMeta.tsx — noindex added for basket, diagrams, feedback, metrics, admin, not-found routes.</span>
   </li>
 
 </ol>
@@ -195,10 +199,10 @@
     <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Count</th>
     <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Status</th>
   </tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Critical</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">3 fixed, 1 remaining (AI-901 — manual Request Indexing)</td></tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">High</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">4 fixed, 1 remaining (pricing H2, PageMeta on listing pages)</td></tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Medium</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">0 fixed, 5 remaining</td></tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Low</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">0 fixed, 4 remaining</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Critical</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">3 fixed — 1 remaining (AI-901 manual Request Indexing; crawled-not-indexed should resolve post-deploy)</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">High</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Medium</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Low</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">3 fixed — 1 remaining (per-page OG images, requires design work)</td></tr>
 </table>
 
 </body>

@@ -313,7 +313,7 @@ export default function PricingPage() {
     <div className="space-y-12">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-3xl font-extrabold">Simple, fair pricing</h2>
+        <h1 className="text-3xl font-extrabold">Simple, fair pricing</h1>
         <p className="text-muted-foreground mt-2 max-w-lg mx-auto">
           Start free. Upgrade for full access to all practice exams and skill labs.
         </p>

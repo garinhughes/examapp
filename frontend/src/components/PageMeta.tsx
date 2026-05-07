@@ -48,6 +48,42 @@ const META: Partial<Record<AppRoute, RouteMeta>> = {
     path: '/account',
     noindex: true,
   },
+  basket: {
+    title: 'certshack | Basket',
+    description: '',
+    path: '/basket',
+    noindex: true,
+  },
+  diagrams: {
+    title: 'certshack | Architecture Diagrams',
+    description: '',
+    path: '/diagrams',
+    noindex: true,
+  },
+  feedback: {
+    title: 'certshack | Feedback',
+    description: '',
+    path: '/feedback',
+    noindex: true,
+  },
+  metrics: {
+    title: 'certshack | Metrics',
+    description: '',
+    path: '/metrics',
+    noindex: true,
+  },
+  admin: {
+    title: 'certshack | Admin',
+    description: '',
+    path: '/admin',
+    noindex: true,
+  },
+  'not-found': {
+    title: 'Page Not Found | certshack',
+    description: '',
+    path: '',
+    noindex: true,
+  },
 }
 
 /* JSON-LD structured data for the homepage */

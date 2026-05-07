@@ -63,7 +63,13 @@ async function collectExams() {
     try {
       const raw = JSON.parse(await readFile(join(EXAMS_DIR, file), 'utf-8'))
       const code = raw.code ?? file.replace('.json', '')
-      const lastmod = raw.publishedAt ? raw.publishedAt.slice(0, 10) : TODAY
+      // Use the most recent lastReviewed date across questions, falling back to publishedAt
+      const questionDates = (raw.questions ?? [])
+        .map(q => q.lastReviewed)
+        .filter(Boolean)
+        .sort()
+      const latestReview = questionDates.at(-1)
+      const lastmod = (latestReview ?? raw.publishedAt ?? TODAY).slice(0, 10)
       exams.push({ code, lastmod })
     } catch {
       exams.push({ code: file.replace('.json', ''), lastmod: TODAY })
@@ -80,7 +86,7 @@ function buildXml(staticUrls, labIds, exams) {
   const entries = [
     ...staticUrls.map((u) => url(u)),
     ...exams.map(({ code, lastmod }) =>
-      url({ loc: `${BASE_URL}/exams/${code}`, changefreq: 'monthly', priority: '0.9', lastmod })
+      url({ loc: `${BASE_URL}/exams/${code}`, changefreq: 'weekly', priority: '0.9', lastmod })
     ),
     ...[...labIds].map((id) =>
       url({ loc: `${BASE_URL}/skill-labs/${id}`, changefreq: 'monthly', priority: '0.7', lastmod: TODAY })
