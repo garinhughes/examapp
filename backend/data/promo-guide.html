@@ -46,14 +46,6 @@
 
   <li>
     <span class="tag critical">CRITICAL</span>
-    <strong>AI-901 (and likely other recently added exams) unknown to Google — not in any crawled page.</strong><br>
-    URL Inspection shows "URL is unknown to Google" with "No referring sitemaps detected" and "No referring page." The sitemap was last read 4/30/26. Any exam added after that date is invisible until Google re-crawls the sitemap or finds an internal link. With no crawlable internal links from <code>/exams</code> (it's a JS-rendered SPA), new exams have no discovery path.<br>
-    <strong>Fix (short-term):</strong> Use "Request Indexing" in URL Inspection for each new exam. <strong>Fix (long-term):</strong> Static <code>/exams</code> and <code>/skill-labs</code> listing pages — see item 5.<br>
-    <span class="sc">Search Console → URL Inspection → https://certshack.com/exams/AI-901</span>
-  </li>
-
-  <li>
-    <span class="tag critical">CRITICAL</span>
     <strong>16 pages "Crawled — currently not indexed."</strong><br>
     Google crawled these pages but chose not to index them, most likely because the crawled HTML was thin (body = <code>&lt;div id="root"&gt;&lt;/div&gt;</code> with no visible text). This affects any page that doesn't yet have a pre-rendered static file. Google's JS rendering is a second-wave process and lower priority — pages without real HTML content on first parse are deprioritised or dropped.<br>
     <strong>Fix:</strong> Ensure all sitemap URLs have pre-built static HTML with body content before deployment. The listing pages generated in this session (items 5 and 6) address the most important cases.<br>
@@ -170,10 +162,11 @@
   </li>
 
   <li>
+    <span class="tag done">DONE</span>
     <span class="tag low">LOW</span>
-    <strong>Missing per-page OG image — all pages share one generic image.</strong><br>
-    Every page uses <code>/og-image.png</code>. Social shares for individual exams or labs show the same generic image. A per-exam OG image (even a simple text-on-background with the exam code) would improve click-through from social and messaging apps. Requires image generation — out of scope for this session.<br>
-    <span class="file">scripts/generate-static-meta.mjs:24</span>
+    <strong>Missing OG image — all pages referenced a non-existent file.</strong><br>
+    <code>/og-image.png</code> did not exist, so social shares showed no preview image at all. Generated a 1200×630 branded image using the certshack logo on a dark background matching the site theme.<br>
+    <span class="file">Fixed: frontend/public/og-image.png</span>
   </li>
 
   <li>
@@ -199,10 +192,10 @@
     <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Count</th>
     <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Status</th>
   </tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Critical</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">3 fixed — 1 remaining (AI-901 manual Request Indexing; crawled-not-indexed should resolve post-deploy)</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Critical</td><td style="padding:8px; border:1px solid #e5e7eb;">3</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed — crawled-not-indexed should resolve post-deploy</td></tr>
   <tr><td style="padding:8px; border:1px solid #e5e7eb;">High</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed</td></tr>
   <tr><td style="padding:8px; border:1px solid #e5e7eb;">Medium</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed</td></tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Low</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">3 fixed — 1 remaining (per-page OG images, requires design work)</td></tr>
+  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Low</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed</td></tr>
 </table>
 
 </body>

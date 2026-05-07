@@ -25,10 +25,16 @@ const OG_IMAGE = `${SITE_URL}/og-image.png`
 
 const shell = await readFile(join(DIST, 'index.html'), 'utf-8')
 
+function stripFallbackMeta(html) {
+  return html
+    .replace(/<meta name="description"[^>]*>\n?/g, '')
+    .replace(/<meta property="og:type"[^>]*>\n?/g, '')
+    .replace(/<meta property="og:site_name"[^>]*>\n?/g, '')
+}
+
 function injectMeta(metaTags) {
-  return shell
+  return stripFallbackMeta(shell)
     .replace(/<title>[^<]*<\/title>/, `<title>${metaTags.title}</title>`)
-    .replace(/<meta name="description"[^>]*>\n?/, '')
     .replace('</head>', `${metaTags.inject}\n</head>`)
 }
 
@@ -89,7 +95,7 @@ for (const file of examFiles) {
   const qCount = raw.defaultQuestions ?? raw.defaultQuestionCount
   const canonical = `${SITE_URL}/exams/${code}`
   const pageTitle = `${code} Practice Exam | certshack`
-  const description = `${title} (${code}) practice questions and mock exam. ${qCount ? `${qCount} questions` : 'Questions'} across multiple domains, pass mark ${passMark}%. Every question mapped to a specific exam objective with detailed explanations.`
+  const description = `${title} (${code}) practice questions and mock exam. ${qCount ? `${qCount} questions` : 'Questions'} across multiple domains, pass mark ${passMark}%.`
   const keywords = `${code} practice exam, ${code} mock exam, ${title} practice test, ${code} sample questions, ${code} practice questions, ${provider} certification prep`
 
   const jsonLd = JSON.stringify({
@@ -138,7 +144,8 @@ for (const file of labFiles) {
     const pageTitle = `${lab.title} Skill Lab | certshack`
     const techList = (lab.technologies ?? []).slice(0, 4).join(', ')
     const relatedCodes = (lab.relatedExamCodes ?? []).join(', ')
-    const description = `${lab.description ?? lab.title}. Interactive ${lab.platform ?? ''} skill lab. ${lab.difficulty ?? ''} difficulty${techList ? `. Covers ${techList}` : ''}${relatedCodes ? `. Relevant to ${relatedCodes}` : ''}.`.replace(/\s+/g, ' ').trim()
+    const labDesc = (lab.description ?? lab.title).slice(0, 90).replace(/\s\S*$/, '')
+    const description = `${labDesc}. ${lab.platform ?? ''} ${lab.difficulty ?? ''} lab${techList ? `. Covers ${techList}` : ''}${relatedCodes ? `. Relevant to ${relatedCodes}` : ''}.`.replace(/\s+/g, ' ').trim()
     const keywords = `${lab.title}, ${lab.platform ?? ''} skill lab, hands-on lab, ${lab.difficulty ?? ''} lab${techList ? `, ${techList}` : ''}${relatedCodes ? `, ${relatedCodes} practice lab` : ''}, certification practice`
     const canonical = `${SITE_URL}/skill-labs/${labId}`
 
@@ -282,9 +289,8 @@ const homeJsonLd = JSON.stringify({
   ],
 })
 
-const homeHtml = shell
+const homeHtml = stripFallbackMeta(shell)
   .replace(/<title>[^<]*<\/title>/, '<title>certshack | IT Certification Practice Exams &amp; Skill Labs</title>')
-  .replace(/<meta name="description"[^>]*>\n?/, '')
   .replace('</head>', `${buildInject({
     description: 'Free practice exams and interactive skill labs for AWS, Azure, CompTIA, and more. Timed or casual mode, per-question explanations, domain analytics, and hands-on labs.',
     keywords: 'IT certification practice exams, AWS certification, Azure certification, CompTIA practice exam, skill labs, cloud certification prep, SAA-C03, AZ-900',
