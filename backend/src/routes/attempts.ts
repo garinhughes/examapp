@@ -202,7 +202,22 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       questions: shuffled
     }
 
-    await attemptsStore.put(attempt)
+    try {
+      await attemptsStore.put(attempt)
+    } catch (err: any) {
+      // DynamoDB rejects items > 400 KB. With ~1.7 KB/question this caps a single
+      // attempt at roughly 230 questions; full-bank runs on long exams trip it.
+      const name = err?.name ?? err?.code
+      if (name === 'ValidationException' && /item size/i.test(String(err?.message ?? ''))) {
+        request.log.warn({ userId, examCode, requested: shuffled.length }, '[attempts] rejected — exceeds DynamoDB item size')
+        return reply.status(413).send({
+          error: 'too-many-questions',
+          message: `Too many questions for a single attempt. Please reduce the question count and try again.`,
+          requested: shuffled.length,
+        })
+      }
+      throw err
+    }
     request.log.info({ userId, examCode, attemptId: id, questionCount: shuffled.length, mode: body?.metadata?.mode ?? 'standard' }, '[attempts] started')
 
     return { attemptId: id, startedAt: now }

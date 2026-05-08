@@ -1218,10 +1218,12 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
 
   // Pre-start defaults
   useEffect(() => {
-    if (route !== 'home' || !selected) return
+    if (route !== 'home' && route !== 'exam-landing') return
+    if (!selected) return
     if (examStarted || resumingRef.current) return
+    const meta = exams.find((e: any) => e.code === selected)
+    if (!meta) return
     try {
-      const meta = exams.find((e: any) => e.code === selected)
       const defDur = typeof meta?.defaultDuration === 'number' ? meta.defaultDuration : 15
       const defQ = meta?.defaultQuestions ?? meta?.defaultQuestionCount ?? (meta?.provider === 'AWS' ? 65 : (questions.length || 10))
       setTakeDomains(['All']); setTimed(false); setDurationMinutes(defDur); setNumQuestions(defQ)
@@ -1349,6 +1351,12 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     // Recover from invalid 0/negative state (can occur if a filter briefly zeroed availableFilteredCount when a default was applied)
     if (numQuestions < 1 && availableFilteredCount > 0) {
       const meta = exams.find((e: any) => e.code === selected)
+      // If the catalog hasn't loaded yet, defer — the pre-start defaults effect
+      // will fire once `exams` is populated. Falling through to availableFilteredCount
+      // here causes us to lock in the full question bank (e.g. 235) before the real
+      // default (e.g. 60) is known, which then exceeds DynamoDB's per-item size limit
+      // when the attempt is created.
+      if (!meta) return
       const def = meta?.defaultQuestions ?? meta?.defaultQuestionCount ?? (meta?.provider === 'AWS' ? 65 : availableFilteredCount)
       setNumQuestions(Math.min(def, availableFilteredCount))
     }
