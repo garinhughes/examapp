@@ -22,8 +22,10 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const isAuthenticated = !!request.user
 
     const filteredExams = allExams.filter((e: any) => {
+      // Retired exams are excluded from public listings (direct URL access still works)
+      if (e.retired === true) return false
       // The 'SAMPLE-10Q' exam is only visible to visitors (unauthenticated users)
-      if (String(e.code).toLowerCase() === 'sample-10q' && isAuthenticated) return false
+      if (String(e.code).toLowerCase() === 'sample-20q' && isAuthenticated) return false
       return true
     })
 
@@ -62,7 +64,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const isAuthenticated = !!request.user
 
     // The sample exam is visitor-only; authenticated users cannot access it
-    if (lc === 'sample-10q' && isAuthenticated) {
+    if (lc === 'sample-20q' && isAuthenticated) {
       return reply.status(403).send({ message: 'sample exam is only available to visitors' })
     }
 

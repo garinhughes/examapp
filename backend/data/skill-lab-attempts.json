@@ -2655,5 +2655,25 @@
     },
     "timed": true,
     "completedAt": "2026-04-29T07:45:33.325Z"
+  },
+  {
+    "userId": "9255a4e4-20f1-7010-8a80-17c43ca141e3",
+    "attemptId": "fe432a96-8bda-4958-968a-e9e2b5f1ad53",
+    "labId": "google-pipeline-incident",
+    "labType": "incident-response",
+    "selectedAnswer": "",
+    "correct": false,
+    "timeTaken": 0,
+    "createdAt": "2026-05-08T09:22:37.730Z",
+    "status": "abandoned",
+    "startedAt": "2026-05-08T09:22:37.730Z",
+    "lastSavedAt": "2026-05-08T09:22:59.401Z",
+    "progressState": {
+      "selectedActions": [],
+      "selectedAnswer": "",
+      "timeLeft": 588
+    },
+    "timed": true,
+    "abandonedAt": "2026-05-08T09:22:59.401Z"
   }
 ]

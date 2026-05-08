@@ -358,7 +358,7 @@ function ExamAppInner() {
               const parts = route.slice('skill-lab:'.length)
               const lastColon = parts.lastIndexOf(':')
               const labId = lastColon > 0 ? parts.slice(0, lastColon) : parts
-              const mode = lastColon > 0 ? parts.slice(lastColon + 1) : 'timed'
+              const mode = lastColon > 0 ? parts.slice(lastColon + 1) : 'casual'
               return <SkillLabRunnerPage labId={labId} timed={mode !== 'casual'} />
             })()}
 

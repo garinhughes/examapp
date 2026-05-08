@@ -126,6 +126,17 @@ export function useRouteSync(): void {
     }
     const mapped = pathnameToRoute(pathname)
     if (mapped && mapped !== route) {
+      // Preserve the existing mode (casual/timed) when re-syncing the same lab
+      // attempt URL — pathnameToRoute defaults to ':timed' but the user may
+      // have started the lab in casual mode.
+      if (
+        mapped.startsWith('skill-lab:') &&
+        route.startsWith('skill-lab:')
+      ) {
+        const mappedLabId = mapped.slice('skill-lab:'.length).split(':')[0]
+        const currentLabId = route.slice('skill-lab:'.length).split(':')[0]
+        if (mappedLabId === currentLabId) return
+      }
       setRoute(mapped)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -12,6 +12,7 @@ import { getBookmarkedLabs, toggleBookmark, clearLabProgress } from './labs/shar
 import { useSkillLab } from './SkillLabContext'
 import { DIFFICULTY_COLORS } from './platformMeta'
 import { ProviderLogo } from '@/components/ProviderLogo'
+import { getProviderLogo } from '@/lib/providerLogos'
 
 const DIFFICULTY_LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced']
 
@@ -196,7 +197,7 @@ export function SkillLabsPage() {
     const categories = new Set<string>()
     const techs = new Set<string>()
     for (const lab of labs) {
-      if (lab.platform) platforms.add(lab.platform)
+      if (lab.platform) platforms.add(getProviderLogo(lab.platform)?.displayName ?? lab.platform)
       if (lab.category) categories.add(lab.category)
       for (const t of lab.technologies || []) techs.add(t)
     }
@@ -224,7 +225,7 @@ export function SkillLabsPage() {
 
       if (showSavedOnly && !bookmarkedLabIds.has(lab.id)) return false
       if (selectedDifficulty && lab.difficulty !== selectedDifficulty) return false
-      if (selectedPlatforms.size > 0 && !selectedPlatforms.has(lab.platform)) return false
+      if (selectedPlatforms.size > 0 && !selectedPlatforms.has(getProviderLogo(lab.platform)?.displayName ?? lab.platform)) return false
       if (selectedCategories.size > 0 && !selectedCategories.has(lab.category)) return false
       if (selectedTechnologies.size > 0) {
         const labTechs = lab.technologies || []
@@ -432,7 +433,7 @@ export function SkillLabsPage() {
                   <div className="absolute top-1.5 right-1.5 flex items-center gap-1">
                     {lab.locked && (
                       <span title="Premium lab" className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/90 dark:bg-gray-900/80 border border-border shadow-sm">
-                        <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+                        <Lock className="w-3.5 h-3.5 text-orange-500" />
                       </span>
                     )}
                     {!lab.locked && (
@@ -493,9 +494,6 @@ export function SkillLabsPage() {
                       <Clock className="w-3 h-3" />
                       {Math.floor(LAB_TIME_LIMITS[lab.difficulty] / 60)} min
                     </span>
-                    {lab.locked && (
-                      <span className="text-amber-700 dark:text-amber-400">Premium</span>
-                    )}
                   </div>
                 </div>
               </div>

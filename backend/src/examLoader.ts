@@ -84,6 +84,8 @@ export interface Exam {
   publishedAt?: string
   /** If this exam supersedes an older version, the code of the previous exam (e.g. "CLF-C02" for "CLF-C03"). */
   predecessorCode?: string
+  /** When true the exam is retired and excluded from public listings (direct access still works). */
+  retired?: boolean
   /** S3 VersionId of the object this exam was loaded from (null when loaded from filesystem). */
   s3VersionId?: string | null
   questions: Question[]
@@ -169,6 +171,7 @@ function parseExamJson(raw: any, code: string, s3VersionId?: string | null): Exa
     version: raw.version ?? raw.v ?? undefined,
     publishedAt: raw.publishedAt ?? undefined,
     predecessorCode: raw.predecessorCode ?? undefined,
+    retired: raw.retired === true ? true : undefined,
     s3VersionId: s3VersionId ?? null,
     questions: (raw.questions ?? []).map(normaliseQuestion),
     featuredLabIds: raw.featuredLabIds ?? undefined,

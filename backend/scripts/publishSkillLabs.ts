@@ -4,10 +4,12 @@
  * to S3 and update the DynamoDB skill-labs index.
  *
  * Usage:
- *   pnpm publish:lab -- <labId>           # publish one lab
- *   pnpm publish:lab -- <labId> --dry-run # preview one lab, don't upload
- *   pnpm publish:skill-labs               # publish all labs
- *   pnpm publish:skill-labs:dry           # preview all, don't upload
+ *   pnpm publish:lab -- <labId>                      # publish one lab
+ *   pnpm publish:lab -- <labId> --dry-run            # preview one lab, don't upload
+ *   pnpm publish:skill-labs                          # publish all labs
+ *   pnpm publish:skill-labs -- --provider GCP        # publish all GCP labs
+ *   pnpm publish:skill-labs:dry -- --provider GCP   # preview GCP labs, don't upload
+ *   pnpm publish:skill-labs:dry                      # preview all, don't upload
  *
  * Environment:
  *   AWS_PROFILE / AWS_REGION (defaults to eu-west-1)
@@ -38,10 +40,12 @@ async function main() {
   const args = process.argv.slice(2)
   const dryRun = args.includes('--dry-run')
   const publishAll = args.includes('--all')
+  const providerIdx = args.indexOf('--provider')
+  const provider = providerIdx !== -1 ? args[providerIdx + 1] : null
   const labId = args.find((a) => !a.startsWith('--'))
 
-  if (!publishAll && !labId) {
-    console.error('Usage: publishSkillLabs.ts <labId> | --all [--dry-run]')
+  if (!publishAll && !provider && !labId) {
+    console.error('Usage: publishSkillLabs.ts <labId> | --all | --provider <name> [--dry-run]')
     process.exit(1)
   }
 
@@ -55,7 +59,13 @@ async function main() {
   )).flat()
 
   let labs: LabDef[]
-  if (publishAll) {
+  if (provider) {
+    labs = allLabs.filter((l) => (l.platform ?? '').toLowerCase() === provider.toLowerCase())
+    if (labs.length === 0) {
+      console.error(`No labs found for provider "${provider}". Available: ${[...new Set(allLabs.map((l) => l.platform ?? 'unknown'))].join(', ')}`)
+      process.exit(1)
+    }
+  } else if (publishAll) {
     labs = allLabs
   } else {
     const match = allLabs.find((l) => l.id === labId)

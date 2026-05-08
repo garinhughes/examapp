@@ -40,7 +40,7 @@ const genericRunnerImports: Record<SkillLabType, () => Promise<{ default: Compon
   'command-terminal':     () => import('./labs/runners/command-terminal').then(m => ({ default: m.CommandTerminalRunner })),
 }
 
-export function SkillLabRunnerPage({ labId, timed = true }: SkillLabRunnerPageProps) {
+export function SkillLabRunnerPage({ labId, timed = false }: SkillLabRunnerPageProps) {
   const { authFetch, setRoute, user } = useExam()
   const [lab, setLab] = useState<LabDefinition | null>(null)
   const [loading, setLoading] = useState(true)
