@@ -261,6 +261,8 @@ await writeListingPage('skill-labs', {
 // Overwrite the generic shell with baked-in homepage meta so Google's first-pass
 // crawl sees a meaningful title, description, and JSON-LD without waiting for React.
 
+// FAQPage is intentionally omitted here — PageMeta.tsx injects it at runtime via Helmet.
+// Including it in the static HTML too causes a duplicate FAQPage error in Google Search Console.
 const homeJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@graph': [
@@ -276,15 +278,6 @@ const homeJsonLd = JSON.stringify({
       name: 'certshack',
       url: SITE_URL,
       logo: `${SITE_URL}/logo.png`,
-    },
-    {
-      '@type': 'FAQPage',
-      mainEntity: [
-        { '@type': 'Question', name: 'Are practice exams enough to pass a certification?', acceptedAnswer: { '@type': 'Answer', text: 'Practice exams are one of the most effective study methods, but combining them with hands-on skill labs and official documentation produces the best results.' } },
-        { '@type': 'Question', name: 'How do skill labs help me become a better engineer?', acceptedAnswer: { '@type': 'Answer', text: 'Skill labs simulate real-world tasks like debugging IAM policies, running AWS CLI commands, and diagnosing architecture issues — building practical muscle memory beyond exam knowledge.' } },
-        { '@type': 'Question', name: 'Which certifications do you cover?', acceptedAnswer: { '@type': 'Answer', text: 'certshack covers AWS (SAA-C03, CLF-C02, SCS-C03), CompTIA (PenTest+ PT0-003), Microsoft Azure, and more, with new certifications added regularly.' } },
-        { '@type': 'Question', name: 'Is there a free tier?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. You can start with free practice exams. Premium tiers unlock additional exams, skill labs, and detailed analytics.' } },
-      ],
     },
   ],
 })

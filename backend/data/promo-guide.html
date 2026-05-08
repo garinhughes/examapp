@@ -2,200 +2,239 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>certshack — SEO Review (2026-05-07)</title>
+  <title>certshack — Promotion Strategy</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 860px; margin: 40px auto; padding: 0 24px; color: #1a1a1a; line-height: 1.6; }
     h1 { font-size: 1.6rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 12px; }
-    h2 { font-size: 1.15rem; margin-top: 2rem; color: #374151; }
-    ol { padding-left: 1.4rem; }
-    li { margin-bottom: 1.2rem; }
-    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
-    .tag { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; margin-right: 6px; vertical-align: middle; }
-    .critical { background: #fee2e2; color: #b91c1c; }
-    .high { background: #fef3c7; color: #92400e; }
-    .medium { background: #dbeafe; color: #1d4ed8; }
-    .low { background: #f3f4f6; color: #6b7280; }
-    .done { background: #d1fae5; color: #065f46; }
-    .file { font-size: 0.85rem; color: #6b7280; margin-top: 4px; }
-    .sc { font-size: 0.85rem; background: #fffbeb; border-left: 3px solid #f59e0b; padding: 6px 10px; margin-top: 6px; border-radius: 0 4px 4px 0; }
+    h2 { font-size: 1.2rem; margin-top: 2.5rem; color: #111; border-left: 4px solid #e5e7eb; padding-left: 12px; }
+    h3 { font-size: 1rem; margin-top: 1.5rem; color: #374151; }
+    p, li { font-size: 0.95rem; }
+    ol, ul { padding-left: 1.4rem; }
+    li { margin-bottom: 0.6rem; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 0.88em; }
+    .verdict { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; margin-right: 8px; vertical-align: middle; }
+    .do { background: #d1fae5; color: #065f46; }
+    .maybe { background: #fef3c7; color: #92400e; }
+    .skip { background: #fee2e2; color: #b91c1c; }
+    .note { background: #f8fafc; border-left: 3px solid #94a3b8; padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 0.9rem; color: #475569; }
+    .brutal { background: #fff7ed; border-left: 3px solid #f97316; padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 1rem; }
+    th { text-align: left; padding: 8px; background: #f9fafb; border: 1px solid #e5e7eb; }
+    td { padding: 8px; border: 1px solid #e5e7eb; vertical-align: top; }
   </style>
 </head>
 <body>
 
-<h1>certshack — SEO Review</h1>
-<p>Generated 2026-05-07. Issues ordered by impact. Items marked <span class="tag done">DONE</span> were fixed in this session.</p>
+<h1>certshack — Promotion Strategy</h1>
+<p style="color:#6b7280; font-size:0.9rem;">Updated 2026-05-07. SEO technical work complete — see git history for the SEO audit. This document covers channel strategy and growth.</p>
 
-<h2>Critical — blocking indexing</h2>
-<ol>
+<div class="brutal">
+  <strong>Honest framing first:</strong> You're a bootstrapped product competing against Udemy, TutorialsDojo, Whizlabs, and ACloudGuru — companies with seven-figure marketing budgets and years of SEO authority. You won't outspend them. Your edges are: freshness (newer exams, newer labs), specificity (not trying to cover everything), and the product quality that got good beta feedback. Every channel decision should lean into those edges.
+</div>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag critical">CRITICAL</span>
-    <strong>Generic meta description overrides page-specific description on every exam/lab page.</strong><br>
-    The base <code>index.html</code> contained a fallback <code>&lt;meta name="description"&gt;</code> that appeared <em>before</em> the page-specific one injected by <code>generate-static-meta.mjs</code>. Google uses whichever tag appears first, so every exam and lab page showed the generic fallback in search results.<br>
-    <span class="file">Fixed: scripts/generate-static-meta.mjs — strip fallback before injecting page meta. index.html fallback also updated to "IT certifications".</span>
-  </li>
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>1. Reddit <span class="verdict do">DO</span></h2>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag critical">CRITICAL</span>
-    <strong>32 pages flagged "Alternate page with proper canonical tag" in Search Console.</strong><br>
-    CloudFront was serving root <code>index.html</code> (canonical = homepage) for all unknown paths. Fixed in two parts: (1) CloudFront now serves <code>404.html</code> (with <code>noindex</code>) for error paths instead of <code>index.html</code>; (2) a CloudFront Function rewrites clean paths (e.g. <code>/exams/AI-901</code> → <code>/exams/AI-901/index.html</code>) so pre-built static files are served directly from S3 with their correct canonicals.<br>
-    <span class="file">Fixed: infra/terraform/modules/cloudfront/viewer-request.js + main.tf, scripts/generate-static-meta.mjs (404.html)</span>
-  </li>
+<p>You've already done the hardest part — validated the product with real users and got good feedback. The challenge now is sustainable presence without getting banned.</p>
 
-  <li>
-    <span class="tag critical">CRITICAL</span>
-    <strong>16 pages "Crawled — currently not indexed."</strong><br>
-    Google crawled these pages but chose not to index them, most likely because the crawled HTML was thin (body = <code>&lt;div id="root"&gt;&lt;/div&gt;</code> with no visible text). This affects any page that doesn't yet have a pre-rendered static file. Google's JS rendering is a second-wave process and lower priority — pages without real HTML content on first parse are deprioritised or dropped.<br>
-    <strong>Fix:</strong> Ensure all sitemap URLs have pre-built static HTML with body content before deployment. The listing pages generated in this session (items 5 and 6) address the most important cases.<br>
-    <span class="sc">Search Console → Indexing → Pages → "Crawled - currently not indexed" (16 pages)</span>
-  </li>
+<h3>What actually works on Reddit</h3>
+<ul>
+  <li><strong>Become a genuine contributor first.</strong> Answer questions in r/AWSCertifications, r/CompTIA, r/Azure. Build post history. Don't touch certshack for a few weeks. Then when you mention it, it's a recommendation from a community member, not a marketer.</li>
+  <li><strong>Resource posts are tolerated in most cert subs.</strong> "I'm studying for SAA-C03, here are the free resources I've found" — certshack can be on that list alongside TutorialsDojo and the official docs. You're not spamming, you're curating.</li>
+  <li><strong>Explicitly allowed subreddits for self-promotion:</strong> r/SideProject, r/InternetIsBeautiful, r/webdev, r/learnprogramming. Post there without guilt. These communities expect and welcome it.</li>
+  <li><strong>Comment on exam passing posts.</strong> When someone posts "Just passed SAA-C03!", ask what resources they used — then mention certshack when someone later asks the same question in replies.</li>
+</ul>
 
-</ol>
+<div class="note">
+  The beta post working well is signal that the product resonates. Don't over-engineer Reddit — occasional, genuine mentions from a credible account will compound over time. Aim for 1–2 natural mentions per month, not campaigns.
+</div>
 
-<h2>High — hurting rankings</h2>
-<ol start="5">
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>2. Paid Ads — Google & Reddit £500 match <span class="verdict maybe">SPEND IT, BUT NOT ON GOOGLE</span></h2>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag high">HIGH</span>
-    <strong>No static HTML for <code>/exams</code> listing page — Google can't follow links to exam detail pages.</strong><br>
-    The <code>/exams</code> route is a React SPA page with no pre-rendered body content. Googlebot's first-pass crawl sees no <code>&lt;a href&gt;</code> links to individual exam pages. All exam page discovery depends entirely on the sitemap. A static listing page with real links passes authority and makes discovery resilient.<br>
-    <span class="file">Fixed: scripts/generate-static-meta.mjs — generates dist/exams/index.html with H1, 15 linked exam entries, and full meta tags.</span>
-  </li>
+<div class="brutal">
+  <strong>Brutal take:</strong> £500 on Google Search ads for "practice exam" queries is burning money. CPCs for those terms run £2–8+. You'll get maybe 100–200 clicks before the budget is gone, against competitors bidding thousands per day. Google Ads at this scale is a rounding error.
+</div>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag high">HIGH</span>
-    <strong>No static HTML for <code>/skill-labs</code> listing page.</strong><br>
-    Same issue as above. 216 skill labs are discoverable only via the sitemap. A static listing page with all 216 labs linked provides a reliable crawl path and signals the breadth of content.<br>
-    <span class="file">Fixed: scripts/generate-static-meta.mjs — generates dist/skill-labs/index.html with H1, 216 linked lab entries, and full meta tags.</span>
-  </li>
+<h3>Use the Reddit match instead</h3>
+<p>Reddit ads let you target specific subreddits directly. £500 targeting r/AWSCertifications, r/CompTIA, r/AzureCertification buys meaningful reach to exactly your audience. The CPMs are much lower than Google and the targeting is sharper than "practice exam" keyword matching.</p>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag high">HIGH</span>
-    <strong>Missing <code>&lt;PageMeta&gt;</code> on <code>/exams</code> and <code>/skill-labs</code> listing pages — no runtime Helmet tags.</strong><br>
-    Already handled by <code>ExamApp.tsx</code> which calls <code>&lt;PageMeta route={route}&gt;</code> for all routes. Both <code>practice</code> and <code>skill-labs</code> have entries in the META object. No additional changes needed.<br>
-    <span class="file">src/exam/ExamApp.tsx:159, src/components/PageMeta.tsx</span>
-  </li>
+<ul>
+  <li>Run a simple ad: the product, one clear claim, free tier CTA. Don't try to sell subscriptions cold.</li>
+  <li>Test two or three creative variants. Kill the losers after £100 spend.</li>
+  <li>The goal at this budget isn't conversions — it's brand awareness with the right audience. Someone who sees the ad and Googles certshack later is a win.</li>
+</ul>
 
-  <li>
-    <span class="tag done">DONE — partially</span>
-    <span class="tag high">HIGH</span>
-    <strong><code>/pricing</code> has H2 as top-level heading instead of H1.</strong><br>
-    <code>/exams</code> and <code>/skill-labs</code> both have correct H1s rendered by the shared ExamApp header (<code>ExamApp.tsx:330</code>). However the pricing page uses <code>&lt;h2&gt;</code> where an <code>&lt;h1&gt;</code> should be — it sits outside the shared header and doesn't benefit from that pattern.<br>
-    <strong>Fix:</strong> Change <code>&lt;h2&gt;</code> → <code>&lt;h1&gt;</code> on PricingPage line 316.<br>
-    <span class="file">src/pricing/PricingPage.tsx:316</span>
-  </li>
+<h3>If you must use Google Ads</h3>
+<p>Target long-tail, low-competition queries: <code>"AI-901 practice questions free"</code>, <code>"CCA-F mock exam"</code>, <code>"EX200 practice test"</code>. These have lower CPCs because TutorialsDojo doesn't have those exams. Lean into exams where you have no competition — that's your actual differentiation.</p>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag high">HIGH</span>
-    <strong>No dedicated 404 page — invalid URLs return 200 with homepage content (soft 404).</strong><br>
-    <code>NotFoundPage</code> component created with <code>noindex, nofollow</code> Helmet tag. Unknown paths now map to <code>'not-found'</code> route in ExamContext (previously fell through to <code>'home'</code>). CloudFront serves <code>404.html</code> for error paths; the CloudFront Function ensures valid pre-built paths are served directly.<br>
-    <span class="file">Fixed: src/components/NotFoundPage.tsx, src/exam/ExamContext.tsx, src/exam/ExamApp.tsx, src/exam/types.ts</span>
-  </li>
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>3. News / Blog Page <span class="verdict do">DO THIS — but do it right</span></h2>
 
-</ol>
+<div class="brutal">
+  <strong>Brutal take:</strong> A changelog that says "Added DOP-C02 exam (2026-04-28)" is completely worthless for SEO and for users. Nobody searches for that. If that's what you're planning, don't bother.
+</div>
 
-<h2>Medium — improving rankings and click-through</h2>
-<ol start="10">
+<h3>What a news page should actually be</h3>
+<p>Each post should be genuinely useful content about the exam or lab, not a product announcement. Examples:</p>
+<ul>
+  <li><em>"What's new in DOP-C02 vs the previous DevOps Pro exam — what to focus on"</em></li>
+  <li><em>"AI-901 is out: Microsoft's new AI Fundamentals exam breakdown by domain"</em></li>
+  <li><em>"5 SAA-C03 questions people consistently get wrong (and why)"</em></li>
+  <li><em>"New skill labs: debugging IAM permission boundaries — what the exam tests vs what production looks like"</em></li>
+</ul>
+<p>These rank for queries your target audience is actively searching. The product mention is natural and credible. Each post is also a shareable asset for LinkedIn and Reddit.</p>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag medium">MEDIUM</span>
-    <strong>Exam detail page titles follow a weak pattern for search intent.</strong><br>
-    Current pattern: <code>certshack | Microsoft Azure AI Fundamentals (AI-901) Practice Exam</code>. Leading with the brand name pushes the exam code and keywords to the right where they're truncated in SERPs (~60 char limit). Users searching "AI-901 practice exam" scan the left side of the title first.<br>
-    <strong>Suggested pattern:</strong> <code>AI-901 Practice Exam | certshack</code> — exam code first, brand last. This also aligns with how competitors title their pages.<br>
-    <span class="file">scripts/generate-static-meta.mjs:80, src/components/PageMeta.tsx:170</span>
-  </li>
+<div class="note">
+  Commit to a realistic cadence. One post per new exam/lab release is achievable. Monthly is better than nothing. But inconsistent posts from 2024 sitting next to nothing since then look worse than no blog at all.
+</div>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag medium">MEDIUM</span>
-    <strong>Skill lab pages lack keywords in their descriptions.</strong><br>
-    The generated description for lab pages is: <em>"[lab.description]. Interactive [platform] skill lab. [difficulty] difficulty. Covers [tech]."</em> This buries the certification relevance. Users search for "AWS SAA-C03 practice lab" or "CompTIA hands-on lab" — those phrases don't appear.<br>
-    <strong>Fix:</strong> Append related exam codes to the description and keywords. The lab JSON has a <code>relatedExamCodes</code> field — use it: <em>"...Covers CloudFront, S3, IAM. Relevant to SAA-C03."</em><br>
-    <span class="file">scripts/generate-static-meta.mjs:117-118</span>
-  </li>
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>4. YouTube <span class="verdict do">YOUR BEST LONG-TERM BET</span></h2>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag medium">MEDIUM</span>
-    <strong>Homepage static HTML has no page-specific meta — relies entirely on runtime Helmet.</strong><br>
-    <code>dist/index.html</code> (served for the root <code>/</code> route) has only the generic fallback title ("certshack") and generic description. The homepage Helmet tags (FAQPage schema, WebSite schema, rich description) are injected at runtime by React. For Google's first-pass crawl of the homepage, it may see no meaningful meta.<br>
-    <strong>Fix:</strong> Add the homepage to <code>generate-static-meta.mjs</code> so <code>dist/index.html</code> gets a proper title, description, canonical, and JSON-LD baked in.<br>
-    <span class="file">scripts/generate-static-meta.mjs, frontend/dist/index.html</span>
-  </li>
+<p>This is the channel with the highest ROI for your situation. Here's why:</p>
+<ul>
+  <li>YouTube search for <em>"AI-901 practice question explained"</em> or <em>"SAA-C03 mock exam walkthrough"</em> is genuinely underserved. TutorialsDojo doesn't do this. ACloudGuru's videos are behind a paywall. There is real organic search opportunity here.</li>
+  <li>Videos embed naturally on exam pages — increases time-on-page, which is an engagement signal.</li>
+  <li>The self-promotion is legitimate: "practice the full 65-question exam at certshack.com" at the end of every video is expected and not spammy.</li>
+  <li>YouTube Shorts and TikTok cuts of the same content are low-effort multipliers once you've made the main video.</li>
+</ul>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag medium">MEDIUM</span>
-    <strong>No breadcrumb structured data (BreadcrumbList schema).</strong><br>
-    Breadcrumbs appear in Google search results as path indicators (e.g. <em>certshack › Exams › AI-901</em>) and can increase click-through rate. Neither the static meta generator nor the React components emit BreadcrumbList JSON-LD.<br>
-    <strong>Fix:</strong> Add BreadcrumbList to exam detail and skill lab detail pages in <code>generate-static-meta.mjs</code>:<br>
-    <code>Home → Practice Exams → [Exam Name]</code> and <code>Home → Skill Labs → [Lab Name]</code><br>
-    <span class="file">scripts/generate-static-meta.mjs</span>
-  </li>
+<h3>What to actually make</h3>
+<ul>
+  <li><strong>Single question deep-dives (5–8 min):</strong> Show a question, explain why each wrong answer is wrong — not just "A is correct because...". This is the content gap. Most practice exam resources only tell you the right answer.</li>
+  <li><strong>Domain breakdowns (10–15 min):</strong> "Everything certshack tests on SAA-C03 Domain 2: Security." Directly maps to your product.</li>
+  <li><strong>Comparison videos:</strong> "I took 3 different SAA-C03 practice exams — here's how certshack compares." Genuinely useful, naturally promotional.</li>
+</ul>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag medium">MEDIUM</span>
-    <strong>8 internal routes have no PageMeta entries and will show generic title/description.</strong><br>
-    Routes with no metadata: <code>exam-setup</code>, <code>exam-attempt-review</code>, <code>diagrams</code>, <code>feedback</code>, <code>basket</code>, <code>metrics</code>. Some of these (diagrams, basket) should probably be <code>noindex</code> since they're not useful search landing pages. <code>exam-attempt-review</code> could have a meaningful title.<br>
-    <strong>Fix:</strong> Add entries to the META object in <code>PageMeta.tsx</code> — <code>noindex: true</code> for utility pages, descriptive titles for content pages.<br>
-    <span class="file">src/components/PageMeta.tsx</span>
-  </li>
+<div class="brutal">
+  <strong>Brutal take:</strong> YouTube requires consistency. 3 videos and a 6-month gap is worse than not starting. Before you begin, decide if you can commit to at least 2 videos per month for 6 months. If not, do Shorts only — lower bar, faster results, same audience reach.
+</div>
 
-</ol>
+<h3>TikTok</h3>
+<p>Your instinct is right — exam walkthrough content works there too. The format is different: hook in 3 seconds, answer in 60. "Can you pass this AWS question?" as a format is proven. It's a discovery channel, not a conversion channel — the goal is to push people to YouTube or the site, not to sell subscriptions on TikTok.</p>
 
-<h2>Low — incremental gains</h2>
-<ol start="15">
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>5. LinkedIn & Twitter/X <span class="verdict maybe">LINKEDIN YES, TWITTER LOW-PRIORITY</span></h2>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag low">LOW</span>
-    <strong>No <code>lastmod</code> dates reflect actual content changes — all set to today's build date.</strong><br>
-    <span class="file">Fixed: scripts/generate-sitemap.js — lastmod now derived from most recent question <code>lastReviewed</code> date.</span>
-  </li>
+<h3>LinkedIn</h3>
+<p>Your target audience — people studying for cloud certifications — is on LinkedIn and actively posts about passing exams. This is a high-signal channel for you.</p>
+<ul>
+  <li><strong>Yes, use UTM params on every link.</strong> <code>?utm_source=linkedin&utm_medium=social&utm_campaign=organic</code> minimum. You need to know what's actually driving signups.</li>
+  <li>Post when new exams or labs go live — but frame it as useful information ("AI-901 is now available — here's a breakdown of what's tested") not a product ad.</li>
+  <li>Engage with posts from people who've just passed certifications. Comment with something genuinely useful, not "check out certshack."</li>
+  <li>Your own "I built this" founder story posts perform well on LinkedIn. The beta testing experience — real feedback, iteration — is content people engage with.</li>
+</ul>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag low">LOW</span>
-    <strong>Missing OG image — all pages referenced a non-existent file.</strong><br>
-    <code>/og-image.png</code> did not exist, so social shares showed no preview image at all. Generated a 1200×630 branded image using the certshack logo on a dark background matching the site theme.<br>
-    <span class="file">Fixed: frontend/public/og-image.png</span>
-  </li>
+<h3>Twitter/X</h3>
+<p>Lower priority. The cloud/DevOps Twitter community exists but it's fragmented and harder to reach without an existing following. Use it to mirror LinkedIn content rather than creating platform-native content. Not worth investing time in relative to YouTube and LinkedIn.</p>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag low">LOW</span>
-    <strong>Sitemap <code>changefreq</code> is "monthly" for exam pages but these change as questions are added.</strong><br>
-    <span class="file">Fixed: scripts/generate-sitemap.js — exam changefreq changed to "weekly".</span>
-  </li>
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>6. Channels You Haven't Mentioned <span class="verdict do">Consider these</span></h2>
 
-  <li>
-    <span class="tag done">DONE</span>
-    <span class="tag low">LOW</span>
-    <strong>No <code>robots</code> meta tag on transient/utility pages (diagrams, basket, feedback).</strong><br>
-    <span class="file">Fixed: src/components/PageMeta.tsx — noindex added for basket, diagrams, feedback, metrics, admin, not-found routes.</span>
-  </li>
+<h3>Discord &amp; Slack communities</h3>
+<p>There are dozens of active Discord servers for AWS, Azure, and CompTIA certification study groups. Most have a <code>#resources</code> channel where sharing tools is explicitly welcomed. This is higher-signal than Reddit because the communities are smaller and more engaged. Find 5–10 active ones and be a genuine member before posting.</p>
 
-</ol>
+<h3>Product Hunt</h3>
+<p>A Product Hunt launch is a one-time event but can drive significant initial traffic and backlinks. Worth doing for the next major feature release (e.g., a big batch of new labs). The audience skews tech/developer — exactly right. Plan it, don't just submit and forget — engage with comments all day on launch day.</p>
 
-<h2>Summary</h2>
-<table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
-  <tr style="background:#f9fafb;">
-    <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Priority</th>
-    <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Count</th>
-    <th style="text-align:left; padding:8px; border:1px solid #e5e7eb;">Status</th>
+<h3>Technical blog posts (Dev.to / Hashnode / Medium)</h3>
+<p>Write genuinely useful posts on exam prep topics — "How to think about IAM for the SAA-C03", "What the DOP-C02 actually tests vs what people study." Post on Dev.to and Hashnode (both index well in Google). Include a natural mention of certshack. These create permanent SEO-indexed content that you don't control the hosting of — diversifying your discovery surface.</p>
+
+<h3>Email list</h3>
+<p>You don't appear to have one. You should. People studying for exams want a "new content" notification — an email list is far more reliable than social reach. Even a simple "new exam/lab added" email to subscribers keeps certshack top of mind during the weeks someone is actively studying. A list of 500 genuinely interested subscribers is worth more than 5,000 social followers.</p>
+
+<h3>Exam community partnerships</h3>
+<p>Bootcamps, study groups, and tutors who teach cloud certifications are always looking for resources to recommend to students. A free tier plus a bulk discount code for study group participants costs you almost nothing and can drive consistent organic signups. Identify 5–10 tutors or study group organisers on LinkedIn and reach out directly.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<h2>Priority Order — where to put time first</h2>
+
+<table>
+  <tr>
+    <th>Channel</th>
+    <th>Effort</th>
+    <th>Time to results</th>
+    <th>Assessment</th>
   </tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Critical</td><td style="padding:8px; border:1px solid #e5e7eb;">3</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed — crawled-not-indexed should resolve post-deploy</td></tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">High</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed</td></tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Medium</td><td style="padding:8px; border:1px solid #e5e7eb;">5</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed</td></tr>
-  <tr><td style="padding:8px; border:1px solid #e5e7eb;">Low</td><td style="padding:8px; border:1px solid #e5e7eb;">4</td><td style="padding:8px; border:1px solid #e5e7eb;">All fixed</td></tr>
+  <tr>
+    <td>YouTube (exam walkthroughs)</td>
+    <td>High</td>
+    <td>3–6 months</td>
+    <td>Highest long-term ROI. Compounds. Do this.</td>
+  </tr>
+  <tr>
+    <td>News/blog posts (real content)</td>
+    <td>Medium</td>
+    <td>4–8 weeks per post</td>
+    <td>Direct SEO value + shareable assets. Easy wins if you write well.</td>
+  </tr>
+  <tr>
+    <td>Discord/Slack communities</td>
+    <td>Low</td>
+    <td>Immediate–4 weeks</td>
+    <td>Fastest path to engaged users. Do this now.</td>
+  </tr>
+  <tr>
+    <td>LinkedIn (organic)</td>
+    <td>Low</td>
+    <td>2–6 weeks</td>
+    <td>Right audience, low bar. UTM everything.</td>
+  </tr>
+  <tr>
+    <td>Reddit (organic contribution)</td>
+    <td>Low</td>
+    <td>2–8 weeks</td>
+    <td>Works if genuine. Doesn't scale but builds credibility.</td>
+  </tr>
+  <tr>
+    <td>Reddit Ads (£500 match)</td>
+    <td>Low</td>
+    <td>Immediate</td>
+    <td>Use the free money. Target cert subreddits. Brand awareness play.</td>
+  </tr>
+  <tr>
+    <td>Email list</td>
+    <td>Low (setup), Medium (maintain)</td>
+    <td>Ongoing</td>
+    <td>Start now. Will matter more as the list grows.</td>
+  </tr>
+  <tr>
+    <td>Product Hunt</td>
+    <td>Medium (prep)</td>
+    <td>One-time spike</td>
+    <td>Save for a feature milestone. Don't waste the launch on the current state.</td>
+  </tr>
+  <tr>
+    <td>Technical guest posts (Dev.to etc.)</td>
+    <td>Medium</td>
+    <td>4–12 weeks</td>
+    <td>Good SEO diversification. Low friction to start.</td>
+  </tr>
+  <tr>
+    <td>TikTok Shorts</td>
+    <td>Low (if repurposing YouTube)</td>
+    <td>Unpredictable</td>
+    <td>Do it once you have YouTube content to cut down. Not a standalone strategy.</td>
+  </tr>
+  <tr>
+    <td>Google Ads</td>
+    <td>Medium</td>
+    <td>Immediate but expensive</td>
+    <td>Only for long-tail, low-competition exam codes where you have no rivals.</td>
+  </tr>
+  <tr>
+    <td>Instagram</td>
+    <td>—</td>
+    <td>—</td>
+    <td>Skip. Wrong audience, wrong format.</td>
+  </tr>
+  <tr>
+    <td>Twitter/X</td>
+    <td>Low</td>
+    <td>Slow</td>
+    <td>Mirror LinkedIn content. Not a primary channel.</td>
+  </tr>
 </table>
 
 </body>
