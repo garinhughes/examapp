@@ -49,11 +49,10 @@
     "PMLE-2026-0208"
   ],
   "featuredLabIds": [
-    "gcp-training-job-code-fix",
-    "gcp-feature-store-config",
-    "gcp-serving-perf-optimize",
+    "gcp-dataflow-log-analysis",
     "gcp-pipeline-incident",
-    "gcp-vertex-deploy-cmd"
+    "gcp-gke-exec-pod-cmd",
+    "gcp-gke-rolling-update-replay"
   ],
   "realWorldValue": "The PMLE-2026 validates advanced skills in designing, building, and productionizing ML models on Google Cloud's Gemini Enterprise Agent Platform. It covers the full ML lifecycle - from low-code approaches with BigQuery ML and Agent Platform AutoML, through custom training with Gemini models and distributed frameworks, to deploying, scaling, and monitoring production AI systems responsibly.",
   "jobRoles": [
