@@ -7,15 +7,15 @@
   "defaultDuration": 120,
   "level": 2,
   "showcaseQuestionIds": [
-    "PMLE-2026-0002",
+    "PMLE-2026-0213",
     "PMLE-2026-0013",
     "PMLE-2026-0023",
-    "PMLE-2026-0029",
+    "PMLE-2026-0232",
     "PMLE-2026-0041",
     "PMLE-2026-0048",
     "PMLE-2026-0060",
-    "PMLE-2026-0078",
-    "PMLE-2026-0086",
+    "PMLE-2026-0226",
+    "PMLE-2026-0229",
     "PMLE-2026-0089",
     "PMLE-2026-0105",
     "PMLE-2026-0125",
@@ -25,7 +25,7 @@
     "PMLE-2026-0177",
     "PMLE-2026-0185",
     "PMLE-2026-0189",
-    "PMLE-2026-0199",
+    "PMLE-2026-0223",
     "PMLE-2026-0205",
     "PMLE-2026-0018",
     "PMLE-2026-0035",
@@ -9783,6 +9783,1155 @@
         }
       ],
       "explanation": "Each metric is suited to the properties of its target task: BLEU for reference-rich translation, groundedness for RAG faithfulness, LLM judge for subjective open-ended generation, and ROUGE-L for recall-focused summarisation.\n\n**Why it works:** BLEU is well-established for machine translation where certified human references exist and n-gram precision matters. Groundedness directly addresses the RAG hallucination risk. LLM-as-a-judge handles subjective rubrics where no single correct answer exists. ROUGE-L's recall orientation matches the summarisation goal of covering source content comprehensively."
+    },
+    {
+      "id": "PMLE-2026-0209",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.1: Validating data and models within pipelines."
+      ],
+      "services": [
+        "agent-platform-pipelines",
+        "cloud-storage",
+        "bigquery"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/pipelines/introduction",
+      "question": "Your organization's fraud detection team trains a tabular classifier weekly on transactional data landed in BigQuery, and the resulting model is promoted to an Agent Platform endpoint by an Agent Platform Pipelines run. Last week a schema change in the upstream feed silently introduced a new categorical value, and the retrained model regressed by 8 points of recall before anyone noticed. You want to update the pipeline so that schema or distribution anomalies in the training data block the run before training begins, while minimizing custom code maintenance.\n\nWhat should you do?",
+      "tip": "Think about which step in the pipeline DAG should fail fast on bad inputs.",
+      "choices": [
+        {
+          "text": "Insert a data validation component near the start of the pipeline that generates statistics from the new training slice, compares them against a stored schema baseline, and fails the run with a clear error when anomalies are detected.",
+          "sequence": 1,
+          "explanation": "A validation step early in the DAG short-circuits training whenever the input fails schema or distribution checks, which is the standard pattern in Agent Platform Pipelines.",
+          "id": "c1"
+        },
+        {
+          "text": "Add a model evaluation component after training that compares offline metrics against the previous champion and blocks the deployment step when recall drops by more than 5 points.",
+          "explanation": "Model evaluation gating runs after training, so a corrupted training set would still consume training cost and would not surface the underlying data issue.",
+          "id": "c2"
+        },
+        {
+          "text": "Configure Agent Platform Model Monitoring on the production endpoint to detect feature drift in incoming prediction requests, and trigger a rollback when drift exceeds the configured threshold.",
+          "explanation": "Endpoint monitoring catches serving-time skew on live traffic, not pre-training schema anomalies in the offline feed.",
+          "id": "c3"
+        },
+        {
+          "text": "Schedule a separate Managed Service for Apache Airflow DAG that reads the source table each morning and emails the team a row-count and null-rate report for manual review before the pipeline runs.",
+          "explanation": "An out-of-band manual review is high-maintenance and racy with the scheduled pipeline run, and does not programmatically gate training.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Adding a data validation component at the head of the pipeline is the canonical way to gate training on schema/anomaly checks.\n\n**Why it works:** The component computes statistics on the incoming slice, diffs them against the stored schema baseline, and fails the run before any compute is spent on training, surfacing the upstream feed change immediately.\n\n**Why the others don't work:**\n- Model evaluation gate: catches the symptom after training cost is incurred, not the root cause.\n- Endpoint monitoring: detects serving-time drift, not pre-training data anomalies.\n- Airflow email report: manual, out-of-band, and does not block the pipeline.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0210",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.1: Validating data and models within pipelines."
+      ],
+      "services": [
+        "agent-platform-pipelines",
+        "agent-platform-model-registry"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/pipelines/build-pipeline",
+      "question": "You maintain an Agent Platform Pipelines workflow that retrains a customer churn model every Monday and registers each candidate to Agent Platform Model Registry. Business stakeholders have asked that no model be promoted to the production alias unless it beats the current champion's holdout AUC by at least 0.01 and has a maximum subgroup-AUC gap below 0.05. You want to enforce both rules inside the pipeline so that promotion is automatic when they pass and skipped otherwise, while minimizing operational overhead.\n\nWhat should you do?",
+      "tip": "The DSL supports a step that consumes evaluation metrics and produces a Boolean used by a conditional branch.",
+      "choices": [
+        {
+          "text": "Add a model evaluation component that emits the holdout AUC and subgroup-AUC gap as output metrics, then use a `dsl.Condition` block that gates a registry-alias-update component on both thresholds.",
+          "sequence": 1,
+          "explanation": "A `dsl.Condition` driven by evaluation outputs cleanly expresses the promotion gate and runs the alias update only when both rules pass.",
+          "id": "c1"
+        },
+        {
+          "text": "Configure a Cloud Build trigger that runs after the pipeline completes, downloads the evaluation artifact from Cloud Storage, evaluates the thresholds in a shell step, and updates the production alias on success.",
+          "explanation": "Splitting the gate across Cloud Build duplicates lineage outside the pipeline and adds an external system to maintain.",
+          "id": "c2"
+        },
+        {
+          "text": "Promote every retrained candidate to the production alias and rely on Agent Platform Model Monitoring to roll the alias back when production AUC degrades.",
+          "explanation": "Promoting unconditionally and relying on monitoring exposes users to a worse model and treats validation as a serving-time concern.",
+          "id": "c3"
+        },
+        {
+          "text": "Have the evaluation component email the metrics to the MLOps lead each Monday and require a manual click in Model Registry to advance the alias when both thresholds are met.",
+          "explanation": "Manual approval is high-overhead and conflicts with the automatic-when-passing requirement.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Wiring `dsl.Condition` off the evaluation component's metrics is the idiomatic Agent Platform Pipelines pattern for promotion gating.\n\n**Why it works:** The conditional only executes the alias-update step when both numeric outputs satisfy the thresholds, keeping the validation, decision, and promotion in one DAG with full lineage.\n\n**Why the others don't work:**\n- Cloud Build post-run gate: splits lineage across systems and adds maintenance.\n- Always-promote with monitoring rollback: harms users before rollback fires.\n- Manual approval: not automatic and high-overhead.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0211",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.1: Validating data and models within pipelines."
+      ],
+      "services": [
+        "agent-platform-pipelines",
+        "bigquery"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/pipelines/introduction",
+      "question": "Your organization's risk team retrains a credit-scoring model nightly on the previous day's applications, which arrive as a partition in BigQuery. Auditors require that every training run record an immutable artifact of the data statistics used and prove the training data is free of values outside the documented categorical domains. You want to add this evidence-capture step to the existing Agent Platform Pipelines workflow, while minimizing code maintenance.\n\nWhat should you do?",
+      "tip": "Pipeline components persist their inputs and outputs as ML metadata artifacts that auditors can later query.",
+      "choices": [
+        {
+          "text": "Add a statistics-and-anomaly-detection component that emits a Statistics artifact and an Anomalies artifact, both auto-tracked in Agent Platform ML Metadata, and fail the run when any anomaly is reported.",
+          "sequence": 1,
+          "explanation": "Pipeline components automatically register their outputs as immutable ML Metadata artifacts and the anomaly output gates the run, satisfying both audit and validation requirements with one step.",
+          "id": "c1"
+        },
+        {
+          "text": "Run a custom Python script outside the pipeline each night that profiles the BigQuery partition with `pandas-profiling` and writes the HTML report to a Cloud Storage bucket with object versioning enabled.",
+          "explanation": "External scripts skip ML Metadata lineage and do not gate the pipeline, so an auditor cannot link the report to a specific training run.",
+          "id": "c2"
+        },
+        {
+          "text": "Enable BigQuery audit logs on the source table and direct auditors to Cloud Logging to verify which rows were read by each training run.",
+          "explanation": "Read audit logs prove access, not data quality, and capture no statistics or anomaly evidence.",
+          "id": "c3"
+        },
+        {
+          "text": "Add a final component that uploads the trained model to Model Registry with a description string containing the row count and min/max of each numeric feature.",
+          "explanation": "Free-text description fields are not structured artifacts and do not fail the run on out-of-domain values.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "A statistics-and-anomaly component gives both the immutable artifact for audit and the validation gate in one step.\n\n**Why it works:** Component outputs land in ML Metadata automatically (queryable per pipeline run), and the Anomalies output drives the failure path when categorical-domain violations are seen.\n\n**Why the others don't work:**\n- Out-of-pipeline pandas-profiling: no lineage, no gating.\n- BigQuery audit logs: prove access, not quality.\n- Description string: unstructured, non-gating.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0212",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 3,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.1: Validating data and models within pipelines."
+      ],
+      "services": [
+        "agent-platform-pipelines",
+        "bigquery",
+        "agent-platform-model-registry"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/pipelines/introduction",
+      "question": "You are designing a weekly retraining pipeline on Agent Platform Pipelines for a recommendation model. The training data is a rolling 90-day window in BigQuery. Your tech lead wants the pipeline to (a) reject the week's run when the new slice's feature distribution drifts more than a configured threshold from the previous week's slice, and (b) when the run does proceed, block model registration if the candidate's offline NDCG@10 is worse than the production champion's. You want to implement both gates inside one pipeline definition with the smallest number of conditional branches.\n\nWhat should you do?",
+      "tip": "Two `dsl.Condition` blocks, one driving training and one driving registration, can be chained on the outputs of upstream validation steps.",
+      "choices": [
+        {
+          "text": "Add a data-statistics component that compares this week's slice against the previous week's stored statistics and emits a `drift_ok` boolean, wrap the training and evaluation steps in a `dsl.Condition` on `drift_ok`, then add a model-evaluation component and wrap the registration step in a second `dsl.Condition` on `ndcg_beats_champion`.",
+          "sequence": 1,
+          "explanation": "Two chained conditionals on validation outputs implement both gates with minimal branching and keep all logic inside the pipeline.",
+          "id": "c1"
+        },
+        {
+          "text": "Run a single combined validation component that performs drift detection and offline evaluation up front, then conditionally execute the entire training-and-registration subgraph based on its output.",
+          "explanation": "Offline NDCG cannot be computed before training, so collapsing both gates upstream is impossible.",
+          "id": "c2"
+        },
+        {
+          "text": "Always run training and registration, then add a post-registration component that deletes the registered model from Model Registry when either drift is too high or NDCG@10 is below the champion's.",
+          "explanation": "Registering then deleting wastes cost, pollutes the registry with rejected versions, and races against any consumers watching the alias.",
+          "id": "c3"
+        },
+        {
+          "text": "Skip in-pipeline gating and configure Agent Platform Model Monitoring on the production endpoint to alert on feature drift and retrieval-quality regressions after the new model goes live.",
+          "explanation": "Endpoint monitoring is reactive and serving-time; it does not prevent a bad weekly run from ever being trained or registered.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Chaining two `dsl.Condition` blocks, each driven by an upstream validation component, is the cleanest way to enforce both gates in a single pipeline.\n\n**Why it works:** The first condition wraps training/evaluation on the drift gate; the second wraps registration on the offline-quality gate. Each gate sees the right artifacts at the right time, with only two conditional branches.\n\n**Why the others don't work:**\n- Single combined upstream gate: NDCG requires a trained model, so it cannot be evaluated before training.\n- Train-then-delete: wasteful and pollutes registry/lineage.\n- Endpoint monitoring only: reactive and serving-time, not pre-promotion gating.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0213",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.2: Building and orchestrating pipelines using managed or unmanaged services and from templates or custom solutions (e.g., Agent Platform Pipelines, Managed Service for Apache Airflow, and Ray on Gemini Enterprise Agent Platform)."
+      ],
+      "services": [
+        "agent-platform-pipelines",
+        "managed-service-for-apache-airflow",
+        "bigquery",
+        "cloud-storage"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/pipelines/introduction",
+      "question": "Your organization's data engineering team owns a nightly workflow that copies CRM exports from an on-premises SFTP server into Cloud Storage, loads them into BigQuery, runs five SQL transformations, calls a third-party REST API to enrich rows, and then needs to kick off a weekly Agent Platform Pipelines run that retrains a churn model. The team wants a single orchestrator for the whole nightly workflow, while minimizing code maintenance.\n\nWhat should you do?",
+      "tip": "Match the orchestrator to the workload's shape: heterogeneous data ops vs a tightly coupled ML-step DAG.",
+      "choices": [
+        {
+          "text": "Author the nightly workflow as a Managed Service for Apache Airflow DAG that uses operators for SFTP, GCS, BigQuery, HTTP, and an Agent Platform Pipelines submit operator to trigger the weekly retraining run.",
+          "sequence": 1,
+          "explanation": "Managed Service for Apache Airflow is purpose-built for heterogeneous data/ops orchestration with rich operator coverage and can submit Agent Platform Pipelines runs as a step.",
+          "id": "c1"
+        },
+        {
+          "text": "Author the nightly workflow as an Agent Platform Pipelines pipeline using KFP custom components for the SFTP transfer, BigQuery loads, SQL transforms, REST enrichment, and the model retraining step.",
+          "explanation": "Agent Platform Pipelines is optimized for ML-step DAGs and lacks the breadth of data-ops operators; recreating SFTP/HTTP/BigQuery operators as custom components is high-maintenance.",
+          "id": "c2"
+        },
+        {
+          "text": "Author the workflow as a Ray application on Agent Platform that uses Ray remote tasks to run the SFTP transfer, BigQuery loads, REST calls, and trigger the retraining job.",
+          "explanation": "Ray is designed for distributed Python compute with dynamic task graphs, not for stitching together heterogeneous external systems on a schedule.",
+          "id": "c3"
+        },
+        {
+          "text": "Author each nightly step as an independent Cloud Scheduler job that triggers a Cloud Run service, and have the last service call the Agent Platform Pipelines API to start the retraining run.",
+          "explanation": "A chain of independent schedulers loses the DAG semantics, retries, backfills, and observability that managed Airflow provides out of the box.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Managed Service for Apache Airflow fits a heterogeneous nightly data/ops workflow that also needs to kick off an ML pipeline.\n\n**Why it works:** Airflow's operator catalogue (SFTP, GCS, BigQuery, HTTP) plus an Agent Platform Pipelines submit operator captures the entire nightly workflow as one DAG with retries, backfills, and lineage.\n\n**Why the others don't work:**\n- Agent Platform Pipelines for everything: optimized for ML steps, not heterogeneous data ops.\n- Ray: distributed compute, not heterogeneous orchestration.\n- Cloud Scheduler chain: no DAG semantics, fragmented observability.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0214",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.2: Building and orchestrating pipelines using managed or unmanaged services and from templates or custom solutions (e.g., Agent Platform Pipelines, Managed Service for Apache Airflow, and Ray on Gemini Enterprise Agent Platform)."
+      ],
+      "services": [
+        "ray-on-agent-platform",
+        "agent-platform-pipelines"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/open-source/ray-on-vertex-ai/overview",
+      "question": "Your organization's research team is running a reinforcement learning project that trains a fleet of agents in parallel against a custom Python simulator. The workload spawns thousands of short-lived Python tasks, the task graph changes each iteration based on which agents converge, and the team also wants to run Ray Tune hyperparameter sweeps over the same cluster. You want to run this on Google Cloud as a managed service, while minimizing operational overhead.\n\nWhat should you do?",
+      "tip": "Static-DAG orchestrators do not fit dynamic task graphs and shared-memory parallel Python.",
+      "choices": [
+        {
+          "text": "Create a Ray cluster on Agent Platform and submit the RL training and Ray Tune sweeps as Ray jobs against that cluster.",
+          "sequence": 1,
+          "explanation": "Ray on Agent Platform is a managed Ray runtime built for dynamic Python task graphs, distributed simulators, and Ray Tune sweeps.",
+          "id": "c1"
+        },
+        {
+          "text": "Model each agent's training run as a step in an Agent Platform Pipelines pipeline and use a `dsl.ParallelFor` loop to fan out across agents.",
+          "explanation": "KFP DAGs are static at compile time; they do not adapt the task graph each iteration based on convergence and have heavy per-step overhead for thousands of short tasks.",
+          "id": "c2"
+        },
+        {
+          "text": "Author a Managed Service for Apache Airflow DAG that dynamically generates one task per agent at parse time and uses the KubernetesPodOperator to run each agent in its own pod.",
+          "explanation": "Airflow is for scheduled heterogeneous workflows, not shared-memory Python parallelism, and pod-per-task overhead dwarfs the short task duration.",
+          "id": "c3"
+        },
+        {
+          "text": "Run the simulator in Cloud Run jobs triggered by Pub/Sub messages and aggregate results in BigQuery for hyperparameter analysis.",
+          "explanation": "Cloud Run jobs cannot share memory across tasks for RL rollouts and have no native hyperparameter-search primitives like Ray Tune.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Ray on Agent Platform is the right managed runtime for distributed Python with dynamic task graphs and Ray Tune.\n\n**Why it works:** It provides a managed Ray cluster, native Ray Tune support, and shared-object-store semantics that suit RL fleets and sweeps that reshape per iteration.\n\n**Why the others don't work:**\n- Agent Platform Pipelines: static DAG, heavy per-step overhead.\n- Managed Airflow with KubernetesPodOperator: scheduling-oriented, no shared memory, pod overhead.\n- Cloud Run jobs: no shared memory, no Ray Tune.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0215",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.2: Building and orchestrating pipelines using managed or unmanaged services and from templates or custom solutions (e.g., Agent Platform Pipelines, Managed Service for Apache Airflow, and Ray on Gemini Enterprise Agent Platform)."
+      ],
+      "services": [
+        "agent-platform-pipelines"
+      ],
+      "docs": "https://www.kubeflow.org/docs/components/pipelines/v2/components/lightweight-python-components/",
+      "question": "You are authoring a new Agent Platform Pipelines pipeline using the KFP v2 Python DSL. You need to define a lightweight component that reads a CSV from Cloud Storage, drops null rows, and writes the cleaned file as an output artifact for the next step to consume. The component should declare its base image and its `pandas` dependency so it can run on the managed pipeline runtime without a custom container build.\n\n```python\nfrom kfp import dsl\nfrom kfp.dsl import Output, Dataset\n\n# (component decorator goes here)\ndef clean_csv(input_uri: str, cleaned: Output[Dataset]):\n    import pandas as pd\n    df = pd.read_csv(input_uri).dropna()\n    df.to_csv(cleaned.path, index=False)\n```\n\nWhat should you do?",
+      "tip": "The lightweight-component decorator accepts both a `base_image` and a `packages_to_install` list.",
+      "choices": [
+        {
+          "text": "Decorate the function with `@dsl.component(base_image=\"python:3.11\", packages_to_install=[\"pandas\", \"gcsfs\"])` so KFP builds a runtime image at compile time and installs `pandas` plus `gcsfs` before invoking the function.",
+          "sequence": 1,
+          "explanation": "`@dsl.component` is the v2 lightweight Python component decorator and accepts both `base_image` and `packages_to_install` to declare runtime dependencies.",
+          "id": "c1"
+        },
+        {
+          "text": "Decorate the function with `@dsl.pipeline(name=\"clean-csv\", base_image=\"python:3.11\")` and add a `pip_install` parameter listing `pandas` and `gcsfs`.",
+          "explanation": "`@dsl.pipeline` defines a pipeline, not a component, and does not accept these parameters.",
+          "id": "c2"
+        },
+        {
+          "text": "Decorate the function with `@dsl.python_op(image=\"python:3.11\", requirements=[\"pandas\", \"gcsfs\"])` so the runtime resolves the image and packages at submission time.",
+          "explanation": "`dsl.python_op` is not part of the KFP v2 SDK; the decorator and parameter names are wrong.",
+          "id": "c3"
+        },
+        {
+          "text": "Wrap the function in `@dsl.ContainerOp(image=\"python:3.11\", command=[\"python\", \"-c\"], arguments=[\"pip install pandas gcsfs && run\"])` and submit it as a containerized step.",
+          "explanation": "`ContainerOp` is the deprecated KFP v1 API; v2 uses lightweight components or `dsl.container_component`.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "`@dsl.component` with `base_image` and `packages_to_install` is the v2 lightweight-component pattern.\n\n**Why it works:** KFP compiles the decorated function into a component spec, builds a runtime image based on the declared base image, installs the listed packages, and invokes the function with KFP-managed inputs/outputs.\n\n**Why the others don't work:**\n- `@dsl.pipeline`: defines a pipeline, not a component.\n- `@dsl.python_op`: not a real v2 decorator.\n- `dsl.ContainerOp`: deprecated v1 API.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0216",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 3,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.2: Building and orchestrating pipelines using managed or unmanaged services and from templates or custom solutions (e.g., Agent Platform Pipelines, Managed Service for Apache Airflow, and Ray on Gemini Enterprise Agent Platform)."
+      ],
+      "services": [
+        "agent-platform-pipelines",
+        "google-kubernetes-engine"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/pipelines/introduction",
+      "question": "Your organization's platform team currently runs Kubeflow Pipelines on a self-managed Google Kubernetes Engine cluster to orchestrate model retraining for six product teams. The cluster has been a source of upgrade toil, IAM exceptions, and on-call paging when the metadata database fills up. Leadership has asked you to reduce operational overhead without rewriting the existing KFP v2 pipeline definitions.\n\nWhat should you do?",
+      "tip": "Agent Platform Pipelines runs the same KFP v2 specs on a Google-managed control plane.",
+      "choices": [
+        {
+          "text": "Submit the existing KFP v2 pipeline specs to Agent Platform Pipelines, which provides a managed control plane, managed metadata, and per-run isolation, and deprecate the self-managed GKE cluster.",
+          "sequence": 1,
+          "explanation": "Agent Platform Pipelines runs KFP v2 specs on a Google-managed runtime, removing the cluster, control plane, and metadata DB toil while preserving the existing pipeline code.",
+          "id": "c1"
+        },
+        {
+          "text": "Migrate the pipelines to Managed Service for Apache Airflow and rewrite each KFP component as an Airflow task using the KubernetesPodOperator on the same GKE cluster.",
+          "explanation": "This swaps one orchestrator for another, requires rewriting every pipeline, and still depends on the GKE cluster the team is trying to retire.",
+          "id": "c2"
+        },
+        {
+          "text": "Keep the self-managed Kubeflow Pipelines installation but move it to GKE Autopilot and add a Cloud SQL HA instance for the metadata database.",
+          "explanation": "Autopilot reduces some toil but keeps the team responsible for KFP upgrades, IAM glue, and metadata schema migrations.",
+          "id": "c3"
+        },
+        {
+          "text": "Replace the orchestrator with a Ray cluster on Agent Platform and re-author each pipeline as a Ray application using `ray.remote` tasks.",
+          "explanation": "Ray is for distributed Python compute, not multi-team static-DAG ML orchestration, and would force a full rewrite for no orchestration win.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Lifting existing KFP v2 specs to Agent Platform Pipelines is the lowest-overhead managed path.\n\n**Why it works:** Agent Platform Pipelines accepts KFP v2 pipeline specs natively, runs them on a Google-managed control plane with managed ML Metadata, and removes the cluster, upgrades, and metadata DB the platform team is currently babysitting.\n\n**Why the others don't work:**\n- Migrate to Airflow: full rewrite plus the GKE cluster persists.\n- Self-managed KFP on Autopilot: still self-managed for the parts that hurt.\n- Ray rewrite: wrong tool and a full rewrite.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0217",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.3: Ensuring consistent data preprocessing between training and serving."
+      ],
+      "services": [
+        "agent-platform",
+        "cloud-storage"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/training/configure-features",
+      "question": "You used Agent Platform Workbench to develop a TensorFlow Keras model that predicts loan default risk on tabular data stored in Cloud Storage. The training code applies normalization, log-transforms on three numeric columns, and one-hot encoding on two categorical columns inside a separate pandas script before feeding tensors into model.fit(). You now need to deploy the model to an Agent Platform Inference endpoint for online predictions, while minimizing the risk of training-serving skew and minimizing code maintenance.\n\nWhat should you do?",
+      "tip": "Pure-Python preprocessing scripts that live next to training code rarely run identically at serving time. Where can the same transformation logic ride along with the model artefact itself?",
+      "choices": [
+        {
+          "text": "Refactor the preprocessing into Keras preprocessing layers placed at the top of the Functional model, retrain, and export a single SavedModel that contains both preprocessing and prediction graphs, then upload that SavedModel to the Agent Platform Model Registry and deploy it to an Agent Platform Inference endpoint.",
+          "sequence": 1,
+          "explanation": "Keras preprocessing layers compiled into the SavedModel guarantee identical math at training and serving.",
+          "id": "c1"
+        },
+        {
+          "text": "Keep the pandas preprocessing script unchanged, package it into a Docker image alongside the trained Keras weights, and deploy that custom container to an Agent Platform Inference endpoint so every prediction call invokes the same script.",
+          "explanation": "Maintaining a parallel pandas script duplicates logic, drifts easily, and is exactly the maintenance burden the goal forbids.",
+          "id": "c2"
+        },
+        {
+          "text": "Export the trained Keras model to SavedModel format without preprocessing, and add a Cloud Run service in front of the Agent Platform Inference endpoint that re-implements the normalization, log-transforms, and one-hot encoding in JavaScript before forwarding the request payload.",
+          "explanation": "Re-implementing transforms in a different language is the canonical recipe for training-serving skew.",
+          "id": "c3"
+        },
+        {
+          "text": "Continue running pandas preprocessing in a scheduled Managed Service for Apache Airflow DAG that writes pre-transformed feature rows to BigQuery, and configure the Agent Platform Inference endpoint to read each request's features from BigQuery before invoking the model.",
+          "explanation": "BigQuery lookups at request time add latency and still rely on the same divergent pandas logic.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Embedding preprocessing layers inside the SavedModel ships training and serving transforms as one artefact.\n\n**Why it works:** Keras preprocessing layers (Normalization, Discretization, StringLookup, etc.) are saved as part of the model graph, so the same TensorFlow ops execute at training time and at every Agent Platform Inference request - no duplicated Python.\n\n**Why the others don't work:**\n- Custom container with pandas: keeps two code paths in sync manually; high maintenance and skew-prone.\n- Cloud Run JS preprocessor: cross-language reimplementation of math is the textbook training-serving skew bug.\n- Airflow + BigQuery lookup: adds a stale offline hop and still depends on the original pandas script.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0218",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.3: Ensuring consistent data preprocessing between training and serving."
+      ],
+      "services": [
+        "bigquery-ml",
+        "bigquery"
+      ],
+      "docs": "https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-create#transform_clause",
+      "question": "Your organization's analytics team trains a logistic regression churn model directly in BigQuery ML over a 200 GB customer events table. Engineers currently materialize a derived table that bucketizes tenure_days, applies ML.STANDARD_SCALER to monthly_spend, and one-hot encodes plan_tier, then run CREATE MODEL on that derived table. At inference time a separate scheduled query rebuilds those features for new rows before calling ML.PREDICT. You want to eliminate the parallel feature pipeline and guarantee that prediction-time feature math matches training, while minimizing code maintenance.\n\nWhat should you do?",
+      "tip": "BigQuery ML can attach the feature-engineering SQL to the model itself so it runs automatically at predict time.",
+      "choices": [
+        {
+          "text": "Recreate the model with a TRANSFORM clause on CREATE MODEL that contains the bucketization, ML.STANDARD_SCALER, and ML.ONE_HOT_ENCODER expressions, train directly on the raw events table, and have ML.PREDICT pass raw rows so BigQuery ML applies the stored transforms automatically.",
+          "sequence": 1,
+          "explanation": "The TRANSFORM clause persists feature SQL inside the model so ML.PREDICT applies identical logic without a second pipeline.",
+          "id": "c1"
+        },
+        {
+          "text": "Keep the derived training table, and add a row-level AFTER INSERT trigger on the events table that re-runs the bucketization, scaling, and one-hot SQL into a serving feature table that ML.PREDICT reads from.",
+          "explanation": "BigQuery does not support row-level DML triggers, and this still maintains two copies of the feature SQL.",
+          "id": "c2"
+        },
+        {
+          "text": "Export the trained BigQuery ML model to Cloud Storage as a TensorFlow SavedModel, deploy it on an Agent Platform Inference endpoint, and reimplement the feature transforms in a Cloud Run preprocessor in front of the endpoint.",
+          "explanation": "Reimplementing transforms in a separate service is exactly the duplicated-code path the goal forbids.",
+          "id": "c3"
+        },
+        {
+          "text": "Materialize the feature table once, register each engineered column as a feature in Agent Platform Feature Store, and have ML.PREDICT join against the feature view before scoring.",
+          "explanation": "Feature Store online serving is for low-latency lookups, not for re-deriving features inside BigQuery ML batch prediction; the feature SQL still lives in two places.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "BigQuery ML's TRANSFORM clause stores feature engineering inline with the model definition so training and inference share one SQL spec.\n\n**Why it works:** When you declare TRANSFORM at CREATE MODEL time, BigQuery ML records those expressions as part of the model and re-applies them automatically on every ML.PREDICT call against raw rows - no second pipeline.\n\n**Why the others don't work:**\n- AFTER INSERT trigger: BigQuery has no such trigger, and the design retains the duplicate transform code.\n- Export to SavedModel + Cloud Run preprocessor: introduces cross-system feature math, the classic skew source.\n- Feature Store join: Feature Store stores precomputed values, it does not re-execute the feature engineering SQL inside ML.PREDICT.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0219",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 3,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.1.3: Ensuring consistent data preprocessing between training and serving."
+      ],
+      "services": [
+        "agent-platform-feature-store",
+        "agent-platform"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/featurestore/latest/overview",
+      "question": "You are developing a fraud detection model whose features include rolling 24-hour transaction counts, a 7-day average transaction amount, and the merchant's lifetime chargeback ratio. Offline training reads these aggregates from BigQuery via a nightly job. Online serving must score a transaction in under 50 ms, and the same three aggregate definitions must be used at training time and at request time. You want to deploy the model to an Agent Platform Inference endpoint while minimizing training-serving skew and minimizing operational overhead.\n\nWhat should you do?",
+      "tip": "Aggregations like rolling counts cannot be recomputed inside a SavedModel from a single request payload - the values must be precomputed and looked up. Where can offline training reads and online lookups share one definition?",
+      "choices": [
+        {
+          "text": "Define the rolling count, 7-day average, and chargeback ratio as features in an Agent Platform Feature Store feature group backed by the BigQuery aggregates, train by reading the offline store via point-in-time fetch, and at serving time have the endpoint look up the same feature view from the online store keyed by transaction and merchant ID.",
+          "sequence": 1,
+          "explanation": "Feature Store provides one feature definition with synchronized offline and online stores, eliminating skew while meeting low-latency online needs.",
+          "id": "c1"
+        },
+        {
+          "text": "Compute the aggregates in BigQuery during training, embed those three values as constants in the SavedModel via a Keras Lambda layer, and deploy the SavedModel to Agent Platform Inference so every request scores against the embedded historical aggregates.",
+          "explanation": "Embedding the aggregates as constants freezes them - online predictions would never see fresh rolling counts for new transactions.",
+          "id": "c2"
+        },
+        {
+          "text": "Run the BigQuery nightly aggregation job, export the result to a Cloud Storage CSV, and at serving time have a Cloud Function load the CSV into memory and pass the looked-up features to the Agent Platform Inference endpoint per request.",
+          "explanation": "A custom CSV cache duplicates the lookup pathway, will exceed the 50 ms budget on cold loads, and risks a definition drift between BigQuery and Cloud Function code.",
+          "id": "c3"
+        },
+        {
+          "text": "Train the model on the BigQuery aggregates, deploy to Agent Platform Inference, and for each prediction request issue an ad-hoc BigQuery query that recomputes the rolling 24-hour count and 7-day average for the requested transaction's user and merchant.",
+          "explanation": "Per-request BigQuery queries blow the 50 ms latency budget by an order of magnitude and add expensive on-demand cost.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Agent Platform Feature Store is purpose-built to serve the same precomputed aggregate features at training and at low-latency inference.\n\n**Why it works:** A feature group defined once is materialized into the offline store (point-in-time-correct training reads from BigQuery) and the online store (millisecond key lookups), so both code paths reference one canonical feature definition.\n\n**Why the others don't work:**\n- Constants in SavedModel: aggregates would be frozen at training time and meaningless for fresh transactions.\n- CSV in Cloud Function: bespoke lookup layer with no offline/online consistency guarantees and poor cold-start latency.\n- Ad-hoc BigQuery at predict time: violates the 50 ms SLO and is cost-prohibitive at fraud-scoring volume.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0220",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.2.1: Determining an appropriate retraining policy."
+      ],
+      "services": [
+        "agent-platform",
+        "agent-platform-pipelines"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/model-monitoring/overview",
+      "question": "You deployed a click-through-rate model on an Agent Platform Inference endpoint six months ago. Traffic patterns shift unpredictably with seasonal promotions, and offline analysis shows the input feature distribution can change abruptly within a week. A fixed monthly retraining cadence has twice missed sharp distribution shifts, leading to a measurable drop in CTR for two-week stretches. You want to choose a retraining trigger that responds to actual changes in production data, while minimizing unnecessary training cost.\n\nWhat should you do?",
+      "tip": "Schedule-based retraining ignores reality between runs. Which trigger fires only when input data has actually moved?",
+      "choices": [
+        {
+          "text": "Configure Agent Platform model monitoring to compute feature skew and drift against the training baseline, and set an alert that triggers an Agent Platform Pipelines retraining run when drift on any monitored feature crosses the configured threshold.",
+          "sequence": 1,
+          "explanation": "A drift-triggered retrain fires precisely when the input distribution moves, matching the real failure mode.",
+          "id": "c1"
+        },
+        {
+          "text": "Tighten the schedule from monthly to daily Agent Platform Pipelines retraining runs so the model is never more than 24 hours stale, regardless of whether input data has changed.",
+          "explanation": "Daily retraining 365 times a year wastes compute when no drift has occurred and is the opposite of cost-minimizing.",
+          "id": "c2"
+        },
+        {
+          "text": "Keep the monthly schedule and add a manual review meeting where the MLOps team decides week by week whether to kick off a retraining pipeline based on dashboard impressions.",
+          "explanation": "Human-in-the-loop weekly review reintroduces lag and is operationally heavy compared with an automated drift trigger.",
+          "id": "c3"
+        },
+        {
+          "text": "Trigger retraining only after a 5 percent absolute drop in production CTR is observed for seven consecutive days, ignoring upstream feature distribution metrics.",
+          "explanation": "Waiting for a sustained business-metric drop means users have already experienced degraded predictions for a week before retraining begins.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Drift-based retraining triggered by Agent Platform model monitoring aligns the cadence to the actual cause of degradation.\n\n**Why it works:** Agent Platform model monitoring continuously compares serving feature distributions to the training baseline; an alert can directly invoke an Agent Platform Pipelines retraining run, so compute is spent only when distributions truly shift.\n\n**Why the others don't work:**\n- Daily fixed schedule: spends compute every day even when input data is stable.\n- Manual weekly review: slow, error-prone, and operationally expensive.\n- Sustained CTR drop trigger: detects damage only after users have suffered for a week.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0221",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.2.1: Determining an appropriate retraining policy."
+      ],
+      "services": [
+        "agent-platform"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/training/incremental-training",
+      "question": "Your organization's recommendations team operates a deep neural network in Agent Platform Inference that took 14 hours to train on 18 months of interaction data. Each week roughly 2 percent of the historical data volume arrives as new interactions, and offline experiments show the underlying user behavior distribution is stable, with only minor concept refinements. The team wants the model to ingest the latest weekly data, while minimizing training cost and minimizing the risk of degrading offline performance on the broader historical distribution.\n\nWhat should you do?",
+      "tip": "When the data distribution is stable and only a small slice is new, full retraining from scratch each week is overkill - what is the cheaper, lower-risk alternative?",
+      "choices": [
+        {
+          "text": "Run a weekly Agent Platform custom training job that loads the previous week's model checkpoint and fine-tunes it for a small number of additional epochs on the combined recent and a sampled slice of historical interactions, then registers the resulting version in the Agent Platform Model Registry.",
+          "sequence": 1,
+          "explanation": "Incremental fine-tuning from the prior checkpoint costs a fraction of full retraining and preserves performance on stable historical data.",
+          "id": "c1"
+        },
+        {
+          "text": "Run a weekly Agent Platform custom training job that retrains a fresh model from random initialization on the full 18-month plus latest-week dataset, paying the 14-hour training cost each week.",
+          "explanation": "Full retraining weekly burns compute when behavior is stable and a small fine-tune would suffice.",
+          "id": "c2"
+        },
+        {
+          "text": "Train weekly on only the most recent week of data starting from random initialization, replacing the production model with the result.",
+          "explanation": "Training only on the latest 2 percent slice causes catastrophic forgetting of the long-tail historical distribution.",
+          "id": "c3"
+        },
+        {
+          "text": "Keep the original model in production indefinitely and rely on Agent Platform model monitoring drift alerts alone, without scheduling any weekly retraining.",
+          "explanation": "The team has explicitly decided fresh weekly data should be incorporated; no retraining at all contradicts the goal.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Incremental fine-tuning from the previous checkpoint is the cost-aware, low-risk match for stable distributions with steady small data accruals.\n\n**Why it works:** Loading the prior weights and tuning for a few epochs on combined recent and sampled historical data takes a fraction of the 14-hour full-training time and avoids forgetting the broad historical distribution.\n\n**Why the others don't work:**\n- Weekly full retrain from scratch: 14 hours of compute every week with little marginal benefit.\n- Train only on latest week from scratch: catastrophic forgetting of historical patterns.\n- No retraining at all: ignores the stated requirement to incorporate new weekly data.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0222",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 3,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.2.1: Determining an appropriate retraining policy."
+      ],
+      "services": [
+        "agent-platform",
+        "bigquery",
+        "agent-platform-pipelines"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/pipelines/introduction",
+      "question": "You operate a demand forecasting model for a logistics platform. The product owner has set a freshness SLO that no prediction may be served from a model trained on data older than 14 days, the platform ingests roughly 30 GB of new shipment events daily into BigQuery, and the finance team has capped retraining spend. Internal experiments show feature drift is rare but data volume accumulates predictably. You want to choose a retraining policy that meets the SLO, while minimizing retraining cost.\n\nWhat should you do?",
+      "tip": "When drift is rare but a freshness SLO exists, the binding constraint is the SLO itself, not drift. What is the cheapest cadence that just satisfies the SLO?",
+      "choices": [
+        {
+          "text": "Schedule an Agent Platform Pipelines retraining run every 13 days using a Cloud Scheduler trigger, retraining on a rolling window of the most recent shipment data so each newly deployed version stays within the 14-day freshness SLO with one day of buffer.",
+          "sequence": 1,
+          "explanation": "A 13-day cadence is the lowest-frequency schedule that reliably keeps the deployed model under the 14-day SLO, minimizing total retrain cost.",
+          "id": "c1"
+        },
+        {
+          "text": "Schedule an Agent Platform Pipelines retraining run every day so that the deployed model is always at most 24 hours old, well below the 14-day SLO.",
+          "explanation": "Daily retraining is roughly 13 times more expensive than necessary given the 14-day SLO and rare drift.",
+          "id": "c2"
+        },
+        {
+          "text": "Skip scheduled retraining and use Agent Platform model monitoring drift alerts as the sole trigger, retraining only when a drift threshold is exceeded.",
+          "explanation": "Drift is rare in this workload, so a pure drift trigger could leave the model in production beyond 14 days and breach the SLO.",
+          "id": "c3"
+        },
+        {
+          "text": "Schedule retraining every 30 days to align with the monthly finance reporting cycle, accepting occasional SLO breaches as a tradeoff against retraining cost.",
+          "explanation": "A 30-day cadence violates the explicit 14-day freshness SLO; the SLO is a hard constraint, not optional.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "When a freshness SLO dominates and drift is rare, the cheapest valid schedule is the one that just meets the SLO with a small safety buffer.\n\n**Why it works:** Retraining every 13 days guarantees that the production model age never exceeds 14 days while incurring the minimum number of retraining runs - this is the cost optimum subject to the SLO constraint.\n\n**Why the others don't work:**\n- Daily retraining: meets the SLO but at roughly 13x the necessary cost.\n- Drift-only trigger: rare drift means the SLO can silently slip past 14 days.\n- 30-day cadence: outright breaches the documented 14-day freshness SLO.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0223",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.2.2: Deploying models in continuous integration, continuous delivery, and continuous training (CI/CD/CT) pipelines (e.g., Cloud Build)."
+      ],
+      "services": [
+        "cloud-build",
+        "agent-platform-pipelines",
+        "cloud-storage"
+      ],
+      "docs": "https://cloud.google.com/build/docs/automating-builds/create-manual-triggers",
+      "question": "Your organization's data engineering team lands a new partition of training data in a Cloud Storage bucket each Monday morning. You want to set up a continuous training (CT) loop so that every Monday landing automatically kicks off an Agent Platform Pipelines retraining run that reads the new partition, retrains the model, and registers the candidate version in the Agent Platform Model Registry. You want to implement this while minimizing operational overhead.\n\nThe team drafts the following Cloud Build configuration:\n\n```yaml\nsteps:\n  - name: 'gcr.io/cloud-builders/gcloud'\n    entrypoint: 'bash'\n    args:\n      - '-c'\n      - |\n        python3 submit_pipeline.py \\\n          --pipeline-spec gs://ml-artifacts/train_pipeline.json \\\n          --data-uri ${_DATA_URI} \\\n          --display-name ct-run-${BUILD_ID}\n```\n\nWhat should you do?",
+      "tip": "Cloud Build can trigger on Cloud Storage object events. Which trigger type matches a weekly file-arrival event without you writing a polling job?",
+      "choices": [
+        {
+          "text": "Create a Cloud Build trigger of type Cloud Storage object finalize, scoped to the training-data bucket and prefix, that invokes the build configuration above and passes the new object's URI as the _DATA_URI substitution.",
+          "sequence": 1,
+          "explanation": "A Cloud Storage object-finalize trigger fires automatically on each new partition, kicking the CT loop with no extra plumbing.",
+          "id": "c1"
+        },
+        {
+          "text": "Create a Cloud Scheduler job that runs every Monday at 09:00 and calls the Cloud Build REST API to start the build, hardcoding _DATA_URI to gs://training-data/latest/ in the request body.",
+          "explanation": "Schedule-based triggering is fragile - if the data lands late or early the run uses the wrong partition or finds nothing.",
+          "id": "c2"
+        },
+        {
+          "text": "Deploy a Cloud Run service that polls the Cloud Storage bucket every 15 minutes for new objects and calls Cloud Build when one is found.",
+          "explanation": "Custom polling reinvents what a Cloud Storage trigger provides natively, adding maintenance burden.",
+          "id": "c3"
+        },
+        {
+          "text": "Wire a GitHub push trigger to the Cloud Build configuration so engineers manually push an empty commit to the repo each Monday after confirming the data has arrived.",
+          "explanation": "Manual-push gating defeats the purpose of continuous training and adds human overhead.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "A Cloud Storage object-finalize trigger is the native Cloud Build mechanism for CT loops keyed on data arrival.\n\n**Why it works:** Cloud Build supports Cloud Storage triggers that fire when a new object is finalized in a watched bucket and prefix. The event payload populates substitutions like _DATA_URI, so the build step submits the Agent Platform Pipelines run against the exact partition that arrived - all without polling code.\n\n**Why the others don't work:**\n- Cloud Scheduler at a fixed time: decouples the trigger from data arrival, leading to wrong-partition runs when timing slips.\n- Cloud Run polling service: reimplements native trigger functionality and adds operational overhead.\n- Manual GitHub push: not continuous training - it is gated human action.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0224",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.2.2: Deploying models in continuous integration, continuous delivery, and continuous training (CI/CD/CT) pipelines (e.g., Cloud Build)."
+      ],
+      "services": [
+        "cloud-build",
+        "agent-platform",
+        "agent-platform-pipelines"
+      ],
+      "docs": "https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning",
+      "question": "You are designing the CI/CD/CT layout for a recommendation model. Three responsibilities must be separated cleanly: validating that new pipeline component code passes unit tests on every pull request, packaging and deploying a new pipeline artefact to the production project after the pull request is merged, and retraining the model on each fresh weekly data drop. You want to assign each responsibility to the correct pipeline stage, while minimizing operational overhead.\n\nWhat should you do?",
+      "tip": "CI tests code, CD ships artefacts, CT retrains on data. Which trigger naturally maps to each?",
+      "choices": [
+        {
+          "text": "Use Cloud Build with a pull-request trigger that runs unit tests as the CI stage, a merge-to-main trigger that compiles the KFP pipeline spec and uploads it to Cloud Storage as the CD stage, and a Cloud Storage object-finalize trigger on the weekly training-data bucket that submits an Agent Platform Pipelines run as the CT stage.",
+          "sequence": 1,
+          "explanation": "Each Cloud Build trigger type is matched to its natural CI, CD, or CT responsibility, keeping concerns separated.",
+          "id": "c1"
+        },
+        {
+          "text": "Use one Cloud Build trigger on every pull request to run unit tests, recompile the pipeline spec, deploy it to production, and submit a retraining run, so CI, CD, and CT all execute on every code change.",
+          "explanation": "Conflating CT with code-change events retrains the model on every PR, regardless of whether new data has arrived, wasting compute and obscuring failure causes.",
+          "id": "c2"
+        },
+        {
+          "text": "Use a single Cloud Scheduler weekly job that runs unit tests, compiles the pipeline, deploys it, and submits a retraining run, treating CI/CD/CT as one combined nightly job.",
+          "explanation": "A weekly schedule disconnects CI from code arrival - test feedback would be days late and CD would lag behind merges.",
+          "id": "c3"
+        },
+        {
+          "text": "Use Cloud Build pull-request triggers for CI, perform CD manually by having engineers run gcloud commands after merge, and run CT from a hand-edited Managed Service for Apache Airflow DAG that engineers update each week.",
+          "explanation": "Manual CD and hand-edited weekly DAGs are exactly the operational overhead the goal forbids.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Cloud Build's three trigger types map cleanly to the CI, CD, and CT responsibilities of an MLOps loop.\n\n**Why it works:** PR triggers gate code quality (CI), merge triggers ship artefacts (CD), and Cloud Storage data-arrival triggers fire retraining (CT) - each lifecycle event drives the right pipeline.\n\n**Why the others don't work:**\n- Single PR trigger doing everything: retrains on every code change irrespective of data state.\n- Single weekly Scheduler job: code feedback latency is unacceptable.\n- Manual CD and hand-edited DAG: high-touch and error-prone.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0225",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 3,
+      "domain": "Automating and Orchestrating ML Pipelines",
+      "skills": [
+        "5.2.2: Deploying models in continuous integration, continuous delivery, and continuous training (CI/CD/CT) pipelines (e.g., Cloud Build)."
+      ],
+      "services": [
+        "cloud-build",
+        "agent-platform",
+        "artifact-registry"
+      ],
+      "docs": "https://cloud.google.com/build/docs/build-config-file-schema",
+      "question": "You are hardening the CD stage for an ML model. After CT retrains the model and registers a candidate version in the Agent Platform Model Registry, the candidate must run an offline evaluation against a held-out test set, only be promoted to the production endpoint if its evaluation metrics meet a fixed threshold, and never overwrite the previous production version until traffic has been ramped up successfully. You want to express this in a Cloud Build pipeline triggered when a new Model Registry version is created, while minimizing operational overhead and minimizing risk to live traffic.\n\nWhat should you do?",
+      "tip": "Promotion has to be gated on metrics, and rollout has to preserve the prior version. Which Agent Platform deployment primitive provides ramping with a safe fallback?",
+      "choices": [
+        {
+          "text": "Configure Cloud Build to react to a Model Registry version-created Eventarc event, run an evaluation step that fails the build if test metrics fall below the threshold, then deploy the candidate to the existing endpoint with a gradual traffic split that starts at 10 percent and ramps to 100 percent only if monitoring stays clean, leaving the prior version available for instant rollback.",
+          "sequence": 1,
+          "explanation": "Metric-gated promotion combined with traffic splitting on an Agent Platform endpoint gives a safe, automated ramp with rollback.",
+          "id": "c1"
+        },
+        {
+          "text": "Configure Cloud Build on a nightly schedule to take whatever the latest Model Registry version is, deploy it to the production endpoint at 100 percent traffic immediately, and retain the previous endpoint configuration in a JSON file in Cloud Storage for manual rollback.",
+          "explanation": "Skipping evaluation gating and going straight to 100 percent traffic exposes users to a regressed model.",
+          "id": "c2"
+        },
+        {
+          "text": "Trigger Cloud Build on Model Registry version creation, evaluate the candidate, and if metrics pass, delete the existing production endpoint and create a new endpoint that points only at the candidate version.",
+          "explanation": "Deleting and recreating the endpoint loses the previous version's serving slot, causing downtime and removing the rollback target.",
+          "id": "c3"
+        },
+        {
+          "text": "Trigger Cloud Build on Model Registry version creation, deploy the candidate at 100 percent traffic, and run the offline evaluation in parallel after deployment, rolling back manually if metrics later fail.",
+          "explanation": "Evaluating after promotion means a failing model serves real traffic during the test window, violating the risk-minimization goal.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Eventarc-triggered Cloud Build with a metric gate and Agent Platform endpoint traffic splitting delivers automated, safe promotion.\n\n**Why it works:** Cloud Build subscribes to Model Registry version-created events via Eventarc, runs offline evaluation as a build step, and fails the build if metrics regress. On pass, Agent Platform's endpoint traffic splitting gradually shifts traffic to the candidate while keeping the prior version deployed for instant rollback.\n\n**Why the others don't work:**\n- Nightly 100 percent deploy: no metric gate and no progressive rollout.\n- Delete-and-recreate endpoint: loses the previous version and incurs downtime.\n- Evaluate-after-promote: production users see the regression before evaluation completes.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0226",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Scaling Prototypes into ML Models",
+      "skills": [
+        "3.2.3: Training models using different software development kits (SDKs) (e.g., Agent Platform custom training, Kubeflow on Google Kubernetes Engine [GKE], Agent Platform AutoML, and Tabular Workflows) and organizing training on Google Cloud."
+      ],
+      "services": [
+        "Agent Platform",
+        "Tabular Workflows",
+        "BigQuery"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/overview",
+      "question": "Your organization's risk team wants to train a churn prediction model on a 200 GB customer transactions table in BigQuery. The data scientists prototyped with Agent Platform AutoML tabular and got reasonable accuracy, but compliance requires that you control the feature transformation logic, persist the engineered features for audit, and substitute a custom architecture search space. You want to keep the operational simplicity of a managed end-to-end pipeline rather than authoring components from scratch, while retaining full visibility into each pipeline step. \n\nWhat should you do?",
+      "tip": "Think about the middle ground between fully opaque AutoML and a hand-written DSL pipeline.",
+      "choices": [
+        {
+          "text": "Run the End-to-End AutoML template from Tabular Workflows on Agent Platform Pipelines, point it at the BigQuery table, customize the feature transformation and architecture search configuration through the template parameters, and inspect each generated pipeline step in the Agent Platform Pipelines run view.",
+          "sequence": 1,
+          "explanation": "Tabular Workflows provides managed, configurable end-to-end pipeline templates that expose feature transformation, training, and architecture search as inspectable steps while remaining a managed offering.",
+          "id": "c1"
+        },
+        {
+          "text": "Continue using Agent Platform AutoML tabular through the Agent Platform console, enable the experimental feature attribution export, and rely on the AutoML training logs as the audit trail for the feature transformations applied internally.",
+          "explanation": "Plain AutoML tabular hides the feature transformation and architecture search behind a single managed call, which does not satisfy the requirement to control transformation logic or inspect each step.",
+          "id": "c2"
+        },
+        {
+          "text": "Author a custom Agent Platform Pipelines DSL pipeline from scratch with KFP v2 components for ingestion, transformation, training, and evaluation, and write your own neural architecture search component on top of Agent Platform custom training.",
+          "explanation": "Building from scratch gives full control but loses the managed simplicity the team wanted; Tabular Workflows already supplies the equivalent template steps without custom component authoring.",
+          "id": "c3"
+        },
+        {
+          "text": "Train the model with BigQuery ML BOOSTED_TREE_CLASSIFIER, export the trained model to Cloud Storage, and orchestrate retraining and evaluation through Managed Service for Apache Airflow with custom Python operators handling feature transformation.",
+          "explanation": "BigQuery ML plus Airflow does not provide a managed tabular training template with configurable architecture search; it shifts the workload to a different stack and abandons the Tabular Workflows benefits.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "The End-to-End AutoML template in Tabular Workflows is the right balance of managed and configurable for this scenario.\n\n**Why it works:** Tabular Workflows runs as an Agent Platform Pipelines pipeline whose steps (transform, train, search, evaluate) are inspectable and parameterizable, so the team gets feature-transformation control and audit visibility without writing the components themselves.\n\n**Why the others don't work:**\n- Plain AutoML: opaque, no per-step configuration or inspection.\n- Custom Pipelines DSL: re-implements what Tabular Workflows already provides as a managed template.\n- BigQuery ML plus Airflow: wrong tool family for the requirement and abandons the managed tabular template path.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0227",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Scaling Prototypes into ML Models",
+      "skills": [
+        "3.2.3: Training models using different software development kits (SDKs) (e.g., Agent Platform custom training, Kubeflow on Google Kubernetes Engine [GKE], Agent Platform AutoML, and Tabular Workflows) and organizing training on Google Cloud."
+      ],
+      "services": [
+        "Agent Platform",
+        "Tabular Workflows",
+        "BigQuery"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/overview",
+      "question": "You work for a national grocery chain with 1,400 stores. Your team needs to predict daily SKU-level demand for the next 14 days across roughly 30,000 SKUs, using three years of point-of-sale history plus promotion calendars and weather covariates stored in BigQuery. A separate model also needs to score 50 million customer rows for a high-cardinality, sparse loyalty propensity task where interpretability via feature importance is required. You want to use Tabular Workflows templates for both jobs and pick the most appropriate template for each, while minimizing custom modelling effort. \n\nWhat should you do?",
+      "tip": "Match each Tabular Workflows template to the structure of the data and the business problem.",
+      "choices": [
+        {
+          "text": "Use the Tabular Workflows Forecasting template for the 14-day SKU demand model with time-series, product hierarchy, and covariate inputs, and use the Tabular Workflows TabNet template for the high-cardinality, sparse loyalty propensity model where attentive feature selection provides interpretability.",
+          "sequence": 1,
+          "explanation": "Forecasting is the purpose-built template for hierarchical multi-horizon time-series demand, and TabNet's sequential attention mechanism handles high-cardinality sparse tabular data with built-in feature attribution.",
+          "id": "c1"
+        },
+        {
+          "text": "Use the Tabular Workflows Wide-and-Deep template for the SKU demand forecast by encoding the date as a categorical feature, and use the Tabular Workflows Forecasting template for the loyalty propensity model by treating the customer rows as a single long time series.",
+          "explanation": "Wide-and-Deep is a classification/regression template not designed for multi-horizon hierarchical forecasting, and forcing customer propensity into the Forecasting template misuses its time-series assumptions.",
+          "id": "c2"
+        },
+        {
+          "text": "Use the Tabular Workflows TabNet template for both jobs, treating the demand forecast as a per-SKU regression for day 14 only and the loyalty propensity as a binary classification, and rely on TabNet's attribution head for both interpretability needs.",
+          "explanation": "Collapsing a 14-day multi-horizon forecast into a single-day regression discards the forecasting structure; the Forecasting template is the correct tool for that side.",
+          "id": "c3"
+        },
+        {
+          "text": "Use the Tabular Workflows End-to-End AutoML template for both models with default settings, and rely on the post-training feature importance report for interpretability and the long-horizon AutoML option for the SKU demand forecast.",
+          "explanation": "End-to-End AutoML is generic; for hierarchical multi-horizon forecasting and for sparse high-cardinality interpretability, the dedicated Forecasting and TabNet templates are stronger fits.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Different Tabular Workflows templates are tuned for different data shapes, and matching them correctly avoids modelling rework.\n\n**Why it works:** The Forecasting template natively handles multi-horizon, hierarchical demand prediction with covariates, while TabNet specialises in high-cardinality sparse tabular data and provides attention-based feature attribution suitable for interpretability requirements.\n\n**Why the others don't work:**\n- Wide-and-Deep + Forecasting swap: misuses both templates relative to the underlying problem structure.\n- TabNet for both: loses the multi-horizon forecasting machinery for the demand problem.\n- End-to-End AutoML for both: generic baseline that ignores the dedicated templates designed for these exact shapes.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0228",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 3,
+      "domain": "Scaling Prototypes into ML Models",
+      "skills": [
+        "3.2.3: Training models using different software development kits (SDKs) (e.g., Agent Platform custom training, Kubeflow on Google Kubernetes Engine [GKE], Agent Platform AutoML, and Tabular Workflows) and organizing training on Google Cloud."
+      ],
+      "services": [
+        "Agent Platform",
+        "Tabular Workflows",
+        "Agent Platform Pipelines"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/overview",
+      "question": "You lead the ML platform team at an insurance company. Two product teams have approached you in the same week. Team A wants to train a claims-severity regression model on a 90 GB BigQuery table on a weekly cadence and asks for the fastest path to production with minimal pipeline maintenance. Team B is building a fraud detection model that requires a custom graph-feature extraction component backed by a proprietary Python library, three bespoke evaluation slices, and a manual approval gate before model registration. You want to recommend the right authoring approach for each team while minimizing long-term operational overhead. What should you do?\n\nWhat should you do?",
+      "tip": "Decide between a managed template and a custom DSL based on how much non-standard logic each team actually needs.",
+      "choices": [
+        {
+          "text": "Recommend that Team A use a Tabular Workflows End-to-End AutoML template scheduled on Agent Platform Pipelines, and recommend that Team B author a custom Agent Platform Pipelines pipeline with KFP v2 components for the graph-feature extraction, custom evaluation slices, and a manual approval step before Agent Platform Model Registry registration.",
+          "sequence": 1,
+          "explanation": "Team A's workload fits a standard managed template, while Team B's bespoke components and approval gate require the full DSL flexibility of custom Agent Platform Pipelines.",
+          "id": "c1"
+        },
+        {
+          "text": "Recommend that both teams author custom Agent Platform Pipelines pipelines from scratch with KFP v2 components so the platform has a single supported authoring pattern, and have Team A re-implement transformation, training, and evaluation components instead of using a Tabular Workflows template.",
+          "explanation": "Forcing Team A onto a custom DSL re-implements what Tabular Workflows already provides as a managed template and increases maintenance for no functional gain.",
+          "id": "c2"
+        },
+        {
+          "text": "Recommend that both teams use the Tabular Workflows End-to-End AutoML template, and have Team B inject their proprietary graph-feature library and approval gate by overriding the template's transformation parameters and adding a Pub/Sub notification at the end of the run.",
+          "explanation": "Tabular Workflows templates do not support arbitrary custom Python components or in-pipeline manual approval gates; squeezing Team B's requirements into the template fails to meet them.",
+          "id": "c3"
+        },
+        {
+          "text": "Recommend that Team A use BigQuery ML AUTOML_REGRESSOR scheduled with BigQuery scheduled queries, and recommend that Team B run their pipeline on Managed Service for Apache Airflow with a PythonOperator wrapping the proprietary graph library and a manual DAG-pause step before registration.",
+          "explanation": "BigQuery ML scheduled queries skip the Tabular Workflows benefits, and Airflow is a heterogeneous workflow tool not optimised for ML-step DAGs with native Agent Platform Model Registry integration.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Tabular Workflows and custom Agent Platform Pipelines occupy different points on the managed-vs-flexible curve, and the right choice depends on how much non-standard logic the team actually needs.\n\n**Why it works:** Team A's standard tabular regression with weekly retraining is exactly the workload Tabular Workflows templates are built for, minimising maintenance. Team B's proprietary library, custom slices, and approval gate exceed template configurability, so the full DSL of custom Agent Platform Pipelines is required.\n\n**Why the others don't work:**\n- Both custom: discards the managed template benefit for Team A and increases overhead.\n- Both Tabular Workflows: cannot accommodate Team B's bespoke components or in-pipeline approval gate.\n- BigQuery ML plus Airflow: wrong stack on both sides and abandons the Agent Platform Model Registry integration.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0229",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 1,
+      "domain": "Architecting Low-code AI Solutions",
+      "skills": [
+        "1.2.4: Optimizing Gemini-based applications for cost, latency, and availability."
+      ],
+      "services": [
+        "Gemini API",
+        "Agent Platform"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/generative-ai/docs/context-cache/context-cache-overview",
+      "question": "Your organization's customer support team built a Gemini-powered assistant that answers product questions. Each user request prepends the same 80,000-token product manual as context, and the assistant currently handles roughly 50,000 requests per day using Gemini 2.5 Pro. You want to reduce the per-request cost of repeatedly sending the manual, while keeping answer quality unchanged. What should you do?\n\nWhat should you do?",
+      "tip": "Repeated identical context across many requests is the textbook trigger for one specific Gemini API feature.",
+      "choices": [
+        {
+          "text": "Create a context cache on the Gemini API containing the 80,000-token product manual, set an appropriate TTL, and reference the cached content from each generateContent request so only the user query and a small system instruction are billed at full input rate.",
+          "sequence": 1,
+          "explanation": "Context caching bills cached tokens at a substantially lower rate than standard input tokens, which directly addresses the repeated-prefix cost pattern.",
+          "id": "c1"
+        },
+        {
+          "text": "Switch the assistant to Gemini 2.5 Flash and continue sending the full 80,000-token manual on every request, accepting the lower per-token rate as the cost optimisation.",
+          "explanation": "Switching model variants alone leaves the dominant cost driver, the repeated 80,000-token prefix, untouched and risks degrading answer quality on detailed product questions.",
+          "id": "c2"
+        },
+        {
+          "text": "Move all traffic to batch prediction on the Gemini API, submit requests in nightly batches that include the manual and the day's questions, and return answers to users the following morning.",
+          "explanation": "Batch prediction is cheaper but breaks the interactive support flow because users cannot wait until the next day for answers.",
+          "id": "c3"
+        },
+        {
+          "text": "Compress the product manual into a 2,000-token summary using a separate Gemini call, store the summary in Cloud Storage, and prepend the summary to every request instead of the full manual.",
+          "explanation": "Aggressive prompt compression discards detail the assistant needs for accurate answers, which violates the constraint of keeping answer quality unchanged.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Context caching is the purpose-built Gemini API feature for the exact pattern described: a large, identical context block reused across many requests.\n\n**Why it works:** A context cache stores the 80,000-token manual once and bills cached input tokens at a reduced rate; each request only pays full price for the small per-user query, dramatically lowering cost without changing the model or the prompt content the model sees.\n\n**Why the others don't work:**\n- Switching to Flash: leaves the repeated prefix as the cost driver and may reduce quality.\n- Batch prediction: incompatible with interactive customer support latency expectations.\n- Prompt compression: loses detail and violates the unchanged-quality constraint.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0230",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Architecting Low-code AI Solutions",
+      "skills": [
+        "1.2.4: Optimizing Gemini-based applications for cost, latency, and availability."
+      ],
+      "services": [
+        "Gemini API",
+        "Agent Platform"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/streaming",
+      "question": "You are building a Gemini-powered chat feature inside a web application used by customers in Europe. The application currently calls the Gemini 2.5 Pro generateContent endpoint in us-central1 and waits for the full response before rendering, which produces a perceived response time of 4 to 6 seconds for a typical 600-token answer. You want to reduce the time-to-first-token visible to users, while keeping the same model and answer length. What should you do?\n\nWhat should you do?",
+      "tip": "Two independent levers help here: where the model runs relative to the user, and how the response is delivered to the browser.",
+      "choices": [
+        {
+          "text": "Call the Gemini API in the europe-west4 regional endpoint and use streamGenerateContent so the application renders tokens to the browser as they are produced rather than waiting for the full response.",
+          "sequence": 1,
+          "explanation": "Regional placement removes transatlantic round-trip latency and streaming reduces perceived latency by displaying tokens as they are generated.",
+          "id": "c1"
+        },
+        {
+          "text": "Keep the call in us-central1, switch from Gemini 2.5 Pro to Gemini 2.5 Flash, and continue using the non-streaming generateContent endpoint so the full response is returned in one payload.",
+          "explanation": "The constraint requires keeping the same model, and a non-streaming response still forces the user to wait for the full answer before any text appears.",
+          "id": "c2"
+        },
+        {
+          "text": "Call the Gemini API in europe-west4, set maxOutputTokens to 100 to truncate responses, and continue using the non-streaming generateContent endpoint.",
+          "explanation": "Truncating outputs to 100 tokens changes the answer length, which violates the stated constraint of keeping the same answer length.",
+          "id": "c3"
+        },
+        {
+          "text": "Keep the call in us-central1 and add a Cloud CDN cache in front of the Gemini API endpoint so repeated chat completions are served from a European edge location.",
+          "explanation": "Cloud CDN cannot meaningfully cache personalised, dynamic chat completions because each request body is unique, so this does not improve time-to-first-token.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Combining a regional endpoint near the users with a streaming response addresses both network and rendering components of perceived latency.\n\n**Why it works:** Calling europe-west4 removes round-trip time to the United States, and streamGenerateContent emits server-sent tokens as the model produces them, so the user sees the first token in well under a second instead of after the full generation completes.\n\n**Why the others don't work:**\n- Flash with non-streaming in us-central1: changes the model and still blocks until completion.\n- maxOutputTokens=100: violates the same-answer-length constraint.\n- Cloud CDN: cannot cache unique per-user generative responses.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0231",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 3,
+      "domain": "Architecting Low-code AI Solutions",
+      "skills": [
+        "1.2.4: Optimizing Gemini-based applications for cost, latency, and availability."
+      ],
+      "services": [
+        "Gemini API",
+        "Agent Platform",
+        "Cloud Load Balancing"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/generative-ai/docs/provisioned-throughput/overview",
+      "question": "Your organization's platform team operates a production Gemini 2.5 Pro application that serves 400 requests per second during business hours and is on the critical path for a revenue-generating checkout flow. During a recent regional incident the on-demand Gemini API in us-central1 returned 429 and 503 errors for 12 minutes, causing checkout failures. You want to redesign the integration to keep the checkout flow available during regional incidents and predictable under sustained load, while minimizing changes to client code. What should you do?\n\nWhat should you do?",
+      "tip": "Sustained predictable load and incident survival map to two complementary Gemini API capabilities.",
+      "choices": [
+        {
+          "text": "Purchase Provisioned Throughput on the Gemini API for the steady-state load in two regions, front both regional endpoints with a global external Application Load Balancer that routes to the secondary region on health-check failure, and add exponential backoff with jitter in the client SDK.",
+          "sequence": 1,
+          "explanation": "Provisioned Throughput guarantees capacity for the steady load, multi-region failover behind a global load balancer survives a single-region incident, and client retries handle transient errors without code rewrites.",
+          "id": "c1"
+        },
+        {
+          "text": "Continue using on-demand Gemini quota in us-central1, raise the project quota by filing a quota increase request, and add aggressive client-side retries that immediately retry on any 429 or 503 response without backoff.",
+          "explanation": "On-demand quota does not protect against regional outages, and retries without backoff amplify load during incidents and can trigger further throttling.",
+          "id": "c2"
+        },
+        {
+          "text": "Deploy the application to Cloud Run in us-central1 and europe-west4 with on-demand Gemini API calls in each region, and rely on Cloud Run's built-in autoscaling to absorb traffic spikes during a Gemini regional incident.",
+          "explanation": "Cloud Run autoscaling does not give the application more Gemini capacity, so an upstream regional Gemini outage still fails requests regardless of how many Cloud Run instances are running.",
+          "id": "c3"
+        },
+        {
+          "text": "Switch the checkout flow to batch prediction on the Gemini API, submit checkout-decision requests in 5-minute batches, and have the client poll for batch completion before finalising the order.",
+          "explanation": "Batch prediction is fundamentally asynchronous and cannot serve a synchronous, latency-sensitive checkout flow.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Production availability for a Gemini-backed critical path requires capacity guarantees plus regional redundancy, layered with sensible client-side retry behaviour.\n\n**Why it works:** Provisioned Throughput reserves dedicated Gemini capacity so the workload is not subject to noisy-neighbour throttling at sustained 400 RPS, deploying it in two regions behind a global Application Load Balancer with health checks fails traffic over automatically during a regional incident, and exponential backoff with jitter handles transient errors without rewriting client logic.\n\n**Why the others don't work:**\n- On-demand with no-backoff retries: no regional protection and retry storms worsen incidents.\n- Cloud Run multi-region with on-demand Gemini: scales the wrong layer and leaves Gemini as the single point of failure.\n- Batch prediction: incompatible with synchronous checkout latency requirements.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0232",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Architecting Low-code AI Solutions",
+      "skills": [
+        "1.2.3: Building solutions and tuning models for specific use cases (e.g., Gemini, Imagen, Veo, and models as a service in Model Garden)."
+      ],
+      "services": [
+        "Veo",
+        "Imagen",
+        "Gemini",
+        "Agent Platform"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/generative-ai/docs/video/generate-videos",
+      "question": "Your organization's marketing team wants to produce a series of 6 to 8 second animated product teaser clips that will run as social media ads for a new line of athletic shoes. The team has a brand style guide and a set of approved still product photographs, and they want each clip to show the shoe in motion (rotating, being worn, splashing through water) generated from a short text description plus one of the reference photographs. The team has no video production budget and wants to iterate on dozens of variations per week, while minimizing implementation effort and avoiding training a custom model.\n\nWhat should you do?",
+      "tip": "Match the output modality (short generated video clips with motion) to the model that natively produces it from text and image conditioning.",
+      "choices": [
+        {
+          "text": "Call the Veo model on Agent Platform from a lightweight application, passing the text description and the reference product photograph as conditioning inputs, and write the returned MP4 clips to a Cloud Storage bucket for the marketing team to review.",
+          "sequence": 1,
+          "explanation": "Veo is Google's text-to-video and image-to-video generation model and natively produces short clips of the length and style described, accepting both a text prompt and a reference image as conditioning inputs.",
+          "id": "c1"
+        },
+        {
+          "text": "Call the Imagen model on Agent Platform with the text description and the reference photograph to generate a sequence of still frames per clip, then stitch the frames together into an MP4 with FFmpeg on Compute Engine before writing the clips to a Cloud Storage bucket.",
+          "explanation": "Imagen generates still images, not coherent motion. Stitching independently generated frames produces flicker rather than smooth animation, and requires substantial custom orchestration the team explicitly wants to avoid.",
+          "id": "c2"
+        },
+        {
+          "text": "Call the Gemini multimodal model on Agent Platform with the text description and the reference photograph and ask it to return a video clip, writing the response to a Cloud Storage bucket for the marketing team to review.",
+          "explanation": "Gemini is a multimodal reasoning model that accepts video as input but does not synthesise video output. It cannot generate the MP4 clips the team needs.",
+          "id": "c3"
+        },
+        {
+          "text": "Use Agent Platform custom training to fine-tune an open-source diffusion video model from Model Garden on the team's reference photographs, deploy the fine-tuned model to an Agent Platform endpoint, and call it from a lightweight application to generate the clips.",
+          "explanation": "Training a custom video diffusion model is exactly what the team wants to avoid. It requires a large training dataset, GPU budget, and ongoing maintenance, while Veo already produces the desired output out of the box.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Veo is the right choice for generating short, motion-rich video clips from a text prompt plus a reference image.\n\n**Why it works:** Veo is Google's purpose-built video generation model on Agent Platform. It produces 6 to 8 second clips conditioned on a text prompt and an optional reference image, which exactly matches the marketing team's iteration-heavy, no-training-budget workflow.\n\n**Why the others don't work:**\n- Imagen frames stitched together: Imagen generates still images with no temporal coherence, so stitched frames flicker and require custom pipeline work.\n- Gemini for video output: Gemini reasons over multimodal inputs but does not synthesise video, so it cannot return the clips.\n- Custom-tuned Model Garden diffusion model: Training and hosting a custom video model contradicts the minimal-effort constraint and is unnecessary when Veo covers the use case.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0233",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Architecting Low-code AI Solutions",
+      "skills": [
+        "1.2.2: Building applications using industry-specific APIs (e.g., Document AI API, Vision API, and Translate API)."
+      ],
+      "services": [
+        "Document AI",
+        "Cloud Storage",
+        "BigQuery"
+      ],
+      "docs": "https://cloud.google.com/document-ai/docs/processors-list",
+      "question": "Your organization's accounts payable team receives roughly 4,000 supplier invoices per week as PDFs in a shared Cloud Storage bucket. The invoices come from hundreds of suppliers and use varied layouts, and the team needs to extract a fixed set of fields, supplier name, invoice number, line item descriptions, line item amounts, total, and due date, and load them into a BigQuery table that drives the payment workflow. The team has no labelling budget for a custom model and wants accurate structured extraction with minimal implementation effort.\n\nWhat should you do?",
+      "tip": "Specialised, pretrained processors already understand common document types and emit the exact fields the team needs without training data.",
+      "choices": [
+        {
+          "text": "Send each PDF to the Document AI Invoice Parser processor, parse the returned entities for the required fields, and write the structured records to the BigQuery table that drives the payment workflow.",
+          "sequence": 1,
+          "explanation": "Invoice Parser is a pretrained Document AI specialised processor that recognises invoice fields including supplier, totals, dates, and line items across varied layouts, with no training data required.",
+          "id": "c1"
+        },
+        {
+          "text": "Send each PDF to the Document AI Document OCR processor to extract raw text, then use regular expressions in a Cloud Run service to identify the supplier name, totals, dates, and line items before writing the records to the BigQuery table.",
+          "explanation": "Document OCR returns unstructured text only. Hand-written regular expressions cannot reliably parse hundreds of supplier-specific invoice layouts, producing brittle extraction that contradicts the minimal-effort requirement.",
+          "id": "c2"
+        },
+        {
+          "text": "Train a Document AI Custom Extractor on a labelled set of the historical invoices, deploy the custom processor, and call it from a Cloud Run service that writes the extracted fields to the BigQuery table.",
+          "explanation": "A Custom Extractor needs a labelled training set the team does not have a budget to produce, and the pretrained Invoice Parser already covers the standard invoice fields the team needs.",
+          "id": "c3"
+        },
+        {
+          "text": "Send each PDF to the Vision API with the DOCUMENT_TEXT_DETECTION feature, then call Gemini on Agent Platform with the returned text and a prompt asking it to return the required fields as JSON before writing the records to the BigQuery table.",
+          "explanation": "DOCUMENT_TEXT_DETECTION plus an LLM is a generic pipeline that loses the layout-aware extraction Document AI provides. It is more expensive per invoice and less reliable than the purpose-built Invoice Parser.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "The Document AI Invoice Parser is a pretrained specialised processor that directly emits the fields the team needs.\n\n**Why it works:** Invoice Parser handles varied invoice layouts out of the box and returns supplier, totals, dates, and line items as structured entities, so the team can land records straight into BigQuery without labelling a training set or writing parsing logic.\n\n**Why the others don't work:**\n- Document OCR plus regex: returns raw text and forces brittle, layout-specific parsing.\n- Custom Extractor: requires labelled training data the team does not have, and duplicates capability the Invoice Parser already provides.\n- Vision API plus Gemini: a generic OCR-then-LLM pipeline that is less accurate and more expensive than the specialised processor.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0234",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 3,
+      "domain": "Architecting Low-code AI Solutions",
+      "skills": [
+        "1.2.2: Building applications using industry-specific APIs (e.g., Document AI API, Vision API, and Translate API)."
+      ],
+      "services": [
+        "Cloud Translation",
+        "Agent Platform",
+        "Gemini"
+      ],
+      "docs": "https://cloud.google.com/translate/docs/advanced/glossary",
+      "question": "Your organization's customer support team operates a live chat product in 14 languages. Agents type replies in English and the platform translates them to the customer's language before sending, with a target end-to-end latency under 300 ms per message. The product team has a list of about 600 brand and product names, model numbers, and feature names that must be preserved verbatim or translated to specific approved equivalents in each target language. The team wants accurate translation that respects the approved terminology, while minimizing implementation effort and operational overhead.\n\nWhat should you do?",
+      "tip": "There is a managed translation feature designed exactly for enforcing approved per-term translations across many target languages.",
+      "choices": [
+        {
+          "text": "Upload the approved brand and product term mappings as a glossary to the Cloud Translation Advanced API, and call the translateText method from the chat backend with the glossary specified for each agent message.",
+          "sequence": 1,
+          "explanation": "Cloud Translation Advanced supports glossaries that enforce approved translations for specified terms across all target languages, meets the latency budget, and requires no model training or custom infrastructure.",
+          "id": "c1"
+        },
+        {
+          "text": "Fine-tune a Gemini model on Agent Platform using a dataset of example agent messages paired with approved translations and the term mappings embedded in each example, deploy the tuned model to an endpoint, and call it from the chat backend for each agent message.",
+          "explanation": "Tuning Gemini for translation across 14 languages requires substantial labelled data per language, ongoing maintenance, and adds latency and cost compared to the managed Cloud Translation Advanced glossary feature.",
+          "id": "c2"
+        },
+        {
+          "text": "Call Gemini on Agent Platform from the chat backend with a system prompt that lists the 600 approved term mappings and instructs the model to translate the agent message into the customer's language while preserving those terms.",
+          "explanation": "A 600-entry glossary in every system prompt inflates token cost and latency on every message, and the model still does not strictly enforce term mappings the way the Translation API glossary feature does.",
+          "id": "c3"
+        },
+        {
+          "text": "Submit each agent message as a batch translation job to the Cloud Translation Advanced API with the glossary configured, and have the chat backend poll for the completed translation before sending the reply to the customer.",
+          "explanation": "Batch translation is asynchronous and aimed at large document sets. It cannot meet the 300 ms per message latency target for live chat replies.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "Cloud Translation Advanced glossaries are the purpose-built feature for enforcing approved terminology in real-time translation.\n\n**Why it works:** The glossary feature in Cloud Translation Advanced lets you upload term mappings once and reference them on each translateText call, enforcing the approved translations across all 14 target languages with sub-second latency and no model training.\n\n**Why the others don't work:**\n- Tuning Gemini per language: heavy labelling and operational overhead for an outcome the managed glossary already provides.\n- Gemini with the term list in the prompt: pays the token cost on every message and still does not strictly enforce term mappings.\n- Batch translation: asynchronous, cannot meet the 300 ms live-chat latency budget.",
+      "lastReviewed": "2026-05-08"
+    },
+    {
+      "id": "PMLE-2026-0235",
+      "type": "single-choice",
+      "format": "text",
+      "difficulty": 2,
+      "domain": "Serving and Scaling Models",
+      "skills": [
+        "4.1.4: Implementing model rollout strategies (e.g., A/B testing and canary deployments) to compare model versions."
+      ],
+      "services": [
+        "Agent Platform",
+        "Agent Platform Inference",
+        "BigQuery"
+      ],
+      "docs": "https://cloud.google.com/vertex-ai/docs/general/deployment#traffic-split",
+      "question": "You recently developed a new recommendation model, model_v2, that you believe will lift add-to-cart click-through rate over the production model, model_v1, which currently serves all traffic on an Agent Platform endpoint. Your data science lead has computed that you need approximately 200,000 prediction requests per variant to detect the expected lift with 95 percent confidence, and the endpoint serves about 1.2 million requests per day. You want to compare the two models on the live business metric and reach a statistically significant decision within a few days, while keeping the experiment design clean.\n\nWhat should you do?",
+      "tip": "An even traffic split between two deployed models on the same endpoint accumulates samples for both variants at the same rate, which is what powers a clean significance test.",
+      "choices": [
+        {
+          "text": "Deploy model_v2 to the same Agent Platform endpoint as model_v1, configure the traffic split as 50 percent model_v1 and 50 percent model_v2, log each prediction's variant assignment and resulting add-to-cart event to BigQuery, and run the significance test once both arms reach the target sample size.",
+          "sequence": 1,
+          "explanation": "An even 50/50 traffic split on a single Agent Platform endpoint randomises requests across the two model versions, accumulates samples for both arms at the same rate so the target sample size is reached quickly, and supports a clean post-hoc significance test on the logged outcomes.",
+          "id": "c1"
+        },
+        {
+          "text": "Deploy model_v2 to the same Agent Platform endpoint as model_v1 with a 5 percent traffic split to model_v2, monitor endpoint error rate and latency for one day, and if no regressions appear, shift traffic fully to model_v2.",
+          "explanation": "A 5 percent canary slice is designed to limit blast radius for a release, not to power a significance test. At 5 percent it would take weeks to accumulate 200,000 requests on model_v2, and the rollout described measures stability rather than the business metric.",
+          "id": "c2"
+        },
+        {
+          "text": "Deploy model_v2 to a second Agent Platform endpoint, route every incoming request to both endpoints in parallel from the application, log the model_v2 prediction without acting on it, and compare the shadow predictions against model_v1's outcomes.",
+          "explanation": "Shadow deployment evaluates model_v2 on offline metrics by replaying live inputs, but customers never see model_v2's recommendations, so add-to-cart click-through rate cannot be observed for the model_v2 arm.",
+          "id": "c3"
+        },
+        {
+          "text": "Deploy model_v2 to a separate Agent Platform endpoint and use Cloud Load Balancing to route traffic by user-agent header, sending mobile users to model_v2 and desktop users to model_v1, then compare add-to-cart click-through rate between the two cohorts.",
+          "explanation": "Splitting on user-agent confounds the model comparison with the device segment, so any observed difference cannot be attributed to the model. A valid A/B test requires randomised assignment between variants.",
+          "id": "c4"
+        }
+      ],
+      "explanation": "An even traffic split between two model versions deployed to the same endpoint is the standard A/B test pattern on Agent Platform.\n\n**Why it works:** Deploying both models to one endpoint with a 50/50 split randomises assignment per request, balances the rate at which each arm accumulates outcomes, and reaches the 200,000-per-arm sample size in roughly a day at 1.2 million requests per day, enabling a valid significance test on the logged business metric.\n\n**Why the others don't work:**\n- 5 percent canary: tuned for blast-radius control, not statistical power, and would take far too long to reach the sample size.\n- Shadow deployment: model_v2 predictions are never shown to users, so the live business metric for model_v2 cannot be measured.\n- User-agent split: confounds the experiment with device segment and breaks randomisation.",
+      "lastReviewed": "2026-05-08"
     }
   ],
   "predecessorCode": "PMLE-2025"
