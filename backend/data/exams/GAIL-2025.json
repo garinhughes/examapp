@@ -29,7 +29,7 @@
         {
           "id": "c2",
           "text": "A foundation model is a model that has been fine-tuned on a specific task, while a large language model is always used in its original pretrained state",
-          "explanation": "This reverses the definitions \u2014 foundation models are pretrained base models, and fine-tuning is a separate step applied to them."
+          "explanation": "This reverses the definitions - foundation models are pretrained base models, and fine-tuning is a separate step applied to them."
         },
         {
           "id": "c3",
@@ -43,7 +43,7 @@
         }
       ],
       "tip": "Consider what the word 'foundation' implies about the scope of these models.",
-      "explanation": "Foundation models are large pretrained models that serve as a base for many downstream tasks and can span modalities such as text, image, and audio. Large language models are a specific type of foundation model trained primarily on text.\n\n**Why it works:** The relationship is one of subset and superset \u2014 every LLM is a foundation model, but not every foundation model is an LLM.\n\n**Why the others don't work:**\n- Reversing fine-tuning definitions: foundation models are the pretrained base, not the fine-tuned variant.\n- Identical terms: LLMs are a specific subset.\n- Restricted modalities: both descriptions are incorrect.",
+      "explanation": "Foundation models are large pretrained models that serve as a base for many downstream tasks and can span modalities such as text, image, and audio. Large language models are a specific type of foundation model trained primarily on text.\n\n**Why it works:** The relationship is one of subset and superset - every LLM is a foundation model, but not every foundation model is an LLM.\n\n**Why the others don't work:**\n- Reversing fine-tuning definitions: foundation models are the pretrained base, not the fine-tuned variant.\n- Identical terms: LLMs are a specific subset.\n- Restricted modalities: both descriptions are incorrect.",
       "domain": "Fundamentals of gen AI",
       "difficulty": 1,
       "lastReviewed": "2026-04-28"

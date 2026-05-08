@@ -4339,7 +4339,7 @@
           "explanation": "M family instances use EBS-backed storage rather than high-speed local NVMe, which cannot match the millions of random IOPS the workload demands."
         }
       ],
-      "tip": "Think about what the workload is most constrained by \u2014 high-speed local disk I/O points to a specific EC2 family.",
+      "tip": "Think about what the workload is most constrained by - high-speed local disk I/O points to a specific EC2 family.",
       "explanation": "Storage optimized instances (I family) are purpose-built for workloads that require high, sequential read/write access or millions of random IOPS on local NVMe storage. A NoSQL database cluster performing millions of random disk operations per second is the canonical use case for this family.\n\n**Why it works:** The I family provides NVMe SSD instance storage with extremely low latency and high random IOPS, matching the database's access pattern.\n\n**Why the others don't work:**\n- Compute optimized (C family): focused on CPU throughput, not disk performance.\n- Accelerated computing (P family): GPU-based, designed for ML/graphics, not database I/O.\n- General purpose (M family): balanced resources backed by EBS cannot deliver the required local IOPS.",
       "domain": "Cloud Technology and Services",
       "difficulty": 1,
@@ -4400,7 +4400,7 @@
           "explanation": "M family balances compute, memory, and networking for typical web and application server workloads."
         }
       ],
-      "tip": "Focus on the primary resource each workload consumes most \u2014 CPU cycles, RAM, GPU parallelism, or balanced resources.",
+      "tip": "Focus on the primary resource each workload consumes most - CPU cycles, RAM, GPU parallelism, or balanced resources.",
       "explanation": "Each EC2 instance family is optimized for a different primary resource. Memory optimized (R) serves workloads that keep large datasets in RAM. Compute optimized (C) targets sustained CPU-intensive tasks like transcoding. Accelerated computing (P) provides GPUs for parallel ML training. General purpose (M) covers balanced workloads like standard web applications.",
       "domain": "Cloud Technology and Services",
       "difficulty": 1,
@@ -4476,16 +4476,16 @@
         {
           "id": "c3",
           "text": "Self-managed Docker Swarm on EC2, which uses native Docker orchestration across a cluster of EC2 instances with straightforward YAML-based service definitions.",
-          "explanation": "Self-managed Docker Swarm requires manual EC2 provisioning, cluster maintenance, and lacks native AWS integrations \u2014 increasing operational burden for an inexperienced team."
+          "explanation": "Self-managed Docker Swarm requires manual EC2 provisioning, cluster maintenance, and lacks native AWS integrations - increasing operational burden for an inexperienced team."
         },
         {
           "id": "c4",
           "text": "Amazon EC2 with user data scripts that pull and run Docker containers on startup, using an Auto Scaling group to scale the fleet.",
-          "explanation": "Running containers directly on EC2 with user data scripts provides no orchestration, health management, or scheduling \u2014 creating significant operational overhead without a real container management layer."
+          "explanation": "Running containers directly on EC2 with user data scripts provides no orchestration, health management, or scheduling - creating significant operational overhead without a real container management layer."
         }
       ],
       "tip": "Think about which AWS-native container service is designed for teams that want simplicity and deep AWS integrations without Kubernetes complexity.",
-      "explanation": "Amazon ECS is AWS's native container orchestration service built around simple task and service abstractions. It integrates natively with IAM roles for tasks, CloudWatch for logging and metrics, and Application Load Balancer for traffic routing \u2014 all without requiring knowledge of Kubernetes.\n\n**Why it works:** ECS uses straightforward AWS concepts familiar to any AWS user, with no control plane to manage.\n\n**Why the others don't work:**\n- Amazon EKS: valid container option but requires Kubernetes expertise the team does not have.\n- Docker Swarm on EC2: self-managed with no native AWS integrations, adding operational overhead.\n- EC2 with user data: no orchestration layer, no health checks, and high operational complexity.",
+      "explanation": "Amazon ECS is AWS's native container orchestration service built around simple task and service abstractions. It integrates natively with IAM roles for tasks, CloudWatch for logging and metrics, and Application Load Balancer for traffic routing - all without requiring knowledge of Kubernetes.\n\n**Why it works:** ECS uses straightforward AWS concepts familiar to any AWS user, with no control plane to manage.\n\n**Why the others don't work:**\n- Amazon EKS: valid container option but requires Kubernetes expertise the team does not have.\n- Docker Swarm on EC2: self-managed with no native AWS integrations, adding operational overhead.\n- EC2 with user data: no orchestration layer, no health checks, and high operational complexity.",
       "domain": "Cloud Technology and Services",
       "difficulty": 1,
       "lastReviewed": "2026-04-29"
@@ -4571,7 +4571,7 @@
         {
           "id": "c5",
           "text": "Both require you to package application code inside a Docker container image before deployment, using Amazon ECR as the container registry.",
-          "explanation": "Lambda can be deployed as ZIP packages or container images, but Docker container packaging is not a requirement for Lambda \u2014 it is required for Fargate."
+          "explanation": "Lambda can be deployed as ZIP packages or container images, but Docker container packaging is not a requirement for Lambda - it is required for Fargate."
         }
       ],
       "selectCount": 2,
@@ -4603,7 +4603,7 @@
         {
           "id": "c2",
           "text": "Dynamic scaling with a target tracking policy, which continuously adjusts instance count to maintain a target metric value such as 70% average CPU utilization across the fleet.",
-          "explanation": "Target tracking reacts to live metric changes, which introduces lag when scaling up before business hours \u2014 it cannot proactively prepare capacity for a known schedule."
+          "explanation": "Target tracking reacts to live metric changes, which introduces lag when scaling up before business hours - it cannot proactively prepare capacity for a known schedule."
         },
         {
           "id": "c3",
@@ -4706,7 +4706,7 @@
         {
           "id": "c2",
           "text": "Network Load Balancer, which operates at Layer 4 of the OSI model and routes traffic based on TCP/UDP connection attributes such as IP address and port, without inspecting the HTTP request path.",
-          "explanation": "Network Load Balancer works at the transport layer and does not inspect HTTP content such as URL paths \u2014 it cannot perform path-based routing."
+          "explanation": "Network Load Balancer works at the transport layer and does not inspect HTTP content such as URL paths - it cannot perform path-based routing."
         },
         {
           "id": "c3",
@@ -4767,7 +4767,7 @@
         }
       ],
       "selectCount": 2,
-      "tip": "Focus on what happens to network traffic \u2014 how it is directed and how its destination is determined \u2014 rather than storage, caching, or scaling capabilities.",
+      "tip": "Focus on what happens to network traffic - how it is directed and how its destination is determined - rather than storage, caching, or scaling capabilities.",
       "explanation": "Elastic Load Balancing serves two core purposes: distributing traffic across multiple healthy targets to improve throughput and resilience, and performing health checks to automatically route traffic away from unhealthy instances. Together these capabilities improve both performance and availability.\n\n**Why it works:** Traffic distribution prevents bottlenecks on individual instances, while health checks ensure users are only routed to instances that are functioning correctly.\n\n**Why the others don't work:**\n- Content caching: this is Amazon CloudFront's role, not a load balancer function.\n- Provisioning EC2 instances: this is Amazon EC2 Auto Scaling's role.\n- EBS volume encryption: managed by the EC2 service and AWS KMS, unrelated to load balancing.",
       "domain": "Cloud Technology and Services",
       "difficulty": 1,

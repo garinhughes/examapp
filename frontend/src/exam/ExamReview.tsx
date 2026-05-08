@@ -396,21 +396,21 @@ export function ExamReview() {
                 {item.q.explanation && (
                   <div className="mt-3 text-base">
                     <div className="p-2 rounded bg-muted/50 dark:bg-card text-foreground">
-                      <div className="flex items-start justify-between gap-2 sm:gap-4 flex-wrap">
-                        <div className="flex-1 min-w-0 pr-0 sm:pr-2"><strong>Explanation:</strong> <MarkdownText text={item.q.explanation} /></div>
-                        {item.q.docs && (
-                          <a href={item.q.docs} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 inline-flex items-center gap-2 px-3 py-1 rounded bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
-                            <ExternalLink className="w-4 h-4" />
-                            <span>Docs</span>
-                          </a>
-                        )}
-                      </div>
-                      {(item.q.domain || (Array.isArray(item.q.skills) && item.q.skills.length > 0)) && (
-                        <div className="mt-3 pt-2 border-t border-border/50 flex flex-col gap-0.5 text-xs">
-                          {item.q.domain && <span><span className="font-medium text-orange-500">Domain:</span> <span className="text-gray-600 dark:text-gray-400">{item.q.domain}</span></span>}
-                          {Array.isArray(item.q.skills) && item.q.skills.length > 0 && <span><span className="font-medium text-orange-500">Skill:</span> <span className="text-gray-600 dark:text-gray-400">{item.q.skills.join(', ')}</span></span>}
+                      {(item.q.domain || (Array.isArray(item.q.skills) && item.q.skills.length > 0) || item.q.docs) && (
+                        <div className="mb-2 pb-2 border-b border-border/50 flex items-start justify-between gap-2 sm:gap-4 flex-wrap">
+                          <div className="flex-1 min-w-0 flex flex-col gap-0.5 text-xs">
+                            {item.q.domain && <span><span className="font-medium text-orange-500">Domain:</span> <span className="text-gray-600 dark:text-gray-400">{item.q.domain}</span></span>}
+                            {Array.isArray(item.q.skills) && item.q.skills.length > 0 && <span><span className="font-medium text-orange-500">Skill:</span> <span className="text-gray-600 dark:text-gray-400">{item.q.skills.join(', ')}</span></span>}
+                          </div>
+                          {item.q.docs && (
+                            <a href={item.q.docs} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 inline-flex items-center gap-2 px-3 py-1 rounded bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
+                              <ExternalLink className="w-4 h-4" />
+                              <span>Docs</span>
+                            </a>
+                          )}
                         </div>
                       )}
+                      <div><strong>Explanation:</strong> <MarkdownText text={item.q.explanation} /></div>
                       {(item.q as any).image && <QuestionImage imageKey={(item.q as any).image} />}
                       {(item.q as any).diagram && <QuestionDiagram diagramKey={(item.q as any).diagram} />}
                     </div>

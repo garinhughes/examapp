@@ -245,6 +245,21 @@ export function AnalyticsView() {
         </div>
       )}
 
+      {!user && selected && (
+        <div className="mt-4 p-4 rounded-lg border border-border bg-card shadow-sm flex items-center justify-between gap-4 flex-wrap">
+          <p className="text-sm text-foreground">
+            <span className="font-semibold">Exam scores aren't saved for guests.</span>{' '}
+            Sign up free to track your score history, domain breakdowns, and progress over time.
+          </p>
+          <button
+            onClick={() => setRoute('pricing')}
+            className="flex-shrink-0 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+          >
+            Sign up free
+          </button>
+        </div>
+      )}
+
       {selected && (
         <div className="mt-4 space-y-4">
           {/* Score history chart */}

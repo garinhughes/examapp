@@ -14,7 +14,7 @@
     "SY0-701-0092", "SY0-701-0093", "SY0-701-0096", "SY0-701-0100", "SY0-701-0103", "SY0-701-0107", "SY0-701-0108", "SY0-701-0112"
   ],
   "featuredLabIds": ["comptia-firewall-rule-ordering", "comptia-iam-provisioning-workflow", "comptia-vulnerability-scan-triage", "comptia-incident-response-sequence"],
-  "realWorldValue": "The SY0-701 is the industry-standard entry credential for cybersecurity roles, satisfying DoD 8570 baseline requirements and recognised globally by employers. It validates hands-on skills across threat analysis, architecture, operations, and governance — making it the typical first certification for analysts, administrators, and junior security engineers.",
+  "realWorldValue": "The SY0-701 is the industry-standard entry credential for cybersecurity roles, satisfying DoD 8570 baseline requirements and recognised globally by employers. It validates hands-on skills across threat analysis, architecture, operations, and governance - making it the typical first certification for analysts, administrators, and junior security engineers.",
   "jobRoles": ["Security Analyst", "SOC Analyst", "IT Security Administrator", "Systems Administrator (Security Focus)", "Network Security Technician", "Junior Penetration Tester"],
   "questions": [
     {

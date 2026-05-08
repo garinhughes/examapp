@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import mermaid from 'mermaid'
 import { apiUrl } from '@/apiBase'
 import { ensureCloudIconPacks, detectProviders } from '@/lib/cloudIconPacks'
 
-let mermaidTheme: string | null = null
+let mermaidInitialised = false
 
 function ensureViewBox(svgStr: string): string {
   const parser = new DOMParser()
@@ -26,13 +27,6 @@ export function QuestionDiagram({ diagramKey }: { diagramKey: string }) {
   const [svg, setSvg] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
   const renderIdRef = useRef(0)
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
-
-  useEffect(() => {
-    const obs = new MutationObserver(() => setIsDark(document.documentElement.classList.contains('dark')))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -47,10 +41,9 @@ export function QuestionDiagram({ diagramKey }: { diagramKey: string }) {
       await ensureCloudIconPacks(providers)
       if (cancelled) return
 
-      const mTheme = isDark ? 'dark' : 'default'
-      if (mermaidTheme !== mTheme) {
-        mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: mTheme })
-        mermaidTheme = mTheme
+      if (!mermaidInitialised) {
+        mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'default' })
+        mermaidInitialised = true
       }
 
       const id = ++renderIdRef.current
@@ -65,7 +58,7 @@ export function QuestionDiagram({ diagramKey }: { diagramKey: string }) {
 
     load().catch(() => {})
     return () => { cancelled = true }
-  }, [diagramKey, isDark])
+  }, [diagramKey])
 
   const close = useCallback(() => setOpen(false), [])
 
@@ -82,16 +75,16 @@ export function QuestionDiagram({ diagramKey }: { diagramKey: string }) {
     <>
       <div className="mt-3">
         <div
-          className="w-full rounded-lg border border-border bg-card p-4 cursor-zoom-in overflow-hidden [&_svg]:w-full [&_svg]:h-auto"
+          className="w-full rounded-lg border border-border bg-white p-4 cursor-zoom-in overflow-hidden [&_svg]:w-full [&_svg]:h-auto"
           onClick={() => setOpen(true)}
           dangerouslySetInnerHTML={{ __html: svg }}
         />
         <p className="text-xs text-muted-foreground mt-1 text-center">Click to enlarge</p>
       </div>
 
-      {open && (
+      {open && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 p-4"
           onClick={close}
         >
           <button
@@ -102,12 +95,13 @@ export function QuestionDiagram({ diagramKey }: { diagramKey: string }) {
             <X className="w-5 h-5" />
           </button>
           <div
-            className="max-w-full max-h-[90vh] overflow-auto rounded-lg bg-zinc-900 p-6 [&_svg]:w-full [&_svg]:h-auto [&_svg_*]:stroke-white/80 [&_svg_text]:fill-white [&_svg_path]:stroke-white/60"
+            className="max-w-full max-h-[90vh] overflow-auto rounded-lg bg-white p-6 [&_svg]:w-full [&_svg]:h-auto"
             style={{ minWidth: 'min(90vw, 800px)' }}
             onClick={e => e.stopPropagation()}
             dangerouslySetInnerHTML={{ __html: svg }}
           />
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

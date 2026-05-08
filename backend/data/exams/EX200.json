@@ -261,7 +261,7 @@
         {
           "id": "c2",
           "text": "Run `script.sh > errors.log 2> /dev/null` to discard stdout and capture stderr.",
-          "explanation": "This inverts the streams \u2014 warnings are discarded and normal output is captured."
+          "explanation": "This inverts the streams - warnings are discarded and normal output is captured."
         },
         {
           "id": "c3",
@@ -759,7 +759,7 @@
       "skills": [
         "1.1.5: Log in and switch users in multiuser targets."
       ],
-      "question": "A systems administrator has logged into a RHEL 10 server as the unprivileged user `ops` and now needs to become root with root's full login environment \u2014 root's home directory, root's `PATH`, and the environment variables set in root's login shell files.\n\nWhich command produces a root shell with root's full login environment?",
+      "question": "A systems administrator has logged into a RHEL 10 server as the unprivileged user `ops` and now needs to become root with root's full login environment - root's home directory, root's `PATH`, and the environment variables set in root's login shell files.\n\nWhich command produces a root shell with root's full login environment?",
       "choices": [
         {
           "id": "c1",
@@ -816,7 +816,7 @@
         {
           "id": "c3",
           "text": "Run `su -c 'dnf install httpd'`",
-          "explanation": "`su -c` prompts for the target user's password \u2014 on RHEL that is the root password, not the operator's own."
+          "explanation": "`su -c` prompts for the target user's password - on RHEL that is the root password, not the operator's own."
         },
         {
           "id": "c4",
@@ -1756,7 +1756,7 @@
       "skills": [
         "1.1.10: List, set, and change standard ugo/rwx permissions."
       ],
-      "question": "The file `/etc/app/secret.conf` must end up with permissions `rw-r-----` \u2014 readable and writable by the owner, readable by the group, and inaccessible to others. The current permissions on the file are `rw-r--r--`\n\nStarting from that existing state, which TWO commands produce exactly the required permissions?",
+      "question": "The file `/etc/app/secret.conf` must end up with permissions `rw-r-----` - readable and writable by the owner, readable by the group, and inaccessible to others. The current permissions on the file are `rw-r--r--`\n\nStarting from that existing state, which TWO commands produce exactly the required permissions?",
       "choices": [
         {
           "id": "c1",

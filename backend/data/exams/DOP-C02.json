@@ -54,7 +54,7 @@
     "aws-guardduty-eventbridge-response",
     "aws-systems-manager-patch-baseline"
   ],
-  "realWorldValue": "The DOP-C02 validates senior-level expertise in automating and operating production AWS environments. It is recognised as one of the most demanding AWS professional credentials, covering CI/CD pipelines, IaC, resilience, observability, and security at scale \u2014 sought after for platform engineering, SRE, and DevSecOps roles.",
+  "realWorldValue": "The DOP-C02 validates senior-level expertise in automating and operating production AWS environments. It is recognised as one of the most demanding AWS professional credentials, covering CI/CD pipelines, IaC, resilience, observability, and security at scale - sought after for platform engineering, SRE, and DevSecOps roles.",
   "jobRoles": [
     "DevOps Engineer",
     "Platform Engineer",

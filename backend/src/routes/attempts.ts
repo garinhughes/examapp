@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { randomUUID } from 'crypto'
-import { loadExam, shuffleQuestions, normaliseQuestion } from '../examLoader.js'
+import { loadExam, shuffleQuestions, normaliseQuestion, getDomainBalancedQuestions } from '../examLoader.js'
 import { attemptsStore } from '../services/attemptsStore.js'
 import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS, isPaidTier } from '../catalog.js'
@@ -162,9 +162,14 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       filteredQuestions = filteredQuestions.filter((q: any) => domainFilter.includes(q.domain))
     }
 
-    // respect requested numQuestions if provided
+    // respect requested numQuestions if provided. Use domain-balanced sampling
+    // so the sample spreads across all domains rather than taking the first N
+    // from file order (which clusters by domain since questions are appended
+    // per-skill).
     const numQuestionsRequested = typeof body?.numQuestions === 'number' && body.numQuestions > 0 ? body.numQuestions : null
-    if (numQuestionsRequested) filteredQuestions = filteredQuestions.slice(0, numQuestionsRequested)
+    if (numQuestionsRequested && filteredQuestions.length > numQuestionsRequested) {
+      filteredQuestions = getDomainBalancedQuestions(filteredQuestions, numQuestionsRequested)
+    }
     } // end else (non-questionIds path)
 
     // If filtering produced no questions, return a clear error (don't create empty attempts)

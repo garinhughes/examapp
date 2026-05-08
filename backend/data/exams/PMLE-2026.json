@@ -99,7 +99,7 @@
         }
       ],
       "tip": "Consider what the label column values represent and which model type is designed for that kind of output.",
-      "explanation": "Logistic regression in BigQuery ML is used for binary classification tasks where the label is a discrete binary outcome. The query trains on a binary 'defaulted' column (0 or 1), making this a binary classification problem.\n\n**Why it works:** logistic_reg maps input features to a probability between 0 and 1, then assigns class labels based on a threshold.\n\n**Why the others don't work:**\n- Linear regression: predicts continuous numeric outputs, not discrete binary classes.\n- Clustering: unsupervised \u2014 uses no label column, groups data by similarity.\n- Time-series: requires a date/time column and uses ARIMA_PLUS; this scenario has no temporal structure.",
+      "explanation": "Logistic regression in BigQuery ML is used for binary classification tasks where the label is a discrete binary outcome. The query trains on a binary 'defaulted' column (0 or 1), making this a binary classification problem.\n\n**Why it works:** logistic_reg maps input features to a probability between 0 and 1, then assigns class labels based on a threshold.\n\n**Why the others don't work:**\n- Linear regression: predicts continuous numeric outputs, not discrete binary classes.\n- Clustering: unsupervised - uses no label column, groups data by similarity.\n- Time-series: requires a date/time column and uses ARIMA_PLUS; this scenario has no temporal structure.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 1,
       "lastReviewed": "2026-05-08"
@@ -140,7 +140,7 @@
         }
       ],
       "tip": "Think about which BigQuery ML model type is purpose-built for multi-series time-based prediction.",
-      "explanation": "ARIMA_PLUS is BigQuery ML's native time-series model. The time_series_id_col option allows a single model to produce separate forecasts for each depot without training one model per series.\n\n**Why it works:** ARIMA_PLUS automatically handles trend, seasonality, and holiday effects. ML.FORECAST returns predicted values per series queryable via standard SQL.\n\n**Why the others don't work:**\n- BOOSTED_TREE_REGRESSOR: can regress on tabular features but requires manual lag engineering and outputs only single-step predictions.\n- LINEAR_REG: lacks autocorrelation modelling; underfits seasonal patterns without heavy feature engineering.\n- KMEANS: unsupervised clustering \u2014 it does not forecast numeric outcomes.",
+      "explanation": "ARIMA_PLUS is BigQuery ML's native time-series model. The time_series_id_col option allows a single model to produce separate forecasts for each depot without training one model per series.\n\n**Why it works:** ARIMA_PLUS automatically handles trend, seasonality, and holiday effects. ML.FORECAST returns predicted values per series queryable via standard SQL.\n\n**Why the others don't work:**\n- BOOSTED_TREE_REGRESSOR: can regress on tabular features but requires manual lag engineering and outputs only single-step predictions.\n- LINEAR_REG: lacks autocorrelation modelling; underfits seasonal patterns without heavy feature engineering.\n- KMEANS: unsupervised clustering - it does not forecast numeric outcomes.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 2,
       "lastReviewed": "2026-05-08",
@@ -164,7 +164,7 @@
           "id": "c1",
           "text": "BigQuery ML trains models directly on data stored in BigQuery without requiring data exports or pipeline orchestration.",
           "sequence": 1,
-          "explanation": "Training in place is a core BigQuery ML advantage \u2014 no data movement, no ETL pipeline, no infrastructure to provision."
+          "explanation": "Training in place is a core BigQuery ML advantage - no data movement, no ETL pipeline, no infrastructure to provision."
         },
         {
           "id": "c2",
@@ -230,7 +230,7 @@
         }
       ],
       "tip": "Think about what option tells the model which column distinguishes one time series from another.",
-      "explanation": "ARIMA_PLUS supports multi-series forecasting through the `time_series_id_col` option. Without it, all rows are treated as a single series. Adding `time_series_id_col = 'store_id'` to OPTIONS \u2014 and including `store_id` in the SELECT \u2014 produces one forecast per store.\n\n**Why it works:** `time_series_id_col` partitions the training data by the identifier column, fitting a separate ARIMA model per unique value.\n\n**Why the others don't work:**\n- input_label_cols: a supervised learning option, not applicable to ARIMA_PLUS.\n- ARIMA_PLUS_XREG: adds regressors, but the missing fix is the series identifier option.\n- GROUP BY: would collapse time-step rows into aggregated rows, destroying the temporal structure.",
+      "explanation": "ARIMA_PLUS supports multi-series forecasting through the `time_series_id_col` option. Without it, all rows are treated as a single series. Adding `time_series_id_col = 'store_id'` to OPTIONS - and including `store_id` in the SELECT - produces one forecast per store.\n\n**Why it works:** `time_series_id_col` partitions the training data by the identifier column, fitting a separate ARIMA model per unique value.\n\n**Why the others don't work:**\n- input_label_cols: a supervised learning option, not applicable to ARIMA_PLUS.\n- ARIMA_PLUS_XREG: adds regressors, but the missing fix is the series identifier option.\n- GROUP BY: would collapse time-step rows into aggregated rows, destroying the temporal structure.",
       "id": "PMLE-2026-0004",
       "lastReviewed": "2026-05-08",
       "domain": "Architecting Low-Code AI Solutions",
@@ -361,7 +361,7 @@
       ],
       "selectCount": 2,
       "tip": "Focus on techniques that quantify or reduce feature influence based on predictive relevance to the target variable.",
-      "explanation": "L1 regularization implicitly selects features by driving weak coefficients to zero during training, while ML.FEATURE_IMPORTANCE provides explicit importance scores after training tree-based models. Both are natively supported within BigQuery ML.\n\n**Why they work:** L1 regularization is set via the l1_reg option in model OPTIONS; ML.FEATURE_IMPORTANCE queries a trained BOOSTED_TREE or RANDOM_FOREST model.\n\n**Why the others don't work:**\n- ML.PRINCIPAL_COMPONENTS: trains a separate PCA model \u2014 a different workflow, not an inline step.\n- ML.NGRAMS: text tokenisation, not importance-based selection.\n- INFORMATION_SCHEMA: schema metadata, not predictive relevance.",
+      "explanation": "L1 regularization implicitly selects features by driving weak coefficients to zero during training, while ML.FEATURE_IMPORTANCE provides explicit importance scores after training tree-based models. Both are natively supported within BigQuery ML.\n\n**Why they work:** L1 regularization is set via the l1_reg option in model OPTIONS; ML.FEATURE_IMPORTANCE queries a trained BOOSTED_TREE or RANDOM_FOREST model.\n\n**Why the others don't work:**\n- ML.PRINCIPAL_COMPONENTS: trains a separate PCA model - a different workflow, not an inline step.\n- ML.NGRAMS: text tokenisation, not importance-based selection.\n- INFORMATION_SCHEMA: schema metadata, not predictive relevance.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 3,
       "lastReviewed": "2026-05-08"
@@ -392,7 +392,7 @@
         {
           "id": "c3",
           "text": "The TRANSFORM clause allows ML.BUCKETIZE and ML.ONE_HOT_ENCODE to be applied as post-processing steps after the model generates predictions.",
-          "explanation": "TRANSFORM applies preprocessing at training time and again at prediction time \u2014 not post-processing. It runs before the model sees the data, not after predictions are made."
+          "explanation": "TRANSFORM applies preprocessing at training time and again at prediction time - not post-processing. It runs before the model sees the data, not after predictions are made."
         },
         {
           "id": "c4",
@@ -401,7 +401,7 @@
         }
       ],
       "tip": "Consider when in the model lifecycle the TRANSFORM clause executes and what that means for serving.",
-      "explanation": "The TRANSFORM clause encodes preprocessing logic inside the model artifact itself. When ML.PREDICT is called on new data, BigQuery ML automatically reapplies ML.BUCKETIZE, ML.ONE_HOT_ENCODE, and any other TRANSFORM steps \u2014 guaranteeing identical transformations in training and serving without any additional code.\n\n**Why it works:** Baking preprocessing into the model eliminates the risk of training-serving skew, which occurs when the serving pipeline applies different transformations than training.\n\n**Why the others don't work:**\n- Parallelism: not the purpose of TRANSFORM; BigQuery is already massively parallel.\n- Post-processing: TRANSFORM runs before model input, not after output.\n- Automatic feature selection: TRANSFORM applies user-defined transforms, not automated selection.",
+      "explanation": "The TRANSFORM clause encodes preprocessing logic inside the model artifact itself. When ML.PREDICT is called on new data, BigQuery ML automatically reapplies ML.BUCKETIZE, ML.ONE_HOT_ENCODE, and any other TRANSFORM steps - guaranteeing identical transformations in training and serving without any additional code.\n\n**Why it works:** Baking preprocessing into the model eliminates the risk of training-serving skew, which occurs when the serving pipeline applies different transformations than training.\n\n**Why the others don't work:**\n- Parallelism: not the purpose of TRANSFORM; BigQuery is already massively parallel.\n- Post-processing: TRANSFORM runs before model input, not after output.\n- Automatic feature selection: TRANSFORM applies user-defined transforms, not automated selection.",
       "id": "PMLE-2026-0008",
       "lastReviewed": "2026-05-08",
       "domain": "Architecting Low-Code AI Solutions",
@@ -484,7 +484,7 @@
         }
       ],
       "tip": "Consider which prediction function accepts a time horizon parameter and returns confidence intervals for future periods.",
-      "explanation": "ML.FORECAST is specifically designed for time-series models trained with ARIMA_PLUS. Calling ML.FORECAST(MODEL ..., STRUCT(12 AS horizon, 0.9 AS confidence_level)) returns 12 future weekly predictions per series, each with lower and upper confidence bounds.\n\n**Why it works:** ML.FORECAST encodes the forecasting logic natively \u2014 no input feature table is needed because ARIMA_PLUS projects from the trained model's learned state.\n\n**Why the others don't work:**\n- ML.PREDICT: incompatible with ARIMA_PLUS for future projections; requires an input table.\n- ML.EVALUATE: computes historical error metrics, not future predictions.\n- ML.EXPLAIN_PREDICT: feature attribution analysis, not future-period forecasting.",
+      "explanation": "ML.FORECAST is specifically designed for time-series models trained with ARIMA_PLUS. Calling ML.FORECAST(MODEL ..., STRUCT(12 AS horizon, 0.9 AS confidence_level)) returns 12 future weekly predictions per series, each with lower and upper confidence bounds.\n\n**Why it works:** ML.FORECAST encodes the forecasting logic natively - no input feature table is needed because ARIMA_PLUS projects from the trained model's learned state.\n\n**Why the others don't work:**\n- ML.PREDICT: incompatible with ARIMA_PLUS for future projections; requires an input table.\n- ML.EVALUATE: computes historical error metrics, not future predictions.\n- ML.EXPLAIN_PREDICT: feature attribution analysis, not future-period forecasting.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 2,
       "lastReviewed": "2026-05-08"
@@ -553,7 +553,7 @@
           "id": "c1",
           "text": "ML.PREDICT cannot generate future forecasts for ARIMA_PLUS models. ML.FORECAST must be used instead, with a HORIZON parameter specifying the number of future periods.",
           "sequence": 1,
-          "explanation": "ARIMA_PLUS uses ML.FORECAST for future predictions. ML.PREDICT is incompatible with ARIMA_PLUS for forward projection \u2014 it does not accept a horizon and cannot produce confidence intervals."
+          "explanation": "ARIMA_PLUS uses ML.FORECAST for future predictions. ML.PREDICT is incompatible with ARIMA_PLUS for forward projection - it does not accept a horizon and cannot produce confidence intervals."
         },
         {
           "id": "c2",
@@ -572,7 +572,7 @@
         }
       ],
       "tip": "Consider which BigQuery ML function is designed specifically for time-series models and future-period projection.",
-      "explanation": "ARIMA_PLUS models require ML.FORECAST for generating future predictions. The correct query uses `ML.FORECAST(MODEL ..., STRUCT(14 AS horizon, 0.9 AS confidence_level))` \u2014 no input table is needed because ARIMA_PLUS projects from its trained state.\n\n**Why it works:** ML.FORECAST is purpose-built for time-series models, accepts a HORIZON parameter, and returns confidence bounds alongside point forecasts.\n\n**Why the others don't work:**\n- Date filter: a secondary concern; the core error is using ML.PREDICT.\n- Column selection: a style issue, not the cause of the forecast failure.\n- Model reference format: unrelated to the function compatibility issue.",
+      "explanation": "ARIMA_PLUS models require ML.FORECAST for generating future predictions. The correct query uses `ML.FORECAST(MODEL ..., STRUCT(14 AS horizon, 0.9 AS confidence_level))` - no input table is needed because ARIMA_PLUS projects from its trained state.\n\n**Why it works:** ML.FORECAST is purpose-built for time-series models, accepts a HORIZON parameter, and returns confidence bounds alongside point forecasts.\n\n**Why the others don't work:**\n- Date filter: a secondary concern; the core error is using ML.PREDICT.\n- Column selection: a style issue, not the cause of the forecast failure.\n- Model reference format: unrelated to the function compatibility issue.",
       "id": "PMLE-2026-0012",
       "lastReviewed": "2026-05-08",
       "domain": "Architecting Low-Code AI Solutions",
@@ -642,7 +642,7 @@
         {
           "id": "c2",
           "text": "Agent Platform Custom Training with a TensorFlow DNN, using a pre-built container and Cloud Storage for data staging.",
-          "explanation": "Custom training with a DNN requires writing training code, selecting architecture, and tuning hyperparameters \u2014 none of which is feasible without ML engineers in a two-week window."
+          "explanation": "Custom training with a DNN requires writing training code, selecting architecture, and tuning hyperparameters - none of which is feasible without ML engineers in a two-week window."
         },
         {
           "id": "c3",
@@ -656,7 +656,7 @@
         }
       ],
       "tip": "Consider which option eliminates the need for ML engineering expertise while still producing a deployable model endpoint.",
-      "explanation": "Agent Platform AutoML Tabular is specifically designed for scenarios where ML expertise is limited and speed-to-deployment is critical. It handles the full pipeline \u2014 algorithm selection, preprocessing, tuning, and endpoint creation \u2014 through a managed interface.\n\n**Why it works:** AutoML Tabular requires only a labelled dataset and a training budget. It produces a deployable endpoint compatible with Agent Platform Prediction.\n\n**Why the others don't work:**\n- Custom Training DNN: requires ML engineering for code, architecture, and tuning.\n- Kubeflow on GKE: high infrastructure and engineering overhead.\n- BigQuery ML manual tuning: still requires ML expertise for hyperparameter configuration.",
+      "explanation": "Agent Platform AutoML Tabular is specifically designed for scenarios where ML expertise is limited and speed-to-deployment is critical. It handles the full pipeline - algorithm selection, preprocessing, tuning, and endpoint creation - through a managed interface.\n\n**Why it works:** AutoML Tabular requires only a labelled dataset and a training budget. It produces a deployable endpoint compatible with Agent Platform Prediction.\n\n**Why the others don't work:**\n- Custom Training DNN: requires ML engineering for code, architecture, and tuning.\n- Kubeflow on GKE: high infrastructure and engineering overhead.\n- BigQuery ML manual tuning: still requires ML expertise for hyperparameter configuration.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 2,
       "lastReviewed": "2026-05-08"
@@ -725,7 +725,7 @@
           "id": "c1",
           "text": "Add predefined_split_column_name='split' to job.run(), where the split column in the CSV contains the values 'TRAIN', 'VALIDATE', or 'TEST' for each row.",
           "sequence": 1,
-          "explanation": "predefined_split_column_name tells AutoML Tabular to use a column in the dataset to assign each row to train, validation, or test \u2014 enabling deterministic, reproducible splits."
+          "explanation": "predefined_split_column_name tells AutoML Tabular to use a column in the dataset to assign each row to train, validation, or test - enabling deterministic, reproducible splits."
         },
         {
           "id": "c2",
@@ -778,7 +778,7 @@
         {
           "id": "c3",
           "text": "It creates a BigQuery ML logistic regression model initialised with Gemini embeddings as input features for classification.",
-          "explanation": "This statement uses REMOTE WITH CONNECTION and references a Gemini endpoint, creating a remote generative model \u2014 not a logistic regression model that uses embeddings."
+          "explanation": "This statement uses REMOTE WITH CONNECTION and references a Gemini endpoint, creating a remote generative model - not a logistic regression model that uses embeddings."
         },
         {
           "id": "c4",
@@ -868,7 +868,7 @@
         {
           "id": "c4",
           "text": "Export the BigQuery tables to Cloud Storage in JSONL format before the first ML.GENERATE_TEXT inference call.",
-          "explanation": "Data export to Cloud Storage is not required. ML.GENERATE_TEXT reads from BigQuery tables in place \u2014 no data movement is needed."
+          "explanation": "Data export to Cloud Storage is not required. ML.GENERATE_TEXT reads from BigQuery tables in place - no data movement is needed."
         },
         {
           "id": "c5",
@@ -878,7 +878,7 @@
       ],
       "selectCount": 2,
       "tip": "Consider what infrastructure objects must exist in BigQuery before ML.GENERATE_TEXT can route calls to a Gemini endpoint.",
-      "explanation": "Two objects are required: a Cloud resource connection (which provides the authorised identity to call Vertex AI) and a remote model definition (which maps a BigQuery model name to the Gemini endpoint). Together they enable ML.GENERATE_TEXT to route SQL calls to Gemini.\n\n**Why they work:** The connection handles authentication and authorisation; the remote model provides the endpoint reference used by ML.GENERATE_TEXT.\n\n**Why the others don't work:**\n- Dedicated endpoint deployment: standard Gemini endpoints are already managed by Google \u2014 no separate deployment is needed.\n- Data export to Cloud Storage: inference reads from BigQuery tables directly.\n- VPC Service Controls: an optional security measure, not a basic prerequisite.",
+      "explanation": "Two objects are required: a Cloud resource connection (which provides the authorised identity to call Vertex AI) and a remote model definition (which maps a BigQuery model name to the Gemini endpoint). Together they enable ML.GENERATE_TEXT to route SQL calls to Gemini.\n\n**Why they work:** The connection handles authentication and authorisation; the remote model provides the endpoint reference used by ML.GENERATE_TEXT.\n\n**Why the others don't work:**\n- Dedicated endpoint deployment: standard Gemini endpoints are already managed by Google - no separate deployment is needed.\n- Data export to Cloud Storage: inference reads from BigQuery tables directly.\n- VPC Service Controls: an optional security measure, not a basic prerequisite.",
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 2,
       "lastReviewed": "2026-05-08",
@@ -906,7 +906,7 @@
         {
           "id": "c2",
           "text": "The prompt column alias must be named input_text rather than prompt for ML.GENERATE_TEXT to recognise it as the input to the Gemini model.",
-          "explanation": "ML.GENERATE_TEXT uses the prompt_col option or the column named prompt by convention, but a column naming issue would produce a different error \u2014 not an IAM permission error."
+          "explanation": "ML.GENERATE_TEXT uses the prompt_col option or the column named prompt by convention, but a column naming issue would produce a different error - not an IAM permission error."
         },
         {
           "id": "c3",
@@ -2813,7 +2813,7 @@
         {
           "id": "c2",
           "text": "The final nn.Linear layer outputs a single logit but BCELoss expects a probability, so the loss is always NaN, which PyTorch silently treats as zero and skips updates.",
-          "explanation": "BCELoss does expect values in [0, 1], so a missing sigmoid would cause NaN loss. However, NaN loss does not produce a converged-to-constant output \u2014 the model would exhibit erratic behaviour. The missing zero_grad is the MOST likely cause of the described symptom."
+          "explanation": "BCELoss does expect values in [0, 1], so a missing sigmoid would cause NaN loss. However, NaN loss does not produce a converged-to-constant output - the model would exhibit erratic behaviour. The missing zero_grad is the MOST likely cause of the described symptom."
         },
         {
           "id": "c3",
@@ -3191,8 +3191,8 @@
           "explanation": "Retry behaviour in KFP is configured through the task's `.set_retry()` method on the component invocation, not through the @component decorator itself."
         }
       ],
-      "tip": "Consider what the decorator produces \u2014 what does KFP receive and how does it execute this function in a pipeline?",
-      "explanation": "The `@component` decorator transforms the Python function into a KFP v2 component specification. It captures the function body, the `base_image`, and `packages_to_install`, then generates a container-based execution spec. When the pipeline runs, KFP instantiates the component in an isolated container, passes typed artifact references (Dataset, Metrics) through its I/O, and schedules it as an independent step.\n\n**Why it works:** The decorator abstracts containerisation \u2014 the author writes a Python function, and KFP handles the packaging and artifact plumbing.\n\n**Why the others don't work:**\n- Model Registry: stores model artifacts, not pipeline component definitions.\n- Beam transform: @component is KFP-specific; it does not interact with Dataflow.\n- Auto-retry: retry is set via `.set_retry()` on the task, not the decorator.",
+      "tip": "Consider what the decorator produces - what does KFP receive and how does it execute this function in a pipeline?",
+      "explanation": "The `@component` decorator transforms the Python function into a KFP v2 component specification. It captures the function body, the `base_image`, and `packages_to_install`, then generates a container-based execution spec. When the pipeline runs, KFP instantiates the component in an isolated container, passes typed artifact references (Dataset, Metrics) through its I/O, and schedules it as an independent step.\n\n**Why it works:** The decorator abstracts containerisation - the author writes a Python function, and KFP handles the packaging and artifact plumbing.\n\n**Why the others don't work:**\n- Model Registry: stores model artifacts, not pipeline component definitions.\n- Beam transform: @component is KFP-specific; it does not interact with Dataflow.\n- Auto-retry: retry is set via `.set_retry()` on the task, not the decorator.",
       "id": "PMLE-2026-0068",
       "lastReviewed": "2026-05-08",
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
@@ -3552,7 +3552,7 @@
         }
       ],
       "tip": "Consider what the context manager creates within an Agent Platform Experiment and how it scopes the logging calls.",
-      "explanation": "`aiplatform.start_run(run='trial-lr-0001')` creates a named Experiment Run under the active Experiment (`fraud-detection-v3`). All `log_params()` and `log_metrics()` calls inside the `with` block are associated exclusively with this run. Multiple runs can be created under the same Experiment and compared side-by-side in the Agent Platform console.\n\n**Why it works:** The Experiment Run is the unit of comparison \u2014 each run captures its own parameter set and metric values as a distinct, named trial.\n\n**Why the others don't work:**\n- Training job launch: start_run() is a logging context, not a job submission.\n- Model Registry entry: model registration requires an explicit upload/register call.\n- TensorBoard writer: Experiments and TensorBoard are separate; log_params writes to Experiments.",
+      "explanation": "`aiplatform.start_run(run='trial-lr-0001')` creates a named Experiment Run under the active Experiment (`fraud-detection-v3`). All `log_params()` and `log_metrics()` calls inside the `with` block are associated exclusively with this run. Multiple runs can be created under the same Experiment and compared side-by-side in the Agent Platform console.\n\n**Why it works:** The Experiment Run is the unit of comparison - each run captures its own parameter set and metric values as a distinct, named trial.\n\n**Why the others don't work:**\n- Training job launch: start_run() is a logging context, not a job submission.\n- Model Registry entry: model registration requires an explicit upload/register call.\n- TensorBoard writer: Experiments and TensorBoard are separate; log_params writes to Experiments.",
       "id": "PMLE-2026-0076",
       "lastReviewed": "2026-05-08",
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
@@ -4502,7 +4502,7 @@
           "explanation": "Shuffling batches rather than individual samples reduces randomness quality and does not address the I/O bottleneck. The low GPU utilisation is caused by sequential file reads, not shuffle overhead."
         }
       ],
-      "tip": "Low GPU utilisation in a tf.data pipeline typically indicates a data-loading bottleneck \u2014 consider how many shard files are being read simultaneously.",
+      "tip": "Low GPU utilisation in a tf.data pipeline typically indicates a data-loading bottleneck - consider how many shard files are being read simultaneously.",
       "explanation": "Using `flat_map` reads TFRecord shards one at a time. Replacing it with `interleave(cycle_length=N, num_parallel_calls=tf.data.AUTOTUNE)` reads from N shards concurrently, overlapping GCS I/O with GPU computation and dramatically reducing data starvation.\n\n**Why it works:** `interleave` with parallelism saturates the I/O pipeline, keeping the preprocessing and batching steps ahead of the GPU's consumption rate.\n\n**Why the others don't work:**\n- Larger batch: reduces per-step overhead but doesn't fix sequential shard reads.\n- cache(): 2 TB cannot fit in RAM; does not help epoch 1.\n- Batch-level shuffle: reduces data quality without addressing the I/O bottleneck.",
       "id": "PMLE-2026-0096",
       "lastReviewed": "2026-05-08",
@@ -4688,7 +4688,7 @@
         {
           "id": "c4",
           "text": "The parquet file format is not compatible with PyTorch DataLoader and must be converted to TFRecord format before it can be used in distributed training.",
-          "explanation": "PyTorch DataLoader can read parquet files using libraries like pandas or PyArrow. The format is not the issue \u2014 the memory exhaustion from loading 800 GB into a single DataFrame is the core problem."
+          "explanation": "PyTorch DataLoader can read parquet files using libraries like pandas or PyArrow. The format is not the issue - the memory exhaustion from loading 800 GB into a single DataFrame is the core problem."
         }
       ],
       "tip": "Consider what happens when to_dataframe() is called on a query returning hundreds of gigabytes of data.",
@@ -4865,7 +4865,7 @@
         {
           "id": "c2",
           "text": "The container_uri must use the gcr.io registry domain rather than the Artifact Registry domain for Agent Platform custom training jobs to recognise the image.",
-          "explanation": "Agent Platform fully supports Artifact Registry (pkg.dev) as a container source. The domain is not the issue \u2014 IAM permissions on the repository are the MOST likely cause."
+          "explanation": "Agent Platform fully supports Artifact Registry (pkg.dev) as a container source. The domain is not the issue - IAM permissions on the repository are the MOST likely cause."
         },
         {
           "id": "c3",
@@ -5451,10 +5451,10 @@
         {
           "id": "c4",
           "text": "Use retrieval-augmented generation by embedding the contract corpus and retrieving relevant clauses at inference time, eliminating the need for fine-tuning or additional few-shot examples.",
-          "explanation": "RAG is well-suited for grounding responses in retrieved context, but contract clause extraction requires the model to reliably identify, classify, and format specific clause types \u2014 a task that benefits from fine-tuning when few-shot performance is already at 0.61 F1 with specialised terminology."
+          "explanation": "RAG is well-suited for grounding responses in retrieved context, but contract clause extraction requires the model to reliably identify, classify, and format specific clause types - a task that benefits from fine-tuning when few-shot performance is already at 0.61 F1 with specialised terminology."
         }
       ],
-      "tip": "Consider when fine-tuning is justified over prompt engineering \u2014 look at the F1 score, domain specificity, output format requirements, and available training data.",
+      "tip": "Consider when fine-tuning is justified over prompt engineering - look at the F1 score, domain specificity, output format requirements, and available training data.",
       "explanation": "The combination of low few-shot F1 (0.61), highly specialised legal terminology, structured JSON output requirements, and 4,800 available training examples makes supervised fine-tuning the MOST justified next step. The base model lacks the domain-adapted representations needed to reliably extract and structure specialised legal concepts from raw contract text.\n\n**Why it works:** Supervised fine-tuning adjusts model weights on domain-specific input-output pairs, enabling the model to internalise extraction patterns and output format requirements that few-shot prompting cannot reliably convey.\n\n**Why the others don't work:**\n- More few-shot examples: marginal gain expected at 0.61 F1 with specialised terminology.\n- Larger base model: reasoning capacity is not the bottleneck; domain adaptation is.\n- RAG: retrieval grounds responses in text but does not teach the extraction and formatting behaviour needed.",
       "id": "PMLE-2026-0116",
       "lastReviewed": "2026-05-08",
@@ -5820,7 +5820,7 @@
         {
           "id": "c2",
           "text": "MultiWorkerMirroredStrategy performs asynchronous gradient updates between workers, so stale gradients from slower workers corrupt the parameter updates and reduce convergence quality.",
-          "explanation": "MultiWorkerMirroredStrategy uses synchronous all-reduce \u2014 all workers must finish their backward pass before parameters are updated. There are no stale gradients. Asynchronous updates are a feature of ParameterServerStrategy."
+          "explanation": "MultiWorkerMirroredStrategy uses synchronous all-reduce - all workers must finish their backward pass before parameters are updated. There are no stale gradients. Asynchronous updates are a feature of ParameterServerStrategy."
         },
         {
           "id": "c3",
@@ -5830,11 +5830,11 @@
         {
           "id": "c4",
           "text": "build_model() must be called inside strategy.scope() for each worker independently, rather than once, so each replica initialises its own model weights without synchronisation.",
-          "explanation": "Placing model construction inside strategy.scope() is exactly correct \u2014 it ensures weights are initialised consistently and replicated across all workers. This code is correct; the learning rate scaling is the issue."
+          "explanation": "Placing model construction inside strategy.scope() is exactly correct - it ensures weights are initialised consistently and replicated across all workers. This code is correct; the learning rate scaling is the issue."
         }
       ],
-      "tip": "When the number of workers increases, the effective batch size changes \u2014 consider what that means for the optimiser's step size.",
-      "explanation": "With MultiWorkerMirroredStrategy, each of 4 workers processes its own local batch per step, and gradients are all-reduced before updating shared weights. The global batch size is effectively 4x larger. The learning rate should scale proportionally (linear scaling rule) to maintain the same effective update magnitude \u2014 e.g., from 1e-3 to 4e-3.\n\n**Why it works:** Scaling the learning rate proportionally to the global batch size restores the gradient signal magnitude expected by the optimiser.\n\n**Why the others don't work:**\n- Asynchronous updates: MultiWorkerMirroredStrategy is synchronous; this describes ParameterServerStrategy.\n- steps_per_epoch x workers: overcounts steps; each worker already handles a shard.\n- Independent model init: strategy.scope() handles weight synchronisation correctly.",
+      "tip": "When the number of workers increases, the effective batch size changes - consider what that means for the optimiser's step size.",
+      "explanation": "With MultiWorkerMirroredStrategy, each of 4 workers processes its own local batch per step, and gradients are all-reduced before updating shared weights. The global batch size is effectively 4x larger. The learning rate should scale proportionally (linear scaling rule) to maintain the same effective update magnitude - e.g., from 1e-3 to 4e-3.\n\n**Why it works:** Scaling the learning rate proportionally to the global batch size restores the gradient signal magnitude expected by the optimiser.\n\n**Why the others don't work:**\n- Asynchronous updates: MultiWorkerMirroredStrategy is synchronous; this describes ParameterServerStrategy.\n- steps_per_epoch x workers: overcounts steps; each worker already handles a shard.\n- Independent model init: strategy.scope() handles weight synchronisation correctly.",
       "id": "PMLE-2026-0124",
       "lastReviewed": "2026-05-08",
       "domain": "Scaling Prototypes into ML Models",
@@ -6756,7 +6756,7 @@
           "explanation": "Recomputing statistics on each request batch would apply serving-time statistics rather than training-time statistics, introducing training-serving skew. Statistics must be loaded from the training artifact."
         }
       ],
-      "tip": "Consider how a Custom Prediction Routine accesses state that was computed during training \u2014 where must that state be stored and loaded from?",
+      "tip": "Consider how a Custom Prediction Routine accesses state that was computed during training - where must that state be stored and loaded from?",
       "explanation": "A Custom Prediction Routine loads model artifacts from the directory pointed to by the model artifact URI. The normalisation statistics (mean_, std_) must be serialised (e.g., as a numpy file or JSON) to that directory during training, then loaded in an overridden `load()` class method that sets `self.mean_` and `self.std_`. Without a `load()` override that reads these files, the attributes are undefined at serving time.\n\n**Why it works:** Overriding `load()` to read saved statistics from the artifact directory restores the serving-time state that was computed during training.\n\n**Why the others don't work:**\n- SklearnPredictor attribute restriction: the base class does not restrict custom attributes; the issue is loading, not definition.\n- super().preprocess(): the base class preprocess does not initialise user-defined statistics.\n- Per-request computation: normalisation must use training statistics, not per-request data.",
       "id": "PMLE-2026-0144",
       "lastReviewed": "2026-05-08",
@@ -7708,12 +7708,12 @@
         {
           "id": "c3",
           "text": "It prunes all Linear layer weights below a threshold of qint8, removing near-zero parameters and reducing the effective model size without any accuracy trade-off.",
-          "explanation": "Quantisation maps floating-point values to a discrete integer range \u2014 it does not prune or remove weights. Pruning is a separate technique that sets weights to zero and requires sparse execution support."
+          "explanation": "Quantisation maps floating-point values to a discrete integer range - it does not prune or remove weights. Pruning is a separate technique that sets weights to zero and requires sparse execution support."
         },
         {
           "id": "c4",
           "text": "It applies quantisation-aware training by inserting fake quantisation nodes into the computation graph, requiring a brief fine-tuning pass to recover accuracy.",
-          "explanation": "quantize_dynamic is post-training dynamic quantisation \u2014 it runs on an already-trained model with no fine-tuning required. Quantisation-aware training uses torch.quantization.prepare_qat() and requires a training loop."
+          "explanation": "quantize_dynamic is post-training dynamic quantisation - it runs on an already-trained model with no fine-tuning required. Quantisation-aware training uses torch.quantization.prepare_qat() and requires a training loop."
         }
       ],
       "tip": "Consider what 'dynamic' quantisation means compared to static quantisation and quantisation-aware training.",
@@ -7876,7 +7876,7 @@
           "id": "c1",
           "text": "SchemaGen regenerates a new schema from the current run's statistics on every execution, so the new feature is included in the schema before ExampleValidator checks against it, suppressing the anomaly.",
           "sequence": 1,
-          "explanation": "SchemaGen derives a schema from the current batch's statistics. If SchemaGen runs on each pipeline execution, the generated schema always reflects the current data \u2014 meaning ExampleValidator finds no mismatch because the schema already includes the new feature."
+          "explanation": "SchemaGen derives a schema from the current batch's statistics. If SchemaGen runs on each pipeline execution, the generated schema always reflects the current data - meaning ExampleValidator finds no mismatch because the schema already includes the new feature."
         },
         {
           "id": "c2",
@@ -7894,7 +7894,7 @@
           "explanation": "ExampleValidator compares current statistics against a provided schema immediately on each run. There is no minimum run count before anomaly detection activates."
         }
       ],
-      "tip": "Consider what schema ExampleValidator is validating against \u2014 is it fixed from the first run or regenerated each time?",
+      "tip": "Consider what schema ExampleValidator is validating against - is it fixed from the first run or regenerated each time?",
       "explanation": "The pipeline regenerates the schema via SchemaGen on every run, so by the time ExampleValidator runs, the schema already includes the new feature. To detect deviations from an approved baseline, the schema should be curated and frozen (e.g., stored in a schema file and loaded via ImportSchemaGen) rather than regenerated from the current data. ExampleValidator then validates incoming statistics against the stable, human-approved schema.\n\n**Why it works:** A fixed baseline schema captures the approved feature set. Any new or missing feature in incoming data produces an anomaly.\n\n**Why the others don't work:**\n- Split filtering: ExampleValidator validates all splits; split behaviour is not the cause.\n- CsvExampleGen caching: even with cached data, a regenerated schema would match it.\n- Three-run baseline: ExampleValidator has no such warm-up requirement.",
       "id": "PMLE-2026-0168",
       "lastReviewed": "2026-05-08",
@@ -8058,7 +8058,7 @@
         {
           "id": "c2",
           "text": "It runs the register_model step in parallel with evaluate_model and only forwards the model artifact if accuracy exceeds 0.85, merging the two outputs at the end.",
-          "explanation": "dsl.Condition gates sequential execution \u2014 it does not create parallel branches. register_model depends on evaluate_model's output and runs after evaluation, not in parallel."
+          "explanation": "dsl.Condition gates sequential execution - it does not create parallel branches. register_model depends on evaluate_model's output and runs after evaluation, not in parallel."
         },
         {
           "id": "c3",
@@ -8618,7 +8618,7 @@
           "id": "c1",
           "text": "It sorts the model list in descending order by creation time (the tilde prefix reverses the sort), so --limit=1 selects the most recently registered model version.",
           "sequence": 1,
-          "explanation": "In gcloud, the tilde (~) prefix on a sort key reverses the order to descending. Combined with --limit=1, this returns only the latest registered model \u2014 the one just produced by the training pipeline."
+          "explanation": "In gcloud, the tilde (~) prefix on a sort key reverses the order to descending. Combined with --limit=1, this returns only the latest registered model - the one just produced by the training pipeline."
         },
         {
           "id": "c2",
@@ -8637,7 +8637,7 @@
         }
       ],
       "tip": "In gcloud list commands, consider what the tilde prefix on a sort-by field name means for the ordering direction.",
-      "explanation": "In gcloud, `--sort-by=\"~fieldName\"` sorts results in descending order by that field. Prefixing `createTime` with `~` reverses the default ascending sort, placing the newest model first. Combined with `--limit=1`, this reliably retrieves the most recently registered model version \u2014 the one just produced by the completed training pipeline \u2014 without hardcoding a model ID.\n\n**Why it works:** The tilde inverts the sort, so the first result is the most recent. `--limit=1` then captures only that result as the deployment target.\n\n**Why the others don't work:**\n- Timestamp filter pattern: the tilde is a sort modifier, not a filter syntax element.\n- tilde_createTime field: no such field exists; the tilde modifies the sort direction for createTime.\n- Future-exclusion filter: the tilde has no filtering effect whatsoever.",
+      "explanation": "In gcloud, `--sort-by=\"~fieldName\"` sorts results in descending order by that field. Prefixing `createTime` with `~` reverses the default ascending sort, placing the newest model first. Combined with `--limit=1`, this reliably retrieves the most recently registered model version - the one just produced by the completed training pipeline - without hardcoding a model ID.\n\n**Why it works:** The tilde inverts the sort, so the first result is the most recent. `--limit=1` then captures only that result as the deployment target.\n\n**Why the others don't work:**\n- Timestamp filter pattern: the tilde is a sort modifier, not a filter syntax element.\n- tilde_createTime field: no such field exists; the tilde modifies the sort direction for createTime.\n- Future-exclusion filter: the tilde has no filtering effect whatsoever.",
       "id": "PMLE-2026-0184",
       "lastReviewed": "2026-05-08",
       "domain": "Automating and Orchestrating ML Pipelines",
@@ -9404,7 +9404,7 @@
           "explanation": "Model Monitoring runs as a separate job, not on the serving replicas themselves. logging_sampling_fraction controls what fraction of prediction requests are logged for analysis."
         }
       ],
-      "tip": "Consider what 'logging' refers to in the context of model monitoring \u2014 what is being sampled?",
+      "tip": "Consider what 'logging' refers to in the context of model monitoring - what is being sampled?",
       "explanation": "`logging_sampling_fraction=0.1` instructs Agent Platform Model Monitoring to log 10% of all prediction requests (inputs and outputs) to a BigQuery table. This sample is used to compute serving-time feature distributions, which are then compared against the training distribution to detect skew. Logging all requests (fraction=1.0) would be accurate but expensive; 10% is typically sufficient for statistically reliable drift detection.\n\n**Why it works:** A 10% sample provides enough data to compute feature distributions for skew detection at a fraction of the storage cost.\n\n**Why the others don't work:**\n- Skew threshold default: logging_sampling_fraction and skew_thresholds are separate config fields.\n- Feature subset sampling: all specified features are evaluated; the fraction applies to requests.\n- Replica-level monitoring: monitoring runs as a standalone job, not on serving replicas.",
       "id": "PMLE-2026-0200",
       "lastReviewed": "2026-05-08",

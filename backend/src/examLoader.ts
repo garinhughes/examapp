@@ -92,6 +92,7 @@ export interface Exam {
   featuredLabIds?: string[]
   realWorldValue?: string
   jobRoles?: string[]
+  showcaseQuestionIds?: (string | number)[]
 }
 
 /**
@@ -177,6 +178,7 @@ function parseExamJson(raw: any, code: string, s3VersionId?: string | null): Exa
     featuredLabIds: raw.featuredLabIds ?? undefined,
     realWorldValue: raw.realWorldValue ?? undefined,
     jobRoles: raw.jobRoles ?? undefined,
+    showcaseQuestionIds: raw.showcaseQuestionIds ?? undefined,
   }
 }
 
