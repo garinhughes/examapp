@@ -512,7 +512,7 @@
       "domain": "Fundamentals of gen AI",
       "difficulty": 2,
       "lastReviewed": "2026-04-28",
-      "diagram": "diagrams/gcp/GAIL-2025/MlLifecycleToolMapping.mmd"
+      "diagram": "diagrams/googlecloud/GAIL-2025/MlLifecycleToolMapping.mmd"
     },
     {
       "id": "GAIL-2025-0012",
@@ -1410,7 +1410,7 @@
       "domain": "Fundamentals of gen AI",
       "difficulty": 2,
       "lastReviewed": "2026-04-28",
-      "diagram": "diagrams/gcp/GAIL-2025/GcsVertexUnsupervisedClustering.mmd"
+      "diagram": "diagrams/googlecloud/GAIL-2025/GcsVertexUnsupervisedClustering.mmd"
     },
     {
       "id": "GAIL-2025-0031",
@@ -3919,7 +3919,7 @@
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
       "lastReviewed": "2026-04-28",
-      "diagram": "diagrams/gcp/GAIL-2025/RagOfferingsManagedVsCustom.mmd"
+      "diagram": "diagrams/googlecloud/GAIL-2025/RagOfferingsManagedVsCustom.mmd"
     },
     {
       "id": "GAIL-2025-0084",
@@ -4273,7 +4273,7 @@
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
       "lastReviewed": "2026-04-28",
-      "diagram": "diagrams/gcp/GAIL-2025/AgentToolingFunctionsAndDataStores.mmd"
+      "diagram": "diagrams/googlecloud/GAIL-2025/AgentToolingFunctionsAndDataStores.mmd"
     },
     {
       "id": "GAIL-2025-0092",
@@ -4456,7 +4456,7 @@
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
       "lastReviewed": "2026-04-28",
-      "diagram": "diagrams/gcp/GAIL-2025/AgentWithVisionAndLanguageApis.mmd"
+      "diagram": "diagrams/googlecloud/GAIL-2025/AgentWithVisionAndLanguageApis.mmd"
     },
     {
       "id": "GAIL-2025-0096",
@@ -4532,7 +4532,7 @@
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
       "lastReviewed": "2026-04-28",
-      "diagram": "diagrams/gcp/GAIL-2025/AiApiInputRouting.mmd"
+      "diagram": "diagrams/googlecloud/GAIL-2025/AiApiInputRouting.mmd"
     },
     {
       "id": "GAIL-2025-0097",
@@ -4570,7 +4570,7 @@
         }
       ],
       "tip": "Identify the studio surface tied to Google Cloud enterprise governance.",
-      "explanation": "Vertex AI Studio is the enterprise gen AI studio inside Google Cloud.\n\n**Why it works:** It integrates with Google Cloud IAM, billing, audit logging, and other enterprise controls, making it the right choice for production workloads.\n\n**Why the others don't work:**\n- Google AI Studio: prototyping-focused, outside the GCP governance perimeter.\n- Local notebook: not a studio surface.\n- Spreadsheet: not a studio.",
+      "explanation": "Vertex AI Studio is the enterprise gen AI studio inside Google Cloud.\n\n**Why it works:** It integrates with Google Cloud IAM, billing, audit logging, and other enterprise controls, making it the right choice for production workloads.\n\n**Why the others don't work:**\n- Google AI Studio: prototyping-focused, outside the Google Cloud governance perimeter.\n- Local notebook: not a studio surface.\n- Spreadsheet: not a studio.",
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
       "lastReviewed": "2026-04-28"
@@ -4611,7 +4611,7 @@
         }
       ],
       "tip": "Identify the studio surface optimised for fast individual prototyping outside enterprise setup.",
-      "explanation": "Google AI Studio is the fast individual-developer studio for Gemini prototyping.\n\n**Why it works:** It removes the Google Cloud project, billing, and IAM setup overhead, making it the fastest path for individual experimentation.\n\n**Why the others don't work:**\n- Vertex AI Studio: requires GCP project setup.\n- Custom AKS cluster: high overhead.\n- CLI without UI: not a studio.",
+      "explanation": "Google AI Studio is the fast individual-developer studio for Gemini prototyping.\n\n**Why it works:** It removes the Google Cloud project, billing, and IAM setup overhead, making it the fastest path for individual experimentation.\n\n**Why the others don't work:**\n- Vertex AI Studio: requires Google Cloud project setup.\n- Custom AKS cluster: high overhead.\n- CLI without UI: not a studio.",
       "domain": "Google Cloud's gen AI offerings",
       "difficulty": 1,
       "lastReviewed": "2026-04-28"
@@ -5887,7 +5887,7 @@
       "domain": "Techniques to improve gen AI model output",
       "difficulty": 1,
       "lastReviewed": "2026-04-28",
-      "diagram": "diagrams/gcp/GAIL-2025/RagFirstPartyGroundingPipeline.mmd"
+      "diagram": "diagrams/googlecloud/GAIL-2025/RagFirstPartyGroundingPipeline.mmd"
     },
     {
       "id": "GAIL-2025-0126",

@@ -543,7 +543,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
         const code = (e.code || '').toUpperCase()
         if (title.includes('AWS') || code.startsWith('AWS')) prov = 'AWS'
         else if (title.includes('AZURE') || code.startsWith('AZ')) prov = 'AZURE'
-        else if (title.includes('GCP') || title.includes('GOOGLE') || code.startsWith('GCP')) prov = 'GCP'
+        else if (title.includes('GCP') || title.includes('GOOGLE') || code.startsWith('GCP')) prov = 'Google Cloud'
         else if (typeof e.code === 'string' && e.code.includes('-')) prov = e.code.split('-')[0].toUpperCase()
         else prov = 'OTHER'
       }

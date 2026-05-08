@@ -42,7 +42,12 @@ const PROVIDER_LOGOS: Record<string, ProviderMeta> = {
   gcp: {
     logo: '/logos/google.svg',
     logoHref: 'https://cloud.google.com/',
-    displayName: 'GCP',
+    displayName: 'Google Cloud',
+  },
+  googlecloud: {
+    logo: '/logos/google.svg',
+    logoHref: 'https://cloud.google.com/',
+    displayName: 'Google Cloud',
   },
 }
 

@@ -615,7 +615,7 @@
       "domain": "Architecting Low-Code AI Solutions",
       "difficulty": 1,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/VisionStorageFunctions.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/VisionStorageFunctions.mmd"
     },
     {
       "id": "PMLE-2025-0014",
@@ -2099,7 +2099,7 @@
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/GcsToVertexTraining.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/GcsToVertexTraining.mmd"
     },
     {
       "id": "PMLE-2025-0046",
@@ -2453,7 +2453,7 @@
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/PubSubDataflowBigQuery.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/PubSubDataflowBigQuery.mmd"
     },
     {
       "id": "PMLE-2025-0054",
@@ -2609,7 +2609,7 @@
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/PreprocessingToolsMatching.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/PreprocessingToolsMatching.mmd"
     },
     {
       "id": "PMLE-2025-0057",
@@ -2652,7 +2652,7 @@
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/FeatureStoreConsolidation.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/FeatureStoreConsolidation.mmd"
     },
     {
       "id": "PMLE-2025-0058",
@@ -2695,7 +2695,7 @@
       "domain": "Collaborating Within and Across Teams to Manage Data and Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/FeatureStoreOnlineServing.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/FeatureStoreOnlineServing.mmd"
     },
     {
       "id": "PMLE-2025-0059",
@@ -5004,7 +5004,7 @@
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 1,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/BigQueryTrainingData.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/BigQueryTrainingData.mmd"
     },
     {
       "id": "PMLE-2025-0110",
@@ -5181,7 +5181,7 @@
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/CsvDataflowToBigQuery.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/CsvDataflowToBigQuery.mmd"
     },
     {
       "id": "PMLE-2025-0114",
@@ -5224,7 +5224,7 @@
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/HadoopLiftShiftDataproc.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/HadoopLiftShiftDataproc.mmd"
     },
     {
       "id": "PMLE-2025-0115",
@@ -5275,7 +5275,7 @@
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/DatastreamCdcBigQuery.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/DatastreamCdcBigQuery.mmd"
     },
     {
       "id": "PMLE-2025-0116",
@@ -6482,7 +6482,7 @@
       "domain": "Scaling Prototypes into ML Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/ReductionServerGpuTraining.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/ReductionServerGpuTraining.mmd"
     },
     {
       "id": "PMLE-2025-0142",
@@ -6658,7 +6658,7 @@
       "domain": "Serving and Scaling Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/BigQueryBatchPrediction.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/BigQueryBatchPrediction.mmd"
     },
     {
       "id": "PMLE-2025-0146",
@@ -6701,7 +6701,7 @@
       "domain": "Serving and Scaling Models",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/BigQueryMlRemoteModel.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/BigQueryMlRemoteModel.mmd"
     },
     {
       "id": "PMLE-2025-0147",
@@ -6795,7 +6795,7 @@
       "domain": "Serving and Scaling Models",
       "difficulty": 1,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/PubSubRunInferenceBigQuery.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/PubSubRunInferenceBigQuery.mmd"
     },
     {
       "id": "PMLE-2025-0149",
@@ -7205,7 +7205,7 @@
       "domain": "Serving and Scaling Models",
       "difficulty": 1,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/EndpointTrafficSplit.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/EndpointTrafficSplit.mmd"
     },
     {
       "id": "PMLE-2025-0158",
@@ -8375,7 +8375,7 @@
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/PipelineConditionalRegistration.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/PipelineConditionalRegistration.mmd"
     },
     {
       "id": "PMLE-2025-0183",
@@ -8510,7 +8510,7 @@
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/FeatureStoreSkewFix.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/FeatureStoreSkewFix.mmd"
     },
     {
       "id": "PMLE-2025-0186",
@@ -8710,7 +8710,7 @@
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 2,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/MlflowOnGke.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/MlflowOnGke.mmd"
     },
     {
       "id": "PMLE-2025-0190",
@@ -8912,7 +8912,7 @@
       "domain": "Automating and Orchestrating ML Pipelines",
       "difficulty": 1,
       "lastReviewed": "2026-04-29",
-      "diagram": "diagrams/gcp/PMLE-2025/CloudBuildVertexPipelines.mmd"
+      "diagram": "diagrams/googlecloud/PMLE-2025/CloudBuildVertexPipelines.mmd"
     },
     {
       "id": "PMLE-2025-0194",

@@ -4,7 +4,7 @@ import { apiUrl } from '@/apiBase'
 import { icons as logosIconsJson } from '@iconify-json/logos'
 
 const loadedPacks = new Set<string>()
-const KNOWN_PROVIDERS = ['aws', 'azure', 'gcp', 'general'] as const
+const KNOWN_PROVIDERS = ['aws', 'azure', 'gcp', 'googlecloud', 'general'] as const
 
 // Register the bundled logos pack (docker, mysql, linux, terraform, etc.) once at module load.
 // Uses prefix 'logos' so diagrams reference icons as icon:logos:docker-icon etc.
@@ -13,7 +13,7 @@ mermaid.registerIconPacks([{ name: logosIconsJson.prefix, icons: logosIconsJson 
 /**
  * Detects provider prefixes referenced in a mermaid diagram string.
  * e.g. "icon:aws:ec2" and "icon:logos:docker-icon" → ['aws']
- * ('logos' is already bundled; 'aws'/'azure'/'gcp'/'general' are fetched from S3)
+ * ('logos' is already bundled; 'aws'/'azure'/'gcp'/'googlecloud'/'general' are fetched from S3)
  */
 export function detectProviders(diagramCode: string): string[] {
   const found = new Set<string>()

@@ -28,14 +28,70 @@ const onlyProvider = process.argv.includes('--provider')
 
 // ── SVG parsing ──────────────────────────────────────────────────────────────
 
+/**
+ * Inline CSS classes defined in <defs><style> into per-element attributes.
+ * The new (post-2026 rebrand) Google Cloud SVGs all share the same class names
+ * (st0, st1, ...). When iconify packs them and mermaid renders multiple icons
+ * inline on one page, the CSS namespaces collide and fills disappear (icons
+ * render as black squares). Inlining the classes makes each icon standalone.
+ *
+ * Returns SVG content with:
+ *   - <defs><style>...</style></defs> removed
+ *   - class="stN" replaced with the matching CSS declarations as attributes
+ */
+function inlineCssClasses(svgContent) {
+  const styleMatch = svgContent.match(/<style[^>]*>([\s\S]*?)<\/style>/i)
+  if (!styleMatch) return svgContent
+
+  // Parse CSS rules — handles single (.st1{...}), multi (.cls-1,.cls-2{...}),
+  // and cascading rules (later rules merge into the same class).
+  const rules = {}   // className -> { property: value, ... }
+  const ruleRegex = /([^{}]+)\{([^}]*)\}/g
+  let m
+  while ((m = ruleRegex.exec(styleMatch[1])) !== null) {
+    const [, selectors, decls] = m
+    const props = {}
+    for (const decl of decls.split(';')) {
+      const [k, v] = decl.split(':').map(s => s && s.trim())
+      if (k && v) props[k] = v
+    }
+    // Apply this rule's properties to every class selector mentioned
+    for (const sel of selectors.split(',')) {
+      const cls = sel.trim().replace(/^\./, '')
+      if (!cls || /[^a-zA-Z0-9_-]/.test(cls)) continue   // skip non-class selectors
+      rules[cls] = { ...(rules[cls] || {}), ...props }
+    }
+  }
+
+  // Strip the entire <defs> block if it now contains only the <style> we processed
+  // (most Google Cloud SVGs have <defs><style>...</style></defs> with nothing else)
+  let cleaned = svgContent.replace(/<defs[^>]*>\s*<style[^>]*>[\s\S]*?<\/style>\s*<\/defs>/i, '')
+  // Fallback: just strip the <style> block if it sits outside <defs>
+  cleaned = cleaned.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+
+  // Replace class="stN" with inline attributes
+  cleaned = cleaned.replace(/class="([^"]+)"/g, (full, classList) => {
+    const classes = classList.split(/\s+/)
+    const props = {}
+    for (const c of classes) {
+      if (rules[c]) Object.assign(props, rules[c])
+    }
+    if (!Object.keys(props).length) return full   // unknown class, leave as-is
+    return Object.entries(props).map(([k, v]) => `${k}="${v}"`).join(' ')
+  })
+
+  return cleaned
+}
+
 function extractIconifyData(svgContent) {
-  const viewBoxMatch = svgContent.match(/viewBox="0 0 ([\d.]+)\s+([\d.]+)"/)
-  const widthMatch = svgContent.match(/\s(?:width)="([\d.]+)(?:px)?"/)
+  const inlined = inlineCssClasses(svgContent)
+  const viewBoxMatch = inlined.match(/viewBox="0 0 ([\d.]+)\s+([\d.]+)"/)
+  const widthMatch = inlined.match(/\s(?:width)="([\d.]+)(?:px)?"/)
   const w = viewBoxMatch ? parseFloat(viewBoxMatch[1]) : widthMatch ? parseFloat(widthMatch[1]) : 24
   const h = viewBoxMatch ? parseFloat(viewBoxMatch[2]) : w
 
   // Extract everything between the opening <svg ...> and closing </svg>
-  const bodyMatch = svgContent.match(/<svg[^>]*>([\s\S]*)<\/svg>\s*$/)
+  const bodyMatch = inlined.match(/<svg[^>]*>([\s\S]*)<\/svg>\s*$/)
   const body = bodyMatch ? bodyMatch[1].trim() : ''
   return { body, width: Math.round(w), height: Math.round(h) }
 }
@@ -74,6 +130,25 @@ function gcpIconName(filePath) {
   return normalise(basename(filePath, '.svg'))
 }
 
+// Google Cloud (post-2026 rebrand) source layout:
+//   googlecloud_icons/category-icons/Category Icons/<Name>/SVG/<NameNoSpaces>-512-color[-rgb].svg
+//   googlecloud_icons/core-products-icons/Unique Icons/<Name>/SVG/<NameNoSpaces>-512-color[-rgb].svg
+// Use the directory two levels up (the human-readable name) instead of the camelCase filename.
+function googlecloudIconName(filePath) {
+  const parts = filePath.split('/')
+  // …/<Human Name>/SVG/<file>.svg → parts[-3] is the human name
+  const humanName = parts[parts.length - 3]
+  if (!humanName) return null
+  // Replace separators, collapse whitespace, lowercase, strip non-alphanumerics
+  return humanName
+    .replace(/[_&]/g, ' ')
+    .replace(/\s+/g, '-')
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
 // ── Walk helpers ──────────────────────────────────────────────────────────────
 
 function walkSvgs(dir) {
@@ -108,6 +183,24 @@ const PROVIDERS = {
     nameFn: gcpIconName,
     prefix: 'gcp',
   },
+  googlecloud: {
+    srcDir: join(ICONS_BASE, 'googlecloud_icons'),
+    nameFn: googlecloudIconName,
+    prefix: 'googlecloud',
+    // Carry these specific product icons over from the legacy gcp_icons dir
+    // so diagrams that reference them keep their product-level specificity.
+    // (The 2026 official Google Cloud icon set only ships 45 curated icons.)
+    mergeFrom: {
+      srcDir: join(ICONS_BASE, 'gcp_icons/svg'),
+      nameFn: gcpIconName,
+      include: [
+        'artifact-registry', 'automl', 'bigtable', 'cloud-build',
+        'cloud-functions', 'cloud-generic', 'cloud-translation-api',
+        'dataflow', 'dataplex', 'datastream', 'document-ai',
+        'firestore', 'pubsub', 'text-to-speech', 'transfer', 'transfer-appliance',
+      ],
+    },
+  },
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -120,7 +213,7 @@ function addIcon(pack, tmpDir, name, filePath) {
   try { symlinkSync(filePath, dest) } catch { /* already exists */ }
 }
 
-function processProvider(key, { srcDir, nameFn, fallbackNameFn, prefix }) {
+function processProvider(key, { srcDir, nameFn, fallbackNameFn, prefix, mergeFrom }) {
   console.log(`\n=== ${key.toUpperCase()} ===`)
   const svgFiles = walkSvgs(srcDir)
   console.log(`  Found ${svgFiles.length} SVG files`)
@@ -161,7 +254,24 @@ function processProvider(key, { srcDir, nameFn, fallbackNameFn, prefix }) {
     }
   }
 
-  console.log(`  → ${Object.keys(pack.icons).length} unique icons`)
+  // Merge carryover icons from another provider's source dir
+  if (mergeFrom) {
+    const { srcDir: mSrc, nameFn: mFn, include } = mergeFrom
+    const mergedSvgs = walkSvgs(mSrc)
+    let merged = 0
+    for (const filePath of mergedSvgs) {
+      const name = mFn(filePath)
+      if (!include.includes(name)) continue
+      if (pack.icons[name]) continue   // don't overwrite native icons
+      addIcon(pack, tmpDir, name, filePath)
+      merged++
+    }
+    console.log(`  + merged ${merged}/${include.length} carryover icons from ${mSrc}`)
+    const missing = include.filter(n => !pack.icons[n])
+    if (missing.length) console.log(`  ⚠ carryover not found: ${missing.join(', ')}`)
+  }
+
+  console.log(`  → ${Object.keys(pack.icons).length} total icons`)
 
   // Write pack.json
   const packPath = join(TMP, `${key}-pack.json`)

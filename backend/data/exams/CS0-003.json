@@ -3905,7 +3905,7 @@
         "CVE",
         "AWS",
         "Azure",
-        "GCP"
+        "Google Cloud"
       ],
       "skills": [
         "2.2: Given a scenario, analyze output from vulnerability assessment tools."
@@ -3966,7 +3966,7 @@
         },
         {
           "id": "c5",
-          "text": "Multi-cloud posture report identifying misconfigurations across AWS, Azure, and GCP",
+          "text": "Multi-cloud posture report identifying misconfigurations across AWS, Azure, and Google Cloud",
           "explanation": "Scout Suite reads cloud APIs to generate an HTML report of posture issues across providers."
         },
         {
@@ -3991,7 +3991,7 @@
         "Pacu",
         "AWS",
         "Azure",
-        "GCP"
+        "Google Cloud"
       ],
       "skills": [
         "2.2: Given a scenario, analyze output from vulnerability assessment tools."
@@ -4018,7 +4018,7 @@
         {
           "id": "c1",
           "text": "Read-only multi-cloud security posture review that produces an HTML report of risky configurations",
-          "explanation": "Scout Suite enumerates AWS, Azure, and GCP configuration via read-only APIs and builds an HTML report."
+          "explanation": "Scout Suite enumerates AWS, Azure, and Google Cloud configuration via read-only APIs and builds an HTML report."
         },
         {
           "id": "c2",
