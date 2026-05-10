@@ -174,7 +174,7 @@ const PROVIDERS = {
     prefix: 'aws',
   },
   azure: {
-    srcDir: join(ICONS_BASE, 'azure_icons/Azure_Public_Service_Icons/Icons'),
+    srcDir: join(ICONS_BASE, 'azure_icons'),
     nameFn: azureIconName,
     prefix: 'azure',
   },
