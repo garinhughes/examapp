@@ -185,8 +185,8 @@ resource "aws_cloudfront_vpc_origin" "api" {
 }
 
 # ---------- API CloudFront distribution ----------
-# Proxies api.domain → ALB; CloudFront injects X-Origin-Verify so the
-# ALB SG can be locked to CloudFront IPs only (no direct public access).
+# Proxies api.domain → ALB via VPC origin; CloudFront injects X-Origin-Verify so
+# only requests through CloudFront pass the backend's auth check.
 resource "aws_cloudfront_distribution" "api" {
   enabled         = true
   is_ipv6_enabled = true
@@ -264,3 +264,4 @@ output "api_cloudfront_domain_name" {
 output "api_cloudfront_hosted_zone_id" {
   value = aws_cloudfront_distribution.api.hosted_zone_id
 }
+

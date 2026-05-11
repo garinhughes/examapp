@@ -312,21 +312,21 @@ variable "stripe_coupon_id_discount" {
 }
 
 # ---------- security groups ----------
-data "aws_vpc" "this" {
-  id = var.vpc_id
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project}-alb-"
-  description = "ALB - allow HTTP from CloudFront VPC origin"
+  description = "ALB - allow HTTP from CloudFront only"
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "HTTP from CloudFront VPC origin"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.this.cidr_block]
+    description     = "HTTP from CloudFront managed prefix list"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
   }
 
   egress {
