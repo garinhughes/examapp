@@ -322,9 +322,9 @@ resource "aws_security_group" "alb" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "HTTPS from CloudFront"
-    from_port       = 443
-    to_port         = 443
+    description     = "HTTP from CloudFront"
+    from_port       = 80
+    to_port         = 80
     protocol        = "tcp"
     prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
   }
@@ -400,13 +400,12 @@ resource "aws_lb_listener" "http" {
   port              = 80
   protocol          = "HTTP"
 
+  # CloudFront terminates TLS for the user and connects to the ALB over HTTP
+  # (HTTPS between CF and ALB breaks due to cert/hostname mismatch on the ELB domain).
+  # The ALB SG only allows CloudFront IPs so this is safe.
   default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend.arn
   }
 }
 
