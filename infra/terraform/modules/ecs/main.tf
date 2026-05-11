@@ -312,21 +312,21 @@ variable "stripe_coupon_id_discount" {
 }
 
 # ---------- security groups ----------
-data "aws_ec2_managed_prefix_list" "cloudfront" {
-  name = "com.amazonaws.global.cloudfront.origin-facing"
+data "aws_vpc" "this" {
+  id = var.vpc_id
 }
 
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project}-alb-"
-  description = "ALB - allow HTTPS from CloudFront only"
+  description = "ALB - allow HTTP from CloudFront VPC origin"
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "HTTP from CloudFront"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+    description = "HTTP from CloudFront VPC origin"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.this.cidr_block]
   }
 
   egress {
@@ -367,7 +367,7 @@ resource "aws_security_group" "ecs" {
 # ---------- ALB ----------
 resource "aws_lb" "this" {
   name               = "${var.project}-alb"
-  internal           = false
+  internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = var.public_subnet_ids
@@ -703,6 +703,10 @@ output "backend_service_name" {
 
 output "cluster_name" {
   value = aws_ecs_cluster.this.name
+}
+
+output "alb_arn" {
+  value = aws_lb.this.arn
 }
 
 output "alb_arn_suffix" {

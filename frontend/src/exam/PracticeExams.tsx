@@ -1,4 +1,5 @@
 import { useExam } from './ExamContext'
+import { ApiErrorMessage } from '@/components/ApiErrorMessage'
 import { ProviderLogo } from '@/components/ProviderLogo'
 import { Info, ChevronDown, ChevronRight, Search, BookOpen, SlidersHorizontal, ListOrdered, TrendingUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -29,7 +30,7 @@ function formatRelative(iso: string | null): string {
 export function PracticeExams() {
   const {
     providers, examStarted, anySavedExam, selected, savedProgress,
-    setupExamFromMeta,
+    setupExamFromMeta, examsFetchError,
     user, authLoading, authFetch,
   } = useExam()
   const tour = useTourContext()
@@ -71,6 +72,8 @@ export function PracticeExams() {
   //     tour.start()
   //   }
   // }, [authLoading, user, providers.length])
+
+  if (examsFetchError) return <ApiErrorMessage context="practice exams" />
 
   return (
     <div className="mb-6">

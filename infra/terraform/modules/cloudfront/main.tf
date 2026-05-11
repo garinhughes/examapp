@@ -40,6 +40,12 @@ variable "alb_dns_name" {
   default     = ""
 }
 
+variable "alb_arn" {
+  description = "ALB ARN for the CloudFront VPC origin"
+  type        = string
+  default     = ""
+}
+
 variable "api_acm_certificate_arn" {
   description = "ACM cert ARN in us-east-1 for api.domain CloudFront distribution"
   type        = string
@@ -160,6 +166,24 @@ resource "aws_s3_bucket_policy" "site" {
   })
 }
 
+# ---------- CloudFront VPC origin — ALB ----------
+resource "aws_cloudfront_vpc_origin" "api" {
+  vpc_origin_endpoint_config {
+    name                   = "${var.project}-api-alb"
+    arn                    = var.alb_arn
+    http_port              = 80
+    https_port             = 443
+    origin_protocol_policy = "http-only"
+
+    origin_ssl_protocols {
+      items    = ["TLSv1.2"]
+      quantity = 1
+    }
+  }
+
+  tags = { Project = var.project }
+}
+
 # ---------- API CloudFront distribution ----------
 # Proxies api.domain → ALB; CloudFront injects X-Origin-Verify so the
 # ALB SG can be locked to CloudFront IPs only (no direct public access).
@@ -174,11 +198,8 @@ resource "aws_cloudfront_distribution" "api" {
     domain_name = var.alb_dns_name
     origin_id   = "ALB"
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+    vpc_origin_config {
+      vpc_origin_id = aws_cloudfront_vpc_origin.api.id
     }
 
     custom_header {

@@ -139,6 +139,7 @@ module "cloudfront" {
   s3_bucket_arn                  = module.s3.bucket_arn
   s3_bucket_regional_domain_name = module.s3.bucket_regional_domain_name
   alb_dns_name                   = module.ecs.alb_dns_name
+  alb_arn                        = module.ecs.alb_arn
   api_acm_certificate_arn        = module.acm.api_cloudfront_certificate_arn
   origin_verify_secret           = module.secretsmanager.cron_secret_value
 

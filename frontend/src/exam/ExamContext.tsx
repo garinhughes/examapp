@@ -87,6 +87,7 @@ export interface ExamContextType {
   setShowTipMap: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   paused: boolean
   setPaused: React.Dispatch<React.SetStateAction<boolean>>
+  examsFetchError: boolean
   lastError: string | null
   setLastError: React.Dispatch<React.SetStateAction<string | null>>
   toasts: Array<{ id: string; msg: string; type?: 'info' | 'error' }>
@@ -326,6 +327,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   const [showTipMap, setShowTipMap] = useState<Record<string, boolean>>({})
   const [attemptId, setAttemptId] = useState<string | null>(null)
   const [paused, setPaused] = useState<boolean>(false)
+  const [examsFetchError, setExamsFetchError] = useState(false)
   const [lastError, setLastError] = useState<string | null>(null)
   const [toasts, setToasts] = useState<Array<{ id: string; msg: string; type?: 'info' | 'error' }>>([])
   const showToast = (msg: string, type: 'info' | 'error' = 'info') => {
@@ -1151,7 +1153,10 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     fetch(apiUrl('/exams'))
       .then((r) => r.json())
       .then(setExams)
-      .catch((e) => { console.error(e); setLastError(String(e)) })
+      .catch((e) => {
+        captureError(e, { tags: { surface: 'practice-exams', action: 'fetch-list' } })
+        setExamsFetchError(true)
+      })
   }, [])
 
   // Fetch available services when exam selected
@@ -1450,7 +1455,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     exams, selected, setSelected, selectedMeta, providers, questions, setQuestions, examTier, userTier, examTotalAvailable, examLimited, examShowcase, trialDaysRemaining,
     dark, setDark, themePreset, setThemePreset, customCorrect, setCustomCorrect, customCorrect2, setCustomCorrect2, customIncorrect, setCustomIncorrect, customIncorrect2, setCustomIncorrect2,
     selectedAnswers, setSelectedAnswers, multiSelectPending, setMultiSelectPending, matchingAnswers, setMatchingAnswers, orderingAnswers, setOrderingAnswers, flaggedQuestions, setFlaggedQuestions, currentQuestionIndex, setCurrentQuestionIndex,
-    showSubmitConfirm, setShowSubmitConfirm, showCompleteEarlyConfirm, setShowCompleteEarlyConfirm, showCancelConfirm, setShowCancelConfirm, setSavedExamVersion, showTipMap, setShowTipMap, paused, setPaused, lastError, setLastError, toasts, setToasts, showToast, showConfetti, setShowConfetti, rewardModal, setRewardModal, mobileOpen, setMobileOpen, ratingTarget, setRatingTarget,
+    showSubmitConfirm, setShowSubmitConfirm, showCompleteEarlyConfirm, setShowCompleteEarlyConfirm, showCancelConfirm, setShowCancelConfirm, setSavedExamVersion, showTipMap, setShowTipMap, paused, setPaused, examsFetchError, lastError, setLastError, toasts, setToasts, showToast, showConfetti, setShowConfetti, rewardModal, setRewardModal, mobileOpen, setMobileOpen, ratingTarget, setRatingTarget,
     attemptId, setAttemptId, attemptData, setAttemptData, showAttempts, setShowAttempts, attemptsList, setAttemptsList, isFinished,
     reviewDomains, setReviewDomains, reviewDomainOpen, setReviewDomainOpen, reviewIndex, setReviewIndex, incorrectOnly, setIncorrectOnly, reviewDomainRef, reviewDomainToggleRef,
     takeDomains, setTakeDomains, domainOpen, setDomainOpen, domainRef, domainToggleRef, examStarted, setExamStarted, timed, setTimed, durationMinutes, setDurationMinutes, examMode, setExamMode, revealAnswers, setRevealAnswers, ttsEnabled, setTtsEnabled, revealedQuestions, setRevealedQuestions, stagedAnswer, setStagedAnswer, weakestLinkInfo, setWeakestLinkInfo, loadingWeakestLink, timeLeft, setTimeLeft, numQuestions, setNumQuestions, visitedQuestions, setVisitedQuestions,

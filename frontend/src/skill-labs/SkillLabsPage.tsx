@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Loader from '@/components/Loader'
+import { ApiErrorMessage } from '@/components/ApiErrorMessage'
 import { useExam } from '@/exam/ExamContext'
 import { Clock, ChevronLeft, ChevronRight, RotateCcw, CheckCircle2, Bookmark, Search, X, Lock, Play } from 'lucide-react'
 import { clarityEvent, clarityTag } from '@/clarity'
 import type { LabSummary, SkillLevel } from './types'
 import { LAB_TIME_LIMITS } from './types'
 import { apiUrl } from '@/apiBase'
+import { captureError } from '@/lib/sentry'
 import { SearchableFilter } from './SearchableFilter'
 import { getBookmarkedLabs, toggleBookmark, clearLabProgress } from './labs/shared'
 import { useSkillLab } from './SkillLabContext'
@@ -131,8 +133,9 @@ export function SkillLabsPage() {
         if (!res.ok) throw new Error('Failed to fetch')
         const data = await res.json()
         if (!cancelled) setLabs(data)
-      } catch {
-        if (!cancelled) setError('Unable to load skill labs. Please try again.')
+      } catch (err) {
+        captureError(err, { tags: { surface: 'skill-labs', action: 'fetch-list' } })
+        if (!cancelled) setError('failed')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -268,7 +271,7 @@ export function SkillLabsPage() {
   }
 
   if (loading) return <Loader text="Loading skill labs…" />
-  if (error) return <div className="text-destructive">{error}</div>
+  if (error) return <ApiErrorMessage context="skill labs" />
 
   return (
     <div ref={topRef} className="space-y-5">
