@@ -88,6 +88,10 @@ data "aws_secretsmanager_secret" "cron_secret" {
   name = var.cron_secret_name
 }
 
+data "aws_secretsmanager_secret_version" "cron_secret" {
+  secret_id = data.aws_secretsmanager_secret.cron_secret.arn
+}
+
 resource "aws_secretsmanager_secret_policy" "cron_secret_policy" {
   secret_arn = data.aws_secretsmanager_secret.cron_secret.arn
   policy = jsonencode({

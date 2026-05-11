@@ -88,9 +88,9 @@ resource "aws_route53_record" "api" {
   allow_overwrite = true
 
   alias {
-    name                   = var.alb_dns_name
-    zone_id                = var.alb_zone_id
-    evaluate_target_health = true
+    name                   = var.api_cloudfront_domain_name
+    zone_id                = var.api_cloudfront_hosted_zone_id
+    evaluate_target_health = false
   }
 }
 

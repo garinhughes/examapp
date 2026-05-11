@@ -49,6 +49,18 @@ variable "create_aliases" {
   default     = false
 }
 
+variable "api_cloudfront_domain_name" {
+  description = "CloudFront domain name for the API distribution (api.domain alias)"
+  type        = string
+  default     = ""
+}
+
+variable "api_cloudfront_hosted_zone_id" {
+  description = "CloudFront hosted zone ID for the API distribution"
+  type        = string
+  default     = ""
+}
+
 variable "apex_txt_records" {
   description = "TXT record values to publish at the apex domain (SPF, GSC verification, etc.)"
   type        = list(string)

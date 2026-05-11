@@ -84,6 +84,10 @@
           "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-cron-secret-bu4WzD"
         },
         {
+          "name": "ORIGIN_VERIFY_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-cron-secret-bu4WzD"
+        },
+        {
           "name": "UNSUBSCRIBE_SECRET",
           "valueFrom": "arn:aws:secretsmanager:eu-west-1:809472479011:secret:examapp-unsubscribe-secret-jcTbxM"
         }

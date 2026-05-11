@@ -36,6 +36,27 @@ locals {
   )
 }
 
+# Separate validation records for the API CloudFront cert (us-east-1).
+# Kept separate from all_cert_dvos because both the ALB cert and this cert
+# cover api.certshack.com — merging them by domain_name would clobber one.
+# domain_name is static (known at plan time); resource_record_name is the value.
+resource "aws_route53_record" "api_cf_cert_validation" {
+  for_each = {
+    for dvo in module.acm.api_cloudfront_domain_validation_options : dvo.domain_name => {
+      resource_record_name  = dvo.resource_record_name
+      resource_record_type  = dvo.resource_record_type
+      resource_record_value = dvo.resource_record_value
+    }
+  }
+
+  zone_id         = data.aws_route53_zone.main.zone_id
+  name            = each.value.resource_record_name
+  type            = each.value.resource_record_type
+  ttl             = 60
+  records         = [each.value.resource_record_value]
+  allow_overwrite = true
+}
+
 module "vpc" {
   source  = "./modules/vpc"
   project = var.project
@@ -117,8 +138,11 @@ module "cloudfront" {
   s3_bucket_id                   = module.s3.bucket_name
   s3_bucket_arn                  = module.s3.bucket_arn
   s3_bucket_regional_domain_name = module.s3.bucket_regional_domain_name
+  alb_dns_name                   = module.ecs.alb_dns_name
+  api_acm_certificate_arn        = module.acm.api_cloudfront_certificate_arn
+  origin_verify_secret           = module.secretsmanager.cron_secret_value
 
-  depends_on = [module.acm]
+  depends_on = [module.acm, module.secretsmanager]
 }
 
 # Create route53 aliases after CloudFront and ALB exist
@@ -127,11 +151,13 @@ module "route53_aliases" {
   project                   = var.project
   zone_id                   = data.aws_route53_zone.main.zone_id
   domain                    = var.domain
-  cloudfront_domain_name    = module.cloudfront.cloudfront_domain_name
-  cloudfront_hosted_zone_id = module.cloudfront.cloudfront_hosted_zone_id
-  alb_dns_name              = module.ecs.alb_dns_name
-  alb_zone_id               = module.ecs.alb_zone_id
-  create_aliases            = true
+  cloudfront_domain_name        = module.cloudfront.cloudfront_domain_name
+  cloudfront_hosted_zone_id     = module.cloudfront.cloudfront_hosted_zone_id
+  alb_dns_name                  = module.ecs.alb_dns_name
+  alb_zone_id                   = module.ecs.alb_zone_id
+  api_cloudfront_domain_name    = module.cloudfront.api_cloudfront_domain_name
+  api_cloudfront_hosted_zone_id = module.cloudfront.api_cloudfront_hosted_zone_id
+  create_aliases                = true
 }
 
 # SES DKIM records for management-account SES identity (certshack.com)
@@ -211,6 +237,7 @@ module "ecs" {
   stripe_secret_key_arn            = module.secretsmanager.stripe_secret_key_arn
   stripe_webhook_secret_arn        = module.secretsmanager.stripe_webhook_secret_arn
   cron_secret                      = module.secretsmanager.cron_secret_arn
+  origin_verify_secret_arn         = module.secretsmanager.cron_secret_arn
   unsubscribe_secret               = module.secretsmanager.unsubscribe_secret_arn
   stripe_price_id_pro_monthly      = "" # Set after creating Stripe recurring Price for Pro
   stripe_price_id_pro_plus_monthly = "" # Set after creating Stripe recurring Price for Pro Plus

@@ -86,6 +86,17 @@ if (process.env.SENTRY_DSN) {
   Sentry.setupFastifyErrorHandler(server)
 }
 
+// Reject requests that didn't come through CloudFront (which injects this header).
+// Exempt /health so the ALB health checker (no CloudFront header) still works.
+server.addHook('onRequest', async (req, reply) => {
+  const secret = process.env.ORIGIN_VERIFY_SECRET
+  if (!secret) return
+  if (req.url === '/health' || req.url.startsWith('/health?')) return
+  if (req.headers['x-origin-verify'] !== secret) {
+    return reply.code(403).send({ error: 'Forbidden' })
+  }
+})
+
 // Per-request scope: tag route + set user (when auth resolves) so any error
 // captured during the request carries useful context.
 server.addHook('onRequest', async (req) => {
@@ -203,6 +214,16 @@ server.setErrorHandler((err, _req, reply) => {
 
 // Health check for ALB
 server.get('/health', async () => ({ status: 'ok' }))
+
+// Disallow all bots from crawling the API subdomain
+server.get('/robots.txt', async (_req, reply) => {
+  reply.type('text/plain').send('User-agent: *\nDisallow: /\n')
+})
+
+// Root route — 200 instead of 404, noindex so Google doesn't index it
+server.get('/', async (_req, reply) => {
+  reply.header('X-Robots-Tag', 'noindex, nofollow').send({ name: 'certshack-api' })
+})
 
 const port = Number(process.env.PORT) || 3000
 
