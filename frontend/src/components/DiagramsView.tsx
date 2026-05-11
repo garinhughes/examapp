@@ -3,25 +3,25 @@ import mermaid from 'mermaid'
 import { ensureCloudIconPacks, detectProviders } from '@/lib/cloudIconPacks'
 
 const SAMPLE_DIAGRAM = `architecture-beta
-  %% Reordered left-to-right for better fit in preview
-  group edge[Edge]
-  group compute[Compute]
+  group cdn[Edge CDN]
+  group vpc[Private VPC]
   group data[Data]
   group monitoring[Monitoring]
 
-  service dns(icon:aws:route-53)[Route 53] in edge
-  service waf(icon:aws:waf)[WAF] in edge
-  service cf(icon:aws:cloudfront)[CloudFront] in edge
-  service s3fe(icon:aws:simple-storage-service)[S3 frontend] in edge
+  service dns(icon:aws:route-53)[Route 53] in cdn
+  service waf(icon:aws:waf)[WAF] in cdn
+  service cfFE(icon:aws:cloudfront)[CloudFront Frontend] in cdn
+  service s3fe(icon:aws:simple-storage-service)[S3 Frontend] in cdn
+  service cfAPI(icon:aws:cloudfront)[CloudFront Backend API] in cdn
 
-  service alb(icon:aws:elastic-load-balancing)[ALB] in compute
-  service ecs(icon:aws:elastic-container-service)[ECS Fargate] in compute
-  service ecr(icon:aws:elastic-container-registry)[ECR] in compute
-  service sm(icon:aws:secrets-manager)[Secrets Mgr] in data
+  service alb(icon:aws:elastic-load-balancing)[Internal ALB] in vpc
+  service ecs(icon:aws:elastic-container-service)[ECS Fargate] in vpc
+  service ecr(icon:aws:elastic-container-registry)[ECR] in vpc
+  service sm(icon:aws:secrets-manager)[Secrets Mgr] in vpc
+  service cognito(icon:aws:cognito)[Cognito] in vpc
 
-  service cognito(icon:aws:cognito)[Cognito] in edge
   service dynamo(icon:aws:dynamodb)[DynamoDB] in data
-  service s3exams(icon:aws:simple-storage-service)[S3 exams] in data
+  service s3data(icon:aws:simple-storage-service)[S3 Exams and Labs] in data
 
   service eb(icon:aws:eventbridge)[EventBridge] in monitoring
   service lambda(icon:aws:lambda)[Lambda] in monitoring
@@ -29,18 +29,18 @@ const SAMPLE_DIAGRAM = `architecture-beta
   service cw(icon:aws:cloudwatch)[CloudWatch] in monitoring
 
   dns:R -- L:waf
-  waf:R -- L:cf
-  cf:R -- L:alb
-  cf:B -- T:s3fe
-  cognito:R -- R:s3fe
+  waf:R -- L:cfFE
+  cfFE:B -- T:s3fe
+  cfFE:R -- L:cfAPI
+  cfAPI:B -- T:alb
 
   alb:R -- L:ecs
-
   ecr:B -- T:ecs
   sm:B -- T:ecs
+  ecs:B -- T:cognito
 
-  ecs:B -- T:dynamo
-  ecs:R -- L:s3exams
+  ecs:R -- L:dynamo
+  dynamo:R -- L:s3data
 
   eb:R -- L:lambda
   apigw:B -- T:lambda
