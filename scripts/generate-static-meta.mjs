@@ -193,6 +193,18 @@ const notFoundHtml = shell
 
 await writeFile(join(DIST, '404.html'), notFoundHtml)
 
+// ── Refund policy page ───────────────────────────────────────────────────────
+
+await writeRoute('refund', {
+  title: 'certshack | Refund Policy',
+  inject: buildInject({
+    description: 'Read the certshack refund policy for practice exams and skill lab subscriptions.',
+    canonical: `${SITE_URL}/refund`,
+    ogTitle: 'certshack | Refund Policy',
+    ogDescription: 'Refund policy for certshack practice exams and skill lab subscriptions.',
+  }),
+})
+
 // ── Pricing listing page ──────────────────────────────────────────────────────
 
 await writeRoute('pricing', {
