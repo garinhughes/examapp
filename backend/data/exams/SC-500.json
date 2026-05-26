@@ -1,6 +1,6 @@
 {
   "code": "SC-500",
-  "provider": "Microsoft",
+  "provider": "Azure",
   "passMark": 70,
   "defaultQuestions": 60,
   "defaultDuration": 120,
