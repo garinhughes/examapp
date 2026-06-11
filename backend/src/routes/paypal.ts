@@ -26,6 +26,7 @@ import { putPaypalSession, getPaypalSession, deletePaypalSession } from '../serv
 import { ddb, ENTITLEMENTS_TABLE, getUserBySub } from '../services/dynamo.js'
 import { logEmailSend } from '../services/emailLogs.js'
 import { captureWithContext, captureWarning, addBreadcrumb } from '../lib/sentry.js'
+import { recordEvent } from '../services/metricsStore.js'
 
 const PP_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.paypal.com'
 
@@ -107,6 +108,7 @@ async function _grantFromSession(
     { pk, sk, userId: sess.userId, productIds: sess.productIds },
     '[paypal] entitlements granted'
   )
+  recordEvent('checkout_complete', { plan: sess.productIds.join(',') }).catch(() => {})
   // Alert if the user now holds multiple active subscription tiers — indicates a cancelled-then-upgraded
   // scenario where both entitlements are valid concurrently (expected but worth monitoring).
   if (sess.productIds.some((pid: string) => getProduct(pid)?.kind === 'subscription')) {
@@ -234,6 +236,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         cancelUrl,
       })
 
+      recordEvent('checkout_start', { plan: productId }).catch(() => {})
       return reply.send({ subscriptionId })
     } catch (err: any) {
       server.log.error({ err }, '[paypal] create-subscription error')

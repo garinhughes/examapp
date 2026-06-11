@@ -15,6 +15,7 @@ import { useSkillLab } from './SkillLabContext'
 import { DIFFICULTY_COLORS } from './platformMeta'
 import { ProviderLogo } from '@/components/ProviderLogo'
 import { getProviderLogo } from '@/lib/providerLogos'
+import { trackPageView } from '@/lib/trackEvent'
 
 const DIFFICULTY_LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced']
 
@@ -43,6 +44,8 @@ export function SkillLabsPage() {
   function scrollToTop() {
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
+
+  useEffect(() => { trackPageView('labs') }, [])
 
   const [labs, setLabs] = useState<LabSummary[]>([])
   const [loading, setLoading] = useState(true)

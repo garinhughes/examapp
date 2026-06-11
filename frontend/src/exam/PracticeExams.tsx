@@ -5,6 +5,7 @@ import { Info, ChevronDown, ChevronRight, Search, BookOpen, SlidersHorizontal, L
 import { useState, useEffect } from 'react'
 import { useTourContext } from '@/components/TourProvider'
 import { apiUrl } from '@/apiBase'
+import { trackPageView } from '@/lib/trackEvent'
 
 type AttemptSummary = {
   examCode: string
@@ -37,6 +38,8 @@ export function PracticeExams() {
   const [collapsedProviders, setCollapsedProviders] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState('')
   const [summaries, setSummaries] = useState<Map<string, AttemptSummary>>(new Map())
+
+  useEffect(() => { trackPageView('exams') }, [])
 
   useEffect(() => {
     if (authLoading || !user) return

@@ -11,6 +11,7 @@ import { isAnswerCorrect, computeDerivedAttempt } from './utils'
 import { downloadAttemptCSV as dlCSV, downloadAttemptPDF as dlPDF, downloadAnalyticsCSV as dlAnalyticsCSV } from './downloads'
 import type { Exam, Question, QuestionType, ExamMode, RevealMode, AppRoute } from './types'
 import { trackExamStarted } from '../analytics'
+import { trackEvent as trackCsEvent } from '../lib/trackEvent'
 import { captureError, addBreadcrumb } from '../lib/sentry'
 
 // ═══════════════════════════════════════════════
@@ -1258,6 +1259,10 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!examStarted || !selected) return
     trackExamStarted(selected, selectedMeta?.title)
+    // Built-in metrics — skip on resume of an existing attempt
+    if (!resumingRef.current) {
+      trackCsEvent('exam_start', { examCode: selected, mode: examMode })
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examStarted])
 
@@ -1334,13 +1339,24 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
       } catch {}
     }
     const onHide = () => { if (document.visibilityState === 'hidden') flush() }
+    // exam_abandon fires only on true page-away (pagehide), never on tab-hide
+    const onPageHide = () => {
+      flush()
+      if (examStarted && !isFinished && selected) {
+        trackCsEvent('exam_abandon', {
+          examCode: selected,
+          lastQuestionIndex: currentQuestionIndex,
+          totalQuestions: displayQuestions.length || undefined,
+        }, { beacon: true })
+      }
+    }
     document.addEventListener('visibilitychange', onHide)
-    window.addEventListener('pagehide', flush)
+    window.addEventListener('pagehide', onPageHide)
     return () => {
       document.removeEventListener('visibilitychange', onHide)
-      window.removeEventListener('pagehide', flush)
+      window.removeEventListener('pagehide', onPageHide)
     }
-  }, [user, attemptId, examStarted, isFinished, currentQuestionIndex, flaggedQuestions, timeLeft, timed, durationMinutes, displayQuestions, examMode, revealAnswers])
+  }, [user, attemptId, examStarted, isFinished, currentQuestionIndex, flaggedQuestions, timeLeft, timed, durationMinutes, displayQuestions, examMode, revealAnswers, selected])
 
   // Fetch server-side in-progress attempts so the "Exam in progress" banner appears on any device.
   // Refreshes when user logs in/out, or when navigating to a page that shows the banner.

@@ -25,6 +25,7 @@ import { useLabProgress } from './useLabProgress'
 import { useLabComplete, signalLabCancelled } from './shared'
 import { useSkillLab } from '@/skill-labs/SkillLabContext'
 import { captureError } from '@/lib/sentry'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 
 type LabMeta = Pick<LabSummary, 'id' | 'type' | 'difficulty' | 's3VersionId'>
 
@@ -206,6 +207,17 @@ export function useLabSession<TProgress extends { timeLeft: number }>(options: {
     return () => { cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Fire lab_start once per session per lab — captures visitors too
+  useEffect(() => {
+    try {
+      const key = `cs_lab_started_${lab.id}`
+      if (sessionStorage.getItem(key)) return
+      sessionStorage.setItem(key, '1')
+    } catch { /* sessionStorage may be unavailable */ }
+    trackCsEvent('lab_start', { labId: lab.id, labType: lab.type })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lab.id])
 
   // Auto-dismiss resume notice after 3 seconds
   useEffect(() => {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { useAuth } from '../auth/AuthContext'
 import { Button } from './ui/button'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 
 type EmailView = 'signin' | 'register' | 'confirm' | 'forgot' | 'reset'
 
@@ -172,7 +173,7 @@ export default function LoginPage() {
             </button>
             <button
               type="button"
-              onClick={() => { setView('register'); setError(null); setInfo(null) }}
+              onClick={() => { setView('register'); setError(null); setInfo(null); trackCsEvent('signup_start') }}
               className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${view === 'register' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'}`}
             >
               Register

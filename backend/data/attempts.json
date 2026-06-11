@@ -56162,6 +56162,1077 @@
         }
       ],
       "abandonedAt": "2026-05-08T15:27:28.185Z"
+    },
+    {
+      "attemptId": "323a0904-2b60-4f8c-a352-9856526ba8b0",
+      "userId": "visitor:4abc2347-7dfd-4580-b922-27842fb516b9",
+      "examCode": "SAA-C03",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-06-11T09:31:46.286Z",
+      "updatedAt": "2026-06-11T09:31:53.633Z",
+      "finishedAt": "2026-06-11T09:31:53.633Z",
+      "status": "finished",
+      "score": 0,
+      "answers": [
+        {
+          "questionId": "SAA-C03-0034",
+          "selectedChoiceId": "c2",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-06-11T09:31:49.006Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "questions": [
+        {
+          "id": "SAA-C03-0034",
+          "type": "single-choice",
+          "question": "During a security review, the team confirmed that only Amazon API Gateway should be able to invoke a specific AWS Lambda function in the same account. No other AWS service or IAM principal should be able to trigger the function directly.\n\nWhich is the MOST suitable control to enforce this restriction?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Attach an IAM permissions boundary to the Lambda function's execution role that restricts the function from being invoked by any principal except Amazon API Gateway, preventing unauthorized service triggers.",
+              "isCorrect": false,
+              "explanation": "A permissions boundary controls what the Lambda execution role itself can do when making outbound AWS API calls. It has no effect on who is allowed to invoke the Lambda function. Invocation control requires a resource-based policy on the function."
+            },
+            {
+              "id": "c4",
+              "text": "Move the Lambda function into a VPC with no internet gateway and configure a VPC endpoint for API Gateway, ensuring that only requests routed through the private internal network can trigger the function.",
+              "isCorrect": false,
+              "explanation": "Placing Lambda in a VPC restricts network-level access but does not prevent IAM-authorized invocations through the AWS API. A principal with the appropriate IAM permissions can still invoke the function via the AWS SDK even when it is deployed inside a VPC."
+            },
+            {
+              "id": "c3",
+              "text": "Enable AWS WAF on the Amazon API Gateway stage with IP-based and rate-limiting rules to filter incoming requests, preventing callers that do not originate through the API Gateway endpoint from reaching the Lambda function.",
+              "isCorrect": false,
+              "explanation": "AWS WAF inspects HTTP requests at the API Gateway layer and can block unwanted web traffic. It cannot prevent direct Lambda invocations made through the AWS SDK or CLI that bypass API Gateway entirely."
+            },
+            {
+              "id": "c1",
+              "text": "Add a resource-based policy to the Lambda function that grants `lambda:InvokeFunction` exclusively to the Amazon API Gateway service principal for that specific API.",
+              "isCorrect": true,
+              "explanation": "A Lambda resource-based policy is the purpose-built control for specifying which services and principals can invoke the function. Granting lambda:InvokeFunction only to the API Gateway service principal with a source ARN condition restricts invocation to that specific API.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Secure Architectures",
+          "skills": [
+            "1.1.5: Determining the appropriate use of resource policies for AWS services."
+          ],
+          "services": [
+            "IAM",
+            "Lambda",
+            "API Gateway"
+          ],
+          "docs": "https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html",
+          "tip": "Look for the control that is attached to the Lambda function itself and specifies which callers are permitted to invoke it, independent of network path.",
+          "explanation": "A Lambda resource-based policy is the correct mechanism for controlling who can invoke a function. By granting `lambda:InvokeFunction` only to the API Gateway service principal and scoping it to a specific source ARN, the policy ensures that no other service or IAM principal can trigger the function.\n\n**Why it works:** Lambda resource-based policies are evaluated whenever the function is invoked. Only callers explicitly permitted by the policy can invoke the function, regardless of how or where the invocation originates.\n\n**Why the others don't work:**\n- A permissions boundary controls outbound permissions for the execution role, not inbound invocation rights for the function itself.\n- AWS WAF operates at the HTTP layer of API Gateway and cannot block direct AWS API invocations that do not go through API Gateway.\n- A VPC configuration restricts network-layer access but does not prevent AWS API-plane invocations from authorized IAM principals.",
+          "diagram": "diagrams/aws/SAA-C03/ApiGatewayLambdaPermission.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0037",
+          "type": "single-choice",
+          "question": "The organization is looking to provide 500 employees who already have Active Directory identities with federated access to the AWS Management Console. The security policy prohibits creating individual IAM users for each employee.\n\nWhich is the MOST appropriate solution?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Configure SAML 2.0 federation by creating an IAM SAML identity provider and mapping Active Directory groups to IAM roles, allowing employees to sign in with their existing corporate credentials.",
+              "isCorrect": true,
+              "explanation": "SAML 2.0 federation lets existing Active Directory users authenticate with their corporate credentials and switch into AWS roles without creating individual IAM users. Group-to-role mappings scale across hundreds of employees.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Enable AWS Directory Service to create a directory that connects to the on-premises Active Directory and configure a scheduled Lambda function to create corresponding IAM users for each directory account automatically.",
+              "isCorrect": false,
+              "explanation": "Automatically creating IAM users for each directory account still produces individual IAM users, violating the stated security policy. Federation eliminates the need for any per-employee IAM user accounts."
+            },
+            {
+              "id": "c3",
+              "text": "Deploy an Amazon EC2 instance running Active Directory Federation Services and configure it to issue AWS Management Console session tokens directly, without registering the IdP as an IAM SAML identity provider in AWS.",
+              "isCorrect": false,
+              "explanation": "Active Directory Federation Services can act as the SAML identity provider, but the IdP must be registered as an IAM SAML identity provider for AWS to validate SAML assertions. Bypassing IAM identity provider registration breaks the federation chain."
+            },
+            {
+              "id": "c2",
+              "text": "Create 500 IAM users in the AWS account with initial passwords matching each employee's Active Directory credentials and configure an automated synchronization script to propagate Active Directory password changes on a weekly schedule.",
+              "isCorrect": false,
+              "explanation": "Creating individual IAM users violates the security policy and introduces a parallel identity system. Synchronizing passwords between two separate identity stores is operationally unsustainable and creates security risks."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Secure Architectures",
+          "skills": [
+            "1.1.6: Determining when to federate a directory service with IAM roles."
+          ],
+          "services": [
+            "IAM",
+            "IAM Identity Center"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_saml.html",
+          "tip": "Consider the authentication mechanism that allows existing corporate directory identities to be used for AWS access without replicating those identities as individual IAM entities.",
+          "explanation": "SAML 2.0 federation with an IAM identity provider is the standard approach for granting existing directory users console access at scale. The corporate identity provider authenticates users and issues SAML assertions, which AWS validates against the registered IAM identity provider to allow users to switch into mapped IAM roles.\n\n**Why it works:** Employees authenticate with their existing corporate credentials. Active Directory groups are mapped to IAM roles. No individual IAM users are created. The solution scales to any number of employees through group-based role assignments.\n\n**Why the others don't work:**\n- Creating 500 IAM users violates the stated security policy and adds a parallel identity system that must be kept in sync.\n- AD FS can serve as the SAML IdP, but skipping IAM identity provider registration means AWS cannot validate the SAML assertions, blocking federation.\n- Using Directory Service with a Lambda to create IAM users still produces IAM user accounts, which the policy explicitly prohibits.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0158",
+          "type": "single-choice",
+          "question": "To meet a 99.99% SLA for a media archive platform, the architecture team has deployed an Amazon S3 bucket that receives video files daily. Access patterns are well understood: files are frequently accessed for the first 30 days, occasionally accessed between 31 and 90 days, rarely accessed between 91 and 365 days, and must be retained for 7 years for compliance before being permanently deleted. The team applied the following lifecycle configuration but a review found it is not cost-optimized:\n\n```json\n{\n  \"Rules\": [\n    {\n      \"ID\": \"archive-rule\",\n      \"Status\": \"Enabled\",\n      \"Transitions\": [\n        { \"Days\": 90, \"StorageClass\": \"GLACIER\" }\n      ],\n      \"Expiration\": { \"Days\": 2555 }\n    }\n  ]\n}\n```\n\nWhich lifecycle configuration change will MOST reduce storage costs while meeting all access and retention requirements?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Keep the transition to `GLACIER` at day 90 and change the expiration from day 2,555 to day 365 to reduce long-term storage costs.",
+              "isCorrect": false,
+              "explanation": "Reducing expiration to day 365 would delete objects after one year, violating the 7-year (2,555-day) compliance retention requirement."
+            },
+            {
+              "id": "c1",
+              "text": "Add a transition to `S3 Standard-IA` at day 31, transition to `S3 Glacier Instant Retrieval` at day 91, and transition to `S3 Glacier Deep Archive` at day 366, retaining the expiration at day 2,555.",
+              "isCorrect": true,
+              "explanation": "Stepping down through Standard-IA, Glacier Instant Retrieval, and Glacier Deep Archive aligns each storage tier with the actual access frequency, progressively reducing the per-GB storage cost as access likelihood decreases.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Replace the single `GLACIER` transition at day 90 with a direct transition to `S3 Glacier Deep Archive` at day 90, and retain the expiration at day 2,555.",
+              "isCorrect": false,
+              "explanation": "Transitioning to `S3 Glacier Deep Archive` at day 90 ignores the occasional access pattern between days 31 and 90, which would require expensive Glacier Deep Archive retrievals for data still accessed occasionally during that window."
+            },
+            {
+              "id": "c3",
+              "text": "Add a transition to `S3 Intelligent-Tiering` at day 31 for all objects and remove the manual `GLACIER` transition, allowing Intelligent-Tiering to manage all subsequent tier movements automatically.",
+              "isCorrect": false,
+              "explanation": "S3 Intelligent-Tiering charges a per-object monitoring fee, which can exceed the savings for large numbers of small objects, and does not automatically transition objects to Glacier Deep Archive for long-term archival at the lowest possible cost."
+            }
+          ],
+          "selectCount": 1,
+          "format": "json",
+          "domain": "Design Cost-Optimized Architectures",
+          "skills": [
+            "4.1.5: Managing S3 object lifecycles."
+          ],
+          "services": [
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html",
+          "tip": "Match each storage tier to the actual access frequency pattern - more tiers means more granular cost savings across the object's lifetime.",
+          "explanation": "The most cost-optimized lifecycle configuration uses multiple transitions to align storage class cost with decreasing access frequency over time.\n\n**Why it works:** `S3 Standard-IA` at day 31 saves costs for infrequently accessed data while still providing millisecond retrieval. `S3 Glacier Instant Retrieval` at day 91 further reduces cost for rarely accessed data that still needs fast retrieval. `S3 Glacier Deep Archive` at day 366 provides the lowest available storage cost ($0.00099/GB/month) for data that is effectively never accessed but must be retained for compliance. The 7-year expiration remains intact.\n\n**Why the others don't work:**\n- Option B: Jumping directly to `S3 Glacier Deep Archive` at day 90 skips cheaper intermediate classes for the occasional-access period (days 31-90) and imposes high retrieval costs for data still occasionally needed.\n- Option C: `S3 Intelligent-Tiering` is suitable for unknown access patterns, not well-understood ones. Its per-object monitoring fees can make it more expensive than explicit lifecycle rules for predictable patterns, and it does not provide a path to `Glacier Deep Archive` at the lowest cost.\n- Option D: Expiring objects at day 365 violates the 7-year compliance retention requirement.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0048",
+          "type": "ordering",
+          "question": "The network team is building a segmented Amazon VPC from scratch. The design requires a public subnet for internet-facing resources and a private subnet for backend resources.\n\nArrange the following steps in the correct order to complete the VPC setup.",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Create an internet gateway and attach it to the VPC to provide a path between the VPC and the internet.",
+              "isCorrect": true,
+              "explanation": "The internet gateway must be created and attached to the VPC before it can be referenced as a target in any route table entry.",
+              "sequence": 3
+            },
+            {
+              "id": "c4",
+              "text": "Update the public subnet's route table to add a route directing all internet-bound traffic (0.0.0.0/0) to the internet gateway.",
+              "isCorrect": true,
+              "explanation": "Adding this route is what makes the subnet public. It can only be done after the internet gateway is attached to the VPC. The private subnet's route table is left without this route.",
+              "sequence": 4
+            },
+            {
+              "id": "c5",
+              "text": "Deploy internet-facing resources into the public subnet and backend resources into the private subnet.",
+              "isCorrect": true,
+              "explanation": "Resources are deployed last, after the network foundation and routing are fully configured, ensuring each resource inherits the correct connectivity behavior for its subnet.",
+              "sequence": 5
+            },
+            {
+              "id": "c1",
+              "text": "Create a new VPC and assign a primary IPv4 CIDR block to define the overall address space.",
+              "isCorrect": true,
+              "explanation": "The VPC is the foundational network container. It must exist before any subnets, internet gateways, or route tables can be created within it.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Create a public subnet and a private subnet within the VPC, each assigned a distinct non-overlapping CIDR block.",
+              "isCorrect": true,
+              "explanation": "Subnets must be created within the VPC and assigned CIDR blocks that fall within the VPC range before resources can be deployed or routing configured.",
+              "sequence": 2
+            }
+          ],
+          "selectCount": 5,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "1.2.2: Determining network segmentation strategies (for example, using public subnets and private subnets)."
+          ],
+          "services": [
+            "Amazon VPC"
+          ],
+          "docs": "https://docs.aws.amazon.com/vpc/latest/userguide/create-vpc.html",
+          "tip": "Work through the dependency chain: the VPC must exist before subnets, the internet gateway must be attached before it can be referenced in a route, and routing must be configured before deploying resources that depend on it.",
+          "explanation": "Setting up a segmented VPC follows a strict dependency order: the VPC must exist before subnets can be created; the internet gateway must be attached to the VPC before it can be referenced in a route table; and the route table must be updated before deploying resources that rely on internet connectivity.\n\n**Why it works:** Each step creates a prerequisite for the next. Subnets cannot exist without a VPC. A route table cannot reference an internet gateway that has not been created and attached. Resources deployed before routing is configured would not have the expected connectivity.\n\n**Why the others don't work:**\n- Creating subnets before the VPC is not possible; subnets must be created within an existing VPC.\n- Adding a route to an internet gateway before it exists and is attached to the VPC would produce a configuration error.\n- Deploying resources before configuring the route table would result in internet-facing instances in a subnet with no path to the internet.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0055",
+          "type": "multiple-choice",
+          "question": "To reduce infrastructure costs, an organization must transfer financial data between an on-premises data center and AWS over a connection that is both private (not traversing the public internet) and encrypted in transit.\n\nWhich TWO components should be combined to satisfy both requirements simultaneously?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Use AWS PrivateLink to create interface endpoints for all required AWS services and configure on-premises DNS to resolve AWS service hostnames to private endpoint IP addresses over an existing internet connection.",
+              "isCorrect": false,
+              "explanation": "AWS PrivateLink routes traffic within the AWS network to private service endpoints but still requires an existing private connectivity mechanism for on-premises access. Using it over an internet connection does not create a private or encrypted dedicated path."
+            },
+            {
+              "id": "c3",
+              "text": "Deploy an AWS Transit Gateway with an inter-region peering attachment and enable BGP route propagation on the virtual private gateway to create a dedicated, encrypted path for all on-premises-to-AWS traffic.",
+              "isCorrect": false,
+              "explanation": "Transit Gateway inter-region peering connects AWS regions within the AWS network. It does not connect on-premises data centers to AWS and does not add encryption to a Direct Connect connection."
+            },
+            {
+              "id": "c2",
+              "text": "Configure an AWS Site-to-Site VPN connection over the Direct Connect link to apply IPsec encryption to all data in transit between the on-premises network and the AWS virtual private gateway.",
+              "isCorrect": true,
+              "explanation": "Running a Site-to-Site VPN over a Direct Connect connection adds IPsec encryption while keeping traffic on the dedicated private circuit. This is the AWS-recommended pattern when both privacy and encryption in transit are required.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Establish an AWS Direct Connect connection to create a dedicated private link between the on-premises network and AWS, ensuring data does not traverse any shared public internet infrastructure.",
+              "isCorrect": true,
+              "explanation": "AWS Direct Connect provides the dedicated private network path. However, Direct Connect does not encrypt traffic by default, so encryption must be added separately.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Enable AWS Shield Advanced on the virtual private gateway to protect the connection from DDoS attacks, and enable VPC Flow Logs to verify that traffic between the on-premises network and AWS is encrypted end to end.",
+              "isCorrect": false,
+              "explanation": "AWS Shield Advanced provides DDoS protection. VPC Flow Logs provide metadata visibility into network traffic. Neither service encrypts the data channel between on-premises and AWS."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "1.2.4: Securing external network connections to and from the AWS Cloud (for example, VPN, AWS Direct Connect)."
+          ],
+          "services": [
+            "AWS Direct Connect",
+            "AWS Site-to-Site VPN"
+          ],
+          "docs": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/encryption-in-transit.html",
+          "tip": "Note that no single AWS connectivity service simultaneously provides both a dedicated private circuit and built-in encryption. Consider which two distinct services complement each other to cover both requirements.",
+          "explanation": "AWS Direct Connect provides the dedicated private network path (addressing the 'no public internet' requirement), and a Site-to-Site VPN overlay adds IPsec encryption in transit (addressing the encryption requirement). Running a VPN over Direct Connect is the AWS-recommended architecture when both are needed.\n\n**Why it works:** Direct Connect ensures the physical path avoids the public internet. The Site-to-Site VPN creates an encrypted IPsec tunnel traveling within the Direct Connect connection, encrypting data end-to-end between the on-premises VPN device and the AWS virtual private gateway.\n\n**Why the others don't work:**\n- Transit Gateway inter-region peering is an AWS-to-AWS construct and cannot substitute for on-premises connectivity or add encryption to Direct Connect.\n- AWS Shield Advanced and VPC Flow Logs address threat protection and traffic visibility, not data-in-transit encryption for external connections.\n- AWS PrivateLink requires a pre-existing private connectivity mechanism for on-premises access and cannot replace the dedicated circuit provided by Direct Connect.",
+          "diagram": "diagrams/aws/SAA-C03/DirectConnectVpnEncryption.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0161",
+          "type": "single-choice",
+          "question": "During a cost review, a platform team discovers that their Amazon S3 bucket contains 80 TB of user-uploaded images. Analytics show that 15% of objects (the most recently uploaded) are accessed multiple times per day. The remaining 85% of objects have not been accessed in over 180 days and have unpredictable future access patterns - some may be retrieved by users on demand, while others may never be accessed again. The team cannot predict which specific objects in the 85% group will be accessed. All objects must remain available for retrieval within milliseconds.\n\nWhich storage tier strategy minimizes cost for the 85% of objects while maintaining millisecond availability?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Keep all 80 TB of objects in `S3 Standard` to ensure consistent performance and avoid per-GB retrieval fees on the unpredictable 85%.",
+              "isCorrect": false,
+              "explanation": "Retaining all objects in `S3 Standard` ignores the clear opportunity to reduce storage costs for 85% of objects that have not been accessed in over 180 days. This approach fails the cost-optimization requirement."
+            },
+            {
+              "id": "c1",
+              "text": "Move the 85% of objects that have not been accessed in over 180 days to `S3 Intelligent-Tiering`, which automatically moves objects between frequent and infrequent access tiers based on access patterns without retrieval fees.",
+              "isCorrect": true,
+              "explanation": "S3 Intelligent-Tiering is designed precisely for this scenario: objects with unknown or unpredictable access patterns. It eliminates retrieval charges and automatically optimizes cost by moving objects to the lowest-cost tier consistent with observed access frequency.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Move the 85% of objects to `S3 Glacier Instant Retrieval` to minimize storage costs while still providing millisecond retrieval for any object.",
+              "isCorrect": false,
+              "explanation": "`S3 Glacier Instant Retrieval` has a higher per-GB retrieval fee ($0.03/GB) than `S3 Standard-IA` and is intended for data accessed once per quarter, not data with unpredictable but potentially frequent ad-hoc access. For objects that might be accessed on demand by users, this tier would generate high retrieval costs."
+            },
+            {
+              "id": "c2",
+              "text": "Move the 85% of objects to `S3 Standard-IA`, which offers a lower per-GB storage price than `S3 Standard` and still provides millisecond retrieval.",
+              "isCorrect": false,
+              "explanation": "`S3 Standard-IA` applies a per-GB retrieval fee. When access patterns are unpredictable and some objects may be frequently retrieved on demand, these retrieval charges can eliminate or reverse the storage cost savings compared to `S3 Standard` or `S3 Intelligent-Tiering`."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Cost-Optimized Architectures",
+          "skills": [
+            "4.1.8: Selecting the appropriate storage tier."
+          ],
+          "services": [
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html",
+          "tip": "When access patterns for a subset of objects are unknown or unpredictable, consider which storage class automatically adapts without requiring predictions or incurring retrieval fees.",
+          "explanation": "`S3 Intelligent-Tiering` is the correct tier for objects with unpredictable access patterns that require millisecond availability.\n\n**Why it works:** `S3 Intelligent-Tiering` monitors access patterns and moves objects between the Frequent Access and Infrequent Access tiers automatically. There are no retrieval fees, so unpredictable on-demand access by users does not generate surprise charges. After 90 days without access, objects are moved to the Archive Instant Access tier at a further reduced price, still with millisecond retrieval.\n\n**Why the others don't work:**\n- Option B: `S3 Standard-IA` charges a per-GB retrieval fee. For objects with unpredictable access, these fees can erode or exceed the storage savings, making the total cost higher than `S3 Intelligent-Tiering`.\n- Option C: `S3 Glacier Instant Retrieval` has even higher retrieval fees ($0.03/GB) and is optimized for archive data accessed at most quarterly. Unpredictable user-driven retrieval would result in high costs.\n- Option D: Keeping all objects in `S3 Standard` is not cost-optimized for 85% of objects with no recent access history.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0006",
+          "type": "single-choice",
+          "question": "Orders are processed through a central checkout service on AWS. When an order is confirmed, an inventory service, a shipping service, and a fraud detection service must each independently receive and process every order event. The inventory service experiences scheduled maintenance windows lasting up to 10 minutes, during which it cannot consume messages.\n\nWhich architecture ensures all three services receive every order event, maintains message delivery during downstream outages, and allows each service to process events at its own rate?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Create an Amazon EventBridge custom event bus and configure three rules, each routing order events directly to a target Lambda function representing the inventory, shipping, and fraud services, with Lambda async retry and a dead-letter queue configured on each function.",
+              "isCorrect": false,
+              "explanation": "EventBridge routing directly to Lambda lacks a durable per-service message buffer. During a 10-minute maintenance window, Lambda invocations will fail and the built-in async retry policy (2 retries over a few minutes) does not retain messages for the full outage duration. A persistent queue is required to absorb extended outages."
+            },
+            {
+              "id": "c3",
+              "text": "Create an Amazon SNS topic for order confirmations and subscribe a dedicated Amazon SQS standard queue for each downstream service, allowing each service to poll its own queue independently.",
+              "isCorrect": true,
+              "explanation": "The SNS fan-out to SQS pattern publishes each order event once to SNS, which delivers it simultaneously to all three subscribed SQS queues. Each queue buffers messages independently, retaining events during the inventory service's maintenance window and allowing each service to consume at its own pace without affecting the others.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Create an Amazon SQS FIFO queue for order events with a message group ID assigned per downstream service, and configure all three services as consumers so each receives only messages belonging to its own group, preserving strict per-service ordering throughout processing.",
+              "isCorrect": false,
+              "explanation": "SQS FIFO queues with message group IDs control ordering within a queue for a single consumer type - they do not support multiple independent consumers each receiving the same message. Messages are still consumed competitively, and each order event can reach only one of the three services."
+            },
+            {
+              "id": "c1",
+              "text": "Create an Amazon SQS standard queue for order events and configure all three downstream services as consumers using long polling, relying on SQS message visibility timeouts to prevent duplicate processing across services.",
+              "isCorrect": false,
+              "explanation": "SQS standard queues use a competing consumer model: each message is delivered to exactly one consumer. Once any service reads and deletes a message, the other two services never receive it. This is not fan-out delivery."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Resilient Architectures",
+          "skills": [
+            "2.1.1: Designing event-driven, microservice, and/or multi-tier architectures based on requirements."
+          ],
+          "services": [
+            "SNS",
+            "SQS"
+          ],
+          "docs": "https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html",
+          "tip": "Identify which pattern delivers the same event independently to multiple consumers while providing per-consumer durability that can absorb downstream outages.",
+          "explanation": "The SNS + SQS fan-out pattern is the canonical AWS architecture for delivering the same event to multiple independent downstream services. SNS publishes the message once and simultaneously delivers it to all subscribed SQS queues. Each queue acts as an independent, durable buffer.\n\n**Why it works:** SNS guarantees delivery to each subscribed SQS queue. Messages persist in each queue independently - during the inventory service's 10-minute maintenance window, messages accumulate in its queue and are processed automatically when the service recovers, with no message loss and no impact on the shipping or fraud service queues.\n\n**Why the others fail:**\n- Shared SQS standard queue with competing consumers: Each SQS message is delivered to exactly one consumer. All three services compete for the same messages, so each order event reaches only one service.\n- EventBridge rules directly to Lambda: Lambda async retry covers only short failure windows (2 retries over a few minutes). A 10-minute maintenance window exceeds built-in retry behavior without an SQS buffer to retain messages during the outage.\n- SQS FIFO with message group IDs per service: Message group IDs manage ordering within a single queue for one consumer - they do not enable multiple independent consumers to each receive the same message.\n\n**Implementation:** Console > SNS > Create topic > Add subscriptions. `aws sns subscribe --topic-arn <arn> --protocol sqs --notification-endpoint <queue-arn>` repeated for each downstream SQS queue.",
+          "diagram": "diagrams/aws/SAA-C03/SnsSquFanOut.mmd",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-30"
+        },
+        {
+          "id": "SAA-C03-0114",
+          "type": "multiple-choice",
+          "question": "You are designing storage for a genomics research platform. Scientists upload large sequencing datasets (100 GB to 2 TB per run) several times per week. Active analysis jobs read these files intensively for the first 30 days, after which files are rarely accessed but must be retrievable within minutes when a cold case is reopened. The solution must scale to accommodate years of accumulated data without pre-provisioning capacity and must minimise ongoing storage cost.\n\nWhich TWO actions should the architect take?",
+          "choices": [
+            {
+              "id": "c5",
+              "text": "Deploy AWS Storage Gateway in `Volume Gateway` mode to present iSCSI volumes to analysis servers and archive snapshots to Amazon S3.",
+              "isCorrect": false,
+              "explanation": "Storage Gateway Volume mode is designed to extend on-premises storage to AWS. It does not provide a scalable cloud-native object store and adds unnecessary gateway infrastructure for a cloud-native workload."
+            },
+            {
+              "id": "c3",
+              "text": "Provision a 500 TB Amazon EFS file system and mount it on analysis EC2 instances so that storage scales automatically without provisioning.",
+              "isCorrect": false,
+              "explanation": "Amazon EFS does scale automatically but charges approximately 10x the per-GB rate of `S3 Standard-IA`. For a dataset that accumulates over years and is mostly cold, EFS is cost-prohibitive and does not provide an HTTPS object interface."
+            },
+            {
+              "id": "c2",
+              "text": "Configure an S3 Lifecycle rule to transition objects to `S3 Standard-Infrequent Access` (`S3 Standard-IA`) after 30 days to reduce per-GB storage costs while retaining millisecond retrieval.",
+              "isCorrect": true,
+              "explanation": "`S3 Standard-IA` costs roughly 45% less per GB than `S3 Standard` and retrieves objects in milliseconds - satisfying the requirement for minute-scale retrieval of cold data.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Transition objects to `S3 Glacier Deep Archive` after 30 days using a Lifecycle rule to achieve the lowest possible storage cost.",
+              "isCorrect": false,
+              "explanation": "`S3 Glacier Deep Archive` retrieval takes 12 hours for standard retrieval, which violates the requirement for minute-scale access to cold files."
+            },
+            {
+              "id": "c1",
+              "text": "Store uploaded datasets in Amazon S3 with the `S3 Standard` storage class to support high-throughput reads during the active analysis window.",
+              "isCorrect": true,
+              "explanation": "`S3 Standard` delivers high availability and throughput for frequently accessed objects, making it appropriate for the 30-day active period without imposing minimum storage durations.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Design High-Performing Architectures",
+          "skills": [
+            "3.1.2: Determining storage services that can scale to accommodate future needs."
+          ],
+          "services": [
+            "Amazon S3",
+            "Amazon EFS",
+            "AWS Storage Gateway"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html",
+          "tip": "Consider the two-phase access pattern and which storage class aligns to each phase without over-provisioning.",
+          "explanation": "The workload has two clearly defined phases: intensive read access for 30 days followed by infrequent access with minute-scale retrieval SLA. Amazon S3 meets both phases through storage class tiering.\n\n**Why it works:** `S3 Standard` handles the high-throughput active period with no retrieval fees. A Lifecycle transition to `S3 Standard-IA` after 30 days reduces per-GB cost by roughly 45% while still providing millisecond latency - satisfying the cold-retrieval SLA. Both classes scale infinitely without pre-provisioning.\n\n**Why the others don't work:**\n- Option C: Amazon EFS is far more expensive per GB and is optimised for shared POSIX file access, not large-scale archival.\n- Option D: `S3 Glacier Deep Archive` retrieval latency (up to 12 hours) violates the minutes requirement.\n- Option E: Storage Gateway Volume mode is an on-premises integration pattern and is not appropriate for a cloud-native research platform.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0020",
+          "type": "matching",
+          "question": "Match each data transfer scenario to the most cost-effective Amazon S3 upload strategy.",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "S3 Multipart Upload with presigned URLs for each individual part",
+              "isCorrect": false,
+              "explanation": "Browser clients cannot embed IAM credentials. Presigned part URLs allow the browser to PUT each part directly to S3 without exposing credentials, and only failed parts need to be retried after a network interruption, enabling true resumability."
+            },
+            {
+              "id": "c1",
+              "text": "AWS Snowball Edge Storage Optimized",
+              "isCorrect": false,
+              "explanation": "100 TB over 50 Mbps would take approximately 185 days -- far exceeding the 5-day window. Snowball Edge ships a physical appliance that loads data at local disk speed, bypassing the network bandwidth constraint entirely."
+            },
+            {
+              "id": "c3",
+              "text": "Aggregate sensor readings into time-windowed batches and upload each batch as a single S3 object",
+              "isCorrect": false,
+              "explanation": "At 1 million individual PutObject calls per day, S3 API costs alone reach approximately $5/day. Aggregating readings into per-minute or per-hour batch files reduces API calls by orders of magnitude and dramatically lowers both request costs and the number of small objects to manage."
+            },
+            {
+              "id": "c4",
+              "text": "AWS DataSync scheduled task with automatic retry and end-to-end checksum verification",
+              "isCorrect": false,
+              "explanation": "DataSync natively supports NFS as a source protocol, provides built-in scheduling, automatic retry on failure, and per-file checksum verification for data integrity -- capabilities that `aws s3 cp` does not provide by default for recurring on-premises-to-S3 transfers."
+            }
+          ],
+          "selectCount": 4,
+          "slots": [
+            {
+              "id": "s1",
+              "label": "Transfer 100 TB of archival records to S3 within 5 days; available internet bandwidth is 50 Mbps",
+              "correctChoiceId": "c1"
+            },
+            {
+              "id": "s3",
+              "label": "Upload a 12 GB video file from a web browser with the ability to resume after a network failure",
+              "correctChoiceId": "c2"
+            },
+            {
+              "id": "s4",
+              "label": "Replicate a 50 GB database export from an on-premises NFS server to S3 nightly with automatic integrity verification",
+              "correctChoiceId": "c4"
+            },
+            {
+              "id": "s2",
+              "label": "Store 1 million 2 KB IoT sensor readings per day in S3 while minimizing per-object API call costs",
+              "correctChoiceId": "c3"
+            }
+          ],
+          "domain": "Design Cost-Optimized Architectures",
+          "skills": [
+            "4.1.1: Designing appropriate storage strategies (for example, batch uploads to Amazon S3 compared with individual uploads)."
+          ],
+          "services": [
+            "Amazon S3",
+            "AWS Snowball Edge",
+            "AWS DataSync"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+          "tip": "Each scenario has a single dominant constraint: bandwidth ceiling, API call volume, client credential model, or source protocol. Match the strategy that directly addresses that constraint.",
+          "explanation": "Each scenario maps to a strategy based on its unique dominant constraint.\n\n**100 TB in 5 days over 50 Mbps:** Network throughput is physically insufficient (estimated 185 days); Snowball Edge bypasses the bandwidth constraint by using physical transport.\n\n**1 million 2 KB objects/day:** Per-PUT API costs dominate at scale; aggregating readings into batch files reduces API calls from one million to tens or hundreds per day, cutting both costs and object count.\n\n**12 GB browser upload with resume:** Browser clients cannot use IAM credentials; presigned part URLs delegate per-part upload authorization, and multipart provides part-level checkpointing for resumability.\n\n**50 GB NFS-to-S3 nightly with integrity:** DataSync supports NFS as a source, handles scheduling, retries, and performs automatic end-to-end checksum verification that ensures data integrity across each nightly transfer.",
+          "difficulty": 3,
+          "lastReviewed": "2026-03-30"
+        },
+        {
+          "id": "SAA-C03-0095",
+          "type": "single-choice",
+          "question": "The platform team supports a SaaS application that aggregates log events from thousands of customer accounts. Customers require a search interface to query their own logs by keyword, time range, and structured field values, with results returned in under two seconds. The log volume is approximately 500 GB per day and grows continuously. Logs older than 90 days are rarely queried. The team wants a managed service that natively supports full-text search and field-level filtering without requiring ETL pipelines to transform logs before querying.\n\nWhich AWS service is MOST appropriate for the primary log search workload?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Amazon Athena with logs stored as Parquet files in Amazon S3, partitioned by `customer_id` and `date`, queried using SQL with `LIKE` operators for keyword search.",
+              "isCorrect": false,
+              "explanation": "Athena is optimised for ad-hoc analytical queries over S3 data. Keyword search using `LIKE` on Parquet files does not use an inverted index and does not provide consistent sub-two-second latency at this log volume. Athena is not designed for interactive full-text search."
+            },
+            {
+              "id": "c3",
+              "text": "Amazon Redshift with a logs table compressed using ZSTD encoding and a sort key on `(customer_id, event_time)`, queried via the Redshift console's SQL workbench.",
+              "isCorrect": false,
+              "explanation": "Redshift is a columnar data warehouse optimised for large analytical queries using SQL aggregations. It does not natively provide inverted-index full-text search, and its query concurrency model is not designed for thousands of concurrent sub-second user searches."
+            },
+            {
+              "id": "c4",
+              "text": "Amazon DynamoDB with a partition key of `customerId` and a sort key of `timestamp`, using `FilterExpression` with `contains()` for keyword searches across log message fields.",
+              "isCorrect": false,
+              "explanation": "DynamoDB `FilterExpression` with `contains()` scans the full result set after the key query, not an inverted index. Full-text search across high-cardinality log message fields at 500 GB per day would result in full-table scans with unpredictable and high latency."
+            },
+            {
+              "id": "c1",
+              "text": "Amazon OpenSearch Service with index lifecycle management (ILM) configured to move indices older than 90 days to UltraWarm storage, and a multi-tenant index pattern per customer account.",
+              "isCorrect": true,
+              "explanation": "OpenSearch is purpose-built for full-text search and log analytics with sub-second query latency. ILM transitions ageing indices to UltraWarm, reducing cost for rarely accessed logs without deleting them.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Resilient Architectures",
+          "skills": [
+            "2.1.7: Using purpose-built AWS services for workloads."
+          ],
+          "services": [
+            "Amazon OpenSearch Service",
+            "Amazon Athena",
+            "Amazon Redshift"
+          ],
+          "docs": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html",
+          "tip": "Consider which AWS service is purpose-built for full-text search with native inverted index support.",
+          "explanation": "Amazon OpenSearch Service is the purpose-built AWS service for log search and analytics. It uses Apache Lucene's inverted index under the hood, enabling sub-second full-text keyword searches and structured field filtering. Index lifecycle management automates tiering of old data to UltraWarm at lower cost.\n\n**Why it works:** OpenSearch indexes every term in log messages, enabling full-text queries, field filters, and range queries in under two seconds even at 500 GB/day ingestion rates. ILM transitions indices older than 90 days from hot to UltraWarm nodes automatically, reducing storage cost without deleting data.\n\n**Why the others don't work:**\n- Option B: Athena queries Parquet via column scans and SQL. `LIKE` operations do not use an inverted index. Sub-two-second interactive search is not achievable at this scale with Athena.\n- Option C: Redshift is designed for batch analytical workloads with SQL aggregations. It lacks full-text search indexing and is not suited for high-concurrency, low-latency keyword lookups.\n- Option D: DynamoDB `FilterExpression` applies after the key-based read, scanning all returned items. There is no full-text index, making keyword search across log messages a table scan at scale.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0051",
+          "type": "multiple-choice",
+          "question": "Management has approved a budget to protect a customer-facing API deployed on Amazon API Gateway from both volumetric DDoS attacks and application-layer exploits, including rate-based abuse and automated bot traffic.\n\nWhich TWO actions provide COMPREHENSIVE protection against both threat categories?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Associate an AWS WAF web ACL with the Amazon API Gateway stage, configuring rate-based rules and managed rule groups to inspect and block malicious HTTP requests at the application layer.",
+              "isCorrect": true,
+              "explanation": "AWS WAF attached to API Gateway inspects each HTTP request at layer 7, enabling rate limiting and blocking of bots, scrapers, and other application-layer threats through configurable rules and managed rule groups.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Enable Amazon GuardDuty on the AWS account and configure an Amazon EventBridge rule to automatically update API Gateway resource policies to block IP addresses flagged by GuardDuty threat intelligence feeds.",
+              "isCorrect": false,
+              "explanation": "GuardDuty detects threats based on account-level log analysis rather than real-time request inspection. Automatically modifying API Gateway resource policies based on GuardDuty findings is a reactive remediation pattern, not a comprehensive protection layer for both DDoS and application-layer attacks."
+            },
+            {
+              "id": "c4",
+              "text": "Deploy AWS Firewall Manager to centrally manage network ACL policies across all AWS accounts in the organization, automatically pushing subnet-level deny rules to the API Gateway region to block all attack vectors.",
+              "isCorrect": false,
+              "explanation": "AWS Firewall Manager helps manage WAF and security group policies centrally across accounts. Network ACLs at the subnet level do not inspect API Gateway traffic at the application layer and do not provide DDoS mitigation comparable to Shield Advanced."
+            },
+            {
+              "id": "c5",
+              "text": "Enable AWS Config rules to continuously evaluate the API Gateway configuration for compliance with security standards and automatically invoke Lambda remediation functions when non-compliant settings are detected.",
+              "isCorrect": false,
+              "explanation": "AWS Config monitors resource configuration for compliance but is not an active threat protection service. It does not inspect live traffic, block attacks, or mitigate DDoS events."
+            },
+            {
+              "id": "c1",
+              "text": "Enable AWS Shield Advanced on the Amazon API Gateway endpoint to receive managed DDoS detection, automatic mitigation, and proactive support from the AWS Shield Response Team for volumetric attacks.",
+              "isCorrect": true,
+              "explanation": "AWS Shield Advanced provides layer 3 and layer 4 DDoS protection with automatic threat mitigation and access to the Shield Response Team for assistance during active attacks.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "1.2.3: Integrating AWS services to secure applications (for example, AWS Shield, AWS WAF, IAM Identity Center, AWS Secrets Manager)."
+          ],
+          "services": [
+            "AWS Shield",
+            "AWS WAF",
+            "Amazon API Gateway"
+          ],
+          "docs": "https://docs.aws.amazon.com/waf/latest/developerguide/aws-shield.html",
+          "tip": "Identify the two distinct threat categories (volumetric at the network layer vs. exploits at the application layer) and match each to the AWS service built specifically for that threat type.",
+          "explanation": "Volumetric DDoS attacks and application-layer exploits require different controls. AWS Shield Advanced addresses DDoS threats at layers 3 and 4, while AWS WAF addresses application-layer threats at layer 7. Both are required for comprehensive protection of the API.\n\n**Why it works:** Shield Advanced monitors for abnormal traffic volumes targeting the API Gateway endpoint and coordinates automatic mitigation. AWS WAF inspects each HTTP request against rules that block rate-based abuse, bots, and common exploits. Together they cover both threat categories.\n\n**Why the others don't work:**\n- GuardDuty is a threat detection service for account-level activity. Reactively modifying API Gateway resource policies based on its findings introduces latency and is not a supported real-time mitigation pattern.\n- Firewall Manager centralizes policy management but does not itself protect against DDoS or perform application-layer traffic inspection.\n- AWS Config is a configuration compliance service, not a threat prevention or traffic filtering service.",
+          "diagram": "diagrams/aws/SAA-C03/ApiGatewayDdosProtection.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0089",
+          "type": "single-choice",
+          "question": "The organization is migrating a suite of microservices from on-premises bare-metal servers to AWS. Each microservice is written in a different language (Java, Python, and Go), has distinct runtime dependency versions that conflict when co-located, and must be deployable independently without affecting other services. The operations team has limited capacity to manage EC2 instance patching and OS maintenance. The services run continuously and handle sustained traffic, with no tolerance for cold starts measured in seconds.\n\nWhich hosting approach is MOST appropriate?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Launch a dedicated `m5.xlarge` EC2 instance per microservice and use AWS Systems Manager Patch Manager to automate OS patching across the fleet.",
+              "isCorrect": false,
+              "explanation": "Dedicated EC2 instances per service resolve dependency conflicts but do not reduce operational overhead compared to containers on Fargate. The team still manages OS lifecycles per instance, and Patch Manager assists but does not eliminate that burden."
+            },
+            {
+              "id": "c4",
+              "text": "Deploy all microservices on a single EC2 instance using separate Python virtual environments and Java class-path isolation to prevent runtime conflicts.",
+              "isCorrect": false,
+              "explanation": "Co-locating services on a single instance introduces resource contention and does not provide the process-level isolation that containers offer. Independent deployment without affecting co-located services is difficult to achieve reliably in this model."
+            },
+            {
+              "id": "c1",
+              "text": "Package each microservice as a container image, push to Amazon ECR, and deploy on Amazon ECS with the AWS Fargate launch type, using separate task definitions per service.",
+              "isCorrect": true,
+              "explanation": "Containers encapsulate each runtime and its dependencies, eliminating conflicts. Fargate removes OS patching overhead. ECS task definitions provide independent deployment units per service.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Deploy each microservice as an AWS Lambda function, packaging each language runtime as a Lambda layer, and configure provisioned concurrency to eliminate cold starts.",
+              "isCorrect": false,
+              "explanation": "Lambda functions have a maximum execution duration of 15 minutes and are optimised for event-driven invocations rather than continuously running services. Provisioned concurrency reduces cold starts but adds cost and does not address sustained long-running workloads."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Resilient Architectures",
+          "skills": [
+            "2.1.4: Determining when to use containers."
+          ],
+          "services": [
+            "Amazon ECS",
+            "AWS Fargate",
+            "Amazon ECR"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html",
+          "tip": "Consider which compute model provides runtime isolation and removes OS management responsibilities.",
+          "explanation": "Containers provide process-level isolation with independent filesystems, letting each microservice carry its own runtime version. Deploying on Fargate means AWS manages the underlying host OS, patching, and infrastructure, directly addressing the team's limited operational capacity.\n\n**Why it works:** Each container image bundles the exact runtime (JDK version, Python version, Go binary) needed. ECS task definitions allow independent deployment -- updating the Python service does not redeploy the Java service. Fargate ensures no EC2 instance maintenance.\n\n**Why the others don't work:**\n- Option B: Lambda is not designed for continuously running services. Its 15-minute maximum invocation duration and event-driven model are mismatched to sustained traffic workloads.\n- Option C: One EC2 per service resolves dependency conflicts but reintroduces OS management per instance. Patch Manager reduces effort but does not eliminate it the way Fargate does.\n- Option D: Shared-instance co-location with virtual environments does not provide container-grade isolation and makes independent service deployments error-prone.",
+          "diagram": "diagrams/aws/SAA-C03/EcsFargateEcr.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0004",
+          "type": "multiple-choice",
+          "question": "During a security audit of a standalone AWS account that is not part of an organization, a team finds the root user has a valid password, no registered MFA device, and two active access keys. Two independent preventive controls must be implemented to minimize the risk of unauthorized root user access.\n\nWhich TWO actions should the team take to reduce the risk of unauthorized root user access?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Create an Amazon CloudWatch alarm on the `ConsoleLogin` CloudTrail event source filtered to root user sign-ins, and notify the security team via SNS whenever root authentication is detected.",
+              "isCorrect": false,
+              "explanation": "A CloudWatch alarm on root login events is a detective control, not a preventive one. It reduces time-to-detect unauthorized root access but does not prevent it. The question asks for controls that minimize the risk of unauthorized access, which requires preventive measures."
+            },
+            {
+              "id": "c1",
+              "text": "Enable a virtual or hardware MFA device on the root user to require a second authentication factor for all root console sign-ins, storing the MFA seed or device in a physically secured vault.",
+              "isCorrect": true,
+              "explanation": "Enabling MFA is the highest-impact preventive control for root access. Even if the root password is compromised, an attacker cannot complete root console sign-in without possession of the registered MFA device or seed.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Delete both root user access keys to eliminate the programmatic attack surface, since root access keys grant unrestricted API access that cannot be scoped or restricted by any IAM policy.",
+              "isCorrect": true,
+              "explanation": "Root access keys bypass all IAM permission boundaries and policies. Deleting them removes the programmatic attack path entirely. AWS best practice states that root access keys should never exist; if present, they must be deleted immediately.",
+              "sequence": 2
+            },
+            {
+              "id": "c4",
+              "text": "Update the root user email address to a non-guessable alias to obscure the login identity and reduce targeted phishing risk against the root account credentials.",
+              "isCorrect": false,
+              "explanation": "The root user login identity is the account's registered email address. Changing the account email is possible but is not a recognized security control - it does not prevent an attacker who already knows the account ID from attempting root sign-in, and it introduces operational risk if the new address is not carefully managed."
+            },
+            {
+              "id": "c5",
+              "text": "Attach an IAM policy to the root user that denies all API calls except account management actions, limiting the blast radius of any unauthorized root session.",
+              "isCorrect": false,
+              "explanation": "IAM policies, permission boundaries, and SCPs do not apply to the root user of an AWS account. The root user has full, unrestricted access regardless of any attached identity policy. This is a fundamental AWS constraint - root user access cannot be limited by IAM."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Design Secure Architectures",
+          "skills": [
+            "1.1.1: Applying AWS security best practices to IAM users and root users (for example, multi-factor authentication [MFA])."
+          ],
+          "services": [
+            "IAM",
+            "CloudTrail"
+          ],
+          "docs": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "tip": "Identify which controls act at or before the authentication step versus which controls observe or restrict activity after authentication succeeds.",
+          "explanation": "Enabling MFA and deleting root access keys are the two correct preventive controls for a standalone account.\n\n**Why they work:** MFA requires physical possession of a registered device, defeating password-only attacks including credential stuffing and phishing. Deleting access keys eliminates the programmatic attack surface entirely - root keys provide unrestricted API access that bypasses all IAM policies.\n\n**Why the others fail:**\n- CloudWatch alarm on root login: Detective control only; it alerts after unauthorized access occurs, not before.\n- Changing root email: Not a recognized security control; an attacker with the account ID can still attempt root sign-in regardless of the email address.\n- IAM policy on root user: IAM policies do not restrict the root user. Root user access is unconditional and cannot be scoped by any attached identity policy.\n\n**Implementation:** Sign in as root > Console > IAM > Security credentials > Multi-factor authentication > Assign MFA device. For access keys: same page > Access keys > Delete for each key.",
+          "difficulty": 4,
+          "lastReviewed": "2026-03-30"
+        },
+        {
+          "id": "SAA-C03-0041",
+          "type": "single-choice",
+          "question": "The engineering team is evaluating the security controls available in Amazon VPC. They need to understand the key behavioral difference between security groups and network ACLs when filtering traffic to Amazon EC2 instances.\n\nWhich statement BEST describes how security groups differ from network ACLs?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Security groups apply at the subnet level and evaluate rules in numeric order with an implicit deny at the end; network ACLs apply at the instance level and allow all traffic by default unless explicitly denied.",
+              "isCorrect": false,
+              "explanation": "This reverses the scope of each control. Security groups are attached to instances or network interfaces, not subnets. Network ACLs evaluate rules in numeric order and apply at the subnet level."
+            },
+            {
+              "id": "c3",
+              "text": "Security groups support both allow and deny rules at the instance level; network ACLs support only allow rules and apply to entire VPCs rather than individual subnets.",
+              "isCorrect": false,
+              "explanation": "Security groups only support allow rules - there is no mechanism to create explicit deny rules in a security group. Network ACLs support both allow and deny rules and apply to subnets, not entire VPCs."
+            },
+            {
+              "id": "c1",
+              "text": "Security groups are stateful, automatically allowing return traffic for established connections; network ACLs are stateless, requiring explicit inbound and outbound rules for every traffic flow.",
+              "isCorrect": true,
+              "explanation": "Security groups track connection state and permit return traffic automatically, while network ACLs evaluate each packet independently and require rules for both directions.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Security groups are stateless, requiring explicit rules for return traffic on every connection; network ACLs are stateful and automatically track outbound-initiated connection state for each session.",
+              "isCorrect": false,
+              "explanation": "This describes the opposite of actual behavior. Security groups are stateful and track connection state; network ACLs are stateless and require explicit rules for both inbound and outbound traffic on every connection."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Security",
+          "skills": [
+            "1.2.1: Designing VPC architectures with security components (for example, security groups, route tables, network ACLs, NAT gateways)."
+          ],
+          "services": [
+            "Amazon VPC"
+          ],
+          "docs": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Security.html",
+          "tip": "Consider how each control handles return traffic and at which layer of the VPC architecture - instance or subnet - each control is applied.",
+          "explanation": "Security groups are stateful: when an inbound rule permits a connection, the return traffic is automatically allowed regardless of outbound rules. Network ACLs are stateless: each packet is evaluated independently, so both inbound and outbound rules must explicitly permit traffic in both directions.\n\n**Why it works:** A security group tracks the state of connections and allows return traffic automatically. A network ACL evaluates every packet without memory of previous packets, requiring rules for each direction.\n\n**Why the others don't work:**\n- Security groups do not apply at the subnet level and do not evaluate rules in numeric order. All security group rules are evaluated simultaneously before any traffic is permitted.\n- Security groups do not support deny rules; only allow rules are supported. Network ACLs apply to subnets, not entire VPCs.\n- The stateful and stateless behaviors described are reversed. Security groups are stateful; network ACLs are stateless.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0117",
+          "type": "single-choice",
+          "question": "The organization is migrating a customer-facing REST API from fixed-size EC2 instances to an Auto Scaling group behind an Application Load Balancer. Historical data shows CPU utilisation fluctuates unpredictably, but the team knows that response latency degrades when the average number of in-flight requests per instance exceeds 800. They want Auto Scaling to add or remove instances automatically to keep user experience consistent, without over-provisioning during quiet periods.\n\nWhich scaling configuration BEST meets this requirement?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Create a step scaling policy triggered by a CloudWatch alarm on `CPUUtilization` with a threshold of 70%, adding 2 instances when the alarm breaches and removing 1 when it drops below 30%.",
+              "isCorrect": false,
+              "explanation": "CPU utilisation does not directly correlate to request-per-instance saturation for this workload. The team explicitly identified request count per target as the degradation signal, not CPU."
+            },
+            {
+              "id": "c3",
+              "text": "Configure a scheduled scaling action to add 4 instances every weekday at 08:00 UTC and remove them at 20:00 UTC based on anticipated business hours traffic.",
+              "isCorrect": false,
+              "explanation": "Scheduled scaling acts on predicted time-based patterns, not actual real-time load. Unpredictable traffic fluctuations will not be handled adequately by a fixed schedule."
+            },
+            {
+              "id": "c4",
+              "text": "Create a target tracking policy using the `ASGAverageCPUUtilization` predefined metric with a target of 50%, and set a `ScaleInCooldown` of 300 seconds.",
+              "isCorrect": false,
+              "explanation": "`ASGAverageCPUUtilization` tracks CPU, not request count. The team's data shows CPU is an unreliable indicator for this workload; using it as the scaling metric will not reliably prevent latency degradation when request rates are high."
+            },
+            {
+              "id": "c1",
+              "text": "Configure a target tracking scaling policy using the `ALBRequestCountPerTarget` predefined metric with a target value of `800`, attached to the Auto Scaling group via the ALB target group ARN.",
+              "isCorrect": true,
+              "explanation": "`ALBRequestCountPerTarget` directly measures in-flight requests per instance. Target tracking continuously adjusts capacity to maintain the target value, scaling out before latency degrades and scaling in during low traffic.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design High-Performing Architectures",
+          "skills": [
+            "3.2.2: Identifying metrics and conditions to perform scaling actions."
+          ],
+          "services": [
+            "Amazon EC2 Auto Scaling",
+            "Amazon CloudWatch",
+            "Elastic Load Balancing"
+          ],
+          "docs": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html",
+          "tip": "Consider which CloudWatch metric most directly measures the condition the team identified as the cause of latency degradation.",
+          "explanation": "When a team has identified a specific load metric that correlates to degraded user experience, that metric should drive the scaling policy. Amazon EC2 Auto Scaling's target tracking policies can use ALB-native metrics directly.\n\n**Why it works:** `ALBRequestCountPerTarget` is a predefined metric in Auto Scaling target tracking that counts the average number of requests per registered target in the ALB target group. Setting the target to `800` means Auto Scaling continuously adds instances as the count approaches 800 and removes them as load decreases - keeping latency stable with minimal over-provisioning.\n\n**Why the others don't work:**\n- Option B: Step scaling on `CPUUtilization` reacts to a metric the team identified as unreliable for this workload. It also requires manual threshold tuning and does not adapt as smoothly as target tracking.\n- Option C: Scheduled scaling does not respond to actual real-time request volumes and will under-provision or over-provision when traffic deviates from the schedule.\n- Option D: `ASGAverageCPUUtilization` has the same problem as Option B - CPU does not represent the per-instance request saturation point.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0029",
+          "type": "single-choice",
+          "question": "The security team needs to ensure that developers in any member account within AWS Organizations can never disable AWS CloudTrail logging, regardless of the IAM permissions they hold within their account.\n\nWhich is the MOST appropriate control mechanism?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Enable an AWS Config rule in each developer account to detect CloudTrail logging changes and trigger an AWS Systems Manager Automation runbook to re-enable logging within five minutes of any disruption.",
+              "isCorrect": false,
+              "explanation": "An AWS Config-based remediation is a reactive detective control. It detects the violation after it occurs and attempts to remediate it, leaving a window during which CloudTrail is disabled and audit coverage is lost."
+            },
+            {
+              "id": "c1",
+              "text": "Attach a service control policy to the organizational unit containing those accounts with an explicit Deny on `cloudtrail:StopLogging` and `cloudtrail:DeleteTrail`.",
+              "isCorrect": true,
+              "explanation": "An SCP with an explicit Deny overrides any Allow in any IAM policy within the member accounts, preventing developers from disabling CloudTrail regardless of their IAM permissions.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Configure an Amazon EventBridge rule in each developer account to detect `cloudtrail:StopLogging` API calls and trigger an AWS Lambda function that immediately re-enables the trail and sends an alert to the security team.",
+              "isCorrect": false,
+              "explanation": "Like Config-based remediation, an EventBridge and Lambda solution is reactive. There is always a brief window between the `StopLogging` call and the Lambda re-enabling the trail, during which audit logging is inactive."
+            },
+            {
+              "id": "c2",
+              "text": "Create a Deny IAM policy for `cloudtrail:StopLogging` in each developer account, attach it to every IAM user and role, and configure AWS Config to alert whenever the policy is modified or removed by any privileged user.",
+              "isCorrect": false,
+              "explanation": "An IAM Deny policy in the member account can be overridden by an administrator in that same account. It does not provide the cross-account, tamper-resistant enforcement that an SCP delivers from the management account."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Secure Architectures",
+          "skills": [
+            "1.1.4: Designing a security strategy for multiple AWS accounts (for example, AWS Control Tower, service control policies [SCPs])."
+          ],
+          "services": [
+            "AWS Organizations",
+            "CloudTrail"
+          ],
+          "docs": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
+          "tip": "Think about which control can enforce a restriction that applies above the account level, making it impossible for any IAM principal within the account to override it.",
+          "explanation": "Service control policies in AWS Organizations apply from outside the member account and override any Allow statement in any IAM policy within that account. An explicit Deny SCP on `cloudtrail:StopLogging` and `cloudtrail:DeleteTrail` ensures that no IAM principal in the member account - regardless of their permissions - can disable CloudTrail.\n\n**Why it works:** SCPs act as a permission ceiling applied from the management account. Unlike IAM policies within a member account, SCPs cannot be circumvented by account-level administrators.\n\n**Why the others don't work:**\n- An IAM Deny policy within the member account can be modified or removed by a sufficiently privileged administrator in that same account. It offers no cross-account protection.\n- Config-based remediation detects and corrects violations after they happen. There is always a gap during which CloudTrail is inactive.\n- EventBridge and Lambda remediation is also reactive and subject to the same timing gap as Config remediation.",
+          "difficulty": 1,
+          "lastReviewed": "2026-04-14"
+        },
+        {
+          "id": "SAA-C03-0160",
+          "type": "single-choice",
+          "question": "Management requires that a manufacturing company migrate 500 TB of factory sensor data from a local NAS device to Amazon S3 over the next 60 days. The factory has a 500 Mbps internet connection with no AWS Direct Connect. After the migration, the on-premises data processing applications must continue to read and write files to a local mount point, with changes synchronizing to S3 in the background. The team has no tolerance for rewriting application code to use the S3 API.\n\nWhich combination of services should the architect recommend?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Use the `aws s3 sync` command in a cron job on a Linux server to copy files from the NAS mount to S3, then mount the S3 bucket using `mountpoint-s3` for ongoing application access.",
+              "isCorrect": false,
+              "explanation": "`aws s3 sync` is not optimized for 500 TB migrations - it runs single-threaded per invocation and lacks automatic retry and bandwidth optimization that DataSync provides. `mountpoint-s3` does not support full POSIX semantics (no random writes), which would break existing applications without code changes."
+            },
+            {
+              "id": "c4",
+              "text": "Use AWS DataSync to migrate the 500 TB to Amazon S3, then use AWS DataSync ongoing replication tasks scheduled every 15 minutes to sync subsequent changes from the NAS to S3.",
+              "isCorrect": false,
+              "explanation": "DataSync scheduled replication requires the applications to continue writing to the NAS, which works, but scheduled 15-minute sync intervals mean data in S3 is always up to 15 minutes stale. File Gateway provides a real-time, transparent local mount that writes directly through to S3, eliminating this lag without requiring application changes."
+            },
+            {
+              "id": "c2",
+              "text": "Deploy an AWS Storage Gateway File Gateway immediately, point the on-premises applications to its mount point, and allow the File Gateway to migrate all 500 TB to S3 organically as files are accessed or written.",
+              "isCorrect": false,
+              "explanation": "File Gateway does not perform a bulk migration of existing NAS data. It only uploads files that are written through it. Pre-existing files on the NAS would not be transferred to S3, so the 500 TB migration goal would not be met within the 60-day window."
+            },
+            {
+              "id": "c1",
+              "text": "Use AWS DataSync to perform the initial 500 TB migration from the NAS to Amazon S3, then deploy an AWS Storage Gateway File Gateway on-premises to provide a local NFS/SMB mount point that transparently reads and writes objects to the same S3 bucket.",
+              "isCorrect": true,
+              "explanation": "DataSync is purpose-built for high-speed bulk data migration and can saturate available bandwidth with parallel transfer threads. Storage Gateway File Gateway then provides the ongoing local file system interface backed by S3, with no application code changes required.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Design Cost-Optimized Architectures",
+          "skills": [
+            "4.1.7: Selecting the appropriate service for data migration to storage services."
+          ],
+          "services": [
+            "AWS Storage Gateway",
+            "AWS DataSync",
+            "Amazon S3"
+          ],
+          "docs": "https://docs.aws.amazon.com/storagegateway/latest/userguide/WhatIsStorageGateway.html",
+          "tip": "Consider which service is designed for high-speed bulk migration versus which is designed for ongoing transparent local file access backed by cloud storage.",
+          "explanation": "The correct pattern is to use AWS DataSync for the bulk initial migration and AWS Storage Gateway File Gateway for ongoing transparent local access.\n\n**Why it works:** AWS DataSync uses parallel, multithreaded transfer agents to maximize available bandwidth. After the initial migration, File Gateway presents a standard NFS or SMB mount point to on-premises applications. Files written to the mount are automatically and synchronously uploaded to Amazon S3, providing a seamless local-to-cloud file system with no application code changes.\n\n**Why the others don't work:**\n- Option B: File Gateway only migrates files that are written through it going forward. It does not crawl and upload pre-existing NAS data in bulk, so the 500 TB would not be migrated within 60 days.\n- Option C: `aws s3 sync` lacks the parallelism and retry mechanisms of DataSync for large-scale migrations. `mountpoint-s3` does not support random writes, making it incompatible with most on-premises applications without code changes.\n- Option D: DataSync scheduled replication introduces an acceptable sync lag but does not eliminate it. File Gateway is the correct tool for real-time, transparent local-to-S3 access without code changes.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0115",
+          "type": "single-choice",
+          "question": "The engineering team needs to process customer order events generated by a front-end checkout service. The checkout service can burst to 5,000 events per second during flash sales, while the downstream inventory system can only safely process 200 events per second. The team wants to decouple the two systems so that each can scale independently without data loss during bursts. They run the following command to create the queue:\n\n```cli\naws sqs create-queue --queue-name order-events --attributes VisibilityTimeout=300\n```\n\nWhich additional architecture decision BEST decouples the components and absorbs traffic bursts?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Create an Amazon SNS topic and subscribe the inventory system directly using an HTTPS endpoint so that SNS fans out events in real time.",
+              "isCorrect": false,
+              "explanation": "SNS is a pub/sub fanout service, not a buffer. It delivers messages immediately to subscribers and does not persist messages if the subscriber is unavailable or cannot keep up with the delivery rate."
+            },
+            {
+              "id": "c1",
+              "text": "Have the checkout service publish messages to the SQS queue using `sqs:SendMessage`, and configure the inventory system to poll the queue with `sqs:ReceiveMessage` at its own sustainable rate.",
+              "isCorrect": true,
+              "explanation": "SQS acts as a buffer: the producer writes at burst rate while the consumer reads at its own pace. The queue absorbs the rate difference, preventing data loss and allowing independent scaling.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Have the checkout service invoke the inventory Lambda function directly using `lambda:InvokeFunction` with `InvocationType=RequestResponse` to ensure synchronous processing.",
+              "isCorrect": false,
+              "explanation": "Direct synchronous invocation tightly couples the two components. If the inventory system is overwhelmed or slow, the checkout service blocks, and there is no buffering against burst traffic."
+            },
+            {
+              "id": "c4",
+              "text": "Configure the checkout service to write events to an Amazon DynamoDB table with a `TTL` attribute set to 60 seconds, and have the inventory system use DynamoDB Streams to consume events.",
+              "isCorrect": false,
+              "explanation": "DynamoDB Streams can decouple reads from writes, but DynamoDB is not designed as a message queue. A 60-second TTL may expire records before the inventory system processes them during sustained bursts, risking data loss."
+            }
+          ],
+          "selectCount": 1,
+          "format": "cli",
+          "domain": "Design High-Performing Architectures",
+          "skills": [
+            "3.2.1: Decoupling workloads so that components can scale independently."
+          ],
+          "services": [
+            "Amazon SQS",
+            "AWS Lambda",
+            "Amazon SNS"
+          ],
+          "docs": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html",
+          "tip": "Consider which service was purpose-built to buffer messages between producers and consumers operating at different throughput rates.",
+          "explanation": "Amazon SQS is a managed message queue that decouples producers from consumers. The producer writes at any rate; the queue stores messages durably until the consumer retrieves them at its own pace.\n\n**Why it works:** The checkout service sends order events to the SQS queue via `sqs:SendMessage`. The inventory system polls via `sqs:ReceiveMessage` at 200 events/second. During a 5,000 events/second burst, messages queue up and are processed without loss once the burst subsides. The `VisibilityTimeout=300` ensures messages are not reprocessed while in flight.\n\n**Why the others don't work:**\n- Option B: `lambda:InvokeFunction` with `RequestResponse` creates tight synchronous coupling. No buffering occurs and the checkout service is blocked by inventory throughput limits.\n- Option C: Amazon SNS does not buffer messages - if the subscriber cannot accept delivery, the message is lost or must rely on a dead-letter queue configuration.\n- Option D: Using DynamoDB with TTL is an anti-pattern for event queuing. Short TTL values risk premature expiry, and DynamoDB Streams retain records for only 24 hours.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0122",
+          "type": "multiple-choice",
+          "question": "Following a production incident, a payments team discovers that their AWS Lambda-based checkout API experiences cold starts of 3-5 seconds when traffic spikes at midnight UTC when promotional campaigns launch. The Lambda function connects to Amazon DynamoDB and initialises a cryptographic signing library during cold start. End-to-end latency must stay below 500 ms at p99 during bursts. The function currently uses 256 MB memory and executes in 180 ms when warm.\n\nWhich TWO actions should the architect take?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Migrate the Lambda function to a container image and set the `PROVISIONED_CONCURRENCY` environment variable to enable automatic warm pool management.",
+              "isCorrect": false,
+              "explanation": "There is no `PROVISIONED_CONCURRENCY` environment variable that enables automatic warm pool management. Provisioned Concurrency must be configured explicitly via the Lambda API or console, and container image deployment does not inherently reduce cold start time for this function."
+            },
+            {
+              "id": "c2",
+              "text": "Increase the Lambda function memory from `256` MB to `1024` MB to allocate more vCPU and reduce the initialisation time of the cryptographic signing library during cold start.",
+              "isCorrect": true,
+              "explanation": "Lambda allocates vCPU proportionally to memory. Increasing memory from 256 MB to 1,024 MB quadruples the allocated vCPU, which can significantly reduce the CPU-bound initialisation time of the signing library during the `Init` phase.",
+              "sequence": 2
+            },
+            {
+              "id": "c3",
+              "text": "Configure a Lambda `Reserved Concurrency` limit of 500 to guarantee that 500 concurrent executions are always available for the checkout function.",
+              "isCorrect": false,
+              "explanation": "Reserved Concurrency limits the maximum concurrent executions for a function - it does not pre-warm execution environments. Setting a reserved concurrency limit does not prevent cold starts; it only caps concurrency and can throttle the function if demand exceeds the limit."
+            },
+            {
+              "id": "c1",
+              "text": "Enable Provisioned Concurrency on the Lambda function alias and schedule it to pre-warm the required number of execution environments before midnight UTC using Application Auto Scaling with a scheduled action.",
+              "isCorrect": true,
+              "explanation": "Provisioned Concurrency keeps initialised execution environments ready, eliminating cold starts. Scheduling a scale-up action ahead of the known midnight burst ensures capacity is warm before traffic arrives.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Increase the Lambda function `timeout` setting from the default 3 seconds to 30 seconds so that cold start initialisation has more time to complete.",
+              "isCorrect": false,
+              "explanation": "The `timeout` setting controls the maximum allowed execution duration before Lambda forcibly terminates the function. Increasing the timeout does not reduce cold start duration - it only prevents the function from timing out. Cold starts still take 3-5 seconds regardless of the timeout value."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Design High-Performing Architectures",
+          "skills": [
+            "3.2.4: Selecting the appropriate resource type and size (for example, the amount of Lambda memory) to meet business requirements."
+          ],
+          "services": [
+            "AWS Lambda",
+            "Amazon API Gateway",
+            "Amazon DynamoDB"
+          ],
+          "docs": "https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html",
+          "tip": "Consider how to eliminate cold starts proactively for a known traffic pattern, and how resource sizing affects initialisation speed.",
+          "explanation": "For latency-sensitive functions with predictable burst patterns, Provisioned Concurrency combined with appropriate memory sizing addresses both the cold start root cause and the initialisation duration.\n\n**Why it works:** Provisioned Concurrency pre-initialises execution environments so that the `Init` phase (including the cryptographic library load) completes before any request arrives. Scheduling the scale-up before midnight using Application Auto Scaling ensures warm environments are ready for the burst. Increasing memory to 1,024 MB allocates 4x more vCPU, directly reducing the CPU-bound signing library initialisation time during any remaining cold starts and improving warm execution speed.\n\n**Why the others don't work:**\n- Option C: Reserved Concurrency sets an upper bound on concurrent executions but does not pre-warm environments. It can actually cause throttling if demand exceeds the reserved limit.\n- Option D: There is no Lambda environment variable that activates Provisioned Concurrency. The feature must be explicitly configured through the AWS API or console.\n- Option E: The `timeout` setting only governs the maximum total execution duration. Cold start latency is part of the `Init` phase and is not affected by the timeout configuration.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        },
+        {
+          "id": "SAA-C03-0094",
+          "type": "multiple-choice",
+          "question": "During a security review, the team must select storage and networking technologies for two distinct requirements. First, a video streaming platform needs to serve large video files (up to 8 GB each) to a global audience with the lowest possible latency and minimum egress cost from the origin. Second, a fleet of 40 ECS tasks running on `c6g.2xlarge` instances must share a common POSIX-compliant filesystem for reading shared configuration files and writing job output, with automatic scaling of storage capacity.\n\nWhich TWO technology choices should the architect recommend?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Use Amazon EBS `gp3` volumes attached to each ECS EC2 host, and synchronise shared configuration files across instances using AWS DataSync on a 5-minute schedule.",
+              "isCorrect": false,
+              "explanation": "EBS volumes are attached to a single EC2 instance and cannot be shared simultaneously across 40 ECS tasks on different hosts. DataSync scheduled sync introduces staleness and does not provide the real-time shared filesystem semantics that POSIX compliance implies."
+            },
+            {
+              "id": "c2",
+              "text": "Use Amazon EFS with the General Purpose performance mode and Elastic throughput mode, mounting the filesystem to all 40 ECS tasks via the `EFSVolumeConfiguration` in the ECS task definition.",
+              "isCorrect": true,
+              "explanation": "EFS provides a POSIX-compliant shared filesystem that scales storage automatically and can be mounted simultaneously by multiple ECS tasks. Elastic throughput mode scales throughput with actual usage without manual provisioning.",
+              "sequence": 2
+            },
+            {
+              "id": "c1",
+              "text": "Store video files in Amazon S3 and serve them through Amazon CloudFront with an S3 origin, using CloudFront's regional edge caches and signed URLs to minimise origin fetch frequency and secure content access.",
+              "isCorrect": true,
+              "explanation": "CloudFront caches content at edge locations globally, dramatically reducing latency for international viewers. Serving from CloudFront edge caches minimises S3 data transfer out charges by avoiding repeated S3 fetches.",
+              "sequence": 1
+            },
+            {
+              "id": "c5",
+              "text": "Use AWS Transfer Family with an SFTP server endpoint backed by Amazon S3 to provide the ECS tasks with a shared filesystem interface using the `sftp` protocol over the task network.",
+              "isCorrect": false,
+              "explanation": "AWS Transfer Family provides managed SFTP/FTPS/FTP access to S3 or EFS for external file transfer workflows, not as a low-latency shared filesystem for containers. SFTP is not a POSIX filesystem interface and is not suitable for concurrent read/write access by 40 tasks."
+            },
+            {
+              "id": "c3",
+              "text": "Store video files in Amazon S3 and serve them directly from an S3 presigned URL without CloudFront, relying on S3 Transfer Acceleration to reduce latency for global viewers.",
+              "isCorrect": false,
+              "explanation": "S3 Transfer Acceleration uses CloudFront edge locations to accelerate uploads, not downloads for end users. For global video delivery at scale, CloudFront distribution with an S3 origin provides lower latency and significantly reduced egress cost compared to direct S3 access."
+            }
+          ],
+          "selectCount": 2,
+          "format": "text",
+          "domain": "Design Resilient Architectures",
+          "skills": [
+            "2.1.6: Recommending appropriate compute, storage, networking, and database technologies based on requirements."
+          ],
+          "services": [
+            "Amazon S3",
+            "Amazon CloudFront",
+            "Amazon EFS",
+            "AWS Transfer Family"
+          ],
+          "docs": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+          "tip": "Consider which storage type provides POSIX semantics for concurrent access and which CDN pattern minimises global delivery latency.",
+          "explanation": "For global video delivery, S3 combined with CloudFront is the standard AWS pattern: S3 provides durable origin storage and CloudFront caches at 400+ edge locations, reducing origin load and egress cost. For shared POSIX filesystem access across ECS tasks, Amazon EFS is the appropriate choice because it scales automatically and supports concurrent mounts.\n\n**Why it works:** CloudFront cached edge delivery means most viewer requests are served from a nearby edge location, not the S3 origin, lowering latency and egress cost. EFS Elastic throughput mode grows with demand and `EFSVolumeConfiguration` in ECS task definitions mounts the filesystem to each task without manual provisioning.\n\n**Why the others don't work:**\n- Option C: S3 Transfer Acceleration accelerates uploads from clients to S3. For video download delivery, CloudFront is the correct caching and distribution layer.\n- Option D: EBS is a block device attached to a single instance. Sharing configuration across multiple hosts via scheduled DataSync does not provide real-time POSIX filesystem semantics.\n- Option E: AWS Transfer Family is designed for external file transfer workflows (SFTP batch transfers). It is not a shared filesystem for concurrent container workloads.",
+          "diagram": "diagrams/aws/SAA-C03/CloudFrontEfsStorage.mmd",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-29"
+        }
+      ],
+      "perDomain": {
+        "Design Secure Architectures": {
+          "total": 1,
+          "correct": 0,
+          "score": 0
+        }
+      },
+      "earlyComplete": true,
+      "answeredCount": 1,
+      "totalQuestions": 20
     }
   ]
 }

@@ -23,6 +23,11 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider'
 import { fromSSO } from '@aws-sdk/credential-providers'
 import { captureWithContext, addBreadcrumb } from '../lib/sentry.js'
+import { recordEvent } from '../services/metricsStore.js'
+
+function trackAuthEvent(type: 'login' | 'signup_complete') {
+  recordEvent(type).catch(() => { /* metrics best-effort */ })
+}
 
 const AUTH_MODE = process.env.AUTH_MODE || 'dev'
 
@@ -139,6 +144,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             try {
               const userId = String(verified.payload.sub)
               const isNew = await setWelcomeEmailSent(userId)
+              trackAuthEvent(isNew ? 'signup_complete' : 'login')
               if (isNew) {
                 await setEmailOptIn(userId, true)
                 const email = (verified.payload.email ?? verified.payload.preferred_username) as string | undefined
@@ -226,6 +232,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             try {
               const userId = String(verified.payload.sub)
               const isNew = await setWelcomeEmailSent(userId)
+              trackAuthEvent(isNew ? 'signup_complete' : 'login')
               if (isNew) {
                 await setEmailOptIn(userId, true)
                 const email = (verified.payload.email ?? verified.payload.preferred_username) as string | undefined
@@ -469,6 +476,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         try {
           const userId = String(verified.payload.sub)
           const isNew = await setWelcomeEmailSent(userId)
+          trackAuthEvent(isNew ? 'signup_complete' : 'login')
           if (isNew) {
             await setEmailOptIn(userId, true)
             const name = ((verified.payload.name ?? verified.payload.given_name) as string | undefined) ?? email ?? 'there'

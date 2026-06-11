@@ -79,6 +79,7 @@ import imagesRoutes from './routes/images.js'
 import cronRoutes from './routes/cron.js'
 import unsubscribeRoutes from './routes/unsubscribe.js'
 import feedbackRoutes from './routes/feedback.js'
+import eventsRoutes from './routes/events.js'
 
 const server = Fastify({ logger: true, trustProxy: true })
 
@@ -204,6 +205,8 @@ await server.register(imagesRoutes, { prefix: '/images' })
 await server.register(cronRoutes, { prefix: '/internal/cron' })
 // Public one-click unsubscribe
 await server.register(unsubscribeRoutes, { prefix: '/unsubscribe' })
+// Public event tracking (page views, funnel events) — bot-filtered, no auth
+await server.register(eventsRoutes, { prefix: '/events' })
 
 // Sentry.setupFastifyErrorHandler (above) already captures unhandled errors
 // with full request context. This handler only owns the wire response shape;

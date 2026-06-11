@@ -6,6 +6,7 @@ import {
   queryQuestionItems,
   getAllLabMetas,
   getDailyItems,
+  getReferrerItems,
 } from '../services/metricsStore.js'
 
 // Suggestion thresholds
@@ -26,31 +27,38 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (!user?.isAdmin) return reply.status(403).send({ message: 'Forbidden' })
   })
 
-  // GET /admin/metrics/overview — global KPIs + 30-day trend
+  // GET /admin/metrics/overview — global KPIs + 30-day trend + funnel
   server.get('/overview', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, _reply) => {
-    const [examMetas, labMetas, dailyItems] = await Promise.all([
+    const [examMetas, labMetas, dailyItems, referrerItems] = await Promise.all([
       getAllExamMetas(),
       getAllLabMetas(),
       getDailyItems(30),
+      getReferrerItems(30),
     ])
 
     let totalAttempts = 0
     let finishedAttempts = 0
     let totalScore = 0
     let passCount = 0
+    let startedAttempts = 0
+    let abandonedAttempts = 0
 
     for (const item of examMetas) {
       totalAttempts += item.totalAttempts ?? 0
       finishedAttempts += item.finishedAttempts ?? 0
       totalScore += item.totalScore ?? 0
       passCount += item.passCount ?? 0
+      startedAttempts += item.startedAttempts ?? 0
+      abandonedAttempts += item.abandonedAttempts ?? 0
     }
 
     let labAttempts = 0
     let labPassCount = 0
+    let labStartedAttempts = 0
     for (const item of labMetas) {
       labAttempts += item.totalAttempts ?? 0
       labPassCount += item.passCount ?? 0
+      labStartedAttempts += item.startedAttempts ?? 0
     }
 
     const avgScore = finishedAttempts > 0 ? Math.round(totalScore / finishedAttempts) : 0
@@ -62,19 +70,75 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       attempts: d.attempts ?? 0,
       finished: d.finishedAttempts ?? 0,
       labAttempts: d.labAttempts ?? 0,
+      examStarts: d.examStarts ?? 0,
+      labStarts: d.labStarts ?? 0,
+      examAbandons: d.examAbandons ?? 0,
+      pageViewsExams: d.pageViewsExams ?? 0,
+      pageViewsLabs: d.pageViewsLabs ?? 0,
+      pageViewsPricing: d.pageViewsPricing ?? 0,
+      newVisitors: d.newVisitors ?? 0,
+      signupStarts: d.signupStarts ?? 0,
+      signupCompletes: d.signupCompletes ?? 0,
+      logins: d.logins ?? 0,
+      upgradeClicks: d.upgradeClicks ?? 0,
+      checkoutStarts: d.checkoutStarts ?? 0,
+      checkoutCompletes: d.checkoutCompletes ?? 0,
     }))
+
+    const sumKey = (key: string) => dailyItems.reduce((s, d: any) => s + (d[key] ?? 0), 0)
+
+    const funnel30d = {
+      pageViewsExams: sumKey('pageViewsExams'),
+      pageViewsLabs: sumKey('pageViewsLabs'),
+      pageViewsPricing: sumKey('pageViewsPricing'),
+      newVisitors: sumKey('newVisitors'),
+      examStarts: sumKey('examStarts'),
+      labStarts: sumKey('labStarts'),
+      examAbandons: sumKey('examAbandons'),
+      examFinishes: sumKey('finishedAttempts'),
+      signupStarts: sumKey('signupStarts'),
+      signupCompletes: sumKey('signupCompletes'),
+      logins: sumKey('logins'),
+      upgradeClicks: sumKey('upgradeClicks'),
+      checkoutStarts: sumKey('checkoutStarts'),
+      checkoutCompletes: sumKey('checkoutCompletes'),
+    }
+    const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : 0)
+    const conversion30d = {
+      visitorToSignup: pct(funnel30d.signupCompletes, funnel30d.pageViewsExams + funnel30d.pageViewsLabs),
+      signupStartToComplete: pct(funnel30d.signupCompletes, funnel30d.signupStarts),
+      pricingToCheckout: pct(funnel30d.checkoutStarts, funnel30d.pageViewsPricing),
+      checkoutStartToComplete: pct(funnel30d.checkoutCompletes, funnel30d.checkoutStarts),
+      examStartToFinish: pct(funnel30d.examFinishes, funnel30d.examStarts),
+    }
+
+    const referrerTotals: Record<string, number> = {}
+    for (const r of referrerItems as any[]) {
+      const host = String(r.host ?? 'other')
+      referrerTotals[host] = (referrerTotals[host] ?? 0) + (r.count ?? 0)
+    }
+    const topReferrers30d = Object.entries(referrerTotals)
+      .map(([host, count]) => ({ host, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10)
 
     const active30d = dailyItems.reduce((sum, d) => sum + (d.attempts ?? 0), 0)
 
     return {
       totalAttempts,
       finishedAttempts,
+      startedAttempts,
+      abandonedAttempts,
       avgScore,
       overallPassRate,
       labAttempts,
+      labStartedAttempts,
       labPassRate,
       active30dAttempts: active30d,
       dailyTrend,
+      funnel30d,
+      conversion30d,
+      topReferrers30d,
       examCount: examMetas.length,
       labCount: labMetas.length,
     }
@@ -90,10 +154,22 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         const items = await queryExamItems(examCode)
 
         const modeBreakdown: Record<string, number> = {}
+        const startModeBreakdown: Record<string, number> = {}
+        let abandonHist: Record<string, number> | null = null
         for (const item of items) {
           if (item.sk?.startsWith('MODE#')) {
             const mode = item.sk.replace('MODE#', '')
             modeBreakdown[mode] = item.count ?? 0
+          } else if (item.sk?.startsWith('START_MODE#')) {
+            const mode = item.sk.replace('START_MODE#', '')
+            startModeBreakdown[mode] = item.count ?? 0
+          } else if (item.sk === 'ABANDON_AT') {
+            abandonHist = {
+              '0-25%': item.bucket0_25 ?? 0,
+              '25-50%': item.bucket25_50 ?? 0,
+              '50-75%': item.bucket50_75 ?? 0,
+              '75-100%': item.bucket75_100 ?? 0,
+            }
           }
         }
 
@@ -110,14 +186,24 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
             ? Math.round(((meta.finishedAttempts ?? 0) / meta.totalAttempts) * 100)
             : 0
 
+        const startedAttempts = meta.startedAttempts ?? 0
+        const abandonedAttempts = meta.abandonedAttempts ?? 0
+        const startToFinishRate = startedAttempts > 0
+          ? Math.round(((meta.finishedAttempts ?? 0) / startedAttempts) * 100)
+          : 0
         return {
           examCode,
           totalAttempts: meta.totalAttempts ?? 0,
           finishedAttempts: meta.finishedAttempts ?? 0,
+          startedAttempts,
+          abandonedAttempts,
+          startToFinishRate,
           finishRate,
           avgScore,
           passRate,
           modeBreakdown,
+          startModeBreakdown,
+          abandonHistogram: abandonHist,
         }
       })
     )

@@ -11,6 +11,7 @@ import { useBasket } from '../basket/BasketContext'
 import { useExam } from '../exam/ExamContext'
 import { Check, X, ShoppingCart, Tag, ChevronRight } from 'lucide-react'
 import { clarityEvent, clarityTag } from '../clarity'
+import { trackEvent as trackCsEvent, trackPageView } from '@/lib/trackEvent'
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -282,12 +283,15 @@ export default function PricingPage() {
   useEffect(() => {
     clarityTag('funnel_stage', 'pricing')
     clarityEvent('pricing_page_viewed')
+    trackPageView('pricing')
+    trackCsEvent('pricing_view')
   }, [])
 
   const handleBuy = (product: CatalogProduct) => {
     clarityEvent('add_to_basket')
     clarityTag('product_added', `${product.kind}:${product.productId}`)
     clarityTag('funnel_stage', 'add_to_basket')
+    trackCsEvent('upgrade_click', { cta: `pricing:${product.productId}` })
     if (tier === 'pro' || tier === 'pro_plus') {
       // For paid users upgrading, replace whatever is in the basket and go straight there
       basket.switchTo(product)

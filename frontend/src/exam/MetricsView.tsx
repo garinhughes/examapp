@@ -11,14 +11,57 @@ import { TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp, RefreshCw, Ale
 interface OverviewData {
   totalAttempts: number
   finishedAttempts: number
+  startedAttempts: number
+  abandonedAttempts: number
   avgScore: number
   overallPassRate: number
   labAttempts: number
+  labStartedAttempts: number
   labPassRate: number
   active30dAttempts: number
   examCount: number
   labCount: number
-  dailyTrend: { date: string; attempts: number; finished: number; labAttempts: number }[]
+  dailyTrend: {
+    date: string
+    attempts: number
+    finished: number
+    labAttempts: number
+    examStarts?: number
+    labStarts?: number
+    examAbandons?: number
+    pageViewsExams?: number
+    pageViewsLabs?: number
+    pageViewsPricing?: number
+    newVisitors?: number
+    signupCompletes?: number
+    upgradeClicks?: number
+    checkoutStarts?: number
+    checkoutCompletes?: number
+  }[]
+  funnel30d?: {
+    pageViewsExams: number
+    pageViewsLabs: number
+    pageViewsPricing: number
+    newVisitors: number
+    examStarts: number
+    labStarts: number
+    examAbandons: number
+    examFinishes: number
+    signupStarts: number
+    signupCompletes: number
+    logins: number
+    upgradeClicks: number
+    checkoutStarts: number
+    checkoutCompletes: number
+  }
+  conversion30d?: {
+    visitorToSignup: number
+    signupStartToComplete: number
+    pricingToCheckout: number
+    checkoutStartToComplete: number
+    examStartToFinish: number
+  }
+  topReferrers30d?: { host: string; count: number }[]
 }
 
 interface ExamSummary {
@@ -184,6 +227,43 @@ function OverviewTab({ overview, exams }: { overview: OverviewData; exams: ExamS
           </AreaChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Acquisition funnel — last 30 days */}
+      {overview.funnel30d && overview.conversion30d && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+          <h3 className="text-sm font-semibold mb-3 text-foreground">Acquisition Funnel — Last 30 Days</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <KpiCard label="Exam Page Views" value={overview.funnel30d.pageViewsExams.toLocaleString()} sub={`${overview.funnel30d.newVisitors.toLocaleString()} new visitors`} />
+            <KpiCard label="Lab Page Views" value={overview.funnel30d.pageViewsLabs.toLocaleString()} />
+            <KpiCard label="Exam Starts" value={overview.funnel30d.examStarts.toLocaleString()} sub={`${overview.conversion30d.examStartToFinish}% → finish`} />
+            <KpiCard label="Lab Starts" value={overview.funnel30d.labStarts.toLocaleString()} />
+            <KpiCard label="Exam Abandons" value={overview.funnel30d.examAbandons.toLocaleString()} />
+            <KpiCard label="Logins" value={overview.funnel30d.logins.toLocaleString()} />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-3">
+            <KpiCard label="Pricing Views" value={overview.funnel30d.pageViewsPricing.toLocaleString()} sub={`${overview.conversion30d.pricingToCheckout}% → checkout`} />
+            <KpiCard label="Upgrade Clicks" value={overview.funnel30d.upgradeClicks.toLocaleString()} />
+            <KpiCard label="Signup Starts" value={overview.funnel30d.signupStarts.toLocaleString()} sub={`${overview.conversion30d.signupStartToComplete}% complete`} />
+            <KpiCard label="Signups" value={overview.funnel30d.signupCompletes.toLocaleString()} sub={`${overview.conversion30d.visitorToSignup}% of visitors`} />
+            <KpiCard label="Checkout Starts" value={overview.funnel30d.checkoutStarts.toLocaleString()} sub={`${overview.conversion30d.checkoutStartToComplete}% complete`} />
+            <KpiCard label="Checkout Completes" value={overview.funnel30d.checkoutCompletes.toLocaleString()} />
+          </div>
+        </div>
+      )}
+
+      {/* Top referrers — last 30 days */}
+      {overview.topReferrers30d && overview.topReferrers30d.length > 0 && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+          <h3 className="text-sm font-semibold mb-3 text-foreground">Top Referrers — Last 30 Days (first-visit only)</h3>
+          <div className="flex flex-wrap gap-2">
+            {overview.topReferrers30d.map((r) => (
+              <span key={r.host} className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                <span className="font-medium text-foreground">{r.host}</span> · {r.count}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Exam summary table */}
       <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">

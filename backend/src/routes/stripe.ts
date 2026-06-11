@@ -23,6 +23,7 @@ import { getUserBySub } from '../services/dynamo.js'
 import { sendPaymentConfirmedEmail, sendInternalAlert, sendRefundedEmail, sendSubscriptionCancelledEmail, sendSubscriptionChangedEmail, sendSubscriptionEndedEmail, sendPaymentFailedEmail } from '../services/ses.js'
 import { logEmailSend } from '../services/emailLogs.js'
 import { captureWithContext, addBreadcrumb } from '../lib/sentry.js'
+import { recordEvent } from '../services/metricsStore.js'
 
 const STRIPE_API = 'https://api.stripe.com/v1'
 // Pin API version so schema changes (like basil removing invoice.subscription) can't
@@ -211,6 +212,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         const idempotencyKey = `checkout:${userId ?? 'anon'}:${productIds.join(',')}:${idemBucket}`
         const session = await stripePost('/checkout/sessions', sessionParams, { idempotencyKey })
         server.log.info({ sessionId: session.id, userId }, '[stripe] checkout session created')
+        recordEvent('checkout_start', { plan: productIds.join(',') }).catch(() => {})
         return { url: session.url }
       } catch (err: any) {
         server.log.error({ err }, '[stripe] create-checkout error')
@@ -315,6 +317,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
               })
             }
             server.log.info({ userId, productIds, sessionId: session.id }, '[stripe] entitlements granted')
+            recordEvent('checkout_complete', { plan: productIds.join(',') }).catch(() => {})
             // Send payment confirmation email (fire-and-forget)
             try {
               const user = await getUserBySub(userId)
@@ -366,6 +369,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
                   })
                 }
                 server.log.info({ userId, productIds, invoiceId: invoice.id, billingReason: invoice.billing_reason }, '[stripe] subscription entitlement granted/renewed')
+                if (isCreate) recordEvent('checkout_complete', { plan: productIds.join(',') }).catch(() => {})
                 // Send confirmation email only on initial purchase, not on renewals
                 if (isCreate) {
                   try {
