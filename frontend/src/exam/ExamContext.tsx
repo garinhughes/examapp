@@ -1151,7 +1151,10 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   // Fetch exams list
   useEffect(() => {
     fetch(apiUrl('/exams'))
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json()
+      })
       .then(setExams)
       .catch((e) => {
         captureError(e, { tags: { surface: 'practice-exams', action: 'fetch-list' } })
