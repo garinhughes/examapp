@@ -167,7 +167,7 @@ function createDynamoStore(): AttemptsStore {
           TableName: ATTEMPTS_TABLE,
           FilterExpression: 'startedAt BETWEEN :f AND :t',
           ExpressionAttributeValues: { ':f': from, ':t': to },
-          ProjectionExpression: 'attemptId, userId, examCode, startedAt, finishedAt, updatedAt, #s, score, metadata, country, answers',
+          ProjectionExpression: 'attemptId, userId, examCode, startedAt, finishedAt, updatedAt, #s, score, metadata, country, answers, abandonReason, abandonNote',
           ExpressionAttributeNames: { '#s': 'status' },
           ExclusiveStartKey: cursor,
         }))

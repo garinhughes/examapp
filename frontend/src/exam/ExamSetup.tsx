@@ -5,6 +5,7 @@ import { useExam } from './ExamContext'
 import { useIsAdmin } from '@/auth/useIsAdmin'
 import { useTourContext } from '@/components/TourProvider'
 import { clarityEvent, clarityTag } from '@/clarity'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 
 export function ExamSetup() {
   const {
@@ -146,7 +147,15 @@ export function ExamSetup() {
                 )}
               </span>
               <button
-                onClick={() => examTier === 'visitor' ? navigate('/login') : setRoute('pricing')}
+                onClick={() => {
+                  if (examTier === 'visitor') {
+                    trackCsEvent('signup_start', { cta: 'exam-setup-banner' })
+                    navigate('/login')
+                  } else {
+                    trackCsEvent('upgrade_click', { cta: 'exam-setup-banner' })
+                    setRoute('pricing')
+                  }
+                }}
                 className="shrink-0 px-3 py-1 rounded text-xs font-semibold bg-primary text-white hover:bg-primary/80"
               >
                 {examTier === 'visitor' ? 'Sign up free' : 'View plans'}

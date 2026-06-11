@@ -4,7 +4,7 @@ import { loadExam, shuffleQuestions, normaliseQuestion, getDomainBalancedQuestio
 import { attemptsStore } from '../services/attemptsStore.js'
 import { getActiveProductIds } from '../services/entitlements.js'
 import { resolveUserTier, TIERS, isPaidTier } from '../catalog.js'
-import { updateMetricsOnAttemptFinish } from '../services/metricsStore.js'
+import { updateMetricsOnAttemptFinish, recordAbandonReason } from '../services/metricsStore.js'
 import { touchUserActivity } from '../services/dynamo.js'
 import { captureWithContext } from '../lib/sentry.js'
 
@@ -350,7 +350,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
   // Replaces the user-facing DELETE flow — preserves the row + answers so the
   // signal "user got 30 questions in then quit" survives. DELETE stays for admin/GDPR.
   // Optional `reason` (chips) only collected when the client has 20+ answers (15.15).
-  const ABANDON_REASONS = new Set(['too-hard', 'ran-out-of-time', 'changed-my-mind', 'technical-issue', 'prefer-not-to-say'])
+  const ABANDON_REASONS = new Set(['too-hard', 'too-easy', 'ran-out-of-time', 'technical-issue', 'something-else'])
+  const ABANDON_NOTE_MAX = 280
   server.post('/:id/abandon', { preHandler: [server.optionalAuth], config: { rateLimit: { max: 100, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { id } = request.params as any
     const userId = extractUserId(request)
@@ -363,14 +364,24 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     const body = (request.body as any) ?? {}
     const reason = typeof body.reason === 'string' && ABANDON_REASONS.has(body.reason) ? body.reason : null
+    const note = reason === 'something-else' && typeof body.note === 'string'
+      ? body.note.trim().slice(0, ABANDON_NOTE_MAX) || null
+      : null
 
     const now = new Date().toISOString()
     const fields: Record<string, any> = { status: 'abandoned', abandonedAt: now, updatedAt: now }
     if (reason) fields.abandonReason = reason
+    if (note) fields.abandonNote = note
     await attemptsStore.updateProgress(userId, id, fields)
 
-    request.log.info({ userId, examCode: attempt.examCode, attemptId: id, reason: reason ?? 'none', answeredCount: Array.isArray(attempt.answers) ? attempt.answers.length : 0 }, '[attempts] abandoned')
-    return { abandoned: true, attemptId: id, abandonedAt: now, reason }
+    if (reason) {
+      recordAbandonReason(attempt.examCode, reason, userId).catch((err) => {
+        request.log.warn({ err }, '[metrics] recordAbandonReason failed')
+      })
+    }
+
+    request.log.info({ userId, examCode: attempt.examCode, attemptId: id, reason: reason ?? 'none', hasNote: !!note, answeredCount: Array.isArray(attempt.answers) ? attempt.answers.length : 0 }, '[attempts] abandoned')
+    return { abandoned: true, attemptId: id, abandonedAt: now, reason, note }
   })
 
   // Submit an answer for an attempt

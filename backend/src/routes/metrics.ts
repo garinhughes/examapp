@@ -11,6 +11,7 @@ import {
   getAllLabMetas,
   getDailyItems,
   getReferrerItems,
+  getAbandonReasonItems,
   isAdminUserId,
 } from '../services/metricsStore.js'
 
@@ -89,11 +90,12 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     const q = request.query as any
     const range = String(q.range ?? '30d')
     const days = range === '7d' ? 7 : range === '90d' ? 90 : range === '6m' ? 183 : range === '12m' ? 365 : 30
-    const [examMetas, labMetas, dailyItems, referrerItems] = await Promise.all([
+    const [examMetas, labMetas, dailyItems, referrerItems, abandonReasonItems] = await Promise.all([
       getAllExamMetas(),
       getAllLabMetas(),
       getDailyItems(days),
       getReferrerItems(days),
+      getAbandonReasonItems(days),
     ])
 
     let totalAttempts = 0
@@ -184,6 +186,15 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
 
     const active30d = dailyItems.reduce((sum, d) => sum + (d.attempts ?? 0), 0)
 
+    const abandonReasonTotals: Record<string, number> = {}
+    for (const it of abandonReasonItems as any[]) {
+      const r = String(it.reason ?? 'unknown')
+      abandonReasonTotals[r] = (abandonReasonTotals[r] ?? 0) + (it.count ?? 0)
+    }
+    const abandonReasons30d = Object.entries(abandonReasonTotals)
+      .map(([reason, count]) => ({ reason, count }))
+      .sort((a, b) => b.count - a.count)
+
     return {
       totalAttempts,
       finishedAttempts,
@@ -199,6 +210,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       funnel30d,
       conversion30d,
       topReferrers30d,
+      abandonReasons30d,
       examCount: examMetas.length,
       labCount: labMetas.length,
     }
@@ -480,6 +492,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
           userType,
           questionsAnswered: reached,
           durationSecs: typeof durationMs === 'number' ? Math.round(durationMs / 1000) : null,
+          abandonReason: a.abandonReason ?? null,
+          abandonNote: a.abandonNote ?? null,
         }
       })
       .filter((r: any) => !userTypeFilter || r.userType === userTypeFilter)

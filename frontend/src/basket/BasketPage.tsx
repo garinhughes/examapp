@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
 import { Trash2, ShoppingCart, ArrowRight, ArrowUp } from 'lucide-react'
 import { clarityEvent, clarityTag } from '../clarity'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 
 const PayPalCheckout = lazy(() => import('./PayPalCheckout'))
 import { useBasket } from './BasketContext'
@@ -180,7 +181,7 @@ export default function BasketPage() {
           <div className="text-center space-y-3 py-2">
             <p className="text-sm text-muted-foreground">Log in or create a free account to complete your purchase.</p>
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => { trackCsEvent('signup_start', { cta: 'basket-login-required' }); navigate('/login') }}
               className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition inline-flex items-center justify-center gap-2"
             >
               Log in / Register to checkout <ArrowRight className="w-4 h-4" />

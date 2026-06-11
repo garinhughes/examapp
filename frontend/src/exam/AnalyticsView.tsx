@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 import { ProviderLogo } from '@/components/ProviderLogo'
 import { Trash2, ChevronDown, ChevronRight, Search, ChevronLeft, Eye, CalendarDays, BookOpen, TrendingUp, BarChart2 } from 'lucide-react'
 import { useExam } from './ExamContext'
@@ -252,7 +253,7 @@ export function AnalyticsView() {
             Sign up free to track your score history, domain breakdowns, and progress over time.
           </p>
           <button
-            onClick={() => setRoute('pricing')}
+            onClick={() => { trackCsEvent('signup_start', { cta: 'analytics-guest-banner' }); setRoute('pricing') }}
             className="flex-shrink-0 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
           >
             Sign up free

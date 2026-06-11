@@ -6,6 +6,7 @@ import { isAnswerCorrect, renderChoiceContent, MarkdownText } from './utils'
 import type { Question, QuestionType } from './types'
 import { QuestionImage } from './QuestionImage'
 import { QuestionDiagram } from './QuestionDiagram'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 
 export function ExamReview() {
   const navigate = useNavigate()
@@ -253,7 +254,7 @@ export function ExamReview() {
                         <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-muted-foreground">This question is from paid content.</p>
-                          <button onClick={() => setRoute('pricing')} className="text-xs text-primary hover:underline">Re-subscribe to unlock full review</button>
+                          <button onClick={() => { trackCsEvent('upgrade_click', { cta: 'exam-review-locked-question' }); setRoute('pricing') }} className="text-xs text-primary hover:underline">Re-subscribe to unlock full review</button>
                         </div>
                       </div>
                     )

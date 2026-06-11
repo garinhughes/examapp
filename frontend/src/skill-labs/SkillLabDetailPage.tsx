@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, Clock, Hourglass, Coffee, Lock, ArrowRight, X, Play, CheckCircle2, Info, Target, Briefcase, BookOpen, Bookmark } from 'lucide-react'
 import Loader from '@/components/Loader'
@@ -235,7 +236,7 @@ export function SkillLabDetailPage({ labId, onLabLoad }: SkillLabDetailPageProps
               <span>This is a premium lab. Upgrade your plan to access it.</span>
             </div>
             <button
-              onClick={() => setRoute('pricing')}
+              onClick={() => { trackCsEvent('upgrade_click', { cta: 'lab-detail-locked' }); setRoute('pricing') }}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
             >
               View Plans <ArrowRight className="w-4 h-4" />

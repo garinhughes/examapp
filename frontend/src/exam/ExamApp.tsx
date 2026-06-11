@@ -3,6 +3,7 @@ import { RatingModal } from '@/feedback/RatingModal'
 import { useNavigate } from 'react-router-dom'
 import { useRef, useEffect, useState } from 'react'
 import { clarityEvent, clarityTag } from '@/clarity'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 import { Sidebar } from '@/components/Sidebar'
 import { TourProvider, useTourContext } from '@/components/TourProvider'
 import { TourBubble } from '@/components/TourBubble'
@@ -261,7 +262,10 @@ function ExamAppInner() {
               {route !== 'pricing' && (
                 <button
                   className="px-3 py-1 rounded-md bg-primary text-white text-xs font-medium hover:bg-primary/90 transition whitespace-nowrap"
-                  onClick={() => setRoute('pricing')}
+                  onClick={() => {
+                    trackCsEvent('upgrade_click', { cta: `discount-banner:${route}` })
+                    setRoute('pricing')
+                  }}
                 >
                   View plans
                 </button>

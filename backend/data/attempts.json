@@ -60039,6 +60039,1883 @@
       "earlyComplete": true,
       "answeredCount": 1,
       "totalQuestions": 60
+    },
+    {
+      "attemptId": "6f27c107-2530-4d6d-b6f6-e9a200e13871",
+      "userId": "visitor:4abc2347-7dfd-4580-b922-27842fb516b9",
+      "examCode": "CCA-F",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-06-11T11:04:08.405Z",
+      "updatedAt": "2026-06-11T11:08:40.422Z",
+      "finishedAt": null,
+      "status": "abandoned",
+      "score": null,
+      "answers": [
+        {
+          "questionId": "CCA-F-0161",
+          "selectedChoiceId": "c1",
+          "selectedChoiceIds": null,
+          "selectedMappings": null,
+          "selectedOrder": null,
+          "selectedIndex": null,
+          "selectedIndices": null,
+          "correct": false,
+          "timeMs": 0,
+          "showTip": false,
+          "createdAt": "2026-06-11T11:04:10.259Z"
+        }
+      ],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "country": null,
+      "questions": [
+        {
+          "id": "CCA-F-0161",
+          "type": "single-choice",
+          "question": "A developer has written detailed formatting instructions for a Claude-powered bug report generator, specifying a required output layout with named fields. After extensive prompt iteration, the output format still varies between runs - sometimes omitting fields, sometimes reordering sections.\n\nWhat is the most effective next intervention?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Rewrite the formatting instructions with additional specificity - including character limits, capitalization requirements, and explicit descriptions of acceptable and unacceptable values per field - so Claude has a more complete rule set to draw on when constructing the output layout.",
+              "isCorrect": false,
+              "explanation": "Adding more detailed instructions continues the strategy that has already failed. Increasing instruction specificity does not resolve inconsistencies that detailed descriptions alone cannot prevent."
+            },
+            {
+              "id": "c2",
+              "text": "Reduce the `temperature` setting to make Claude's output more deterministic, on the basis that stochastic sampling is the primary source of the field-level variation observed across runs.",
+              "isCorrect": false,
+              "explanation": "Format inconsistency in structured output is rarely caused by temperature. Reducing `temperature` affects token sampling randomness but does not teach Claude the desired layout pattern."
+            },
+            {
+              "id": "c3",
+              "text": "Split the task into two separate Claude calls - one to identify bugs and one to format the discovered list - so that the formatting call receives clean structured input and can apply layout rules without the complexity introduced by simultaneous bug detection.",
+              "isCorrect": false,
+              "explanation": "Task splitting may reduce per-call complexity but does not guarantee consistent formatting. The formatting call still lacks a concrete demonstration of the desired structure."
+            },
+            {
+              "id": "c4",
+              "text": "Add 2-4 few-shot examples that demonstrate complete, correctly formatted bug reports with all required fields populated in the correct layout.",
+              "isCorrect": true,
+              "explanation": "Few-shot examples give Claude a direct demonstration of the desired format. When instructions alone produce inconsistent output, concrete examples communicate the pattern in a form that Claude can generalize reliably.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Prompt Engineering & Structured Output",
+          "skills": [
+            "4.2.1: Understanding few-shot examples as the most effective technique for achieving consistently formatted, actionable output when detailed instructions alone produce inconsistent results."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+          "tip": "When detailed instructions have been exhausted without resolving inconsistency, consider what technique communicates the desired pattern more directly than written rules.",
+          "explanation": "Detailed instructions describe the desired output abstractly. When Claude cannot reliably infer the exact layout from descriptions alone, few-shot examples provide a direct demonstration that anchors the formatting pattern.\n\n**Why it works:** Completed examples allow Claude to extract the layout from concrete instances rather than from abstract rules, which is more effective when instructions alone produce variance.\n\n**Why the others don't work:**\n- Distractor A: More instructions continue the approach that failed - the problem is that description alone is insufficient.\n- Distractor B: Reducing `temperature` addresses sampling variance, not formatting knowledge.\n- Distractor C: Task splitting reduces context complexity but still doesn't provide the formatting demonstration Claude needs.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0174",
+          "type": "single-choice",
+          "question": "A developer wants Claude to extract structured metadata - title, author, and publication date - from academic paper abstracts and return the data as a typed object for downstream processing.\n\nWhich implementation approach guarantees structured output and enables the application to access the extracted fields reliably?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Instruct Claude in the system prompt to return the metadata as a JSON object with the required field names, and parse the response text as JSON in the application layer, catching any syntax errors that occur when Claude deviates from the specified format.",
+              "isCorrect": false,
+              "explanation": "Free-text JSON generation requires manual parsing and error handling. Without schema enforcement, occasional syntax errors and missing fields persist regardless of how clearly the instruction is written."
+            },
+            {
+              "id": "c1",
+              "text": "Define an `extract_metadata` tool with an `input_schema` specifying the required fields as typed properties, force the tool call using `tool_choice`, and read the extracted values from the `tool_use` block in Claude's response.",
+              "isCorrect": true,
+              "explanation": "Defining the extraction schema as a tool's `input_schema` and forcing the call ensures Claude returns the data in a structured `tool_use` block with validated field types, which the application reads directly.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Enumerate the required fields as a numbered list with example values in the system prompt, add a human-turn reminder to return only JSON, and run a post-processing step that uses pattern matching to pull each field from the response even when Claude includes surrounding prose.",
+              "isCorrect": false,
+              "explanation": "Instruction-based JSON with pattern-matching post-processing is fragile. Varied response formats break regex-based field extraction, and there is no structural guarantee that all required fields will be present."
+            },
+            {
+              "id": "c3",
+              "text": "Set the `response_format` parameter to `json_object` in the API request so Claude returns only valid JSON, then access the extracted fields by key in the parsed response, relying on the format constraint to enforce the required field structure.",
+              "isCorrect": false,
+              "explanation": "The Claude API does not have a `response_format` parameter. This option describes an OpenAI API feature that is not available in the Anthropic API and cannot be used to enforce structured output."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Prompt Engineering & Structured Output",
+          "skills": [
+            "4.3.5: Defining extraction tools with JSON schemas as input parameters and extracting structured data from the tool_use response."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Think about which approach eliminates free-text JSON generation entirely and gives the application a typed, validated data structure to read from.",
+          "explanation": "Defining an extraction tool with a JSON Schema `input_schema` and forcing the call moves structured output from free-text generation into a validated `tool_use` block, giving the application a reliable typed object to read.\n\n**Why it works:** The API validates the tool call against the schema before returning it, guaranteeing that required fields are present and typed correctly. The application reads from the `tool_use` block directly.\n\n**Why the others don't work:**\n- Distractor B: Free-text JSON requires manual parsing and cannot prevent syntax errors or missing fields.\n- Distractor C: `response_format` is an OpenAI API parameter that does not exist in the Claude API.\n- Distractor D: Pattern-matching post-processing is fragile and does not provide structural guarantees.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0176",
+          "type": "single-choice",
+          "question": "A developer builds a multi-step document processing pipeline where Claude must extract structured metadata before downstream enrichment steps can run. Two tools are defined - `extract_metadata` and `enrich_document` - and the developer needs to guarantee that `extract_metadata` is always called first, regardless of the document content.\n\nWhich configuration guarantees that `extract_metadata` runs as the first operation?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Include only `extract_metadata` in the `tools` array for the first API call and add `enrich_document` to a second separate request after the metadata extraction is confirmed complete, sequencing the tools by controlling which are available at each pipeline step.",
+              "isCorrect": false,
+              "explanation": "Limiting available tools per call is a valid sequencing mechanism, but it requires maintaining two separate tool configurations. Forced `tool_choice` achieves the same guarantee with the full tool set available."
+            },
+            {
+              "id": "c2",
+              "text": "Set `tool_choice` to `{\"type\": \"tool\", \"name\": \"extract_metadata\"}` in the first call to force Claude to invoke that specific tool, then make a second request without the forced setting to allow Claude to proceed with enrichment.",
+              "isCorrect": true,
+              "explanation": "Forcing a named tool guarantees that `extract_metadata` is called in the first turn. Removing the constraint in the follow-up request allows Claude to proceed with enrichment once the metadata is available.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Place `extract_metadata` first in the `tools` array and set `tool_choice` to `\"auto\"`, on the basis that Claude defaults to the first declared tool when both are equally applicable to the document content.",
+              "isCorrect": false,
+              "explanation": "Claude does not default to the first declared tool based on array position. With `\"auto\"`, Claude may call either tool or return a text response depending on the document content."
+            },
+            {
+              "id": "c1",
+              "text": "Set `tool_choice` to `\"any\"` so that Claude must call one of the two tools for every document, relying on the tool descriptions and the order in which they appear in the `tools` array to signal to Claude that `extract_metadata` should be called before `enrich_document`.",
+              "isCorrect": false,
+              "explanation": "`\"any\"` requires a tool call but leaves selection to Claude. Tool declaration order does not guarantee which tool Claude will invoke first - Claude chooses based on content suitability, not array position."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Prompt Engineering & Structured Output",
+          "skills": [
+            "4.3.7: Forcing a specific tool with tool_choice: {\"type\": \"tool\", \"name\": \"extract_metadata\"} to ensure a particular extraction runs before enrichment steps."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Think about which `tool_choice` value eliminates ambiguity entirely by specifying exactly which tool must be called, rather than relying on hints or tool availability.",
+          "explanation": "Forcing `tool_choice` to a specific named tool guarantees that exactly that tool is invoked in the first pipeline step. The constraint is then removed in the follow-up request to allow normal continuation.\n\n**Why it works:** `{\"type\": \"tool\", \"name\": \"extract_metadata\"}` leaves no room for Claude to select a different tool or return text in the first turn, making the pipeline ordering deterministic.\n\n**Why the others don't work:**\n- Distractor A: `\"any\"` requires a call but does not guarantee which tool is called first.\n- Distractor C: Array declaration order does not control Claude's tool selection under `\"auto\"`.\n- Distractor D: Splitting tool configurations per call achieves sequencing but at the cost of maintaining dual configurations - forced selection is simpler.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0108",
+          "type": "single-choice",
+          "question": "A lead architect oversees a TypeScript monorepo where the root `CLAUDE.md` has grown to over 600 lines. Different packages require different subsets of those rules, and the architect wants each package to explicitly pull in only the sections relevant to it, keeping the root file focused on truly universal guidelines.\n\nWhich mechanism allows a package's `CLAUDE.md` to include content from an external file so that Claude Code loads those rules as part of the package's effective configuration?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Placing a symbolic link from the package directory to the shared rules file, because Claude Code follows symlinks at startup and automatically merges the referenced file's contents into the active session configuration without any additional directive.",
+              "isCorrect": false,
+              "explanation": "Claude Code does not follow symlinks to perform configuration merges. A symlink to a rules file is treated as a filesystem artifact, not as an instruction to load and apply that file's contents as part of the package's `CLAUDE.md`."
+            },
+            {
+              "id": "c1",
+              "text": "Adding a `[shared-rules]` block at the top of the package `CLAUDE.md` listing the paths to external files, similar to how `.gitconfig` handles includes - Claude Code resolves these path entries before parsing the rest of the `CLAUDE.md` file.",
+              "isCorrect": false,
+              "explanation": "Claude Code does not recognize `.gitconfig`-style include block syntax. No `[shared-rules]` directive exists in the `CLAUDE.md` specification; this pattern would be silently ignored or treated as plain markdown content."
+            },
+            {
+              "id": "c4",
+              "text": "Using `@import path/to/file.md` within the package's `CLAUDE.md` - Claude Code loads the referenced file's contents into the package's effective configuration.",
+              "isCorrect": true,
+              "explanation": "The `@import` directive is the supported mechanism for modular `CLAUDE.md` organization. Claude Code reads the directive, loads the referenced file, and applies its contents as if they were written inline in the importing `CLAUDE.md`, scoped to that package.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Adding a `source:` key in the package `CLAUDE.md`'s YAML frontmatter listing paths to the shared files - Claude Code resolves these paths using the same import pipeline it applies to skill frontmatter configuration.",
+              "isCorrect": false,
+              "explanation": "`CLAUDE.md` files do not use YAML frontmatter for file inclusion. Claude Code does not parse a `source:` key in `CLAUDE.md`; the skill frontmatter pipeline is a separate mechanism that applies only to `SKILL.md` files."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Claude Code Configuration & Workflows",
+          "skills": [
+            "3.1.3: Understanding the @import syntax for referencing external files to keep CLAUDE.md modular (for example, importing specific standards files relevant to each package)."
+          ],
+          "services": [
+            "Claude Code"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "tip": "Consider which syntax Claude Code recognizes within a `CLAUDE.md` file for referencing another file's contents.",
+          "explanation": "Claude Code supports an `@import` directive within `CLAUDE.md` files. When a `CLAUDE.md` contains a line such as `@import path/to/file.md`, Claude Code loads the referenced file and applies its contents as part of that configuration scope, enabling modular rule organization across packages.\n\n**Why it works:** `@import` lets maintainers keep shared standards in dedicated files and selectively pull them into whichever packages need them, without duplicating content or loading irrelevant rules everywhere.\n\n**Why the others don't work:**\n- `[shared-rules]` block: Claude Code does not parse `.gitconfig`-style include blocks; this syntax is not recognized as a configuration directive.\n- Symbolic links: Claude Code does not follow symlinks to merge file contents into the active configuration; a symlink to a rules file is not equivalent to importing it.\n- `source:` YAML frontmatter key: `CLAUDE.md` does not use YAML frontmatter for file inclusion; only the `@import` directive syntax is supported for referencing external files.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0236",
+          "type": "single-choice",
+          "question": "A coordinator is managing five parallel subagents that each analyse a different segment of a large dataset. After three segments are completed and written to disk, the coordinator process crashes. On restart, the coordinator has no record of which segments are done and issues all five subagents again, duplicating three analyses and producing conflicting results.\n\nWhich design change would allow the coordinator to restart cleanly from the point of failure?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Increase the coordinator's `max_tokens` budget so it can embed the full output of each completed subagent in its own context window and reconstruct pipeline state from this in-context summary on every startup.",
+              "isCorrect": false,
+              "explanation": "Storing completed subagent output in the coordinator's context requires the context to survive a crash, which it cannot; a crashed process loses all in-memory context regardless of `max_tokens`."
+            },
+            {
+              "id": "c3",
+              "text": "Add retry logic to each subagent so that if it receives a request for a segment it has already processed, it detects the duplication and exits early without re-running the analysis.",
+              "isCorrect": false,
+              "explanation": "Subagent-level duplicate detection is a local guard but does not give the coordinator the pipeline-level visibility it needs; the coordinator must still know what is already done before deciding which subagents to spawn."
+            },
+            {
+              "id": "c2",
+              "text": "Configure the coordinator to use `cache_control` blocks on each subagent's system prompt so that completed analyses are stored in the prompt cache and the coordinator can detect which subagents have cached responses before re-issuing them.",
+              "isCorrect": false,
+              "explanation": "`cache_control` caches static prompt prefixes to avoid re-sending tokens; it does not track pipeline completion state or prevent re-issuing subagents after a coordinator crash."
+            },
+            {
+              "id": "c4",
+              "text": "After each subagent completes its segment, have the coordinator write an updated manifest to a known file path recording each segment's status and output location, then load and parse this manifest on startup to determine which segments still require processing.",
+              "isCorrect": true,
+              "explanation": "A coordinator-maintained manifest that is updated after each subagent completion gives the coordinator a durable record of pipeline progress that survives crashes and allows targeted resume without duplication.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Context Management & Reliability",
+          "skills": [
+            "5.4.8: Designing crash recovery using structured agent state exports (manifests) that the coordinator loads on resume and injects into agent prompts."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/files",
+          "tip": "Consider what a coordinator needs to persist externally so it can distinguish completed from pending work after a restart.",
+          "explanation": "A manifest file updated after each subagent completes provides a crash-durable record of pipeline state that the coordinator can load on restart to resume exactly where it failed.\n\n**Why it works:** The manifest is written to disk after each completion event, surviving the crash; the coordinator reads it on startup and re-issues only incomplete segments.\n\n**Why the others don't work:**\n- `cache_control` blocks: manage prompt token costs, not pipeline completion state.\n- Subagent-level duplicate detection: improves subagent robustness but does not give the coordinator a reliable picture of overall progress.\n- In-context output storage: context is lost when the process crashes; `max_tokens` cannot persist data across a process boundary.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0107",
+          "type": "single-choice",
+          "question": "A platform engineer customizes Claude's behavior by editing `~/.claude/CLAUDE.md` on their own workstation, adding project-specific style guidance and prompt patterns developed over several months. After onboarding a new colleague who clones the same repository, the colleague reports that Claude does not apply any of the engineer's customizations.\n\nWhy does the colleague's Claude Code session lack the engineer's customizations?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "`~/.claude/CLAUDE.md` requires an explicit `@import` reference in the project's root `CLAUDE.md` before Claude Code applies it; without that reference, colleague sessions cannot access the user-level file even when working in the same project directory on another machine.",
+              "isCorrect": false,
+              "explanation": "There is no `@import` mechanism that allows one user's `~/.claude/CLAUDE.md` to be referenced from a project file. User-level configuration is inherently personal and is not discoverable or importable from the project repository."
+            },
+            {
+              "id": "c3",
+              "text": "Claude Code applies `~/.claude/CLAUDE.md` only once on the first session after installation; all subsequent sessions require the developer to reload it manually using the `/memory` command, which the new colleague has not yet done.",
+              "isCorrect": false,
+              "explanation": "`~/.claude/CLAUDE.md` is loaded automatically at the start of every Claude Code session without requiring any manual reload command. There is no first-session-only restriction or `/memory` dependency for user-level configuration files."
+            },
+            {
+              "id": "c2",
+              "text": "`~/.claude/CLAUDE.md` is only consulted by Claude Code when the project does not contain a `.claude/CLAUDE.md` file; the presence of a project-level `CLAUDE.md` in the cloned repository automatically suppresses the user-level file for all sessions derived from that project.",
+              "isCorrect": false,
+              "explanation": "Claude Code reads both user-level and project-level `CLAUDE.md` files in the same session and merges their instructions. A project-level file does not suppress the user-level one; both are applied together."
+            },
+            {
+              "id": "c1",
+              "text": "`~/.claude/CLAUDE.md` is a user-level file stored in the engineer's home directory; it is never part of the repository and does not propagate to teammates who clone the project.",
+              "isCorrect": true,
+              "explanation": "The home-directory path is outside the repository working tree, so Git never tracks or shares it. Claude Code reads it only for the user on the machine where the file exists, making it invisible to any colleague who clones the project on a different machine.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Claude Code Configuration & Workflows",
+          "skills": [
+            "3.1.2: Understanding that user-level settings apply only to that user and instructions in ~/.claude/CLAUDE.md are not shared with teammates via version control."
+          ],
+          "services": [
+            "Claude Code"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "tip": "Think about what distinguishes a home-directory configuration file from a file that is tracked in a project repository.",
+          "explanation": "`~/.claude/CLAUDE.md` is stored in the user's home directory on their local machine. Because it lives outside the repository working tree, it is never committed to version control and cannot be accessed by anyone else who clones the project, which is why the colleague's session has no knowledge of it.\n\n**Why it works:** The home-directory path is per-machine and per-user by design. Claude Code reads it for the individual who owns that machine, but there is no mechanism for sharing it across team members through Git.\n\n**Why the others don't work:**\n- Project-level file takes precedence: Claude Code loads both user-level and project-level `CLAUDE.md` files simultaneously; the presence of a project-level file does not suppress the user-level one for any user.\n- Requires `/memory` reload: `~/.claude/CLAUDE.md` is loaded automatically at session start without any manual command; no reload step is needed or exists for this purpose.\n- Requires `@import` in project `CLAUDE.md`: There is no mechanism by which an `@import` in the project file would pull in another user's `~/.claude/CLAUDE.md`; user-level files are personal and not reachable via import paths from the project.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0004",
+          "type": "single-choice",
+          "question": "An agentic assistant must call multiple tools in sequence before delivering a final answer. Each iteration sends a request to the Claude Messages API and inspects the response to decide whether to continue or stop.\n\nWhich approach correctly implements the control flow for this agentic loop?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Check the last content block's `type` field instead of `stop_reason`, and when it equals `\"tool_use\"`, execute the tool and return the result in a new request, then terminate once the last content block type changes to `\"text\"` regardless of `stop_reason`.",
+              "isCorrect": false,
+              "explanation": "Relying on the last content block type is unreliable because Claude can include both text and tool_use blocks in a single response. The stop_reason field is the authoritative signal for whether Claude wants to call a tool or has finished its turn."
+            },
+            {
+              "id": "c4",
+              "text": "Check the `stop_reason` field on the response, and when it equals `\"tool_use\"`, execute the tool and return the result in a new request, repeating this cycle until `stop_reason` equals `\"end_turn\"`.",
+              "isCorrect": true,
+              "explanation": "This is the standard agentic loop pattern. The stop_reason field is the authoritative indicator of whether Claude needs to call another tool or has completed its response.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Check the `stop_reason` field on the response, and when it equals `\"tool_use\"`, execute the tool and return the result in a new request, but terminate the loop after a single tool round regardless of the next `stop_reason` value to avoid runaway iterations.",
+              "isCorrect": false,
+              "explanation": "Terminating after one tool round ignores the possibility that Claude may need to call additional tools. The loop should continue as long as stop_reason is tool_use and only stop when stop_reason is end_turn."
+            },
+            {
+              "id": "c1",
+              "text": "Check the `stop_reason` field on the response, and when it equals `\"tool_use\"`, execute the tool and return the result in a new request, but set `max_tokens` to 1 on the follow-up call so Claude immediately yields a final `\"end_turn\"` response.",
+              "isCorrect": false,
+              "explanation": "Setting max_tokens to 1 would truncate Claude's response and prevent it from generating a meaningful answer or requesting additional tools. The loop should allow Claude to use as many tokens as needed to continue reasoning."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Agentic Architecture & Orchestration",
+          "skills": [
+            "1.1.4: Implementing agentic loop control flow that continues when stop_reason is \"tool_use\" and terminates when stop_reason is \"end_turn\"."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons",
+          "tip": "Think about which field on the API response is the definitive signal that Claude is requesting a tool call versus finishing its answer.",
+          "explanation": "The correct approach is to loop on `stop_reason`, continuing whenever it equals `\"tool_use\"` and stopping when it equals `\"end_turn\"`. This allows Claude to chain as many tool calls as it needs before delivering a final answer.\n\n**Why it works:** The `stop_reason` field is the authoritative signal from the API indicating why Claude stopped generating. A value of `\"tool_use\"` means Claude is requesting a tool invocation, while `\"end_turn\"` means it has finished its response and no further iterations are needed.\n\n**Why the others don't work:**\n- Setting `max_tokens` to 1 on follow-up calls: this artificially truncates Claude's output and prevents it from reasoning or requesting additional tools.\n- Terminating after a single tool round: this breaks multi-step workflows where Claude needs to chain several tool calls before reaching a conclusion.\n- Checking the last content block type instead of `stop_reason`: a response can contain both text and tool_use blocks, so inspecting block types rather than the dedicated `stop_reason` field leads to incorrect loop termination.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0230",
+          "type": "single-choice",
+          "question": "An agent is performing a multi-phase architecture review of a large system. After phase one, the agent has identified several critical dependency cycles and three performance bottlenecks. Phase two will begin a new API call with a fresh context window. The team is concerned that the phase-one findings will be lost.\n\nWhich approach most reliably preserves the phase-one findings so that phase two can act on them without re-running the earlier analysis?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Send the entire phase-one conversation as a concatenated `role: user` message at the start of phase two so the model can scan its own previous outputs for the key findings it generated earlier.",
+              "isCorrect": false,
+              "explanation": "Concatenating the full raw conversation wastes tokens on conversational filler and leaves the model to re-extract findings rather than receiving them in a structured, immediately usable form."
+            },
+            {
+              "id": "c2",
+              "text": "Increase the `max_tokens` budget for the phase-one response so the model has enough room to summarise all findings inline, then copy the last message from phase one into the phase-two user turn.",
+              "isCorrect": false,
+              "explanation": "Increasing `max_tokens` only extends how much Claude can write in a single response; it does not create a persistent artifact, and copying one message into the user turn adds noise rather than structured context."
+            },
+            {
+              "id": "c3",
+              "text": "Set `temperature` to 0 in phase two so the model deterministically reproduces the same findings it identified in phase one without needing any persistent storage.",
+              "isCorrect": false,
+              "explanation": "Deterministic output requires the same input; phase two starts with a different context, so setting `temperature` to 0 cannot recreate findings that are no longer in the context window."
+            },
+            {
+              "id": "c1",
+              "text": "Before closing phase one, have the agent write the critical dependency cycles and performance bottlenecks to a structured scratchpad file, then inject the contents of that file into the phase-two system prompt.",
+              "isCorrect": true,
+              "explanation": "A scratchpad file persists findings outside the context window so they can be loaded into the next phase's initial context, bridging the gap between separate API calls.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Context Management & Reliability",
+          "skills": [
+            "5.4.2: Understanding the role of scratchpad files for persisting key findings across context boundaries."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/context-editing",
+          "tip": "Consider what mechanism reliably bridges information across separate API calls where the context window resets.",
+          "explanation": "Scratchpad files give the agent a mechanism to externally persist structured findings before a context boundary, then load them as authoritative starting context for the next phase.\n\n**Why it works:** Written files survive context resets and can be injected in a structured, concise form into the next phase's initial prompt, ensuring key findings are immediately available.\n\n**Why the others don't work:**\n- `max_tokens` increase: extending output length does not create persistence across API calls.\n- `temperature` to 0: determinism still requires the same input; a new context cannot reproduce findings it never saw.\n- Raw conversation concatenation: this is inefficient and unstructured; scratchpad files distil findings rather than replaying raw dialogue.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0012",
+          "type": "single-choice",
+          "question": "A coordinator agent must gather information about a new medication by delegating research to three subagents. The team notices that subagents frequently return overlapping results, wasting tokens and increasing latency.\n\nWhich partitioning strategy best reduces duplication across subagents?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Assign each subagent a distinct source type: one searches clinical trials, one searches regulatory filings, and one searches peer-reviewed journals.",
+              "isCorrect": true,
+              "explanation": "Partitioning by source type gives each subagent a non-overlapping domain of responsibility, which directly prevents duplicate retrieval of the same documents or data.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Let each subagent research freely and broadcast intermediate results to the other subagents in real time so they can dynamically avoid topics already covered by a peer.",
+              "isCorrect": false,
+              "explanation": "Real-time broadcasting adds significant coordination overhead and latency. It also requires each subagent to interpret and track the work of every other subagent, which is fragile and does not guarantee clean scope boundaries."
+            },
+            {
+              "id": "c2",
+              "text": "Give all three subagents the same broad research prompt and then have the coordinator deduplicate their combined results before returning a final answer to the user.",
+              "isCorrect": false,
+              "explanation": "Sending identical prompts guarantees overlapping work. Post-hoc deduplication wastes tokens and latency even though it produces a clean final output, because the redundant calls have already been made."
+            },
+            {
+              "id": "c3",
+              "text": "Have each subagent run the same query but set a different `temperature` value so that their outputs naturally diverge and cover a wider range of findings.",
+              "isCorrect": false,
+              "explanation": "Varying temperature changes response randomness but does not control which sources or subtopics a subagent explores. The same underlying data can still be retrieved multiple times, leading to duplication."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Agentic Architecture & Orchestration",
+          "skills": [
+            "1.2.6: Partitioning research scope across subagents to minimize duplication (for example, assigning distinct subtopics or source types to each agent)."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+          "tip": "Consider how the coordinator can prevent overlap before any subagent begins its work rather than resolving it afterward.",
+          "explanation": "Effective scope partitioning assigns each subagent a clearly bounded slice of the research space before work begins. The boundaries can be drawn along source types, subtopics, time ranges, or geographic regions.\n\n**Why it works:** Assigning distinct source types means each subagent searches a non-overlapping pool of documents, so duplicate retrieval is structurally prevented rather than cleaned up after the fact.\n\n**Why the others don't work:**\n- Sending the same prompt to all subagents and deduplicating afterward still incurs the full cost of redundant research before any duplicates are removed.\n- Adjusting `temperature` changes the style and randomness of outputs but does not direct subagents toward different sources or subtopics.\n- Real-time broadcasting of intermediate results introduces complex inter-agent communication overhead and still relies on each subagent to self-regulate, which is unreliable at scale.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0235",
+          "type": "single-choice",
+          "question": "A multi-phase research agent has just completed an exploration phase where it gathered detailed evidence about an API's rate-limiting behaviour. The next phase will spawn several subagents to propose mitigation strategies. The team is concerned that each subagent will lack awareness of the specific rate-limiting patterns discovered in phase one.\n\nWhat should the principal agent do before spawning the phase-two subagents?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Increase the `max_tokens` budget for each phase-two subagent so they have room to reproduce the phase-one conclusions independently before proposing mitigations.",
+              "isCorrect": false,
+              "explanation": "Increasing `max_tokens` widens only the output budget; it does not provide subagents with phase-one knowledge, and re-deriving conclusions independently is inefficient and may produce different results."
+            },
+            {
+              "id": "c3",
+              "text": "Include a `cache_control` block on the phase-one messages so the subagents can access cached outputs via the prompt cache without duplicating tokens across their individual context windows.",
+              "isCorrect": false,
+              "explanation": "`cache_control` reduces the cost of re-sending the same content in subsequent requests, but each subagent still needs specific, interpreted findings rather than raw cached messages to work effectively."
+            },
+            {
+              "id": "c2",
+              "text": "Pass the full phase-one conversation history as the first user message in each subagent's context so the subagents can extract the relevant findings themselves rather than relying on a pre-computed summary.",
+              "isCorrect": false,
+              "explanation": "Passing raw conversation history wastes tokens on conversational overhead and places the extraction burden on each subagent, rather than providing a compact, pre-distilled summary ready for immediate use."
+            },
+            {
+              "id": "c1",
+              "text": "Compile a concise structured summary of the key rate-limiting findings from phase one, then inject that summary into the initial context of each subagent spawned for the mitigation phase.",
+              "isCorrect": true,
+              "explanation": "Summarising findings before the phase boundary and injecting the summary into each subagent's initial context ensures all mitigation subagents share the specific evidence from phase one without re-running the earlier exploration.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Context Management & Reliability",
+          "skills": [
+            "5.4.7: Summarizing key findings from one exploration phase before spawning subagents for the next phase, injecting summaries into initial context."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/compaction",
+          "tip": "Focus on what must be available at the start of each subagent's context window to give it the right foundation.",
+          "explanation": "Before spawning phase-two subagents, the principal agent should distil phase-one findings into a compact summary and inject it into each subagent's initial context, ensuring they all start with the correct, shared evidence.\n\n**Why it works:** A pre-computed summary placed early in the subagent's context is immediately available and does not require the subagent to re-discover or re-interpret phase-one work.\n\n**Why the others don't work:**\n- Full history as user message: verbose and places extraction burden on subagents rather than providing distilled findings.\n- `cache_control`: reduces token re-sending costs but doesn't provide the interpreted, structured findings each subagent needs.\n- Higher `max_tokens`: expands output capacity but supplies no knowledge; subagents cannot reproduce earlier phase findings without having them in context.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0170",
+          "type": "single-choice",
+          "question": "A team builds a Claude-powered invoice processing pipeline that must return structured data in a strict schema. Using a prompt that instructs Claude to \"respond with JSON matching this schema,\" they observe occasional JSON syntax errors and missing required fields that break downstream parsing.\n\nWhat is the most reliable technique for guaranteeing schema-compliant output?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Set the `response_format` parameter to `json_object` in the API request so Claude emits only valid JSON without any prose, guaranteeing schema compliance and eliminating missing-field errors without requiring changes to the tool configuration.",
+              "isCorrect": false,
+              "explanation": "The Claude API does not have a `response_format` parameter. This option describes an OpenAI API feature that does not exist in the Anthropic API and would not be actionable."
+            },
+            {
+              "id": "c2",
+              "text": "Add a post-processing validation step that parses Claude's JSON response, catches syntax errors, and automatically retries the full conversation with an appended error message so Claude can correct the malformed output in a follow-up turn.",
+              "isCorrect": false,
+              "explanation": "Retry loops can recover from some failures but do not eliminate the source of syntax errors. Each retry still relies on free-text JSON generation, which can repeat the same formatting mistakes."
+            },
+            {
+              "id": "c3",
+              "text": "Embed the full JSON schema in the system prompt alongside a strict instruction that all responses must be valid JSON conforming to that schema, and repeat a JSON compliance reminder at the end of every human turn to reinforce the constraint across the conversation.",
+              "isCorrect": false,
+              "explanation": "Repeating schema instructions in text can reduce but does not eliminate JSON syntax errors or missing fields. Free-text JSON generation offers no structural guarantee comparable to tool-use enforcement."
+            },
+            {
+              "id": "c1",
+              "text": "Define the desired schema as a `tool_use` tool with JSON Schema input parameters, set `tool_choice` to force Claude to call that tool, and extract the structured data from the `tool_use` response block.",
+              "isCorrect": true,
+              "explanation": "Invoking a tool with a JSON Schema input definition forces Claude to emit a structurally valid tool call, eliminating JSON syntax errors by construction because the API validates the output before returning it.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Prompt Engineering & Structured Output",
+          "skills": [
+            "4.3.1: Understanding tool use (tool_use) with JSON schemas as the most reliable approach for guaranteed schema-compliant structured output, eliminating JSON syntax errors."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Think about which approach removes the responsibility for valid JSON formatting from free-text generation entirely.",
+          "explanation": "Using `tool_use` with a JSON Schema input definition is the most reliable method for guaranteed schema-compliant output because it eliminates free-text JSON generation. The API enforces structural validity before returning the response.\n\n**Why it works:** Tool input schemas are validated by the API, so JSON syntax errors and missing required fields are impossible by construction rather than handled through retries or instructions.\n\n**Why the others don't work:**\n- Distractor B: Retry loops can recover some failures but don't prevent the source of syntax errors in free-text generation.\n- Distractor C: Instructional reinforcement reduces errors but offers no structural guarantee.\n- Distractor D: `response_format` is an OpenAI API parameter; it does not exist in the Claude API.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0058",
+          "type": "single-choice",
+          "question": "A developer builds an agent with two tools: `search_database` for querying internal records and `web_search` for retrieving live online content. Both tools have clearly differentiated descriptions. The system prompt contains the instruction: \"Always retrieve the most current information available before answering.\" Despite this, Claude routes internal record queries to `web_search` instead of `search_database`.\n\nWhat is the most likely explanation for this behavior?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "The `search_database` description does not explicitly state that it holds current records, so Claude infers from the description alone that the database contains only historical data; any query using words associated with recency is then routed to `web_search` even when the internal database would be the correct source.",
+              "isCorrect": false,
+              "explanation": "While description clarity matters, this explanation misidentifies the cause. The scenario states both tools have clearly differentiated descriptions. The misrouting stems from the system prompt instruction creating a keyword association with `web_search`, not from ambiguity in the `search_database` description."
+            },
+            {
+              "id": "c4",
+              "text": "The phrase \"most current information\" in the system prompt creates a keyword association that biases Claude toward `web_search`, overriding the tool descriptions for queries where the internal database would be the appropriate source.",
+              "isCorrect": true,
+              "explanation": "System prompt language can create unintended keyword associations that influence tool selection even when tool descriptions are well-written. The phrase \"most current information\" semantically aligns with what a web search retrieves, causing Claude to favor `web_search` for queries that the internal database could answer. Reviewing and rephrasing keyword-sensitive system prompt instructions is necessary to prevent this type of unintended override.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "Claude treats the word \"always\" in a system prompt instruction as an absolute directive that fully suppresses tool description evaluation; whenever an imperative adverb appears in the system prompt, Claude bypasses the tool selection mechanism and calls whichever tool was listed first in the tools array instead.",
+              "isCorrect": false,
+              "explanation": "Claude does not suppress description evaluation based on imperative adverbs or tool list order. The word \"always\" contributes to the instruction's emphasis but does not override the tool selection process entirely. The misrouting is caused by the semantic content of the instruction, specifically the keyword association with \"web_search\", not by the presence of \"always\" alone."
+            },
+            {
+              "id": "c3",
+              "text": "The tools array lists `web_search` before `search_database`, and Claude assigns higher routing priority to tools that appear earlier in the array when the system prompt contains an instruction that shares vocabulary with any word in a tool's name; reordering the array to place `search_database` first would resolve the misrouting without requiring system prompt changes.",
+              "isCorrect": false,
+              "explanation": "Tool list order is not a reliable routing mechanism and is not how Claude resolves conflicts between system prompt instructions and tool descriptions. The misrouting is caused by the semantic association between the system prompt's language and the `web_search` tool's perceived purpose, not by positional priority in the tools array."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Tool Design & MCP Integration",
+          "skills": [
+            "2.1.4: Understanding the impact of system prompt wording on tool selection: keyword-sensitive instructions can create unintended tool associations."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "System prompt instructions can carry semantic weight that associates naturally with one tool's purpose even when the tool descriptions are clearly differentiated - look for language in the prompt that could echo a tool's description.",
+          "explanation": "Even clear tool descriptions can be overridden by keyword-sensitive phrasing in the system prompt. The phrase \"most current information\" semantically maps to what a web search tool provides, creating an association that biases Claude toward `web_search` regardless of whether the internal database would be more appropriate. Developers must audit system prompt language for phrases that could unintentionally align with one tool's description and steer selection away from another.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0061",
+          "type": "single-choice",
+          "question": "An agent uses a single `process_report` tool that accepts a `mode` parameter with three valid values: \"summarize\", \"extract\", and \"verify\". The developer observes that Claude frequently passes incorrect mode values - sending \"summarize\" when factual verification was requested, and \"verify\" when structured data extraction was needed.\n\nWhich refactoring most directly resolves the mode selection errors?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Replace `process_report` with three dedicated tools - such as `summarize_report`, `extract_data_points`, and `verify_claims` - each with a description defining its specific purpose, the inputs it requires, and the output it produces.",
+              "isCorrect": true,
+              "explanation": "Splitting a generic multi-mode tool into purpose-specific tools gives Claude a distinct description for each operation. Claude selects among tools rather than inferring the correct value for an opaque parameter, which is a more reliable routing mechanism. Each tool's description can precisely define what it does, what inputs are valid, and what output to expect, eliminating the ambiguity that caused mode selection errors.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "Add an enum constraint to the `mode` parameter's JSON schema so only the three defined values pass validation, and append worked examples to the parameter description illustrating when each mode value should be used, so Claude receives structured guidance on mode selection without any change to the overall tool architecture.",
+              "isCorrect": false,
+              "explanation": "An enum constraint prevents invalid mode values but does not address the underlying problem: Claude is choosing the wrong valid mode because a single description cannot adequately differentiate three distinct operations. Adding examples to the parameter description improves guidance but still requires Claude to infer which mode applies from a single shared context. The fundamental issue is that all three operations compete for selection within one tool."
+            },
+            {
+              "id": "c4",
+              "text": "Expand the `mode` parameter description to include a detailed explanation of each mode, the input conditions under which each is appropriate, and worked examples of \"summarize\", \"extract\", and \"verify\" invocations - preserving the single-tool interface while giving Claude sufficient guidance to infer the correct mode for any request without restructuring the tool definitions.",
+              "isCorrect": false,
+              "explanation": "Detailed parameter descriptions improve guidance but maintain the same architecture: Claude must still infer which mode is appropriate from a single tool's context. As descriptions grow longer, they also become harder for Claude to reason over precisely. The more reliable approach is to split the tool so that each operation has its own description and selection path, rather than burdening one parameter description with the full disambiguation task."
+            },
+            {
+              "id": "c2",
+              "text": "Add an instruction to the system prompt that explicitly maps each task type - summarization, extraction, and verification - to the corresponding mode value, and leave the tool's parameter description unchanged so the routing logic is centralised in the system prompt and applies uniformly across all invocations of `process_report`.",
+              "isCorrect": false,
+              "explanation": "Delegating mode selection to the system prompt creates a maintenance burden and couples global context to tool-specific behavior. It also does not fix the root cause: a single generic tool requires Claude to disambiguate three different operations from one description. If a new report type is added or a mode is renamed, both the system prompt and tool definition must be updated in sync."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Tool Design & MCP Integration",
+          "skills": [
+            "2.1.7: Splitting generic tools into purpose-specific tools with defined input/output contracts (for example, splitting a generic analyze_document into extract_data_points, summarize_content, and verify_claim_against_source)."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "When a tool relies on a mode or type parameter to choose among fundamentally different operations, that is a signal the tool is doing too much - each operation usually benefits from its own description and selection path.",
+          "explanation": "A generic tool with a mode parameter forces Claude to perform two reasoning steps: select the tool, then infer the correct mode value. Splitting the tool into purpose-specific tools with distinct descriptions reduces this to one step - tool selection - and gives each operation its own unambiguous description defining purpose, expected input, and output. This is the most direct way to eliminate mode-selection errors caused by an overloaded generic tool.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0005",
+          "type": "single-choice",
+          "question": "Claude has returned a `tool_use` block requesting a `get_pricing` tool. The developer executes the tool and receives a JSON payload with current prices.\n\nHow should the developer add this tool result to the conversation before sending the next API request?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Append the assistant message containing the `tool_use` block, then inject the pricing JSON directly into the system prompt as additional context so Claude treats it as grounding data across all future turns.",
+              "isCorrect": false,
+              "explanation": "Tool results must be returned as tool_result content blocks in a user message, not placed in the system prompt. The system prompt is for persistent instructions, not dynamic per-turn data."
+            },
+            {
+              "id": "c2",
+              "text": "Append the assistant message containing the `tool_use` block, then append a user message with a `tool_result` content block, setting the `tool_use_id` to a new unique identifier so Claude can distinguish it from prior results.",
+              "isCorrect": false,
+              "explanation": "The tool_use_id must match the ID from the original tool_use block. Using a new identifier breaks the pairing and causes Claude to reject or misinterpret the result."
+            },
+            {
+              "id": "c1",
+              "text": "Append the assistant message containing the `tool_use` block, then append a user message with a `tool_result` content block whose `tool_use_id` matches the original request.",
+              "isCorrect": true,
+              "explanation": "This preserves the full conversation history and correctly pairs the result with the original tool_use request via matching IDs.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Replace the assistant message with a new user message that embeds the pricing JSON in plain text, then send the updated conversation so Claude can read the data without needing to process a structured `tool_result` block.",
+              "isCorrect": false,
+              "explanation": "Removing the assistant message that contains the tool_use block breaks the conversation history. Claude requires the tool_use and tool_result to appear as a matched pair in the message sequence."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Agentic Architecture & Orchestration",
+          "skills": [
+            "1.1.5: Adding tool results to conversation context between iterations so the model can incorporate new information into its reasoning."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Think about what identifiers Claude uses to connect a tool result back to the tool call it originally made.",
+          "explanation": "The correct approach is to append both the assistant message with the `tool_use` block and a user message containing a `tool_result` block with a matching `tool_use_id`.\n\n**Why it works:** The Messages API is stateless, so each request must include the full conversation history. The `tool_result` content block uses the `tool_use_id` to pair the result with the original request, allowing Claude to incorporate the new information into its next reasoning step.\n\n**Why the others don't work:**\n- Using a new unique identifier: the `tool_use_id` must match the ID from the original `tool_use` block so Claude can correlate the result with the request it made.\n- Injecting into the system prompt: tool outputs are dynamic turn-level data that belong in `tool_result` content blocks, not in the system prompt which is reserved for persistent instructions.\n- Replacing the assistant message with plain text: removing the `tool_use` block breaks the required pairing between request and result, and Claude loses the context of why the tool was called.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0106",
+          "type": "single-choice",
+          "question": "A developer joins a mid-sized engineering team that uses Claude Code across a shared monorepo. The team stores shared conventions in a committed `.claude/CLAUDE.md`. The developer wants to add personal productivity shortcuts that teammates should not see or be affected by.\n\nWhich file location ensures the personal shortcuts are available during the developer's own Claude Code sessions but are never shared with teammates through the repository?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "A `CLAUDE.md` file placed in a project subdirectory, since directory-level files apply only within that subtree and Claude Code marks them as developer-local so they are excluded from the default staging area.",
+              "isCorrect": false,
+              "explanation": "Directory-level `CLAUDE.md` files are ordinary repository files and are committed to version control like any other file. Claude Code applies no automatic local-only marking; they are visible to all teammates who pull the branch."
+            },
+            {
+              "id": "c4",
+              "text": "`~/.claude/CLAUDE.md` in the developer's home directory - this user-level file is stored on the local machine and is never part of the repository.",
+              "isCorrect": true,
+              "explanation": "`~/.claude/CLAUDE.md` lives outside the project working tree in the developer's home directory. Git never tracks it, so it is invisible to teammates while still being loaded by Claude Code at session start alongside the project-level file.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "The `.claude/CLAUDE.md` at the project root, because the `.claude/` directory is always added to `.gitignore` by default during Claude Code project initialization, making all files within it private to the local environment.",
+              "isCorrect": false,
+              "explanation": "`.claude/CLAUDE.md` is the standard project-level configuration file and is typically committed to version control so that the entire team shares the same project settings. It is not automatically `.gitignore`d."
+            },
+            {
+              "id": "c1",
+              "text": "The root `CLAUDE.md` at the top of the repository, because project-level files apply only to the current user's session and are isolated from teammates by Claude Code's session management system.",
+              "isCorrect": false,
+              "explanation": "The root `CLAUDE.md` is committed to the repository and is visible to every contributor. Claude Code does not apply any user-isolation to committed files; all team members receive the same instructions from it."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Claude Code Configuration & Workflows",
+          "skills": [
+            "3.1.1: Understanding the CLAUDE.md configuration hierarchy: user-level (~/.claude/CLAUDE.md), project-level (.claude/CLAUDE.md or root CLAUDE.md), and directory-level (subdirectory CLAUDE.md files)."
+          ],
+          "services": [
+            "Claude Code"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "tip": "Consider which part of the configuration hierarchy is tied to the individual machine rather than the project repository.",
+          "explanation": "User-level configuration in `~/.claude/CLAUDE.md` is stored in the developer's home directory on their local machine. It is never committed to any repository and therefore remains private to that individual, making it the correct location for personal shortcuts that should not affect teammates.\n\n**Why it works:** The home-directory location is outside the project working tree entirely, so no Git operation will ever stage or commit it. Claude Code reads it alongside the project-level file, giving the developer both sets of instructions simultaneously.\n\n**Why the others don't work:**\n- Root `CLAUDE.md` at the repository top level: This file is committed to the repository and is visible to all contributors; personal shortcuts placed here would be shared with the entire team.\n- A `CLAUDE.md` in a project subdirectory: Directory-level files are also part of the repository and would be committed to version control, exposing the personal shortcuts to teammates.\n- `.claude/CLAUDE.md` at the project root: This is the project-level configuration file. It is committed to the repository and applies to every team member who clones the project.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0232",
+          "type": "single-choice",
+          "question": "A coordinator is running a multi-agent pipeline that processes financial reports across three subagents: one for data extraction, one for ratio analysis, and one for narrative drafting. The pipeline runs for several hours, and the team has experienced mid-run failures that force a full restart, discarding all completed work.\n\nWhich mechanism most directly enables the coordinator to resume from the point of failure rather than restarting from scratch?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Configure the coordinator to retry each failed API call up to five times with exponential backoff before surfacing an error, ensuring transient failures are automatically recovered without requiring state persistence.",
+              "isCorrect": false,
+              "explanation": "Retry logic handles transient network or rate-limit failures but cannot restart a multi-hour pipeline from its last successful checkpoint; a full crash still loses all progress."
+            },
+            {
+              "id": "c2",
+              "text": "Set a very high `max_tokens` budget so each subagent can return its entire output in one response, removing the need for intermediate storage and making it safe to restart from any point without data loss.",
+              "isCorrect": false,
+              "explanation": "A large `max_tokens` budget affects output length, not persistence; if the process crashes, in-memory output is lost regardless of how long the response was."
+            },
+            {
+              "id": "c4",
+              "text": "Require each subagent to write its completed output and current status to a known file location after each unit of work, and have the coordinator load a central manifest on startup to identify which subagents have already finished and which require re-execution.",
+              "isCorrect": true,
+              "explanation": "Structured state exports to known locations combined with a coordinator-readable manifest implement crash recovery: on resume, the coordinator reads the manifest to skip completed work and re-run only what failed.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "Store the entire conversation history for all three subagents in the coordinator's context window so it can review what each subagent completed before re-issuing incomplete tasks on resume.",
+              "isCorrect": false,
+              "explanation": "Keeping all subagent conversation histories in the coordinator's context consumes tokens proportionally to runtime and still loses everything on a crash; it does not persist state outside the process."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Context Management & Reliability",
+          "skills": [
+            "5.4.4: Understanding structured state persistence for crash recovery: each agent exports state to a known location, and the coordinator loads a manifest on resume."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/files",
+          "tip": "Think about what a coordinator needs to read on startup to know exactly where the pipeline was before a failure.",
+          "explanation": "Structured state persistence means each agent writes its status and output to a known external location, and the coordinator reads a manifest on startup to determine which work is already done and which must resume.\n\n**Why it works:** External file-based state survives process crashes and gives the coordinator a reliable map of pipeline progress without re-running completed subagents.\n\n**Why the others don't work:**\n- High `max_tokens`: output length doesn't create persistence; in-memory data is lost on crash.\n- Retry with backoff: handles transient errors but cannot recover from a full process crash.\n- Conversation history in context: in-memory context is lost on crash and grows excessively over long runs.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0001",
+          "type": "single-choice",
+          "question": "A developer is building an agentic loop using the Claude Messages API. After sending the initial user request, Claude responds with a `stop_reason` of `\"tool_use\"`. The developer extracts the tool name and input arguments from the response content blocks.\n\nWhat should the developer do next to continue the loop correctly?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Execute the requested tool, then send a new Messages API request that includes the original assistant message (with its `tool_use` block) and a new user message containing the `tool_result` block.",
+              "isCorrect": true,
+              "explanation": "The agentic loop is stateless, so the full conversation history must be preserved. After executing the tool, both the assistant's `tool_use` message and the `tool_result` user turn are appended before sending the next request to Claude.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Execute the requested tool, then send a new Messages API request that contains only the `tool_result` block as a user message, omitting the assistant's prior response to reduce token usage.",
+              "isCorrect": false,
+              "explanation": "Omitting the assistant's prior response breaks the conversation context. Claude requires the full conversation history, including the `tool_use` block, to correctly interpret the tool_result and continue reasoning."
+            },
+            {
+              "id": "c1",
+              "text": "Return the assistant's response to the user as the final answer, since a `stop_reason` of `\"tool_use\"` signals that Claude has finished reasoning and is ready to respond.",
+              "isCorrect": false,
+              "explanation": "A stop_reason of tool_use means Claude wants to invoke a tool, not that it has finished. The conversation must continue before a final answer can be surfaced."
+            },
+            {
+              "id": "c3",
+              "text": "Execute the requested tool, then append the tool output to the system prompt and re-send the original request, setting a stop_sequence of `\"end_turn\"` to prevent further tool calls.",
+              "isCorrect": false,
+              "explanation": "Tool results must be returned as `tool_result` content blocks in the user turn, not injected into the system prompt. System prompts are for persistent instructions, not dynamic tool outputs."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Agentic Architecture & Orchestration",
+          "skills": [
+            "1.1.1: Understanding the agentic loop lifecycle: sending requests to Claude, inspecting stop_reason (\"tool_use\" vs \"end_turn\"), executing requested tools, and returning results for the next iteration."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons",
+          "tip": "Consider what information Claude needs in order to continue reasoning after a tool has been invoked.",
+          "explanation": "When `stop_reason` is `\"tool_use\"`, the agentic loop must execute the requested tool and return the result to Claude in a subsequent API request.\n\n**Why it works:** The Messages API is stateless, so the full conversation history - including the assistant turn that contains the `tool_use` block - must be preserved. A new user turn carrying the `tool_result` block is then appended, and Claude receives the complete history in the next call so it can continue reasoning.\n\n**Why the others don't work:**\n- Returning the response as a final answer: `stop_reason: tool_use` is a request to call a tool, not a completion signal.\n- Sending only the `tool_result` block: without the preceding `tool_use` block in the history, Claude cannot match the result to its original request and will error or behave unpredictably.\n- Appending results to the system prompt: tool outputs are dynamic turn-level data and must flow through `tool_result` content blocks, not be baked into the system prompt.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0175",
+          "type": "single-choice",
+          "question": "A data pipeline processes mixed document batches - contracts, invoices, and receipts - where the document type is not known in advance. The developer defines three extraction tools, one per type, and needs every document to produce a structured tool call while allowing Claude to select the schema that best fits each document.\n\nWhich configuration best meets both requirements?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Define the three tools and set `tool_choice` to `\"auto\"` so Claude can select the most relevant extraction tool per document, while retaining the ability to return a plain text response if none of the tools is a confident match for the document's content.",
+              "isCorrect": false,
+              "explanation": "`\"auto\"` allows Claude to return a text response instead of calling a tool, violating the requirement that every document must produce a structured tool call."
+            },
+            {
+              "id": "c4",
+              "text": "Route each document through a pre-classification Claude call that identifies the document type, then make a second API call with `tool_choice` forced to the matching tool by name, ensuring the correct schema is always selected with no ambiguity about which tool Claude will invoke.",
+              "isCorrect": false,
+              "explanation": "Two-pass routing adds latency and a failure mode for the pre-classifier. Pre-classification must itself handle document type ambiguity, and `\"any\"` achieves the structured-output guarantee in a single call."
+            },
+            {
+              "id": "c2",
+              "text": "Create a single unified extraction schema with optional fields covering every possible attribute across contracts, invoices, and receipts, then set `tool_choice` to `\"auto\"` so Claude calls the merged tool when it identifies the document type and returns text when it cannot.",
+              "isCorrect": false,
+              "explanation": "Merging schemas into one tool loses per-type precision, and `\"auto\"` still allows text responses for ambiguous documents - satisfying neither the per-type schema requirement nor the structured output guarantee."
+            },
+            {
+              "id": "c3",
+              "text": "Define the three tools and set `tool_choice` to `\"any\"` so Claude must call one of the tools on every document but can select which schema fits the document characteristics, guaranteeing a structured response without restricting selection to a fixed tool.",
+              "isCorrect": true,
+              "explanation": "`\"any\"` makes a tool call mandatory for every request while leaving the choice of which tool to Claude - satisfying both the structured output guarantee and the per-document schema flexibility.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Prompt Engineering & Structured Output",
+          "skills": [
+            "4.3.6: Setting tool_choice: \"any\" to guarantee structured output when multiple extraction schemas exist and the document type is unknown."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Identify which `tool_choice` value mandates a tool call on every response while still giving Claude flexibility to pick the most appropriate tool.",
+          "explanation": "`tool_choice: \"any\"` is designed for exactly this scenario: it requires Claude to call one of the available tools on every response while leaving the tool selection to Claude's judgment, combining the call guarantee with per-document schema flexibility.\n\n**Why it works:** `\"any\"` makes tool invocation mandatory without locking Claude to a single schema, satisfying both the structured output requirement and the need for per-type tool selection.\n\n**Why the others don't work:**\n- Distractor A: `\"auto\"` allows text responses for ambiguous documents, breaking the structured output guarantee.\n- Distractor B: A merged schema loses per-type precision, and `\"auto\"` still allows text responses.\n- Distractor D: Two-pass routing adds latency and an additional failure mode that `\"any\"` resolves in a single call.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0234",
+          "type": "single-choice",
+          "question": "An agent is running a long-horizon investigation into a production system's memory usage behaviour. Over the course of many tool calls and analysis steps the context window fills, and the agent begins producing answers that contradict its earlier conclusions about which services are the primary memory consumers.\n\nWhich strategy most directly counteracts this degradation across subsequent investigation steps?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Switch to a higher-context model variant mid-session so that earlier findings remain within the model's effective attention range without any additional engineering changes.",
+              "isCorrect": false,
+              "explanation": "A larger context window delays degradation but does not prevent it; without explicit re-injection, early findings will still drift to peripheral attention as the session continues to grow."
+            },
+            {
+              "id": "c4",
+              "text": "Set `temperature` to 0 to make the agent deterministic, ensuring it produces consistent answers across steps even as the context grows longer.",
+              "isCorrect": false,
+              "explanation": "Determinism reduces randomness in sampling but does not affect which context positions the model effectively attends to; contradictions from context length occur regardless of `temperature` setting."
+            },
+            {
+              "id": "c3",
+              "text": "After each significant discovery, have the agent append the finding to a scratchpad file, then begin each subsequent analysis step by reading the scratchpad so that confirmed facts are always present at the top of the active context.",
+              "isCorrect": true,
+              "explanation": "Maintaining a scratchpad and prepending its contents to each subsequent prompt reintroduces key findings at the top of the active context, counteracting the attention loss that causes contradictions in long sessions.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "Instruct the agent to include a brief self-summary at the end of each response, so that each new turn starts with the model's own freshly generated recap of what it has found so far.",
+              "isCorrect": false,
+              "explanation": "A self-summary at the end of each response still occupies later positions in the context and competes with new content; it also trusts the model to accurately recall facts it may already be degrading on."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Context Management & Reliability",
+          "skills": [
+            "5.4.6: Having agents maintain scratchpad files recording key findings, referencing them for subsequent questions to counteract context degradation."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/context-editing",
+          "tip": "Consider where confirmed findings need to appear in the context at each step to remain reliably retrieved.",
+          "explanation": "A scratchpad that the agent writes to after each discovery and reads at the start of each subsequent step keeps verified findings in the most-attended portion of the context, counteracting the drift that causes contradictions.\n\n**Why it works:** Re-injecting the scratchpad at the beginning of each prompt places confirmed facts in a high-attention position, preventing earlier discoveries from being eclipsed by growing context.\n\n**Why the others don't work:**\n- Larger context model: postpones but does not eliminate degradation without explicit re-injection.\n- Self-summary at end: late-position summaries still degrade; the model may also misrecall facts it is already losing grip on.\n- `temperature` to 0: eliminates sampling randomness but does not address context-position attention drop-off.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0057",
+          "type": "single-choice",
+          "question": "An agent exposes two tools to Claude: `analyze_content` for processing web-scraped text and `analyze_document` for parsing uploaded PDFs. Both descriptions read \"Analyzes text content and extracts key information.\" A developer observes that Claude routes PDF analysis requests to `analyze_content` approximately half the time.\n\nWhat is the root cause of this misrouting?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Claude defers to the tool that appears first in the tools array when two tools share the same description; moving `analyze_document` before `analyze_content` in the list would resolve the PDF misrouting without requiring any modification to the descriptions themselves.",
+              "isCorrect": false,
+              "explanation": "Claude does not mechanically default to the first tool in the array when descriptions are ambiguous. Position in the tools array is not a reliable tool-selection signal. The correct fix is to differentiate the descriptions so that each tool's distinct purpose, input type, and appropriate use case are clearly communicated."
+            },
+            {
+              "id": "c3",
+              "text": "The tool names share the `analyze_` prefix, which Claude's tokenizer treats as a shared namespace identifier, causing it to interpret both tools as members of the same functional group and select whichever was invoked most recently in the conversation context, regardless of the input type being requested.",
+              "isCorrect": false,
+              "explanation": "Claude does not group tools by name prefix or apply most-recently-invoked heuristics when selecting tools. The tokenizer behavior described here is not how Claude processes tool definitions. The misrouting is caused by the identical descriptions, not by any name-prefix or recency effect."
+            },
+            {
+              "id": "c2",
+              "text": "Claude routes requests based on the alphabetical order of tool names when descriptions are identical; since `analyze_content` precedes `analyze_document` alphabetically, it is always selected first for any document-like request until Claude has built a usage preference for `analyze_document` through repeated invocations in the same session.",
+              "isCorrect": false,
+              "explanation": "Claude does not sort tools alphabetically or build session preferences through repeated invocations. Tool selection is governed by the content of tool descriptions read at inference time, not by the lexicographic order of tool names or accumulated usage history within a session."
+            },
+            {
+              "id": "c1",
+              "text": "The near-identical descriptions give Claude no differentiating signal, so it cannot determine which tool is appropriate for a given input type and selects between them inconsistently.",
+              "isCorrect": true,
+              "explanation": "When two tools describe the same capability in the same words, Claude has no basis on which to distinguish between them. The description is the primary mechanism for tool selection, so identical or near-identical descriptions guarantee unreliable routing regardless of how different the underlying implementations are.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Tool Design & MCP Integration",
+          "skills": [
+            "2.1.3: Understanding how ambiguous or overlapping tool descriptions cause misrouting (for example, analyze_content vs analyze_document with near-identical descriptions)."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Imagine Claude at inference time reading only the description field to decide which tool matches the user's intent - if two descriptions are indistinguishable, so are the tools.",
+          "explanation": "Near-identical tool descriptions are the direct cause of misrouting. Claude relies on the description to understand when each tool should be called; when two descriptions convey the same meaning, the model has no signal on which to base a consistent routing decision. Differentiating descriptions by input type, data source, and intended use case is the correct resolution.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0059",
+          "type": "single-choice",
+          "question": "An agent exposes three retrieval tools to Claude: `get_customer`, `get_order`, and `get_product`. All three carry the description \"Retrieves data from the database.\" The developer observes frequent misrouting - Claude returns customer records when order data was requested and vice versa.\n\nWhich approach most directly resolves the misrouting?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Rewrite each description to specify the entity it retrieves, the identifier it requires as input, the fields it returns, and the scenarios in which the other retrieval tools should be preferred instead.",
+              "isCorrect": true,
+              "explanation": "Each tool description should communicate the tool's distinct purpose, what inputs it expects (including the identifier type), what data it returns, and when not to use it as an alternative to a similar tool. These four elements give Claude the differentiating signal it needs to route each request to the correct retrieval tool consistently.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Prefix each tool name with the entity type - renaming them to `customer_get`, `order_get`, and `product_get` - so that Claude can infer the correct tool from the entity-specific portion of the name, removing the need for descriptive differentiation since the name prefix carries sufficient routing signal on its own.",
+              "isCorrect": false,
+              "explanation": "Tool names contribute some routing signal, but they are not a substitute for well-written descriptions. Claude's primary mechanism for distinguishing tools remains the description content. Renaming alone without updating descriptions leaves the same ambiguous text in place and does not reliably fix misrouting."
+            },
+            {
+              "id": "c1",
+              "text": "Consolidate all three tools into a single `get_entity` tool that accepts an entity type parameter, so Claude must select only one tool and the parameter value determines which record is retrieved; this removes the routing decision entirely and eliminates misrouting without requiring changes to any individual tool description.",
+              "isCorrect": false,
+              "explanation": "Collapsing three distinct tools into one with a mode parameter shifts the disambiguation problem from tool selection to parameter selection - Claude must still determine the correct entity type to pass, and the parameter description faces the same ambiguity problem as the original tool descriptions did. This approach also loses the clarity benefit of distinct tool contracts for each entity."
+            },
+            {
+              "id": "c3",
+              "text": "Add a routing instruction to the system prompt that explicitly names the correct tool for each request category - for example, instructing Claude to use `get_customer` for user lookups and `get_order` for transaction lookups - and leave the existing tool descriptions unchanged, since system prompt instructions take precedence over descriptions during tool selection.",
+              "isCorrect": false,
+              "explanation": "System prompt routing instructions can act as a workaround, but they duplicate information that belongs in the tool descriptions and introduce a maintenance burden when tools change. System prompt instructions do not always reliably override description-driven selection, and relying on them instead of fixing descriptions is a fragile pattern that will break when new tools with similar descriptions are added."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Tool Design & MCP Integration",
+          "skills": [
+            "2.1.5: Writing tool descriptions that clearly differentiate each tool's purpose, expected inputs, outputs, and when to use it versus similar alternatives."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "A good tool description answers four questions: what entity or resource does this tool operate on, what input does it need, what does it return, and when should I choose this over a similar alternative?",
+          "explanation": "Descriptions that differentiate each tool across four dimensions - purpose, required input, output, and comparison to alternatives - give Claude the distinct signals it needs to route consistently. Generic descriptions like \"Retrieves data from the database\" convey no differentiating information and guarantee misrouting when multiple retrieval tools are present. Each description must stake out a clear and exclusive purpose.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0171",
+          "type": "single-choice",
+          "question": "A developer builds a document classification pipeline that may receive documents of several types. Three specialized extraction tools are defined - one per document type - and the developer needs to guarantee that Claude always calls one of them rather than returning a plain text response, but needs Claude to choose which tool is most appropriate for each document.\n\nWhich `tool_choice` setting achieves this requirement?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Set `tool_choice` to `\"auto\"` so Claude can evaluate each document and choose the most contextually appropriate tool, while also retaining the ability to return a plain text response when none of the tools is a strong match for the document content.",
+              "isCorrect": false,
+              "explanation": "`\"auto\"` allows Claude to return a text response instead of calling a tool. This does not satisfy the requirement that every document must produce a structured tool call."
+            },
+            {
+              "id": "c2",
+              "text": "Set `tool_choice` to a specific named tool using the forced selection format so Claude always calls the designated extraction tool regardless of which document type is received, guaranteeing a tool call on every request at the cost of selecting the same schema for all document types.",
+              "isCorrect": false,
+              "explanation": "Forced selection guarantees a tool call but locks Claude to a single tool, eliminating the ability to choose the most appropriate schema per document type - the other half of the stated requirement."
+            },
+            {
+              "id": "c4",
+              "text": "Consolidate the three tools into a single unified extraction schema with optional fields covering all possible attributes across all document types, then set `tool_choice` to `\"auto\"` so Claude calls the merged tool when it recognizes the document and returns text when it does not.",
+              "isCorrect": false,
+              "explanation": "Merging schemas into one tool collapses per-document-type precision into a single generalized schema, and `\"auto\"` still allows text responses when the document type is ambiguous - neither part of the stated requirement is met."
+            },
+            {
+              "id": "c3",
+              "text": "Set `tool_choice` to `\"any\"` so Claude must call one of the provided tools for every document but can select which one best fits the document characteristics, guaranteeing structured output without restricting selection to a single fixed tool.",
+              "isCorrect": true,
+              "explanation": "`\"any\"` requires Claude to call a tool on every response while leaving the choice of which tool to Claude's judgment - satisfying both the structured-output guarantee and the per-document tool selection requirement.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Prompt Engineering & Structured Output",
+          "skills": [
+            "4.3.2: Understanding the distinction between tool_choice: \"auto\" (model may return text instead of calling a tool), \"any\" (model must call a tool but can choose which), and forced tool selection (model must call a specific named tool)."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Think about which `tool_choice` value makes a tool call mandatory while still allowing Claude to pick among the available tools.",
+          "explanation": "The `\"any\"` setting requires Claude to call one of the available tools on every response while still choosing which tool is most appropriate - combining the call guarantee of forced selection with the flexibility of `\"auto\"`.\n\n**Why it works:** `tool_choice: \"any\"` mandates a tool call without locking the selection to a specific tool, satisfying both constraints simultaneously.\n\n**Why the others don't work:**\n- Distractor A: `\"auto\"` allows Claude to skip tool calls entirely and return plain text, violating the guarantee requirement.\n- Distractor B: Forced named-tool selection removes Claude's ability to choose the most appropriate schema per document.\n- Distractor D: Merging schemas and using `\"auto\"` satisfies neither the call guarantee nor per-type schema selection.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0109",
+          "type": "single-choice",
+          "question": "A backend team has a `.claude/CLAUDE.md` that has grown to 900 lines with sections for API design rules, authentication patterns, database conventions, and deployment instructions. The tech lead wants to break these sections into separate, independently editable files while ensuring Claude Code continues to load all of them automatically - without requiring developers to add any `@import` directives.\n\nWhich directory structure allows Claude Code to load topic-specific rule files automatically without requiring any `@import` statements?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "A `rules/` folder at the project root containing `.md` files for each topic - Claude Code scans all directories named `rules/` that are adjacent to a `CLAUDE.md` file and loads their contents before loading the `CLAUDE.md` itself.",
+              "isCorrect": false,
+              "explanation": "Claude Code does not automatically scan any directory named `rules/` at the project root. Only the specifically designated `.claude/rules/` path triggers automatic rule-file discovery at session startup."
+            },
+            {
+              "id": "c3",
+              "text": "A `.claude/config/` directory containing topic-specific `.md` files - Claude Code autodiscovers any `.md` file under `.claude/` at session start and merges their contents into the active configuration without requiring explicit imports or additional configuration.",
+              "isCorrect": false,
+              "explanation": "`.claude/config/` has no special autodiscovery meaning in Claude Code. Only `.claude/rules/` triggers automatic loading of topic-specific rule files; other subdirectories of `.claude/` are not scanned for rule content."
+            },
+            {
+              "id": "c2",
+              "text": "`.claude/rules/` containing topic-specific `.md` files - Claude Code automatically loads all files placed there as part of the project configuration.",
+              "isCorrect": true,
+              "explanation": "`.claude/rules/` is the designated directory for topic-specific rule files. Claude Code autodiscovers and loads all markdown files within it at session start, making it the correct alternative to a monolithic `CLAUDE.md` without requiring any import directives.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Multiple `CLAUDE.md` files in named subdirectories at the project root (for example, `api/CLAUDE.md`, `auth/CLAUDE.md`) - Claude Code detects these and merges them into a single effective project configuration at startup regardless of the current working directory.",
+              "isCorrect": false,
+              "explanation": "Directory-level `CLAUDE.md` files are scoped to their own subtrees and apply only when Claude Code is operating within those directories. They are not merged into a global project configuration at startup and do not serve as a replacement for `.claude/rules/`."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Claude Code Configuration & Workflows",
+          "skills": [
+            "3.1.4: Understanding the .claude/rules/ directory for organizing topic-specific rule files as an alternative to a monolithic CLAUDE.md."
+          ],
+          "services": [
+            "Claude Code"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "tip": "Consider which directory Claude Code monitors and loads from as a built-in part of project configuration discovery.",
+          "explanation": "Claude Code automatically loads all markdown files placed in the `.claude/rules/` directory as part of the project configuration. This makes `.claude/rules/` the purpose-built location for splitting a monolithic `CLAUDE.md` into topic-specific files without requiring any import directives.\n\n**Why it works:** The `.claude/rules/` directory is recognized by Claude Code at session startup. Every file it contains is loaded alongside the project `CLAUDE.md`, giving the same effective merged configuration without a single `@import` line.\n\n**Why the others don't work:**\n- A `rules/` folder at the project root: Claude Code does not automatically scan arbitrary directories named `rules/` at the project root; only the specifically designated `.claude/rules/` path triggers autodiscovery.\n- A `.claude/config/` directory: Claude Code does not autodiscover `.md` files from `.claude/config/`; that path has no special meaning in the configuration loading pipeline.\n- Multiple `CLAUDE.md` files in named subdirectories: Directory-level `CLAUDE.md` files apply only when Claude Code is operating within those subdirectories; they are not merged into a single project-wide configuration at startup.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0111",
+          "type": "single-choice",
+          "question": "A monorepo contains three packages: `api/`, `web/`, and `infra/`. A shared standards directory holds four files: `api-contracts.md`, `react-patterns.md`, `terraform-standards.md`, and `security-baseline.md`. The lead architect wants `api/` to receive only API and security rules, `web/` to receive only React and security rules, and `infra/` to receive only Terraform and security rules - ensuring no package ever receives irrelevant guidance.\n\nHow should each package's `CLAUDE.md` be configured to selectively load only its relevant standards files?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Place all four shared files under `.claude/rules/` at the monorepo root so Claude Code loads them automatically for every package at session start, then add `@exclude` directives in each package's `CLAUDE.md` to suppress the standards files that are irrelevant to that package's technology stack.",
+              "isCorrect": false,
+              "explanation": "`.claude/rules/` causes Claude Code to load all files in that directory globally for the project, applying them to every package. There is no `@exclude` directive in Claude Code's configuration system; rules loaded globally cannot be selectively suppressed by a package's `CLAUDE.md`."
+            },
+            {
+              "id": "c3",
+              "text": "Create a single `@import shared/` directive in the root `CLAUDE.md` to load all four standards files for every package simultaneously, then rely on each package's directory-level `CLAUDE.md` to override or neutralize irrelevant rules using more specific local definitions that take precedence.",
+              "isCorrect": false,
+              "explanation": "`@import` operates on individual files, not directories, so `@import shared/` is not valid syntax. Furthermore, loading all standards globally and relying on local overrides does not prevent Claude Code from receiving the unwanted rules - it only adds conflicting instructions on top of them."
+            },
+            {
+              "id": "c4",
+              "text": "Copy the relevant rule sections from each of the four shared standards files directly into each package's `CLAUDE.md`, because `@import` directives in subdirectory `CLAUDE.md` files can only reference files located within the same directory or its subdirectories and cannot traverse to sibling directories elsewhere in the monorepo.",
+              "isCorrect": false,
+              "explanation": "`@import` in a subdirectory `CLAUDE.md` can reference files relative to the project root or using relative paths that traverse parent directories; it is not restricted to the same directory. Copying content is a maintenance anti-pattern that `@import` is specifically designed to avoid."
+            },
+            {
+              "id": "c1",
+              "text": "Add `@import` directives in each package's `CLAUDE.md` referencing only the relevant shared files - for example, `api/CLAUDE.md` imports `api-contracts.md` and `security-baseline.md`, while `web/CLAUDE.md` imports `react-patterns.md` and `security-baseline.md`.",
+              "isCorrect": true,
+              "explanation": "`@import` directives allow each package's `CLAUDE.md` to reference exactly the shared standards files that apply to it. Claude Code loads only the imported files in that package's scope, giving maintainers selective control without duplication.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Claude Code Configuration & Workflows",
+          "skills": [
+            "3.1.6: Using @import to selectively include relevant standards files in each package's CLAUDE.md based on maintainer domain knowledge."
+          ],
+          "services": [
+            "Claude Code"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "tip": "Focus on how individual packages can reference specific shared files rather than loading all shared files globally.",
+          "explanation": "Each package's `CLAUDE.md` should use `@import` directives to reference only the shared standards files that apply to that package. For example, `api/CLAUDE.md` would import `api-contracts.md` and `security-baseline.md`, while `web/CLAUDE.md` imports `react-patterns.md` and `security-baseline.md`. This gives each maintainer precise control over which rules Claude Code receives in their package context.\n\n**Why it works:** `@import` is a per-file directive, so each package's `CLAUDE.md` can independently declare which standards to load. Only the referenced files are loaded in that package's scope, preventing irrelevant rules from polluting the Claude context.\n\n**Why the others don't work:**\n- Placing all files in `.claude/rules/`: That causes Claude Code to load all four standards files globally for every package. There is no `@exclude` directive to suppress rules selectively.\n- Single `@import shared/` at the root with local overrides: A directory-level `@import` is not supported; `@import` works on individual files, not directories. Local override patterns also cannot suppress globally loaded rules.\n- Copying sections into each package's `CLAUDE.md` directly: Duplication makes maintenance error-prone. Additionally, `@import` does support traversing to sibling directories; the constraint described is fictional.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0055",
+          "type": "single-choice",
+          "question": "An engineer builds an agent that exposes two tools to Claude: `get_quote` (which returns a pricing estimate) and `get_invoice` (which retrieves a finalized bill). Both tool definitions carry the description \"Returns pricing information.\" During testing, Claude frequently calls `get_quote` when the user asks for a finalized invoice.\n\nWhat does this behavior most directly illustrate about how Claude selects which tool to invoke?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Claude treats tool names as the dominant routing signal and descriptions as supplementary documentation; because `get_quote` and `get_invoice` share a common prefix, Claude interprets them as interchangeable variants of the same operation and selects between them arbitrarily.",
+              "isCorrect": false,
+              "explanation": "Claude does not treat tool names as the dominant routing signal. The description is the primary mechanism Claude uses to determine a tool's purpose. Name similarity does not explain the misrouting - the identical descriptions are the root cause."
+            },
+            {
+              "id": "c2",
+              "text": "Claude caches tool selection decisions within a session and replays prior invocations when requests are semantically similar; the routing inconsistency indicates that the first tool call in the session established the wrong default for all subsequent similar queries.",
+              "isCorrect": false,
+              "explanation": "Claude does not cache tool selection decisions and replay them across turns. Each tool call decision is made based on the current context, including the tool descriptions present in the request. The problem here is the absence of meaningful description content, not session-level caching."
+            },
+            {
+              "id": "c3",
+              "text": "Claude uses tool descriptions as its primary signal for tool selection; when multiple tools carry identical or near-identical descriptions, the model has no reliable basis to distinguish between them and will route requests inconsistently.",
+              "isCorrect": true,
+              "explanation": "Tool descriptions are the principal mechanism through which Claude understands a tool's intended use. When two tools share the same description, Claude receives no signal to differentiate them and cannot reliably route requests to the correct tool. Minimal or duplicate descriptions are the direct cause of unpredictable selection among similar tools.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Tool routing inconsistency at this level is typically caused by a missing system prompt instruction specifying which tool to use for each request type; Claude infers which tool to call exclusively from system prompt context rather than from the tool description field, so adding a system prompt clarification is the correct fix.",
+              "isCorrect": false,
+              "explanation": "Claude does not rely exclusively on the system prompt for tool selection. Tool descriptions are the primary signal for determining which tool to invoke for a given request. While system prompt guidance can supplement tool descriptions, it does not replace the fundamental role that descriptions play in Claude's tool selection."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Tool Design & MCP Integration",
+          "skills": [
+            "2.1.1: Understanding tool descriptions as the primary mechanism LLMs use for tool selection and that minimal descriptions lead to unreliable selection among similar tools."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Think about what information is available to Claude at the moment it must decide which tool to call and which part of the tool definition carries the most semantic weight.",
+          "explanation": "Claude selects tools primarily based on their descriptions. When two tools have identical or near-identical descriptions, Claude cannot distinguish between them and will route inconsistently. Providing distinct, detailed descriptions for each tool is the foundational requirement for reliable tool selection among similar alternatives.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0231",
+          "type": "single-choice",
+          "question": "A principal agent is responsible for producing an executive summary of how a monorepo's authentication system works. To answer this question it must explore dozens of source files, read configuration files, and trace call chains. The team notices that the principal agent's context fills with verbose file contents after each exploration step, leaving little room for high-level reasoning.\n\nWhich design pattern most directly resolves this problem?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Increase the principal agent's context window by switching to a long-context model variant so that verbose exploration output does not crowd out subsequent reasoning steps.",
+              "isCorrect": false,
+              "explanation": "A larger context window defers the problem rather than solving it; eventually exploration output still consumes available space, and high-level reasoning must compete with growing verbose content."
+            },
+            {
+              "id": "c3",
+              "text": "Delegate the file exploration and call-chain tracing to one or more subagents that return only structured summaries of their findings, leaving the principal agent's context free for coordination and synthesis.",
+              "isCorrect": true,
+              "explanation": "Subagent delegation confines verbose exploration output to the subagents' own contexts; the principal agent receives compact, structured summaries and maintains enough context headroom for high-level reasoning.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Have the principal agent read all files directly but set a low `max_tokens` value on each intermediate response to prevent verbose output from accumulating in the context window.",
+              "isCorrect": false,
+              "explanation": "Reducing `max_tokens` truncates the principal agent's output but does not prevent input tokens from accumulating; reading files directly still fills the context with raw content."
+            },
+            {
+              "id": "c4",
+              "text": "Compress intermediate file contents by encoding them as base64 strings before appending them to the principal agent's context, reducing their token footprint without losing fidelity.",
+              "isCorrect": false,
+              "explanation": "Base64-encoded content is not interpretable by the model as structured information and would actually increase token count while making the content unreadable, not reduce context usage."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Context Management & Reliability",
+          "skills": [
+            "5.4.3: Understanding subagent delegation for isolating verbose exploration output while the main agent coordinates high-level understanding."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/compaction",
+          "tip": "Consider which pattern physically prevents verbose output from ever entering the principal agent's context window.",
+          "explanation": "Delegating detailed exploration to subagents means verbose content stays in the subagents' contexts; the principal agent only sees the compact, structured summaries it needs to coordinate and synthesise.\n\n**Why it works:** Subagents absorb the token cost of exploration in their own independent contexts, returning high-signal summaries that keep the orchestrator's context lean.\n\n**Why the others don't work:**\n- Low `max_tokens`: limits output length but not how much content the principal agent reads in as input.\n- Long-context model: a wider window postpones but does not eliminate the crowding problem.\n- Base64 encoding: does not reduce token count and renders content uninterpretable to the model.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0229",
+          "type": "single-choice",
+          "question": "A developer is using Claude to perform exploratory analysis of a large codebase over an extended session. Early in the session, Claude correctly identified three unusual anti-patterns present in the codebase. An hour later, when asked to cross-reference those patterns with new findings, Claude's answers start describing \"typical patterns found in codebases of this type\" rather than the specific anti-patterns it had already identified.\n\nWhat is the most likely explanation for this behavioural shift?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Claude's tool-use loop has stalled because a prior `tool_result` block was not returned in the correct message turn, causing the model to lose track of which findings came from tool calls versus its own reasoning.",
+              "isCorrect": false,
+              "explanation": "The scenario describes a plain conversational session without tool use, so a missing `tool_result` block is not a plausible cause of the generalisation observed."
+            },
+            {
+              "id": "c2",
+              "text": "The session has grown long enough that earlier discoveries are being overshadowed by the volume of subsequent context, causing the model to revert to generalised pattern descriptions instead of the specific findings it generated earlier.",
+              "isCorrect": true,
+              "explanation": "This is context degradation: as the conversation grows, older specific findings recede in effective attention, and the model falls back on generalised knowledge rather than the precise details it uncovered earlier.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "The model has hit its `max_tokens` limit on the latest response, truncating its reply before it could include the earlier findings and forcing it to use shorter, generic descriptions instead.",
+              "isCorrect": false,
+              "explanation": "`max_tokens` limits output length but does not alter how the model attends to earlier context; truncated output would be cut off, not replaced with generic summaries."
+            },
+            {
+              "id": "c1",
+              "text": "The model's `temperature` setting has drifted upward during the session, increasing randomness and making it less likely to retrieve the exact anti-pattern names from earlier turns.",
+              "isCorrect": false,
+              "explanation": "`temperature` is a fixed per-request parameter - it does not drift during a session - so this cannot be the cause of the observed inconsistency."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Context Management & Reliability",
+          "skills": [
+            "5.4.1: Understanding context degradation in extended sessions: models start giving inconsistent answers and referencing \"typical patterns\" rather than specific classes discovered earlier."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/compaction",
+          "tip": "Think about what structurally changes as a conversation grows longer and how that affects model attention to distant content.",
+          "explanation": "As a session extends, the volume of subsequent context can overwhelm references to earlier specific findings, leading the model to substitute generalised knowledge for precise details it had previously surfaced. This is context degradation.\n\n**Why it works:** Long-context models exhibit reduced effective attention to content from earlier in the conversation relative to recent content, making specific findings from the early session less reliably retrieved.\n\n**Why the others don't work:**\n- `temperature` drift: `temperature` is set per API request and does not change mid-session.\n- `max_tokens` truncation: limiting output length does not change what the model attends to in its input context.\n- `tool_result` block issue: the scenario involves no tool use; missing tool results are unrelated to this problem.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0056",
+          "type": "single-choice",
+          "question": "A developer registers a `create_event` tool with the description \"Creates a calendar event.\" During integration testing, Claude passes date arguments as natural language strings such as \"next Tuesday\" and \"this weekend\" - expressions the tool's underlying API does not accept, causing every call to return a validation error.\n\nWhich addition to the tool description would most directly prevent Claude from generating incompatible date arguments?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Specify in the description that date parameters must be supplied in ISO 8601 format, include an example valid value such as `2026-04-15T09:00:00Z`, and note that natural language date expressions such as \"next Tuesday\" are outside the tool's accepted input boundary.",
+              "isCorrect": true,
+              "explanation": "Including the expected input format, a concrete example, and explicit boundary conditions directly equips Claude with the information it needs to generate a compatible argument. Tool descriptions that define valid input formats, illustrate them with examples, and clarify what the tool does not accept are the most effective way to prevent format-mismatch errors.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Replace the date parameter with a structured enum field that lists each calendar date explicitly so that the JSON schema validator rejects any value not in the predefined set, preventing incompatible inputs from reaching the tool's API without modifying the natural language description text.",
+              "isCorrect": false,
+              "explanation": "An enum of every possible calendar date is impractical and does not address the description quality issue. Schema validation can catch already-generated invalid values, but it does not help Claude understand what valid input looks like before generating a tool call. The description explanation of input format is the appropriate place to convey format expectations."
+            },
+            {
+              "id": "c3",
+              "text": "Add a system prompt instruction telling Claude to always convert dates to a numeric format before calling any calendar-related tool, and leave the tool description unchanged so the fix applies uniformly across all date-handling tools in the agent without requiring individual description edits for each one.",
+              "isCorrect": false,
+              "explanation": "Moving input format guidance into the system prompt rather than the tool description reduces clarity for that specific tool and couples global system behavior to a tool-specific detail. The description is the correct location for input format, examples, and boundary conditions because it is co-located with the tool's definition and is always present when Claude decides how to call it."
+            },
+            {
+              "id": "c1",
+              "text": "Add a server-side normalization layer that silently converts natural language date strings to ISO 8601 format before the tool's API processes them, keeping the description concise and adapting Claude's output transparently at runtime without requiring any changes to the tool definition.",
+              "isCorrect": false,
+              "explanation": "Server-side normalization addresses the symptom rather than the root cause. Claude generates incompatible arguments because the description gives no guidance on what input format the tool accepts. Fixing this at the implementation layer does not help Claude produce correct inputs in the first place and may mask future description quality issues."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Tool Design & MCP Integration",
+          "skills": [
+            "2.1.2: Understanding the importance of including input formats, example queries, edge cases, and boundary explanations in tool descriptions."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Consider what information Claude needs at the moment it constructs a tool call argument - format constraints, examples, and boundaries all live in the description, not in the implementation.",
+          "explanation": "Tool descriptions should specify the expected input format for each parameter, provide at least one concrete example of a valid value, and explicitly state the boundary conditions the tool does not handle. Without this information, Claude must guess input format from context alone, leading to type mismatches like natural language date strings being passed to an API that expects ISO 8601.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0008",
+          "type": "single-choice",
+          "question": "During testing, a subagent in a multi-agent system fails to reference details the user shared earlier in the coordinator's conversation.\n\nWhat is the most likely cause of this behavior?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "The coordinator's system prompt is blocking the subagent from accessing earlier messages due to a permissions conflict.",
+              "isCorrect": false,
+              "explanation": "Incorrect. System prompts do not enforce access restrictions between agents. The issue is that subagents simply do not receive the coordinator's conversation history unless it is explicitly forwarded."
+            },
+            {
+              "id": "c4",
+              "text": "The subagent needs a tool-use declaration that grants it read access to the coordinator's conversation state before it can reference prior messages.",
+              "isCorrect": false,
+              "explanation": "Incorrect. There is no tool-use declaration that grants cross-agent conversation access. Subagents operate with isolated context by design, and the coordinator must explicitly include any needed information in the subagent's prompt."
+            },
+            {
+              "id": "c1",
+              "text": "Subagents run with isolated context and do not automatically inherit the coordinator's conversation history.",
+              "isCorrect": true,
+              "explanation": "Correct. Each subagent starts a new API call with its own message list. It only sees what the coordinator explicitly passes to it, not the full parent conversation.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "The subagent's `max_tokens` parameter is set too low, preventing it from processing the full conversation context that was automatically shared.",
+              "isCorrect": false,
+              "explanation": "Incorrect. The `max_tokens` parameter controls output length, not input processing. More importantly, conversation context is not automatically shared with subagents at all."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Agentic Architecture & Orchestration",
+          "skills": [
+            "1.2.2: Understanding how subagents operate with isolated context and do not inherit the coordinator's conversation history automatically."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices",
+          "tip": "Consider what context each agent instance receives when it is invoked.",
+          "explanation": "**Why it works:** In agentic architectures using the Claude API, each subagent is invoked as a separate API call with its own messages array. Subagents do not automatically inherit or have access to the coordinator's conversation history. The coordinator must explicitly extract and pass any relevant context to the subagent.\n\n**Why the others don't work:** System prompts do not control inter-agent data sharing (c2). The `max_tokens` parameter governs output generation, not input context handling, and context is never auto-shared regardless (c3). No tool-use mechanism exists to grant one agent read access to another agent's conversation state (c4).",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0002",
+          "type": "single-choice",
+          "question": "During a multi-step research session, the agent calls a `search_documents` tool and receives a large JSON result. The developer needs to feed this result back to Claude so it can decide whether to search again or summarize its findings.\n\nHow should the developer structure the next API request to ensure Claude can reason correctly about the tool output?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Append the assistant message containing the `tool_use` block, then append a user message with a `tool_result` block that references a summarized version of the output to keep token counts low, omitting the raw JSON entirely.",
+              "isCorrect": false,
+              "explanation": "While summarizing can be useful for very large outputs, arbitrarily discarding the raw result and replacing it with a summary may lose details Claude needs. More importantly, this choice does not address the core mechanic being tested: proper ID matching and history structure. The approach also risks the developer's summary introducing bias or errors."
+            },
+            {
+              "id": "c4",
+              "text": "Append the assistant message containing the `tool_use` block, then insert the tool output as a second assistant message so Claude sees it as its own prior reasoning, followed by an empty user message to prompt the next step.",
+              "isCorrect": false,
+              "explanation": "Tool results must be returned as tool_result content blocks inside a user message, not as assistant messages. Fabricating assistant messages misrepresents the conversation history and violates the API's alternating-turn structure."
+            },
+            {
+              "id": "c1",
+              "text": "Append the assistant message containing the `tool_use` block, then append a user message with a `tool_result` block whose `tool_use_id` matches a newly generated UUID to avoid ID collisions across turns.",
+              "isCorrect": false,
+              "explanation": "The tool_use_id in the tool_result must match the original tool_use block's ID exactly. Using a new UUID breaks the pairing and Claude cannot associate the result with its request."
+            },
+            {
+              "id": "c3",
+              "text": "Append the assistant message containing the `tool_use` block, then append a user message with a `tool_result` block whose `tool_use_id` matches the ID from the original `tool_use` block.",
+              "isCorrect": true,
+              "explanation": "This preserves the full conversation history and correctly pairs the tool result with its corresponding tool request using the matching tool_use_id.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Agentic Architecture & Orchestration",
+          "skills": [
+            "1.1.2: Understanding how tool results are appended to conversation history so the model can reason about the next action."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Think about which field links a tool result back to the specific tool call that requested it.",
+          "explanation": "The correct approach is to append both the assistant turn (with its `tool_use` block) and a new user turn containing a `tool_result` block whose `tool_use_id` matches the original `tool_use` block's ID.\n\n**Why it works:** The Messages API is stateless, so each request must include the full conversation history. The `tool_use_id` field is the key that lets Claude pair a result with the exact tool call it made, enabling it to reason about the output and decide on its next action.\n\n**Why the others don't work:**\n- Generating a new UUID: the `tool_use_id` must match the ID from the original `tool_use` block exactly, otherwise the API cannot correlate the result with the request.\n- Summarizing and omitting raw output: while reducing tokens can be practical, this answer sidesteps the core requirement of correct history structure and risks losing information Claude needs for its next decision.\n- Inserting output as an assistant message: tool results must be user-turn `tool_result` blocks, not fabricated assistant messages, which would break the alternating message structure the API requires.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0013",
+          "type": "single-choice",
+          "question": "Initial synthesis outputs from a coordinator-based research assistant frequently miss key subtopics. The first round of search results does not cover the full scope of the query.\n\nWhat approach should the team implement to ensure the coordinator produces comprehensive reports?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Have the coordinator evaluate synthesis output for gaps, then re-delegate to search subagents with targeted queries addressing those gaps, and repeat until coverage is sufficient.",
+              "isCorrect": true,
+              "explanation": "This implements the iterative refinement loop pattern. The coordinator inspects synthesis results, identifies missing areas, issues focused follow-up queries, and re-synthesizes until the report meets coverage requirements.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Have the synthesis subagent return a confidence score with each report, and only trigger a second fixed round of the same search queries whenever the score falls below a predefined threshold before accepting the output as final.",
+              "isCorrect": false,
+              "explanation": "Re-running the same queries will likely return the same results and miss the same gaps. Effective refinement requires the coordinator to identify specific missing areas and issue targeted follow-up queries rather than repeating identical searches."
+            },
+            {
+              "id": "c3",
+              "text": "Pre-define a static list of required subtopics for each query category and have the coordinator check off items from that list, skipping the evaluation step entirely and only delegating to subagents for topics not on the pre-approved coverage list.",
+              "isCorrect": false,
+              "explanation": "A static subtopic list cannot adapt to novel or open-ended queries. The coordinator needs to dynamically evaluate synthesis output for gaps rather than relying on rigid predefined checklists that may not match the actual query scope."
+            },
+            {
+              "id": "c1",
+              "text": "Increase the number of search subagents invoked in the first round and set a higher `max_tokens` value on the synthesis prompt so the coordinator can produce longer output from the initial results without needing additional rounds.",
+              "isCorrect": false,
+              "explanation": "Adding more initial subagents and increasing token limits does not address the fundamental problem. The coordinator still lacks a mechanism to detect missing subtopics and fill them in through follow-up queries."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Agentic Architecture & Orchestration",
+          "skills": [
+            "1.2.7: Implementing iterative refinement loops where the coordinator evaluates synthesis output for gaps, re-delegates to search and analysis subagents with targeted queries, and re-invokes synthesis until coverage is sufficient."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+          "tip": "Think about what must change between each iteration for the loop to actually improve coverage rather than repeat the same results.",
+          "explanation": "When a coordinator agent produces synthesis output that has gaps, the solution is an iterative refinement loop. The coordinator evaluates the current output, identifies specific areas of insufficient coverage, delegates targeted follow-up queries to search and analysis subagents, and re-invokes synthesis with the combined results. This loop continues until coverage meets the required threshold.\n\n**Why it works:** The iterative refinement loop allows the coordinator to progressively close coverage gaps by issuing targeted queries that address specific missing subtopics. Each iteration builds on the previous results, and the loop terminates only when the coordinator determines that coverage is sufficient.\n\n**Why the others don't work:**\n- Increasing subagents and token limits: more initial resources do not help if the coordinator cannot detect and act on gaps in subsequent rounds.\n- Re-running the same queries on low confidence: repeating identical searches will return the same incomplete results and fail to address the specific subtopics that were missed.\n- Using a static subtopic checklist: predefined lists cannot cover novel queries and bypass the dynamic evaluation that makes iterative refinement adaptive.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0010",
+          "type": "single-choice",
+          "question": "Users submit broad questions like \"Analyze the environmental and economic impacts of offshore wind energy.\" The coordinator consistently breaks these into very specific subtasks such as \"Find the average cost per megawatt-hour of offshore wind\" and \"List bird species affected by turbines.\" Testers report that final answers feel shallow and miss entire dimensions of the topic.\n\nWhat is the most likely root cause of this issue?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "The coordinator decomposes tasks too narrowly, causing entire relevant subtopics to be omitted from delegation",
+              "isCorrect": true,
+              "explanation": "Correct. Overly narrow decomposition means the coordinator focuses on a few specific angles and fails to generate subtasks that cover the full breadth of the research topic.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "The worker agents lack sufficient context window size to process the research subtasks assigned to them",
+              "isCorrect": false,
+              "explanation": "The problem is not with worker capacity. The workers are completing their assigned tasks. The issue is that the coordinator defines tasks too narrowly, so many relevant areas are never assigned at all."
+            },
+            {
+              "id": "c4",
+              "text": "The system prompt for the coordinator agent does not include a high enough `max_tokens` value, which prevents it from generating a sufficiently detailed decomposition plan that would cover all relevant dimensions",
+              "isCorrect": false,
+              "explanation": "While max_tokens can limit output length, the described behavior is a design-level decomposition problem. The coordinator is producing narrow subtasks by approach, not because it is being truncated."
+            },
+            {
+              "id": "c3",
+              "text": "The worker agents are not returning enough detail in their individual responses, resulting in a final synthesis that appears incomplete and lacks depth across the topic",
+              "isCorrect": false,
+              "explanation": "The scenario states that the coordinator breaks queries into very specific subtasks. The gap is in coverage of subtopics, not in the depth of individual worker responses."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Agentic Architecture & Orchestration",
+          "skills": [
+            "1.2.4: Understanding risks of overly narrow task decomposition by the coordinator, leading to incomplete coverage of broad research topics."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+          "tip": "Consider how the granularity of task decomposition affects whether all relevant aspects of a broad topic are explored.",
+          "explanation": "**Why it works:** When a coordinator agent decomposes a broad research question into overly specific and narrow subtasks, it risks missing entire dimensions of the topic. The narrow focus leads to a few well-defined but limited subtasks, leaving large portions of the research space unexplored by any worker agent.\n\n**Why the others don't work:** Worker context window size (c1) is unrelated because workers are completing their tasks successfully. Insufficient worker detail (c3) misidentifies the problem, which is about missing subtopics, not shallow subtask responses. Blaming `max_tokens` (c4) confuses a token budget parameter with a fundamental decomposition strategy flaw.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0110",
+          "type": "single-choice",
+          "question": "A platform team recently updated their mandatory peer-review guidelines and placed them in `.claude/CLAUDE.md` at the repository root. After reviewing several pull requests, the tech lead notices that Claude is not applying the peer-review guidelines during the sessions of two engineers who onboarded the previous week. Both engineers confirm they have Claude Code set up and running on their machines.\n\nWhich diagnostic step most directly determines whether the peer-review guidelines are being loaded in the affected engineers' sessions?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Ask the engineers to launch Claude Code with a `claude --verbose` flag at session start, which prints the full assembled system prompt, then search the output for the peer-review guidelines text to verify the content is present in what Claude received.",
+              "isCorrect": false,
+              "explanation": "No standard `--verbose` flag exists in Claude Code for printing the assembled system prompt at session start. This is not a documented diagnostic approach and would not reliably surface which configuration files were loaded or why a file might be missing."
+            },
+            {
+              "id": "c3",
+              "text": "Compare the output of `cat ~/.claude/CLAUDE.md` on the tech lead's workstation with the output on each affected engineer's machine, since user-level files sometimes shadow project-level configuration when they contain instructions that conflict with the project-level file.",
+              "isCorrect": false,
+              "explanation": "Comparing user-level files diagnoses a different class of problem - shadowing by personal configuration - not whether the project-level file is being loaded at all. This step does not directly confirm whether `.claude/CLAUDE.md` is active in the affected sessions."
+            },
+            {
+              "id": "c2",
+              "text": "Ask each engineer to run `/memory` in their Claude Code session to see which `CLAUDE.md` files are currently loaded and confirm whether the project-level file appears in the list.",
+              "isCorrect": true,
+              "explanation": "`/memory` displays all configuration files Claude Code has loaded for the active session. If `.claude/CLAUDE.md` does not appear in the output, the engineer's session is not receiving the peer-review guidelines, directly identifying the configuration gap.",
+              "sequence": 1
+            },
+            {
+              "id": "c1",
+              "text": "Ask each engineer to run `git log --oneline .claude/CLAUDE.md` to confirm the file was included in their most recent pull, since a failed merge or partial sync could leave the project-level configuration in a stale state on their machines.",
+              "isCorrect": false,
+              "explanation": "`git log` confirms the file's commit history and whether it was pulled, but does not show whether Claude Code actually loaded the file in the current session. The file could be present on disk yet still not be loaded due to a scope or path resolution issue."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Claude Code Configuration & Workflows",
+          "skills": [
+            "3.1.5: Diagnosing configuration hierarchy issues (for example, a new team member not receiving instructions because they're in user-level rather than project-level configuration)."
+          ],
+          "services": [
+            "Claude Code"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "tip": "Think about which built-in command shows the developer exactly which configuration files Claude Code has loaded for the current session.",
+          "explanation": "The `/memory` command in Claude Code displays the list of memory and configuration files loaded for the active session, including user-level and project-level `CLAUDE.md` files. Running it in the affected engineers' sessions immediately reveals whether the project-level `.claude/CLAUDE.md` is present, pinpointing whether the issue is a missing or unread configuration file.\n\n**Why it works:** `/memory` provides direct visibility into Claude Code's loaded configuration state without requiring any file-system inspection or external tooling. It is the quickest way to confirm whether a specific configuration file is active in a given session.\n\n**Why the others don't work:**\n- `git log .claude/CLAUDE.md`: Confirms the file was committed and pulled, but does not tell you whether Claude Code actually loaded it in the current session - the file could be present on disk yet not loaded due to a path or scope issue.\n- `cat ~/.claude/CLAUDE.md` comparison: The issue is a project-level file not being loaded, not a conflict between user-level files. Comparing home-directory files does not directly confirm what the project-level session loaded.\n- `claude --verbose` at session start: No such flag exists as a standard diagnostic tool for listing loaded configuration files; this approach would not reliably surface the loaded `CLAUDE.md` paths.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0060",
+          "type": "single-choice",
+          "question": "An engineer renames `analyze_content` to `extract_web_results` to reduce confusion with a document parsing tool called `parse_document`. After the rename, Claude still routes some PDF parsing requests to `extract_web_results`. The developer inspects both tool definitions and finds that `extract_web_results` still carries its original description: \"Analyzes and extracts key information from content.\"\n\nWhat does this scenario most directly illustrate about renaming tools to resolve functional overlap?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "The underscore-separated convention in `extract_web_results` causes Claude to interpret the tool name as a compound multi-purpose identifier; Claude scans each segment of the name independently and routes any task matching any segment - including \"results\" - to the tool, which is why PDF requests that produce output results continue to be misrouted to it.",
+              "isCorrect": false,
+              "explanation": "Claude does not parse tool names segment by segment or route based on matching individual tokens within an underscore-separated name. Tool names are read as a whole and their contribution to routing is secondary to the description. The misrouting is caused by the generic description, not by any name-parsing heuristic."
+            },
+            {
+              "id": "c2",
+              "text": "Tool names carry more routing weight than descriptions in Claude's selection mechanism; if the rename alone did not fix the misrouting, the remaining problem must be that `extract_web_results` and `parse_document` still share overlapping vocabulary in their descriptions, so the rename was an insufficient but directionally correct first step and the description of `parse_document` now needs to be narrowed further.",
+              "isCorrect": false,
+              "explanation": "Descriptions carry more routing weight than tool names, not the other way around. The scenario illustrates the opposite: the rename had no effect precisely because the description was not updated. The problem is not with `parse_document`'s description but with the unchanged description on `extract_web_results`."
+            },
+            {
+              "id": "c3",
+              "text": "Claude caches tool metadata between API calls within a session and does not re-read tool definitions after the first invocation; the rename will take effect only after a fresh session is started where the updated tool name is presented with no prior tool call history in the context window.",
+              "isCorrect": false,
+              "explanation": "Claude does not cache tool definitions between calls and does not require a fresh session to recognise a renamed tool. Tool schemas are read from each API request. The continued misrouting is caused by the unchanged description, not by any caching behavior."
+            },
+            {
+              "id": "c1",
+              "text": "Renaming a tool without updating its description leaves the description's semantic content unchanged; Claude continues to associate the tool with the same broad use cases because the description - not the name alone - is the primary signal for tool selection.",
+              "isCorrect": true,
+              "explanation": "A new tool name signals intent to the developer but does not change what Claude reads to infer the tool's purpose. Because the description still says \"Analyzes and extracts key information from content,\" Claude continues to consider `extract_web_results` a candidate for any content analysis task, including PDF parsing. Both the name and the description must be updated together to eliminate functional overlap.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Tool Design & MCP Integration",
+          "skills": [
+            "2.1.6: Renaming tools and updating descriptions to eliminate functional overlap (for example, renaming analyze_content to extract_web_results with a web-specific description)."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "A rename communicates intent to developers reading the code, but Claude reads the description at inference time - if the description is unchanged, the routing behavior is unchanged.",
+          "explanation": "Renaming a tool without updating its description is insufficient to eliminate functional overlap. Claude selects tools primarily based on description content, so a new name that no longer reflects the old description still leaves the old description in place. Both the name and the description must be updated together: the name should reflect the specific purpose and the description must use scope-limiting language that rules out use cases belonging to similar tools.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0233",
+          "type": "single-choice",
+          "question": "A principal agent is tasked with producing a refactoring plan for a large e-commerce backend. During its planning phase it must answer several targeted questions: which files contain payment integration tests, which services depend on the refund flow, and which endpoints call the legacy tax calculation module. If the principal agent investigates each question directly, its context fills with raw search results before it can produce the plan.\n\nWhat is the most effective approach for the principal agent to answer these targeted questions without consuming its own context budget?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Use `cache_control` headers on each investigation to store intermediate search results in the prompt cache, so the principal agent can retrieve them without using additional context tokens on repeated lookups.",
+              "isCorrect": false,
+              "explanation": "`cache_control` caches static prompt prefixes to avoid re-sending the same tokens; it does not prevent exploration results from occupying the principal agent's active context during the session."
+            },
+            {
+              "id": "c2",
+              "text": "Spawn a dedicated subagent for each targeted investigation, providing it with a specific question and the relevant portion of the codebase to search, then receive only the structured answer back into the principal agent's context.",
+              "isCorrect": true,
+              "explanation": "Purpose-specific subagents absorb the exploration cost in their own contexts and return compact, actionable answers, preserving the principal agent's context for coordination and plan generation.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Pre-populate the principal agent's system prompt with the full index of the codebase before the session starts, so it can answer all investigation questions using only its parametric knowledge without issuing tool calls.",
+              "isCorrect": false,
+              "explanation": "Loading the full index at session start consumes exactly the context space that subagent delegation is designed to avoid, and parametric knowledge cannot substitute for live codebase queries."
+            },
+            {
+              "id": "c1",
+              "text": "Have the principal agent issue all three investigation questions as a single batch in one API call, instructing Claude to answer them sequentially within one response so that only one context window is consumed.",
+              "isCorrect": false,
+              "explanation": "Batching questions in one call still keeps the principal agent responsible for all exploration; the verbose search results accumulate in its single response and context, solving nothing."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Context Management & Reliability",
+          "skills": [
+            "5.4.5: Spawning subagents to investigate specific questions (for example, \"find all test files,\" \"trace refund flow dependencies\") while the main agent preserves high-level coordination."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+          "tip": "Consider which design pattern physically offloads targeted investigation work outside the principal agent's own context window.",
+          "explanation": "Spawning purpose-specific subagents for each investigation question keeps expensive exploration in the subagents' contexts and returns compact answers to the principal agent, preserving its context for high-level reasoning.\n\n**Why it works:** Each subagent operates in its own context window, absorbing verbose search output and returning a structured answer rather than raw results.\n\n**Why the others don't work:**\n- Single-batch call: all three investigations still happen inside the principal agent's context.\n- `cache_control` headers: prompt caching reduces re-sending costs but does not offload active exploration context.\n- Pre-populated index: loading a full index upfront wastes the very context budget the approach aims to preserve.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0172",
+          "type": "single-choice",
+          "question": "A developer uses `tool_use` with a strict JSON schema to extract invoice data from supplier documents. After deploying to production, JSON syntax errors have been eliminated, but a small percentage of invoices are rejected by downstream validation because extracted line-item totals do not sum to the invoice total field.\n\nWhat does this outcome demonstrate about the limits of schema enforcement via `tool_use`?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "JSON schemas enforce structural constraints at parse time but Claude populates field values before schema validation occurs, so inserting a pre-population arithmetic-checking Claude call between extraction and schema validation would catch cross-field semantic errors before they reach the downstream system.",
+              "isCorrect": false,
+              "explanation": "The claim that schema validation occurs only after value population mischaracterizes the tool-use mechanism. The core issue is that schema validation checks structure, not arithmetic relationships between fields, regardless of sequencing."
+            },
+            {
+              "id": "c2",
+              "text": "A strict `tool_use` schema enforced via the API guarantees syntactic correctness - valid field names, required field presence, and correct data types - but does not prevent semantic errors such as extracted values placed in the wrong field or line items that do not sum to the stated total.",
+              "isCorrect": true,
+              "explanation": "Schema validation catches structural problems - missing fields, wrong types, invalid names - but cannot verify computed or cross-field relationships. Semantic correctness requires separate validation logic.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "The discrepancy indicates that the source supplier documents contain genuine arithmetic errors that Claude faithfully extracts into the structured output, meaning the `tool_use` schema and extraction prompt are working correctly and the downstream validator is misconfigured.",
+              "isCorrect": false,
+              "explanation": "While source document errors are possible, the scenario states the pipeline rejects invoices in which extracted totals don't sum correctly - the more direct explanation is that schema enforcement does not catch cross-field semantic errors."
+            },
+            {
+              "id": "c1",
+              "text": "The JSON schema is specified too narrowly at the field type level and should be extended with custom constraint keywords - such as arithmetic relationship validators - to enforce cross-field dependencies like the sum invariant, which would eliminate the total-mismatch errors.",
+              "isCorrect": false,
+              "explanation": "Standard JSON Schema does not support runtime arithmetic constraints between fields. Even extended schema keywords cannot enforce computed cross-field relationships during Claude's extraction process."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Prompt Engineering & Structured Output",
+          "skills": [
+            "4.3.3: Understanding that strict JSON schemas via tool use eliminate syntax errors but do not prevent semantic errors (for example, line items that don't sum to total, values in wrong fields)."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "Think about the distinction between what a JSON schema can enforce - structure - and what it cannot - computed relationships between values.",
+          "explanation": "`tool_use` with JSON schemas guarantees that outputs are structurally valid: required fields are present, types are correct, and field names match. But schemas cannot verify semantic relationships such as arithmetic consistency between fields.\n\n**Why it works:** Schema enforcement operates at the structural level. Cross-field invariants like sum consistency require separate application-layer validation logic that runs after extraction.\n\n**Why the others don't work:**\n- Distractor A: Standard JSON Schema cannot enforce runtime arithmetic constraints between fields.\n- Distractor C: Attributing all mismatches to source document errors ignores the structural vs. semantic distinction that the outcome actually illustrates.\n- Distractor D: Mischaracterizes how `tool_use` validation works; the issue is what schemas can check, not when they run.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0006",
+          "type": "single-choice",
+          "question": "One engineer proposes scanning each assistant response for phrases like \"I have completed the task\" to determine when an agentic loop should exit. Another suggests capping the loop at 10 iterations regardless of progress.\n\nWhich approach correctly determines when the agentic loop should terminate?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Check the `stop_reason` field in each API response and exit the loop when it equals `\"end_turn\"` rather than `\"tool_use\"`.",
+              "isCorrect": true,
+              "explanation": "The stop_reason field is the definitive, structured signal from the API. A value of end_turn means Claude has finished its response and is not requesting any further tool calls, making it the correct termination condition.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Set a fixed iteration cap of 10 as the primary exit condition, and only check `stop_reason` as a secondary fallback in case the cap is never reached during the conversation.",
+              "isCorrect": false,
+              "explanation": "An iteration cap can serve as a safety guardrail, but using it as the primary stopping mechanism causes the loop to terminate prematurely on complex tasks or to run unnecessarily on simple ones. The structured stop_reason signal should always be the primary condition."
+            },
+            {
+              "id": "c1",
+              "text": "Parse each assistant response for completion phrases such as \"done\" or \"finished\", and terminate the loop when any of those keywords appear in the last text block of the response.",
+              "isCorrect": false,
+              "explanation": "Scanning for natural language keywords is fragile and unreliable. Claude may use those words in explanations or caveats without intending to signal completion, and it may complete a task without using any of the expected phrases."
+            },
+            {
+              "id": "c4",
+              "text": "Check whether the assistant response contains any text content blocks, and terminate the loop whenever at least one text block is present since that indicates Claude is speaking to the user rather than requesting a tool.",
+              "isCorrect": false,
+              "explanation": "Claude can include text content blocks alongside tool_use blocks in a single response, such as when it explains what it is about to do before invoking a tool. The presence of text content does not reliably indicate that the loop should end."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Agentic Architecture & Orchestration",
+          "skills": [
+            "1.1.6: Avoiding anti-patterns such as parsing natural language signals to determine loop termination, setting arbitrary iteration caps as the primary stopping mechanism, or checking for assistant text content as a completion indicator."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons",
+          "tip": "Think about which signal in the API response is explicitly designed to communicate whether Claude wants to continue working or has finished.",
+          "explanation": "The `stop_reason` field is the structured, purpose-built signal in the Messages API response that indicates whether Claude has finished its turn or is requesting a tool call.\n\n**Why it works:** When `stop_reason` equals `\"end_turn\"`, Claude is signaling that it has completed its response and does not need any further tool invocations. This is a deterministic, machine-readable field that removes ambiguity from loop control.\n\n**Why the others don't work:**\n- Parsing for completion phrases: natural language is ambiguous and Claude may use words like \"done\" or \"finished\" in contexts that do not indicate task completion, leading to premature or missed termination.\n- Using a fixed iteration cap as the primary condition: iteration caps are useful safety nets but should not drive termination logic, because they ignore the actual state of the task and cause the loop to stop at arbitrary points.\n- Checking for text content blocks: Claude frequently includes text alongside `tool_use` blocks in the same response, so the presence of text does not mean the loop should end.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0062",
+          "type": "single-choice",
+          "question": "A developer writes distinct, detailed descriptions for two tools: `query_internal_docs` for retrieving answers from a company knowledge base, and `fetch_web_page` for retrieving live content from an external URL. Despite the clear descriptions, Claude consistently calls `fetch_web_page` for questions that the internal knowledge base can answer. The developer reviews the system prompt and finds the instruction: \"Always retrieve information directly from its source.\"\n\nWhat action should the developer take first?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Add an explicit exclusion statement to the `fetch_web_page` tool description noting that it must not be used when the answer is available in the internal knowledge base, so that the description-level constraint counters the keyword association created by the system prompt instruction and redirects Claude back to `query_internal_docs`.",
+              "isCorrect": false,
+              "explanation": "Adding a negative use-case note to the description is a reasonable supplement, but it treats the symptom rather than the cause. The system prompt instruction is actively creating an association that biases Claude toward `fetch_web_page`. Fixing the description of the secondary tool while leaving the root cause in the system prompt is less effective than identifying and revising the problematic instruction directly."
+            },
+            {
+              "id": "c4",
+              "text": "Revise the system prompt to remove or rephrase the instruction \"Always retrieve information directly from its source,\" which creates an unintended association with `fetch_web_page`, and verify that tool selection returns to description-driven behavior after the change.",
+              "isCorrect": true,
+              "explanation": "The phrase \"retrieve information directly from its source\" semantically aligns with what fetching a live web page does, overriding the descriptions even though they are clearly differentiated. Identifying and rephrasing the keyword-sensitive instruction is the correct first action because it addresses the root cause. After revising the system prompt, the developer should verify that routing behavior now matches the tool descriptions before making any further changes.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Rename `query_internal_docs` to `fetch_internal_source` so that the tool name contains the keyword \"source,\" creating a name-level association with the phrase \"retrieve information directly from its source\" in the system prompt and allowing Claude to route internal questions correctly without any changes to the system prompt itself.",
+              "isCorrect": false,
+              "explanation": "Renaming the tool to include a keyword from the system prompt instruction is a brittle workaround that depends on name-matching behavior and introduces a maintenance risk. If the system prompt instruction changes, the workaround breaks. The system prompt instruction is the actual source of the problematic association and is the correct place to apply the fix."
+            },
+            {
+              "id": "c3",
+              "text": "Significantly expand the `query_internal_docs` description to cover every category of question the knowledge base can answer, so that the description's specificity and length outweigh the keyword influence of the system prompt instruction and Claude routes internal queries to the correct tool without requiring any modification to the system prompt.",
+              "isCorrect": false,
+              "explanation": "Expanding the description may partially counteract the system prompt's influence, but a sufficiently strong keyword-sensitive instruction will continue to bias Claude regardless of description length. Addressing the root cause - the keyword-sensitive instruction in the system prompt - is more direct and does not require the description to compensate for a problem that originates elsewhere."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Tool Design & MCP Integration",
+          "skills": [
+            "2.1.8: Reviewing system prompts for keyword-sensitive instructions that might override well-written tool descriptions."
+          ],
+          "services": [
+            "Claude API"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works",
+          "tip": "When well-written tool descriptions fail to produce correct routing, look at the system prompt for language that could be semantically mapped to one tool's purpose - the description-level fix may be in the wrong place.",
+          "explanation": "Well-written tool descriptions can still be overridden by keyword-sensitive system prompt instructions. The phrase \"retrieve information directly from its source\" creates an association with live web retrieval, biasing Claude toward `fetch_web_page` even when the internal knowledge base is appropriate. Reviewing the system prompt for language that echoes a specific tool's implicit purpose - and rephrasing or removing such instructions - is the correct diagnostic step when description-level fixes have already been applied.",
+          "difficulty": 3,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0112",
+          "type": "single-choice",
+          "question": "A senior engineer inherits a monorepo whose `.claude/CLAUDE.md` contains 1,100 lines covering testing patterns, API versioning rules, deployment procedures, and security policies. The engineer wants each section to be independently editable and searchable without requiring developers to add any new directive or import statement to the existing configuration.\n\nWhat is the recommended approach to restructure the oversized file while keeping all rules accessible to Claude Code?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Split the content into multiple `CLAUDE.md` files inside topic-named subdirectories at the repo root (for example, `testing/CLAUDE.md`, `api/CLAUDE.md`), then add an `@import` directive for each subdirectory file into the root `.claude/CLAUDE.md` so Claude Code continues to load all sections.",
+              "isCorrect": false,
+              "explanation": "Directory-level `CLAUDE.md` files apply only within their own subtrees, not project-wide. Adding `@import` directives for each file also modifies the existing configuration, violating the goal of avoiding any new directives."
+            },
+            {
+              "id": "c1",
+              "text": "Extract each section into a separate file under `.claude/rules/` (for example, `.claude/rules/testing.md`) and remove that content from `.claude/CLAUDE.md` - Claude Code auto-loads all files in `.claude/rules/` without requiring any `@import` statements.",
+              "isCorrect": true,
+              "explanation": "`.claude/rules/` is automatically scanned by Claude Code at session start. Extracting sections into individual files there and removing them from `CLAUDE.md` produces focused, independently editable files while maintaining complete rule coverage with zero additional directives.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Add `@import` directives to `.claude/CLAUDE.md` pointing to each subtopic file stored in a new `.claude/docs/` subdirectory, while keeping the full original content in `.claude/CLAUDE.md` as a fallback for Claude Code environments that may not support external file imports or `.claude/rules/` autodiscovery.",
+              "isCorrect": false,
+              "explanation": "Keeping a full duplicate in `.claude/CLAUDE.md` preserves the original problem of a 1,100-line monolithic file. Adding `@import` directives also requires modifying the file, and maintaining two sources of truth creates a maintenance risk where rules diverge between the original and the imported versions."
+            },
+            {
+              "id": "c3",
+              "text": "Create a `standards/` folder at the project root, move each section into a separate file there (for example, `standards/testing.md`), then add a single `@import standards/` directive to `.claude/CLAUDE.md` to load all files in that directory through Claude Code's directory-level import syntax.",
+              "isCorrect": false,
+              "explanation": "`@import` does not support directory-level imports; it operates on individual file paths only. Additionally, this approach still requires modifying `.claude/CLAUDE.md` to add the `@import` directive, which the requirement specifically sought to avoid."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Claude Code Configuration & Workflows",
+          "skills": [
+            "3.1.7: Splitting large CLAUDE.md files into focused topic-specific files in .claude/rules/ (for example, testing.md, api-conventions.md, deployment.md)."
+          ],
+          "services": [
+            "Claude Code"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "tip": "Consider which directory Claude Code automatically scans in addition to `CLAUDE.md`, and what action allows the existing `CLAUDE.md` to stop carrying that content.",
+          "explanation": "Claude Code automatically loads all files placed in `.claude/rules/`. The recommended approach is to extract each section from `.claude/CLAUDE.md` into a dedicated file in `.claude/rules/` - for example, `.claude/rules/testing.md` and `.claude/rules/api-conventions.md` - and remove the corresponding content from `CLAUDE.md`. No `@import` directive or other configuration change is needed because `.claude/rules/` is autodiscovered at session startup.\n\n**Why it works:** Moving content to `.claude/rules/` preserves full rule coverage while enabling each topic to be edited in isolation. Claude Code merges all files in `.claude/rules/` with the project `CLAUDE.md` automatically, so no developer action is required after the restructure.\n\n**Why the others don't work:**\n- Multiple `CLAUDE.md` files in named subdirectories with `@import` lines: Subdirectory `CLAUDE.md` files apply only within their own subtree, not globally. Adding `@import` directives defeats the goal of eliminating directive changes.\n- Moving content to `standards/` with a `@import standards/` directive: `@import` operates on individual files, not directories; directory-level imports are not supported. This approach also requires modifying `CLAUDE.md`.\n- Adding `@import` directives to `.claude/CLAUDE.md` pointing to `.claude/docs/`: This still requires `@import` changes and keeping a full duplicate fallback, which adds maintenance burden rather than reducing it.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        },
+        {
+          "id": "CCA-F-0113",
+          "type": "single-choice",
+          "question": "A developer notices that Claude Code inconsistently applies a custom testing convention defined in the project's `.claude/CLAUDE.md`. The convention is present in the file and has not been modified, yet Claude follows it in some sessions and ignores it in others with no obvious pattern.\n\nWhich built-in Claude Code command should the developer run to verify which memory and configuration files are loaded in the current session?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "`/status` - displays a summary of the current session's active model, system prompt source, and file paths of all tools and configuration files that Claude Code has registered for the session.",
+              "isCorrect": false,
+              "explanation": "No `/status` command with this behavior exists in Claude Code. It is not a documented command for inspecting loaded configuration file paths or confirming which `CLAUDE.md` files are active in a session."
+            },
+            {
+              "id": "c2",
+              "text": "`/config` - prints the fully resolved contents of the active `CLAUDE.md` after all `@import` directives have been expanded, so the developer can confirm every expected rule is present in the merged output.",
+              "isCorrect": false,
+              "explanation": "No `/config` command with this behavior exists in Claude Code. While such a command would be useful, Claude Code does not provide a built-in command that renders the fully merged `CLAUDE.md` output after import resolution."
+            },
+            {
+              "id": "c3",
+              "text": "`/memory` - shows which memory files Claude Code has loaded for the current session, including user-level and project-level `CLAUDE.md` files.",
+              "isCorrect": true,
+              "explanation": "`/memory` is the correct diagnostic command. It lists all configuration files loaded into the current Claude Code session, making it straightforward to confirm whether `.claude/CLAUDE.md` is present and to identify when it is missing in sessions where the convention is not being applied.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "`/context` - reports the current token usage breakdown for the session and lists each configuration source contributing content to Claude's active context window, including the cumulative token cost of each loaded `CLAUDE.md` file.",
+              "isCorrect": false,
+              "explanation": "No `/context` command with this behavior exists in Claude Code. Token usage reporting and configuration source enumeration of this kind are not provided by a standard slash command in the Claude Code interface."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Claude Code Configuration & Workflows",
+          "skills": [
+            "3.1.8: Using the /memory command to verify which memory files are loaded and diagnose inconsistent behavior across sessions."
+          ],
+          "services": [
+            "Claude Code"
+          ],
+          "docs": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+          "tip": "Think about which command is specifically designed to surface the set of files Claude Code has loaded for a given session.",
+          "explanation": "The `/memory` command displays all memory files that Claude Code has loaded for the current session, including user-level and project-level `CLAUDE.md` files. Running it in a session where the convention is not being applied will reveal whether `.claude/CLAUDE.md` appears in the loaded list, directly confirming or ruling out a configuration loading issue.\n\n**Why it works:** `/memory` is the dedicated diagnostic tool for inspecting Claude Code's loaded configuration state. It shows exactly which files contributed to the current session's instructions, making it the fastest way to determine whether an expected file is actually being read.\n\n**Why the others don't work:**\n- `/status`: No `/status` command exists in Claude Code for listing loaded configuration file paths; this is not a documented command in the Claude Code interface.\n- `/config`: No `/config` command exists that prints resolved `CLAUDE.md` contents after `@import` expansion; this command does not exist in Claude Code.\n- `/context`: No `/context` command exists that reports token usage and lists configuration source paths; this is not a standard Claude Code diagnostic command.",
+          "difficulty": 2,
+          "lastReviewed": "2026-04-12"
+        }
+      ],
+      "abandonedAt": "2026-06-11T11:08:40.422Z"
     }
   ]
 }

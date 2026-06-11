@@ -6,6 +6,7 @@ import { useGamification } from '../gamification/GamificationContext'
 import { useEntitlements, isPaidTier } from '../hooks/useEntitlements'
 import CertificateOptions from './CertificateOptions'
 import CertificatePreview, { type CertOptions } from './CertificatePreview'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 
 type Phase = 'options' | 'generating' | 'preview'
 
@@ -60,6 +61,7 @@ export default function CertificatesTab() {
         </p>
         <a
           href="/pricing"
+          onClick={() => trackCsEvent('upgrade_click', { cta: 'certificates-paywall' })}
           className="inline-block px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition-colors"
         >
           View Plans

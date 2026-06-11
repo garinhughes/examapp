@@ -311,6 +311,44 @@ export async function recordEvent(type: EventType, payload: EventPayload = {}, o
   await Promise.allSettled(ops)
 }
 
+export async function recordAbandonReason(examCode: string, reason: string, userId?: string | null): Promise<void> {
+  if (!METRICS_TABLE) return
+  if (userId && (await isAdminUserId(userId))) return
+  const today = new Date().toISOString().slice(0, 10)
+  await Promise.allSettled([
+    // Per-exam reason breakdown
+    ddb.send(new UpdateCommand({
+      TableName: METRICS_TABLE,
+      Key: { pk: `EXAM#${examCode}`, sk: `ABANDON_REASON#${reason}` },
+      UpdateExpression: 'ADD #count :one SET examCode = :ec, #reason = :r',
+      ExpressionAttributeNames: { '#count': 'count', '#reason': 'reason' },
+      ExpressionAttributeValues: { ':one': 1, ':ec': examCode, ':r': reason },
+    })),
+    // Daily reason totals (for sparkline / overview)
+    ddb.send(new UpdateCommand({
+      TableName: METRICS_TABLE,
+      Key: { pk: 'DAILY_ABANDON_REASON', sk: `${today}#${reason}` },
+      UpdateExpression: 'ADD #count :one SET #date = :d, #reason = :r',
+      ExpressionAttributeNames: { '#count': 'count', '#date': 'date', '#reason': 'reason' },
+      ExpressionAttributeValues: { ':one': 1, ':d': today, ':r': reason },
+    })),
+  ])
+}
+
+export async function getAbandonReasonItems(days = 30): Promise<any[]> {
+  if (!METRICS_TABLE) return []
+  const { Items } = await ddb.send(new QueryCommand({
+    TableName: METRICS_TABLE,
+    KeyConditionExpression: 'pk = :pk',
+    ExpressionAttributeValues: { ':pk': 'DAILY_ABANDON_REASON' },
+  }))
+  if (!Items) return []
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+  const cutoffStr = cutoff.toISOString().slice(0, 10)
+  return Items.filter((it: any) => typeof it.date === 'string' && it.date >= cutoffStr)
+}
+
 export async function getReferrerItems(days = 30): Promise<any[]> {
   if (!METRICS_TABLE) return []
   const { Items } = await ddb.send(new QueryCommand({

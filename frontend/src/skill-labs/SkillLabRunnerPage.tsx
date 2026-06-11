@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, Suspense, lazy, ComponentType } from 'react'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 import { Lock, ArrowRight } from 'lucide-react'
 import Loader from '@/components/Loader'
 import { apiUrl } from '@/apiBase'
@@ -97,7 +98,7 @@ export function SkillLabRunnerPage({ labId, timed = false }: SkillLabRunnerPageP
               </div>
               <div className="flex flex-col gap-2">
                 <button
-                  onClick={() => setRoute('pricing')}
+                  onClick={() => { trackCsEvent('upgrade_click', { cta: 'lab-runner-locked' }); setRoute('pricing') }}
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
                 >
                   View Plans <ArrowRight className="w-4 h-4" />

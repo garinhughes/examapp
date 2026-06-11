@@ -366,7 +366,7 @@ export default function PricingPage() {
               discountActive={discountActive}
               onBuy={handleBuy}
               inBasket={basket.has.bind(basket)}
-              onSignUp={() => navigate('/login')}
+              onSignUp={() => { trackCsEvent('signup_start', { cta: 'pricing-plan-card' }); navigate('/login') }}
             />
           ))}
         </div>
@@ -424,7 +424,7 @@ export default function PricingPage() {
             Register for free to unlock 40 questions per exam, analytics, badges, and unlimited saved attempts.
           </p>
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => { trackCsEvent('signup_start', { cta: 'pricing-register-cta' }); navigate('/login') }}
             className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-semibold"
           >
             Login / Register

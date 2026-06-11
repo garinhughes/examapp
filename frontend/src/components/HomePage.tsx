@@ -7,6 +7,7 @@ import {
   TrendingUp, GraduationCap, Lightbulb, ArrowRight, X, ZoomIn, Hourglass, MessageSquare,
 } from 'lucide-react'
 import { useEntitlements } from '../hooks/useEntitlements'
+import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
 import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
 import {
@@ -589,7 +590,7 @@ export function HomePage() {
             Get Started Free <ArrowRight className="w-5 h-5" />
           </button>
           <button
-            onClick={() => navigate('/pricing')}
+            onClick={() => { trackCsEvent('upgrade_click', { cta: 'home-final-cta' }); navigate('/pricing') }}
             className="px-6 py-3 rounded-lg border-2 border-primary text-primary font-semibold bg-transparent inline-flex items-center gap-2 hover:bg-primary/5 transition-all"
           >
             View Pricing

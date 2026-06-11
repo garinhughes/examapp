@@ -62,6 +62,7 @@ interface OverviewData {
     examStartToFinish: number
   }
   topReferrers30d?: { host: string; count: number }[]
+  abandonReasons30d?: { reason: string; count: number }[]
 }
 
 interface ExamSummary {
@@ -129,6 +130,14 @@ const USER_TYPE_COLORS: Record<string, string> = {
   pro_plus: '#a855f7',
 }
 
+const ABANDON_REASON_LABELS: Record<string, string> = {
+  'too-hard': 'Too hard',
+  'too-easy': 'Too easy',
+  'ran-out-of-time': 'Ran out of time',
+  'technical-issue': 'Technical issue',
+  'something-else': 'Something else',
+}
+
 const STATUS_COLORS: Record<string, string> = {
   'in-progress': '#f59e0b',
   finished: '#22c55e',
@@ -151,6 +160,8 @@ interface ExamActivityRow {
   userLabel: string | null
   questionsAnswered: number | null
   durationSecs: number | null
+  abandonReason: string | null
+  abandonNote: string | null
 }
 
 interface LabActivityRow {
@@ -320,6 +331,21 @@ function OverviewTab({ overview, exams }: { overview: OverviewData; exams: ExamS
               </span>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Abandon reasons — last 30 days */}
+      {overview.abandonReasons30d && overview.abandonReasons30d.length > 0 && (
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+          <h3 className="text-sm font-semibold mb-3 text-foreground">Why exams were cancelled — Last 30 Days</h3>
+          <div className="flex flex-wrap gap-2">
+            {overview.abandonReasons30d.map((r) => (
+              <span key={r.reason} className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                <span className="font-medium text-foreground">{ABANDON_REASON_LABELS[r.reason] ?? r.reason}</span> · {r.count}
+              </span>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Reasons are optional — users can skip the prompt.</p>
         </div>
       )}
 
@@ -1036,10 +1062,10 @@ function UserTypePill({ type, label, userId }: { type: string; label?: string | 
   )
 }
 
-function StatusPill({ status }: { status: string }) {
+function StatusPill({ status, title }: { status: string; title?: string }) {
   const colour = STATUS_COLORS[status] ?? '#888'
   return (
-    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: colour + '22', color: colour }}>
+    <span className={`text-xs px-2 py-0.5 rounded-full${title ? ' cursor-help' : ''}`} style={{ background: colour + '22', color: colour }} title={title}>
       {status}
     </span>
   )
@@ -1137,7 +1163,7 @@ function ExamActivityTab({ range, exams }: { range: RangeKey; exams: ExamSummary
                   <td className="px-4 py-2 font-mono text-xs">{r.examCode}</td>
                   <td className="px-4 py-2"><UserTypePill type={r.userType} label={r.userLabel} userId={r.userId} /></td>
                   <td className="px-4 py-2 text-xs text-muted-foreground">{r.mode}</td>
-                  <td className="px-4 py-2"><StatusPill status={r.status} /></td>
+                  <td className="px-4 py-2"><StatusPill status={r.status} title={r.status === 'abandoned' && (r.abandonReason || r.abandonNote) ? `${ABANDON_REASON_LABELS[r.abandonReason ?? ''] ?? r.abandonReason ?? 'No reason given'}${r.abandonNote ? ` — ${r.abandonNote}` : ''}` : undefined} /></td>
                   <td className={`px-4 py-2 text-right font-semibold ${typeof r.score === 'number' ? correctRateColor(r.score) : 'text-muted-foreground'}`}>{typeof r.score === 'number' ? `${r.score}%` : '—'}</td>
                   <td className="px-4 py-2 text-right text-xs text-muted-foreground">{r.questionsAnswered ?? '—'}</td>
                   <td className="px-4 py-2 text-right text-xs text-muted-foreground">{formatDuration(r.durationSecs)}</td>
