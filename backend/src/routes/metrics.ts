@@ -1,5 +1,9 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import { getUserBySub } from '../services/dynamo.js'
+import { attemptsStore } from '../services/attemptsStore.js'
+import { skillLabAttemptsStore } from '../services/skillLabAttemptsStore.js'
+import { getActiveProductIds } from '../services/entitlements.js'
+import { resolveUserTier, type Tier } from '../catalog.js'
 import {
   getAllExamMetas,
   queryExamItems,
@@ -7,7 +11,59 @@ import {
   getAllLabMetas,
   getDailyItems,
   getReferrerItems,
+  isAdminUserId,
 } from '../services/metricsStore.js'
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function parseRange(query: any): { from: string; to: string } {
+  const now = new Date()
+  const toStr = (typeof query.to === 'string' && query.to) || now.toISOString()
+  let fromStr: string
+  if (typeof query.from === 'string' && query.from) {
+    fromStr = query.from
+  } else {
+    const range = String(query.range ?? '30d')
+    const days = range === '7d' ? 7 : range === '90d' ? 90 : range === '6m' ? 183 : range === '12m' ? 365 : 30
+    const from = new Date(now)
+    from.setUTCDate(from.getUTCDate() - days)
+    fromStr = from.toISOString()
+  }
+  return { from: fromStr, to: toStr }
+}
+
+function isVisitorId(userId: string | undefined | null): boolean {
+  return !userId || userId.startsWith('visitor-') || userId === 'anonymous'
+}
+
+interface UserInfo {
+  type: 'visitor' | Tier
+  label: string | null  // email / username / null for visitors
+}
+
+async function resolveUser(userId: string | undefined | null): Promise<UserInfo> {
+  if (isVisitorId(userId)) return { type: 'visitor', label: null }
+  try {
+    const [user, ownedProductIds] = await Promise.all([
+      getUserBySub(userId as string).catch(() => null),
+      getActiveProductIds(userId as string).catch(() => []),
+    ])
+    const type = resolveUserTier({ isAuthenticated: true, ownedProductIds })
+    const label = (user?.name ?? user?.username ?? user?.email ?? null) as string | null
+    return { type, label }
+  } catch {
+    return { type: 'registered', label: null }
+  }
+}
+
+async function resolveUsersBatch(userIds: string[]): Promise<Map<string, UserInfo>> {
+  const map = new Map<string, UserInfo>()
+  const unique = Array.from(new Set(userIds))
+  await Promise.all(unique.map(async (uid) => {
+    map.set(uid, await resolveUser(uid))
+  }))
+  return map
+}
 
 // Suggestion thresholds
 const THRESHOLD_TOO_HARD = 35      // correctRate % below this → too hard
@@ -27,13 +83,16 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     if (!user?.isAdmin) return reply.status(403).send({ message: 'Forbidden' })
   })
 
-  // GET /admin/metrics/overview — global KPIs + 30-day trend + funnel
-  server.get('/overview', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, _reply) => {
+  // GET /admin/metrics/overview — global KPIs + N-day trend + funnel
+  server.get('/overview', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, _reply) => {
+    const q = request.query as any
+    const range = String(q.range ?? '30d')
+    const days = range === '7d' ? 7 : range === '90d' ? 90 : range === '6m' ? 183 : range === '12m' ? 365 : 30
     const [examMetas, labMetas, dailyItems, referrerItems] = await Promise.all([
       getAllExamMetas(),
       getAllLabMetas(),
-      getDailyItems(30),
-      getReferrerItems(30),
+      getDailyItems(days),
+      getReferrerItems(days),
     ])
 
     let totalAttempts = 0
@@ -376,5 +435,113 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
     suggestions.sort((a, b) => (order[a.type as keyof typeof order] ?? 9) - (order[b.type as keyof typeof order] ?? 9))
 
     return { suggestions, thresholds: { tooHard: tooHardThreshold, tooEasy: tooEasyThreshold, domainWeak: domainWeakThreshold, labLowPass: labLowPassThreshold } }
+  })
+
+  // GET /admin/metrics/exam-activity — drill-down of individual exam attempts
+  server.get('/exam-activity', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, _reply) => {
+    const q = request.query as any
+    const { from, to } = parseRange(q)
+    const examFilter = typeof q.exam === 'string' && q.exam ? q.exam : null
+    const statusFilter = typeof q.status === 'string' && q.status ? q.status : null
+    const userTypeFilter = typeof q.userType === 'string' && q.userType ? q.userType : null
+    const limit = Math.min(Math.max(Number(q.limit) || 500, 1), 2000)
+
+    const rawAll = await attemptsStore.scanByDateRange(from, to)
+    // Strip admin attempts so dogfood testing doesn't pollute drill-downs
+    const adminFlags = await Promise.all(rawAll.map((a: any) => isAdminUserId(a.userId)))
+    const raw = rawAll.filter((_: any, i: number) => !adminFlags[i])
+    const userIds = raw.map((a: any) => a.userId).filter(Boolean)
+    const userMap = await resolveUsersBatch(userIds)
+
+    const rows = raw
+      .filter((a: any) => !examFilter || a.examCode === examFilter)
+      .filter((a: any) => !statusFilter || a.status === statusFilter)
+      .map((a: any) => {
+        const info = userMap.get(a.userId) ?? { type: 'visitor' as const, label: null }
+        const userType = info.type
+        const userLabel = info.label
+        const reached = Array.isArray(a.answers) ? a.answers.length : null
+        const durationMs = a.finishedAt && a.startedAt
+          ? Date.parse(a.finishedAt) - Date.parse(a.startedAt)
+          : (a.updatedAt && a.startedAt ? Date.parse(a.updatedAt) - Date.parse(a.startedAt) : null)
+        return {
+          attemptId: a.attemptId,
+          examCode: a.examCode,
+          startedAt: a.startedAt,
+          finishedAt: a.finishedAt ?? null,
+          updatedAt: a.updatedAt ?? null,
+          status: a.status ?? 'unknown',
+          score: a.score ?? null,
+          mode: a.metadata?.mode ?? 'casual',
+          country: a.country ?? null,
+          userId: a.userId,
+          userLabel,
+          userType,
+          questionsAnswered: reached,
+          durationSecs: typeof durationMs === 'number' ? Math.round(durationMs / 1000) : null,
+        }
+      })
+      .filter((r: any) => !userTypeFilter || r.userType === userTypeFilter)
+      .sort((a: any, b: any) => String(b.startedAt).localeCompare(String(a.startedAt)))
+
+    return {
+      from,
+      to,
+      total: rows.length,
+      rows: rows.slice(0, limit),
+      truncated: rows.length > limit,
+    }
+  })
+
+  // GET /admin/metrics/lab-activity — drill-down of individual lab attempts
+  server.get('/lab-activity', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, _reply) => {
+    const q = request.query as any
+    const { from, to } = parseRange(q)
+    const labFilter = typeof q.lab === 'string' && q.lab ? q.lab : null
+    const statusFilter = typeof q.status === 'string' && q.status ? q.status : null
+    const userTypeFilter = typeof q.userType === 'string' && q.userType ? q.userType : null
+    const limit = Math.min(Math.max(Number(q.limit) || 500, 1), 2000)
+
+    const rawAll = await skillLabAttemptsStore.scanByDateRange(from, to)
+    const adminFlags = await Promise.all(rawAll.map((a: any) => isAdminUserId(a.userId)))
+    const raw = rawAll.filter((_: any, i: number) => !adminFlags[i])
+    const userIds = raw.map((a: any) => a.userId).filter(Boolean)
+    const userMap = await resolveUsersBatch(userIds)
+
+    const rows = raw
+      .filter((a: any) => !labFilter || a.labId === labFilter)
+      .filter((a: any) => !statusFilter || a.status === statusFilter)
+      .map((a: any) => {
+        const info = userMap.get(a.userId) ?? { type: 'visitor' as const, label: null }
+        const userType = info.type
+        const userLabel = info.label
+        const startedAt = a.startedAt ?? a.createdAt ?? null
+        const endedAt = a.completedAt ?? a.abandonedAt ?? null
+        return {
+          attemptId: a.attemptId,
+          labId: a.labId,
+          labType: a.labType ?? 'unknown',
+          startedAt,
+          endedAt,
+          status: a.status ?? 'completed',
+          correct: a.correct ?? null,
+          timed: a.timed ?? false,
+          timeTakenSecs: typeof a.timeTaken === 'number' ? a.timeTaken : null,
+          country: a.country ?? null,
+          userId: a.userId,
+          userLabel,
+          userType,
+        }
+      })
+      .filter((r: any) => !userTypeFilter || r.userType === userTypeFilter)
+      .sort((a: any, b: any) => String(b.startedAt ?? '').localeCompare(String(a.startedAt ?? '')))
+
+    return {
+      from,
+      to,
+      total: rows.length,
+      rows: rows.slice(0, limit),
+      truncated: rows.length > limit,
+    }
   })
 }

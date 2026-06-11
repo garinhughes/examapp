@@ -409,10 +409,11 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         status: 'completed' as const,
         startedAt: now,
         completedAt: now,
+        country: (request.headers['cloudfront-viewer-country'] as string | undefined)?.toUpperCase() ?? null,
       }
       await skillLabAttemptsStore.put(attempt)
       void touchUserActivity(userId)
-      updateMetricsOnLabAttempt({ labId, labType: attempt.labType, correct, timeTaken })
+      updateMetricsOnLabAttempt({ labId, labType: attempt.labType, correct, timeTaken, userId })
         .catch((err) => {
           console.error('[metrics] updateMetricsOnLabAttempt failed', err)
           captureWithContext(err, { tags: { surface: 'skill-lab', stage: 'metrics-update' }, user: { id: userId }, extra: { labId } })
@@ -446,6 +447,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       lastSavedAt: now,
       progressState: progressState ?? null,
       timed,
+      country: (request.headers['cloudfront-viewer-country'] as string | undefined)?.toUpperCase() ?? null,
     }
     await skillLabAttemptsStore.put(attempt)
     void touchUserActivity(userId)
@@ -499,7 +501,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       lastSavedAt: now,
     })
     void touchUserActivity(userId)
-    updateMetricsOnLabAttempt({ labId, labType, correct, timeTaken })
+    updateMetricsOnLabAttempt({ labId, labType, correct, timeTaken, userId })
       .catch((err) => {
         console.error('[metrics] updateMetricsOnLabAttempt failed', err)
         captureWithContext(err, { tags: { surface: 'skill-lab', stage: 'metrics-update' }, user: { id: userId }, extra: { labId, attemptId } })

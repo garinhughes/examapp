@@ -16,6 +16,7 @@ import {
   PutCommand,
   GetCommand,
   QueryCommand,
+  ScanCommand,
   DeleteCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
@@ -53,6 +54,9 @@ export interface AttemptsStore {
 
   /** Delete all attempts for a user */
   deleteAllForUser(userId: string): Promise<number>
+
+  /** Admin: scan attempts in a date range (full-table scan, paged). */
+  scanByDateRange(from: string, to: string): Promise<any[]>
 }
 
 /* ================================================================== */
@@ -154,6 +158,24 @@ function createDynamoStore(): AttemptsStore {
       }
       return items.length
     },
+
+    async scanByDateRange(from: string, to: string) {
+      const items: any[] = []
+      let cursor: Record<string, any> | undefined = undefined
+      do {
+        const res: any = await ddb.send(new ScanCommand({
+          TableName: ATTEMPTS_TABLE,
+          FilterExpression: 'startedAt BETWEEN :f AND :t',
+          ExpressionAttributeValues: { ':f': from, ':t': to },
+          ProjectionExpression: 'attemptId, userId, examCode, startedAt, finishedAt, updatedAt, #s, score, metadata, country, answers',
+          ExpressionAttributeNames: { '#s': 'status' },
+          ExclusiveStartKey: cursor,
+        }))
+        items.push(...((res.Items as any[]) ?? []))
+        cursor = res.LastEvaluatedKey
+      } while (cursor)
+      return items
+    },
   }
 }
 
@@ -226,6 +248,11 @@ function createLocalStore(): AttemptsStore {
       const count = all.length - remaining.length
       await saveAll(remaining)
       return count
+    },
+
+    async scanByDateRange(from: string, to: string) {
+      const all = await loadAll()
+      return all.filter((a: any) => typeof a.startedAt === 'string' && a.startedAt >= from && a.startedAt <= to)
     },
   }
 }

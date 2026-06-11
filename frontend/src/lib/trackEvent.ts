@@ -45,17 +45,30 @@ function consumeNewVisitor(): { isNew: boolean; referrerHost?: string } {
   }
 }
 
+function getIdToken(): string | null {
+  try {
+    return localStorage.getItem('examapp_impersonation_token') ?? localStorage.getItem('examapp_id_token')
+  } catch {
+    return null
+  }
+}
+
 function send(type: TrackEventType, payload: TrackPayload, useBeacon: boolean): void {
   const body = JSON.stringify({ type, payload })
   const url = apiUrl('/events/track')
+  const token = getIdToken()
   try {
-    if (useBeacon && typeof navigator.sendBeacon === 'function') {
+    // sendBeacon can't set custom headers, so when we need to forward the JWT
+    // (to let the backend skip admin events) we fall back to keepalive fetch.
+    if (useBeacon && !token && typeof navigator.sendBeacon === 'function') {
       navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }))
       return
     }
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
     fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body,
       keepalive: true,
     }).catch(() => {})

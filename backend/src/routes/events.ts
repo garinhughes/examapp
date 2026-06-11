@@ -32,7 +32,7 @@ function originMatches(origin: string | undefined, allowed: string): boolean {
 export default async function (server: FastifyInstance, _opts: FastifyPluginOptions) {
   server.post(
     '/track',
-    { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } },
+    { preHandler: [server.optionalAuth], config: { rateLimit: { max: 60, timeWindow: '1 minute' } } },
     async (request, reply) => {
       const ua = request.headers['user-agent']
       if (looksLikeBot(typeof ua === 'string' ? ua : undefined)) {
@@ -65,7 +65,8 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         cta: typeof raw.cta === 'string' ? raw.cta.slice(0, 32) : undefined,
       }
 
-      recordEvent(type, payload).catch((err) => {
+      const userId = request.user?.sub
+      recordEvent(type, payload, { userId }).catch((err) => {
         server.log.error({ err, type }, '[events] recordEvent failed')
       })
 

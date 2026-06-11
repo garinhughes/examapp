@@ -198,6 +198,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
       score: null,
       answers: [] as any[],
       metadata: body?.metadata ?? null,
+      country: (request.headers['cloudfront-viewer-country'] as string | undefined)?.toUpperCase() ?? null,
       // store the concrete question objects for this attempt so scoring and resume work on the filtered set
       questions: shuffled
     }

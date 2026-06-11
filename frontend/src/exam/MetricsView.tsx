@@ -116,8 +116,66 @@ interface Suggestion {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const TABS = ['Overview', 'Questions', 'Labs', 'Usage & Modes', 'Suggestions'] as const
+const TABS = ['Overview', 'Exam Activity', 'Lab Activity', 'Questions', 'Labs', 'Usage & Modes', 'Suggestions'] as const
 type Tab = typeof TABS[number]
+
+const RANGES = ['7d', '30d', '90d', '6m', '12m'] as const
+type RangeKey = typeof RANGES[number]
+
+const USER_TYPE_COLORS: Record<string, string> = {
+  visitor: '#64748b',
+  registered: '#6366f1',
+  pro: '#22c55e',
+  pro_plus: '#a855f7',
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  'in-progress': '#f59e0b',
+  finished: '#22c55e',
+  abandoned: '#ef4444',
+  in_progress: '#f59e0b',
+  completed: '#22c55e',
+}
+
+interface ExamActivityRow {
+  attemptId: string
+  examCode: string
+  startedAt: string
+  finishedAt: string | null
+  status: string
+  score: number | null
+  mode: string
+  country: string | null
+  userType: string
+  userId: string
+  userLabel: string | null
+  questionsAnswered: number | null
+  durationSecs: number | null
+}
+
+interface LabActivityRow {
+  attemptId: string
+  labId: string
+  labType: string
+  startedAt: string | null
+  endedAt: string | null
+  status: string
+  correct: boolean | null
+  timed: boolean
+  timeTakenSecs: number | null
+  country: string | null
+  userType: string
+  userId: string
+  userLabel: string | null
+}
+
+interface ActivityResponse<T> {
+  from: string
+  to: string
+  total: number
+  rows: T[]
+  truncated: boolean
+}
 
 const MODE_COLORS: Record<string, string> = {
   timed: '#6366f1',
@@ -812,6 +870,7 @@ function SuggestionsTab() {
 export function MetricsView() {
   const authFetch = useAuthFetch()
   const [activeTab, setActiveTab] = useState<Tab>('Overview')
+  const [range, setRange] = useState<RangeKey>('30d')
   const [overview, setOverview] = useState<OverviewData | null>(null)
   const [exams, setExams] = useState<ExamSummary[]>([])
   const [labs, setLabs] = useState<LabStat[]>([])
@@ -824,7 +883,7 @@ export function MetricsView() {
       setError(null)
       try {
         const [ovRes, exRes, labRes] = await Promise.all([
-          authFetch('/admin/metrics/overview'),
+          authFetch(`/admin/metrics/overview?range=${range}`),
           authFetch('/admin/metrics/exams'),
           authFetch('/admin/metrics/labs'),
         ])
@@ -839,7 +898,7 @@ export function MetricsView() {
       }
     }
     load()
-  }, [authFetch])
+  }, [authFetch, range])
 
   if (loading) {
     return (
@@ -859,26 +918,35 @@ export function MetricsView() {
 
   return (
     <div className="space-y-4">
-      {/* Tab bar */}
-      <div className="flex flex-wrap gap-0.5 rounded-lg bg-muted/40 p-1 w-fit">
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              activeTab === tab
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+      {/* Tab bar + range selector */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-0.5 rounded-lg bg-muted/40 p-1 w-fit">
+          {TABS.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                activeTab === tab
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+        <RangeSelector value={range} onChange={setRange} />
       </div>
 
       {/* Tab content */}
       {activeTab === 'Overview' && overview && (
         <OverviewTab overview={overview} exams={exams} />
+      )}
+      {activeTab === 'Exam Activity' && (
+        <ExamActivityTab range={range} exams={exams} />
+      )}
+      {activeTab === 'Lab Activity' && (
+        <LabActivityTab range={range} labs={labs} />
       )}
       {activeTab === 'Questions' && (
         <QuestionsTab exams={exams} />
@@ -893,5 +961,318 @@ export function MetricsView() {
         <SuggestionsTab />
       )}
     </div>
+  )
+}
+
+// ── Range selector ────────────────────────────────────────────────────────────
+
+function RangeSelector({ value, onChange }: { value: RangeKey; onChange: (v: RangeKey) => void }) {
+  return (
+    <div className="flex gap-0.5 rounded-lg bg-muted/40 p-1">
+      {RANGES.map((r) => (
+        <button
+          key={r}
+          onClick={() => onChange(r)}
+          className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+            value === r ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          {r}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// ── Activity tabs ─────────────────────────────────────────────────────────────
+
+function formatRelative(iso: string | null | undefined): string {
+  if (!iso) return '—'
+  const then = Date.parse(iso)
+  if (!Number.isFinite(then)) return iso
+  const diff = Date.now() - then
+  const m = 60 * 1000, h = 60 * m, d = 24 * h
+  if (diff < m) return 'just now'
+  if (diff < h) return `${Math.floor(diff / m)}m ago`
+  if (diff < d) return `${Math.floor(diff / h)}h ago`
+  if (diff < 30 * d) return `${Math.floor(diff / d)}d ago`
+  return new Date(then).toISOString().slice(0, 10)
+}
+
+function formatDuration(secs: number | null): string {
+  if (secs === null || secs === undefined) return '—'
+  if (secs < 60) return `${secs}s`
+  if (secs < 3600) return `${Math.floor(secs / 60)}m ${secs % 60}s`
+  return `${Math.floor(secs / 3600)}h ${Math.floor((secs % 3600) / 60)}m`
+}
+
+function downloadCsv(filename: string, headers: string[], rows: any[][]) {
+  const escape = (v: any) => {
+    const s = v === null || v === undefined ? '' : String(v)
+    if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"'
+    return s
+  }
+  const csv = [headers.map(escape).join(','), ...rows.map((r) => r.map(escape).join(','))].join('\n')
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+function UserTypePill({ type, label, userId }: { type: string; label?: string | null; userId?: string }) {
+  const colour = USER_TYPE_COLORS[type] ?? '#888'
+  const title = label ?? (type === 'visitor' ? 'Anonymous visitor' : (userId ?? ''))
+  return (
+    <span
+      className="text-xs px-2 py-0.5 rounded-full cursor-help"
+      style={{ background: colour + '22', color: colour }}
+      title={title}
+    >
+      {type}
+    </span>
+  )
+}
+
+function StatusPill({ status }: { status: string }) {
+  const colour = STATUS_COLORS[status] ?? '#888'
+  return (
+    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: colour + '22', color: colour }}>
+      {status}
+    </span>
+  )
+}
+
+function ExamActivityTab({ range, exams }: { range: RangeKey; exams: ExamSummary[] }) {
+  const authFetch = useAuthFetch()
+  const [data, setData] = useState<ActivityResponse<ExamActivityRow> | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [filterExam, setFilterExam] = useState<string>('')
+  const [filterStatus, setFilterStatus] = useState<string>('')
+  const [filterUserType, setFilterUserType] = useState<string>('')
+
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      setLoading(true)
+      try {
+        const params = new URLSearchParams({ range, limit: '1000' })
+        if (filterExam) params.set('exam', filterExam)
+        if (filterStatus) params.set('status', filterStatus)
+        if (filterUserType) params.set('userType', filterUserType)
+        const r = await authFetch(`/admin/metrics/exam-activity?${params}`)
+        const d = (await r.json()) as ActivityResponse<ExamActivityRow>
+        if (!cancelled) setData(d)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [authFetch, range, filterExam, filterStatus, filterUserType])
+
+  const rows = data?.rows ?? []
+  const breakdown = useMemoBreakdown(rows)
+
+  function exportCsv() {
+    downloadCsv(
+      `exam-activity-${range}.csv`,
+      ['startedAt', 'examCode', 'userType', 'mode', 'status', 'score', 'questionsAnswered', 'durationSecs', 'country', 'userId', 'attemptId'],
+      rows.map((r) => [r.startedAt, r.examCode, r.userType, r.mode, r.status, r.score, r.questionsAnswered, r.durationSecs, r.country, r.userId, r.attemptId]),
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Filters + summary */}
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4 shadow-sm">
+        <Filter label="Exam" value={filterExam} onChange={setFilterExam} options={[{ value: '', label: 'All' }, ...exams.map((e) => ({ value: e.examCode, label: e.examCode }))]} />
+        <Filter label="Status" value={filterStatus} onChange={setFilterStatus} options={[{ value: '', label: 'All' }, { value: 'in-progress', label: 'In progress' }, { value: 'finished', label: 'Finished' }, { value: 'abandoned', label: 'Abandoned' }]} />
+        <Filter label="User Type" value={filterUserType} onChange={setFilterUserType} options={[{ value: '', label: 'All' }, { value: 'visitor', label: 'Visitor' }, { value: 'registered', label: 'Registered' }, { value: 'pro', label: 'Pro' }, { value: 'pro_plus', label: 'Pro+' }]} />
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-xs text-muted-foreground">{loading ? 'Loading…' : `${rows.length} of ${data?.total ?? 0} attempts`}</span>
+          <button onClick={exportCsv} disabled={rows.length === 0} className="text-xs px-3 py-1.5 rounded-md border border-border bg-background hover:bg-muted disabled:opacity-50">Export CSV</button>
+        </div>
+      </div>
+
+      {/* Quick breakdown */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <KpiCard label="Total Started" value={rows.length.toLocaleString()} />
+        <KpiCard label="Finished" value={breakdown.finished.toLocaleString()} sub={rows.length > 0 ? `${Math.round(breakdown.finished / rows.length * 100)}%` : undefined} />
+        <KpiCard label="Abandoned" value={breakdown.abandoned.toLocaleString()} sub={rows.length > 0 ? `${Math.round(breakdown.abandoned / rows.length * 100)}%` : undefined} />
+        <KpiCard label="Visitors" value={breakdown.visitors.toLocaleString()} sub={rows.length > 0 ? `${Math.round(breakdown.visitors / rows.length * 100)}%` : undefined} />
+      </div>
+
+      {/* Rows */}
+      <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/30 text-muted-foreground text-xs">
+                <th className="text-left px-4 py-2">When</th>
+                <th className="text-left px-4 py-2">Exam</th>
+                <th className="text-left px-4 py-2">Who</th>
+                <th className="text-left px-4 py-2">Mode</th>
+                <th className="text-left px-4 py-2">Status</th>
+                <th className="text-right px-4 py-2">Score</th>
+                <th className="text-right px-4 py-2">Reached</th>
+                <th className="text-right px-4 py-2">Duration</th>
+                <th className="text-left px-4 py-2">Country</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.attemptId} className="border-b border-border/50 hover:bg-muted/20">
+                  <td className="px-4 py-2 text-xs text-muted-foreground whitespace-nowrap" title={r.startedAt}>{formatRelative(r.startedAt)}</td>
+                  <td className="px-4 py-2 font-mono text-xs">{r.examCode}</td>
+                  <td className="px-4 py-2"><UserTypePill type={r.userType} label={r.userLabel} userId={r.userId} /></td>
+                  <td className="px-4 py-2 text-xs text-muted-foreground">{r.mode}</td>
+                  <td className="px-4 py-2"><StatusPill status={r.status} /></td>
+                  <td className={`px-4 py-2 text-right font-semibold ${typeof r.score === 'number' ? correctRateColor(r.score) : 'text-muted-foreground'}`}>{typeof r.score === 'number' ? `${r.score}%` : '—'}</td>
+                  <td className="px-4 py-2 text-right text-xs text-muted-foreground">{r.questionsAnswered ?? '—'}</td>
+                  <td className="px-4 py-2 text-right text-xs text-muted-foreground">{formatDuration(r.durationSecs)}</td>
+                  <td className="px-4 py-2 text-xs text-muted-foreground">{r.country ?? '—'}</td>
+                </tr>
+              ))}
+              {!loading && rows.length === 0 && (
+                <tr><td colSpan={9} className="px-4 py-8 text-center text-muted-foreground text-sm">No attempts in this window.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {data?.truncated && (
+        <div className="text-xs text-muted-foreground text-center">Showing first {rows.length} attempts. Narrow the filters or shorten the range to see more.</div>
+      )}
+    </div>
+  )
+}
+
+function useMemoBreakdown(rows: { status: string; userType: string }[]) {
+  return {
+    finished: rows.filter((r) => r.status === 'finished').length,
+    abandoned: rows.filter((r) => r.status === 'abandoned').length,
+    visitors: rows.filter((r) => r.userType === 'visitor').length,
+  }
+}
+
+function LabActivityTab({ range, labs }: { range: RangeKey; labs: LabStat[] }) {
+  const authFetch = useAuthFetch()
+  const [data, setData] = useState<ActivityResponse<LabActivityRow> | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [filterLab, setFilterLab] = useState<string>('')
+  const [filterStatus, setFilterStatus] = useState<string>('')
+  const [filterUserType, setFilterUserType] = useState<string>('')
+
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      setLoading(true)
+      try {
+        const params = new URLSearchParams({ range, limit: '1000' })
+        if (filterLab) params.set('lab', filterLab)
+        if (filterStatus) params.set('status', filterStatus)
+        if (filterUserType) params.set('userType', filterUserType)
+        const r = await authFetch(`/admin/metrics/lab-activity?${params}`)
+        const d = (await r.json()) as ActivityResponse<LabActivityRow>
+        if (!cancelled) setData(d)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [authFetch, range, filterLab, filterStatus, filterUserType])
+
+  const rows = data?.rows ?? []
+  const completed = rows.filter((r) => r.status === 'completed').length
+  const passed = rows.filter((r) => r.correct === true).length
+  const visitors = rows.filter((r) => r.userType === 'visitor').length
+
+  function exportCsv() {
+    downloadCsv(
+      `lab-activity-${range}.csv`,
+      ['startedAt', 'labId', 'labType', 'userType', 'status', 'correct', 'timeTakenSecs', 'country', 'userId', 'attemptId'],
+      rows.map((r) => [r.startedAt, r.labId, r.labType, r.userType, r.status, r.correct, r.timeTakenSecs, r.country, r.userId, r.attemptId]),
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4 shadow-sm">
+        <Filter label="Lab" value={filterLab} onChange={setFilterLab} options={[{ value: '', label: 'All' }, ...labs.map((l) => ({ value: l.labId, label: l.labId }))]} />
+        <Filter label="Status" value={filterStatus} onChange={setFilterStatus} options={[{ value: '', label: 'All' }, { value: 'in_progress', label: 'In progress' }, { value: 'completed', label: 'Completed' }, { value: 'abandoned', label: 'Abandoned' }]} />
+        <Filter label="User Type" value={filterUserType} onChange={setFilterUserType} options={[{ value: '', label: 'All' }, { value: 'registered', label: 'Registered' }, { value: 'pro', label: 'Pro' }, { value: 'pro_plus', label: 'Pro+' }]} />
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-xs text-muted-foreground">{loading ? 'Loading…' : `${rows.length} of ${data?.total ?? 0} attempts`}</span>
+          <button onClick={exportCsv} disabled={rows.length === 0} className="text-xs px-3 py-1.5 rounded-md border border-border bg-background hover:bg-muted disabled:opacity-50">Export CSV</button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <KpiCard label="Total Started" value={rows.length.toLocaleString()} />
+        <KpiCard label="Completed" value={completed.toLocaleString()} sub={rows.length > 0 ? `${Math.round(completed / rows.length * 100)}%` : undefined} />
+        <KpiCard label="Correct" value={passed.toLocaleString()} sub={completed > 0 ? `${Math.round(passed / completed * 100)}% of completed` : undefined} />
+        <KpiCard label="Visitors" value={visitors.toLocaleString()} />
+      </div>
+
+      <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/30 text-muted-foreground text-xs">
+                <th className="text-left px-4 py-2">When</th>
+                <th className="text-left px-4 py-2">Lab</th>
+                <th className="text-left px-4 py-2">Type</th>
+                <th className="text-left px-4 py-2">Who</th>
+                <th className="text-left px-4 py-2">Status</th>
+                <th className="text-left px-4 py-2">Correct</th>
+                <th className="text-right px-4 py-2">Time taken</th>
+                <th className="text-left px-4 py-2">Country</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.attemptId} className="border-b border-border/50 hover:bg-muted/20">
+                  <td className="px-4 py-2 text-xs text-muted-foreground whitespace-nowrap" title={r.startedAt ?? ''}>{formatRelative(r.startedAt)}</td>
+                  <td className="px-4 py-2 font-mono text-xs">{r.labId}</td>
+                  <td className="px-4 py-2 text-xs text-muted-foreground">{r.labType}</td>
+                  <td className="px-4 py-2"><UserTypePill type={r.userType} label={r.userLabel} userId={r.userId} /></td>
+                  <td className="px-4 py-2"><StatusPill status={r.status} /></td>
+                  <td className="px-4 py-2 text-xs">{r.correct === true ? '✓' : r.correct === false ? '✗' : '—'}</td>
+                  <td className="px-4 py-2 text-right text-xs text-muted-foreground">{formatDuration(r.timeTakenSecs)}</td>
+                  <td className="px-4 py-2 text-xs text-muted-foreground">{r.country ?? '—'}</td>
+                </tr>
+              ))}
+              {!loading && rows.length === 0 && (
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground text-sm">No lab attempts in this window.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {data?.truncated && (
+        <div className="text-xs text-muted-foreground text-center">Showing first {rows.length} attempts. Narrow the filters or shorten the range to see more.</div>
+      )}
+    </div>
+  )
+}
+
+function Filter({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+  return (
+    <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+      {label}
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="text-sm rounded-md border border-border bg-background px-2 py-1.5 min-w-[120px]"
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>{o.label}</option>
+        ))}
+      </select>
+    </label>
   )
 }

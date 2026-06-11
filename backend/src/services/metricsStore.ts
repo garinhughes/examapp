@@ -8,6 +8,28 @@ import { ddb } from './dynamo.js'
 
 const METRICS_TABLE = process.env.METRICS_TABLE ?? ''
 
+// ── Admin exclusion ───────────────────────────────────────────────────────────
+// Admins testing the site should not pollute metrics. Looked up lazily and cached
+// in-process for the lifetime of the lambda/task. Cache invalidates on restart;
+// that's fine because admin status changes very rarely.
+
+const adminCache = new Map<string, boolean>()
+
+export async function isAdminUserId(userId: string | undefined | null): Promise<boolean> {
+  if (!userId) return false
+  if (userId.startsWith('visitor-') || userId === 'anonymous') return false
+  if (adminCache.has(userId)) return adminCache.get(userId)!
+  try {
+    const { getUserBySub } = await import('./dynamo.js')
+    const user = await getUserBySub(userId)
+    const isAdmin = Boolean(user?.isAdmin)
+    adminCache.set(userId, isAdmin)
+    return isAdmin
+  } catch {
+    return false
+  }
+}
+
 // ── Write helpers ─────────────────────────────────────────────────────────────
 
 export async function updateMetricsOnAttemptFinish(attempt: {
@@ -20,6 +42,7 @@ export async function updateMetricsOnAttemptFinish(attempt: {
   metadata?: { mode?: string } | null
 }) {
   if (!METRICS_TABLE) return
+  if (await isAdminUserId(attempt.userId)) return
 
   const { examCode, score, perDomain, answers, questions, metadata } = attempt
   const today = new Date().toISOString().slice(0, 10)
@@ -104,8 +127,10 @@ export async function updateMetricsOnLabAttempt(attempt: {
   labType: string
   correct: boolean
   timeTaken: number
+  userId?: string
 }) {
   if (!METRICS_TABLE) return
+  if (attempt.userId && (await isAdminUserId(attempt.userId))) return
 
   const { labId, labType, correct, timeTaken } = attempt
   const today = new Date().toISOString().slice(0, 10)
@@ -187,8 +212,9 @@ function bucketAbandon(pct: number): string {
   return 'bucket75_100'
 }
 
-export async function recordEvent(type: EventType, payload: EventPayload = {}): Promise<void> {
+export async function recordEvent(type: EventType, payload: EventPayload = {}, opts: { userId?: string | null } = {}): Promise<void> {
   if (!METRICS_TABLE) return
+  if (opts.userId && (await isAdminUserId(opts.userId))) return
   const today = new Date().toISOString().slice(0, 10)
   const ops: Promise<any>[] = []
 

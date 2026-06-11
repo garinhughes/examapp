@@ -14,6 +14,7 @@ import {
   PutCommand,
   GetCommand,
   QueryCommand,
+  ScanCommand,
   UpdateCommand,
   DeleteCommand,
 } from '@aws-sdk/lib-dynamodb'
@@ -46,6 +47,7 @@ export interface SkillLabAttempt {
   timed?: boolean
   rating?: number
   ratingComment?: string
+  country?: string | null
 }
 
 export interface SkillLabAttemptsStore {
@@ -58,6 +60,8 @@ export interface SkillLabAttemptsStore {
   /** First in_progress attempt across all labs (sorted by startedAt desc), if any. */
   findAnyActive(userId: string): Promise<{ attemptId: string; labId: string; startedAt?: string; timed?: boolean; lastSavedAt?: string } | null>
   deleteAllForUser(userId: string): Promise<number>
+  /** Admin: scan attempts by startedAt range (Dynamo) or fallback to createdAt (legacy). */
+  scanByDateRange(from: string, to: string): Promise<SkillLabAttempt[]>
 }
 
 function createDynamoStore(): SkillLabAttemptsStore {
@@ -135,6 +139,23 @@ function createDynamoStore(): SkillLabAttemptsStore {
       }
       return items.length
     },
+
+    async scanByDateRange(from: string, to: string) {
+      const items: SkillLabAttempt[] = []
+      let cursor: Record<string, any> | undefined = undefined
+      do {
+        const res: any = await ddb.send(new ScanCommand({
+          TableName: TABLE,
+          // Use startedAt where present (newer rows), else fall back to createdAt (legacy / one-shot)
+          FilterExpression: '(attribute_exists(startedAt) AND startedAt BETWEEN :f AND :t) OR (attribute_not_exists(startedAt) AND createdAt BETWEEN :f AND :t)',
+          ExpressionAttributeValues: { ':f': from, ':t': to },
+          ExclusiveStartKey: cursor,
+        }))
+        items.push(...((res.Items as SkillLabAttempt[]) ?? []))
+        cursor = res.LastEvaluatedKey
+      } while (cursor)
+      return items
+    },
   }
 }
 
@@ -202,6 +223,14 @@ function createLocalStore(): SkillLabAttemptsStore {
       const count = all.length - remaining.length
       await saveAll(remaining)
       return count
+    },
+
+    async scanByDateRange(from: string, to: string) {
+      const all = await loadAll()
+      return all.filter((a) => {
+        const ts = a.startedAt ?? a.createdAt
+        return typeof ts === 'string' && ts >= from && ts <= to
+      })
     },
   }
 }

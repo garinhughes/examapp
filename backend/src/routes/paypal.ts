@@ -108,7 +108,7 @@ async function _grantFromSession(
     { pk, sk, userId: sess.userId, productIds: sess.productIds },
     '[paypal] entitlements granted'
   )
-  recordEvent('checkout_complete', { plan: sess.productIds.join(',') }).catch(() => {})
+  recordEvent('checkout_complete', { plan: sess.productIds.join(',') }, { userId: sess.userId }).catch(() => {})
   // Alert if the user now holds multiple active subscription tiers — indicates a cancelled-then-upgraded
   // scenario where both entitlements are valid concurrently (expected but worth monitoring).
   if (sess.productIds.some((pid: string) => getProduct(pid)?.kind === 'subscription')) {
@@ -236,7 +236,7 @@ export default async function (server: FastifyInstance, _opts: FastifyPluginOpti
         cancelUrl,
       })
 
-      recordEvent('checkout_start', { plan: productId }).catch(() => {})
+      recordEvent('checkout_start', { plan: productId }, { userId }).catch(() => {})
       return reply.send({ subscriptionId })
     } catch (err: any) {
       server.log.error({ err }, '[paypal] create-subscription error')
