@@ -1153,6 +1153,8 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
     fetch(apiUrl('/exams'))
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        const ct = r.headers.get('content-type') || ''
+        if (!ct.includes('application/json')) throw new Error(`Non-JSON response (${ct || 'unknown'})`)
         return r.json()
       })
       .then(setExams)
