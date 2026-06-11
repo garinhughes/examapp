@@ -17,7 +17,7 @@ const adminCache = new Map<string, boolean>()
 
 export async function isAdminUserId(userId: string | undefined | null): Promise<boolean> {
   if (!userId) return false
-  if (userId.startsWith('visitor-') || userId === 'anonymous') return false
+  if (userId.startsWith('visitor:') || userId.startsWith('visitor-') || userId === 'anonymous') return false
   if (adminCache.has(userId)) return adminCache.get(userId)!
   try {
     const { getUserBySub } = await import('./dynamo.js')

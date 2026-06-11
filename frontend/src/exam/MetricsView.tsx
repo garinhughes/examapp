@@ -1045,6 +1045,8 @@ function StatusPill({ status }: { status: string }) {
   )
 }
 
+const PAGE_SIZE = 50
+
 function ExamActivityTab({ range, exams }: { range: RangeKey; exams: ExamSummary[] }) {
   const authFetch = useAuthFetch()
   const [data, setData] = useState<ActivityResponse<ExamActivityRow> | null>(null)
@@ -1052,6 +1054,9 @@ function ExamActivityTab({ range, exams }: { range: RangeKey; exams: ExamSummary
   const [filterExam, setFilterExam] = useState<string>('')
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [filterUserType, setFilterUserType] = useState<string>('')
+  const [page, setPage] = useState(1)
+
+  useEffect(() => { setPage(1) }, [range, filterExam, filterStatus, filterUserType])
 
   useEffect(() => {
     let cancelled = false
@@ -1075,6 +1080,9 @@ function ExamActivityTab({ range, exams }: { range: RangeKey; exams: ExamSummary
 
   const rows = data?.rows ?? []
   const breakdown = useMemoBreakdown(rows)
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const pageRows = rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   function exportCsv() {
     downloadCsv(
@@ -1123,7 +1131,7 @@ function ExamActivityTab({ range, exams }: { range: RangeKey; exams: ExamSummary
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {pageRows.map((r) => (
                 <tr key={r.attemptId} className="border-b border-border/50 hover:bg-muted/20">
                   <td className="px-4 py-2 text-xs text-muted-foreground whitespace-nowrap" title={r.startedAt}>{formatRelative(r.startedAt)}</td>
                   <td className="px-4 py-2 font-mono text-xs">{r.examCode}</td>
@@ -1143,9 +1151,21 @@ function ExamActivityTab({ range, exams }: { range: RangeKey; exams: ExamSummary
           </table>
         </div>
       </div>
+      <Pagination page={currentPage} totalPages={totalPages} onChange={setPage} />
       {data?.truncated && (
         <div className="text-xs text-muted-foreground text-center">Showing first {rows.length} attempts. Narrow the filters or shorten the range to see more.</div>
       )}
+    </div>
+  )
+}
+
+function Pagination({ page, totalPages, onChange }: { page: number; totalPages: number; onChange: (p: number) => void }) {
+  if (totalPages <= 1) return null
+  return (
+    <div className="flex items-center justify-center gap-2 text-xs">
+      <button onClick={() => onChange(Math.max(1, page - 1))} disabled={page === 1} className="px-2 py-1 rounded-md border border-border bg-background hover:bg-muted disabled:opacity-50">‹ Prev</button>
+      <span className="text-muted-foreground">Page {page} of {totalPages}</span>
+      <button onClick={() => onChange(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="px-2 py-1 rounded-md border border-border bg-background hover:bg-muted disabled:opacity-50">Next ›</button>
     </div>
   )
 }
@@ -1165,6 +1185,9 @@ function LabActivityTab({ range, labs }: { range: RangeKey; labs: LabStat[] }) {
   const [filterLab, setFilterLab] = useState<string>('')
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [filterUserType, setFilterUserType] = useState<string>('')
+  const [page, setPage] = useState(1)
+
+  useEffect(() => { setPage(1) }, [range, filterLab, filterStatus, filterUserType])
 
   useEffect(() => {
     let cancelled = false
@@ -1190,6 +1213,9 @@ function LabActivityTab({ range, labs }: { range: RangeKey; labs: LabStat[] }) {
   const completed = rows.filter((r) => r.status === 'completed').length
   const passed = rows.filter((r) => r.correct === true).length
   const visitors = rows.filter((r) => r.userType === 'visitor').length
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const pageRows = rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   function exportCsv() {
     downloadCsv(
@@ -1234,7 +1260,7 @@ function LabActivityTab({ range, labs }: { range: RangeKey; labs: LabStat[] }) {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {pageRows.map((r) => (
                 <tr key={r.attemptId} className="border-b border-border/50 hover:bg-muted/20">
                   <td className="px-4 py-2 text-xs text-muted-foreground whitespace-nowrap" title={r.startedAt ?? ''}>{formatRelative(r.startedAt)}</td>
                   <td className="px-4 py-2 font-mono text-xs">{r.labId}</td>
@@ -1253,6 +1279,7 @@ function LabActivityTab({ range, labs }: { range: RangeKey; labs: LabStat[] }) {
           </table>
         </div>
       </div>
+      <Pagination page={currentPage} totalPages={totalPages} onChange={setPage} />
       {data?.truncated && (
         <div className="text-xs text-muted-foreground text-center">Showing first {rows.length} attempts. Narrow the filters or shorten the range to see more.</div>
       )}

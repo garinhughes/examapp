@@ -33,7 +33,8 @@ function parseRange(query: any): { from: string; to: string } {
 }
 
 function isVisitorId(userId: string | undefined | null): boolean {
-  return !userId || userId.startsWith('visitor-') || userId === 'anonymous'
+  if (!userId || userId === 'anonymous') return true
+  return userId.startsWith('visitor:') || userId.startsWith('visitor-')
 }
 
 interface UserInfo {
