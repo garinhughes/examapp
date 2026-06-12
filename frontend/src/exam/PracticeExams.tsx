@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { useTourContext } from '@/components/TourProvider'
 import { apiUrl } from '@/apiBase'
 import { trackPageView } from '@/lib/trackEvent'
+import { RequestExamModal } from '@/components/RequestExamModal'
 
 type AttemptSummary = {
   examCode: string
@@ -38,6 +39,7 @@ export function PracticeExams() {
   const [collapsedProviders, setCollapsedProviders] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState('')
   const [summaries, setSummaries] = useState<Map<string, AttemptSummary>>(new Map())
+  const [showRequestExam, setShowRequestExam] = useState(false)
 
   useEffect(() => { trackPageView('exams') }, [])
 
@@ -112,7 +114,14 @@ export function PracticeExams() {
             className="w-full pl-8 pr-3 py-1.5 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
-        <div className="flex items-center justify-end -mt-1 mb-1">
+        <div className="flex items-center justify-between -mt-1 mb-1 gap-3">
+          <button
+            type="button"
+            onClick={() => setShowRequestExam(true)}
+            className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold shadow-sm hover:bg-primary/90 transition-colors"
+          >
+            Request exam
+          </button>
           <button
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => {
@@ -183,6 +192,8 @@ export function PracticeExams() {
         <Info className="w-5 h-5 flex-shrink-0 mt-0.5 text-primary" aria-hidden />
         <div className="leading-snug">These products are not affiliated with or endorsed by any certification provider. All questions are original and created for practice purposes only.</div>
       </div>
+
+      {showRequestExam && <RequestExamModal onClose={() => setShowRequestExam(false)} />}
     </div>
   )
 }

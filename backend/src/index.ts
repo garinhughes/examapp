@@ -79,6 +79,7 @@ import imagesRoutes from './routes/images.js'
 import cronRoutes from './routes/cron.js'
 import unsubscribeRoutes from './routes/unsubscribe.js'
 import feedbackRoutes from './routes/feedback.js'
+import examRequestsRoutes from './routes/examRequests.js'
 import eventsRoutes from './routes/events.js'
 
 const server = Fastify({ logger: true, trustProxy: true })
@@ -193,6 +194,8 @@ await server.register(skillLabsRoutes, { prefix: '/skill-labs' })
 await server.register(reportsRoutes, { prefix: '/reports' })
 // General user feedback
 await server.register(feedbackRoutes, { prefix: '/feedback' })
+// Public exam-request form
+await server.register(examRequestsRoutes, { prefix: '/exam-requests' })
 // Ratings
 await server.register(ratingsRoutes, { prefix: '/ratings' })
 // Certificates

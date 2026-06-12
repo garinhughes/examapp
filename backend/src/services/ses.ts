@@ -655,6 +655,35 @@ export async function sendRefundedEmail(params: {
   await sendHtml({ from: FROM, to: params.to, cc: [TO], subject, html, text })
 }
 
+export async function sendExamRequestEmail(p: {
+  requesterEmail: string
+  examText: string
+  usage?: 'light' | 'heavy'
+}): Promise<void> {
+  const subject = `[certshack] Exam request from ${p.requesterEmail}`
+  const usageLine = p.usage === 'heavy'
+    ? '40+ questions (Pro intent)'
+    : p.usage === 'light'
+      ? '0–40 questions (Free intent)'
+      : 'Not specified'
+  const body = [
+    `From: ${p.requesterEmail}`,
+    `Usage: ${usageLine}`,
+    ``,
+    `Requested exam:`,
+    p.examText,
+  ].join('\n')
+
+  await ses.send(new SendEmailCommand({
+    Source: FROM,
+    Destination: { ToAddresses: [TO] },
+    Message: {
+      Subject: { Data: subject, Charset: 'UTF-8' },
+      Body: { Text: { Data: body, Charset: 'UTF-8' } },
+    },
+  }))
+}
+
 /**
  * Internal ops alert — plain-text notification from noreply to support@certshack.com.
  * Fire-and-forget: never throws so it can't break the main request path.
