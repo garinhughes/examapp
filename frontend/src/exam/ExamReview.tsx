@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Play, X, Check, TrendingUp, ChevronLeft, BookOpen, ExternalLink, ChevronDown, Lock } from 'lucide-react'
+import { Play, X, Check, TrendingUp, ChevronLeft, BookOpen, ExternalLink, ChevronDown, Lock, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useExam } from './ExamContext'
 import { isAnswerCorrect, renderChoiceContent, MarkdownText } from './utils'
@@ -7,6 +7,7 @@ import type { Question, QuestionType } from './types'
 import { QuestionImage } from './QuestionImage'
 import { QuestionDiagram } from './QuestionDiagram'
 import { trackEvent as trackCsEvent } from '@/lib/trackEvent'
+import { useEntitlements, isPaidTier } from '@/hooks/useEntitlements'
 
 export function ExamReview() {
   const navigate = useNavigate()
@@ -18,6 +19,16 @@ export function ExamReview() {
     createAttempt, setAttemptData, setAttemptId, setExamStarted, setRoute, setSelected,
     setShowAttempts, setAttemptsList,
   } = useExam()
+  const { tier, products, discountActive } = useEntitlements()
+  const proProduct = products.find((p) => p.productId === 'sub:pro')
+  const proBasePence = proProduct?.priceGBP
+  const proDiscountPence = discountActive ? proProduct?.discountedPriceGBP : undefined
+  const proEffectivePence = proDiscountPence != null ? proDiscountPence : proBasePence
+  const formatGBP = (pence: number) => {
+    const pounds = pence / 100
+    return pounds % 1 === 0 ? `£${pounds}` : `£${pounds.toFixed(2)}`
+  }
+  const showProPromo = !isPaidTier(tier) && proEffectivePence != null
 
   const domains: string[] = attemptData?.perDomain ? Object.keys(attemptData.perDomain) : Array.from(new Set(questions.map((q) => (q as any).domain)))
   const allSelected = reviewDomains.includes('All')
@@ -80,6 +91,30 @@ export function ExamReview() {
 
   return (
     <div className="mb-4">
+      {showProPromo && (
+        <div className="mb-4 p-4 rounded-lg border border-primary/30 bg-gradient-to-r from-primary/10 to-primary/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/15 shrink-0">
+              <Sparkles className="w-5 h-5 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <div className="font-semibold text-sm">
+                Unlock all questions for {formatGBP(proEffectivePence!)}
+                {proDiscountPence != null && proBasePence != null && proDiscountPence !== proBasePence && (
+                  <span className="ml-2 text-xs line-through text-muted-foreground font-normal">{formatGBP(proBasePence)}</span>
+                )}
+              </div>
+              <div className="text-xs text-muted-foreground">Full question banks across every exam · cancel anytime</div>
+            </div>
+          </div>
+          <button
+            onClick={() => { trackCsEvent('upgrade_click', { cta: 'exam-review-pro-promo' }); setRoute('pricing') }}
+            className="shrink-0 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Go Pro
+          </button>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
         <h3 className="font-semibold">Review</h3>
         <div className="flex items-center gap-2 flex-wrap">
