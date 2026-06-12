@@ -65734,6 +65734,937 @@
       "earlyComplete": true,
       "answeredCount": 1,
       "totalQuestions": 40
+    },
+    {
+      "attemptId": "090eb6d7-cfa7-4f3c-8bbd-913f372ae5c3",
+      "userId": "visitor:4abc2347-7dfd-4580-b922-27842fb516b9",
+      "examCode": "220-1201",
+      "examVersion": null,
+      "s3VersionId": null,
+      "attemptSchemaVersion": 1,
+      "startedAt": "2026-06-12T12:45:02.641Z",
+      "updatedAt": "2026-06-12T12:45:13.165Z",
+      "finishedAt": null,
+      "status": "abandoned",
+      "score": null,
+      "answers": [],
+      "metadata": {
+        "serviceKeywords": [],
+        "domains": [],
+        "services": []
+      },
+      "country": null,
+      "questions": [
+        {
+          "id": "220-1201-0007",
+          "type": "single-choice",
+          "question": "During a desk rollout, the IT team is equipping hot-desking workstations so that any visiting employee can plug their corporate laptop into a single connector and immediately drive two external displays, charge the laptop, and connect to the wired network and peripheral hub. The chosen solution must use one cable per laptop and adapt to multiple laptop brands.\n\nWhich device should the team specify?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "A proprietary port replicator designed for a single laptop family.",
+              "isCorrect": false,
+              "explanation": "Port replicators are typically tied to one vendor's connector, breaking multi-brand support."
+            },
+            {
+              "id": "c1",
+              "text": "A USB-C docking station that supports DisplayPort alt mode, Power Delivery, and Ethernet over a single host cable.",
+              "isCorrect": true,
+              "explanation": "A USB-C dock provides charging, video, USB, and Ethernet through one connector across vendor-agnostic laptops.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "A Bluetooth keyboard-mouse combo paired with each visitor's laptop on arrival.",
+              "isCorrect": false,
+              "explanation": "Bluetooth peripherals do not address video, charging, or wired networking requirements."
+            },
+            {
+              "id": "c3",
+              "text": "A powered USB-A hub combined with a separate HDMI splitter at each desk.",
+              "isCorrect": false,
+              "explanation": "A USB-A hub cannot deliver enough power to charge a laptop and lacks display alt mode."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Mobile Devices",
+          "skills": [
+            "1.2: Compare and contrast accessories and connectivity options for mobile devices."
+          ],
+          "services": [
+            "Mobile Devices",
+            "Cables & Connectors"
+          ],
+          "tip": "Look for the option that consolidates power, video, and data on one connector.",
+          "explanation": "A USB-C dock is the only option meeting all four requirements over one cable.\n\n**Why it works:** USB-C carries DisplayPort alt mode for monitors, Power Delivery for charging, and tunneled USB and Ethernet for peripherals and network.\n\n**Why the others don't work:**\n- Port replicator: vendor-locked.\n- USB-A hub: no charging or alt-mode video.\n- Bluetooth combo: only addresses input, not display or power.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0079",
+          "type": "single-choice",
+          "question": "A technician is upgrading RAM in a thin-and-light business laptop. The user supplied a desktop DIMM kit they had spare from a recent build. After opening the service hatch, the technician sees a smaller memory slot than the desktop module fits into.\n\nWhich form factor does the laptop require?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Registered DIMM as used in server platforms.",
+              "isCorrect": false,
+              "explanation": "RDIMM is even longer than a standard DIMM and is server-only."
+            },
+            {
+              "id": "c1",
+              "text": "SODIMM module sized for laptop and small-form-factor systems.",
+              "isCorrect": true,
+              "explanation": "SODIMM is the compact memory standard used in laptops.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Mini-ITX memory cartridge from the motherboard vendor.",
+              "isCorrect": false,
+              "explanation": "No such standard memory form factor exists for ITX boards."
+            },
+            {
+              "id": "c2",
+              "text": "Full-length DIMM identical to standard desktop modules.",
+              "isCorrect": false,
+              "explanation": "DIMM is the larger desktop form factor and will not fit a laptop slot."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Hardware",
+          "skills": [
+            "3.3: Compare and contrast RAM characteristics."
+          ],
+          "services": [
+            "RAM"
+          ],
+          "tip": "Identify the compact memory form factor designed for portable systems.",
+          "explanation": "SODIMM (Small Outline DIMM) is shorter and narrower than DIMM, designed for laptops and SFF systems.\n\n**Why it works:** SODIMM modules use a different pin count and length than DIMM, matching laptop slots.\n\n**Why the others don't work:**\n- DIMM: too long for a laptop slot.\n- RDIMM: server-specific.\n- Invented ITX cartridge: not a real standard.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0073",
+          "type": "single-choice",
+          "question": "During an office fit-out, the network installer needs to run twisted-pair cable through the air handling space above the suspended ceiling. Local fire code requires cabling in that area to produce minimal smoke and flame spread.\n\nWhich cable specification should the installer use for these runs?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "PVC-jacketed riser-rated Cat 6 cable rated for vertical floor runs.",
+              "isCorrect": false,
+              "explanation": "Riser-rated cable is not approved for plenum air spaces."
+            },
+            {
+              "id": "c4",
+              "text": "Standard PVC-jacketed Cat 6 patch cable.",
+              "isCorrect": false,
+              "explanation": "Standard PVC jackets emit toxic smoke when burning and are not permitted in plenums."
+            },
+            {
+              "id": "c1",
+              "text": "Plenum-rated Cat 6 cable with a fire-retardant jacket.",
+              "isCorrect": true,
+              "explanation": "Plenum-rated cable meets fire code requirements for air handling spaces.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Direct burial outdoor-rated Cat 6 with a gel-filled core.",
+              "isCorrect": false,
+              "explanation": "Direct burial cable is designed for underground use, not indoor plenum runs."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Hardware",
+          "skills": [
+            "3.2: Summarize basic cable types and their connectors, features, and purposes."
+          ],
+          "services": [
+            "Cables & Connectors"
+          ],
+          "tip": "Look for the rating that addresses fire and smoke behaviour in air spaces.",
+          "explanation": "Plenum cable uses low-smoke jacketing approved for air handling areas.\n\n**Why it works:** The fluorinated jacket reduces smoke and flame propagation when fire breaks out in the plenum.\n\n**Why the others don't work:**\n- Riser-rated: only approved for vertical shafts.\n- Direct burial: designed for outdoor underground use.\n- Standard PVC: prohibited in plenums due to toxic smoke.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0013",
+          "type": "single-choice",
+          "question": "A user travelling abroad has bought a local prepaid plan but does not want to remove the physical SIM that holds their home number. Their handset is dual-SIM capable, supports both physical and embedded SIMs, and was sold unlocked. They want to keep both lines active and pick which one places outbound calls.\n\nWhich approach should the technician walk them through?",
+          "choices": [
+            {
+              "id": "c4",
+              "text": "Tether the handset to a second device that holds the local SIM.",
+              "isCorrect": false,
+              "explanation": "Tethering doesn't make the local number callable from the original handset."
+            },
+            {
+              "id": "c1",
+              "text": "Activate the local carrier's eSIM profile in addition to the physical SIM, then select the preferred line for outbound calls in the dual-SIM settings.",
+              "isCorrect": true,
+              "explanation": "An eSIM lets the user add a second line digitally while keeping the home physical SIM in place and choose a default for calls.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Enable Wi-Fi calling only and disable the cellular radio entirely while abroad.",
+              "isCorrect": false,
+              "explanation": "Disabling cellular drops the home line completely and breaks the dual-SIM requirement."
+            },
+            {
+              "id": "c2",
+              "text": "Swap the physical SIM for the local one and use call forwarding from the home number.",
+              "isCorrect": false,
+              "explanation": "This removes the home SIM and depends on forwarding being active, which doesn't meet the requirement to keep both lines on the device."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Mobile Devices",
+          "skills": [
+            "1.3: Given a scenario, configure basic mobile device network connectivity and provide application support."
+          ],
+          "services": [
+            "Mobile Devices",
+            "Wireless",
+            "MDM"
+          ],
+          "tip": "Identify the technology that lets a second carrier profile coexist with a physical SIM.",
+          "explanation": "eSIM provisioning adds a second carrier profile without removing the physical SIM.\n\n**Why it works:** Modern handsets allow dual-SIM operation by combining a physical SIM with an embedded SIM profile, and the user can pick the default line per service.\n\n**Why the others don't work:**\n- SIM swap: loses the home line.\n- Wi-Fi calling only: disables cellular entirely.\n- Tethering: doesn't bring the line into the handset.",
+          "difficulty": 2,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0115",
+          "type": "single-choice",
+          "question": "A developer needs to test a piece of malware safely without risking the host operating system or any other systems on the corporate network. The lab workstation runs Windows 11, and the malware sample must be detonated and observed in an isolated environment that can be reverted to a clean state afterwards.\n\nWhich use of a virtual machine BEST describes this scenario?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "A sandbox VM used to safely execute and analyse untrusted code in isolation from the host.",
+              "isCorrect": true,
+              "explanation": "Sandboxing is the canonical VM use case for malware analysis and untrusted code execution.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "A VDI session brokered from a central server so the developer can roam between thin clients.",
+              "isCorrect": false,
+              "explanation": "VDI delivers centrally hosted desktops to end users, it is not focused on malware isolation."
+            },
+            {
+              "id": "c4",
+              "text": "An application virtualization wrapper that streams legacy software to the developer's desktop.",
+              "isCorrect": false,
+              "explanation": "Application virtualization packages legacy apps for delivery, it does not isolate the host from malicious behaviour."
+            },
+            {
+              "id": "c2",
+              "text": "A cross-platform virtualization VM used to run macOS applications on a Windows host.",
+              "isCorrect": false,
+              "explanation": "Cross-platform virtualization is about running a different guest OS family, not isolating malware."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Virtualization and Cloud Computing",
+          "skills": [
+            "4.1: Explain virtualization concepts."
+          ],
+          "services": [
+            "Virtualization"
+          ],
+          "tip": "Consider which VM purpose specifically targets isolating untrusted or potentially harmful code.",
+          "explanation": "A sandbox virtual machine provides a contained, disposable environment for detonating malware.\n\n**Why it works:** The VM isolates the malicious binary from the host kernel and the physical network, and snapshots allow the analyst to revert to a known good state after each run.\n\n**Why the others don't work:**\n- Cross-platform virtualization: addresses running a different guest OS, not safety from malicious code.\n- VDI: is a desktop delivery model, not a malware analysis pattern.\n- Application virtualization: packages and streams applications, it does not provide a malware containment boundary.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0139",
+          "type": "single-choice",
+          "question": "During a board presentation, the projector image suddenly turns off while the projector fan continues to run loudly. The status indicator on the projector glows red. After about thirty minutes the unit cools and produces an image again, but the cycle repeats during use.\n\nWhich is the MOST likely cause?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "Laptop is set to mirror displays at the wrong resolution",
+              "isCorrect": false,
+              "explanation": "Resolution mismatches usually show an out-of-range message, not a thermal shutdown."
+            },
+            {
+              "id": "c4",
+              "text": "Lamp has reached end of life and needs immediate replacement",
+              "isCorrect": false,
+              "explanation": "An end-of-life lamp generally fails to ignite at all, rather than producing repeated overheat shutdowns."
+            },
+            {
+              "id": "c2",
+              "text": "HDMI cable is partially seated, dropping the video signal",
+              "isCorrect": false,
+              "explanation": "A loose cable would lose signal but would not cause the projector to shut down with a red status light."
+            },
+            {
+              "id": "c1",
+              "text": "Air filter is clogged, causing the projector to overheat and trigger thermal shutdown",
+              "isCorrect": true,
+              "explanation": "A blocked filter restricts airflow over the lamp, raising temperature until the projector cuts off to protect itself.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Hardware and Network Troubleshooting",
+          "skills": [
+            "5.3: Given a scenario, troubleshoot video, projector, and display issues."
+          ],
+          "services": [
+            "Displays",
+            "Troubleshooting"
+          ],
+          "tip": "Shutdowns that recover after cooling are temperature-driven.",
+          "explanation": "Projectors include a thermal cut-out that disables the lamp when internal temperature exceeds safe limits. Restricted intake from a clogged filter is the most common trigger for cyclical shutdowns that recover after the unit cools.\n\n**Why it works:** Restricted airflow raises lamp temperature past threshold; cooling cycle resets the protection until the next overheat.\n\n**Why the others don't work:**\n- Loose HDMI: drops signal, no thermal shutdown.\n- Wrong resolution: produces sync errors, not shutdown.\n- End-of-life lamp: usually fails to strike, not cycles by temperature.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0133",
+          "type": "single-choice",
+          "question": "A user reports their five-year-old desktop has become unbearably slow when opening files. The technician hears a faint rhythmic clicking from the system unit that gets louder when File Explorer is opened. Windows still boots, but file operations stall for several seconds at a time.\n\nWhich component is failing and what should the technician do first?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "The mechanical hard drive head assembly is failing; back up data immediately before replacing the drive",
+              "isCorrect": true,
+              "explanation": "Rhythmic clicking with stalls indicates head failure on an HDD; priority is data preservation before the drive fails completely.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "The optical drive lens is dirty; clean the disc tray",
+              "isCorrect": false,
+              "explanation": "The optical drive is not driven by File Explorer activity on the system disk and would not stall file operations."
+            },
+            {
+              "id": "c2",
+              "text": "The SSD controller is failing; run TRIM and continue using the drive",
+              "isCorrect": false,
+              "explanation": "SSDs have no moving parts and cannot click; the symptom rules out an SSD as the source."
+            },
+            {
+              "id": "c3",
+              "text": "The CPU fan bearing is failing; replace the cooler",
+              "isCorrect": false,
+              "explanation": "A failing fan produces a continuous whine or rattle that is not tied to file system activity."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Hardware and Network Troubleshooting",
+          "skills": [
+            "5.2: Given a scenario, troubleshoot drive and RAID issues."
+          ],
+          "services": [
+            "Storage",
+            "Troubleshooting"
+          ],
+          "tip": "Audible mechanical noise tied to disk activity points to one specific device class.",
+          "explanation": "Clicking sounds from a hard drive, especially when correlated with file access, are a sign of imminent mechanical failure. Backing up data is the first and most important action.\n\n**Why it works:** The read/write heads on a failing HDD repeatedly attempt to recalibrate, producing the characteristic click.\n\n**Why the others don't work:**\n- SSDs: cannot click as they contain no moving parts.\n- CPU fan: noise is unrelated to file activity.\n- Optical drive: not engaged during normal file operations.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0003",
+          "type": "single-choice",
+          "question": "An accountant's ultrabook has begun freezing during heavy spreadsheet work, and the Resource Monitor shows committed memory pegged at 99% with constant pagefile activity. The laptop has a single SODIMM slot populated with an 8 GB module, and the service manual lists a maximum supported capacity of 32 GB.\n\nWhich upgrade is the MOST appropriate next step?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Replace the existing 8 GB SODIMM with a single higher-capacity SODIMM that matches the laptop's supported speed and form factor.",
+              "isCorrect": true,
+              "explanation": "A single-slot laptop can only be upgraded by swapping the existing module for a larger one of the correct type.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Replace the SSD with a larger NVMe drive to expand pagefile headroom.",
+              "isCorrect": false,
+              "explanation": "A bigger pagefile masks rather than fixes a RAM shortfall and does not improve responsiveness."
+            },
+            {
+              "id": "c2",
+              "text": "Add a second SODIMM in dual-channel configuration alongside the existing 8 GB module.",
+              "isCorrect": false,
+              "explanation": "The chassis has only one SODIMM slot, so dual-channel installation is not possible."
+            },
+            {
+              "id": "c3",
+              "text": "Install a DDR5 desktop DIMM after confirming the BIOS supports the newer standard.",
+              "isCorrect": false,
+              "explanation": "Laptops use SODIMM, not full-size DIMM, and form factor is not BIOS-selectable."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Mobile Devices",
+          "skills": [
+            "1.1: Given a scenario, monitor mobile device hardware and use appropriate replacement techniques."
+          ],
+          "services": [
+            "Mobile Devices"
+          ],
+          "tip": "Match the physical and electrical constraints of the platform.",
+          "explanation": "Single-slot laptops force a swap rather than an add.\n\n**Why it works:** With only one SODIMM slot and a 32 GB ceiling, replacing the 8 GB module with a 16 or 32 GB SODIMM of the supported speed resolves the shortage.\n\n**Why the others don't work:**\n- Second SODIMM: there is no second slot.\n- Desktop DIMM: wrong form factor for a laptop.\n- Larger SSD: pagefile is not a substitute for physical RAM.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0025",
+          "type": "single-choice",
+          "question": "Following a complaint about poor wireless coverage in a warehouse with thick metal racking, a technician runs a site survey and finds that the existing 5 GHz access points cannot reach the far aisles. The supplied client devices are all dual-band but spend most of their time at distance from the nearest AP, and the team needs the longest practical range from the existing radios.\n\nWhich frequency band should the technician prioritise for new APs in the far aisles?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "The 6 GHz band, because the newer spectrum is uncongested and therefore reaches further than older bands.",
+              "isCorrect": false,
+              "explanation": "Less congestion does not increase propagation distance; 6 GHz has the shortest practical range of the three."
+            },
+            {
+              "id": "c4",
+              "text": "Both 5 GHz and 6 GHz simultaneously, using band steering to maximise the reach of each client.",
+              "isCorrect": false,
+              "explanation": "Band steering can rebalance load but cannot extend the physical reach of higher-frequency radios."
+            },
+            {
+              "id": "c1",
+              "text": "The 2.4 GHz band, which has longer range and penetrates obstacles better than the higher bands.",
+              "isCorrect": true,
+              "explanation": "Lower-frequency signals propagate further and pass through walls and racking more readily.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "The 5 GHz band at 80 MHz channel width, since wider channels carry signal further into the warehouse.",
+              "isCorrect": false,
+              "explanation": "Wider channels reduce range and effective power per Hz, they do not extend coverage."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Networking",
+          "skills": [
+            "2.2: Explain wireless networking technologies."
+          ],
+          "services": [
+            "Wireless"
+          ],
+          "tip": "Consider which wireless band offers the greatest propagation distance.",
+          "explanation": "Lower-frequency wireless signals travel further and penetrate obstacles more effectively than higher-frequency ones.\n\n**Why it works:** 2.4 GHz has longer wavelengths than 5 GHz or 6 GHz, giving it better range and obstacle penetration in cluttered industrial spaces.\n\n**Why the others don't work:**\n- Wider 5 GHz channels: actually reduce range due to lower power per subcarrier.\n- 6 GHz: shortest range of the three bands.\n- Band steering: redistributes clients, does not extend coverage.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0037",
+          "type": "single-choice",
+          "question": "The mail administrator at a charity has been told their newsletters keep landing in recipients' junk folders. After confirming the mail server is reputable, the administrator wants to publish a DNS record listing the IP addresses authorised to send mail on behalf of the domain so recipients can verify the source.\n\nWhich DNS record type should the administrator publish?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "A `TXT` record containing the `SPF` policy that lists authorised sending IPs for the domain.",
+              "isCorrect": true,
+              "explanation": "`SPF` is published as a `TXT` record naming the IPs allowed to send mail for the domain.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "An `MX` record pointing to the IPs allowed to send mail on behalf of the domain.",
+              "isCorrect": false,
+              "explanation": "`MX` records direct inbound mail to mailbox hosts; they do not authorise senders."
+            },
+            {
+              "id": "c4",
+              "text": "An `AAAA` record pointing to the IPv6 address of the outbound mail relay.",
+              "isCorrect": false,
+              "explanation": "`AAAA` records resolve a name to an IPv6 address; they do not list authorised senders."
+            },
+            {
+              "id": "c3",
+              "text": "A `CNAME` record aliasing the sending hosts to the corporate domain.",
+              "isCorrect": false,
+              "explanation": "`CNAME` provides name aliases and does not communicate sender authorisation."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Networking",
+          "skills": [
+            "2.4: Explain common network configuration concepts."
+          ],
+          "services": [
+            "Networking"
+          ],
+          "tip": "Look for the record family used to publish text-based mail authorisation policies.",
+          "explanation": "Authorised sender lists for a domain are published in a specific DNS record format.\n\n**Why it works:** `SPF` policies live in `TXT` records and enumerate the IP addresses that are permitted to send mail using the domain.\n\n**Why the others don't work:**\n- MX: routes inbound mail to mailbox hosts.\n- `CNAME`: name alias.\n- `AAAA`: IPv6 host record.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0085",
+          "type": "single-choice",
+          "question": "A small business owner has asked their technician to maximise storage performance for a video editing workstation. The motherboard exposes an M.2 slot wired for four PCIe lanes, and the budget allows for a high-end solid-state drive.\n\nWhich drive interface should the technician choose?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "mSATA SSD plugged into the M.2 slot using an adapter.",
+              "isCorrect": false,
+              "explanation": "mSATA is a legacy form factor still bound by the SATA interface."
+            },
+            {
+              "id": "c4",
+              "text": "SAS SSD wired through the M.2 to SAS controller.",
+              "isCorrect": false,
+              "explanation": "SAS is a server interface and is not exposed via consumer M.2 slots."
+            },
+            {
+              "id": "c2",
+              "text": "SATA SSD installed in the M.2 slot for compatibility.",
+              "isCorrect": false,
+              "explanation": "SATA caps at 6 Gbps and wastes the PCIe lane capacity."
+            },
+            {
+              "id": "c1",
+              "text": "NVMe SSD using the PCIe lanes through the M.2 slot.",
+              "isCorrect": true,
+              "explanation": "NVMe over PCIe offers the highest available SSD throughput.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Hardware",
+          "skills": [
+            "3.4: Compare and contrast storage devices."
+          ],
+          "services": [
+            "Storage"
+          ],
+          "tip": "Match the protocol to the available PCIe lanes for maximum throughput.",
+          "explanation": "NVMe is the storage protocol designed for PCIe-attached SSDs and delivers multi-GB/s throughput.\n\n**Why it works:** Using PCIe lanes directly bypasses the SATA bottleneck.\n\n**Why the others don't work:**\n- SATA: capped at 6 Gbps.\n- mSATA: same SATA bottleneck on a legacy form factor.\n- SAS: enterprise interface, not on M.2 desktop slots.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0123",
+          "type": "single-choice",
+          "question": "A regional NHS trust and three neighbouring trusts share a cloud environment built specifically to meet their common clinical, compliance, and data residency requirements. The platform is not open to the general public and is not owned by a single trust.\n\nWhich cloud deployment model does this represent?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "A community cloud shared by organisations with common requirements.",
+              "isCorrect": true,
+              "explanation": "Community clouds serve a defined group of organisations with shared concerns such as compliance.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "A hybrid cloud spanning on-premises and a public provider.",
+              "isCorrect": false,
+              "explanation": "Hybrid mixes deployment models, but the scenario describes one shared sector platform, not a mix."
+            },
+            {
+              "id": "c3",
+              "text": "A private cloud dedicated to a single organisation.",
+              "isCorrect": false,
+              "explanation": "A private cloud is for one organisation, but here four trusts share the environment."
+            },
+            {
+              "id": "c2",
+              "text": "A public cloud open to any customer on the internet.",
+              "isCorrect": false,
+              "explanation": "A public cloud is open to anyone, which contradicts the closed, sector-specific scenario."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Virtualization and Cloud Computing",
+          "skills": [
+            "4.2: Summarize cloud computing concepts."
+          ],
+          "services": [
+            "Cloud Computing"
+          ],
+          "tip": "Identify who the consumers are and whether the platform is for one organisation, several, or anyone.",
+          "explanation": "A community cloud is shared by a defined set of organisations with common needs.\n\n**Why it works:** Several trusts pool requirements, governance, and often cost on a platform that meets healthcare-specific obligations, which is the textbook community cloud pattern.\n\n**Why the others don't work:**\n- Public cloud: is open to any customer.\n- Private cloud: is for a single organisation.\n- Hybrid cloud: combines two or more models, which is not what is described.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0121",
+          "type": "single-choice",
+          "question": "The marketing team at a mid-sized firm wants to use a hosted email and document suite without managing any servers, operating systems, or application patching. They simply log in through a browser and pay a monthly per-user fee.\n\nWhich cloud service model does this describe?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Software as a Service (SaaS), where the provider manages everything below the application.",
+              "isCorrect": true,
+              "explanation": "SaaS delivers ready-to-use applications consumed over the network.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Platform as a Service (PaaS), where the customer deploys their own code onto a managed runtime.",
+              "isCorrect": false,
+              "explanation": "PaaS still requires the customer to build and deploy an application, not just consume one."
+            },
+            {
+              "id": "c2",
+              "text": "Infrastructure as a Service (IaaS), where the customer manages the OS and applications on rented VMs.",
+              "isCorrect": false,
+              "explanation": "IaaS leaves OS and app management to the customer, which the team explicitly does not want."
+            },
+            {
+              "id": "c4",
+              "text": "A private cloud running on the firm's own hardware in their data centre.",
+              "isCorrect": false,
+              "explanation": "A private cloud means the firm operates the infrastructure themselves, not a hosted browser app."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Virtualization and Cloud Computing",
+          "skills": [
+            "4.2: Summarize cloud computing concepts."
+          ],
+          "services": [
+            "Cloud Computing"
+          ],
+          "tip": "Identify how much of the stack the customer is responsible for versus the provider.",
+          "explanation": "SaaS is the right model when only the application is consumed.\n\n**Why it works:** With SaaS, the provider runs the data centre, hardware, OS, and application, and the customer just signs in. That matches a monthly per-user, browser-only email and documents experience.\n\n**Why the others don't work:**\n- IaaS: hands the OS and apps to the customer to manage.\n- PaaS: targets developers deploying their own code.\n- Private cloud: keeps infrastructure ownership in-house, contradicting the hosted model.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0031",
+          "type": "single-choice",
+          "question": "During an audit, the operations team is reviewing how Kerberos tickets are issued in the domain. The lead engineer points out that the cluster of replicated servers also handles account lockouts and certificate distribution to clients. The auditor asks the technician to identify the role these servers are fulfilling.\n\nWhich server role best describes a host that issues Kerberos tickets and enforces account lockout policies?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "A fileshare server that controls per-folder permissions across the organisation.",
+              "isCorrect": false,
+              "explanation": "Fileshare servers serve files; permissions on the share rely on authentication done elsewhere."
+            },
+            {
+              "id": "c2",
+              "text": "A syslog server that receives login event records from all domain controllers.",
+              "isCorrect": false,
+              "explanation": "Syslog servers collect log data and do not themselves issue authentication tickets."
+            },
+            {
+              "id": "c4",
+              "text": "A print server that authenticates each print job before despatching it to the device.",
+              "isCorrect": false,
+              "explanation": "Print servers queue print jobs and rely on a separate authentication service."
+            },
+            {
+              "id": "c1",
+              "text": "An AAA server that authenticates users and authorises access to domain resources.",
+              "isCorrect": true,
+              "explanation": "AAA servers cover authentication, authorisation, and accounting, including Kerberos-based logon services.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Networking",
+          "skills": [
+            "2.3: Summarize services provided by networked hosts."
+          ],
+          "services": [
+            "Networking"
+          ],
+          "tip": "Focus on the role responsible for authentication decisions in a domain.",
+          "explanation": "The function of issuing tickets and enforcing logon policy maps to a specific server role.\n\n**Why it works:** Authentication, authorisation, and accounting are the three functions of an AAA server, of which Kerberos-based logon is one common example.\n\n**Why the others don't work:**\n- Syslog: receives logs, does not authenticate.\n- Fileshare: serves files only.\n- Print: queues print jobs only.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0127",
+          "type": "single-choice",
+          "question": "During a routine workstation refresh, a technician powers on a tower PC and hears a repeating pattern of one long beep followed by three short beeps from the motherboard speaker. The fans spin and the power LED is lit, but no image appears on the monitor.\n\nWhich component is the POST code most likely indicating has failed or is improperly seated?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Video adapter or onboard GPU",
+              "isCorrect": true,
+              "explanation": "One long followed by three short beeps is a long-standing AMI/Award convention indicating a video card or display adapter failure.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "CMOS battery requiring replacement",
+              "isCorrect": false,
+              "explanation": "A depleted CMOS battery produces date/time errors and configuration warnings rather than a POST beep pattern."
+            },
+            {
+              "id": "c4",
+              "text": "CPU thermal protection has triggered",
+              "isCorrect": false,
+              "explanation": "Thermal shutdowns cause the system to power off entirely rather than POST with a coded beep sequence."
+            },
+            {
+              "id": "c2",
+              "text": "System RAM modules in the primary slot",
+              "isCorrect": false,
+              "explanation": "RAM failures generally produce continuous or repeating short beeps, not the one-long-three-short pattern."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Hardware and Network Troubleshooting",
+          "skills": [
+            "5.1: Given a scenario, troubleshoot motherboards, RAM, CPUs, and power."
+          ],
+          "services": [
+            "Motherboards & CPUs",
+            "Troubleshooting"
+          ],
+          "tip": "Beep codes are a structured language; specific patterns map to specific subsystems.",
+          "explanation": "The classic one-long, three-short beep code from AMI and Award BIOS firmware indicates a problem with the video subsystem. Reseating the GPU or testing with another card is the appropriate next step.\n\n**Why it works:** POST runs before video is initialized, so the BIOS uses the motherboard speaker to communicate failures in a coded pattern that maps to specific hardware areas.\n\n**Why the others don't work:**\n- RAM failures: produce different beep patterns, typically repeating shorts.\n- CMOS battery: causes BIOS settings loss, not POST beeps.\n- Thermal shutdown: halts the system entirely rather than emitting beep codes.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0001",
+          "type": "single-choice",
+          "question": "During routine checks, a technician examines a two-year-old business laptop that powers off unexpectedly when unplugged, even at a reported 60% charge. The battery health utility shows the design capacity is 56 Wh but the full-charge capacity has dropped to 18 Wh, with 412 cycles logged. The chassis around the battery bay is slightly raised and the trackpad has started clicking unevenly.\n\nWhich component should the technician replace?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "The DC jack and charging board, since power delivery appears unstable when running on battery.",
+              "isCorrect": false,
+              "explanation": "A faulty DC jack would affect charging while plugged in, not runtime on battery."
+            },
+            {
+              "id": "c4",
+              "text": "The trackpad assembly, since uneven clicking can indicate a power-related ground fault.",
+              "isCorrect": false,
+              "explanation": "The trackpad symptom is a consequence of the swollen battery pressing upward, not its cause."
+            },
+            {
+              "id": "c3",
+              "text": "The system board, because the power management IC is misreporting the charge level.",
+              "isCorrect": false,
+              "explanation": "Misreported charge alone would not cause physical bulging or capacity loss to a third of design."
+            },
+            {
+              "id": "c1",
+              "text": "The internal lithium-ion battery, because it is swollen and has lost most of its usable capacity.",
+              "isCorrect": true,
+              "explanation": "Reduced full-charge capacity, high cycle count, and chassis bulging are classic signs of a failing, swollen battery.",
+              "sequence": 1
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Mobile Devices",
+          "skills": [
+            "1.1: Given a scenario, monitor mobile device hardware and use appropriate replacement techniques."
+          ],
+          "services": [
+            "Mobile Devices"
+          ],
+          "tip": "Consider the combination of physical and electrical symptoms together.",
+          "explanation": "A swollen battery is both an electrical and physical hazard.\n\n**Why it works:** Lithium-ion cells lose capacity over hundreds of cycles and can outgas, causing the pack to swell and push on surrounding components like the trackpad.\n\n**Why the others don't work:**\n- DC jack: would affect charging on AC, not unplugged runtime.\n- System board: a reporting bug would not cause physical bulging or capacity collapse.\n- Trackpad: its symptom is downstream of the swelling battery underneath.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0067",
+          "type": "single-choice",
+          "question": "A graphic designer is selecting a new monitor for colour-critical photo editing work. The studio requires accurate colour reproduction from any viewing angle because reviewers often gather around the screen. Budget allows for an LCD panel but not a premium OLED.\n\nWhich LCD panel technology should the technician recommend?",
+          "choices": [
+            {
+              "id": "c2",
+              "text": "Twisted nematic (TN) panel optimised for the fastest pixel response time.",
+              "isCorrect": false,
+              "explanation": "TN panels have narrow viewing angles and weaker colour reproduction."
+            },
+            {
+              "id": "c1",
+              "text": "In-plane switching (IPS) panel with a wide color gamut rating.",
+              "isCorrect": true,
+              "explanation": "IPS offers the best colour accuracy and viewing angles among LCD types.",
+              "sequence": 1
+            },
+            {
+              "id": "c3",
+              "text": "Vertical alignment (VA) panel with the deepest contrast ratio available.",
+              "isCorrect": false,
+              "explanation": "VA offers good contrast but viewing angle colour shift makes it unsuitable for collaborative colour work."
+            },
+            {
+              "id": "c4",
+              "text": "Mini-LED backlit TN panel with local dimming zones.",
+              "isCorrect": false,
+              "explanation": "Mini-LED can improve backlight performance but the underlying TN layer still limits colour accuracy and angles."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Hardware",
+          "skills": [
+            "3.1: Compare and contrast display components and attributes."
+          ],
+          "services": [
+            "Displays"
+          ],
+          "tip": "Consider which LCD technology balances colour fidelity with viewing angle stability.",
+          "explanation": "IPS panels are the standard recommendation for colour-critical work because the liquid crystal alignment maintains consistent colour across wide viewing angles.\n\n**Why it works:** The in-plane switching arrangement keeps crystals parallel to the panel, producing minimal colour shift at off-axis angles.\n\n**Why the others don't work:**\n- TN: poor colour gamut and severe vertical viewing angle shift.\n- VA: contrast is strong but colours wash out at angles.\n- Mini-LED TN: improved backlight does not fix the TN layer's colour weakness.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0019",
+          "type": "single-choice",
+          "question": "A help-desk technician is troubleshooting a remote office worker who needs to manage a Linux server over an encrypted command-line session. The user reports that the legacy plaintext terminal protocol is blocked at the corporate firewall, and the security team has standardised on encrypted equivalents. The technician needs to open the correct outbound port on the host-based firewall.\n\nWhich port should the technician permit for the encrypted remote shell?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "TCP port 3389 for RDP, configured for a text-only console mode that limits bandwidth across the wide area link.",
+              "isCorrect": false,
+              "explanation": "RDP is the Microsoft graphical remote desktop protocol and is not used for shell management of a Linux server."
+            },
+            {
+              "id": "c1",
+              "text": "TCP port 22 for SSH, which provides an encrypted interactive shell and replaces the plaintext alternative on Linux servers.",
+              "isCorrect": true,
+              "explanation": "SSH on TCP 22 is the standard encrypted replacement for Telnet for command-line server management.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "TCP port 443 for HTTPS, tunnelling the terminal session inside the browser's TLS channel to the server.",
+              "isCorrect": false,
+              "explanation": "HTTPS on 443 is for web traffic, not for an interactive command-line shell to a Linux server."
+            },
+            {
+              "id": "c2",
+              "text": "TCP port 23 for Telnet, opened only on the outbound interface so that the plaintext session never reaches the public internet.",
+              "isCorrect": false,
+              "explanation": "Telnet is unencrypted regardless of which interface it traverses and is the protocol being blocked by policy."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Networking",
+          "skills": [
+            "2.1: Compare and contrast Transmission Control Protocol (TCP) and User Datagram Protocol (UDP) ports, protocols, and their purposes."
+          ],
+          "services": [
+            "Networking",
+            "Ports & Protocols"
+          ],
+          "tip": "Consider which port number the standard encrypted command-line management protocol uses.",
+          "explanation": "Linux servers are managed remotely over an encrypted shell that listens on a well-known TCP port.\n\n**Why it works:** SSH operates on TCP 22 and provides an authenticated, encrypted interactive terminal session that has long since replaced Telnet.\n\n**Why the others don't work:**\n- Telnet on 23: plaintext and the protocol explicitly being phased out.\n- RDP on 3389: a graphical Windows remote desktop protocol, not a Linux shell.\n- HTTPS on 443: a web traffic port, not a remote shell port.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0117",
+          "type": "single-choice",
+          "question": "The operations team is rolling out a microservices application. They need each service to start in under a second, share the host Linux kernel, and be packaged with only its application binaries and dependencies, with no separate guest OS for each instance.\n\nWhich virtualization technology fits these requirements?",
+          "choices": [
+            {
+              "id": "c3",
+              "text": "A VDI pool where each microservice instance is assigned a virtual desktop.",
+              "isCorrect": false,
+              "explanation": "VDI is for delivering user desktops, not for hosting microservices."
+            },
+            {
+              "id": "c2",
+              "text": "Full virtual machines running on a Type 1 hypervisor, each with its own guest OS.",
+              "isCorrect": false,
+              "explanation": "Each VM carries a full guest OS, which is heavier and slower to start than the requirement allows."
+            },
+            {
+              "id": "c1",
+              "text": "Containers, which package the application and its dependencies and share the host kernel.",
+              "isCorrect": true,
+              "explanation": "Containers are designed for fast startup and minimal overhead by sharing the host kernel.",
+              "sequence": 1
+            },
+            {
+              "id": "c4",
+              "text": "Cross-platform virtualization that emulates a different CPU architecture for each service.",
+              "isCorrect": false,
+              "explanation": "Architecture emulation is slow and adds significant overhead, the opposite of the requirement."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Virtualization and Cloud Computing",
+          "skills": [
+            "4.1: Explain virtualization concepts."
+          ],
+          "services": [
+            "Virtualization"
+          ],
+          "tip": "Focus on the technology that omits a per-instance guest OS.",
+          "explanation": "Containers meet the lightweight, kernel-sharing requirement.\n\n**Why it works:** A container image only carries the application binaries and libraries, the container runtime uses kernel namespaces and cgroups to isolate processes while sharing one kernel, which gives sub-second start times.\n\n**Why the others don't work:**\n- Full VMs: each ships a guest OS, increasing image size and boot time.\n- VDI pool: targets end user desktops, not service workloads.\n- Cross-platform virtualization: emulates hardware, which adds overhead.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        },
+        {
+          "id": "220-1201-0145",
+          "type": "single-choice",
+          "question": "A user brings in a two-year-old smartphone and reports the back cover no longer sits flush against the chassis. On inspection the technician sees the back panel bulging outward in the middle of the device, and the phone runs noticeably warm even at idle.\n\nWhich action should the technician take next?",
+          "choices": [
+            {
+              "id": "c1",
+              "text": "Power the device down, isolate it from other electronics, and arrange safe battery replacement",
+              "isCorrect": true,
+              "explanation": "A swollen lithium-ion battery is a fire and chemical hazard; isolate and replace through proper handling.",
+              "sequence": 1
+            },
+            {
+              "id": "c2",
+              "text": "Apply firm pressure to reseat the back cover and continue using the device",
+              "isCorrect": false,
+              "explanation": "Compressing a swollen lithium-ion cell risks rupture and fire."
+            },
+            {
+              "id": "c3",
+              "text": "Perform a full factory reset to clear background processes causing heat",
+              "isCorrect": false,
+              "explanation": "A factory reset cannot reverse physical battery swelling."
+            },
+            {
+              "id": "c4",
+              "text": "Update the device firmware to improve battery management",
+              "isCorrect": false,
+              "explanation": "Firmware updates do not repair a physically damaged battery."
+            }
+          ],
+          "selectCount": 1,
+          "format": "text",
+          "domain": "Hardware and Network Troubleshooting",
+          "skills": [
+            "5.4: Given a scenario, troubleshoot common mobile device issues."
+          ],
+          "services": [
+            "Mobile Devices",
+            "Troubleshooting"
+          ],
+          "tip": "Physical deformation of a battery has safety priority over feature troubleshooting.",
+          "explanation": "A bulging back cover almost always indicates a swollen lithium-ion battery, which is a serious safety hazard. The device should be powered down, kept away from other equipment, and the battery professionally replaced.\n\n**Why it works:** Cell swelling indicates gas build-up inside; pressure or heat may cause venting or fire.\n\n**Why the others don't work:**\n- Pressing the cover back: risks rupture.\n- Factory reset: cannot fix hardware.\n- Firmware update: does not address physical damage.",
+          "difficulty": 1,
+          "lastReviewed": "2026-06-12"
+        }
+      ],
+      "abandonedAt": "2026-06-12T12:45:13.165Z"
     }
   ]
 }
