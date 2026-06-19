@@ -95,6 +95,19 @@ server.addHook('onRequest', async (req, reply) => {
   if (!secret) return
   if (req.url === '/health' || req.url.startsWith('/health?')) return
   if (req.headers['x-origin-verify'] !== secret) {
+    // Log enough to distinguish a CloudFront propagation gap (header absent on a
+    // POP that hasn't picked up the custom-header config) from a direct-to-ALB
+    // request (stale DNS / corporate proxy / scanner bypassing CloudFront).
+    req.log.warn({
+      msg: 'origin-verify rejected',
+      url: req.url,
+      method: req.method,
+      ip: req.ip,
+      headerPresent: req.headers['x-origin-verify'] !== undefined,
+      ua: req.headers['user-agent'],
+      via: req.headers['via'],
+      xff: req.headers['x-forwarded-for'],
+    })
     return reply.code(403).send({ error: 'Forbidden' })
   }
 })

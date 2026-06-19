@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronRight, Terminal, Briefcase, Link2, Check } from 'lucide-react'
 import { useExam } from './ExamContext'
-import { apiUrl } from '@/apiBase'
+import { apiUrl, fetchWithRetry } from '@/apiBase'
 import { ProviderLogo } from '@/components/ProviderLogo'
 import { useIsAdmin } from '@/auth/useIsAdmin'
 import type { AppRoute } from './types'
@@ -57,7 +57,7 @@ export function ExamPageContent() {
   useEffect(() => {
     if (!selected) return
     let cancelled = false
-    fetch(apiUrl(`/exams/${encodeURIComponent(selected)}/overview`))
+    fetchWithRetry(apiUrl(`/exams/${encodeURIComponent(selected)}/overview`))
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (!cancelled && d) setOverview(d) })
       .catch(() => {})

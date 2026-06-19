@@ -6,7 +6,7 @@ import { useIsAdmin } from '../auth/useIsAdmin'
 import { useGamification } from '../gamification/GamificationContext'
 import { levelFromXP } from '../gamification/types'
 import { BADGES } from '../gamification/badges'
-import { apiUrl } from '../apiBase'
+import { apiUrl, fetchWithRetry } from '../apiBase'
 import { isAnswerCorrect, computeDerivedAttempt } from './utils'
 import { downloadAttemptCSV as dlCSV, downloadAttemptPDF as dlPDF, downloadAnalyticsCSV as dlAnalyticsCSV } from './downloads'
 import type { Exam, Question, QuestionType, ExamMode, RevealMode, AppRoute } from './types'
@@ -1151,7 +1151,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch exams list
   useEffect(() => {
-    fetch(apiUrl('/exams'))
+    fetchWithRetry(apiUrl('/exams'))
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         const ct = r.headers.get('content-type') || ''
@@ -1168,7 +1168,7 @@ export function ExamProvider({ children }: { children: React.ReactNode }) {
   // Fetch available services when exam selected
   useEffect(() => {
     if (!selected) { setAvailableServices([]); setSelectedServices([]); return }
-    fetch(apiUrl(`/exams/${selected}/services`))
+    fetchWithRetry(apiUrl(`/exams/${selected}/services`))
       .then((r) => (r.ok ? r.json() : []))
       .then((svcs: string[]) => { setAvailableServices(Array.isArray(svcs) ? svcs : []); setSelectedServices([]) })
       .catch(() => setAvailableServices([]))

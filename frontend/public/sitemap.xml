@@ -2,25 +2,25 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://certshack.com/</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://certshack.com/exams</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://certshack.com/pricing</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -170,1297 +170,1297 @@
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-sequence-agentic-loop</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fix-agentic-loop-stop-reason</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fix-tool-result-id</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-diagnose-multi-agent-routing</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fix-agent-definition-task-tool</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fix-subagent-context-passing</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fill-claude-md-hierarchy</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fix-sequential-to-parallel-subagents</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fix-prompt-gate-to-programmatic-gate</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-diagnose-context-window-degradation</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fix-missing-assistant-turn</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fix-tool-schema-required</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-order-prompt-caching-prefix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-diagnose-cache-miss</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-diagnose-tool-never-called</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fill-pause-turn-loop</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-diagnose-cache-invalidation-dynamic</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fix-structured-output-constraints</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-diagnose-trust-escalation</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-fill-compaction-config</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-policy-fix-tool-input-schema</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/anthropic-policy-fix-subagent-model</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-cloudfront-403</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-s3-access-denied-cli</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-s3-iam-policy-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-ha-web-app-builder</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-lambda-timeout-logs</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-api-request-network-debug</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-incident-response-ordering</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-fix-alb-health-check</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-reduce-monthly-aws-cost</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-secure-s3-app</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-improve-api-latency</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-write-s3-readonly-policy</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-handle-traffic-spike</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-investigate-api-outage</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-detect-terraform-drift</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-migration-service-mapping</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-disaster-recovery-runbook</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-fix-terraform-s3</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-detect-iam-escalation</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-review-architecture-flaws</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-recover-from-az-failure</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-tune-rds-performance</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-build-serverless-pipeline</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-label-vpc-architecture</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-wire-up-ec2-access</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-msk-consumer-lag</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-glue-etl-pyspark-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-lake-formation-access-denied</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-athena-query-optimization</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-redshift-slow-query-diagnose</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-sagemaker-training-failure</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-sagemaker-model-drift</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-dynamodb-hot-partition</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-bedrock-rag-architecture</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-bedrock-agent-debug</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-kinesis-shard-throttle</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-kinesis-firehose-s3-delivery-failure</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-glue-job-failure-debug</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-s3-data-lake-architecture</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-redshift-distribution-style</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-emr-cluster-sizing</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-step-functions-ml-pipeline</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-sagemaker-pipeline-design</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-mlops-deployment-steps</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-textract-iam-policy</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-codepipeline-build-failure</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-ecs-task-start-failure</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-fix-cloudformation-template</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-fix-vpc-routing</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-ssm-patch-runbook</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-s3-lifecycle-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-cloudfront-invalidation-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-kms-key-rotation-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-asg-target-tracking-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-rds-promote-replica-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-s3-crr-setup-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-secrets-manager-rotation-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-vpc-peering-cross-account-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-multi-region-dr-failover-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-eks-crashloop-incident</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-eks-namespace-rbac-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/aws-eks-scale-deployment-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-model-selection-drag</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-workload-label</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-foundry-deploy-walk</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-speech-pipeline-label</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-pipeline-config</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-endpoint-deploy-cli</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-data-asset-path</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-component-code-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-batch-endpoint-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-rbac-policy-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-compute-cluster-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-monitor-log-analysis</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-responsible-dashboard</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-mlops-architecture-design</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aisec-content-filter-toggle</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aisec-defender-incident</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aisec-prompt-injection-detect</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aisec-managed-identity-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aisec-network-isolation-path</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aisec-purview-label-match</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aisec-key-rotation-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aisec-sentinel-analytic</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aisec-diag-settings-config</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aml-job-submit-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-openai-incident</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-keyvault-rbac-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-pipeline-log-analysis</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aks-oom-incident</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aks-deploy-service-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/azure-aks-get-logs-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-pre-engagement-ordering</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-report-sections-match</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-fix-scope-yaml</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-nmap-enumeration</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-dns-enumeration</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-shodan-osint</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-whois-banner-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-nessus-authenticated-scan</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-nikto-web-scan</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-hydra-ssh-brute</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-sqli-payload-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-metasploit-eternalblue</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-pass-the-hash-sequence</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-cloud-iam-hardening</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-xss-incident-response</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-mitre-attack-mapping</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-post-exploitation-ordering</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-lateral-movement-logs</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-powershell-persistence-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-smb-enum-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-gobuster-web-recon-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-wifi-wpa2-handshake-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-bloodhound-collection-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-responder-ntlmrelay-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-kerberoasting-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-hashcat-modes-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-john-password-audit-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-tshark-pcap-analysis-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-curl-webapp-probe-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-sqlmap-injection-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-sigma-rule-authoring-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-splunk-spl-triage-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-yara-malware-scan-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-osquery-endpoint-hunt-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-zeek-log-analysis-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-suricata-rule-tuning-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-winevent-threat-hunt-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-virustotal-ioc-enrichment-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-auditd-log-triage-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-volatility-memory-forensics-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-ir-containment-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-forensic-imaging-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-phishing-email-headers-log-analysis</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-ssh-brute-force-log-analysis</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-web-access-log-analysis</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-ransomware-response</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-phishing-credential-theft-response</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/comptia-cloud-account-compromise-response</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-model-landscape-label</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-foundation-model-match</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-prompt-techniques-match</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-agent-tools-label</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-responsible-ai-toggle</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-roi-scenario-order</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-ecosystem-match</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-bq-query-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-storage-class-match</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-dataflow-log-analysis</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-iam-policy-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-transfer-tool-match</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-bq-ml-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-looker-dashboard-config</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-composer-schedule-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-cmek-label</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-pubsub-pipeline-path</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-vertex-pipeline-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-feature-store-config</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-training-job-code-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-data-validation-log</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-serving-perf-optimize</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-mlops-architecture</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-vertex-deploy-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-pipeline-incident</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-gcs-setup-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-dataproc-log-analysis</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-gke-pending-pod-incident</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-gke-rolling-update-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/googlecloud-gke-exec-pod-cmd</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-apache-phased-pipeline</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-nfs-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-nginx-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-lvm-phased-pipeline</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-chrony-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-user-mgmt-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-ssh-keyauth-phased-pipeline</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-selinux-phased-pipeline</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-nmcli-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-journal-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-tar-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-firewalld-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-boot-ordering</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-text-tools-drag-match</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-dnf-fill-command</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-logrotate-code-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-sshd-config-toggle</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-selinux-security-hardening</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-sudoers-policy-fix</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-journal-log-analysis</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-disk-full-incident-response</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-autofs-terminal-replay</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-stratis-phased-pipeline</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://certshack.com/skill-labs/rhel-sysctl-command-terminal</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
