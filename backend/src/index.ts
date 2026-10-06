@@ -82,7 +82,10 @@ import feedbackRoutes from './routes/feedback.js'
 import examRequestsRoutes from './routes/examRequests.js'
 import eventsRoutes from './routes/events.js'
 
-const server = Fastify({ logger: true, trustProxy: true })
+// Two proxy hops: CloudFront then the ALB. Trusting only those makes req.ip the
+// real viewer, not a client-supplied X-Forwarded-For entry (which bypassed the
+// rate limiter — see the 2026-10-06 /exams load incident).
+const server = Fastify({ logger: true, trustProxy: 2 })
 
 if (process.env.SENTRY_DSN) {
   Sentry.setupFastifyErrorHandler(server)

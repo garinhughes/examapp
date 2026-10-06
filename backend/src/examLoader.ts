@@ -244,7 +244,28 @@ export async function loadExam(
  * each published exam from S3 (version-pinned).
  * Falls back to the local data/exams/ directory.
  */
+// loadAllExams() pulls and parses every full question bank, so /exams would
+// otherwise cost seconds of CPU per call. Cache the parsed list briefly and let
+// concurrent callers share one in-flight load. Callers must treat it as read-only.
+const ALL_EXAMS_TTL_MS = 60_000
+let allExamsCache: { exams: Exam[]; expires: number } | null = null
+let allExamsInFlight: Promise<Exam[]> | null = null
+
 export async function loadAllExams(): Promise<Exam[]> {
+  if (allExamsCache && allExamsCache.expires > Date.now()) return allExamsCache.exams
+  if (!allExamsInFlight) {
+    allExamsInFlight = fetchAllExams()
+      .then((exams) => {
+        // Don't pin an empty list from a failed load for the whole TTL.
+        if (exams.length > 0) allExamsCache = { exams, expires: Date.now() + ALL_EXAMS_TTL_MS }
+        return exams
+      })
+      .finally(() => { allExamsInFlight = null })
+  }
+  return allExamsInFlight
+}
+
+async function fetchAllExams(): Promise<Exam[]> {
   if (USE_S3) {
     try {
       const entries = await listExamIndex()
