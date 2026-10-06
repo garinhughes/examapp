@@ -135,6 +135,7 @@ module "cloudfront" {
   domain                         = var.domain
   acm_certificate_arn            = module.acm.cloudfront_certificate_arn
   web_acl_arn                    = module.waf.web_acl_arn
+  api_web_acl_arn                = module.waf.api_web_acl_arn
   s3_bucket_id                   = module.s3.bucket_name
   s3_bucket_arn                  = module.s3.bucket_arn
   s3_bucket_regional_domain_name = module.s3.bucket_regional_domain_name

@@ -13,6 +13,12 @@ variable "acm_certificate_arn" {
   type        = string
 }
 
+variable "api_web_acl_arn" {
+  description = "WAFv2 Web ACL ARN for the API distribution"
+  type        = string
+  default     = null
+}
+
 variable "web_acl_arn" {
   description = "Optional WAF Web ACL ARN to attach to the CloudFront distribution"
   type        = string
@@ -236,6 +242,8 @@ resource "aws_cloudfront_distribution" "api" {
   restrictions {
     geo_restriction { restriction_type = "none" }
   }
+
+  web_acl_id = var.api_web_acl_arn
 
   tags = { Project = var.project }
 }

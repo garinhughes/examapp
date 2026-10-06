@@ -107,3 +107,47 @@ resource "aws_wafv2_web_acl" "main" {
     sampled_requests_enabled   = false
   }
 }
+
+# ---------- API Web ACL (api.certshack.com) ----------
+# Separate from the frontend ACL: the managed CommonRuleSet blocks request
+# bodies over 8KB, which would break attempt submissions. This one only
+# rate-limits. WAF keys on the real viewer IP, so a spoofed X-Forwarded-For
+# (which Fastify's req.ip trusts) cannot dodge it.
+resource "aws_wafv2_web_acl" "api" {
+  provider = aws.useast1
+  name     = "${var.project}-api-waf"
+  scope    = "CLOUDFRONT"
+
+  default_action {
+    allow {}
+  }
+
+  # 1000 req/5min/IP (~3/s sustained) — well above a real user's SPA traffic.
+  rule {
+    name     = "api-rate-limit"
+    priority = 0
+
+    action {
+      block {}
+    }
+
+    statement {
+      rate_based_statement {
+        limit              = 1000
+        aggregate_key_type = "IP"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${var.project}-api-rate-limit"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "${var.project}-api-waf"
+    sampled_requests_enabled   = true
+  }
+}
